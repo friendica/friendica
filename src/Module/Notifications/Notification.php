@@ -144,11 +144,11 @@ class Notification extends BaseModule
 			$Notify->setSeen();
 			$this->notifyRepo->save($Notify);
 		} else {
-			if ($Notify->uriId) {
-				$this->notificationRepo->setAllSeenForUser($Notify->uid, ['target-uri-id' => $Notify->uriId]);
-			}
-
 			$this->notifyRepo->setAllSeenForRelatedNotify($Notify);
+		}
+
+		if ($Notify->uriId) {
+			$this->notificationRepo->setAllSeenForUser($Notify->uid, ['target-uri-id' => $Notify->uriId]);
 		}
 
 		if ((string)$Notify->link) {

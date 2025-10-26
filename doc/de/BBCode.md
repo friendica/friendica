@@ -455,37 +455,16 @@ Du kannst Videos, Musikdateien und weitere Dinge in Beitr&auml;gen einbinden.
 </tr>
 <tr>
   <td>[video]url[/video]</td>
-  <td>Wobei die *url* eine URL von youtube, vimeo, soundcloud oder einer anderen Plattform sein kann, die die opengraph Spezifikationen unterst&uuml;tzt.</td>
+  <td>Die komplette URL einer nativ unterstützten Video-Datei (z.B. MP4, Ogg oder WebM), diese wird dann mit einem HTML5-Player angezeigt.</td>
 </tr>
 <tr>
   <td>[video]URL der Videodatei[/video]
 [audio]URL der Musikdatei[/audio]</td>
-  <td>Die komplette URL einer ogg/ogv/oga/ogm/webm/mp4/mp3 Datei angeben, diese wird dann mit einem HTML5-Player angezeigt.</td>
-</tr>
-<tr>
-  <td>[youtube]Youtube URL[/youtube]</td>
-  <td>Youtube Video mittels OEmbed anzeigen. Kann u.U, den Player nicht einbetten.</td>
-</tr>
-<tr>
-  <td>[youtube]Youtube video ID[/youtube]</td>
-  <td>Youtube-Player im iframe einbinden.</td>
-</tr>
-<tr>
-  <td>[vimeo]Vimeo URL[/vimeo]</td>
-  <td>Vimeo Video mittels OEmbed anzeigen. Kann u.U, den Player nicht einbetten.</td>
-</tr>
-<tr>
-  <td>[vimeo]Vimeo video ID[/vimeo]</td>
-  <td>Vimeo-Player im iframe einbinden.</td>
+  <td>Die komplette URL einer nativ unterstützten Audio-Datei (z.B. MP3, AAC oder FLAC), diese wird dann mit einem HTML5-Player angezeigt.</td>
 </tr>
 <tr>
   <td>[embed]URL[/embed]</td>
-  <td>OEmbed rich content einbetten.</td>
-</tr>
-<tr>
-  <td>[url]*url*[/url]</td>
-  <td>Wenn *url* die OEmbed- oder Opengraph-Spezifikationen unterst&uuml;tzt, wird das Objekt eingebettet (z.B. Dokumente von scribd).
-  Ansonsten wird der Titel der Seite mit der URL verlinkt.</td>
+  <td>Bettet Video-Player, Podcast-Player und andere Medien direkt ein.</td>
 </tr>
 </table>
 

@@ -937,7 +937,7 @@ li.widget-list {
 }
 
 #sidebar-new-circle,
-#sidebar-edit-circles, 
+#sidebar-edit-circles,
 #sidebar-new-group {
 	padding: 7px;
 	width: 165px;
@@ -1818,8 +1818,6 @@ ul .sidebar-circle-li .icon {
   margin-left: 160px;
   max-height: 160px;
   overflow: hidden;
-}
-.type-link .oembed {
 }
 
 .shared_header a {
@@ -4228,7 +4226,6 @@ a.active {
 /* autocomplete popup */
 .acpopup, acpopup-mce {
 	overflow: auto;
-	z-index: 100000;
 	color: #2e3436;
 	border-top: 0px;
 	background: #eeeeee;

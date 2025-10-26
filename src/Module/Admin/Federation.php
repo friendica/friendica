@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Admin;
 
-use Friendica\App;
 use Friendica\Content\ContactSelector;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
@@ -37,6 +36,7 @@ class Federation extends BaseAdmin
 			'foundkey'     => ['name' => 'Foundkey', 'color' => '#609926'], // Some random color from the repository
 			'funkwhale'    => ['name' => 'Funkwhale', 'color' => '#4082B4'], // From the homepage
 			'gancio'       => ['name' => 'Gancio', 'color' => '#7253ed'], // Fontcolor from the page
+			'ghost'        => ['name' => 'Ghost', 'color' => '#d1ff10'], // A color from their website
 			'glitchsoc'    => ['name' => 'Mastodon Glitch Edition', 'color' => '#82dcb9'], // Color from their site
 			'gnusocial'    => ['name' => 'GNU Social/Statusnet', 'color' => '#a22430'], // dark red from the logo
 			'gotosocial'   => ['name' => 'GoToSocial', 'color' => '#df8958'], // Some color from their mascot
@@ -83,22 +83,27 @@ class Federation extends BaseAdmin
 		$halfyear = 0;
 		$posts    = 0;
 
-		$gservers = DBA::p("SELECT COUNT(*) AS `total`, SUM(`registered-users`) AS `users`,
+		$gservers = DBA::p(
+			"SELECT COUNT(*) AS `total`, SUM(`registered-users`) AS `users`,
 			SUM(IFNULL(`local-posts`, 0) + IFNULL(`local-comments`, 0)) AS `posts`,
 			SUM(IFNULL(`active-month-users`, `active-week-users`)) AS `month`,
 			SUM(IFNULL(`active-halfyear-users`, `active-week-users`)) AS `halfyear`, `platform`,
 			MIN(`network`) AS `network`, MAX(`version`) AS `version`
 			FROM `gserver` WHERE NOT `failed` AND `platform` != ? AND `detection-method` != ? AND NOT `network` IN (?, ?) GROUP BY `platform`",
-				'', GServer::DETECT_MANUAL, Protocol::PHANTOM, Protocol::FEED);
+			'',
+			GServer::DETECT_MANUAL,
+			Protocol::PHANTOM,
+			Protocol::FEED
+		);
 		while ($gserver = DBA::fetch($gservers)) {
-			$total    += $gserver['total'];
-			$users    += $gserver['users'];
-			$month    += $gserver['month'];
+			$total += $gserver['total'];
+			$users += $gserver['users'];
+			$month += $gserver['month'];
 			$halfyear += $gserver['halfyear'];
-			$posts    += $gserver['posts'];
+			$posts += $gserver['posts'];
 
 			$versionCounts = [];
-			$versions = DBA::p("SELECT COUNT(*) AS `total`, `version` FROM `gserver`
+			$versions      = DBA::p("SELECT COUNT(*) AS `total`, `version` FROM `gserver`
 				WHERE NOT `failed` AND `platform` = ? AND `detection-method` != ? AND NOT `network` IN (?, ?)
 				GROUP BY `version` ORDER BY `version`", $gserver['platform'], GServer::DETECT_MANUAL, Protocol::PHANTOM, Protocol::FEED);
 			while ($version = DBA::fetch($versions)) {
@@ -148,19 +153,19 @@ class Federation extends BaseAdmin
 
 			if ($platform != $gserver['platform']) {
 				if ($platform == 'other') {
-					$versionCounts = $counts[$platform][1] ?? [];
-					$versionCounts[] = ['version' => $gserver['platform'] ?: DI::l10n()->t('unknown'), 'total' => $gserver['total']];
+					$versionCounts      = $counts[$platform][1] ?? [];
+					$versionCounts[]    = ['version' => $gserver['platform'] ?: DI::l10n()->t('unknown'), 'total' => $gserver['total']];
 					$gserver['version'] = '';
 				} else {
 					$versionCounts = array_merge($versionCounts, $counts[$platform][1] ?? []);
 				}
 
-				$gserver['platform']  = $platform;
-				$gserver['total']    += $counts[$platform][0]['total'] ?? 0;
-				$gserver['users']    += $counts[$platform][0]['users'] ?? 0;
-				$gserver['month']    += $counts[$platform][0]['month'] ?? 0;
+				$gserver['platform'] = $platform;
+				$gserver['total'] += $counts[$platform][0]['total']       ?? 0;
+				$gserver['users'] += $counts[$platform][0]['users']       ?? 0;
+				$gserver['month'] += $counts[$platform][0]['month']       ?? 0;
 				$gserver['halfyear'] += $counts[$platform][0]['halfyear'] ?? 0;
-				$gserver['posts']    += $counts[$platform][0]['posts'] ?? 0;
+				$gserver['posts'] += $counts[$platform][0]['posts']       ?? 0;
 			}
 
 			if ($platform == 'friendica') {
@@ -183,10 +188,10 @@ class Federation extends BaseAdmin
 
 			$gserver['platform']    = $systems[$platform]['name'];
 			$gserver['svg']         = ContactSelector::networkToSVG($gserver['network'], null, $platform, DI::userSession()->getLocalUserId());
-			$gserver['totallbl']    = DI::l10n()->tt('%2$s total system'                   , '%2$s total systems'                     , $gserver['total'], number_format($gserver['total']));
-			$gserver['monthlbl']    = DI::l10n()->tt('%2$s active user last month'         , '%2$s active users last month'           , $gserver['month'] ?? 0, number_format($gserver['month'] ?? 0));
-			$gserver['halfyearlbl'] = DI::l10n()->tt('%2$s active user last six months'    , '%2$s active users last six months'      , $gserver['halfyear'] ?? 0, number_format($gserver['halfyear'] ?? 0));
-			$gserver['userslbl']    = DI::l10n()->tt('%2$s registered user'                , '%2$s registered users'                  , $gserver['users'], number_format($gserver['users']));
+			$gserver['totallbl']    = DI::l10n()->tt('%2$s total system', '%2$s total systems', $gserver['total'], number_format($gserver['total']));
+			$gserver['monthlbl']    = DI::l10n()->tt('%2$s active user last month', '%2$s active users last month', $gserver['month'] ?? 0, number_format($gserver['month'] ?? 0));
+			$gserver['halfyearlbl'] = DI::l10n()->tt('%2$s active user last six months', '%2$s active users last six months', $gserver['halfyear'] ?? 0, number_format($gserver['halfyear'] ?? 0));
+			$gserver['userslbl']    = DI::l10n()->tt('%2$s registered user', '%2$s registered users', $gserver['users'], number_format($gserver['users']));
 			$gserver['postslbl']    = DI::l10n()->tt('%2$s locally created post or comment', '%2$s locally created posts and comments', $gserver['posts'], number_format($gserver['posts']));
 
 			if (($gserver['users'] > 0) && ($gserver['posts'] > 0)) {
@@ -210,10 +215,10 @@ class Federation extends BaseAdmin
 		// load the template, replace the macros and return the page content
 		$t = Renderer::getMarkupTemplate('admin/federation.tpl');
 		return Renderer::replaceMacros($t, [
-			'$title' => DI::l10n()->t('Administration'),
-			'$page' => DI::l10n()->t('Federation Statistics'),
-			'$intro' => $intro,
-			'$counts' => $counts,
+			'$title'      => DI::l10n()->t('Administration'),
+			'$page'       => DI::l10n()->t('Federation Statistics'),
+			'$intro'      => $intro,
+			'$counts'     => $counts,
 			'$legendtext' => DI::l10n()->tt('Currently this node is aware of %2$s node (%3$s active users last month, %4$s active users last six months, %5$s registered users in total) from the following platforms:', 'Currently this node is aware of %2$s nodes (%3$s active users last month, %4$s active users last six months, %5$s registered users in total) from the following platforms:', $total, number_format($total), number_format($month), number_format($halfyear), number_format($users)),
 		]);
 	}
@@ -227,14 +232,14 @@ class Federation extends BaseAdmin
 	 */
 	private static function reformaFriendicaVersions(array $versionCounts)
 	{
-		$newV = [];
+		$newV  = [];
 		$newVv = [];
 		foreach ($versionCounts as $vv) {
-			$newVC = $vv['total'];
-			$newVV = $vv['version'];
-			$lastDot = strrpos($newVV, '.');
+			$newVC     = $vv['total'];
+			$newVV     = $vv['version'];
+			$lastDot   = strrpos($newVV, '.');
 			$firstDash = strpos($newVV, '-');
-			$len = strlen($newVV) - 1;
+			$len       = strlen($newVV) - 1;
 			if (($lastDot == $len - 4) && (!strrpos($newVV, '-rc') == $len - 3) && (!$firstDash == $len - 1)) {
 				$newVV = substr($newVV, 0, $lastDot);
 			}
@@ -262,11 +267,11 @@ class Federation extends BaseAdmin
 	 */
 	private static function reformaDiasporaVersions(array $versionCounts)
 	{
-		$newV = [];
+		$newV  = [];
 		$newVv = [];
 		foreach ($versionCounts as $vv) {
-			$newVC = $vv['total'];
-			$newVV = $vv['version'];
+			$newVC   = $vv['total'];
+			$newVV   = $vv['version'];
 			$posDash = strpos($newVV, '-');
 			if ($posDash) {
 				$newVV = substr($newVV, 0, $posDash);
@@ -296,7 +301,7 @@ class Federation extends BaseAdmin
 		$compacted = [];
 		foreach ($versionCounts as $key => $value) {
 			$version = $versionCounts[$key]['version'];
-			$parts = explode(' ', trim($version));
+			$parts   = explode(' ', trim($version));
 			do {
 				$part = array_pop($parts);
 			} while (!empty($parts) && ((strlen($part) >= 40) || (strlen($part) <= 3)));
@@ -334,7 +339,7 @@ class Federation extends BaseAdmin
 			$version = $versionCounts[$key]['version'];
 
 			foreach ([' ', '+', '-', '#', '_', '~'] as $delimiter) {
-				$parts = explode($delimiter, trim($version));
+				$parts   = explode($delimiter, trim($version));
 				$version = array_shift($parts);
 			}
 
@@ -365,7 +370,7 @@ class Federation extends BaseAdmin
 		foreach ($versionCounts as $key => $value) {
 			$version = $versionCounts[$key]['version'];
 
-			$parts = explode(' ', trim($version));
+			$parts   = explode(' ', trim($version));
 			$version = array_shift($parts);
 
 			if (empty($compacted[$version])) {
@@ -403,12 +408,12 @@ class Federation extends BaseAdmin
 		}
 
 		// Assure that the versions are sorted correctly
-		$v2 = [];
+		$v2       = [];
 		$versions = [];
 		foreach ($versionCounts as $vv) {
-			$version = trim(strip_tags($vv["version"]));
+			$version      = trim(strip_tags($vv["version"]));
 			$v2[$version] = $vv;
-			$versions[] = $version;
+			$versions[]   = $version;
 		}
 
 		usort($versions, 'version_compare');

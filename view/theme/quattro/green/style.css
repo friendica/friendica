@@ -761,7 +761,6 @@ ul.menu-popup .toolbar a:hover {
   color: #2d2d2d;
   border: 1px solid #364e59;
   overflow: auto;
-  z-index: 100000;
   -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.7);
   -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.7);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.7);
@@ -1442,16 +1441,6 @@ section {
 }
 .type-video blockquote {
   padding-left: 1em;
-}
-.oembed.video > a.embed_video {
-  display: block;
-  position: relative;
-}
-.oembed.video > a.embed_video > div {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  background: rgba(255, 255, 255, 0.36) url(../../../images/icons/48/play.png) no-repeat center center !important;
 }
 /* threaded comments */
 .children {

@@ -6,6 +6,13 @@
   *}}
 <div class="generic-page-wrapper">
 
+	{{* Display system messages *}}
+	{{if $notices}}
+		{{foreach $notices as $notice}}
+			<div class="alert alert-warning" role="alert">{{$notice}}</div>
+		{{/foreach}}
+	{{/if}}
+
 	<form action="register" method="post" id="register-form">
 
 		<input type="hidden" name="photo" value="{{$photo}}" />
@@ -37,7 +44,7 @@
 
 		<div id="register-name-wrapper" class="form-group">
 			<label for="register-name" id="label-register-name">{{$namelabel}}</label>
-			<input type="text" maxlength="60" size="32" name="username" id="register-name" class="form-control" value="{{$username}}" required>
+			<input type="text" maxlength="60" size="32" name="username" id="register-name" class="form-control" value="{{$username}}" required autofocus>
 		</div>
 		<div id="register-name-end"></div>
 

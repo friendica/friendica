@@ -172,6 +172,7 @@ class HTML
 			@$doc->loadHTML($message, LIBXML_HTML_NODEFDTD);
 
 			XML::deleteNode($doc, 'style');
+			XML::deleteNode($doc, 'script');
 			XML::deleteNode($doc, 'head');
 			XML::deleteNode($doc, 'title');
 			XML::deleteNode($doc, 'meta');
@@ -852,14 +853,14 @@ class HTML
 		if (strpos($s, '#') === 0) {
 			$mode = 'tag';
 		}
-		$save_label = $mode === 'text' ? DI::l10n()->t('Save') : DI::l10n()->t('Follow');
+		$action_text = DI::l10n()->t('Save search');
 
 		$values = [
 			'$s'            => $s,
 			'$q'            => urlencode($s),
 			'$id'           => $id,
 			'$search_label' => DI::l10n()->t('Search'),
-			'$save_label'   => $save_label,
+			'$action_text'  => $action_text,
 			'$search_hint'  => DI::l10n()->t('@name, !group, #tags, content'),
 			'$mode'         => $mode,
 			'$return_url'   => bin2hex(Search::getSearchPath($s)),

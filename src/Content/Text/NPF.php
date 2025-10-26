@@ -321,8 +321,8 @@ class NPF
 		list($npf, $text, $formatting) = self::routeChildren($element, $uri_id, false, $callstack, $npf, $text, $formatting);
 
 		$attributes = [];
-		foreach ($element->attributes as $key => $attribute) {
-			$attributes[$key] = trim($attribute->value);
+		foreach ($element->attributes as $attribute) {
+			$attributes[$attribute->name] = trim($attribute->value);
 		}
 		if (!empty($attributes['href'])) {
 			$formatting[] = [

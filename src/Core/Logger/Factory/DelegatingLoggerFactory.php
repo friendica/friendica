@@ -48,10 +48,10 @@ final class DelegatingLoggerFactory implements LoggerFactory
 		$factoryName = $this->config->get('system', 'logger_config') ?? '';
 
 		/**
-		 * @deprecated 2025.02 The value `monolog` for `system.logger_config` inside the `config/local.config.php` file is deprecated, please use `stream` or `syslog` instead.
+		 * @deprecated 2025.07 The value `monolog` for `system.logger_config` inside the `config/local.config.php` file is deprecated, please use `stream` or `syslog` instead.
 		 */
 		if ($factoryName === 'monolog') {
-			@trigger_error('The config `system.logger_config` with value `monolog` is deprecated since 2025.02 and will stop working in 5 months, please change the value to `stream` or `syslog` in the `config/local.config.php` file.', \E_USER_DEPRECATED);
+			@trigger_error('The config `system.logger_config` with value `monolog` is deprecated since 2025.07 and will stop working in 5 months, please change the value to `stream` or `syslog` in the `config/local.config.php` file.', \E_USER_DEPRECATED);
 
 			$factoryName = 'stream';
 		}

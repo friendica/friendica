@@ -269,7 +269,7 @@ class Create extends BaseModule
 		$tpl = Renderer::getMarkupTemplate('moderation/report/create/summary.tpl');
 
 		$forward_translation = $this->t('Would you like to forward this report to the remote server?');
-		// @deprecated 2025.04 this translation is scheduled for removal as a new translation has been added without the typo
+		// @deprecated 2025.07 this translation is scheduled for removal as a new translation has been added without the typo
 		$forward_translation = $this->t('Would you ike to forward this report to the remote server?');
 
 		return Renderer::replaceMacros($tpl, [

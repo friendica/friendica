@@ -9,10 +9,8 @@ namespace Friendica\Content\Text;
 
 use DOMDocument;
 use DOMXPath;
-use Exception;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Item;
-use Friendica\Content\OEmbed;
 use Friendica\Content\PageInfo;
 use Friendica\Content\Smilies;
 use Friendica\Core\Protocol;
@@ -408,13 +406,13 @@ class BBCode
 	 *
 	 * @param string  $text
 	 * @param integer $simplehtml
-	 * @param bool    $tryoembed
+	 * @param bool    $embed
 	 * @param array   $data
 	 * @param int     $uriid
 	 * @return string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, bool $tryoembed = true, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_LARGE): string
+	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_LARGE, bool $embed = false): string
 	{
 		DI::profiler()->startRecording('rendering');
 		$data = $data ?: self::getAttachmentData($text);
@@ -438,55 +436,63 @@ class BBCode
 		}
 
 		$return = '';
-		try {
-			if ($tryoembed && OEmbed::isAllowedURL($data['url'])) {
-				$return = OEmbed::getHTML($data['url'], $data['title'], $uriid);
+
+		$data['title'] = ($data['title'] ?? '') ?: $data['url'];
+
+		if ($simplehtml != self::CONNECTORS) {
+			$return = sprintf('<div class="type-%s">', $data['type']);
+		}
+
+		if ($embed && (($data['player_url'] != '' && $data['player_height'] != 0) || $data['embed_html'] != '')) {
+			$media = DI::postMediaFactory()->createFromAttachment($data, $uriid);
+			if ($data['player_url'] != '' && $data['player_height'] != 0) {
+				$return .= DI::postMediaRepository()->getPlayerIframe($media);
 			} else {
-				throw new Exception('OEmbed is disabled for this attachment.');
+				$return .= DI::postMediaRepository()->getEmbedIframe($media);
 			}
-		} catch (Exception $e) {
-			$data['title'] = ($data['title'] ?? '') ?: $data['url'];
+			$preview_mode = self::PREVIEW_NO_IMAGE;
+			unset($data['title']);
+			unset($data['url']);
+			unset($data['description']);
+			unset($data['provider_url']);
+			unset($data['provider_name']);
+		}
 
-			if ($simplehtml != self::CONNECTORS) {
-				$return = sprintf('<div class="type-%s">', $data['type']);
-			}
+		if ($preview_mode == self::PREVIEW_NO_IMAGE) {
+			unset($data['image']);
+			unset($data['preview']);
+		}
 
-			if ($preview_mode == self::PREVIEW_NO_IMAGE) {
-				unset($data['image']);
-				unset($data['preview']);
-			}
-
-			if (!empty($data['title']) && !empty($data['url'])) {
-				$preview_class = $preview_mode == self::PREVIEW_LARGE ? 'attachment-image' : 'attachment-preview';
-				if (!empty($data['image']) && empty($data['text']) && ($data['type'] == 'photo')) {
-					$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
-				} else {
-					if (!empty($data['image'])) {
-						$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a><br>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
-					} elseif (!empty($data['preview'])) {
-						$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $data['url'], self::proxyUrl($data['preview'], $simplehtml, $uriid), $data['title']);
-					}
-					$return .= sprintf('<h4><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></h4>', $data['url'], $data['title']);
+		if (!empty($data['title']) && !empty($data['url'])) {
+			$preview_class = $preview_mode == self::PREVIEW_LARGE ? 'attachment-image' : 'attachment-preview';
+			if (!empty($data['image']) && empty($data['text']) && ($data['type'] == 'photo')) {
+				$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
+			} else {
+				if (!empty($data['image'])) {
+					$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a><br>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
+				} elseif (!empty($data['preview'])) {
+					$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $data['url'], self::proxyUrl($data['preview'], $simplehtml, $uriid), $data['title']);
 				}
+				$return .= sprintf('<h4><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></h4>', $data['url'], $data['title']);
 			}
+		}
 
-			if (!empty($data['description']) && $data['description'] != $data['title']) {
-				// Sanitize the HTML
-				$return .= sprintf('<blockquote>%s</blockquote>', trim(HTML::purify($data['description'])));
-			}
+		if (!empty($data['description']) && $data['description'] != $data['title']) {
+			// Sanitize the HTML
+			$return .= sprintf('<blockquote>%s</blockquote>', trim(HTML::purify($data['description'])));
+		}
 
-			if (!empty($data['provider_url']) && !empty($data['provider_name'])) {
-				$data['provider_url'] = Network::sanitizeUrl($data['provider_url']);
-				if (!empty($data['author_name'])) {
-					$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s (%s)</a></sup>', $data['provider_url'], $data['author_name'], $data['provider_name']);
-				} else {
-					$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></sup>', $data['provider_url'], $data['provider_name']);
-				}
+		if (!empty($data['provider_url']) && !empty($data['provider_name'])) {
+			$data['provider_url'] = Network::sanitizeUrl($data['provider_url']);
+			if (!empty($data['author_name'])) {
+				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s (%s)</a></sup>', $data['provider_url'], $data['author_name'], $data['provider_name']);
+			} else {
+				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></sup>', $data['provider_url'], $data['provider_name']);
 			}
+		}
 
-			if ($simplehtml != self::CONNECTORS) {
-				$return .= '</div>';
-			}
+		if ($simplehtml != self::CONNECTORS) {
+			$return .= '</div>';
 		}
 
 		DI::profiler()->stopRecording();
@@ -1210,19 +1216,21 @@ class BBCode
 	 */
 	private static function normalizeVideoLinks(string $text): string
 	{
-		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/embed\/(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/shorts\/(.*?)\[\/youtube\]/ism", '[youtube]$2[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/youtu\.be\/(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[youtube\]https?:\/\/m\.youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[youtube]$1[/youtube]', $text);
-		$text = preg_replace("/\[vimeo\]https?:\/\/player\.vimeo\.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
-		$text = preg_replace("/\[vimeo\]https?:\/\/vimeo\.com\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[vimeo]$1[/vimeo]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$2[/embed]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/embed\/(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$2[/embed]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/(www\.)?youtube\.com\/shorts\/(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$2[/embed]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/youtu\.be\/(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$1[/embed]', $text);
+		$text = preg_replace("/\[youtube\]https?:\/\/m\.youtube\.com\/watch\?v\=(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$1[/embed]', $text);
+		$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '[embed]https://www.youtube.com/watch?v=$1[/embed]', $text);
+		$text = preg_replace("/\[vimeo\]https?:\/\/player\.vimeo\.com\/video\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[embed]https://vimeo.com/$1[/embed]', $text);
+		$text = preg_replace("/\[vimeo\]https?:\/\/vimeo\.com\/([0-9]+)(.*?)\[\/vimeo\]/ism", '[embed]https://vimeo.com/$1[/embed]', $text);
+		$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '[embed]https://vimeo.com/$1[/embed]', $text);
 
 		return $text;
 	}
 
 	/**
-	 * Expand Youtube and Vimeo links to
+	 * Expand embedded media links (e.g. Youtube or Vimeo links) to a [url] BBCode tag
 	 *
 	 * @param string $text
 	 * @return string
@@ -1230,8 +1238,7 @@ class BBCode
 	public static function expandVideoLinks(string $text): string
 	{
 		$text = self::normalizeVideoLinks($text);
-		$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '[url=https://www.youtube.com/watch?v=$1]https://www.youtube.com/watch?v=$1[/url]', $text);
-		$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '[url=https://vimeo.com/$1]https://vimeo.com/$1[/url]', $text);
+		$text = preg_replace("/\[embed\](.*?)\[\/embed\]/ism", '[url=$1]$1[/url]', $text);
 
 		return $text;
 	}
@@ -1262,9 +1269,7 @@ class BBCode
 	 */
 	public static function convertForUriId(int $uriid = null, string $text = null, int $simple_html = self::INTERNAL): string
 	{
-		$try_oembed = ($simple_html == self::INTERNAL);
-
-		return self::convert($text ?? '', $try_oembed, $simple_html, false, $uriid ?? 0);
+		return self::convert($text ?? '', false, $simple_html, false, $uriid ?? 0);
 	}
 
 	/**
@@ -1286,14 +1291,14 @@ class BBCode
 	 * - 9: ActivityPub
 	 *
 	 * @param string $text
-	 * @param bool   $try_oembed
+	 * @param bool   $embed
 	 * @param int    $simple_html
 	 * @param bool   $for_plaintext
 	 * @param int    $uriid
 	 * @return string Converted code or empty string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function convert(string $text = null, bool $try_oembed = true, int $simple_html = self::INTERNAL, bool $for_plaintext = false, int $uriid = 0): string
+	public static function convert(string $text = null, bool $embed = true, int $simple_html = self::INTERNAL, bool $for_plaintext = false, int $uriid = 0): string
 	{
 		// Accounting for null default column values
 		if (is_null($text) || $text === '') {
@@ -1314,28 +1319,8 @@ class BBCode
 
 		$ev = Event::fromBBCode($text);
 
-		$text = self::performWithEscapedTags($text, ['code'], function ($text) use ($try_oembed, $simple_html, $for_plaintext, $uriid, $ev) {
-			$text = self::performWithEscapedTags($text, ['noparse', 'nobb', 'pre'], function ($text) use ($try_oembed, $simple_html, $for_plaintext, $uriid, $ev) {
-				/*
-				 * preg_match_callback function to replace potential Oembed tags with Oembed content
-				 *
-				 * $match[0] = [tag]$url[/tag] or [tag=$url]$title[/tag]
-				 * $match[1] = $url
-				 * $match[2] = $title or absent
-				 */
-				$try_oembed_callback = function (array $match) use ($uriid) {
-					$url   = $match[1];
-					$title = $match[2] ?? '';
-
-					try {
-						$return = OEmbed::getHTML($url, $title, $uriid);
-					} catch (Exception $ex) {
-						$return = $match[0];
-					}
-
-					return $return;
-				};
-
+		$text = self::performWithEscapedTags($text, ['code'], function ($text) use ($simple_html, $for_plaintext, $uriid, $ev) {
+			$text = self::performWithEscapedTags($text, ['noparse', 'nobb', 'pre'], function ($text) use ($simple_html, $for_plaintext, $uriid, $ev) {
 				// Extract the private images which use data urls since preg has issues with
 				// large data sizes. Stash them away while we do bbcode conversion, and then put them back
 				// in after we've done all the regex matching. We cannot use any preg functions to do this.
@@ -1356,7 +1341,7 @@ class BBCode
 				// We add URL without a surrounding URL at this time, since at a earlier stage it would had been too early,
 				// since the used regular expression won't touch URL inside of BBCode elements, but with the structural ones it should.
 				// At a later stage we won't be able to exclude certain parts of the code.
-				$text = self::performWithEscapedTags($text, ['url', 'img', 'audio', 'video', 'youtube', 'vimeo', 'share', 'attachment', 'iframe', 'bookmark', 'map', 'oembed'], function ($text) use ($simple_html, $for_plaintext) {
+				$text = self::performWithEscapedTags($text, ['url', 'img', 'audio', 'video', 'youtube', 'vimeo', 'share', 'attachment', 'iframe', 'bookmark', 'map', 'embed'], function ($text) use ($simple_html, $for_plaintext) {
 					if (!$for_plaintext) {
 						$text = preg_replace(Strings::autoLinkRegEx(), '[url]$1[/url]', $text) ?? '';
 					}
@@ -1364,11 +1349,9 @@ class BBCode
 				});
 
 				// Now for some more complex BBCode elements (mostly non standard ones)
-				$text = self::convertAttachmentsToHtml($text, $simple_html, $try_oembed, $uriid);
+				$text = self::convertAttachmentsToHtml($text, $simple_html, $uriid);
 				$text = self::convertMapsToHtml($text, $simple_html);
 				$text = self::convertQuotesToHtml($text);
-				$text = self::convertVideoPlatformsToHtml($text, $try_oembed);
-				$text = self::convertOEmbedToHtml($text, $uriid);
 				$text = self::convertEventsToHtml($text, $simple_html, $uriid, $ev);
 
 				// Some simpler non standard elements
@@ -1376,12 +1359,13 @@ class BBCode
 				$text = self::convertCryptToHtml($text);
 				$text = self::convertIFramesToHtml($text);
 				$text = self::convertMailToHtml($text);
-				$text = self::convertAudioVideoToHtml($text, $simple_html, $try_oembed, $try_oembed_callback);
+				$text = self::convertAudioVideoToHtml($text, $simple_html);
+				$text = self::convertEmbedToHtml($text, $simple_html);
 
 				// At last, some standard elements. URL has to go last,
 				// since some previous conversions use URL elements.
 				$text = self::convertImagesToHtml($text, $simple_html, $uriid);
-				$text = self::convertUrlToHtml($text, $simple_html, $for_plaintext, $try_oembed, $try_oembed_callback);
+				$text = self::convertUrlToHtml($text, $simple_html, $for_plaintext);
 
 				// If the post only consists of an emoji, we display it larger than normal.
 				if (!$for_plaintext && DI::config()->get('system', 'big_emojis') && ($simple_html != self::DIASPORA) && Smilies::isEmojiPost($text)) {
@@ -1392,7 +1376,7 @@ class BBCode
 				$text = self::cleanupHtml($text);
 
 				// This needs to be called after the cleanup, since otherwise some links are invalidated
-				$text = self::convertSharesToHtml($text, $simple_html, $try_oembed, $uriid);
+				$text = self::convertSharesToHtml($text, $simple_html, $uriid);
 
 				// Insert the previously extracted embedded image again.
 				return self::interpolateSavedImagesIntoItemBody($uriid, $text, $saved_image);
@@ -1425,21 +1409,11 @@ class BBCode
 			$text
 		);
 
-		// Default iframe allowed domains/path
-		$allowedIframeDomains = DI::config()->get('system', 'no_oembed_rich_content') ? [] : ['www.youtube.com/embed/', 'player.vimeo.com/video/'];
-
-		$allowedIframeDomains = array_merge(
-			$allowedIframeDomains,
-			DI::config()->get('system', 'allowed_oembed') ?
-				explode(',', DI::config()->get('system', 'allowed_oembed'))
-				: []
-		);
-
 		if (strpos($text, '<p>') !== false || strpos($text, '</p>') !== false) {
 			$text = '<p>' . $text . '</p>';
 		}
 
-		$text = HTML::purify($text, $allowedIframeDomains);
+		$text = HTML::purify($text);
 		DI::profiler()->stopRecording();
 
 		return trim($text);
@@ -1543,7 +1517,7 @@ class BBCode
 		return $text;
 	}
 
-	private static function convertAttachmentsToHtml(string $text, int $simple_html, bool $try_oembed, int $uriid): string
+	private static function convertAttachmentsToHtml(string $text, int $simple_html, int $uriid): string
 	{
 		/// @todo Have a closer look at the different html modes
 		// Handle attached links or videos
@@ -1554,7 +1528,7 @@ class BBCode
 		} elseif (!in_array($simple_html, [self::INTERNAL, self::EXTERNAL, self::CONNECTORS])) {
 			$text = self::replaceAttachment($text, true);
 		} else {
-			$text = self::convertAttachment($text, $simple_html, $try_oembed, [], $uriid);
+			$text = self::convertAttachment($text, $simple_html, [], $uriid);
 		}
 
 		return $text;
@@ -1837,7 +1811,7 @@ class BBCode
 		);
 
 		$text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '<img src="$3" style="width: $1px;" alt="" class="empty-description">', $text);
-		$text = preg_replace("/\[zmg\=([0-9]*)x([0-9]*)\](.*?)\[\/zmg\]/ism", '<img class="zrl" src="$3" style="width: $1px;" alt="" class="empty-description">', $text);
+		$text = preg_replace("/\[zmg\=([0-9]*)x([0-9]*)\](.*?)\[\/zmg\]/ism", '<img class="empty-description zrl" src="$3" style="width: $1px;" alt="">', $text);
 
 		$text = preg_replace_callback(
 			"/\[[iz]mg\=(.*?)\](.*?)\[\/[iz]mg\]/ism",
@@ -1884,7 +1858,7 @@ class BBCode
 		return $text;
 	}
 
-	private static function convertAudioVideoToHtml(string $text, int $simple_html, bool $try_oembed, \Closure $try_oembed_callback): string
+	private static function convertAudioVideoToHtml(string $text, int $simple_html): string
 	{
 		// Simplify "video" element
 		$text = preg_replace('(\[video[^\]]*?\ssrc\s?=\s?([^\s\]]+)[^\]]*?\].*?\[/video\])ism', '[video]$1[/video]', $text);
@@ -1903,22 +1877,9 @@ class BBCode
 				'</p><audio src="$1" controls>$1">$1</audio><p>',
 				$text
 			);
-		} elseif ($try_oembed) {
-			// html5 video and audio
-			$text = preg_replace(
-				"/\[video\](.*?\.(ogg|ogv|oga|ogm|webm|mp4).*?)\[\/video\]/ism",
-				'<video src="$1" controls width="100%" height="auto"><a href="$1">$1</a></video>',
-				$text
-			);
-
-			$text = preg_replace_callback("/\[video\](.*?)\[\/video\]/ism", $try_oembed_callback, $text);
-			$text = preg_replace_callback("/\[audio\](.*?)\[\/audio\]/ism", $try_oembed_callback, $text);
-
-			$text = preg_replace("/\[video\](.*?)\[\/video\]/ism", '[url]$1[/url]', $text);
-			$text = preg_replace("/\[audio\](.*?)\[\/audio\]/ism", '<audio src="$1" controls><a href="$1">$1</a></audio>', $text);
 		} else {
-			$text = preg_replace("/\[video\](.*?)\[\/video\]/ism", '[url]$1[/url]', $text);
-			$text = preg_replace("/\[audio\](.*?)\[\/audio\]/ism", '[url]$1[/url]', $text);
+			$text = preg_replace("/\[video\](.*?)\[\/video\]/ism", '[embed]$1[/embed]', $text);
+			$text = preg_replace("/\[audio\](.*?)\[\/audio\]/ism", '[embed]$1[/embed]', $text);
 		}
 		return $text;
 	}
@@ -1932,40 +1893,28 @@ class BBCode
 		return $text;
 	}
 
-	private static function convertVideoPlatformsToHtml(string $text, bool $try_oembed): string
+	private static function convertEmbedToHtml(string $text, int $simple_html): string
 	{
-		$appHelper = DI::appHelper();
-
 		$text = self::normalizeVideoLinks($text);
 
-		// Youtube extensions
-		if ($try_oembed && OEmbed::isAllowedURL('https://www.youtube.com/embed/')) {
-			$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '<iframe width="' . $appHelper->getThemeInfoValue('videowidth') . '" height="' . $appHelper->getThemeInfoValue('videoheight') . '" src="https://www.youtube.com/embed/$1" frameborder="0" ></iframe>', $text);
+		if ($simple_html == self::INTERNAL) {
+			$max_length = DI::config()->get('system', 'display_link_length');
 		} else {
-			$text = preg_replace("/\[youtube\]([A-Za-z0-9\-_=]+)(.*?)\[\/youtube\]/ism", '[url]https://www.youtube.com/watch?v=$1[/url]', $text);
+			$max_length = 30;
 		}
 
-		// Vimeo extensions
-		if ($try_oembed && OEmbed::isAllowedURL('https://player.vimeo.com/video')) {
-			$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '<iframe width="' . $appHelper->getThemeInfoValue('videowidth') . '" height="' . $appHelper->getThemeInfoValue('videoheight') . '" src="https://player.vimeo.com/video/$1" frameborder="0" ></iframe>', $text);
-		} else {
-			$text = preg_replace("/\[vimeo\]([0-9]+)(.*?)\[\/vimeo\]/ism", '[url]https://vimeo.com/$1[/url]', $text);
-		}
-		return $text;
-	}
-
-	private static function convertOEmbedToHtml(string $text, int $uriid): string
-	{
-		// oembed tag
-		$text = OEmbed::BBCode2HTML($text, $uriid);
-
-		// Avoid triple linefeeds through oembed
-		$text = str_replace("<br style='clear:left'></span><br><br>", "<br style='clear:left'></span><br>", $text);
+		$text = preg_replace_callback(
+			"/\[embed\](.*?)\[\/embed\]/ism",
+			function ($match) use ($max_length) {
+				return '<a class="embed" href="' . self::escapeUrl(Network::sanitizeUrl($match[1])) . '">' . Strings::getStyledURL(Network::sanitizeUrl($match[1]), $max_length) . "</a>";
+			},
+			$text
+		);
 
 		return $text;
 	}
 
-	private static function convertUrlToHtml(string $text, int $simple_html, bool $for_plaintext, bool $try_oembed, \Closure $try_oembed_callback): string
+	private static function convertUrlToHtml(string $text, int $simple_html, bool $for_plaintext): string
 	{
 		$text = preg_replace_callback("/\[(url)\](.*?)\[\/url\]/ism", [self::class, 'sanitizeLinksCallback'], $text);
 		$text = preg_replace_callback("/\[(url)\=(.*?)\](.*?)\[\/url\]/ism", [self::class, 'sanitizeLinksCallback'], $text);
@@ -2041,11 +1990,6 @@ class BBCode
 			$text = preg_replace_callback("/([^#@!])\[url\=([^\]]*)\](.*?)\[\/url\]/ism", [self::class, 'expandLinksCallback'], $text);
 			//$text = preg_replace("/[^#@!]\[url\=([^\]]*)\](.*?)\[\/url\]/ism", ' $2 [url]$1[/url]', $text);
 			$text = preg_replace("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", ' $2 [url]$1[/url]', $text);
-		}
-
-		// Perform URL Search
-		if ($try_oembed) {
-			$text = preg_replace_callback("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", $try_oembed_callback, $text);
 		}
 
 		$text = preg_replace("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", '[url=$1]$2[/url]', $text);
@@ -2186,11 +2130,11 @@ class BBCode
 		return $text;
 	}
 
-	private static function convertSharesToHtml(string $text, int $simple_html, bool $try_oembed, int $uriid): string
+	private static function convertSharesToHtml(string $text, int $simple_html, int $uriid): string
 	{
 		// Shared content
 		// when the content is meant exporting to other systems then remove the avatar picture since this doesn't really look good on these systems
-		if (!$try_oembed) {
+		if ($simple_html != self::INTERNAL) {
 			$text = preg_replace("/\[share(.*?)avatar\s?=\s?'.*?'\s?(.*?)\]\s?(.*?)\s?\[\/share\]\s?/ism", "\n[share$1$2]$3[/share]", $text);
 		}
 
@@ -2356,7 +2300,6 @@ class BBCode
 		// Converting images with size parameters to simple images. Markdown doesn't know it.
 		$text = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $text);
 
-		// Convert it to HTML - don't try oembed
 		if ($for_diaspora) {
 			$text = self::convertForUriId(0, $text, self::DIASPORA);
 
@@ -2464,7 +2407,7 @@ class BBCode
 			// Otherwise pull out single word tags. These can be @nickname, @first_last
 			// and #hash tags.
 
-			if (preg_match_all('/([!#@][^\^ \x0D\x0A,;:?\']*[^\^ \x0D\x0A,;:?!\'.])/', $string, $matches)) {
+			if (preg_match_all('/(?<=^|\s)([!#@][^\^ \x0D\x0A,;:?\']*[^\^ \x0D\x0A,;:?!\'.])/', $string, $matches)) {
 				foreach ($matches[1] as $match) {
 					if (strstr($match, ']')) {
 						// we might be inside a bbcode color tag - leave it alone

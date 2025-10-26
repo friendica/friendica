@@ -84,7 +84,7 @@ class StrategiesFileManager
 		}
 
 		/**
-		 * @deprecated 2025.02 Providing strategies via addons is deprecated and will be removed in 5 months.
+		 * @deprecated 2025.07 Providing strategies via addons is deprecated and will be removed in 5 months.
 		 */
 		$this->config = array_merge_recursive($config, $this->getActiveAddonConfig());
 	}
@@ -113,14 +113,14 @@ class StrategiesFileManager
 			foreach ($config as $classname => $rule) {
 				if ($classname === LoggerInterface::class) {
 					@trigger_error(sprintf(
-						'Providing a strategy for `%s` is deprecated since 2025.02 and will stop working in 5 months, please provide an implementation for `%s` via `dependency.config.php` and remove the `strategies.config.php` file in the `%s` addon.',
+						'Providing a strategy for `%s` is deprecated since 2025.07 and will stop working in 5 months, please provide an implementation for `%s` via `dependency.config.php` and remove the `strategies.config.php` file in the `%s` addon.',
 						$classname,
 						LoggerFactory::class,
 						$addonName,
 					), \E_USER_DEPRECATED);
 				} else {
 					@trigger_error(sprintf(
-						'Providing strategies for `%s` via addons is deprecated since 2025.02 and will stop working in 5 months, please stop using this and remove the `strategies.config.php` file in the `%s` addon.',
+						'Providing strategies for `%s` via addons is deprecated since 2025.07 and will stop working in 5 months, please stop using this and remove the `strategies.config.php` file in the `%s` addon.',
 						$classname,
 						$addonName,
 					), \E_USER_DEPRECATED);

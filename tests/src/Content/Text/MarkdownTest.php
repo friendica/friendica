@@ -53,48 +53,6 @@ class MarkdownTest extends FixtureTestCase
 				'expectedBBCode' => 'with the <sup> and </sup> tag',
 				'markdown'       => 'with the &lt;sup&gt; and &lt;/sup&gt; tag',
 			],
-			/** @see https://github.com/friendica/friendica/pull/14940 */
-			'task-14940-youtube-watch-with-www' => [
-				'expectedBBCode' => '[youtube]hfwbmTzBFT0[/youtube]',
-				'markdown'       => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
-			],
-			'task-14940-youtube-watch-without-www' => [
-				'expectedBBCode' => '[youtube]hfwbmTzBFT0[/youtube]',
-				'markdown'       => '[url=https://youtube.com/watch?v=hfwbmTzBFT0]https://youtube.com/watch?v=hfwbmTzBFT0[/url]',
-			],
-			'task-14940-youtube-shorts-with-www' => [
-				'expectedBBCode' => '[youtube]hfwbmTzBFT0[/youtube]',
-				'markdown'       => '[url=https://www.youtube.com/shorts/hfwbmTzBFT0]https://www.youtube.com/shorts/hfwbmTzBFT0[/url]',
-			],
-			'task-14940-youtube-shorts-without-www' => [
-				'expectedBBCode' => '[youtube]hfwbmTzBFT0[/youtube]',
-				'markdown'       => '[url=https://youtube.com/shorts/hfwbmTzBFT0]https://youtube.com/shorts/hfwbmTzBFT0[/url]',
-			],
-			'task-14940-youtube-embed-with-www' => [
-				'expectedBBCode' => '[youtube]hfwbmTzBFT0[/youtube]',
-				'markdown'       => '[url=https://www.youtube.com/embed/hfwbmTzBFT0]https://www.youtube.com/embed/hfwbmTzBFT0[/url]',
-			],
-			'task-14940-youtube-embed-without-www' => [
-				'expectedBBCode' => '[youtube]hfwbmTzBFT0[/youtube]',
-				'markdown'       => '[url=https://youtube.com/embed/hfwbmTzBFT0]https://youtube.com/embed/hfwbmTzBFT0[/url]',
-			],
-			'task-14940-youtube-mobile' => [
-				'expectedBBCode' => '[youtube]hfwbmTzBFT0[/youtube]',
-				'markdown'       => '[url=https://m.youtube.com/watch?v=hfwbmTzBFT0]https://m.youtube.com/watch?v=hfwbmTzBFT0[/url]',
-			],
-			// @todo - should we really ignore the URL content in favor of parsing the link of the body?
-			'task-14940-vimeo-custom-url' => [
-				'expectedBBCode' => '[vimeo]2345345[/vimeo]',
-				'markdown'       => '[url=https://no.thing]https://vimeo.com/2345345[/url]',
-			],
-			'task-14940-vimeo-custom-text' => [
-				'expectedBBCode' => '[vimeo]2345345[/vimeo]',
-				'markdown'       => '[url=https://vimeo.com/2345345]CustomText[/url]',
-			],
-			'task-14940-player-vimeo' => [
-				'expectedBBCode' => '[vimeo]2345345[/vimeo]',
-				'markdown'       => '[url=https://player.vimeo.com/video/2345345]https://player.vimeo.com/video/2345345[/url]',
-			],
 		];
 	}
 

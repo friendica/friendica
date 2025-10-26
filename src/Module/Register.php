@@ -131,6 +131,9 @@ class Register extends BaseModule
 
 		$ask_password = !DBA::count('contact');
 
+		// Retrieve system messages to display on the registration page
+		$notices = DI::sysmsg()->flushNotices();
+
 		$tpl = Renderer::getMarkupTemplate('register.tpl');
 
 		$hook_data = [
@@ -144,13 +147,14 @@ class Register extends BaseModule
 		$tpl = $hook_data['template'] ?? $tpl;
 
 		$o = Renderer::replaceMacros($tpl, [
+			'$notices'               => $notices,
 			'$invitations'           => DI::config()->get('system', 'invitation_only'),
 			'$permonly'              => self::getPolicy() === self::APPROVE,
 			'$permonlybox'           => ['permonlybox', DI::l10n()->t('Note for the admin'), '', DI::l10n()->t('Leave a message for the admin, why you want to join this node'), DI::l10n()->t('Required')],
 			'$invite_desc'           => DI::l10n()->t('Membership on this site is by invitation only.'),
 			'$invite_label'          => DI::l10n()->t('Your invitation code: '),
 			'$invite_id'             => $invite_id,
-			'$regtitle'              => DI::l10n()->t('Registration'),
+			'$regtitle'              => DI::l10n()->t('Create an account'),
 			'$registertext'          => BBCode::convertForUriId(User::getSystemUriId(), DI::config()->get('config', 'register_text', '')),
 			'$fillwith'              => $fillwith,
 			'$fillext'               => $fillext,

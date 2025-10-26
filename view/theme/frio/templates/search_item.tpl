@@ -227,12 +227,12 @@
 
 						{{if $item.language}}
 						<li role="menuitem">
-							<a id="language-{{$item.id}}" href="javascript:displayLanguage({{$item.uriid}});" class="btn-link filer-item language-icon" title="{{$item.language}}"><i class="fa fa-language" aria-hidden="true"></i>&nbsp;{{$item.language}}</a>
+							<a id="language-{{$item.id}}" href="javascript:displayLanguage({{$item.uriid}});" class="btn-link filer-item" title="{{$item.language}}"><i class="fa fa-language" aria-hidden="true"></i>&nbsp;{{$item.language}}</a>
 						</li>
 						{{/if}}
 
 						<li role="menuitem">
-							<a id="searchtext-{{$item.id}}" href="javascript:displaySearchText({{$item.uriid}});" class="btn-link filer-item search-icon" title="{{$item.searchtext}}"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;{{$item.searchtext}}</a>
+							<a id="searchtext-{{$item.id}}" href="javascript:displaySearchText({{$item.uriid}});" class="btn-link filer-item" title="{{$item.searchtext}}"><i class="fa fa-file-text" aria-hidden="true"></i>&nbsp;{{$item.searchtext}}</a>
 						</li>
 
 						{{if $item.browsershare}}

@@ -197,7 +197,7 @@ class Profile
 	 * @throws HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function load(AppHelper $appHelper, string $nickname, bool $show_contacts = true): array
+	public static function load(AppHelper $appHelper, string $nickname, bool $show_contacts = true, int $view_as_contact_id = 0): array
 	{
 		$profile = User::getOwnerDataByNick($nickname);
 		if (!isset($profile['account_removed']) || $profile['account_removed']) {
@@ -213,7 +213,7 @@ class Profile
 
 		$appHelper->setProfileOwner($profile['uid']);
 
-		DI::page()['title'] = $profile['name'] . ' @ ' . DI::config()->get('config', 'sitename');
+		DI::page()['title'] = $profile['name'];
 
 		if (!DI::userSession()->getLocalUserId()) {
 			$appHelper->setCurrentTheme($profile['theme']);
@@ -238,7 +238,7 @@ class Profile
 		 * By now, the contact block isn't shown, when a different profile is given
 		 * But: When this profile was on the same server, then we could display the contacts
 		 */
-		DI::page()['aside'] .= self::getVCardHtml($profile, $block, $show_contacts);
+		DI::page()['aside'] .= self::getVCardHtml($profile, $block, $show_contacts, $view_as_contact_id);
 
 		return $profile;
 	}
@@ -259,7 +259,7 @@ class Profile
 	 * @throws \ImagickException
 	 * @note  Returns empty string if passed $profile is wrong type or not populated
 	 */
-	public static function getVCardHtml(array $profile, bool $block, bool $show_contacts): string
+	public static function getVCardHtml(array $profile, bool $block, bool $show_contacts, int $view_as_contact_id = 0): string
 	{
 		$o        = '';
 		$location = false;
@@ -336,17 +336,12 @@ class Profile
 				}
 			}
 		}
-
-		// show edit profile to yourself, but only if this is not meant to be
-		// rendered as a "contact". i.e., if 'self' (a "contact" table column) isn't
-		// set in $profile.
-		if (!isset($profile['self']) && $local_user_is_self) {
-			$profile['edit'] = [DI::baseUrl() . '/settings/profile', DI::l10n()->t('Edit profile'), '', DI::l10n()->t('Edit profile')];
-			$profile['menu'] = [
-				'chg_photo' => DI::l10n()->t('Change profile photo'),
-				'cr_new'    => null,
-				'entries'   => [],
-			];
+		if ($local_user_is_self && $view_as_contact_id == 0) {
+			$picture_dest_url            = DI::baseUrl() . '/settings/profile?profilepicture';
+			$change_profile_picture_text = DI::l10n()->t('Change profile picture');
+		} else {
+			$picture_dest_url            = $profile['url'];
+			$change_profile_picture_text = "";
 		}
 
 		// Fetch the account type
@@ -451,31 +446,33 @@ class Profile
 
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$profile'             => $p,
-			'$xmpp'                => $xmpp,
-			'$matrix'              => $matrix,
-			'$follow'              => DI::l10n()->t('Follow'),
-			'$follow_link'         => $follow_link,
-			'$unfollow'            => DI::l10n()->t('Unfollow'),
-			'$unfollow_link'       => $unfollow_link,
-			'$subscribe_feed'      => DI::l10n()->t('Atom feed'),
-			'$subscribe_feed_link' => $profile['hidewall'] ?? 0 ? '' : $profile['poll'],
-			'$wallmessage'         => DI::l10n()->t('Message'),
-			'$wallmessage_link'    => $wallmessage_link,
-			'$account_type'        => $account_type,
-			'$location'            => $location,
-			'$homepage'            => $homepage,
-			'$homepage_verified'   => DI::l10n()->t('This website has been verified to belong to the same person.'),
-			'$about'               => $about,
-			'$network'             => DI::l10n()->t('Network:'),
-			'$contacts'            => $contact_count,
-			'$updated'             => $updated,
-			'$diaspora'            => $diaspora,
-			'$contact_block'       => $contact_block,
-			'$mention_label'       => $mention_label,
-			'$mention_url'         => $mention_url,
-			'$network_label'       => $network_label,
-			'$network_url'         => $network_url,
+			'$profile'                     => $p,
+			'$picture_dest_url'            => $picture_dest_url,
+			'$change_profile_picture_text' => $change_profile_picture_text,
+			'$xmpp'                        => $xmpp,
+			'$matrix'                      => $matrix,
+			'$follow'                      => DI::l10n()->t('Follow'),
+			'$follow_link'                 => $follow_link,
+			'$unfollow'                    => DI::l10n()->t('Unfollow'),
+			'$unfollow_link'               => $unfollow_link,
+			'$subscribe_feed'              => DI::l10n()->t('Atom feed'),
+			'$subscribe_feed_link'         => $profile['hidewall'] ?? 0 ? '' : $profile['poll'],
+			'$wallmessage'                 => DI::l10n()->t('Message'),
+			'$wallmessage_link'            => $wallmessage_link,
+			'$account_type'                => $account_type,
+			'$location'                    => $location,
+			'$homepage'                    => $homepage,
+			'$homepage_verified'           => DI::l10n()->t('This website has been verified to belong to the same person.'),
+			'$about'                       => $about,
+			'$network'                     => DI::l10n()->t('Network:'),
+			'$contacts'                    => $contact_count,
+			'$updated'                     => $updated,
+			'$diaspora'                    => $diaspora,
+			'$contact_block'               => $contact_block,
+			'$mention_label'               => $mention_label,
+			'$mention_url'                 => $mention_url,
+			'$network_label'               => $network_label,
+			'$network_url'                 => $network_url,
 		]);
 
 		$hook_data = [

@@ -75,8 +75,7 @@ span.connector {
   margin-top: 10px;
 }
 
-.type-link:after, .type-video:after,
-.oembed.video:after {
+.type-link:after, .type-video:after {
   content: ".";
   display: block;
   height: 0;
@@ -84,7 +83,7 @@ span.connector {
   visibility: hidden;
 }
 
-.type-video .oembed.video:after {
+.type-video {
   float: left;
 }
 
@@ -132,11 +131,6 @@ span.connector {
   line-height: normal;
 }
 
-.type-link .oembed, .type-video .oembed {
-  font-size: 18px;
-  font-weight: 300;
-  line-height: normal;
-}
 .type-link img, .type-video img {
 }
 
@@ -144,7 +138,6 @@ span.connector {
   margin: 0em;
 }
 
-.type-link span.oembed + br, .type-video span.oembed + br,
 .type-link a + br, .type-video a + br,
 .type-link img + br, .type-video img + br{
   display: none;
@@ -160,11 +153,6 @@ span.connector {
   float: none;
 }
 
-.oembed.video .embed_video > div {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-}
 .embed_rich {
   display: block;
   transition: height .75s;
@@ -192,7 +180,7 @@ span.connector {
   border-radius: 4px;
 }
 .shared_header > .metadata {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
 }
 .shared_header > .metadata > p {
   margin: 0;
@@ -280,7 +268,7 @@ h6 {
   font-size: 14.95px;
 }
 
-span.oembed, h4 {
+h4 {
   margin: 0px 0px 0px 0px;
 }
 
@@ -691,6 +679,10 @@ audio {
   width: 100%;
 }
 
+img {
+  max-width: 100%;
+}
+
 /**
  * Image grid settings START
  **/
@@ -793,37 +785,60 @@ figure.img-allocated-height img{
 summary.wall-item-summary {
 	font-weight: bold;
 	font-style: oblique;
-  padding-bottom: 5px;
+	padding-bottom: 5px;
 }
 
 /* css instructions notification.tpl */
 /* Flexbox layout to align the icon and text in a single line */
 .notif-item a {
-    	display: flex;
-    	align-items: flex-start;
+	display: flex;
+	align-items: flex-start;
 }
 
 /* Margin to create space between the icon and the text */
 .notif-image {
-    	margin-right: 10px;
+	margin-right: 10px;
 }
 
 /* Styles to ensure the text wraps properly after 70 characters */
 .notif-text {
-    	display: inline-block;
-    	max-width: 70ch;
-    	overflow-wrap: break-word;
+	display: inline-block;
+	max-width: 70ch;
+	overflow-wrap: break-word;
 }
 
 /* Add alt tag indicators to the relevant images */
 a:has(img.has-alt-description)::after {
-	background: lightgray;
+	background: rgba(0, 0, 0, 0.69);
 	border-radius: 4px;
-	color: black;
+	color: #eee;
 	content: "ALT";
+	font-size: 12px;
 	font-weight: bold;
-	padding: 3px 8px;
+	padding: 4px 5px;
 	position: absolute;
-	bottom: 10px;
-	right: 10px;
+	bottom: 8px;
+	right: 8px;
+}
+
+#change-profile-picture {
+	background-color: rgba(0, 0, 0, 0.5);
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	opacity: 0;
+	position: absolute;
+	left: 0;
+	top: 0;
+  width: 100%;
+}
+
+.vcard-anchor {
+	display: inline-block;
+}
+
+#change-profile-picture:hover {
+	opacity: 1;
 }

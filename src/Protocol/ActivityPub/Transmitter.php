@@ -1609,18 +1609,28 @@ class Transmitter
 		$attachments = [];
 
 		$urls = [];
-		foreach (Post\Media::getByURIId($item['uri-id'], [Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::DOCUMENT, Post\Media::TORRENT]) as $attachment) {
+		foreach (Post\Media::getByURIId($item['uri-id'], [Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::DOCUMENT, Post\Media::TORRENT, Post\Media::HTML]) as $attachment) {
 			if (in_array($attachment['url'], $urls)) {
 				continue;
 			}
 			$urls[] = $attachment['url'];
 
-			$attach = [
-				'type'      => 'Document',
-				'mediaType' => $attachment['mimetype'],
-				'url'       => $attachment['url'],
-				'name'      => $attachment['description']
-			];
+			if ($attachment['type'] == Post\Media::HTML) {
+				$attach = [
+					'type'    => 'Link',
+					'href'    => $attachment['url'],
+					'name'    => $attachment['name'],
+					'content' => $attachment['description'],
+				];
+			} else {
+				$attach = [
+					'type' => 'Document',
+					'url'  => $attachment['url'],
+					'name' => $attachment['description'],
+				];
+			}
+
+			$attach['mediaType'] = $attachment['mimetype'];
 
 			if (!empty($attachment['height'])) {
 				$attach['height'] = $attachment['height'];
@@ -1812,7 +1822,7 @@ class Transmitter
 			$data['updated'] = DateTimeFormat::utc($item['edited'] . '+00:00', DateTimeFormat::ATOM);
 		}
 
-		$data['url'] = $link ?? $item['plink'];
+		$data['url'] = $item['plink'];
 		if ($api_mode) {
 			$data['attributedTo'] = self::getActorArrayByCid($item['author-id']);
 		} else {

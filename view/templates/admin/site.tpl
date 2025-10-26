@@ -58,8 +58,6 @@
 
 		<h2>{{$corporate}}</h2>
 		{{include file="field_input.tpl" field=$allowed_sites}}
-		{{include file="field_checkbox.tpl" field=$no_oembed_rich_content}}
-		{{include file="field_input.tpl" field=$allowed_oembed}}
 		{{include file="field_checkbox.tpl" field=$block_public}}
 		{{include file="field_checkbox.tpl" field=$force_publish}}
 		{{include file="field_select.tpl" field=$community_page_style}}

@@ -386,10 +386,6 @@ Eine komplette Liste aller Hook-Callbacks mit den zugehörigen Dateien (am 01-Ap
 
     Hook::callAll('network_to_name', $nets);
 
-### src/Content/OEmbed.php
-
-    Hook::callAll('oembed_fetch_url', $embedurl, $j);
-
 ### src/Content/Nav.php
 
     Hook::callAll('page_header', DI::page()['nav']);

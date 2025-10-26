@@ -68,8 +68,6 @@ class Site extends BaseAdmin
 		$disallowed_email        = (!empty($_POST['disallowed_email'])        ? trim($_POST['disallowed_email'])  : '');
 		$forbidden_nicknames     = (!empty($_POST['forbidden_nicknames'])     ? strtolower(trim($_POST['forbidden_nicknames'])) : '');
 		$system_actor_name       = (!empty($_POST['system_actor_name'])       ? trim($_POST['system_actor_name']) : '');
-		$no_oembed_rich_content  = !empty($_POST['no_oembed_rich_content']);
-		$allowed_oembed          = (!empty($_POST['allowed_oembed'])          ? trim($_POST['allowed_oembed']) : '');
 		$block_public            = !empty($_POST['block_public']);
 		$force_publish           = !empty($_POST['publish_all']);
 		$global_directory        = (!empty($_POST['directory'])               ? trim($_POST['directory'])      : '');
@@ -249,8 +247,6 @@ class Site extends BaseAdmin
 		$transactionConfig->set('system', 'disallowed_email', $disallowed_email);
 		$transactionConfig->set('system', 'forbidden_nicknames', $forbidden_nicknames);
 		$transactionConfig->set('system', 'system_actor_name', $system_actor_name);
-		$transactionConfig->set('system', 'no_oembed_rich_content', $no_oembed_rich_content);
-		$transactionConfig->set('system', 'allowed_oembed', $allowed_oembed);
 		$transactionConfig->set('system', 'block_public', $block_public);
 		$transactionConfig->set('system', 'publish_all', $force_publish);
 		$transactionConfig->set('system', 'newuser_private', $newuser_private);
@@ -501,8 +497,6 @@ class Site extends BaseAdmin
 			'$allowed_sites'                   => ['allowed_sites', DI::l10n()->t('Allowed friend domains'), DI::config()->get('system', 'allowed_sites'), DI::l10n()->t('Comma separated list of domains which are allowed to establish friendships with this site. Wildcards are accepted. Empty to allow any domains')],
 			'$allowed_email'                   => ['allowed_email', DI::l10n()->t('Allowed email domains'), DI::config()->get('system', 'allowed_email'), DI::l10n()->t('Comma separated list of domains which are allowed in email addresses for registrations to this site. Wildcards are accepted. Empty to allow any domains')],
 			'$disallowed_email'                => ['disallowed_email', DI::l10n()->t('Disallowed email domains'), DI::config()->get('system', 'disallowed_email'), DI::l10n()->t('Comma separated list of domains which are rejected as email addresses for registrations to this site. Wildcards are accepted.')],
-			'$no_oembed_rich_content'          => ['no_oembed_rich_content', DI::l10n()->t('No OEmbed rich content'), DI::config()->get('system', 'no_oembed_rich_content'), DI::l10n()->t('Don\'t show the rich content (e.g. embedded PDF), except from the domains listed below.')],
-			'$allowed_oembed'                  => ['allowed_oembed', DI::l10n()->t('Trusted third-party domains'), DI::config()->get('system', 'allowed_oembed'), DI::l10n()->t('Comma separated list of domains from which content is allowed to be embedded in posts like with OEmbed. All sub-domains of the listed domains are allowed as well.')],
 			'$block_public'                    => ['block_public', DI::l10n()->t('Block public'), DI::config()->get('system', 'block_public'), DI::l10n()->t('Check to block public access to all otherwise public personal pages on this site unless you are currently logged in.')],
 			'$force_publish'                   => ['publish_all', DI::l10n()->t('Force publish'), DI::config()->get('system', 'publish_all'), DI::l10n()->t('Check to force all profiles on this site to be listed in the site directory.') . '<strong>' . DI::l10n()->t('Enabling this may violate privacy laws like the GDPR') . '</strong>'],
 			'$global_directory'                => ['directory', DI::l10n()->t('Global directory URL'), DI::config()->get('system', 'directory'), DI::l10n()->t('URL to the global directory. If this is not set, the global directory is completely unavailable to the application.')],

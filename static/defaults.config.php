@@ -83,6 +83,10 @@ return [
 		// Checks for missing entries in "post", "post-thread" or "post-thread-user" and creates them
 		'add_missing_posts' => false,
 
+		// add_page_media (boolean)
+		// Add page related audio and video media when adding a HTML page entry
+		'add_page_media' => false,
+
 		// admin_inactivity_limit (Integer)
 		// Days of inactivity after which an admin is considered inactive. "0" means that there will be no check for inactivity.
 		'admin_inactivity_limit' => 30,
@@ -274,6 +278,11 @@ return [
 		// Fetch featured posts from all contacts
 		'fetch_featured_posts' => false,
 
+		// ffmpeg_installed (Boolean)
+		// When FFMpeg is installed, video thumbnails will be generated.
+		// We will also be able to fetch video dimensions in a more ressource-friendly way.
+		'ffmpeg_installed' => false,
+
 		// free_crawls (Integer)
 		// Number of "free" searches when system => permit_crawling is enabled.
 		'free_crawls' => 10,
@@ -340,7 +349,7 @@ return [
 
 		// logger_config (String)
 		// Sets the logging adapter of Friendica globally (syslog, stream)
-		// @deprecated 2025.02 The value `monolog` is deprecated, please use `stream` or `syslog` instead.
+		// @deprecated 2025.07 The value `monolog` is deprecated, please use `stream` or `syslog` instead.
 		'logger_config' => 'stream',
 
 		// syslog_flags (Integer)
@@ -384,6 +393,10 @@ return [
 		// Maximum number of "fetchreplies" activities in the callstack. The higher, the more complete a thread will be.
 		'max_fetchreplies_depth' => 2,
 
+		// max_height (Integer)
+		// Maximum height for OEmbed and videos
+		'max_height' => 620,
+
 		// max_image_length (Integer)
 		// An alternate way of limiting picture upload sizes.
 		// Specify the maximum pixel length that pictures are allowed to be (for non-square pictures, it will apply to the longest side).
@@ -411,9 +424,9 @@ return [
 		// Maximum recursion depth when fetching posts until the job is delegated to a worker task or finished.
 		'max_recursion_depth' => 50,
 
-		// max_video_height (Integer)
-		// Maximum height of videos in portrait mode.
-		'max_video_height' => 640,
+		// max_width (Integer)
+		// Maximum width for OEmbed and videos
+		'max_width' => 620,
 
 		// memcache_host (String)
 		// Host name of the memcache daemon.

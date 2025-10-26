@@ -24,10 +24,11 @@ use Friendica\Util\Temporal;
 
 function message_init()
 {
-	$tabs = '';
+	$tabs               = '';
+	DI::page()['title'] = DI::l10n()->t('Messages');
 
 	if (DI::args()->getArgc() > 1 && is_numeric(DI::args()->getArgv()[1])) {
-		$tabs = render_messages(get_messages(DI::userSession()->getLocalUserId(), 0, 5), 'mail_list.tpl');
+		$tabs = render_messages(get_messages(DI::userSession()->getLocalUserId(), 0, 15), 'mail_list.tpl');
 	}
 
 	$new = [
@@ -187,7 +188,7 @@ function message_content()
 			'$upload'      => DI::l10n()->t('Upload photo'),
 			'$insert'      => DI::l10n()->t('Insert web link'),
 			'$wait'        => DI::l10n()->t('Please wait'),
-			'$submit'      => DI::l10n()->t('Submit')
+			'$submit'      => DI::l10n()->t('Send Message')
 		]);
 		return $o;
 	}
@@ -343,7 +344,7 @@ function message_content()
 			'$parent'      => $parent,
 			'$upload'      => DI::l10n()->t('Upload photo'),
 			'$insert'      => DI::l10n()->t('Insert web link'),
-			'$submit'      => DI::l10n()->t('Submit'),
+			'$submit'      => DI::l10n()->t('Send Message'),
 			'$wait'        => DI::l10n()->t('Please wait')
 		]);
 

@@ -103,13 +103,14 @@ class Conversations extends BaseModule
 		if (!$contact['ap-posting-restricted']) {
 			$options = [
 				'lockstate' => ACL::getLockstateForUserId($this->userSession->getLocalUserId()) ? 'lock' : 'unlock',
-				'acl' => ACL::getFullSelectorHTML($this->page, $this->userSession->getLocalUserId(), true, []),
-				'bang' => '',
-				'content' => ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY ? '!' : '@') . ($contact['addr'] ?: $contact['url']),
+				'acl'       => ACL::getFullSelectorHTML($this->page, $this->userSession->getLocalUserId(), true, []),
+				'bang'      => '',
+				'content'   => ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY ? '!' : '@') . ($contact['addr'] ?: $contact['url']),
 			];
 			$output = $this->conversation->statusEditor($options);
 		}
 
+		Contact::setPageTitle($contact);
 		$output .= Contact::getTabsHTML($contact, Contact::TAB_CONVERSATIONS);
 		$output .= ModelContact::getThreadsFromId($contact['id'], $this->userSession->getLocalUserId(), 0, 0, $request['last_created'] ?? '');
 

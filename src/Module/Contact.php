@@ -177,6 +177,9 @@ class Contact extends BaseModule
 
 		$page = DI::page();
 
+		// Default page title when not viewing a specific contact
+		$page['title'] = DI::l10n()->t('Contacts');
+
 		$page->registerFooterScript(Theme::getPathForFile('asset/typeahead.js/dist/typeahead.bundle.js'));
 		$page->registerFooterScript(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.js'));
 		$page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
@@ -399,7 +402,7 @@ class Contact extends BaseModule
 				$header = DI::l10n()->t('Following');
 				break;
 			case 'mutuals':
-				$header = DI::l10n()->t('Mutual friends');
+				$header = DI::l10n()->t('Friends');
 				break;
 			case 'nothing':
 				$header = DI::l10n()->t('No relationship');
@@ -541,6 +544,11 @@ class Contact extends BaseModule
 		return $tab_str;
 	}
 
+	public static function setPageTitle(array $contact)
+	{
+		DI::page()['title'] = $contact['name'];
+	}
+
 	/**
 	 * Return the fields for the contact template
 	 *
@@ -565,15 +573,15 @@ class Contact extends BaseModule
 		if (!empty($contact['uid']) && !empty($contact['rel']) && DI::userSession()->getLocalUserId() == $contact['uid']) {
 			switch ($contact['rel']) {
 				case Model\Contact::FRIEND:
-					$alt_text = DI::l10n()->t('Mutual Friendship');
+					$alt_text = DI::l10n()->t('Friend');
 					break;
 
 				case Model\Contact::FOLLOWER:
-					$alt_text = DI::l10n()->t('is a fan of yours');
+					$alt_text = DI::l10n()->t('Follows you');
 					break;
 
 				case Model\Contact::SHARING:
-					$alt_text = DI::l10n()->t('you are a fan of');
+					$alt_text = DI::l10n()->t('You follow');
 					break;
 
 				default:

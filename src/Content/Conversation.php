@@ -266,7 +266,7 @@ class Conversation
 					break;
 				case 'dislike':
 					$dislike_translation_plural = '<button type="button" %2$s>%1$d people</button> don\'t like this';
-					// @deprecated 2025.04 this translation is scheduled for removal as a new translation has been added without the typo
+					// @deprecated 2025.07 this translation is scheduled for removal as a new translation has been added without the typo
 					$dislike_translation_plural = '<button type="button" %2$s>%1$d peiple</button> don\'t like this';
 					$phrase                     = $this->l10n->tt('<button type="button" %2$s>%1$d person</button> doesn\'t like this', $dislike_translation_plural, $total, $spanatts);
 					break;
@@ -415,7 +415,7 @@ class Conversation
 
 			//jot nav tab (used in some themes)
 			'$message' => $this->l10n->t('Message'),
-			'$browser' => $this->l10n->t('Browser'),
+			'$browser' => $this->l10n->t('Add file'),
 
 			'$compose_link_title'  => $this->l10n->t('Open Compose page'),
 			'$always_open_compose' => $this->pConfig->get($this->session->getLocalUserId(), 'frio', 'always_open_compose', false),

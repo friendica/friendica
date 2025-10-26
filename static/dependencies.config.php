@@ -163,6 +163,7 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			],
 		],
 		\Psr\Log\LoggerInterface::class => [
+			'shared' => false, // LoggerManager::getLogger() will return a shared instance
 			'instanceOf' => \Friendica\Core\Logger\LoggerManager::class,
 			'call' => [
 				['getLogger', [], Dice::CHAIN_CALL],

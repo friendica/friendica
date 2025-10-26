@@ -11,15 +11,27 @@
 	{{* The link to create a new event *}}
 	{{if $new_event.0}}
 	<div class="pull-right" id="new-event-link">
-		<button type="button" class="btn-link page-action faded-icon" onclick="addToModal('{{$new_event.0}}')" title="{{$new_event.1}}" data-toggle="tooltip">
+		<button type="button" class="btn btn-primary page-action" onclick="addToModal('{{$new_event.0}}')" data-toggle="tooltip">
 			<i class="fa fa-plus"></i>
+			<span>{{$new_event.1}}</span>
 		</button>
 	</div>
 	{{/if}}
 
 	{{* We create our own fullcalendar header (with title & calendar view *}}
 	<div id="fc-header" class="clear">
-		<div id="fc-header-right" class="pull-right">
+
+		{{* The buttons to change the month/weeks/days *}}
+		<div id="fc-fc-header-left" class="btn-group">
+			<button class="btn btn-eventnav" onclick="changeView('prev', false);" title="{{$prev}}"><i class="fa fa-angle-up" aria-hidden="true"></i></button>
+			<button class="btn btn-eventnav btn-separator" onclick="changeView('next', false);" title="{{$next}}"><i class="fa fa-angle-down" aria-hidden="true"></i></button>
+			<button class="btn btn-eventnav btn-separator" onclick="changeView('today', false);">{{$today}}</button>
+		</div>
+
+		{{* The title (e.g. name of the mont/week/day) *}}
+		<div id="event-calendar-title"><h4 id="fc-title"></h4></div>
+
+		<div id="fc-header-right">
 			{{* The dropdown to change the calendar view *}}
 			<ul class="nav nav-pills">
 				<li class="dropdown pull-right">
@@ -43,16 +55,6 @@
 				</li>
 			</ul>
 		</div>
-
-		{{* The buttons to change the month/weeks/days *}}
-		<div id="fc-fc-header-left" class="btn-group">
-			<button class="btn btn-eventnav" onclick="changeView('prev', false);" title="{{$prev}}"><i class="fa fa-angle-up" aria-hidden="true"></i></button>
-			<button class="btn btn-eventnav btn-separator" onclick="changeView('next', false);" title="{{$next}}"><i class="fa fa-angle-down" aria-hidden="true"></i></button>
-			<button class="btn btn-eventnav btn-separator" onclick="changeView('today', false);" title="{{$today}}"><i class="fa fa-bullseye" aria-hidden="true"></i></button>
-		</div>
-
-		{{* The title (e.g. name of the mont/week/day) *}}
-		<div id="event-calendar-title"><h4 id="fc-title"></h4></div>
 
 	</div>
 

@@ -156,15 +156,15 @@ class Account extends BaseSettings
 			DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'system', 'default-group-gid', intval($request['circle-selection-group'] ?? $def_gid));
 
 			$fields = [
-				'allow_cid'  => $str_contact_allow,
-				'allow_gid'  => $str_circle_allow,
-				'deny_cid'   => $str_contact_deny,
-				'deny_gid'   => $str_circle_deny,
-				'maxreq'     => $maxreq,
-				'def_gid'    => $def_gid,
-				'blockwall'  => $blockwall,
-				'hidewall'   => $hidewall,
-				'blocktags'  => $blocktags,
+				'allow_cid' => $str_contact_allow,
+				'allow_gid' => $str_circle_allow,
+				'deny_cid'  => $str_contact_deny,
+				'deny_gid'  => $str_circle_deny,
+				'maxreq'    => $maxreq,
+				'def_gid'   => $def_gid,
+				'blockwall' => $blockwall,
+				'hidewall'  => $hidewall,
+				'blocktags' => $blocktags,
 			];
 
 			$profile_fields = [
@@ -426,7 +426,7 @@ class Account extends BaseSettings
 				$user['account-type'] == User::ACCOUNT_TYPE_COMMUNITY
 			],
 			'$account_relay' => $account_relay,
-			'$page_normal' => [
+			'$page_normal'   => [
 				'page-flags',
 				DI::l10n()->t('Normal Account Page'),
 				User::PAGE_FLAGS_NORMAL,
@@ -524,23 +524,23 @@ class Account extends BaseSettings
 			'$timezone'         => ['timezone_select', DI::l10n()->t('Your Timezone:'), Temporal::getTimezoneSelect($timezone), ''],
 			'$language'         => ['language', DI::l10n()->t('Your Language:'), $language, DI::l10n()->t('Set the language we use to show you friendica interface and to send you emails'), $lang_choices],
 			'$default_location' => ['default_location', DI::l10n()->t('Default Post Location:'), $default_location, ''],
-			'$allow_location'   => ['allow_location', DI::l10n()->t('Use Browser Location:'), ($user['allow_location'] == 1), ''],
+			'$allow_location'   => ['allow_location', DI::l10n()->t('Use browser location'), ($user['allow_location'] == 1), ''],
 
-			'$h_prv'              => DI::l10n()->t('Security and Privacy Settings'),
-			'$is_community'       => ($user['account-type'] == User::ACCOUNT_TYPE_COMMUNITY),
-			'$maxreq'             => ['maxreq', DI::l10n()->t('Maximum Friend Requests/Day:'), $maxreq, DI::l10n()->t("(to prevent spam abuse)")],
-			'$profile_in_dir'     => $profile_in_dir,
-			'$profile_in_net_dir' => ['profile_in_netdirectory', DI::l10n()->t('Allow your profile to be searchable globally?'), $profile['net-publish'], DI::l10n()->t("Activate this setting if you want others to easily find and follow you. Your profile will be searchable on remote systems. This setting also determines whether Friendica will inform search engines that your profile should be indexed or not.") . $net_pub_desc],
-			'$hide_friends'       => ['hide-friends', DI::l10n()->t('Hide your contact/friend list from viewers of your profile?'), $profile['hide-friends'], DI::l10n()->t('A list of your contacts is displayed on your profile page. Activate this option to disable the display of your contact list.')],
-			'$hide_wall'          => ['hidewall', $this->t('Hide your public content from anonymous viewers'), $user['hidewall'], $this->t('Anonymous visitors will only see your basic profile details. Your public posts and replies will still be freely accessible on the remote servers of your followers and through relays.')],
-			'$unlisted'           => ['unlisted', DI::l10n()->t('Make public posts unlisted'), DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'unlisted'), DI::l10n()->t('Your public posts will not appear on the community pages or in search results, nor be sent to relay servers. However they can still appear on public feeds on remote servers.')],
-			'$accessiblephotos'   => ['accessible-photos', DI::l10n()->t('Make all posted pictures accessible'), DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'accessible-photos'), DI::l10n()->t("This option makes every posted picture accessible via the direct link. This is a workaround for the problem that most other networks can't handle permissions on pictures. Non public pictures still won't be visible for the public on your photo albums though.")],
-			'$blockwall'          => ['blockwall', DI::l10n()->t('Allow friends to post to your profile page?'), (intval($user['blockwall']) ? '0' : '1'), DI::l10n()->t('Your contacts may write posts on your profile wall. These posts will be distributed to your contacts')],
-			'$blocktags'          => ['blocktags', DI::l10n()->t('Allow friends to tag your posts?'), (intval($user['blocktags']) ? '0' : '1'), DI::l10n()->t('Your contacts can add additional tags to your posts.')],
-			'$circle_select'      => Circle::getSelectorHTML(DI::userSession()->getLocalUserId(), $user['def_gid'], 'circle-selection', DI::l10n()->t('Default privacy circle for new contacts')),
+			'$h_prv'               => DI::l10n()->t('Security and Privacy Settings'),
+			'$is_community'        => ($user['account-type'] == User::ACCOUNT_TYPE_COMMUNITY),
+			'$maxreq'              => ['maxreq', DI::l10n()->t('Maximum Friend Requests/Day:'), $maxreq, DI::l10n()->t("(to prevent spam abuse)")],
+			'$profile_in_dir'      => $profile_in_dir,
+			'$profile_in_net_dir'  => ['profile_in_netdirectory', DI::l10n()->t('Allow your profile to be searchable globally?'), $profile['net-publish'], DI::l10n()->t("Activate this setting if you want others to easily find and follow you. Your profile will be searchable on remote systems. This setting also determines whether Friendica will inform search engines that your profile should be indexed or not.") . $net_pub_desc],
+			'$hide_friends'        => ['hide-friends', DI::l10n()->t('Hide your contact/friend list from viewers of your profile?'), $profile['hide-friends'], DI::l10n()->t('A list of your contacts is displayed on your profile page. Activate this option to disable the display of your contact list.')],
+			'$hide_wall'           => ['hidewall', $this->t('Hide your public content from anonymous viewers'), $user['hidewall'], $this->t('Anonymous visitors will only see your basic profile details. Your public posts and replies will still be freely accessible on the remote servers of your followers and through relays.')],
+			'$unlisted'            => ['unlisted', DI::l10n()->t('Make public posts unlisted'), DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'unlisted'), DI::l10n()->t('Your public posts will not appear on the community pages or in search results, nor be sent to relay servers. However they can still appear on public feeds on remote servers.')],
+			'$accessiblephotos'    => ['accessible-photos', DI::l10n()->t('Make all posted pictures accessible'), DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'accessible-photos'), DI::l10n()->t("This option makes every posted picture accessible via the direct link. This is a workaround for the problem that most other networks can't handle permissions on pictures. Non public pictures still won't be visible for the public on your photo albums though.")],
+			'$blockwall'           => ['blockwall', DI::l10n()->t('Allow friends to post to your profile page?'), (intval($user['blockwall']) ? '0' : '1'), DI::l10n()->t('Your contacts may write posts on your profile wall. These posts will be distributed to your contacts')],
+			'$blocktags'           => ['blocktags', DI::l10n()->t('Allow friends to tag your posts?'), (intval($user['blocktags']) ? '0' : '1'), DI::l10n()->t('Your contacts can add additional tags to your posts.')],
+			'$circle_select'       => Circle::getSelectorHTML(DI::userSession()->getLocalUserId(), $user['def_gid'], 'circle-selection', DI::l10n()->t('Default privacy circle for new contacts')),
 			'$circle_select_group' => Circle::getSelectorHTML(DI::userSession()->getLocalUserId(), DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'default-group-gid', $user['def_gid']), 'circle-selection-group', DI::l10n()->t('Default privacy circle for new group contacts')),
-			'$permissions'        => DI::l10n()->t('Default Post Permissions'),
-			'$aclselect'          => ACL::getFullSelectorHTML(DI::page(), $this->session->getLocalUserId()),
+			'$permissions'         => DI::l10n()->t('Default Post Permissions'),
+			'$aclselect'           => ACL::getFullSelectorHTML(DI::page(), $this->session->getLocalUserId()),
 
 			'$expire' => [
 				'label'        => DI::l10n()->t('Expiration settings'),

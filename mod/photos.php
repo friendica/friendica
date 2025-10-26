@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -87,7 +88,7 @@ function photos_init()
 				'$title'    => DI::l10n()->t('Photo Albums'),
 				'$recent'   => DI::l10n()->t('Recent Photos'),
 				'$albums'   => $ret['albums'],
-				'$upload'   => [DI::l10n()->t('Upload New Photos'), 'photos/' . $owner['nickname'] . '/upload'],
+				'$upload'   => [DI::l10n()->t('Upload Photos'), 'photos/' . $owner['nickname'] . '/upload'],
 				'$can_post' => $can_post
 			]);
 		}
@@ -781,7 +782,7 @@ function photos_content()
 			}
 		} elseif ($can_post) {
 			$edit = [DI::l10n()->t('Edit Album'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album) . '/edit'];
-			$drop = [DI::l10n()->t('Drop Album'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album) . '/drop'];
+			$drop = [DI::l10n()->t('Delete album'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album) . '/drop'];
 		}
 
 		if ($order_field === 'created') {
@@ -823,7 +824,7 @@ function photos_content()
 			'$photos'   => $photos,
 			'$album'    => $album,
 			'$can_post' => $can_post,
-			'$upload'   => [DI::l10n()->t('Upload New Photos'), 'photos/' . $user['nickname'] . '/upload/' . bin2hex($album)],
+			'$upload'   => [DI::l10n()->t('Upload Photos'), 'photos/' . $user['nickname'] . '/upload/' . bin2hex($album)],
 			'$order'    => $order,
 			'$edit'     => $edit,
 			'$drop'     => $drop,
@@ -955,7 +956,7 @@ function photos_content()
 			} else {
 				$tools['edit']    = ['photos/' . $user['nickname'] . '/image/' . $datum . '/edit', DI::l10n()->t('Edit photo')];
 				$tools['delete']  = ['photos/' . $user['nickname'] . '/image/' . $datum . '/drop', DI::l10n()->t('Delete photo')];
-				$tools['profile'] = ['settings/profile/photo/crop/' . $ph[0]['resource-id'], DI::l10n()->t('Use as profile photo')];
+				$tools['profile'] = ['settings/profile/photo/crop/' . $ph[0]['resource-id'], DI::l10n()->t('Use as profile picture')];
 			}
 
 			if (
@@ -1266,22 +1267,26 @@ function photos_content()
 
 		$photo_tpl = Renderer::getMarkupTemplate('photo_view.tpl');
 		$o .= Renderer::replaceMacros($photo_tpl, [
-			'$id'          => $ph[0]['id'],
-			'$album'       => [$album_link, $ph[0]['album']],
-			'$tools'       => $tools,
-			'$photo'       => $photo,
-			'$prevlink'    => $prevlink,
-			'$nextlink'    => $nextlink,
-			'$desc'        => $ph[0]['desc'],
-			'$tags'        => $tags,
-			'$edit'        => $edit,
-			'$map'         => $map,
-			'$map_text'    => DI::l10n()->t('Map'),
-			'$likebuttons' => $likebuttons,
-			'$like'        => $like,
-			'$dislike'     => $dislike,
-			'$comments'    => $comments,
-			'$paginate'    => $paginate,
+			'$id'                          => $ph[0]['id'],
+			'$album'                       => [$album_link, $ph[0]['album']],
+			'$tools'                       => $tools,
+			'$photo'                       => $photo,
+			'$prevlink'                    => $prevlink,
+			'$nextlink'                    => $nextlink,
+			'$desc'                        => $ph[0]['desc'],
+			'$tags'                        => $tags,
+			'$edit'                        => $edit,
+			'$edit_text'                   => DI::l10n()->t('Edit'),
+			'$delete_text'                 => DI::l10n()->t('Delete'),
+			'$use_as_profile_picture_text' => DI::l10n()->t('Use as profile picture'),
+			'$back_to_viewing_text'        => DI::l10n()->t('Back to viewing'),
+			'$map'                         => $map,
+			'$map_text'                    => DI::l10n()->t('Map'),
+			'$likebuttons'                 => $likebuttons,
+			'$like'                        => $like,
+			'$dislike'                     => $dislike,
+			'$comments'                    => $comments,
+			'$paginate'                    => $paginate,
 		]);
 
 		DI::page()['htmlhead'] .= "\n" . '<meta name="twitter:card" content="summary_large_image" />' . "\n";

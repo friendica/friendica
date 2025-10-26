@@ -269,15 +269,19 @@ class Index extends BaseSettings
 			'$l10n' => [
 				'profile_action'            => $this->t('Profile Actions'),
 				'banner'                    => $this->t('Edit Profile Details'),
-				'submit'                    => $this->t('Submit'),
-				'profpic'                   => $this->t('Change Profile Photo'),
+				'submit'                    => $this->t('Save Settings'),
+				'profpic_header'            => $this->t('Change profile picture'),
+				'profpic_intro'             => $this->t('To change your profile picture, you can either upload a new picture here, or click to visit your photos to pick among your existing pictures.'),
+				'profpic_upload_new_header' => $this->t('Upload new picture'),
+				'profpic_upload_submit'     => $this->t('Upload selected picture'),
+				'profpic_existing_header'   => $this->t('Pick existing picture from photos'),
+				'yourphotos'                => $this->t('Go to my photos'),
 				'viewprof'                  => $this->t('View Profile'),
 				'personal_section'          => $this->t('Personal'),
 				'picture_section'           => $this->t('Profile picture'),
 				'location_section'          => $this->t('Location'),
 				'miscellaneous_section'     => $this->t('Miscellaneous'),
 				'custom_fields_section'     => $this->t('Custom Profile Fields'),
-				'profile_photo'             => $this->t('Upload Profile Photo'),
 				'custom_fields_description' => $this->t(
 					'<p>Custom fields appear on <a href="%s">your profile page</a>.</p>
 				<p>You can use BBCodes in the field values.</p>
@@ -288,7 +292,8 @@ class Index extends BaseSettings
 				),
 			],
 
-			'$personal_account' => $personal_account,
+			'$personal_account'       => $personal_account,
+			'$change_profile_picture' => isset($_GET['profilepicture']),
 
 			'$form_security_token'       => self::getFormSecurityToken('settings_profile'),
 			'$form_security_token_photo' => self::getFormSecurityToken('settings_profile_photo'),

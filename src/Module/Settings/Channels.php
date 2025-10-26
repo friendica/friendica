@@ -151,7 +151,7 @@ class Channels extends BaseSettings
 			$circles[$circle['id']] = $circle['name'];
 		}
 
-		$languages         = $this->l10n->getLanguageCodes(true);
+		$languages         = $this->l10n->getLanguageCodes(true, true);
 		$channel_languages = User::getWantedLanguages($uid);
 
 		$channels = [];
@@ -194,7 +194,7 @@ class Channels extends BaseSettings
 		$t = Renderer::getMarkupTemplate('settings/channels.tpl');
 
 		$exclude_tags_translation = $this->t('Comma separated list of tags. If a post contain any of these tags, then it will not be part of this channel.');
-		// @deprecated 2025.04 this translation is scheduled for removal as a new translation has been added without the typo
+		// @deprecated 2025.07 this translation is scheduled for removal as a new translation has been added without the typo
 		$exclude_tags_translation = $this->t('Comma separated list of tags. If a post contain any of these tags, then it will not be part of nthis channel.');
 
 		return Renderer::replaceMacros($t, [

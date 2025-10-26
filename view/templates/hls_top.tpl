@@ -6,8 +6,7 @@
   *}}
 <div class="video-top-wrapper lframe" id="video-top-wrapper-{{$video.id}}">
 	<script src="view/js/hls/hls.min.js"></script>
-	<video id="{{$video.id}}" controls poster="{{$video.preview}}" width="{{$video.width}}" height="{{$video.height}}"
-		title="{{$video.description}}">
+	<video id="{{$video.id}}" controls {{if $video.preview}}preload="none" poster="{{$video.preview}}" {{else}}preload="metadata" {{/if}} width="{{$video.width}}" height="{{$video.height}}" title="{{$video.description}}" type="{{$video.mime}}">
 		<a href="{{$video.src}}">{{$video.name}}</a>
 	</video>
 	<script>

@@ -36,7 +36,7 @@
 
 					{{* Block with status information about the contact *}}
 					<ul>
-						{{if $relation_text}}<li><div id="contact-edit-rel">{{$relation_text}}</div></li>{{/if}}
+						{{if $relation_text}}<li><div id="contact-edit-rel">{{$con}} {{$relation_text}}</div></li>{{/if}}
 
 						{{if $poll_enabled}}
 							<li><div id="contact-edit-last-update-text">{{$lastupdtext}} <span id="contact-edit-last-updated">{{$last_update}}</span></div>

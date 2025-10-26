@@ -505,7 +505,7 @@ class Post
 		$languages = [];
 		$language  = '';
 		if (!empty($item['language'])) {
-			$languages = DI::l10n()->t('Languages');
+			$languages = DI::l10n()->t('Detected languages');
 			$language  = array_key_first(json_decode($item['language'], true));
 		}
 
@@ -588,7 +588,7 @@ class Post
 			'filer'                  => $filer,
 			'language'               => $languages,
 			'lang'                   => $language,
-			'searchtext'             => DI::l10n()->t('Search Text'),
+			'searchtext'             => DI::l10n()->t('Raw content'),
 			'drop'                   => $drop,
 			'block'                  => $block,
 			'ignore_author'          => $ignore,

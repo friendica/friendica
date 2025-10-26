@@ -83,7 +83,7 @@ return [
 
 ## Addons
 
-> ⚠️ Since Friendica 2025.02 the strategy hooks for addons are deprecated, please use PHP hooks instead.
+> ⚠️ Since Friendica 2025.07 the strategy hooks for addons are deprecated, please use PHP hooks instead.
 
 The hook logic is useful for decoupling the Friendica core logic, but its primary goal is to modularize Friendica in creating addons.
 

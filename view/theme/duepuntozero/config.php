@@ -53,13 +53,13 @@ function theme_admin_post()
 function clean_form(AppHelper $appHelper, &$colorset, $user)
 {
 	$colorset = [
-		'default'     => DI::l10n()->t('default'),
-		'greenzero'   => DI::l10n()->t('greenzero'),
-		'purplezero'  => DI::l10n()->t('purplezero'),
-		'easterbunny' => DI::l10n()->t('easterbunny'),
-		'darkzero'    => DI::l10n()->t('darkzero'),
-		'comix'       => DI::l10n()->t('comix'),
-		'slackr'      => DI::l10n()->t('slackr'),
+		'default'     => 'default',
+		'greenzero'   => 'greenzero',
+		'purplezero'  => 'purplezero',
+		'easterbunny' => 'easterbunny',
+		'darkzero'    => 'darkzero',
+		'comix'       => 'comix',
+		'slackr'      => 'slackr',
 	];
 
 	if ($user) {

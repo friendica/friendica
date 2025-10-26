@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 2025.02-dev (Interrupted Fern)
--- DB_UPDATE_VERSION 1580
+-- Friendica 2025.07-rc (Interrupted Fern)
+-- DB_UPDATE_VERSION 1582
 -- ------------------------------------------
 
 
@@ -1079,18 +1079,6 @@ CREATE TABLE IF NOT EXISTS `notify-threads` (
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='';
 
 --
--- TABLE oembed
---
-CREATE TABLE IF NOT EXISTS `oembed` (
-	`url` varbinary(383) NOT NULL COMMENT 'page url',
-	`maxwidth` mediumint unsigned NOT NULL COMMENT 'Maximum width passed to Oembed',
-	`content` mediumtext COMMENT 'OEmbed data of the page',
-	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of creation',
-	 PRIMARY KEY(`url`,`maxwidth`),
-	 INDEX `created` (`created`)
-) DEFAULT COLLATE utf8mb4_general_ci COMMENT='cache for OEmbed queries';
-
---
 -- TABLE openwebauth-token
 --
 CREATE TABLE IF NOT EXISTS `openwebauth-token` (
@@ -1111,7 +1099,7 @@ CREATE TABLE IF NOT EXISTS `openwebauth-token` (
 CREATE TABLE IF NOT EXISTS `parsed_url` (
 	`url_hash` binary(64) NOT NULL COMMENT 'page url hash',
 	`guessing` boolean NOT NULL DEFAULT '0' COMMENT 'is the \'guessing\' mode active?',
-	`oembed` boolean NOT NULL DEFAULT '0' COMMENT 'is the data the result of oembed?',
+	`oembed` boolean NOT NULL DEFAULT '0' COMMENT 'is the data the result of oembed? - Obsolete field.',
 	`url` text NOT NULL COMMENT 'page url',
 	`content` mediumtext COMMENT 'page data',
 	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'datetime of creation',
@@ -1441,6 +1429,13 @@ CREATE TABLE IF NOT EXISTS `post-media` (
 	`publisher-url` varbinary(383) COMMENT 'URL of the publisher of the media',
 	`publisher-name` varchar(255) COMMENT 'Name of the publisher of the media',
 	`publisher-image` varbinary(383) COMMENT 'Image of the publisher of the media',
+	`player-url` varbinary(383) COMMENT 'URL of the embedded player for this media',
+	`player-height` smallint unsigned COMMENT 'Height of the embedded player',
+	`player-width` smallint unsigned COMMENT 'Width of the embedded player',
+	`embed-type` varchar(10) COMMENT 'Type of the embed (e.g. rich or video)',
+	`embed-html` text COMMENT 'HTML embed code for this media',
+	`embed-height` smallint unsigned COMMENT 'Height of the embed',
+	`embed-width` smallint unsigned COMMENT 'Width of the embed',
 	`language` char(3) COMMENT 'Language information about this media in the ISO 639 format',
 	`published` datetime COMMENT 'Publification date of this media',
 	`modified` datetime COMMENT 'Modification date of this media',

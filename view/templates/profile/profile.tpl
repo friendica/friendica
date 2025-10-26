@@ -16,18 +16,17 @@
 {{if $is_owner}}
 	<div id="profile-edit-links">
 		<ul class="nav nav-pills preferences">
-			<li class="pull-right">
-				<a class="btn btn-link btn-sm" type="button" id="profile-edit-link" href="{{$edit_link.url}}" title="{{$edit_link.title}}">
-					<i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;{{$edit_link.label}}
-				</a>
-			</li>
-			<li class="pull-right">
-				<a class="btn btn-link btn-sm" type="button" id="profile-viewas-link" href="{{$viewas_link.url}}" title="{{$viewas_link.title}}">
+			<li>
+				<a class="btn btn-primary" type="button" id="profile-viewas-link" href="{{$viewas_link.url}}">
 					<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;{{$viewas_link.label}}
 				</a>
 			</li>
+			<li>
+				<a class="btn btn-primary" type="button" id="profile-edit-link" href="{{$edit_link.url}}">
+					<i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;{{$edit_link.label}}
+				</a>
+			</li>
 		</ul>
-		<div class="clear"></div>
 	</div>
 {{/if}}
 	<dl id="{{$basic_fields.fullname.id}}" class="row {{$basic_fields.fullname.class|default:'aprofile'}}">
@@ -71,7 +70,7 @@
 	<dl id="aprofile-homepage" class="row {{$basic_fields.homepage.class|default:'aprofile'}}">
 		<hr class="profile-separator">
 		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.homepage.label}}</dt>
-		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.homepage.value nofilter}}</dd>
+		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.homepage.value nofilter}}{{if $profile.homepage_verified}} <span title="{{$homepage_verified}}">✔</span>{{/if}}</dd>
 	</dl>
 {{/if}}
 

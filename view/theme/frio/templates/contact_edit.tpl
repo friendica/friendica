@@ -48,7 +48,7 @@
 
 					{{* Block with status information about the contact *}}
 					<ul>
-						{{if $relation_text}}<li><div id="contact-edit-rel">{{$relation_text}}</div></li>{{/if}}
+						{{if $relation_text}}<li><div id="contact-edit-rel">{{$con}} {{$relation_text}}</div></li>{{/if}}
 						{{if $nettype}}<li><div id="contact-edit-nettype">{{$nettype}}</div></li>{{/if}}
 
 						{{if $poll_enabled}}
@@ -61,7 +61,7 @@
 						{{/if}}
 
 						{{if $lost_contact}}<li><div id="lost-contact-message">{{$lost_contact}}</div></li>{{/if}}
-						{{if $insecure}}<li><div id="insecure-message">{{$insecure}}</div></li>	{{/if}}
+						{{if $insecure}}<li><div id="insecure-message">{{$insecure}}</div></li>{{/if}}
 						{{if $blocked && !$pending}}<li><div id="block-message">{{$blocked}}</div></li>{{/if}}
 						{{if $pending}}<li><div id="pending-message">{{$pending}}</div></li>{{/if}}
 						{{if $ignored}}<li><div id="ignore-message">{{$ignored}}</div></li>{{/if}}

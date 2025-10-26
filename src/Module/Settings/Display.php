@@ -104,6 +104,8 @@ class Display extends BaseSettings
 		$display_eventlist       = (bool)$request['display_eventlist'];
 		$preview_mode            = (int)$request['preview_mode'];
 		$update_content          = (int)$request['update_content'];
+		$embed_remote_media      = (bool)$request['embed_remote_media'];
+		$embed_media             = (bool)$request['embed_media'];
 
 		$enabled_timelines = [];
 		foreach ($enable as $code => $enabled) {
@@ -148,6 +150,8 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'show_page_drop', $show_page_drop);
 		$this->pConfig->set($uid, 'system', 'display_eventlist', $display_eventlist);
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
+		$this->pConfig->set($uid, 'system', 'embed_remote_media', $embed_remote_media);
+		$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
 
 		$this->pConfig->set($uid, 'system', 'network_timelines', $network_timelines);
 		$this->pConfig->set($uid, 'system', 'enabled_timelines', $enabled_timelines);
@@ -234,13 +238,15 @@ class Display extends BaseSettings
 
 		$update_content         = $this->pConfig->get($uid, 'system', 'update_content') ?? false;
 		$enable_smile           = !$this->pConfig->get($uid, 'system', 'no_smilies', false);
-		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', false);
+		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', true);
 		$enable_smart_threading = !$this->pConfig->get($uid, 'system', 'no_smart_threading', false);
 		$enable_dislike         = !$this->pConfig->get($uid, 'system', 'hide_dislike', false);
 		$display_resharer       = $this->pConfig->get($uid, 'system', 'display_resharer', false);
-		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', false);
+		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', true);
 		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
 		$display_eventlist      = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
+		$embed_remote_media     = $this->pConfig->get($uid, 'system', 'embed_remote_media', false);
+		$embed_media            = $this->pConfig->get($uid, 'system', 'embed_media', false);
 
 		$hide_empty_descriptions = $this->pConfig->get($uid, 'accessibility', 'hide_empty_descriptions', false);
 		$hide_custom_emojis      = $this->pConfig->get($uid, 'accessibility', 'hide_custom_emojis', false);
@@ -264,7 +270,7 @@ class Display extends BaseSettings
 		$bookmarked_timelines = $this->pConfig->get($uid, 'system', 'network_timelines', $this->getAvailableTimelines($uid, true)->column('code'));
 		$enabled_timelines    = $this->pConfig->get($uid, 'system', 'enabled_timelines', $this->getAvailableTimelines($uid, false)->column('code'));
 		$channel_languages    = User::getWantedLanguages($uid);
-		$languages            = $this->l10n->getLanguageCodes(true);
+		$languages            = $this->l10n->getLanguageCodes(true, true);
 
 		$timelines = [];
 		foreach ($this->getAvailableTimelines($uid) as $timeline) {
@@ -335,6 +341,8 @@ class Display extends BaseSettings
 			'$hide_empty_descriptions'  => ['hide_empty_descriptions', $this->t('Hide pictures with empty alternative text'), $hide_empty_descriptions, $this->t("Don't display pictures that are missing the alternative text.")],
 			'$hide_custom_emojis'       => ['hide_custom_emojis', $this->t('Hide custom emojis'), $hide_custom_emojis, $this->t("Don't display custom emojis.")],
 			'$platform_icon_style'      => ['platform_icon_style', $this->t('Platform icons style'), $platform_icon_style, $this->t('Style of the platform icons'), $platform_icon_styles, false],
+			'$embed_remote_media'       => ['embed_remote_media', $this->t('Embed remote media'), $embed_remote_media, $this->t('When enabled, remote media will be embedded in the post, like for example YouTube videos.')],
+			'$embed_media'              => ['embed_media', $this->t('Embed supported media'), $embed_media, $this->t('When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos.')],
 
 			'$timeline_label'       => $this->t('Label'),
 			'$timeline_descriptiom' => $this->t('Description'),

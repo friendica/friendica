@@ -5,13 +5,13 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Test\src\Core\Logger;
+namespace Friendica\Test\src\Core\Logger\Type;
 
 use Friendica\Core\Logger\Type\WorkerLogger;
-use Friendica\Test\MockedTestCase;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class WorkerLoggerTest extends MockedTestCase
+class WorkerLoggerTest extends TestCase
 {
 	private function assertUid($uid)
 	{
@@ -63,18 +63,20 @@ class WorkerLoggerTest extends MockedTestCase
 	 * Test the WorkerLogger with different log calls
 	 * @dataProvider dataTest
 	 */
-	public function testEmergency($func, $msg, $context = [])
+	public function testLogMethod($func, $msg, $context = [])
 	{
-		$logger                    = \Mockery::mock(LoggerInterface::class);
-		$workLogger                = new WorkerLogger($logger);
+		$logger = $this->createMock(LoggerInterface::class);
+
+		$workLogger = new WorkerLogger($logger);
+
 		$testContext               = $context;
 		$testContext['worker_id']  = $workLogger->getWorkerId();
 		$testContext['worker_cmd'] = '';
 		self::assertUid($testContext['worker_id']);
-		$logger
-			->shouldReceive($func)
-			->with($msg, $testContext)
-			->once();
+
+
+		$logger->expects(self::once())->method($func)->with($msg, $testContext);
+
 		$workLogger->$func($msg, $context);
 	}
 
@@ -83,49 +85,72 @@ class WorkerLoggerTest extends MockedTestCase
 	 */
 	public function testLog()
 	{
-		$logger                    = \Mockery::mock(LoggerInterface::class);
-		$workLogger                = new WorkerLogger($logger);
-		$context                   = $testContext                   = ['test' => 'it'];
+		$logger = $this->createMock(LoggerInterface::class);
+
+		$workLogger = new WorkerLogger($logger);
+
+		$context = $testContext = ['test' => 'it'];
+
 		$testContext['worker_id']  = $workLogger->getWorkerId();
 		$testContext['worker_cmd'] = '';
 		self::assertUid($testContext['worker_id']);
-		$logger
-			->shouldReceive('log')
-			->with('debug', 'a test', $testContext)
-			->once();
+
+		$logger->expects(self::once())->method('log')->with('debug', 'a test', $testContext);
+
 		$workLogger->log('debug', 'a test', $context);
 	}
-
 
 	/**
 	 * Test the WorkerLogger after setting a worker function
 	 */
 	public function testChangedId()
 	{
-		$logger                    = \Mockery::mock(LoggerInterface::class);
-		$workLogger                = new WorkerLogger($logger);
-		$context                   = $testContext                   = ['test' => 'it'];
-		$testContext['worker_id']  = $workLogger->getWorkerId();
-		$testContext['worker_cmd'] = '';
-		self::assertUid($testContext['worker_id']);
-		$logger
-			->shouldReceive('log')
-			->with('debug', 'a test', $testContext)
-			->once();
+		$logger = $this->createMock(LoggerInterface::class);
+
+		$workLogger = new WorkerLogger($logger);
+
+		$context = $testContext1 = ['test' => 'it'];
+
+		$testContext1['worker_id']  = $workLogger->getWorkerId();
+		$testContext1['worker_cmd'] = '';
+		self::assertUid($testContext1['worker_id']);
+
+		$context2 = $testContext2 = ['test' => 'it'];
+
+		$testContext2['worker_id']  = $workLogger->getWorkerId();
+		$testContext2['worker_cmd'] = 'testFunc';
+		self::assertUid($testContext2['worker_id']);
+
+		$logger->expects(self::exactly(2))->method('log')->willReturnMap([
+			['debug', 'a test', $testContext1],
+			['debug', 'a test', $testContext2],
+		]);
+
 		$workLogger->log('debug', 'a test', $context);
 
 		$workLogger->setFunctionName('testFunc');
 
-		self::assertNotEquals($testContext['worker_id'], $workLogger->getWorkerId());
+		self::assertNotEquals($testContext1['worker_id'], $workLogger->getWorkerId());
 
-		$context                   = $testContext                   = ['test' => 'it'];
-		$testContext['worker_id']  = $workLogger->getWorkerId();
-		$testContext['worker_cmd'] = 'testFunc';
-		self::assertUid($testContext['worker_id']);
-		$logger
-			->shouldReceive('log')
-			->with('debug', 'a test', $testContext)
-			->once();
-		$workLogger->log('debug', 'a test', $context);
+		$workLogger->log('debug', 'a test', $context2);
+	}
+
+	public function testReplaceDefaultContextReturnsOldDefaultContext()
+	{
+		$logger = $this->createStub(LoggerInterface::class);
+
+		$workLogger = new WorkerLogger($logger);
+
+		$newContext = ['worker_id' => 'new_id', 'worker_cmd' => 'new_cmd'];
+
+		$this->assertSame(
+			['worker_id', 'worker_cmd'],
+			array_keys($workLogger->replaceDefaultContext($newContext))
+		);
+
+		$this->assertSame(
+			$newContext,
+			$workLogger->replaceDefaultContext([])
+		);
 	}
 }

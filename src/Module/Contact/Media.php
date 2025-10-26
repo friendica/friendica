@@ -49,6 +49,8 @@ class Media extends BaseModule
 
 		DI::page()['aside'] = Widget\VCard::getHTML($contact);
 
+		Contact::setPageTitle($contact);
+
 		$o = Contact::getTabsHTML($contact, Contact::TAB_MEDIA);
 
 		$o .= ModelContact::getPostsFromUrl($contact['url'], $this->userSession->getLocalUserId(), true, $request['last_created'] ?? '');

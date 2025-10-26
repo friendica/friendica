@@ -8,17 +8,18 @@
 namespace Friendica\Content;
 
 use Friendica\App\BaseURL;
-use Friendica\AppHelper;
+use Friendica\Content\Post\Factory\PostMedia as PostMediaFactory;
+use Friendica\Content\Post\Repository\PostMedia as PostMediaRepository;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\BBCode\Video;
 use Friendica\Content\Text\HTML;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Attach;
 use Friendica\Model\Circle;
@@ -44,6 +45,8 @@ use Friendica\Util\XML;
 use GuzzleHttp\Psr7\Uri;
 use ImagickException;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use LanguageDetection\Language;
+use Psr\Log\LoggerInterface;
 
 /**
  * A content helper class for displaying items
@@ -64,27 +67,36 @@ class Item
 	private $aclFormatter;
 	/** @var IManagePersonalConfigValues */
 	private $pConfig;
+	/** @var IManageConfigValues */
+	private $config;
 	/** @var BaseURL */
 	private $baseURL;
 	/** @var Emailer */
 	private $emailer;
-	/** @var AppHelper */
-	private $appHelper;
 	private EventDispatcherInterface $eventDispatcher;
+	/** @var LoggerInterface */
+	protected $logger;
+	/** @var PostMediaRepository */
+	protected $postMediaRepository;
+	/** @var PostMediaFactory */
+	protected $postMediaFactory;
 
-	public function __construct(Profiler $profiler, Activity $activity, L10n $l10n, IHandleUserSessions $userSession, Video $bbCodeVideo, ACLFormatter $aclFormatter, IManagePersonalConfigValues $pConfig, BaseURL $baseURL, Emailer $emailer, AppHelper $appHelper, EventDispatcherInterface $eventDispatcher)
+	public function __construct(LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, IHandleUserSessions $userSession, Video $bbCodeVideo, ACLFormatter $aclFormatter, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, BaseURL $baseURL, Emailer $emailer, EventDispatcherInterface $eventDispatcher, PostMediaRepository $postMediaRepository, PostMediaFactory $postMediaFactory)
 	{
-		$this->profiler        = $profiler;
-		$this->activity        = $activity;
-		$this->l10n            = $l10n;
-		$this->userSession     = $userSession;
-		$this->bbCodeVideo     = $bbCodeVideo;
-		$this->aclFormatter    = $aclFormatter;
-		$this->baseURL         = $baseURL;
-		$this->pConfig         = $pConfig;
-		$this->emailer         = $emailer;
-		$this->appHelper       = $appHelper;
-		$this->eventDispatcher = $eventDispatcher;
+		$this->profiler            = $profiler;
+		$this->activity            = $activity;
+		$this->l10n                = $l10n;
+		$this->userSession         = $userSession;
+		$this->bbCodeVideo         = $bbCodeVideo;
+		$this->aclFormatter        = $aclFormatter;
+		$this->baseURL             = $baseURL;
+		$this->pConfig             = $pConfig;
+		$this->config              = $config;
+		$this->emailer             = $emailer;
+		$this->eventDispatcher     = $eventDispatcher;
+		$this->logger              = $logger;
+		$this->postMediaRepository = $postMediaRepository;
+		$this->postMediaFactory    = $postMediaFactory;
 	}
 
 	/**
@@ -403,7 +415,7 @@ class Item
 		}
 
 		$authorBaseUri = new Uri($item['author-baseurl'] ?? '');
-		if (!empty($item['author-gsid']) && $authorBaseUri->getHost() && !DI::baseUrl()->isLocalUrl($authorBaseUri)) {
+		if (!empty($item['author-gsid']) && $authorBaseUri->getHost() && !$this->baseURL->isLocalUrl($authorBaseUri)) {
 			$ignoreserver_link = 'settings/server/' . $item['author-gsid'] . '/ignore';
 		}
 
@@ -424,7 +436,7 @@ class Item
 				$this->l10n->t('View Photos')                                 => $photos_link,
 				$this->l10n->t('Network Posts')                               => $posts_link,
 				$this->l10n->t('View Contact')                                => $contact_url,
-				$this->l10n->t('Send PM')                                     => $pm_url,
+				$this->l10n->t('Message')                                     => $pm_url,
 				$this->l10n->t('Block')                                       => $block_link,
 				$this->l10n->t('Ignore')                                      => $ignore_link,
 				$this->l10n->t('Collapse')                                    => $collapse_link,
@@ -432,10 +444,10 @@ class Item
 			];
 
 			if (!empty($item['language'])) {
-				$menu[$this->l10n->t('Languages')] = 'javascript:displayLanguage(' . $item['uri-id'] . ');';
+				$menu[$this->l10n->t('Detected languages')] = 'javascript:displayLanguage(' . $item['uri-id'] . ');';
 			}
 
-			$menu[$this->l10n->t('Search Text')] = 'javascript:displaySearchText(' . $item['uri-id'] . ');';
+			$menu[$this->l10n->t('Raw content')] = 'javascript:displaySearchText(' . $item['uri-id'] . ');';
 
 			if ((($cid == 0) || ($rel == Contact::FOLLOWER)) &&
 				in_array($item['network'], Protocol::FEDERATED)
@@ -524,18 +536,18 @@ class Item
 				$only_to_group = ($tag[1] == Tag::TAG_CHARACTER[Tag::EXCLUSIVE_MENTION]);
 				$private_id    = $contact['id'];
 				$group_contact = $contact;
-				DI::logger()->info('Private group or exclusive mention', ['url' => $tag[2], 'mention' => $tag[1]]);
+				$this->logger->info('Private group or exclusive mention', ['url' => $tag[2], 'mention' => $tag[1]]);
 			} elseif ($item['allow_cid'] == '<' . $contact['id'] . '>') {
 				$private_group = false;
 				$only_to_group = true;
 				$private_id    = $contact['id'];
 				$group_contact = $contact;
-				DI::logger()->info('Public group', ['url' => $tag[2], 'mention' => $tag[1]]);
+				$this->logger->info('Public group', ['url' => $tag[2], 'mention' => $tag[1]]);
 			} else {
-				DI::logger()->info('Post with group mention will not be converted to a group post', ['url' => $tag[2], 'mention' => $tag[1]]);
+				$this->logger->info('Post with group mention will not be converted to a group post', ['url' => $tag[2], 'mention' => $tag[1]]);
 			}
 		}
-		DI::logger()->info('Got inform', ['inform' => $item['inform']]);
+		$this->logger->info('Got inform', ['inform' => $item['inform']]);
 
 		if (($item['gravity'] == ItemModel::GRAVITY_PARENT) && !empty($group_contact) && ($private_group || $only_to_group)) {
 			// we tagged a group in a top level post. Now we change the post
@@ -642,7 +654,7 @@ class Item
 		$fields      = ['uri-id', 'uri', 'body', 'title', 'author-name', 'author-link', 'author-avatar', 'guid', 'created', 'plink', 'network', 'quote-uri-id'];
 		$shared_item = Post::selectFirst($fields, ['uri-id' => $item['quote-uri-id'], 'uid' => [$item['uid'], 0], 'private' => [ItemModel::PUBLIC, ItemModel::UNLISTED]]);
 		if (!DBA::isResult($shared_item)) {
-			DI::logger()->notice('Post does not exist.', ['uri-id' => $item['quote-uri-id'], 'uid' => $item['uid']]);
+			$this->logger->notice('Post does not exist.', ['uri-id' => $item['quote-uri-id'], 'uid' => $item['uid']]);
 			return $body;
 		}
 
@@ -658,7 +670,7 @@ class Item
 		$shared_item = Post::selectFirst($fields, ['guid' => $guid, 'uid' => 0, 'private' => [ItemModel::PUBLIC, ItemModel::UNLISTED]]);
 
 		if (!DBA::isResult($shared_item)) {
-			DI::logger()->notice('Post does not exist.', ['guid' => $guid]);
+			$this->logger->notice('Post does not exist.', ['guid' => $guid]);
 			return '';
 		}
 
@@ -1086,7 +1098,7 @@ class Item
 	public function isTooOld(string $created, int $uid = 0): bool
 	{
 		// check for create date and expire time
-		$expire_interval = DI::config()->get('system', 'dbclean-expire-days', 0);
+		$expire_interval = $this->config->get('system', 'dbclean-expire-days', 0);
 
 		if ($uid) {
 			$user = DBA::selectFirst('user', ['expire'], ['uid' => $uid]);
@@ -1099,11 +1111,253 @@ class Item
 			$expire_date  = time() - ($expire_interval * 86400);
 			$created_date = strtotime($created);
 			if ($created_date < $expire_date) {
-				DI::logger()->notice('Item created before expiration interval.', ['created' => date('c', $created_date), 'expired' => date('c', $expire_date)]);
+				$this->logger->notice('Item created before expiration interval.', ['created' => date('c', $created_date), 'expired' => date('c', $expire_date)]);
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get guid from given item record
+	 *
+	 * @param array $item Item record
+	 * @param bool $notify Whether to notify (?)
+	 * @return string Guid
+	 */
+	public function guid(array $item, bool $notify): string
+	{
+		if (!empty($item['guid'])) {
+			return trim($item['guid']);
+		}
+
+		if ($notify) {
+			// We have to avoid duplicates. So we create the GUID in form of a hash of the plink or uri.
+			// We add the hash of our own host because our host is the original creator of the post.
+			$prefix_host = $this->baseURL->getHost();
+		} else {
+			$prefix_host = '';
+
+			// We are only storing the post so we create a GUID from the original hostname.
+			if (!empty($item['author-link'])) {
+				$parsed = parse_url($item['author-link']);
+				if (!empty($parsed['host'])) {
+					$prefix_host = $parsed['host'];
+				}
+			}
+
+			if (empty($prefix_host) && !empty($item['plink'])) {
+				$parsed = parse_url($item['plink']);
+				if (!empty($parsed['host'])) {
+					$prefix_host = $parsed['host'];
+				}
+			}
+
+			if (empty($prefix_host) && !empty($item['uri'])) {
+				$parsed = parse_url($item['uri']);
+				if (!empty($parsed['host'])) {
+					$prefix_host = $parsed['host'];
+				}
+			}
+
+			// Is it in the format data@host.tld? - Used for mail contacts
+			if (empty($prefix_host) && !empty($item['author-link']) && strstr($item['author-link'], '@')) {
+				$mailparts   = explode('@', $item['author-link']);
+				$prefix_host = array_pop($mailparts);
+			}
+		}
+
+		if (!empty($item['plink'])) {
+			$guid = ItemModel::guidFromUri($item['plink'], $prefix_host);
+		} elseif (!empty($item['uri'])) {
+			$guid = ItemModel::guidFromUri($item['uri'], $prefix_host);
+		} else {
+			$guid = System::createUUID(hash('crc32', $prefix_host));
+		}
+
+		return $guid;
+	}
+
+	/**
+	 * Get a language array from a given text
+	 *
+	 * @param string  $body
+	 * @param integer $count
+	 * @param integer $uri_id
+	 * @param integer $author_id
+	 * @param array   $default
+	 * @return array
+	 */
+	public function getLanguageArray(string $body, int $count, int $uri_id = 0, int $author_id = 0, array $default = []): array
+	{
+		$default = $default ?: [L10n::UNDETERMINED_LANGUAGE => 1];
+
+		$searchtext = BBCode::toSearchText($body, $uri_id);
+
+		if ((count(explode(' ', $searchtext)) < 10) && (mb_strlen($searchtext) < 30) && $author_id) {
+			$author = Contact::selectFirst(['about'], ['id' => $author_id]);
+			if (!empty($author['about'])) {
+				$about = BBCode::toSearchText($author['about'], 0);
+				$this->logger->debug('About field added', ['author' => $author_id, 'body' => $searchtext, 'about' => $about]);
+				$searchtext .= ' ' . $about;
+			}
+		}
+
+		if (empty($searchtext)) {
+			return $default;
+		}
+
+		$ld = new Language($this->l10n->getDetectableLanguages());
+
+		$result = [];
+
+		foreach ($this->splitByBlocks($searchtext) as $block) {
+			$languages = $ld->detect($block)->close() ?: [];
+
+			$hook_data = [
+				'text'      => $block,
+				'detected'  => $languages,
+				'uri-id'    => $uri_id,
+				'author-id' => $author_id,
+			];
+
+			$hook_data = $this->eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::DETECT_LANGUAGES, $hook_data),
+			)->getArray();
+
+			foreach ($hook_data['detected'] as $language => $quality) {
+				$result[$language] = max($result[$language] ?? 0, $quality * (strlen($block) / strlen($searchtext)));
+			}
+		}
+
+		$result = $this->compactLanguages($result);
+		if (empty($result)) {
+			return $default;
+		}
+
+		arsort($result);
+		return array_slice($result, 0, $count);
+	}
+
+	/**
+	 * Concert the language code in the detection result to ISO 639-1.
+	 * On duplicates the system uses the higher quality value.
+	 *
+	 * @param array $result
+	 * @return array
+	 */
+	private function compactLanguages(array $result): array
+	{
+		$languages = [];
+		foreach ($result as $language => $quality) {
+			if ($quality == 0) {
+				continue;
+			}
+			$code = $this->l10n->toISO6391($language);
+			if (empty($languages[$code]) || ($languages[$code] < $quality)) {
+				$languages[$code] = $quality;
+			}
+		}
+		return $languages;
+	}
+
+	/**
+	 * Split a string into different unicode blocks
+	 * Currently the text is split into the latin and the non latin part.
+	 *
+	 * @param string $body
+	 * @return array
+	 */
+	private function splitByBlocks(string $body): array
+	{
+		if (!class_exists('IntlChar')) {
+			return [$body];
+		}
+
+		$blocks         = [];
+		$previous_block = 0;
+
+		for ($i = 0; $i < mb_strlen($body); $i++) {
+			$character = mb_substr($body, $i, 1);
+			$previous  = ($i > 0) ? mb_substr($body, $i - 1, 1) : '';
+			$next      = ($i < mb_strlen($body)) ? mb_substr($body, $i + 1, 1) : '';
+
+			if (!\IntlChar::isalpha($character)) {
+				if (($previous != '') && (\IntlChar::isalpha($previous))) {
+					$previous_block = $this->getBlockCode($previous);
+				}
+
+				$block          = (($next != '') && \IntlChar::isalpha($next)) ? $this->getBlockCode($next) : $previous_block;
+				$blocks[$block] = ($blocks[$block] ?? '') . $character;
+			} else {
+				$block          = $this->getBlockCode($character);
+				$blocks[$block] = ($blocks[$block] ?? '') . $character;
+			}
+		}
+
+		foreach (array_keys($blocks) as $key) {
+			$blocks[$key] = trim($blocks[$key]);
+			if (empty($blocks[$key])) {
+				unset($blocks[$key]);
+			}
+		}
+
+		return array_values($blocks);
+	}
+
+	/**
+	 * returns the block code for the given character
+	 *
+	 * @param string $character
+	 * @return integer 0 = no alpha character (blank, signs, emojis, ...), 1 = latin character, 2 = character in every other language
+	 */
+	private function getBlockCode(string $character): int
+	{
+		if (!\IntlChar::isalpha($character)) {
+			return 0;
+		}
+		return $this->isLatin($character) ? 1 : 2;
+	}
+
+	/**
+	 * Checks if the given character is in one of the latin code blocks
+	 *
+	 * @param string $character
+	 * @return boolean
+	 */
+	private function isLatin(string $character): bool
+	{
+		return in_array(\IntlChar::getBlockCode($character), [
+			\IntlChar::BLOCK_CODE_BASIC_LATIN, \IntlChar::BLOCK_CODE_LATIN_1_SUPPLEMENT,
+			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_A, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_B,
+			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_C, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_D,
+			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_E, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_ADDITIONAL
+		]);
+	}
+
+	public function getLanguageMessage(array $item): string
+	{
+		$iso639 = new \Matriphe\ISO639\ISO639();
+
+		$used_languages = '';
+		foreach (json_decode($item['language'], true) as $language => $reliability) {
+			$code = $this->l10n->toISO6391($language);
+
+			if ($code == L10n::UNDETERMINED_LANGUAGE) {
+				$native = $language = $this->l10n->t('Undetermined');
+			} else {
+				$native   = $iso639->nativeByCode1($code);
+				$language = $iso639->languageByCode1($code);
+			}
+
+			if ($native != $language) {
+				$used_languages .= $this->l10n->t('%s (%s - %s): %s', $native, $language, $code, number_format($reliability, 5)) . "\n";
+			} else {
+				$used_languages .= $this->l10n->t('%s (%s): %s', $native, $code, number_format($reliability, 5)) . "\n";
+			}
+		}
+		$used_languages = $this->l10n->t("Detected languages in this post:\n%s", $used_languages);
+		return $used_languages;
 	}
 }

@@ -3449,7 +3449,7 @@ class Diaspora
 			$path = str_replace($name, '', $media['url']);
 
 			$message[++$counter . ':photo'] = [
-				'guid'                => Item::guid(['uri' => $media['url']], false),
+				'guid'                => DI::contentItem()->guid(['uri' => $media['url']], false),
 				'author'              => $item['author-addr'],
 				'public'              => $public,
 				'created_at'          => $item['created'],

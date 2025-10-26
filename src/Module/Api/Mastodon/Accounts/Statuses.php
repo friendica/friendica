@@ -56,7 +56,7 @@ class Statuses extends BaseApi
 		if ($request['pinned']) {
 			$condition = ['author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED], 'type' => Post\Collection::FEATURED];
 		} elseif ($request['only_media']) {
-			$condition = ['author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED], 'type' => [Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO]];
+			$condition = ['author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED], 'type' => [Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::HLS]];
 		} elseif (!$uid) {
 			$condition = [
 				'author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED],

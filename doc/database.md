@@ -50,7 +50,6 @@ Database Tables
 | [notification](help/database/db_notification) | notifications |
 | [notify](help/database/db_notify) | [Deprecated] User notifications |
 | [notify-threads](help/database/db_notify-threads) |  |
-| [oembed](help/database/db_oembed) | cache for OEmbed queries |
 | [openwebauth-token](help/database/db_openwebauth-token) | Store OpenWebAuth token to verify contacts |
 | [parsed_url](help/database/db_parsed_url) | cache for 'parse_url' queries |
 | [pconfig](help/database/db_pconfig) | personal (per user) configuration storage |

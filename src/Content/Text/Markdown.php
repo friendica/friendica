@@ -120,16 +120,6 @@ class Markdown
 		// protect the recycle symbol from turning into a tag, but without unescaping angles and naked ampersands
 		$s = str_replace('&#x2672;', html_entity_decode('&#x2672;', ENT_QUOTES, 'UTF-8'), $s);
 
-		//$s = preg_replace("/([^\]\=]|^)(https?\:\/\/)(vimeo|youtu|www\.youtube|soundcloud)([a-zA-Z0-9\:\/\-\?\&\;\.\=\_\~\#\%\$\!\+\,]+)/ism", '$1[url=$2$3$4]$2$3$4[/url]',$s);
-		$s = BBCode::pregReplaceInTag('/\[url\=?(.*?)\]https?:\/\/www\.youtube\.com\/watch\?v\=(.*?)\[\/url\]/ism', '[youtube]$2[/youtube]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/(www\.)?youtube\.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism', '[youtube]$2[/youtube]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/(www\.)?youtube\.com\/embed\/(.*?)\].*?\[\/url\]/ism', '[youtube]$2[/youtube]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/(www\.)?youtube\.com\/shorts\/(.*?)\].*?\[\/url\]/ism', '[youtube]$2[/youtube]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/m\.youtube\.com\/watch\?v\=(.*?)\].*?\[\/url\]/ism', '[youtube]$1[/youtube]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=?(.*?)\]https?:\/\/vimeo\.com\/([0-9]+)(.*?)\[\/url\]/ism', '[vimeo]$2[/vimeo]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=?(.*?)\]https?:\/\/player\.vimeo\.com\/video\/([0-9]+)(.*?)\[\/url\]/ism', '[vimeo]$2[/vimeo]', 'url', $s);
-		$s = BBCode::pregReplaceInTag('/\[url\=https?:\/\/vimeo\.com\/([0-9]+)\](.*?)\[\/url\]/ism', '[vimeo]$1[/vimeo]', 'url', $s);
-
 		// remove duplicate adjacent code tags
 		$s = preg_replace('/(\[code\])+(.*?)(\[\/code\])+/ism', '[code]$2[/code]', $s);
 

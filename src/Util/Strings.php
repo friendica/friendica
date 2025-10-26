@@ -610,4 +610,24 @@ class Strings
 	{
 		return explode(',', self::cleanTags($tag_list));
 	}
+
+	/**
+	 * Convert the first character of a string to uppercase.
+	 * Handles the missing base function mb_ucfirst() gracefully.
+	 *
+	 * @param string $string
+	 * @return string String with first character in uppercase
+	 */
+	public static function ucFirst(string $string): string
+	{
+		if (function_exists('mb_ucfirst')) {
+			return mb_ucfirst($string);
+		}
+
+		if (function_exists('mb_substr') && function_exists('mb_strtoupper')) {
+			return mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
+		}
+
+		return ucfirst($string);
+	}
 }

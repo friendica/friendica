@@ -27,7 +27,6 @@ class OptimizeTables
 
 		DBA::optimizeTable('cache');
 		DBA::optimizeTable('locks');
-		DBA::optimizeTable('oembed');
 		DBA::optimizeTable('parsed_url');
 		DBA::optimizeTable('session');
 		DBA::optimizeTable('post-engagement');

@@ -71,7 +71,6 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
 			ArrayFilterEvent::ACL_LOOKUP_END                  => 'onArrayFilterEvent',
-			ArrayFilterEvent::OEMBED_FETCH_END                => 'onOembedFetchEndEvent',
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::BBCODE_TO_HTML_START            => 'onBbcodeToHtmlEvent',
@@ -365,28 +364,6 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertSame(
 			['profile' => ['uid' => 0, 'name' => 'changed']],
-			$event->getArray(),
-		);
-	}
-
-	public function testOnOembedFetchEndEventCallsHookWithCorrectValue(): void
-	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::OEMBED_FETCH_END, ['url' => 'original_url']);
-
-		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
-
-		$reflectionProperty->setValue(null, function (string $name, string $data): string {
-			$this->assertSame('oembed_fetch_url', $name);
-			$this->assertSame('original_url', $data);
-
-			return 'changed_url';
-		});
-
-		HookEventBridge::onOembedFetchEndEvent($event);
-
-		$this->assertSame(
-			['url' => 'changed_url'],
 			$event->getArray(),
 		);
 	}

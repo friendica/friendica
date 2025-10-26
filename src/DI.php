@@ -332,13 +332,13 @@ abstract class DI
 	}
 
 	/**
-	 * @deprecated 2025.02 Use `DI::loggerManager()` and `DI::logger()` instead
+	 * @deprecated 2025.07 Use `DI::loggerManager()` and `DI::logger()` instead
 	 *
 	 * @return \Friendica\Core\Logger\Type\WorkerLogger
 	 */
 	public static function workerLogger()
 	{
-		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2025.02 and will be removed after 5 months, use `DI::logger()` instead.', E_USER_DEPRECATED);
+		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2025.07 and will be removed after 5 months, use `DI::logger()` instead.', E_USER_DEPRECATED);
 
 		return self::$dice->create(Core\Logger\Type\WorkerLogger::class);
 	}
@@ -796,9 +796,14 @@ abstract class DI
 		return self::$dice->create(Content\Post\Repository\PostMedia::class);
 	}
 
+	public static function postMediaFactory(): Content\Post\Factory\PostMedia
+	{
+		return self::$dice->create(Content\Post\Factory\PostMedia::class);
+	}
+
 	/**
 	 * @internal The EventDispatcher should never called outside of the core, like in addons or themes
-	 * @deprecated 2025.02 Use constructor injection instead
+	 * @deprecated 2025.07 Use constructor injection instead
 	 */
 	public static function eventDispatcher(): \Psr\EventDispatcher\EventDispatcherInterface
 	{

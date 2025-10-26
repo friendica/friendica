@@ -475,37 +475,16 @@ You can embed video, audio and more in a message.
 </tr>
 <tr>
   <td>[video]url[/video]</td>
-  <td>Where *url* can be an url to youtube, vimeo, soundcloud, or other sites wich supports oembed or opengraph specifications.</td>
+  <td>Full URL to a natively supported video file (e.g. MP4, Ogg or WebM). An HTML5 player will be used to show it.</td>
 </tr>
 <tr>
   <td>[video]Video file url[/video]
 [audio]Audio file url[/audio]</td>
-  <td>Full URL to an ogg/ogv/oga/ogm/webm/mp4/mp3 file. An HTML5 player will be used to show it.</td>
-</tr>
-<tr>
-  <td>[youtube]Youtube URL[/youtube]</td>
-  <td>Youtube video OEmbed display. May not embed an actual player.</td>
-</tr>
-<tr>
-  <td>[youtube]Youtube video ID[/youtube]</td>
-  <td>Youtube player iframe embed.</td>
-</tr>
-<tr>
-  <td>[vimeo]Vimeo URL[/vimeo]</td>
-  <td>Vimeo video OEmbed display. May not embed an actual player.</td>
-</tr>
-<tr>
-  <td>[vimeo]Vimeo video ID[/vimeo]</td>
-  <td>Vimeo player iframe embed.</td>
+  <td>Full URL to a natively supported audio file (e.g. MP3, AAC or FLAC). An HTML5 player will be used to show it.</td>
 </tr>
 <tr>
   <td>[embed]URL[/embed]</td>
-  <td>Embed OEmbed rich content.</td>
-</tr>
-<tr>
-  <td>[url]*url*[/url]</td>
-  <td>If *url* supports oembed or opengraph specifications the embedded object will be shown (eg, documents from scribd).
-Page title with a link to *url* will be shown.</td>
+  <td>Embed rich content like a Youtube video or a podcast player.</td>
 </tr>
 </table>
 

@@ -106,17 +106,19 @@ class Nav
 		$tpl = Renderer::getMarkupTemplate('nav.tpl');
 
 		$nav .= Renderer::replaceMacros($tpl, [
-			'$sitelocation'       => $nav_info['sitelocation'],
-			'$nav'                => $nav_info['nav'],
-			'$banner'             => $nav_info['banner'],
-			'$emptynotifications' => $this->l10n->t('Nothing new here'),
-			'$userinfo'           => $nav_info['userinfo'],
-			'$sel'                => self::$selected,
-			'$apps'               => $this->getAppMenu(),
-			'$home'               => $this->l10n->t('Home'),
-			'$skip'               => $this->l10n->t('Skip to main content'),
-			'$clear_notifs'       => $this->l10n->t('Clear notifications'),
-			'$search_hint'        => $this->l10n->t('@name, !group, #tags, content')
+			'$sitelocation'         => $nav_info['sitelocation'],
+			'$nav'                  => $nav_info['nav'],
+			'$banner'               => $nav_info['banner'],
+			'$emptynotifications'   => $this->l10n->t('Nothing new here'),
+			'$loadingnotifications' => $this->l10n->t('Loading...'),
+			'$userinfo'             => $nav_info['userinfo'],
+			'$nickname'             => $this->session->getLocalUserNickname(),
+			'$sel'                  => self::$selected,
+			'$apps'                 => $this->getAppMenu(),
+			'$home'                 => $this->l10n->t('Home'),
+			'$skip'                 => $this->l10n->t('Skip to main content'),
+			'$clear_notifs'         => $this->l10n->t('Clear notifications'),
+			'$search_placeholder'   => $this->l10n->t('Search: @name, !group, #tags, content')
 		]);
 
 		$nav = $this->eventDispatcher->dispatch(
@@ -215,9 +217,9 @@ class Nav
 
 		// nav links: array of array('href', 'text', 'extra css classes', 'title')
 		if ($this->session->isAuthenticated()) {
-			$nav['logout'] = ['logout', $this->l10n->t('Logout'), '', $this->l10n->t('End this session')];
+			$nav['logout'] = ['logout', $this->l10n->t('Sign out'), '', $this->l10n->t('End this session')];
 		} else {
-			$nav['login'] = ['login', $this->l10n->t('Login'), ($this->router->getModuleClass() == Login::class ? 'selected' : ''), $this->l10n->t('Sign in')];
+			$nav['login'] = ['login', $this->l10n->t('Sign in'), ($this->router->getModuleClass() == Login::class ? 'selected' : ''), $this->l10n->t('Sign in')];
 		}
 
 		if ($this->session->isAuthenticated()) {
@@ -317,7 +319,7 @@ class Nav
 			$nav['messages']['new']    = ['message/new', $this->l10n->t('New Message'), '', $this->l10n->t('New Message')];
 
 			if (User::hasIdentities($this->session->getSubManagedUserId() ?: $this->session->getLocalUserId())) {
-				$nav['delegation'] = ['delegation', $this->l10n->t('Accounts'), '', $this->l10n->t('Manage other pages')];
+				$nav['delegation'] = ['delegation', $this->l10n->t('Accounts'), '', $this->l10n->t('Manage other accounts, including groups and pages')];
 			}
 
 			$nav['settings'] = ['settings', $this->l10n->t('Settings'), '', $this->l10n->t('Account settings')];
@@ -334,6 +336,7 @@ class Nav
 		$nav['navigation'] = ['navigation/', $this->l10n->t('Navigation'), '', $this->l10n->t('Site map')];
 
 		// Provide a banner/logo/whatever
+		// NOTE: Frio does not use this.
 		$banner = $this->config->get('system', 'banner');
 		if (is_null($banner)) {
 			$banner = '<a href="https://friendi.ca"><img id="logo-img" width="32" height="32" src="images/friendica.svg" alt="logo" /></a><span id="logo-text"><a href="https://friendi.ca">Friendica</a></span>';

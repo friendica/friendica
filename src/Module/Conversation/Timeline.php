@@ -23,6 +23,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\Worker;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Database\Database;
@@ -295,8 +296,7 @@ class Timeline extends BaseModule
 			$selected_items = $items;
 		}
 
-		$condition = ['unseen' => true, 'uid' => $uid, 'parent-uri-id' => array_column($selected_items, 'uri-id')];
-		$this->setItemsSeenByCondition($condition);
+		$this->setItemsSeenForUser($uid);
 
 		return $selected_items;
 	}
@@ -443,8 +443,7 @@ class Timeline extends BaseModule
 			$items = array_reverse($items, true);
 		}
 
-		$condition = ['unseen' => true, 'uid' => $uid, 'parent-uri-id' => array_column($items, 'uri-id')];
-		$this->setItemsSeenByCondition($condition);
+		$this->setItemsSeenForUser($uid);
 
 		return $items;
 	}
@@ -701,12 +700,6 @@ class Timeline extends BaseModule
 		}
 
 		if ($maxpostperauthor === 0) {
-			$this->setItemsSeenByCondition([
-				'unseen'        => true,
-				'uid'           => $this->session->getLocalUserId(),
-				'parent-uri-id' => array_column($items, 'uri-id')
-			]);
-
 			return $items;
 		}
 
@@ -748,9 +741,6 @@ class Timeline extends BaseModule
 				$items = $this->selectItems();
 			}
 		}
-
-		$condition = ['unseen' => true, 'uid' => $this->session->getLocalUserId(), 'parent-uri-id' => array_column($selected_items, 'uri-id')];
-		$this->setItemsSeenByCondition($condition);
 
 		return $selected_items;
 	}
@@ -834,22 +824,18 @@ class Timeline extends BaseModule
 	}
 
 	/**
-	 * Sets items as seen
-	 *
-	 * @param array $condition The array with the SQL condition
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * Sets all unseen items for a user as seen
+	 * @param int $uid User ID
 	 */
-	protected function setItemsSeenByCondition(array $condition)
+	protected function setItemsSeenForUser(int $uid)
 	{
-		if (empty($condition) || $this->ping) {
-			return;
+		$posts = Post::getUnseenPosts($uid);
+		if (!empty($posts)) {
+			Item::update(['unseen' => false], ['unseen' => true, 'uid' => $uid, 'uri-id' => $posts]);
 		}
 
-		$unseen = Post::exists($condition);
-
-		if ($unseen) {
-			/// @todo handle huge "unseen" updates in the background to avoid timeout errors
-			Item::update(['unseen' => false], $condition);
+		if (count($posts) == 100) {
+			Worker::add(Worker::PRIORITY_MEDIUM, 'SetSeen', $uid);
 		}
 	}
 }

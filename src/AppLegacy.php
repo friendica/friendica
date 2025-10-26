@@ -53,8 +53,6 @@ final class AppLegacy implements AppHelper
 	// Allow themes to control internal parameters
 	// by changing App values in theme.php
 	private $theme_info = [
-		'videowidth'  => 425,
-		'videoheight' => 350,
 	];
 
 	/**

@@ -35,6 +35,17 @@ use Psr\Http\Message\UriInterface;
  * @property-read ?string $publisherName
  * @property-read ?UriInterface $publisherImage
  * @property-read ?string $blurhash
+ * @property-read ?UriInterface $playerUrl
+ * @property-read ?int $playerWidth
+ * @property-read ?int $playerHeight
+ * @property-read ?string $embedType
+ * @property-read ?string $embedHtml
+ * @property-read ?int $embedWidth
+ * @property-read ?int $embedHeight
+ * @property-read ?int $attachId
+ * @property-read ?string $language
+ * @property-read ?string $published
+ * @property-read ?string $modified
  */
 class PostMedia extends BaseEntity
 {
@@ -98,6 +109,28 @@ class PostMedia extends BaseEntity
 	 * @see https://blurha.sh/
 	 */
 	protected $blurhash;
+	/** @var ?UriInterface Player URL */
+	protected $playerUrl;
+	/** @var ?int In pixels */
+	protected $playerWidth;
+	/** @var ?int In pixels */
+	protected $playerHeight;
+	/** @var ?int */
+	protected $attachId;
+	/** @var ?string */
+	protected $language;
+	/** @var ?string (Datetime) */
+	protected $published;
+	/** @var ?string (Datetime) */
+	protected $modified;
+	/** @var ?string */
+	protected $embedType;
+	/** @var ?string */
+	protected $embedHtml;
+	/** @var ?int In pixels */
+	protected $embedWidth;
+	/** @var ?int In pixels */
+	protected $embedHeight;
 
 	public function __construct(
 		int $uriId,
@@ -120,7 +153,18 @@ class PostMedia extends BaseEntity
 		?string $publisherName = null,
 		?UriInterface $publisherImage = null,
 		?string $blurhash = null,
-		int $id = null
+		?UriInterface $playerUrl = null,
+		?int $playerWidth = null,
+		?int $playerHeight = null,
+		?int $id = null,
+		?int $attachId = null,
+		?string $language = null,
+		?string $published = null,
+		?string $modified = null,
+		?string $embedType = null,
+		?string $embedHtml = null,
+		?int $embedWidth = null,
+		?int $embedHeight = null
 	) {
 		$this->uriId          = $uriId;
 		$this->url            = $url;
@@ -142,7 +186,18 @@ class PostMedia extends BaseEntity
 		$this->publisherName  = $publisherName;
 		$this->publisherImage = $publisherImage;
 		$this->blurhash       = $blurhash;
+		$this->playerUrl      = $playerUrl;
+		$this->playerWidth    = $playerWidth;
+		$this->playerHeight   = $playerHeight;
 		$this->id             = $id;
+		$this->attachId       = $attachId;
+		$this->language       = $language;
+		$this->published      = $published;
+		$this->modified       = $modified;
+		$this->embedType      = $embedType;
+		$this->embedHtml      = $embedHtml;
+		$this->embedWidth     = $embedWidth;
+		$this->embedHeight    = $embedHeight;
 	}
 
 
@@ -247,7 +302,18 @@ class PostMedia extends BaseEntity
 			$this->publisherName,
 			$this->publisherImage,
 			$this->blurhash,
+			$this->playerUrl,
+			$this->playerWidth,
+			$this->playerHeight,
 			$this->id,
+			$this->attachId,
+			$this->language,
+			$this->published,
+			$this->modified,
+			$this->embedType,
+			$this->embedHtml,
+			$this->embedWidth,
+			$this->embedHeight
 		);
 	}
 
@@ -274,7 +340,18 @@ class PostMedia extends BaseEntity
 			$this->publisherName,
 			$this->publisherImage,
 			$this->blurhash,
+			$this->playerUrl,
+			$this->playerWidth,
+			$this->playerHeight,
 			$this->id,
+			$this->attachId,
+			$this->language,
+			$this->published,
+			$this->modified,
+			$this->embedType,
+			$this->embedHtml,
+			$this->embedWidth,
+			$this->embedHeight
 		);
 	}
 

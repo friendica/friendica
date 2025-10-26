@@ -59,6 +59,7 @@ class OAuth extends BaseSettings
 			'$website'             => $this->t('Home Page'),
 			'$created_at'          => $this->t('Created'),
 			'$delete'              => $this->t('Remove authorization'),
+			'$no_connected_apps'   => $this->t('You have no connected apps.'),
 			'$apps'                => $applications,
 		]);
 	}

@@ -39,195 +39,196 @@ class Babel extends BaseModule
 			self::checkFormSecurityTokenForbiddenOnError('babel');
 			switch (($request['type'] ?? '') ?: 'bbcode') {
 				case 'bbcode':
-					$bbcode = $request['text'];
+					$bbcode    = $request['text'];
 					$results[] = [
-						'title'   => DI::l10n()->t('Source input'),
+						'title'   => 'Source input',
 						'content' => $visible_whitespace($bbcode)
 					];
 
-					$plain = Text\BBCode::toPlaintext($bbcode, false);
+					$plain     = Text\BBCode::toPlaintext($bbcode, false);
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::toPlaintext'),
+						'title'   => 'BBCode::toPlaintext',
 						'content' => $visible_whitespace($plain)
 					];
 
-					$html = Text\BBCode::convertForUriId(0, $bbcode);
+					$html      = Text\BBCode::convertForUriId(0, $bbcode);
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::convert (raw HTML)'),
+						'title'   => 'BBCode::convert (raw HTML)',
 						'content' => $visible_whitespace($html)
 					];
 
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::convert (hex)'),
+						'title'   => 'BBCode::convert (hex)',
 						'content' => $visible_whitespace(bin2hex($html)),
 					];
 
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::convert'),
+						'title'   => 'BBCode::convert',
 						'content' => $html
 					];
 
-					$bbcode2 = Text\HTML::toBBCode($html);
+					$bbcode2   = Text\HTML::toBBCode($html);
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::convert => HTML::toBBCode'),
+						'title'   => 'BBCode::convert => HTML::toBBCode',
 						'content' => $visible_whitespace($bbcode2)
 					];
 
-					$markdown = Text\BBCode::toMarkdown($bbcode);
+					$markdown  = Text\BBCode::toMarkdown($bbcode);
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::toMarkdown'),
+						'title'   => 'BBCode::toMarkdown',
 						'content' => $visible_whitespace($markdown)
 					];
 
-					$html2 = Text\Markdown::convert($markdown);
+					$html2     = Text\Markdown::convert($markdown);
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::toMarkdown => Markdown::convert (raw HTML)'),
+						'title'   => 'BBCode::toMarkdown => Markdown::convert (raw HTML)',
 						'content' => $visible_whitespace($html2)
 					];
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::toMarkdown => Markdown::convert'),
+						'title'   => 'BBCode::toMarkdown => Markdown::convert',
 						'content' => $html2
 					];
 
-					$bbcode3 = Text\Markdown::toBBCode($markdown);
+					$bbcode3   = Text\Markdown::toBBCode($markdown);
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::toMarkdown => Markdown::toBBCode'),
+						'title'   => 'BBCode::toMarkdown => Markdown::toBBCode',
 						'content' => $visible_whitespace($bbcode3)
 					];
 
-					$bbcode4 = Text\HTML::toBBCode($html2);
+					$bbcode4   = Text\HTML::toBBCode($html2);
 					$results[] = [
-						'title'   => DI::l10n()->t('BBCode::toMarkdown =>  Markdown::convert => HTML::toBBCode'),
+						'title'   => 'BBCode::toMarkdown =>  Markdown::convert => HTML::toBBCode',
 						'content' => $visible_whitespace($bbcode4)
 					];
 
 					$tags = Text\BBCode::getTags($bbcode);
 
-					$body = Item::setHashtags($bbcode);
+					$body      = Item::setHashtags($bbcode);
 					$results[] = [
-						'title'   => DI::l10n()->t('Item Body'),
+						'title'   => 'Item Body',
 						'content' => $visible_whitespace($body)
 					];
 					$results[] = [
-						'title'   => DI::l10n()->t('Item Tags'),
+						'title'   => 'Item Tags',
 						'content' => $visible_whitespace(var_export($tags, true)),
 					];
 
-					$body2 = PageInfo::searchAndAppendToBody($bbcode, true);
+					$body2     = PageInfo::searchAndAppendToBody($bbcode, true);
 					$results[] = [
-						'title'   => DI::l10n()->t('PageInfo::appendToBody'),
+						'title'   => 'PageInfo::appendToBody',
 						'content' => $visible_whitespace($body2)
 					];
-					$html3 = Text\BBCode::convertForUriId(0, $body2);
+					$html3     = Text\BBCode::convertForUriId(0, $body2);
 					$results[] = [
-						'title'   => DI::l10n()->t('PageInfo::appendToBody => BBCode::convert (raw HTML)'),
+						'title'   => 'PageInfo::appendToBody => BBCode::convert (raw HTML)',
 						'content' => $visible_whitespace($html3)
 					];
 					$results[] = [
-						'title'   => DI::l10n()->t('PageInfo::appendToBody => BBCode::convert'),
+						'title'   => 'PageInfo::appendToBody => BBCode::convert',
 						'content' => $html3
 					];
 					break;
 				case 'diaspora':
-					$diaspora = trim($request['text']);
+					$diaspora  = trim($request['text']);
 					$results[] = [
-						'title'   => DI::l10n()->t('Source input (Diaspora format)'),
+						'title'   => 'Source input (Diaspora format)',
 						'content' => $visible_whitespace($diaspora),
 					];
 
 					$markdown = XML::unescape($diaspora);
+					// no break
 				case 'markdown':
 					$markdown = $markdown ?? trim($request['text']);
 
 					$results[] = [
-						'title'   => DI::l10n()->t('Source input (Markdown)'),
+						'title'   => 'Source input (Markdown)',
 						'content' => $visible_whitespace($markdown),
 					];
 
-					$html = Text\Markdown::convert($markdown);
+					$html      = Text\Markdown::convert($markdown);
 					$results[] = [
-						'title'   => DI::l10n()->t('Markdown::convert (raw HTML)'),
+						'title'   => 'Markdown::convert (raw HTML)',
 						'content' => $visible_whitespace($html),
 					];
 
 					$results[] = [
-						'title'   => DI::l10n()->t('Markdown::convert'),
+						'title'   => 'Markdown::convert',
 						'content' => $html
 					];
 
-					$bbcode = Text\Markdown::toBBCode($markdown);
+					$bbcode    = Text\Markdown::toBBCode($markdown);
 					$results[] = [
-						'title'   => DI::l10n()->t('Markdown::toBBCode'),
+						'title'   => 'Markdown::toBBCode',
 						'content' => $visible_whitespace($bbcode),
 					];
 					break;
-				case 'html' :
-					$html = trim($request['text']);
+				case 'html':
+					$html      = trim($request['text']);
 					$results[] = [
-						'title'   => DI::l10n()->t('Raw HTML input'),
+						'title'   => 'Raw HTML input',
 						'content' => $visible_whitespace($html),
 					];
 
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML Input'),
+						'title'   => 'HTML Input',
 						'content' => $html
 					];
 
 					$purified = Text\HTML::purify($html);
 
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML Purified (raw)'),
+						'title'   => 'HTML Purified (raw)',
 						'content' => $visible_whitespace($purified),
 					];
 
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML Purified (hex)'),
+						'title'   => 'HTML Purified (hex)',
 						'content' => $visible_whitespace(bin2hex($purified)),
 					];
 
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML Purified'),
+						'title'   => 'HTML Purified',
 						'content' => $purified,
 					];
 
-					$bbcode = Text\HTML::toBBCode($html);
+					$bbcode    = Text\HTML::toBBCode($html);
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML::toBBCode'),
+						'title'   => 'HTML::toBBCode',
 						'content' => $visible_whitespace($bbcode)
 					];
 
-					$html2 = Text\BBCode::convertForUriId(0, $bbcode);
+					$html2     = Text\BBCode::convertForUriId(0, $bbcode);
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML::toBBCode => BBCode::convert'),
+						'title'   => 'HTML::toBBCode => BBCode::convert',
 						'content' => $html2
 					];
 
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML::toBBCode => BBCode::convert (raw HTML)'),
+						'title'   => 'HTML::toBBCode => BBCode::convert (raw HTML)',
 						'content' => htmlspecialchars($html2)
 					];
 
 					$bbcode2plain = Text\BBCode::toPlaintext($bbcode);
-					$results[] = [
-						'title'   => DI::l10n()->t('HTML::toBBCode => BBCode::toPlaintext'),
+					$results[]    = [
+						'title'   => 'HTML::toBBCode => BBCode::toPlaintext',
 						'content' => $visible_whitespace($bbcode2plain),
 					];
 
-					$markdown = Text\HTML::toMarkdown($html);
+					$markdown  = Text\HTML::toMarkdown($html);
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML::toMarkdown'),
+						'title'   => 'HTML::toMarkdown',
 						'content' => $visible_whitespace($markdown)
 					];
 
-					$text = Text\HTML::toPlaintext($html, 0);
+					$text      = Text\HTML::toPlaintext($html, 0);
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML::toPlaintext'),
+						'title'   => 'HTML::toPlaintext',
 						'content' => $visible_whitespace($text),
 					];
 
-					$text = Text\HTML::toPlaintext($html, 0, true);
+					$text      = Text\HTML::toPlaintext($html, 0, true);
 					$results[] = [
-						'title'   => DI::l10n()->t('HTML::toPlaintext (compact)'),
+						'title'   => 'HTML::toPlaintext (compact)',
 						'content' => $visible_whitespace($text),
 					];
 					break;
@@ -237,11 +238,11 @@ class Babel extends BaseModule
 					$status = json_decode($json);
 
 					$results[] = [
-						'title'   => DI::l10n()->t('Decoded post'),
+						'title'   => 'Decoded post',
 						'content' => $visible_whitespace(var_export($status, true)),
 					];
 
-					$postarray = [];
+					$postarray                = [];
 					$postarray['object-type'] = Activity\ObjectType::NOTE;
 
 					if (!empty($status->full_text)) {
@@ -256,7 +257,7 @@ class Babel extends BaseModule
 					}
 
 					$results[] = [
-						'title'   => DI::l10n()->t('Post array before expand entities'),
+						'title'   => 'Post array before expand entities',
 						'content' => $visible_whitespace(var_export($postarray, true)),
 					];
 
@@ -265,18 +266,18 @@ class Babel extends BaseModule
 		}
 
 		$tpl = Renderer::getMarkupTemplate('babel.tpl');
-		$o = Renderer::replaceMacros($tpl, [
-			'$title'         => DI::l10n()->t('Babel Diagnostic'),
+		$o   = Renderer::replaceMacros($tpl, [
+			'$title'               => DI::l10n()->t('Babel Diagnostic'),
 			'$form_security_token' => self::getFormSecurityToken('babel'),
-			'$text'          => ['text', DI::l10n()->t('Source text'), $request['text'] ?? '', ''],
-			'$type_bbcode'   => ['type', DI::l10n()->t('BBCode'), 'bbcode', '', (($request['type'] ?? '') ?: 'bbcode') == 'bbcode'],
-			'$type_diaspora' => ['type', DI::l10n()->t('Diaspora'), 'diaspora', '', (($request['type'] ?? '') ?: 'bbcode') == 'diaspora'],
-			'$type_markdown' => ['type', DI::l10n()->t('Markdown'), 'markdown', '', (($request['type'] ?? '') ?: 'bbcode') == 'markdown'],
-			'$type_html'     => ['type', DI::l10n()->t('HTML'), 'html', '', (($request['type'] ?? '') ?: 'bbcode') == 'html'],
-			'$flag_twitter'  => file_exists('addon/twitter/twitter.php'),
-			'$type_twitter'  => ['type', DI::l10n()->t('Twitter Source / Tweet URL (requires API key)'), 'twitter', '', (($request['type'] ?? '') ?: 'bbcode') == 'twitter'],
-			'$results'       => $results,
-			'$submit'        => DI::l10n()->t('Submit'),
+			'$text'                => ['text', 'Source text', $request['text'] ?? '', ''],
+			'$type_bbcode'         => ['type', 'BBCode', 'bbcode', '', (($request['type'] ?? '') ?: 'bbcode') == 'bbcode'],
+			'$type_diaspora'       => ['type', 'Diaspora', 'diaspora', '', (($request['type'] ?? '') ?: 'bbcode') == 'diaspora'],
+			'$type_markdown'       => ['type', 'Markdown', 'markdown', '', (($request['type'] ?? '') ?: 'bbcode') == 'markdown'],
+			'$type_html'           => ['type', 'HTML', 'html', '', (($request['type'] ?? '') ?: 'bbcode') == 'html'],
+			'$flag_twitter'        => file_exists('addon/twitter/twitter.php'),
+			'$type_twitter'        => ['type', DI::l10n()->t('Twitter Source / Tweet URL (requires API key)'), 'twitter', '', (($request['type'] ?? '') ?: 'bbcode') == 'twitter'],
+			'$results'             => $results,
+			'$submit'              => DI::l10n()->t('Submit'),
 		]);
 
 		return $o;

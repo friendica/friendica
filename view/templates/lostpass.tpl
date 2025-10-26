@@ -13,12 +13,11 @@
 
 <form action="lostpass" method="post">
 <div id="login-name-wrapper">
-        <label for="login-name" id="label-login-name">{{$name}}</label>
-        <input type="text" maxlength="60" name="login-name" id="login-name" value="" />
+   <input type="text" name="login-name" id="login-name" placeholder="{{$name}}" value="" class="form-control" autofocus />
 </div>
 <div id="login-extra-end"></div>
 <div id="login-submit-wrapper">
-        <input type="submit" name="submit" id="lostpass-submit-button" value="{{$submit}}" />
+   <input type="submit" name="submit" id="lostpass-submit-button" class="btn btn-primary" value="{{$submit}}" />
 </div>
 <div id="login-submit-end"></div>
 </form>

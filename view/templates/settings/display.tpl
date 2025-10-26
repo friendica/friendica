@@ -31,6 +31,8 @@
 	{{include file="field_checkbox.tpl" field=$hide_empty_descriptions}}
 	{{include file="field_checkbox.tpl" field=$hide_custom_emojis}}
 	{{include file="field_select.tpl" field=$platform_icon_style}}
+	{{include file="field_checkbox.tpl" field=$embed_remote_media}}
+	{{include file="field_checkbox.tpl" field=$embed_media}}
 	<h2>{{$timeline_title}}</h2>
 	{{$timeline_explanation}}
 	<table class="table table-condensed table-striped table-bordered">

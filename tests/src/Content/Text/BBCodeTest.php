@@ -8,6 +8,7 @@
 namespace Friendica\Test\src\Content\Text;
 
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Test\FixtureTestCase;
@@ -26,7 +27,6 @@ class BBCodeTest extends FixtureTestCase
 		DI::config()->set('system', 'url', 'https://friendica.local');
 		DI::config()->set('system', 'no_smilies', false);
 		DI::config()->set('system', 'big_emojis', false);
-		DI::config()->set('system', 'allowed_oembed', '');
 
 		$config = \HTMLPurifier_HTML5Config::createDefault();
 		$config->set('HTML.Doctype', 'HTML5');
@@ -177,21 +177,21 @@ class BBCodeTest extends FixtureTestCase
 			'bug-2199-diaspora-no-named-size' => [
 				'expectedHtml' => 'Test text',
 				'text'         => '[size=xx-large]Test text[/size]',
-				'try_oembed'   => false,
+				'embed'        => false,
 				// Triggers the diaspora compatible output
 				'simpleHtml' => BBCode::DIASPORA,
 			],
 			'bug-2199-diaspora-no-numeric-size' => [
 				'expectedHtml' => 'Test text',
 				'text'         => '[size=24]Test text[/size]',
-				'try_oembed'   => false,
+				'embed'        => false,
 				// Triggers the diaspora compatible output
 				'simpleHtml' => BBCode::DIASPORA,
 			],
 			'bug-7665-audio-tag' => [
-				'expectedHtml' => '<audio src="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3" controls><a href="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3">http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3</a></audio>',
+				'expectedHtml' => '<a class="embed" href="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3">cendrones.fr/colloque2017/jona…</a>',
 				'text'         => '[audio]http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3[/audio]',
-				'try_oembed'   => true,
+				'embed'        => true,
 			],
 			'bug-7808-code-lt' => [
 				'expectedHtml' => '<code>&lt;</code>',
@@ -240,7 +240,7 @@ Karl Marx - Die ursprüngliche Akkumulation
 [url=https://wohlstandfueralle.podigee.io/107-urspruengliche-akkumulation]https://wohlstandfueralle.podigee.io/107-urspruengliche-akkumulation[/url]
 #[url=https://horche.demkontinuum.de/search?tag=Podcast]Podcast[/url] #[url=https://horche.demkontinuum.de/search?tag=Kapitalismus]Kapitalismus[/url]
 [attachment type='link' url='https://wohlstandfueralle.podigee.io/107-urspruengliche-akkumulation' title='Ep. 107: Karl Marx #8 - Die urspr&uuml;ngliche Akkumulation' publisher_name='Wohlstand f&uuml;r Alle' preview='https://images.podigee-cdn.net/0x,s6LXshYO7uhG23H431B30t4hxj1bQuzlTsUlze0F_-H8=/https://cdn.podigee.com/uploads/u8126/bd5fe4f4-38b7-4f3f-b269-6a0080144635.jpg']Wie der Kapitalismus funktioniert und inwieweit Menschen darin ausgebeutet werden, haben wir bereits besprochen. Immer wieder verweisen wir auch darauf, dass der Kapitalismus nicht immer schon existierte, sondern historisiert werden muss.[/attachment]",
-				'try_oembed' => false,
+				'embed'      => false,
 				'simpleHtml' => BBCode::TWITTER,
 			],
 			'task-10886-deprecate-class' => [
@@ -277,16 +277,16 @@ Karl Marx - Die ursprüngliche Akkumulation
 	 *
 	 * @param string $expectedHtml Expected HTML output
 	 * @param string $text         BBCode text
-	 * @param bool   $try_oembed   Whether to convert multimedia BBCode tag
+	 * @param bool   $embed   Whether to convert multimedia BBCode tag
 	 * @param int    $simpleHtml   BBCode::convert method $simple_html parameter value, optional.
 	 * @param bool   $forPlaintext BBCode::convert method $for_plaintext parameter value, optional.
 	 *
 	 * @throws InternalServerErrorException
 	 */
-	public function testConvert(string $expectedHtml, string $text, bool $try_oembed = true, int $simpleHtml = BBCode::INTERNAL, bool $forPlaintext = false)
+	public function testConvert(string $expectedHtml, string $text, bool $embed = true, int $simpleHtml = BBCode::INTERNAL, bool $forPlaintext = false)
 	{
 		// This assumes system.remove_multiplicated_lines = false
-		$actual = BBCode::convert($text, $try_oembed, $simpleHtml, $forPlaintext);
+		$actual = BBCode::convert($text, $embed, $simpleHtml, $forPlaintext);
 
 		self::assertEquals($expectedHtml, $actual);
 	}
@@ -336,6 +336,29 @@ Karl Marx - Die ursprüngliche Akkumulation
 	public function testToMarkdown(string $expected, string $text, $for_diaspora = true)
 	{
 		$actual = BBCode::toMarkdown($text, $for_diaspora);
+
+		self::assertEquals($expected, $actual);
+	}
+
+	public function dataGetTags()
+	{
+		return [
+			'bug-15076-uri-fragments-require-space-before-tags' => [
+				[],
+				'https://github.com/uBlockOrigin/uBOL-home/wiki/Frequently-asked-questions-(FAQ)#if-i-install-ubol-will-i-see-a-difference-with-ubo',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataGetTags
+	 *
+	 * @param array $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testGetTags(array $expected, string $text)
+	{
+		$actual = BBCode::getTags($text);
 
 		self::assertEquals($expected, $actual);
 	}
@@ -696,6 +719,70 @@ Lucas: For the right price, yes.[/share]',
 	public function testProfileLink(string $expected, string $text)
 	{
 		$actual = BBCode::convertForUriId(0, $text);
+
+		self::assertEquals($expected, $actual);
+	}
+
+	public function dataConvertAttachment(): array
+	{
+		return [
+			'player' => [
+				'expected' => 'text <div class="type-link"><div style="">' . "\n" .
+'  <iframe src="http://domain.tld/player" style="" height="480" width="100%" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts"></iframe>' . "\n" .
+"</div>\n" .
+'</div>',
+				'data' => [
+					'author_name'   => 'author_name',
+					'author_url'    => 'http://domain.tld/author_url',
+					'description'   => 'description',
+					'image'         => 'http://domain.tld/image',
+					'preview'       => 'http://domain.tld/preview',
+					'provider_name' => 'provider_name',
+					'provider_url'  => 'http://domain.tld/provider_url',
+					'text'          => 'text',
+					'title'         => 'title',
+					'type'          => 'link',
+					'url'           => 'http://domain.tld/page',
+					'player_url'    => 'http://domain.tld/player',
+					'player_width'  => 620,
+					'player_height' => 480,
+				],
+			],
+			'embed' => [
+				'expected' => 'text <div class="type-link"><iframe srcdoc="&lt;iframe src=&quot;http://domain.tld/player&quot;&gt;&lt;/iframe&gt;" height="500" width="620" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts"></iframe>' . "\n" .
+'</div>',
+				'data' => [
+					'author_name'   => 'author_name',
+					'author_url'    => 'http://domain.tld/author_url',
+					'description'   => 'description',
+					'image'         => 'http://domain.tld/image',
+					'preview'       => 'http://domain.tld/preview',
+					'provider_name' => 'provider_name',
+					'provider_url'  => 'http://domain.tld/provider_url',
+					'text'          => 'text',
+					'title'         => 'title',
+					'type'          => 'link',
+					'url'           => 'http://domain.tld/page',
+					'player_url'    => '',
+					'embed_html'    => '<iframe src="http://domain.tld/player"></iframe>',
+					'embed_width'   => 620,
+					'embed_height'  => 480,
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider dataConvertAttachment
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testConvertAttachment(string $expected, array $data)
+	{
+		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+
+		$actual = BBCode::convertAttachment('', BBCode::INTERNAL, $data, 0, BBCode::PREVIEW_LARGE, true);
 
 		self::assertEquals($expected, $actual);
 	}

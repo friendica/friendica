@@ -345,12 +345,6 @@ div.pager, ul.tabs {
   font-size:12px;
 }
 
-.type-link .oembed, .type-video .oembed {
-  font-size: 14px;
-  font-weight: 300;
-  line-height: normal;
-}
-
 /* Post footer */
 .wall-item-like { font-size:12px; }
 

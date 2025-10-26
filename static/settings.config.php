@@ -193,10 +193,6 @@ return [
 		// Allow users to register with a display name comporting fewer than two parts separated by spaces.
 		'no_regfullname' => true,
 
-		// no_oembed_rich_content (Boolean)
-		// If enabled, allow OEmbed for all URLs. Disabled by default.
-		'no_oembed_rich_content' => true,
-
 		// optimize_tables (Boolean)
 		// Periodically (once an hour) run an "optimize table" command for cache tables
 		'optimize_tables' => false,

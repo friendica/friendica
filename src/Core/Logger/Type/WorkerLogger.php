@@ -7,6 +7,7 @@
 
 namespace Friendica\Core\Logger\Type;
 
+use Friendica\Core\Logger\Capability\DefaultContextLogger;
 use Friendica\Core\Logger\Exception\LoggerException;
 use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
@@ -15,7 +16,7 @@ use Psr\Log\LoggerInterface;
  * A Logger for specific worker tasks, which adds a worker id to it.
  * Uses the decorator pattern (https://en.wikipedia.org/wiki/Decorator_pattern)
  */
-class WorkerLogger implements LoggerInterface
+class WorkerLogger implements LoggerInterface, DefaultContextLogger
 {
 	/** @var int Length of the unique worker id */
 	const WORKER_ID_LENGTH = 7;
@@ -35,6 +36,8 @@ class WorkerLogger implements LoggerInterface
 	 */
 	private $functionName;
 
+	private array $defaultContext = [];
+
 	/**
 	 * @param LoggerInterface $logger       The logger for worker entries
 	 *
@@ -48,6 +51,22 @@ class WorkerLogger implements LoggerInterface
 		} catch (\Exception $exception) {
 			throw new LoggerException('Cannot generate random Hex.', $exception);
 		}
+
+		$this->defaultContext = [
+			'worker_id'  => $this->workerId,
+			'worker_cmd' => null,
+		];
+	}
+
+	/**
+	 * @return array The old context that will be replaced with the new context
+	 */
+	public function replaceDefaultContext(array $defaultContext): array
+	{
+		$oldContext           = $this->defaultContext;
+		$this->defaultContext = $defaultContext;
+
+		return $oldContext;
 	}
 
 	/**
@@ -65,17 +84,19 @@ class WorkerLogger implements LoggerInterface
 		} catch (\Exception $exception) {
 			throw new LoggerException('Cannot generate random Hex.', $exception);
 		}
+
+		$this->defaultContext = [
+			'worker_id'  => $this->workerId,
+			'worker_cmd' => $this->functionName,
+		];
 	}
 
 	/**
-	 * Adds the worker context for each log entry
-	 *
-	 * @param array $context
+	 * Adds the default context for each log entry
 	 */
-	private function addContext(array &$context)
+	private function addDefaultContext(array $context): array
 	{
-		$context['worker_id']  = $this->workerId;
-		$context['worker_cmd'] = $this->functionName;
+		return $context + $this->defaultContext;
 	}
 
 	/**
@@ -98,7 +119,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function emergency($message, array $context = [])
 	{
-		$this->addContext($context);
+		$context = $this->addDefaultContext($context);
 		$this->logger->emergency($message, $context);
 	}
 
@@ -115,7 +136,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function alert($message, array $context = [])
 	{
-		$this->addContext($context);
+		$context = $this->addDefaultContext($context);
 		$this->logger->alert($message, $context);
 	}
 
@@ -131,7 +152,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function critical($message, array $context = [])
 	{
-		$this->addContext($context);
+		$context = $this->addDefaultContext($context);
 		$this->logger->critical($message, $context);
 	}
 
@@ -146,7 +167,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function error($message, array $context = [])
 	{
-		$this->addContext($context);
+		$context = $this->addDefaultContext($context);
 		$this->logger->error($message, $context);
 	}
 
@@ -163,7 +184,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function warning($message, array $context = [])
 	{
-		$this->addContext($context);
+		$context = $this->addDefaultContext($context);
 		$this->logger->warning($message, $context);
 	}
 
@@ -177,7 +198,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function notice($message, array $context = [])
 	{
-		$this->addContext($context);
+		$context = $this->addDefaultContext($context);
 		$this->logger->notice($message, $context);
 	}
 
@@ -193,7 +214,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function info($message, array $context = [])
 	{
-		$this->addContext($context);
+		$context = $this->addDefaultContext($context);
 		$this->logger->info($message, $context);
 	}
 
@@ -207,7 +228,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function debug($message, array $context = [])
 	{
-		$this->addContext($context);
+		$context = $this->addDefaultContext($context);
 		$this->logger->debug($message, $context);
 	}
 
@@ -222,7 +243,7 @@ class WorkerLogger implements LoggerInterface
 	 */
 	public function log($level, $message, array $context = [])
 	{
-		$this->addContext($context);
+		$context = $this->addDefaultContext($context);
 		$this->logger->log($level, $message, $context);
 	}
 }

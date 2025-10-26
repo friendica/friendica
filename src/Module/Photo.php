@@ -272,6 +272,20 @@ class Photo extends BaseApi
 					$height = $media['height'];
 				}
 
+				if (empty($url) && ($media['type'] == Post\Media::VIDEO) && DI::config()->get('system', 'ffmpeg_installed')) {
+					$image = new Image('', image_type_to_mime_type(IMAGETYPE_JPEG));
+					$image->getFromVideoUrl($media['url']);
+					if ($image->isValid()) {
+						return MPhoto::createPhotoForImageData($image->asString());
+					}
+				}
+
+				if (empty($url) && isset($media['blurhash']) && isset($media['width']) && isset($media['height'])) {
+					$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
+					$image->getFromBlurHash($media['blurhash'], $media['width'], $media['height']);
+					return MPhoto::createPhotoForImageData($image->asString());
+				}
+
 				if (empty($url)) {
 					return false;
 				}

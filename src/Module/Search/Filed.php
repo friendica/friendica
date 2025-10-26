@@ -31,9 +31,9 @@ class Filed extends BaseSearch
 
 		DI::page()['aside'] .= Widget::fileAs(DI::args()->getCommand(), $_GET['file'] ?? '');
 
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll') && ($_GET['mode'] ?? '') != 'minimal') {
+		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true) && ($_GET['mode'] ?? '') != 'minimal') {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
+			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		} else {
 			$o = '';
 		}
@@ -46,11 +46,19 @@ class Filed extends BaseSearch
 		}
 
 		if (DI::mode()->isMobile()) {
-			$itemspage_network = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_mobile_network',
-				DI::config()->get('system', 'itemspage_network_mobile'));
+			$itemspage_network = DI::pConfig()->get(
+				DI::userSession()->getLocalUserId(),
+				'system',
+				'itemspage_mobile_network',
+				DI::config()->get('system', 'itemspage_network_mobile')
+			);
 		} else {
-			$itemspage_network = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_network',
-				DI::config()->get('system', 'itemspage_network'));
+			$itemspage_network = DI::pConfig()->get(
+				DI::userSession()->getLocalUserId(),
+				'system',
+				'itemspage_network',
+				DI::config()->get('system', 'itemspage_network')
+			);
 		}
 
 		$last_uriid = isset($_GET['last_uriid']) ? intval($_GET['last_uriid']) : 0;
@@ -67,7 +75,7 @@ class Filed extends BaseSearch
 		}
 
 		$term_params = ['order' => ['uri-id' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
-		$result = DBA::select('category-view', ['uri-id'], $term_condition, $term_params);
+		$result      = DBA::select('category-view', ['uri-id'], $term_condition, $term_params);
 
 		$count = DBA::count('category-view', $term_condition);
 
@@ -81,13 +89,13 @@ class Filed extends BaseSearch
 			return '';
 		}
 		$item_condition = ['uid' => [0, DI::userSession()->getLocalUserId()], 'uri-id' => $posts];
-		$item_params = ['order' => ['uri-id' => true, 'uid' => true]];
+		$item_params    = ['order' => ['uri-id' => true, 'uid' => true]];
 
 		$items = Post::toArray(Post::selectForUser(DI::userSession()->getLocalUserId(), Item::DISPLAY_FIELDLIST, $item_condition, $item_params));
 
 		$o .= DI::conversation()->render($items, Conversation::MODE_FILED, false, false, '', DI::userSession()->getLocalUserId());
 
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll')) {
+		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader();
 		} else {
 			$o .= $pager->renderMinimal($count);

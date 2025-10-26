@@ -116,32 +116,12 @@ class Profile extends BaseProfile
 
 	protected function content(array $request = []): string
 	{
-		$profile = ProfileModel::load($this->appHelper, $this->parameters['nickname'] ?? '');
-		if (!$profile) {
+		$owner = User::getByNickname($this->parameters['nickname'] ?? '', ['uid']);
+		if (!$owner) {
 			throw new HTTPException\NotFoundException($this->t('Profile not found.'));
 		}
 
-		$remote_contact_id = $this->session->getRemoteContactID($profile['uid']);
-
-		if ($this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
-			return Login::form();
-		}
-
-		if (!empty($profile['hidewall']) && !$this->session->isAuthenticated()) {
-			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
-		}
-
-		if (!empty($profile['page-flags']) && in_array($profile['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_COMM_MAN])) {
-			$this->page['htmlhead'] .= '<meta name="friendica.community" content="true" />' . "\n";
-		}
-
-		$this->page['htmlhead'] .= $this->buildHtmlHead($profile, $this->parameters['nickname']);
-
-		Nav::setSelected('home');
-
-		$is_owner = $this->session->getLocalUserId() == $profile['uid'];
-		$o        = self::getTabsHTML('profile', $is_owner, $profile['nickname'], $profile['hide-friends']);
-
+		$is_owner              = $this->session->getLocalUserId() == $owner['uid'];
 		$view_as_contacts      = [];
 		$view_as_contact_id    = 0;
 		$view_as_contact_alert = '';
@@ -171,9 +151,34 @@ class Profile extends BaseProfile
 			}
 		}
 
+		$profile = ProfileModel::load($this->appHelper, $this->parameters['nickname'], true, $view_as_contact_id);
+		if (!$profile) {
+			throw new HTTPException\NotFoundException($this->t('Profile not found.'));
+		}
+
+		$remote_contact_id = $this->session->getRemoteContactID($profile['uid']);
+
+		if ($this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
+			return Login::form();
+		}
+
+		if (!empty($profile['hidewall']) && !$this->session->isAuthenticated()) {
+			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
+		}
+
+		if (!empty($profile['page-flags']) && in_array($profile['page-flags'], [User::PAGE_FLAGS_COMMUNITY, User::PAGE_FLAGS_COMM_MAN])) {
+			$this->page['htmlhead'] .= '<meta name="friendica.community" content="true" />' . "\n";
+		}
+
+		$this->page['htmlhead'] .= $this->buildHtmlHead($profile, $this->parameters['nickname']);
+
+		Nav::setSelected('home');
+
+		$o = self::getTabsHTML('profile', $is_owner, $profile['nickname'], $profile['hide-friends']);
+
 		$basic_fields = [];
 
-		$basic_fields += self::buildField('fullname', $this->t('Full Name:'), $this->cleanInput($profile['uri-id'], $profile['name']));
+		$basic_fields += self::buildField('fullname', $this->t('Display name:'), $this->cleanInput($profile['uri-id'], $profile['name']));
 
 		if (Feature::isEnabled($profile['uid'], Feature::MEMBER_SINCE)) {
 			$basic_fields += self::buildField(
@@ -280,7 +285,7 @@ class Profile extends BaseProfile
 			'$view_as_contact_id'    => $view_as_contact_id,
 			'$view_as_contact_alert' => $view_as_contact_alert,
 			'$view_as'               => $this->t('View profile as:'),
-			'$submit'                => $this->t('Submit'),
+			'$submit'                => $this->t('View as selected profile'),
 			'$basic'                 => $this->t('Basic'),
 			'$advanced'              => $this->t('Advanced'),
 			'$is_owner'              => $profile['uid'] == $this->session->getLocalUserId(),
@@ -288,14 +293,13 @@ class Profile extends BaseProfile
 			'$basic_fields'          => $basic_fields,
 			'$custom_fields'         => $custom_fields,
 			'$profile'               => $profile,
+			'$homepage_verified'     => $this->l10n->t('This website has been verified to belong to the same person.'),
 			'$edit_link'             => [
 				'url'   => 'settings/profile', $this->t('Edit profile'),
-				'title' => '',
 				'label' => $this->t('Edit profile')
 			],
 			'$viewas_link' => [
 				'url'   => $this->args->getQueryString() . '#viewas',
-				'title' => '',
 				'label' => $this->t('View as')
 			],
 		]);

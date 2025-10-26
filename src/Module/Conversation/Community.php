@@ -80,7 +80,7 @@ class Community extends Timeline
 			'$global_community_hint'      => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
 		]);
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll')) {
+		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
 		}
@@ -125,7 +125,7 @@ class Community extends Timeline
 			$this->itemsPerPage
 		);
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll')) {
+		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader();
 		} else {
 			$o .= $pager->renderMinimal(count($items));

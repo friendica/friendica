@@ -28,7 +28,7 @@ class DocWriter
 	public static function writeDbDefinition(DbaDefinition $definition, string $basePath)
 	{
 		$tables = [];
-		foreach ($definition->getAll() as $name => $definition) {
+		foreach ($definition->load(false)->getAll() as $name => $definition) {
 			$indexes = [
 				[
 					'name'   => 'Name',

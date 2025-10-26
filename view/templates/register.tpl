@@ -4,6 +4,14 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
+
+{{* Display system messages *}}
+{{if $notices}}
+	{{foreach $notices as $notice}}
+		<div class="alert alert-warning" role="alert">{{$notice}}</div>
+	{{/foreach}}
+{{/if}}
+
 <h3>{{$regtitle}}</h3>
 
 <form action="register" method="post" id="register-form">

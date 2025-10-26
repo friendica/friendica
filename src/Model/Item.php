@@ -14,7 +14,6 @@ use Friendica\Content\Post\Collection\PostMedias;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
@@ -449,66 +448,6 @@ class Item
 	}
 
 	/**
-	 * Get guid from given item record
-	 *
-	 * @param array $item Item record
-	 * @param bool $notify Whether to notify (?)
-	 * @return string Guid
-	 */
-	public static function guid(array $item, bool $notify): string
-	{
-		if (!empty($item['guid'])) {
-			return trim($item['guid']);
-		}
-
-		if ($notify) {
-			// We have to avoid duplicates. So we create the GUID in form of a hash of the plink or uri.
-			// We add the hash of our own host because our host is the original creator of the post.
-			$prefix_host = DI::baseUrl()->getHost();
-		} else {
-			$prefix_host = '';
-
-			// We are only storing the post so we create a GUID from the original hostname.
-			if (!empty($item['author-link'])) {
-				$parsed = parse_url($item['author-link']);
-				if (!empty($parsed['host'])) {
-					$prefix_host = $parsed['host'];
-				}
-			}
-
-			if (empty($prefix_host) && !empty($item['plink'])) {
-				$parsed = parse_url($item['plink']);
-				if (!empty($parsed['host'])) {
-					$prefix_host = $parsed['host'];
-				}
-			}
-
-			if (empty($prefix_host) && !empty($item['uri'])) {
-				$parsed = parse_url($item['uri']);
-				if (!empty($parsed['host'])) {
-					$prefix_host = $parsed['host'];
-				}
-			}
-
-			// Is it in the format data@host.tld? - Used for mail contacts
-			if (empty($prefix_host) && !empty($item['author-link']) && strstr($item['author-link'], '@')) {
-				$mailparts   = explode('@', $item['author-link']);
-				$prefix_host = array_pop($mailparts);
-			}
-		}
-
-		if (!empty($item['plink'])) {
-			$guid = self::guidFromUri($item['plink'], $prefix_host);
-		} elseif (!empty($item['uri'])) {
-			$guid = self::guidFromUri($item['uri'], $prefix_host);
-		} else {
-			$guid = System::createUUID(hash('crc32', $prefix_host));
-		}
-
-		return $guid;
-	}
-
-	/**
 	 * Returns contact id from given item record
 	 *
 	 * @param array $item Item record
@@ -671,7 +610,7 @@ class Item
 	/**
 	 * Inserts item record
 	 *
-	 * @param array<string,mixed> $item Item array to be inserted
+	 * @param array $item Item array to be inserted
 	 * @param int   $notify Notification (type?)
 	 * @param bool  $post_local (???)
 	 * @return int Zero means error, otherwise primary key (id) is being returned
@@ -1870,7 +1809,7 @@ class Item
 			}
 		}
 
-		$languages = self::getLanguageArray($content, 3, $item['uri-id'], $item['author-id'], $transmitted);
+		$languages = DI::contentItem()->getLanguageArray($content, 3, $item['uri-id'], $item['author-id'], $transmitted);
 
 		if (!empty($transmitted)) {
 			$languages = array_merge($transmitted, $languages);
@@ -1878,190 +1817,6 @@ class Item
 		}
 
 		return json_encode($languages);
-	}
-
-	/**
-	 * Get a language array from a given text
-	 *
-	 * @param string  $body
-	 * @param integer $count
-	 * @param integer $uri_id
-	 * @param integer $author_id
-	 * @param array   $default
-	 * @return array
-	 */
-	public static function getLanguageArray(string $body, int $count, int $uri_id = 0, int $author_id = 0, array $default = []): array
-	{
-		$default = $default ?: [L10n::UNDETERMINED_LANGUAGE => 1];
-
-		$searchtext = BBCode::toSearchText($body, $uri_id);
-
-		if ((count(explode(' ', $searchtext)) < 10) && (mb_strlen($searchtext) < 30) && $author_id) {
-			$author = Contact::selectFirst(['about'], ['id' => $author_id]);
-			if (!empty($author['about'])) {
-				$about = BBCode::toSearchText($author['about'], 0);
-				DI::logger()->debug('About field added', ['author' => $author_id, 'body' => $searchtext, 'about' => $about]);
-				$searchtext .= ' ' . $about;
-			}
-		}
-
-		if (empty($searchtext)) {
-			return $default;
-		}
-
-		$ld = new Language(DI::l10n()->getDetectableLanguages());
-
-		$result = [];
-
-		$eventDispatcher = DI::eventDispatcher();
-
-		foreach (self::splitByBlocks($searchtext) as $block) {
-			$languages = $ld->detect($block)->close() ?: [];
-
-			$hook_data = [
-				'text'      => $block,
-				'detected'  => $languages,
-				'uri-id'    => $uri_id,
-				'author-id' => $author_id,
-			];
-
-			$hook_data = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::DETECT_LANGUAGES, $hook_data),
-			)->getArray();
-
-			foreach ($hook_data['detected'] as $language => $quality) {
-				$result[$language] = max($result[$language] ?? 0, $quality * (strlen($block) / strlen($searchtext)));
-			}
-		}
-
-		$result = self::compactLanguages($result);
-		if (empty($result)) {
-			return $default;
-		}
-
-		arsort($result);
-		return array_slice($result, 0, $count);
-	}
-
-	/**
-	 * Concert the language code in the detection result to ISO 639-1.
-	 * On duplicates the system uses the higher quality value.
-	 *
-	 * @param array $result
-	 * @return array
-	 */
-	private static function compactLanguages(array $result): array
-	{
-		$languages = [];
-		foreach ($result as $language => $quality) {
-			if ($quality == 0) {
-				continue;
-			}
-			$code = DI::l10n()->toISO6391($language);
-			if (empty($languages[$code]) || ($languages[$code] < $quality)) {
-				$languages[$code] = $quality;
-			}
-		}
-		return $languages;
-	}
-
-	/**
-	 * Split a string into different unicode blocks
-	 * Currently the text is split into the latin and the non latin part.
-	 *
-	 * @param string $body
-	 * @return array
-	 */
-	private static function splitByBlocks(string $body): array
-	{
-		if (!class_exists('IntlChar')) {
-			return [$body];
-		}
-
-		$blocks         = [];
-		$previous_block = 0;
-
-		for ($i = 0; $i < mb_strlen($body); $i++) {
-			$character = mb_substr($body, $i, 1);
-			$previous  = ($i > 0) ? mb_substr($body, $i - 1, 1) : '';
-			$next      = ($i < mb_strlen($body)) ? mb_substr($body, $i + 1, 1) : '';
-
-			if (!\IntlChar::isalpha($character)) {
-				if (($previous != '') && (\IntlChar::isalpha($previous))) {
-					$previous_block = self::getBlockCode($previous);
-				}
-
-				$block          = (($next != '') && \IntlChar::isalpha($next)) ? self::getBlockCode($next) : $previous_block;
-				$blocks[$block] = ($blocks[$block] ?? '') . $character;
-			} else {
-				$block          = self::getBlockCode($character);
-				$blocks[$block] = ($blocks[$block] ?? '') . $character;
-			}
-		}
-
-		foreach (array_keys($blocks) as $key) {
-			$blocks[$key] = trim($blocks[$key]);
-			if (empty($blocks[$key])) {
-				unset($blocks[$key]);
-			}
-		}
-
-		return array_values($blocks);
-	}
-
-	/**
-	 * returns the block code for the given character
-	 *
-	 * @param string $character
-	 * @return integer 0 = no alpha character (blank, signs, emojis, ...), 1 = latin character, 2 = character in every other language
-	 */
-	private static function getBlockCode(string $character): int
-	{
-		if (!\IntlChar::isalpha($character)) {
-			return 0;
-		}
-		return self::isLatin($character) ? 1 : 2;
-	}
-
-	/**
-	 * Checks if the given character is in one of the latin code blocks
-	 *
-	 * @param string $character
-	 * @return boolean
-	 */
-	private static function isLatin(string $character): bool
-	{
-		return in_array(\IntlChar::getBlockCode($character), [
-			\IntlChar::BLOCK_CODE_BASIC_LATIN, \IntlChar::BLOCK_CODE_LATIN_1_SUPPLEMENT,
-			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_A, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_B,
-			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_C, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_D,
-			\IntlChar::BLOCK_CODE_LATIN_EXTENDED_E, \IntlChar::BLOCK_CODE_LATIN_EXTENDED_ADDITIONAL
-		]);
-	}
-
-	public static function getLanguageMessage(array $item): string
-	{
-		$iso639 = new \Matriphe\ISO639\ISO639();
-
-		$used_languages = '';
-		foreach (json_decode($item['language'], true) as $language => $reliability) {
-			$code = DI::l10n()->toISO6391($language);
-
-			if ($code == L10n::UNDETERMINED_LANGUAGE) {
-				$native = $language = DI::l10n()->t('Undetermined');
-			} else {
-				$native   = $iso639->nativeByCode1($code);
-				$language = $iso639->languageByCode1($code);
-			}
-
-			if ($native != $language) {
-				$used_languages .= DI::l10n()->t('%s (%s - %s): %s', $native, $language, $code, number_format($reliability, 5)) . "\n";
-			} else {
-				$used_languages .= DI::l10n()->t('%s (%s): %s', $native, $code, number_format($reliability, 5)) . "\n";
-			}
-		}
-		$used_languages = DI::l10n()->t("Detected languages in this post:\n%s", $used_languages);
-		return $used_languages;
 	}
 
 	/**
@@ -2338,10 +2093,6 @@ class Item
 	 */
 	private static function autoReshare(array $item)
 	{
-		if ($item['gravity'] != self::GRAVITY_PARENT) {
-			return;
-		}
-
 		$ucid = Contact::getUserContactId($item['author-id'], $item['uid']);
 		if (!$ucid || ($ucid != $item['contact-id'])) {
 			return;
@@ -2359,9 +2110,26 @@ class Item
 			return;
 		}
 
-		DI::logger()->info('Automatically reshare item', ['uid' => $item['uid'], 'id' => $item['id'], 'guid' => $item['guid'], 'uri-id' => $item['uri-id']]);
+		if ($item['gravity'] == self::GRAVITY_PARENT) {
+			$id     = $item['id'];
+			$guid   = $item['guid'];
+			$uri_id = $item['uri-id'];
+		} elseif ($item['gravity'] == self::GRAVITY_ACTIVITY && $item['verb'] == Activity::ANNOUNCE) {
+			$post = Post::selectFirst(['id', 'guid', 'uri-id'], ['uri-id' => $item['parent-uri-id'], 'uid' => [0, $item['uid']]]);
+			if (!DBA::isResult($post)) {
+				DI::logger()->warning('No parent post found for reshare', ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
+				return;
+			}
+			$id     = $post['id'];
+			$guid   = $post['guid'];
+			$uri_id = $post['uri-id'];
+		} else {
+			return;
+		}
 
-		self::performActivity($item['id'], 'announce', $item['uid']);
+		DI::logger()->info('Automatically reshare item', ['gravity' => $item['gravity'], 'uid' => $item['uid'], 'id' => $id, 'guid' => $guid, 'uri-id' => $uri_id]);
+
+		self::performActivity($id, 'announce', $item['uid']);
 	}
 
 	public static function isRemoteSelf(array $contact, array &$datarray): bool
@@ -3139,7 +2907,7 @@ class Item
 		$shared_item        = [];
 
 		$shared = DI::contentItem()->getSharedPost($item, $fields);
-		if (!empty($shared['post'])) {
+		if (!empty($shared['post']) && !self::containsEmbed($body, $shared['post']['uri']) && !self::containsEmbed($body, $shared['post']['plink'] ?? '')) {
 			$shared_item         = $shared['post'];
 			$shared_item['body'] = Post\Media::removeFromEndOfBody($shared_item['body']);
 			$shared_item['body'] = Post\Media::replaceImage($shared_item['body']);
@@ -3265,8 +3033,8 @@ class Item
 
 		if (!empty($sharedSplitAttachments)) {
 			$s    = self::addGallery($s, $sharedSplitAttachments['visual']);
-			$s    = self::addVisualAttachments($sharedSplitAttachments['visual'], $shared_item, $s, true);
-			$s    = self::addLinkAttachment($shared_uri_id ?: $item['uri-id'], $sharedSplitAttachments, $body, $s, true, $quote_shared_links);
+			$s    = self::addVisualAttachments($sharedSplitAttachments['visual'], $shared_item, $s, true, $uid);
+			$s    = self::addLinkAttachment($shared_uri_id ?: $item['uri-id'], $sharedSplitAttachments, $body, $s, true, $quote_shared_links, $uid);
 			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s);
 			$body = BBCode::removeSharedData($body);
 		}
@@ -3278,8 +3046,8 @@ class Item
 		}
 
 		$s = self::addGallery($s, $itemSplitAttachments['visual']);
-		$s = self::addVisualAttachments($itemSplitAttachments['visual'], $item, $s, false);
-		$s = self::addLinkAttachment($item['uri-id'], $itemSplitAttachments, $body, $s, false, $shared_links);
+		$s = self::addVisualAttachments($itemSplitAttachments['visual'], $item, $s, false, $uid);
+		$s = self::addLinkAttachment($item['uri-id'], $itemSplitAttachments, $body, $s, false, $shared_links, $uid);
 		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s);
 		$s = self::addQuestions($item, $s);
 
@@ -3300,6 +3068,8 @@ class Item
 		if (!empty($shared_html)) {
 			$s .= $shared_html;
 		}
+
+		$s = DI::postMediaRepository()->addEmbed($s, $uid, $item['uri-id']);
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
@@ -3382,6 +3152,25 @@ class Item
 		}
 
 		return $s;
+	}
+
+	private static function containsEmbed(string $body, string $url): bool
+	{
+		$contains = false;
+
+		if (preg_match_all("/\[audio\]([^\[\]]*)\[\/audio\]/Usi", $body, $embeds)) {
+			$contains = in_array($url, $embeds[1]);
+		}
+
+		if (!$contains && preg_match_all("/\[video\]([^\[\]]*)\[\/video\]/Usi", $body, $embeds)) {
+			$contains = in_array($url, $embeds[1]);
+		}
+
+		if (!$contains && preg_match_all("/\[embed\]([^\[\]]*)\[\/embed\]/Usi", $body, $embeds)) {
+			$contains = in_array($url, $embeds[1]);
+		}
+
+		return $contains;
 	}
 
 	/**
@@ -3478,10 +3267,11 @@ class Item
 	 * @param array      $item
 	 * @param string     $content
 	 * @param bool       $shared
+	 * @param int        $uid
 	 * @return string modified content
 	 * @throws ServiceUnavailableException
 	 */
-	private static function addVisualAttachments(PostMedias $PostMedias, array $item, string $content, bool $shared): string
+	private static function addVisualAttachments(PostMedias $PostMedias, array $item, string $content, bool $shared, int $uid): string
 	{
 		DI::profiler()->startRecording('rendering');
 		$leading  = '';
@@ -3490,7 +3280,7 @@ class Item
 
 		// @todo In the future we should make a single for the template engine with all media in it. This allows more flexibilty.
 		foreach ($PostMedias as $PostMedia) {
-			if (self::containsLink($item['body'], $PostMedia->preview ?? $PostMedia->url, $PostMedia->type)) {
+			if (self::containsLink($item['body'], $PostMedia->preview ?? $PostMedia->url, $PostMedia->type) || self::containsEmbed($item['body'], $PostMedia->url)) {
 				continue;
 			}
 
@@ -3506,53 +3296,27 @@ class Item
 				continue;
 			}
 
-			if (($PostMedia->mimetype->type == 'video') || ($PostMedia->type == Post\Media::HLS)) {
-				if (($PostMedia->height ?? 0) > ($PostMedia->width ?? 0)) {
-					$height = min(DI::config()->get('system', 'max_video_height') ?: '100%', $PostMedia->height);
-					$width  = 'auto';
-				} else {
-					$height = 'auto';
-					$width  = '100%';
-				}
-				/// @todo Move the template to /content as well
-				$media = Renderer::replaceMacros(Renderer::getMarkupTemplate($PostMedia->type == Post\Media::HLS ? 'hls_top.tpl' : 'video_top.tpl'), [
-					'$video' => [
-						'id'          => $PostMedia->id,
-						'src'         => (string)$PostMedia->url,
-						'name'        => $PostMedia->name ?: $PostMedia->url,
-						'preview'     => $preview_url,
-						'mime'        => (string)$PostMedia->mimetype,
-						'height'      => $height,
-						'width'       => $width,
-						'description' => $PostMedia->description,
-					],
-				]);
+			if (in_array($PostMedia->type, [Post\Media::VIDEO, Post\Media::HLS])) {
+				$media = DI::postMediaRepository()->getVideoAttachment($PostMedia, $uid);
 				if (($item['post-type'] ?? null) == Item::PT_VIDEO) {
 					$leading .= $media;
 				} else {
 					$trailing .= $media;
 				}
-			} elseif ($PostMedia->mimetype->type == 'audio') {
-				$media = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/audio.tpl'), [
-					'$audio' => [
-						'id'   => $PostMedia->id,
-						'src'  => (string)$PostMedia->url,
-						'name' => $PostMedia->name ?: $PostMedia->url,
-						'mime' => (string)$PostMedia->mimetype,
-					],
-				]);
+			} elseif ($PostMedia->type == Post\Media::AUDIO) {
+				$media = DI::postMediaRepository()->getAudioAttachment($PostMedia);
 				if (($item['post-type'] ?? null) == Item::PT_AUDIO) {
 					$leading .= $media;
 				} else {
 					$trailing .= $media;
 				}
-			} elseif ($PostMedia->mimetype->type == 'image') {
+			} elseif ($PostMedia->type == Post\Media::IMAGE) {
 				$src_url = DI::baseUrl() . $PostMedia->getPhotoPath();
 				if (self::containsLink($item['body'], $src_url)) {
 					continue;
 				}
 
-				if (empty($PostMedia->description) && DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'accessibility', 'hide_empty_descriptions')) {
+				if (empty($PostMedia->description) && DI::pConfig()->get($uid, 'accessibility', 'hide_empty_descriptions')) {
 					continue;
 				}
 				$images[] = $PostMedia->withUrl(new Uri($src_url))->withPreview(new Uri($preview_url), $preview_size);
@@ -3594,11 +3358,12 @@ class Item
 	 * @param string       $content
 	 * @param bool         $shared
 	 * @param array        $ignore_links A list of URLs to ignore
+	 * @param int          $uid
 	 * @return string modified content
 	 * @throws InternalServerErrorException
 	 * @throws ServiceUnavailableException
 	 */
-	private static function addLinkAttachment(int $uriid, array $attachments, string $body, string $content, bool $shared, array $ignore_links): string
+	private static function addLinkAttachment(int $uriid, array $attachments, string $body, string $content, bool $shared, array $ignore_links, int $uid): string
 	{
 		DI::profiler()->startRecording('rendering');
 		// Don't show a preview when there is a visual attachment (audio or video)
@@ -3637,6 +3402,13 @@ class Item
 				'title'         => $attachment->name ?? '',
 				'type'          => 'link',
 				'url'           => (string)$attachment->url,
+				'player_url'    => (string)$attachment->playerUrl,
+				'player_width'  => $attachment->playerWidth,
+				'player_height' => $attachment->playerHeight,
+				'embed_type'    => $attachment->embedType,
+				'embed_html'    => $attachment->embedHtml,
+				'embed_width'   => $attachment->embedWidth,
+				'embed_height'  => $attachment->embedHeight,
 			];
 
 			if ($preview && $attachment->preview) {
@@ -3687,9 +3459,9 @@ class Item
 				}
 
 				// @todo Use a template
-				$preview_mode = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'preview_mode', BBCode::PREVIEW_LARGE);
-				if ($preview_mode != BBCode::PREVIEW_NONE) {
-					$rendered = BBCode::convertAttachment('', BBCode::INTERNAL, false, $data, $uriid, $preview_mode);
+				$preview_mode = DI::pConfig()->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_LARGE);
+				if ($preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $data['url'])) {
+					$rendered = BBCode::convertAttachment('', BBCode::INTERNAL, $data, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false));
 				} elseif (!self::containsLink($content, $data['url'], Post\Media::HTML)) {
 					$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
 						'$url'   => $data['url'],

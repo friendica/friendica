@@ -372,7 +372,7 @@ class APContact
 		}
 
 		$apcontact['discoverable'] = JsonLD::fetchElement($compacted, 'toot:discoverable', '@value');
-		if (is_null($apcontact['discoverable']) && ($apcontact['type'] == 'Application')) {
+		if (is_null($apcontact['discoverable']) && in_array($apcontact['type'], ['Application', 'Service'])) {
 			$apcontact['discoverable'] = false;
 		}
 
@@ -610,12 +610,19 @@ class APContact
 			return true;
 		}
 
-		if (in_array($apcontact['type'], ['Application', 'Service']) && empty($apcontact['following']) && empty($apcontact['followers'])) {
+		if (in_array($apcontact['type'], ['Application', 'Service']) && empty($apcontact['following']) && empty($apcontact['followers']) && !$apcontact['discoverable']) {
 			return true;
 		}
 
 		if (($apcontact['type'] == 'Application') && ($apcontact['nick'] == 'relay') && in_array($path, ['/actor', '/relay'])) {
 			return true;
+		}
+
+		if (($apcontact['type'] == 'Application') && !empty($apcontact['gsid'])) {
+			$gserver = DBA::selectFirst('gserver', ['platform'], ['id' => $apcontact['gsid']]);
+			if (($gserver['platform'] ?? '') == 'peertube') {
+				return true;
+			}
 		}
 
 		return false;

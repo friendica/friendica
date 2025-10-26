@@ -13,14 +13,14 @@ use Friendica\Util\Strings;
 /**
  * Some functions to handle addons
  *
- * @deprecated 2025.02 Use implementation of `Friendica\Core\Addon\AddonHelper` instead
+ * @deprecated 2025.07 Use implementation of `Friendica\Core\Addon\AddonHelper` instead
  */
 class Addon
 {
 	/**
 	 * The addon sub-directory
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getAddonPath()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::getAddonPath()` instead
 	 *
 	 * @var string
 	 */
@@ -38,14 +38,14 @@ class Addon
 	 * This list is made from scanning the addon/ folder.
 	 * Unsupported addons are excluded unless they already are enabled or system.show_unsupported_addon is set.
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getAvailableAddons()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::getAvailableAddons()` instead
 	 *
 	 * @return array
 	 * @throws \Exception
 	 */
 	public static function getAvailableList(): array
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		$addons = [];
 		$files  = glob('addon/*/');
@@ -72,14 +72,14 @@ class Addon
 	 * Returns a list of addons that can be configured at the node level.
 	 * The list is formatted for display in the admin panel aside.
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getEnabledAddonsWithAdminSettings()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::getEnabledAddonsWithAdminSettings()` instead
 	 *
 	 * @return array
 	 * @throws \Exception
 	 */
 	public static function getAdminList(): array
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		$addons_admin = [];
 		$addons       = array_filter(DI::config()->get('addons') ?? []);
@@ -111,11 +111,11 @@ class Addon
 	 * Then go through the config list and if we have a addon that isn't installed,
 	 * call the install procedure and add it to the database.
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::loadAddons()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::loadAddons()` instead
 	 */
 	public static function loadAddons()
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		self::$addons = array_keys(array_filter(DI::config()->get('addons') ?? []));
 	}
@@ -123,7 +123,7 @@ class Addon
 	/**
 	 * uninstalls an addon.
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::uninstallAddon()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::uninstallAddon()` instead
 	 *
 	 * @param string $addon name of the addon
 	 * @return void
@@ -131,7 +131,7 @@ class Addon
 	 */
 	public static function uninstall(string $addon)
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		$addon = Strings::sanitizeFilePathItem($addon);
 
@@ -153,7 +153,7 @@ class Addon
 	/**
 	 * installs an addon.
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::installAddon()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::installAddon()` instead
 	 *
 	 * @param string $addon name of the addon
 	 * @return bool
@@ -161,7 +161,7 @@ class Addon
 	 */
 	public static function install(string $addon): bool
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		$addon = Strings::sanitizeFilePathItem($addon);
 
@@ -195,7 +195,7 @@ class Addon
 	/**
 	 * reload all updated addons
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::reloadAddons()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::reloadAddons()` instead
 	 *
 	 * @return void
 	 * @throws \Exception
@@ -203,7 +203,7 @@ class Addon
 	 */
 	public static function reload()
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		$addons = array_filter(DI::config()->get('addons') ?? []);
 
@@ -236,7 +236,7 @@ class Addon
 	 *   *
 	 *   *\endcode
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getAddonInfo()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::getAddonInfo()` instead
 	 *
 	 * @param string $addon the name of the addon
 	 * @return array with the addon information
@@ -244,7 +244,7 @@ class Addon
 	 */
 	public static function getInfo(string $addon): array
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		$addon = Strings::sanitizeFilePathItem($addon);
 
@@ -300,14 +300,14 @@ class Addon
 	/**
 	 * Checks if the provided addon is enabled
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::isAddonEnabled()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::isAddonEnabled()` instead
 	 *
 	 * @param string $addon
 	 * @return boolean
 	 */
 	public static function isEnabled(string $addon): bool
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		return in_array($addon, self::$addons);
 	}
@@ -315,13 +315,13 @@ class Addon
 	/**
 	 * Returns a list of the enabled addon names
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getEnabledAddons()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::getEnabledAddons()` instead
 	 *
 	 * @return array
 	 */
 	public static function getEnabledList(): array
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		return self::$addons;
 	}
@@ -329,14 +329,14 @@ class Addon
 	/**
 	 * Returns the list of non-hidden enabled addon names
 	 *
-	 * @deprecated 2025.02 Use `Friendica\Core\Addon\AddonHelper::getVisibleEnabledAddons()` instead
+	 * @deprecated 2025.07 Use `Friendica\Core\Addon\AddonHelper::getVisibleEnabledAddons()` instead
 	 *
 	 * @return array
 	 * @throws \Exception
 	 */
 	public static function getVisibleList(): array
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.07 and will be removed after 5 months, use implementation of `Friendica\Core\Addon\AddonHelper` instead.', E_USER_DEPRECATED);
 
 		$visible_addons = [];
 		$addons         = array_filter(DI::config()->get('addons') ?? []);

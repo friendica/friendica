@@ -197,24 +197,28 @@ class Actor
 			return $contact;
 		}
 
-		$fields = [
-			'uid'      => $contact_uid,
-			'network'  => Protocol::BLUESKY,
-			'priority' => 1,
-			'writable' => true,
-			'blocked'  => false,
-			'readonly' => false,
-			'pending'  => false,
-			'url'      => $did,
-			'nurl'     => $did,
-			'alias'    => ATProtocol::WEB . '/profile/' . $did,
-			'name'     => $did,
-			'nick'     => $did,
-			'addr'     => $did,
-			'rel'      => Contact::NOTHING,
-		];
+		if (empty($contact)) {
+			$fields = [
+				'uid'      => $contact_uid,
+				'network'  => Protocol::BLUESKY,
+				'priority' => 1,
+				'writable' => true,
+				'blocked'  => false,
+				'readonly' => false,
+				'pending'  => false,
+				'url'      => $did,
+				'nurl'     => $did,
+				'alias'    => ATProtocol::WEB . '/profile/' . $did,
+				'name'     => $did,
+				'nick'     => $did,
+				'addr'     => $did,
+				'rel'      => Contact::NOTHING,
+			];
 
-		$cid = Contact::insert($fields);
+			$cid = Contact::insert($fields);
+		} else {
+			$cid = $contact['id'];
+		}
 
 		$this->updateContactByDID($did, $contact_uid);
 

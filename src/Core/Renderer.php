@@ -34,8 +34,6 @@ class Renderer
 	 * beyond are used.
 	 */
 	public static $theme = [
-		'videowidth'      => 425,
-		'videoheight'     => 350,
 		'stylesheet'      => '',
 		'template_engine' => 'smarty3',
 	];
@@ -127,6 +125,7 @@ class Renderer
 
 		if (!empty($v['name'])) {
 			$name = $v['name'];
+
 			self::$template_engines[$name] = $class;
 		} else {
 			$admin_message = DI::l10n()->t('template engine cannot be registered without a name.');
@@ -156,8 +155,9 @@ class Renderer
 				return self::$template_engine_instance[$template_engine];
 			} else {
 				$appHelper = DI::appHelper();
-				$class = self::$template_engines[$template_engine];
-				$obj = new $class($appHelper->getCurrentTheme(), $appHelper->getThemeInfo());
+				$class     = self::$template_engines[$template_engine];
+				$obj       = new $class($appHelper->getCurrentTheme(), $appHelper->getThemeInfo());
+
 				self::$template_engine_instance[$template_engine] = $obj;
 				return $obj;
 			}

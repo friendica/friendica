@@ -145,15 +145,19 @@ class Processor
 			return;
 		}
 
-		$data                = ['uri-id' => $uriid];
-		$data['type']        = Post\Media::UNKNOWN;
-		$data['url']         = $attachment['url'];
-		$data['mimetype']    = $attachment['mediaType'] ?? null;
-		$data['height']      = $attachment['height']    ?? null;
-		$data['width']       = $attachment['width']     ?? null;
-		$data['size']        = $attachment['size']      ?? null;
-		$data['preview']     = $attachment['image']     ?? null;
-		$data['description'] = $attachment['name']      ?? null;
+		$data                  = ['uri-id' => $uriid];
+		$data['type']          = Post\Media::UNKNOWN;
+		$data['url']           = $attachment['url'];
+		$data['mimetype']      = $attachment['mediaType']     ?? null;
+		$data['height']        = $attachment['height']        ?? null;
+		$data['width']         = $attachment['width']         ?? null;
+		$data['size']          = $attachment['size']          ?? null;
+		$data['blurhash']      = $attachment['blurhash']      ?? null;
+		$data['preview']       = $attachment['image']         ?? null;
+		$data['description']   = $attachment['name']          ?? null;
+		$data['player-url']    = $attachment['player-url']    ?? null;
+		$data['player-height'] = $attachment['player-height'] ?? null;
+		$data['player-width']  = $attachment['player-width']  ?? null;
 
 		Post\Media::insert($data);
 	}
@@ -231,7 +235,7 @@ class Processor
 		$item['changed'] = DateTimeFormat::utcNow();
 		$item['edited']  = DateTimeFormat::utc($activity['updated']);
 
-		Post\Media::deleteByURIId($item['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HTML]);
+		Post\Media::deleteByURIId($item['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HTML, Post\Media::HLS, Post\Media::TORRENT]);
 		$item = self::processContent($activity, $item);
 		if (empty($item)) {
 			Queue::remove($activity);
@@ -422,9 +426,6 @@ class Processor
 				$item['causer-id']   = $item['owner-id'];
 				DI::logger()->info('Use actor as causer.', ['id' => $item['owner-id'], 'actor' => $item['owner-link']]);
 			}
-
-			$item['owner-link'] = $item['author-link'];
-			$item['owner-id']   = $item['author-id'];
 		}
 
 		if (!$item['isGroup'] && !empty($activity['receiver_urls']['as:audience'])) {
@@ -2036,7 +2037,7 @@ class Processor
 		}
 
 		$searchtext = Engagement::getSearchTextForActivity($content, $authorid, $messageTags, $receivers);
-		$languages  = Item::getLanguageArray($content, 1, 0, $authorid);
+		$languages  = DI::contentItem()->getLanguageArray($content, 1, 0, $authorid);
 		$language   = !empty($languages) ? array_key_first($languages) : '';
 		return DI::userDefinedChannel()->match($searchtext, $language);
 	}

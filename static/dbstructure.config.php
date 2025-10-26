@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1580);
+	define('DB_UPDATE_VERSION', 1582);
 }
 
 return [
@@ -1101,19 +1101,6 @@ return [
 			"notify-id" => ["notify-id"],
 		]
 	],
-	"oembed" => [
-		"comment" => "cache for OEmbed queries",
-		"fields" => [
-			"url" => ["type" => "varbinary(383)", "not null" => "1", "primary" => "1", "comment" => "page url"],
-			"maxwidth" => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "comment" => "Maximum width passed to Oembed"],
-			"content" => ["type" => "mediumtext", "comment" => "OEmbed data of the page"],
-			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of creation"],
-		],
-		"indexes" => [
-			"PRIMARY" => ["url", "maxwidth"],
-			"created" => ["created"],
-		]
-	],
 	"openwebauth-token" => [
 		"comment" => "Store OpenWebAuth token to verify contacts",
 		"fields" => [
@@ -1134,7 +1121,7 @@ return [
 		"fields" => [
 			"url_hash" => ["type" => "binary(64)", "not null" => "1", "primary" => "1", "comment" => "page url hash"],
 			"guessing" => ["type" => "boolean", "not null" => "1", "default" => "0", "primary" => "1", "comment" => "is the 'guessing' mode active?"],
-			"oembed" => ["type" => "boolean", "not null" => "1", "default" => "0", "primary" => "1", "comment" => "is the data the result of oembed?"],
+			"oembed" => ["type" => "boolean", "not null" => "1", "default" => "0", "primary" => "1", "comment" => "is the data the result of oembed? - Obsolete field."],
 			"url" => ["type" => "text", "not null" => "1", "comment" => "page url"],
 			"content" => ["type" => "mediumtext", "comment" => "page data"],
 			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "datetime of creation"],
@@ -1447,6 +1434,13 @@ return [
 			"publisher-url" => ["type" => "varbinary(383)", "comment" => "URL of the publisher of the media"],
 			"publisher-name" => ["type" => "varchar(255)", "comment" => "Name of the publisher of the media"],
 			"publisher-image" => ["type" => "varbinary(383)", "comment" => "Image of the publisher of the media"],
+			"player-url" => ["type" => "varbinary(383)", "comment" => "URL of the embedded player for this media"],
+			"player-height" => ["type" => "smallint unsigned", "comment" => "Height of the embedded player"],
+			"player-width" => ["type" => "smallint unsigned", "comment" => "Width of the embedded player"],
+			"embed-type" => ["type" => "varchar(10)", "comment" => "Type of the embed (e.g. rich or video)"],
+			"embed-html" => ["type" => "text", "comment" => "HTML embed code for this media"],
+			"embed-height" => ["type" => "smallint unsigned", "comment" => "Height of the embed"],
+			"embed-width" => ["type" => "smallint unsigned", "comment" => "Width of the embed"],
 			"language" => ["type" => "char(3)", "comment" => "Language information about this media in the ISO 639 format"],
 			"published" => ["type" => "datetime", "comment" => "Publification date of this media"],
 			"modified" => ["type" => "datetime", "comment" => "Modification date of this media"],

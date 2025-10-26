@@ -23,13 +23,16 @@ use Friendica\Model\Post;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
+use Friendica\Object\Image;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\ATProtocol;
+use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
+use getID3;
 use GuzzleHttp\Psr7\Uri;
 
 /**
@@ -187,22 +190,34 @@ class Media
 			}
 		}
 
+		if (($media['type'] == self::HLS) && empty($media['mimetype'])) {
+			$media['mimetype'] = 'application/vnd.apple.mpegurl';
+		}
+
 		// Fetch the mimetype or size if missing.
-		if (Network::isValidHttpUrl($media['url']) && (empty($media['mimetype']) || $media['type'] == self::HTML) && !in_array($media['type'], [self::IMAGE, self::HLS])) {
+		if (Network::isValidHttpUrl($media['url']) && (empty($media['mimetype']) || $media['type'] == self::HTML) && ($media['type'] != self::IMAGE)) {
 			$timeout = DI::config()->get('system', 'xrd_timeout');
 			try {
 				$curlResult = DI::httpClient()->head($media['url'], [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::AS_DEFAULT, HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::REQUEST => HttpClientRequest::CONTENTTYPE]);
+				$is_head    = true;
 
 				// Workaround for systems that can't handle a HEAD request
 				if (!$curlResult->isSuccess() && in_array($curlResult->getReturnCode(), [400, 403, 405])) {
-					$curlResult = DI::httpClient()->get($media['url'], HttpClientAccept::AS_DEFAULT, [HttpClientOptions::TIMEOUT => $timeout]);
+					$curlResult = DI::httpClient()->get($media['url'], HttpClientAccept::AS_DEFAULT, [HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::HEADERS => ['Range' => 'bytes=0-100000']]);
+					$is_head    = false;
 				}
 				if ($curlResult->isSuccess()) {
 					if (!empty($curlResult->getContentType())) {
 						$media['mimetype'] = $curlResult->getContentType();
 					}
-					if (empty($media['size'])) {
+					if (empty($media['size']) && $is_head) {
 						$media['size'] = (int)($curlResult->getHeader('Content-Length')[0] ?? strlen($curlResult->getBodyString() ?? ''));
+					}
+					if (empty($media['modified']) && !empty($curlResult->getHeader('Last-Modified')[0])) {
+						$media['modified'] = DateTimeFormat::utc($curlResult->getHeader('Last-Modified')[0]);
+						if (empty($media['published'])) {
+							$media['published'] = $media['modified'];
+						}
 					}
 				} else {
 					DI::logger()->notice('Could not fetch head', ['media' => $media, 'code' => $curlResult->getReturnCode()]);
@@ -239,11 +254,16 @@ class Media
 			$media = self::addPreviewData($media);
 		}
 
+		if ($media['type'] === self::VIDEO) {
+			$media = self::getVideoInformationByFFMPEG($media);
+			$media = self::getVideoDimensionsByID3($media, false);
+		}
+
 		if (in_array($media['type'], [self::TEXT, self::ACTIVITY, self::LD, self::JSON, self::HTML, self::XML, self::PLAIN])) {
 			$media = self::addAccount($media);
 		}
 
-		if (in_array($media['type'], [self::ACTIVITY, self::LD, self::JSON]) || self::isFederatedServer($media['url'])) {
+		if (in_array($media['type'], [self::ACTIVITY, self::LD, self::JSON]) || (self::isFederatedServer($media['url']) && !in_array($media['type'], [self::HLS, self::AUDIO, self::VIDEO]))) {
 			$media = self::addActivity($media);
 		}
 
@@ -251,6 +271,9 @@ class Media
 			$media = self::addPage($media);
 		}
 
+		if (empty($media['name'])) {
+			$media['name'] = basename(parse_url($media['url'], PHP_URL_PATH));
+		}
 		return $media;
 	}
 
@@ -267,7 +290,7 @@ class Media
 			}
 
 			return DBA::exists('gserver', ['nurl' => Strings::normaliseLink($baseurl), 'network' => Protocol::FEDERATED]);
-		} catch(\Throwable $e) {
+		} catch (\Throwable $e) {
 			DI::logger()->notice('Invalid URL provided', ['url' => $url, 'exception' => $e, 'callstack' => System::callstack(10)]);
 			return false;
 		}
@@ -442,18 +465,66 @@ class Media
 		}
 
 		$media['type']            = self::HTML;
-		$media['size']            = $data['size']           ?? null;
-		$media['author-url']      = $data['author_url']     ?? null;
-		$media['author-name']     = $data['author_name']    ?? null;
-		$media['author-image']    = $data['author_img']     ?? null;
-		$media['publisher-url']   = $data['publisher_url']  ?? null;
-		$media['publisher-name']  = $data['publisher_name'] ?? null;
-		$media['publisher-image'] = $data['publisher_img']  ?? null;
-		$media['language']        = $data['language']       ?? null;
-		$media['published']       = $data['published']      ?? null;
-		$media['modified']        = $data['modified']       ?? null;
+		$media['size']            = $data['size']             ?? null;
+		$media['author-url']      = $data['author_url']       ?? null;
+		$media['author-name']     = $data['author_name']      ?? null;
+		$media['author-image']    = $data['author_img']       ?? null;
+		$media['publisher-url']   = $data['publisher_url']    ?? null;
+		$media['publisher-name']  = $data['publisher_name']   ?? null;
+		$media['publisher-image'] = $data['publisher_img']    ?? null;
+		$media['player-url']      = $data['player']['embed']  ?? null;
+		$media['player-height']   = $data['player']['height'] ?? null;
+		$media['player-width']    = $data['player']['width']  ?? null;
+		$media['embed-type']      = $data['embed']['type']    ?? null;
+		$media['embed-html']      = $data['embed']['html']    ?? null;
+		$media['embed-height']    = $data['embed']['height']  ?? null;
+		$media['embed-width']     = $data['embed']['width']   ?? null;
+		$media['language']        = $data['language']         ?? null;
+		$media['published']       = $data['published']        ?? null;
+		$media['modified']        = $data['modified']         ?? null;
+
+		if (DI::config()->get('system', 'add_page_media')) {
+			if (!empty($data['audio'])) {
+				foreach ($data['audio'] as $entry) {
+					self::insertMedia($entry, $media['uri-id']);
+				}
+			}
+
+			if (!empty($data['video'])) {
+				foreach ($data['video'] as $entry) {
+					self::insertMedia($entry, $media['uri-id']);
+				}
+			}
+		}
 
 		return $media;
+	}
+
+	private static function insertMedia(array $element, int $uri_id)
+	{
+		if (empty($element['src']) || $uri_id <= 0) {
+			return;
+		}
+
+		if (($element['mimetype'] ?? '') === 'application/x-mpegURL') {
+			// Until we can detect live streaming, we don't store HLS streams
+			return;
+		}
+
+		$media                = ['uri-id' => $uri_id];
+		$media['type']        = Post\Media::UNKNOWN;
+		$media['url']         = $element['src'];
+		$media['mimetype']    = $element['contenttype'] ?? null;
+		$media['name']        = $element['name']        ?? null;
+		$media['description'] = $element['description'] ?? null;
+		$media['size']        = $element['size']        ?? null;
+		$media['height']      = $element['height']      ?? null;
+		$media['width']       = $element['width']       ?? null;
+		if (!empty($element['uploaded'])) {
+			$media['modified'] = DateTimeFormat::utc($element['uploaded']);
+		}
+		$result = self::insert($media);
+		DI::logger()->debug('Found media in page', ['result' => $result, 'uri-id' => $uri_id, 'media' => $media]);
 	}
 
 	/**
@@ -530,6 +601,8 @@ class Media
 			$type = self::IMAGE;
 		} elseif ($filetype == 'video') {
 			$type = self::VIDEO;
+		} elseif (($filetype == 'audio') && ($subtype == 'x-mpegurl')) {
+			$type = self::HLS;
 		} elseif ($filetype == 'audio') {
 			$type = self::AUDIO;
 		} elseif (($filetype == 'text') && ($subtype == 'html')) {
@@ -542,7 +615,7 @@ class Media
 			$type = self::TEXT;
 		} elseif (($filetype == 'application') && ($subtype == 'x-bittorrent')) {
 			$type = self::TORRENT;
-		} elseif (($filetype == 'application') && ($subtype == 'vnd.apple.mpegurl')) {
+		} elseif (($filetype == 'application') && in_array($subtype, ['vnd.apple.mpegurl', 'x-mpegurl'])) {
 			$type = self::HLS;
 		} elseif (($filetype == 'application') && ($subtype == 'activity+json')) {
 			$type = self::ACTIVITY;
@@ -559,6 +632,102 @@ class Media
 
 		DI::logger()->debug('Detected type', ['type' => $type, 'filetype' => $filetype, 'subtype' => $subtype, 'media' => $mimeType]);
 		return $type;
+	}
+
+	/**
+	 * Fetch video information (dimensions and blurhash) using ffmpeg
+	 *
+	 * @param array $media Media array
+	 * @return array media with added dimensions and blurhash
+	 */
+	private static function getVideoInformationByFFMPEG(array $media): array
+	{
+		if (!DI::config()->get('system', 'ffmpeg_installed')) {
+			return $media;
+		}
+
+		if (isset($media['width']) && isset($media['height']) && $media['width'] > 0 && $media['height'] > 0 && isset($media['blurhash'])) {
+			return $media;
+		}
+
+		DI::logger()->debug('Fetch video information', ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
+
+		$image = new Image('');
+		$image->getFromVideoUrl($media['url']);
+		if ($image->isValid()) {
+			$media['blurhash'] = $image->getBlurHash();
+			$media['width']    = $image->getWidth();
+			$media['height']   = $image->getHeight();
+			DI::logger()->debug('Detected video dimensions via FFMpeg preview', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'width' => $media['width'], 'height' => $media['height']]);
+			return $media;
+		}
+
+		return $media;
+	}
+
+	/**
+	 * Fetch video dimensions using getID3
+	 *
+	 * @param array $media     Media array
+	 * @param bool  $full_file If true, the whole video will be fetched
+	 * @return array media with added dimensions
+	 */
+	private static function getVideoDimensionsByID3(array $media, bool $full_file): array
+	{
+		if (isset($media['width']) && isset($media['height']) && $media['width'] > 0 && $media['height'] > 0) {
+			return $media;
+		}
+
+		DI::logger()->debug('Fetch video dimensions', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file]);
+		$timestamp  = microtime(true);
+		$timeout    = DI::config()->get('system', 'xrd_timeout');
+		$options    = $full_file ? [HttpClientOptions::TIMEOUT => $timeout] : [HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::HEADERS => ['Range' => 'bytes=0-1000000']];
+		$curlResult = DI::httpClient()->get($media['url'], HttpClientAccept::AS_DEFAULT, $options);
+		if (!$curlResult->isSuccess()) {
+			DI::logger()->notice('Could not fetch video', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'code' => $curlResult->getReturnCode()]);
+			return $media;
+		}
+
+		if ((!isset($media['modified']) || !$media['modified']) && isset($curlResult->getHeader('Last-Modified')[0]) && $curlResult->getHeader('Last-Modified')[0] != '') {
+			$media['modified'] = DateTimeFormat::utc($curlResult->getHeader('Last-Modified')[0]);
+			if (!isset($media['published']) || !$media['published']) {
+				$media['published'] = $media['modified'];
+			}
+		}
+
+		$video = $curlResult->getBodyString() ?? '';
+		if (!$video) {
+			DI::logger()->notice('Empty video content', ['uri-id' => $media['uri-id'], 'media' => $media, 'full_file' => $full_file]);
+			return $media;
+		}
+
+		$tempfile = tempnam(System::getTempPath(), 'video-');
+		file_put_contents($tempfile, $video);
+		$getID3 = new getID3();
+		$info   = $getID3->analyze($tempfile);
+		unlink($tempfile);
+		$runtime = number_format(microtime(true) - $timestamp, 3);
+
+		// @todo When we find a way to read the video file in chunks, we can enable this part again.
+		//if (isset($info['error']) && !$full_file && substr($info['error'][0], 0, 14) == 'Atom at offset') {
+		//	DI::logger()->info('Detection failed for shortened file, trying the full file now.', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'error' => $info['error']]);
+		//	return self::getVideoDimensions($media, true);
+		//}
+
+		if (isset($info['error'])) {
+			DI::logger()->info('Error analyzing video', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'error' => $info['error']]);
+		} elseif (isset($info['video']['resolution_x']) && isset($info['video']['resolution_y'])) {
+			$media['width']  = $info['video']['resolution_x'];
+			$media['height'] = $info['video']['resolution_y'];
+			DI::logger()->debug('Detected video dimensions', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'width' => $media['width'], 'height' => $media['height']]);
+		} elseif (isset($info['audio'])) {
+			$media['width']  = 0;
+			$media['height'] = 0;
+			DI::logger()->debug('Detected audio file', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file]);
+		} else {
+			DI::logger()->info('No video dimensions found', ['runtime' => $runtime, 'uri-id' => $media['uri-id'], 'url' => $media['url'], 'full_file' => $full_file, 'info' => $info]);
+		}
+		return $media;
 	}
 
 	/**
@@ -731,6 +900,14 @@ class Media
 				$body = str_replace($video[0], '', $body);
 
 				$attachments[$video[1]] = ['uri-id' => $uriid, 'type' => self::VIDEO, 'url' => $video[1]];
+			}
+		}
+
+		if (preg_match_all("/\[embed\]([^\[\]]*)\[\/embed\]$endmatchpattern/ism", $body, $embeds, PREG_SET_ORDER)) {
+			foreach ($embeds as $embed) {
+				$body = str_replace($embed[0], '', $body);
+
+				$attachments[$embed[1]] = ['uri-id' => $uriid, 'type' => self::UNKNOWN, 'url' => $embed[1]];
 			}
 		}
 

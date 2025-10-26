@@ -900,10 +900,6 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
 
     Hook::callAll('network_to_name', $nets);
 
-### src/Content/OEmbed.php
-
-    Hook::callAll('oembed_fetch_url', $embedurl, $j);
-
 ### src/Content/Nav.php
 
     Hook::callAll('page_header', DI::page()['nav']);

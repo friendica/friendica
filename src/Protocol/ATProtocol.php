@@ -132,7 +132,7 @@ final class ATProtocol
 
 		if ($data === null) {
 			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
-
+			$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while fetching data from Bluesky');
 			return null;
 		}
 
@@ -229,6 +229,13 @@ final class ATProtocol
 			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
 			if (!$data) {
 				$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
+				if (!empty($curlResult->getBodyString())) {
+					$this->pConfig->set($uid, 'bluesky', 'status-message', $curlResult->getBodyString());
+				} elseif (!empty($curlResult->getReturnCode())) {
+					$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $curlResult->getReturnCode());
+				} else {
+					$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while posting to Bluesky');
+				}
 
 				return null;
 			}
@@ -244,6 +251,8 @@ final class ATProtocol
 				$this->pConfig->set($uid, 'bluesky', 'status-message', $data->message);
 			} elseif (!empty($data->code)) {
 				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $data->code);
+			} else {
+				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while posting to Bluesky');
 			}
 		}
 		return $data;

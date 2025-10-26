@@ -67,7 +67,7 @@ class App
 {
 	const PLATFORM = 'Friendica';
 	const CODENAME = 'Interrupted Fern';
-	const VERSION  = '2025.02-dev';
+	const VERSION  = '2025.07-rc';
 
 	/**
 	 * @internal
@@ -293,7 +293,7 @@ class App
 	{
 		$command = strtolower($argv[1] ?? '');
 
-		if ($command === 'daemon' || $command === 'jetstream') {
+		if ($command === 'daemon') {
 			return LogChannel::DAEMON;
 		}
 
@@ -301,7 +301,9 @@ class App
 			return LogChannel::WORKER;
 		}
 
-		// @TODO Add support for jetstream
+		if ($command === 'jetstream') {
+			return LogChannel::JETSTREAM;
+		}
 
 		return LogChannel::CONSOLE;
 	}
@@ -437,8 +439,17 @@ class App
 		$serverVars = $request->getServerParams();
 		$queryVars  = $request->getQueryParams();
 
+		if ($this->mode->isNormal() && !$this->mode->isBackend()) {
+			$requester = HTTPSignature::getSigner('', $serverVars);
+			if (!empty($requester)) {
+				OpenWebAuth::addVisitorCookieForHandle($requester);
+			}
+		} else {
+			$requester = '';
+		}
+
 		$requeststring = ($serverVars['REQUEST_METHOD'] ?? '') . ' ' . ($serverVars['REQUEST_URI'] ?? '') . ' ' . ($serverVars['SERVER_PROTOCOL'] ?? '');
-		$this->logger->debug('Request received', ['address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '']);
+		$this->logger->debug('Request received', ['address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '', 'requester' => $requester]);
 		$request_start = microtime(true);
 		$request       = $_REQUEST;
 
@@ -468,13 +479,6 @@ class App
 			}
 
 			DID::routeRequest($this->args->getCommand(), $serverVars);
-
-			if ($this->mode->isNormal() && !$this->mode->isBackend()) {
-				$requester = HTTPSignature::getSigner('', $serverVars);
-				if (!empty($requester)) {
-					OpenWebAuth::addVisitorCookieForHandle($requester);
-				}
-			}
 
 			// ZRL
 			if (!empty($queryVars['zrl']) && $this->mode->isNormal() && !$this->mode->isBackend() && !$this->session->getLocalUserId()) {

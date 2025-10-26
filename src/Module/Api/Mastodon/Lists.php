@@ -102,7 +102,9 @@ class Lists extends BaseApi
 	protected function get(array $request = [])
 	{
 		$this->checkAllowedScope(self::SCOPE_READ);
-		$uid = self::getCurrentUserID();
+		$uid        = self::getCurrentUserID();
+		$enabled    = DI::pConfig()->get($uid, 'system', 'enabled_timelines', []);
+		$bookmarked = DI::pConfig()->get($uid, 'system', 'network_timelines', []);
 
 		if (empty($this->parameters['id'])) {
 			$lists = [];
@@ -112,11 +114,15 @@ class Lists extends BaseApi
 			}
 
 			foreach ($this->channel->getTimelines($uid) as $channel) {
-				$lists[] = DI::mstdnList()->createFromChannel($channel);
+				if (empty($enabled) || in_array($channel->code, $enabled) || in_array($channel->code, $bookmarked)) {
+					$lists[] = DI::mstdnList()->createFromChannel($channel);
+				}
 			}
 
 			foreach ($this->userDefinedChannel->selectByUid($uid) as $channel) {
-				$lists[] = DI::mstdnList()->createFromChannel($channel);
+				if (empty($enabled) || in_array($channel->code, $enabled) || in_array($channel->code, $bookmarked)) {
+					$lists[] = DI::mstdnList()->createFromChannel($channel);
+				}
 			}
 
 			foreach (GroupManager::getList($uid, true, true, true) as $group) {

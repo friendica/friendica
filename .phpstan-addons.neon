@@ -14,6 +14,7 @@ parameters:
             - addon/*/vendor/*
             - addon/convert/UnitConvertor.php
             - addon/pumpio/oauth/*
+            - addon/mailstream/phpmailer/*
 
     scanDirectories:
         - mod
@@ -25,28 +26,4 @@ parameters:
     dynamicConstantNames:
         - DB_UPDATE_VERSION
 
-    ignoreErrors:
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^.+ an unknown class SMTP\.$)'
-            path: addon/mailstream/phpmailer
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^Property .+ has unknown class SMTP as its type\.$)'
-            path: addon/mailstream/phpmailer
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^Method .+ has invalid return type SMTP\.$)'
-            path: addon/mailstream/phpmailer
-
-        -
-            # Ignore missing SMTP class in PHPMailer 5.2.21
-            # see https://github.com/PHPMailer/PHPMailer/blob/v5.2.21/class.smtp.php
-            message: '(^Instantiated class SMTP not found\.$)'
-            path: addon/mailstream/phpmailer
+    ignoreErrors: []

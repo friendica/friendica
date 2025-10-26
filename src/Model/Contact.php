@@ -218,7 +218,13 @@ class Contact
 
 		$fields = DI::dbaDefinition()->truncateFieldsForTable('contact', $fields);
 		DBA::insert('contact', $fields, $duplicate_mode);
-		$contact = DBA::selectFirst('contact', [], ['id' => DBA::lastInsertId()]);
+		$id = DBA::lastInsertId();
+		if ($id == 0) {
+			DI::logger()->warning('Contact was not created', ['fields' => $fields]);
+			return 0;
+		}
+
+		$contact = DBA::selectFirst('contact', [], ['id' => $id]);
 		if (!DBA::isResult($contact)) {
 			// Shouldn't happen
 			DI::logger()->warning('Created contact could not be found', ['fields' => $fields]);
@@ -234,7 +240,7 @@ class Contact
 			$duplicate = DBA::selectFirst('contact', [], ['id' => $account_user['id'], 'deleted' => false]);
 			if (!empty($duplicate['id'])) {
 				$ret = Contact::deleteById($contact['id']);
-				DI::logger()->notice('Deleted duplicated contact', ['ret' => $ret, 'account-user' => $account_user, 'cid' => $duplicate['id'], 'uid' => $duplicate['uid'], 'uri-id' => $duplicate['uri-id'], 'url' => $duplicate['url']]);
+				DI::logger()->notice('Deleted duplicated contact', ['ret' => $ret, 'id' => $contact['id'], 'account-user' => $account_user, 'cid' => $duplicate['id'], 'uid' => $duplicate['uid'], 'uri-id' => $duplicate['uri-id'], 'url' => $duplicate['url']]);
 				$contact = $duplicate;
 			} else {
 				$ret = DBA::update('account-user', ['id' => $contact['id']], ['uid' => $contact['uid'], 'uri-id' => $contact['uri-id']]);
@@ -1295,7 +1301,7 @@ class Contact
 				'photos'   => [DI::l10n()->t('View Photos'), $photos_link, true],
 				'network'  => [$network_label, $network_url, false],
 				'edit'     => [DI::l10n()->t('View Contact'), $contact_url, false],
-				'pm'       => [DI::l10n()->t('Send PM'), $pm_url, false],
+				'pm'       => [DI::l10n()->t('Message'), $pm_url, false],
 				'follow'   => [DI::l10n()->t('Connect/Follow'), $follow_link, true],
 				'unfollow' => [DI::l10n()->t('Unfollow'), $unfollow_link, true],
 				'mention'  => [$mention_label, $mention_url, false],
@@ -1666,7 +1672,7 @@ class Contact
 		if ($only_media) {
 			$condition = DBA::mergeConditions($condition, [
 				"`uri-id` IN (SELECT `uri-id` FROM `post-media` WHERE `type` IN (?, ?, ?))",
-				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO
+				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::HLS
 			]);
 		}
 
@@ -1680,7 +1686,7 @@ class Contact
 
 		$params = ['order' => ['created' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]];
 
-		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
+		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		} else {
@@ -1692,7 +1698,7 @@ class Contact
 
 		$o .= DI::conversation()->render($items, ConversationContent::MODE_CONTACT_POSTS);
 
-		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
+		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader();
 		} else {
 			$o .= $pager->renderMinimal(count($items));
@@ -1743,7 +1749,7 @@ class Contact
 
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
-		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
+		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
 			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
 			$o   = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		} else {
@@ -1776,7 +1782,7 @@ class Contact
 		$o .= DI::conversation()->render($items, ConversationContent::MODE_CONTACTS, $update, false, 'pinned_created', $uid);
 
 		if (!$update) {
-			if (DI::pConfig()->get($uid, 'system', 'infinite_scroll')) {
+			if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
 				$o .= HTML::scrollLoader();
 			} else {
 				$o .= $pager->renderMinimal(count($items));
@@ -3659,7 +3665,7 @@ class Contact
 	 */
 	public static function magicLinkById(int $cid, string $url = ''): string
 	{
-		if (($url == '') && DI::userSession()->isAuthenticated() && DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'stay_local')) {
+		if (($url == '') && DI::userSession()->isAuthenticated() && DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'stay_local', true)) {
 			return 'contact/' . $cid . '/conversations';
 		}
 
@@ -3689,7 +3695,7 @@ class Contact
 			return $destination;
 		}
 
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'stay_local') && ($url == '')) {
+		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'stay_local', true) && ($url == '')) {
 			return 'contact/' . $contact['id'] . '/conversations';
 		}
 

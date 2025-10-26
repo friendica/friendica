@@ -679,8 +679,7 @@ nav#topbar-first #nav-search-box #nav-search-text {
 	position: relative;
 	height: 17px;
 	margin: 4px 0px 4px 4px;
-	width: 150px;
-	max-width: 150px;
+	width: 257px;
 	background-color: #eee;
 }
 
@@ -936,7 +935,6 @@ ul.menu-popup .empty {
 	background-color: #ffffff;
 	border: 1px solid #MenuBorder;
 	overflow: auto;
-	z-index: 100000;
 	box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.7);
 }
 .acpopup-mce {
@@ -2395,6 +2393,11 @@ aside #id_password {
 	margin-bottom: 15px;
 }
 
+#aprofile-fullname {
+	clear: both;
+	padding-top: 15px;
+}
+
 #profile-edit-links ul {margin: 0; padding:0 0 20px 0; list-style: none; }
 
 #profile-edit-links li {
@@ -2574,31 +2577,6 @@ blockquote {
 	color: #777;
 }
 
-.oembed {
-	/* font-size: large; */
-	font-size: larger;
-	font-weight: bold;
-	display: block;
-}
-
-.oembed.video .embed_video > div {
-	position: absolute; top: 0px; left: 0px;
-	background-color: rgba(0,0,0,0.5);
-}
-.oembed.video .embed_video > div::before {
-	font-family: FontAwesome;
-	font-weight: normal;
-	font-style: normal;
-	display: inline-block;
-	text-decoration: inherit;
-	vertical-align: top;
-	font-size: 3em;
-	content: "\f01d"; /* icon-play-circle */
-	color: #fff;
-	bottom: 10px;
-	right: 10px;
-	position: absolute;
-}
 
 /* ================== */
 /* = Contacts Block = */
@@ -3319,4 +3297,10 @@ fbrowser.photo .photo-album-image-wrapper { margin-left: 10px; }
 
 #settings-server td + td {
 	text-align: center;
+}
+
+iframe,
+video {
+	max-width: 100%;
+	max-height: 90vh;
 }

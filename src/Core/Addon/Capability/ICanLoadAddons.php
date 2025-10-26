@@ -10,14 +10,14 @@ namespace Friendica\Core\Addon\Capability;
 /**
  * Interface for loading Addons specific content
  *
- * @deprecated 2025.02 Use implementation of `\Friendica\Core\Addon\AddonHelper` instead.
+ * @deprecated 2025.07 Use implementation of `\Friendica\Core\Addon\AddonHelper` instead.
  */
 interface ICanLoadAddons
 {
 	/**
 	 * Returns a merged config array of all active addons for a given config-name
 	 *
-	 * @deprecated 2025.02 Use `\Friendica\Core\Addon\AddonHelper::getAddonDependencyConfig()` instead.
+	 * @deprecated 2025.07 Use `\Friendica\Core\Addon\AddonHelper::getAddonDependencyConfig()` instead.
 	 *
 	 * @param string $configName The config-name (config-file at the static directory, like 'hooks' => '{addon}/static/hooks.config.php)
 	 *

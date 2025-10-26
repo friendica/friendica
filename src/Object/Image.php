@@ -8,6 +8,10 @@
 namespace Friendica\Object;
 
 use Exception;
+use FFMpeg\Coordinate\TimeCode;
+use FFMpeg\FFMpeg;
+use Friendica\Core\Cache\Enum\Duration;
+use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Util\Images;
 use Imagick;
@@ -859,4 +863,90 @@ class Image
 
 		$this->scaleUp(min($width, $height));
 	}
+
+	/**
+	 * Create a preview image for the provided video URL using ffmpeg.
+	 * The result is cached for one day.
+	 *
+	 * @param string $url Video URL
+	 * @return string binary image data or empty string
+	 */
+	private function getPreviewImageForVideoUrlCached(string $url): string
+	{
+		$cacheKey = 'getPreviewImageForVideoUrl:' . sha1($url);
+
+		$preview = DI::cache()->get($cacheKey);
+
+		if (!$preview) {
+			$preview = $this->getPreviewImageForVideoUrl($url);
+			if (!$preview) {
+				return '';
+			}
+
+			DI::cache()->set($cacheKey, base64_encode($preview), Duration::DAY);
+		} else {
+			$preview = base64_decode($preview);
+		}
+
+		return $preview;
+	}
+
+	/**
+	 * Create a preview image for the provided video URL using ffmpeg
+	 *
+	 * @param string $url Video URL
+	 * @return string binary image data or empty string
+	 */
+	private function getPreviewImageForVideoUrl($url): string
+	{
+		$preview = '';
+
+		$timestamp = microtime(true);
+
+		try {
+			$ffmpeg = FFMpeg::create();
+			/** @var \FFMpeg\Media\Video $video */
+			$video = $ffmpeg->open($url);
+			$frame = $video->frame(TimeCode::fromSeconds(0));
+
+			$tempfile = tempnam(System::getTempPath(), 'videopreview-');
+			$frame->save($tempfile);
+			$preview = file_get_contents($tempfile);
+			unlink($tempfile);
+			$runtime = number_format(microtime(true) - $timestamp, 3);
+			DI::logger()->debug('Created video preview', ['runtime' => $runtime, 'url' => $url]);
+		} catch (\Throwable $th) {
+			$runtime = number_format(microtime(true) - $timestamp, 3);
+			DI::logger()->notice('Got exception', ['runtime' => $runtime, 'url' => $url, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
+		}
+
+		return $preview;
+	}
+
+	/**
+	 * Create a preview image for the provided video URL using ffmpeg
+	 *
+	 * @param string $url Video URL
+	 * @param bool   $cached optional, default true
+	 * @return boolean Success
+	 */
+	public function getFromVideoUrl(string $url, bool $cached = true): bool
+	{
+		if (!$url) {
+			return false;
+		}
+
+		if (!DI::config()->get('system', 'ffmpeg_installed')) {
+			return false;
+		}
+
+		if ($cached) {
+			$data = $this->getPreviewImageForVideoUrlCached($url);
+		} else {
+			$data = $this->getPreviewImageForVideoUrl($url);
+		}
+
+		return($this->loadData($data));
+	}
+
 }

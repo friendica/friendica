@@ -40,8 +40,6 @@ function frio_init(AppHelper $appHelper)
 	global $frio;
 	$frio = 'view/theme/frio';
 
-	$appHelper->setThemeInfoValue('videowidth', 622);
-
 	Renderer::setActiveTemplateEngine('smarty3');
 
 	// if the device is a mobile device set js is_mobile

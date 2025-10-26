@@ -83,6 +83,8 @@ class Posts extends BaseModule
 
 		Nav::setSelected('contact');
 
+		Contact::setPageTitle($contact);
+
 		$o = Contact::getTabsHTML($contact, Contact::TAB_POSTS);
 
 		$o .= Model\Contact::getPostsFromId($contact['id'], $this->userSession->getLocalUserId(), false, $request['last_created'] ?? '');
