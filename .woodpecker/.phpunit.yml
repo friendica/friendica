@@ -127,6 +127,8 @@ steps:
 services:
   mariadb:
     image: mariadb:latest
+    ports:
+      - 3306
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
       MYSQL_DATABASE: "test"
@@ -135,6 +137,10 @@ services:
 
   memcached:
     image: memcached
+    ports:
+      - 11211
 
   redis:
     image: redis
+    ports:
+      - 6379
