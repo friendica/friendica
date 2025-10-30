@@ -127,6 +127,11 @@ steps:
 services:
   mariadb:
     image: mariadb:latest
+    backend_options:
+      kubernetes:
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
     ports:
       - 3306
     environment:
@@ -137,10 +142,20 @@ services:
 
   memcached:
     image: memcached
+    backend_options:
+      kubernetes:
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
     ports:
       - 11211
 
   redis:
     image: redis
+    backend_options:
+      kubernetes:
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
     ports:
       - 6379
