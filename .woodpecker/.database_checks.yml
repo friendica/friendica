@@ -92,8 +92,8 @@ services:
     backend_options:
       kubernetes:
         securityContext:
-          runAsUser: 999
-          runAsGroup: 999
+          runAsUser: 0
+          runAsGroup: 0
     ports:
       - 3306
     environment:
