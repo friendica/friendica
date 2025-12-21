@@ -127,13 +127,9 @@ steps:
 services:
   mariadb:
     image: mariadb:latest
-    backend_options:
-      kubernetes:
-        securityContext:
-          runAsUser: 0
-          runAsGroup: 0
     ports:
       - 3306
+    directory: /tmp
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
       MYSQL_DATABASE: "test"
@@ -142,20 +138,12 @@ services:
 
   memcached:
     image: memcached
-    backend_options:
-      kubernetes:
-        securityContext:
-          runAsUser: 0
-          runAsGroup: 0
     ports:
       - 11211
+    directory: /tmp
 
   redis:
     image: redis
-    backend_options:
-      kubernetes:
-        securityContext:
-          runAsUser: 0
-          runAsGroup: 0
     ports:
       - 6379
+    directory: /tmp
