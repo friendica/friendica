@@ -43,7 +43,7 @@ steps:
     image: php:${PHP_MAJOR_VERSION}
     commands:
       - find . -name \*.php -not -path './vendor/*' -not -path './view/asset/*' -print0 | xargs -0 -n1 php -l
-  restore_cache:
+  restore-cache:
     image: meltwater/drone-cache:dev
     settings:
       backend: "filesystem"
@@ -54,7 +54,7 @@ steps:
         - '.composer'
     volumes:
       - /tmp/drone-cache:/tmp/cache
-  composer_install:
+  composer-install:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     commands:
       - git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
@@ -63,7 +63,7 @@ steps:
       - ./bin/composer.phar install --prefer-dist
     volumes:
       - /etc/hosts:/etc/hosts
-  rebuild_cache:
+  rebuild-cache:
     image: meltwater/drone-cache:dev
     settings:
       backend: "filesystem"
