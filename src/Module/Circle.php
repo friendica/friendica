@@ -169,8 +169,8 @@ class Circle extends BaseModule
 		// @TODO: Replace with parameter from router
 		if ((DI::args()->getArgc() == 2) && (DI::args()->getArgv()[1] === 'new')) {
 			return Renderer::replaceMacros($tpl, $context + [
-				'$title'               => DI::l10n()->t('Create a circle of contacts/friends.'),
-				'$gname'               => ['circle_name', DI::l10n()->t('Circle Name: '), '', ''],
+				'$title'               => DI::l10n()->t('Create a circle of contacts.'),
+				'$gname'               => ['circle_name', DI::l10n()->t('Circle name'), '', ''],
 				'$gid'                 => 'new',
 				'$form_security_token' => BaseModule::getFormSecurityToken('circle_edit'),
 			]);
@@ -189,12 +189,12 @@ class Circle extends BaseModule
 			$nocircle = true;
 			$circle   = [
 				'id'   => $id,
-				'name' => DI::l10n()->t('Contacts not in any circle'),
+				'name' => DI::l10n()->t('Outside circles'),
 			];
 
 			$context = $context + [
 				'$title'    => $circle['name'],
-				'$gname'    => ['circle_name', DI::l10n()->t('Circle Name: '), $circle['name'], ''],
+				'$gname'    => ['circle_name', DI::l10n()->t('Circle name'), $circle['name'], ''],
 				'$gid'      => $id,
 				'$editable' => 0,
 			];
@@ -280,7 +280,7 @@ class Circle extends BaseModule
 
 			$context = $context + [
 				'$title'                        => $circle['name'],
-				'$gname'                        => ['circle_name', DI::l10n()->t('Circle Name: '), $circle['name'], ''],
+				'$gname'                        => ['circle_name', DI::l10n()->t('Circle name'), $circle['name'], ''],
 				'$public'                       => ['circle_visible', DI::l10n()->t('Public circle'), $circle['public'], DI::l10n()->t('Public circles can be downloaded by others as CSV files.')],
 				'$gid'                          => $circle['id'],
 				'$drop'                         => $drop_txt,

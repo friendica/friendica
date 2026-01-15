@@ -131,18 +131,18 @@ abstract class BaseUsers extends BaseModeration
 	{
 		return function ($user) {
 			$page_types = [
-				User::PAGE_FLAGS_NORMAL    => $this->t('Normal Account Page'),
-				User::PAGE_FLAGS_SOAPBOX   => $this->t('Soapbox Page'),
+				User::PAGE_FLAGS_NORMAL    => $this->t('Standard'),
+				User::PAGE_FLAGS_SOAPBOX   => $this->t('Soapbox'),
 				User::PAGE_FLAGS_COMMUNITY => $this->t('Public Group'),
 				User::PAGE_FLAGS_COMM_MAN  => $this->t('Public Group - Restricted'),
-				User::PAGE_FLAGS_FREELOVE  => $this->t('Automatic Friend Page'),
+				User::PAGE_FLAGS_FREELOVE  => $this->t('Love-all'),
 				User::PAGE_FLAGS_PRVGROUP  => $this->t('Private Group'),
 			];
 			$account_types = [
-				User::ACCOUNT_TYPE_PERSON       => $this->t('Personal Page'),
+				User::ACCOUNT_TYPE_PERSON       => $this->t('Personal account'),
 				User::ACCOUNT_TYPE_ORGANISATION => $this->t('Organisation Page'),
 				User::ACCOUNT_TYPE_NEWS         => $this->t('News Page'),
-				User::ACCOUNT_TYPE_COMMUNITY    => $this->t('Community Group'),
+				User::ACCOUNT_TYPE_COMMUNITY    => $this->t('Group'),
 				User::ACCOUNT_TYPE_RELAY        => $this->t('Relay'),
 			];
 

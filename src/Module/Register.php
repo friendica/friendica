@@ -146,7 +146,7 @@ class Register extends BaseModule
 			User::PERSONAL => DI::l10n()->t('Personal (standard account)'),
 			User::SOAPBOX  => DI::l10n()->t('Soap-Box (auto-approve Follow requests)'),
 			User::LOVEALL  => DI::l10n()->t('Love-All (auto-approve Friend requests)'),
-			User::ORGPAGE  => DI::l10n()->t('Organization Page'),
+			User::ORGPAGE  => DI::l10n()->t('Organisation'),
 			User::NEWSPAGE => DI::l10n()->t('News Page'),
 			User::PUBGROUP => DI::l10n()->t('Public Group'),
 			User::RESGROUP => DI::l10n()->t('Restricted Group'),
@@ -167,7 +167,7 @@ class Register extends BaseModule
 			}
 			if ($which_types == User::ORGPAGE || $which_types == User::NEWSPAGE) {
 				$acct_list = [
-					User::ORGPAGE  => DI::l10n()->t('Organization Page'),
+					User::ORGPAGE  => DI::l10n()->t('Organisation'),
 					User::NEWSPAGE => DI::l10n()->t('News Page'),
 				];
 				$regbutton_label = DI::l10n()->t('Create Page');

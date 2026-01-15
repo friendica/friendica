@@ -390,8 +390,8 @@ class Account extends BaseSettings
 		$pageset_tpl = Renderer::getMarkupTemplate('settings/pagetypes.tpl');
 		$pagetype    = Renderer::replaceMacros($pageset_tpl, [
 			'$account_types'     => DI::l10n()->t("Account Types"),
-			'$user'              => DI::l10n()->t("Personal Page Subtypes"),
-			'$community'         => DI::l10n()->t("Community Group Subtypes"),
+			'$user'              => DI::l10n()->t("Select type of personal account"),
+			'$community'         => DI::l10n()->t("Select type of group"),
 			'$account_type'      => $user['account-type'],
 			'$type_person'       => User::ACCOUNT_TYPE_PERSON,
 			'$type_organisation' => User::ACCOUNT_TYPE_ORGANISATION,
@@ -400,73 +400,73 @@ class Account extends BaseSettings
 			'$type_relay'        => User::ACCOUNT_TYPE_RELAY,
 			'$account_person'    => [
 				'account-type',
-				DI::l10n()->t('Personal Page'),
+				DI::l10n()->t('Personal account'),
 				User::ACCOUNT_TYPE_PERSON,
-				DI::l10n()->t('Account for a personal profile.'),
+				'',
 				$user['account-type'] == User::ACCOUNT_TYPE_PERSON,
 			],
 			'$account_organisation' => [
 				'account-type',
-				DI::l10n()->t('Organisation Page'),
+				DI::l10n()->t('Organisation'),
 				User::ACCOUNT_TYPE_ORGANISATION,
-				DI::l10n()->t('Account for an organisation that automatically approves contact requests as "Followers".'),
+				DI::l10n()->t('Automatically accepts "Followers".'),
 				$user['account-type'] == User::ACCOUNT_TYPE_ORGANISATION,
 			],
 			'$account_news' => [
 				'account-type',
 				DI::l10n()->t('News Page'),
 				User::ACCOUNT_TYPE_NEWS,
-				DI::l10n()->t('Account for a news reflector that automatically approves contact requests as "Followers".'),
+				DI::l10n()->t('Automatically accepts "Followers".'),
 				$user['account-type'] == User::ACCOUNT_TYPE_NEWS,
 			],
 			'$account_community' => [
 				'account-type',
-				DI::l10n()->t('Community Group'),
+				DI::l10n()->t('Group'),
 				User::ACCOUNT_TYPE_COMMUNITY,
-				DI::l10n()->t('Account for community discussions.'),
+				DI::l10n()->t('For community discussions.'),
 				$user['account-type'] == User::ACCOUNT_TYPE_COMMUNITY,
 			],
 			'$account_relay' => $account_relay,
 			'$page_normal'   => [
 				'page-flags',
-				DI::l10n()->t('Normal Account Page'),
+				DI::l10n()->t('Standard'),
 				User::PAGE_FLAGS_NORMAL,
-				DI::l10n()->t('Account for a regular personal profile that requires manual approval of "Friends" and "Followers".'),
+				DI::l10n()->t('Manual approval of "Friends" and "Followers".'),
 				$user['page-flags'] == User::PAGE_FLAGS_NORMAL,
 			],
 			'$page_soapbox' => [
 				'page-flags',
-				DI::l10n()->t('Soapbox Page'),
+				DI::l10n()->t('Soapbox'),
 				User::PAGE_FLAGS_SOAPBOX,
-				DI::l10n()->t('Account for a public profile that automatically approves contact requests as "Followers".'),
+				DI::l10n()->t('Automatically accepts contact requests as "Followers".'),
 				$user['page-flags'] == User::PAGE_FLAGS_SOAPBOX,
+			],
+			'$page_freelove' => [
+				'page-flags',
+				DI::l10n()->t('Love-all'),
+				User::PAGE_FLAGS_FREELOVE,
+				DI::l10n()->t('Automatically accepts contact requests as "Friends".'),
+				$user['page-flags'] == User::PAGE_FLAGS_FREELOVE,
 			],
 			'$page_community' => [
 				'page-flags',
 				DI::l10n()->t('Public Group'),
 				User::PAGE_FLAGS_COMMUNITY,
-				DI::l10n()->t('Automatically approves all contact requests.'),
+				DI::l10n()->t('Automatically accepts members.'),
 				$user['page-flags'] == User::PAGE_FLAGS_COMMUNITY,
 			],
 			'$page_community_manually' => [
 				'page-flags',
 				DI::l10n()->t('Public Group - Restricted'),
 				User::PAGE_FLAGS_COMM_MAN,
-				DI::l10n()->t('Contact requests have to be manually approved.'),
+				DI::l10n()->t('Manual approval of members.'),
 				$user['page-flags'] == User::PAGE_FLAGS_COMM_MAN,
-			],
-			'$page_freelove' => [
-				'page-flags',
-				DI::l10n()->t('Automatic Friend Page'),
-				User::PAGE_FLAGS_FREELOVE,
-				DI::l10n()->t('Account for a popular profile that automatically approves contact requests as "Friends".'),
-				$user['page-flags'] == User::PAGE_FLAGS_FREELOVE,
 			],
 			'$page_prvgroup' => [
 				'page-flags',
 				DI::l10n()->t('Private Group [Experimental]'),
 				User::PAGE_FLAGS_PRVGROUP,
-				DI::l10n()->t('Requires manual approval of contact requests.'),
+				DI::l10n()->t('Manual approval of members.'),
 				$user['page-flags'] == User::PAGE_FLAGS_PRVGROUP,
 			],
 		]);
@@ -483,7 +483,7 @@ class Account extends BaseSettings
 		} else {
 			$opt_tpl        = Renderer::getMarkupTemplate("field_checkbox.tpl");
 			$profile_in_dir = Renderer::replaceMacros($opt_tpl, [
-				'$field' => ['profile_in_directory', DI::l10n()->t('Publish your profile in your local site directory?'), $profile['publish'], DI::l10n()->t('Your profile will be published in this node\'s <a href="%s">local directory</a>. Your profile details may be publicly visible depending on the system settings.', DI::baseUrl() . '/directory')],
+				'$field' => ['profile_in_directory', DI::l10n()->t('Publish your profile in your local directory?'), $profile['publish'], DI::l10n()->t('Your profile will be published in this node\'s <a href="%s">local directory</a>. Your profile details may be publicly visible depending on the system settings.', DI::baseUrl() . '/directory')],
 			]);
 		}
 
@@ -597,12 +597,12 @@ class Account extends BaseSettings
 				DI::l10n()->t("You don't see posts from ignored contacts. But you still see their comments. This setting controls if you want to still receive regular notifications that are caused by ignored contacts or not."),
 			],
 
-			'$h_advn'     => DI::l10n()->t('Advanced Account/Page Type Settings'),
-			'$h_descadvn' => DI::l10n()->t('Change the behaviour of this account for special situations'),
+			'$h_advn'     => DI::l10n()->t('Account type'),
+			'$h_descadvn' => DI::l10n()->t('Here you can change the type of your current account.'),
 			'$pagetype'   => $pagetype,
 
 			'$relocate'        => DI::l10n()->t('Relocate'),
-			'$relocate_text'   => DI::l10n()->t("If you have moved this profile from another server, and some of your contacts don't receive your updates, try pushing this button."),
+			'$relocate_text'   => DI::l10n()->t("If you have moved this account from another server, and some of your contacts don't receive your updates, try pushing this button."),
 			'$relocate_button' => DI::l10n()->t("Resend relocate message to contacts"),
 		]);
 
