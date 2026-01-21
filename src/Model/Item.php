@@ -2643,7 +2643,7 @@ class Item
 
 		// Enable activity toggling instead of on/off
 		$event_verb_flag = $activity === Activity::ATTEND || $activity === Activity::ATTENDNO || $activity === Activity::ATTENDMAYBE;
-		$like_verb_flag = $activity === Activity::LIKE || $activity === Activity::DISLIKE;
+		$like_verb_flag  = $activity === Activity::LIKE || $activity === Activity::DISLIKE;
 
 		// Look for an existing verb row
 		// Event participation activities are mutually exclusive, only one of them can exist at all times.
