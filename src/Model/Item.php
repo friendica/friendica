@@ -2643,11 +2643,21 @@ class Item
 
 		// Enable activity toggling instead of on/off
 		$event_verb_flag = $activity === Activity::ATTEND || $activity === Activity::ATTENDNO || $activity === Activity::ATTENDMAYBE;
+		$like_verb_flag = $activity === Activity::LIKE || $activity === Activity::DISLIKE;
 
 		// Look for an existing verb row
 		// Event participation activities are mutually exclusive, only one of them can exist at all times.
+		// Like and dislike activities are also mutually exclusive.
 		if ($event_verb_flag) {
 			$verbs = [Activity::ATTEND, Activity::ATTENDNO, Activity::ATTENDMAYBE];
+
+			// Translate to the index based activity index
+			$vids = [];
+			foreach ($verbs as $verb) {
+				$vids[] = Verb::getID($verb);
+			}
+		} elseif ($like_verb_flag) {
+			$verbs = [Activity::LIKE, Activity::DISLIKE];
 
 			// Translate to the index based activity index
 			$vids = [];
@@ -2692,7 +2702,7 @@ class Item
 				self::markForDeletionById($like_item['id']);
 			}
 
-			if (!$event_verb_flag || $like_item['verb'] == $activity) {
+			if ((!$event_verb_flag && !$like_verb_flag) || $like_item['verb'] == $activity) {
 				return true;
 			}
 		}
