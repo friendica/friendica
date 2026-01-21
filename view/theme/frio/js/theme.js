@@ -762,6 +762,11 @@ function htmlToText(htmlString) {
  * @param {boolean} un    Whether to perform an activity removal instead of creation
  */
 function doActivityItemAction(ident, verb, un) {
+	// Prevent multiple simultaneous requests for the same action
+	if ($('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').length > 0) {
+		return false;
+	}
+	
 	_verb = un ? 'un' + verb : verb;
 	var thumbsClass = '';
 	switch (verb) {
@@ -814,6 +819,16 @@ function doActivityItemAction(ident, verb, un) {
 				$('button#attendyes-' + ident.toString()).attr('onclick', 'javascript:doActivityItemAction(' + ident +', "attendyes")');
 				$('button#attendno-' + ident.toString()).attr('onclick', 'javascript:doActivityItemAction(' + ident +', "attendno")');
 				$('button#attendmaybe-' + ident.toString()).attr('onclick', 'javascript:doActivityItemAction(' + ident +', "attendmaybe")');
+			}
+			// Like and dislike are mutually exclusive, ensure opposite button is deactivated
+			if (verb === 'like' && data.verb === 'like') {
+				$('button[id^=dislike-' + ident.toString() + ']')
+					.removeClass('active')
+					.attr('onclick', 'doActivityItemAction(' + ident +', "dislike")');
+			} else if (verb === 'dislike' && data.verb === 'dislike') {
+				$('button[id^=like-' + ident.toString() + ']')
+					.removeClass('active')
+					.attr('onclick', 'doActivityItemAction(' + ident +', "like")');
 			}
 			if (data.verb == 'un' + verb) {
 				// like/dislike buttons
