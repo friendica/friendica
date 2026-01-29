@@ -274,9 +274,6 @@ class Page implements ArrayAccess
 		'$max_imagesize' => round(Images::getMaxUploadBytes() / 1000000, 0),
 
 	]) . $this->page['htmlhead'];
-
-		if ($pConfig->get($localUID, 'accessibility', 'hide_empty_descriptions')) {
-			$this->page['htmlhead'] .= "<style>.empty-description {display: none;}</style>\n";
 		}
 		if ($pConfig->get($localUID, 'accessibility', 'hide_custom_emojis')) {
 			$this->page['htmlhead'] .= "<style>span.emoji.mastodon img {display: none;}</style>\n";
