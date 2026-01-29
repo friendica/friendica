@@ -2636,7 +2636,7 @@ class Item
 		$event_verb_flag = $activity === Activity::ATTEND || $activity === Activity::ATTENDNO || $activity === Activity::ATTENDMAYBE;
 		// Like and dislike activities are mutually exclusive if the user has enabled this setting
 		$exclusive_like_dislike = DI::pConfig()->get($uid, 'system', 'exclusive_like_dislike', false);
-		$like_verb_flag = $exclusive_like_dislike && ($activity === Activity::LIKE || $activity === Activity::DISLIKE);
+		$like_verb_flag         = $exclusive_like_dislike && ($activity === Activity::LIKE || $activity === Activity::DISLIKE);
 
 		// Look for an existing verb row
 		// Event participation activities are mutually exclusive, only one of them can exist at all times.

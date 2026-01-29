@@ -261,22 +261,19 @@ class Page implements ArrayAccess
 				'dictMaxFilesExceeded'         => $l10n->t("You can't upload any more files."),
 			],
 
-		'$local_user'                => $localUID,
-		'$generator'                 => 'Friendica' . ' ' . App::VERSION,
-		'$update_content'            => (int)$pConfig->get($localUID, 'system', 'update_content'),
-		'$exclusive_like_dislike'    => (int)$pConfig->get($localUID, 'system', 'exclusive_like_dislike', false),
-		'$shortcut_icon'             => $shortcut_icon,
-		'$touch_icon'                => $touch_icon,
-		'$block_public'              => intval($config->get('system', 'block_public')),
-		'$stylesheets'               => $this->stylesheets,
+		'$local_user'             => $localUID,
+		'$generator'              => 'Friendica' . ' ' . App::VERSION,
+		'$update_content'         => (int)$pConfig->get($localUID, 'system', 'update_content'),
+		'$exclusive_like_dislike' => (int)$pConfig->get($localUID, 'system', 'exclusive_like_dislike', false),
+		'$shortcut_icon'          => $shortcut_icon,
+		'$touch_icon'             => $touch_icon,
+		'$block_public'           => intval($config->get('system', 'block_public')),
+		'$stylesheets'            => $this->stylesheets,
 
 		// Dropzone
 		'$max_imagesize' => round(Images::getMaxUploadBytes() / 1000000, 0),
 
 	]) . $this->page['htmlhead'];
-
-		if ($pConfig->get($localUID, 'accessibility', 'hide_empty_descriptions')) {
-			$this->page['htmlhead'] .= "<style>.empty-description {display: none;}</style>\n";
 		}
 		if ($pConfig->get($localUID, 'accessibility', 'hide_custom_emojis')) {
 			$this->page['htmlhead'] .= "<style>span.emoji.mastodon img {display: none;}</style>\n";
