@@ -274,6 +274,29 @@ class Page implements ArrayAccess
 		'$max_imagesize' => round(Images::getMaxUploadBytes() / 1000000, 0),
 
 	]) . $this->page['htmlhead'];
+
+		if ($pConfig->get($localUID, 'accessibility', 'hide_empty_descriptions')) {
+			$this->page['htmlhead'] .= "<style>.empty-description {display: none;}</style>\n";
+		}
+		if ($pConfig->get($localUID, 'accessibility', 'hide_custom_emojis')) {
+			$this->page['htmlhead'] .= "<style>span.emoji.mastodon img {display: none;}</style>\n";
+		}
+	}
+
+	/**
+	 * Returns the complete URL of the current page, e.g.: http(s)://something.com/network
+	 *
+	 * Taken from http://webcheatsheet.com/php/get_current_page_url.php
+	 */
+	private function curPageURL(): string
+	{
+		$pageURL = 'http';
+		if (!empty($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) {
+			$pageURL .= "s";
+		}
+
+		$pageURL .= "://";
+
 		if ($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") {
 			$pageURL .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
 		} else {
