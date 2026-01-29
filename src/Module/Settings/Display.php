@@ -102,6 +102,7 @@ class Display extends BaseSettings
 		$infinite_scroll         = (bool)$request['infinite_scroll'];
 		$enable_smart_threading  = (bool)$request['enable_smart_threading'];
 		$enable_dislike          = (bool)$request['enable_dislike'];
+		$exclusive_like_dislike  = (bool)$request['exclusive_like_dislike'];
 		$display_resharer        = (bool)$request['display_resharer'];
 		$stay_local              = (bool)$request['stay_local'];
 		$hide_empty_descriptions = (bool)$request['hide_empty_descriptions'];
@@ -156,6 +157,7 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'infinite_scroll', $infinite_scroll);
 		$this->pConfig->set($uid, 'system', 'no_smart_threading', !$enable_smart_threading);
 		$this->pConfig->set($uid, 'system', 'hide_dislike', !$enable_dislike);
+		$this->pConfig->set($uid, 'system', 'exclusive_like_dislike', $exclusive_like_dislike);
 		$this->pConfig->set($uid, 'system', 'display_resharer', $display_resharer);
 		$this->pConfig->set($uid, 'system', 'stay_local', $stay_local);
 		$this->pConfig->set($uid, 'system', 'show_page_drop', $show_page_drop);
@@ -268,6 +270,7 @@ class Display extends BaseSettings
 		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', true);
 		$enable_smart_threading = !$this->pConfig->get($uid, 'system', 'no_smart_threading', false);
 		$enable_dislike         = !$this->pConfig->get($uid, 'system', 'hide_dislike', false);
+		$exclusive_like_dislike = $this->pConfig->get($uid, 'system', 'exclusive_like_dislike', false);
 		$display_resharer       = $this->pConfig->get($uid, 'system', 'display_resharer', false);
 		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', true);
 		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
@@ -457,6 +460,7 @@ class Display extends BaseSettings
 			'$infinite_scroll'          => ['infinite_scroll', $this->t('Infinite scroll'), $infinite_scroll, $this->t('Automatic fetch new items when reaching the page end.')],
 			'$enable_smart_threading'   => ['enable_smart_threading', $this->t('Enable Smart Threading'), $enable_smart_threading, $this->t('Enable the automatic suppression of extraneous thread indentation.')],
 			'$enable_dislike'           => ['enable_dislike', $this->t('Display the Dislike feature'), $enable_dislike, $this->t('Display the Dislike button and dislike reactions on posts and comments.')],
+			'$exclusive_like_dislike'   => ['exclusive_like_dislike', $this->t('Make Like and Dislike mutually exclusive'), $exclusive_like_dislike, $this->t('When enabled, clicking Like removes any existing Dislike and vice versa, similar to event attendance.')],
 			'$display_resharer'         => ['display_resharer', $this->t('Display the resharer'), $display_resharer, $this->t('Display the first resharer as icon and text on a reshared item.')],
 			'$stay_local'               => ['stay_local', $this->t('Stay local'), $stay_local, $this->t("Don't go to a remote system when following a contact link.")],
 			'$show_page_drop'           => ['show_page_drop', $this->t('Show the post deletion checkbox'), $show_page_drop, $this->t("Display the checkbox for the post deletion on the network page.")],

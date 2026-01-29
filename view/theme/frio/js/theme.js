@@ -510,7 +510,6 @@ function justifyPhotos() {
 		.justifiedGallery({
 			margins: 3,
 			border: 0,
-			captions: false,
 			sizeRangeSuffixes: {
 				lt48: "-6",
 				lt80: "-5",
@@ -762,11 +761,11 @@ function htmlToText(htmlString) {
  * @param {boolean} un    Whether to perform an activity removal instead of creation
  */
 function doActivityItemAction(ident, verb, un) {
-	// Prevent multiple simultaneous requests for the same action
-	if ($('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').length > 0) {
+	// Prevent multiple simultaneous requests for the same action if exclusive like/dislike is enabled
+	if (exclusiveLikeDislike && $('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').length > 0) {
 		return false;
 	}
-	
+
 	_verb = un ? 'un' + verb : verb;
 	var thumbsClass = '';
 	switch (verb) {
@@ -820,15 +819,17 @@ function doActivityItemAction(ident, verb, un) {
 				$('button#attendno-' + ident.toString()).attr('onclick', 'javascript:doActivityItemAction(' + ident +', "attendno")');
 				$('button#attendmaybe-' + ident.toString()).attr('onclick', 'javascript:doActivityItemAction(' + ident +', "attendmaybe")');
 			}
-			// Like and dislike are mutually exclusive, ensure opposite button is deactivated
-			if (verb === 'like' && data.verb === 'like') {
-				$('button[id^=dislike-' + ident.toString() + ']')
-					.removeClass('active')
-					.attr('onclick', 'doActivityItemAction(' + ident +', "dislike")');
-			} else if (verb === 'dislike' && data.verb === 'dislike') {
-				$('button[id^=like-' + ident.toString() + ']')
-					.removeClass('active')
-					.attr('onclick', 'doActivityItemAction(' + ident +', "like")');
+			// Like and dislike are mutually exclusive if the user setting is enabled
+			if (exclusiveLikeDislike) {
+				if (verb === 'like' && data.verb === 'like') {
+					$('button[id^=dislike-' + ident.toString() + ']')
+						.removeClass('active')
+						.attr('onclick', 'doActivityItemAction(' + ident +', "dislike")');
+				} else if (verb === 'dislike' && data.verb === 'dislike') {
+					$('button[id^=like-' + ident.toString() + ']')
+						.removeClass('active')
+						.attr('onclick', 'doActivityItemAction(' + ident +', "like")');
+				}
 			}
 			if (data.verb == 'un' + verb) {
 				// like/dislike buttons

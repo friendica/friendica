@@ -261,41 +261,19 @@ class Page implements ArrayAccess
 				'dictMaxFilesExceeded'         => $l10n->t("You can't upload any more files."),
 			],
 
-			'$local_user'     => $localUID,
-			'$generator'      => 'Friendica' . ' ' . App::VERSION,
-			'$update_content' => (int)$pConfig->get($localUID, 'system', 'update_content'),
-			'$shortcut_icon'  => $shortcut_icon,
-			'$touch_icon'     => $touch_icon,
-			'$block_public'   => intval($config->get('system', 'block_public')),
-			'$stylesheets'    => $this->stylesheets,
+		'$local_user'                => $localUID,
+		'$generator'                 => 'Friendica' . ' ' . App::VERSION,
+		'$update_content'            => (int)$pConfig->get($localUID, 'system', 'update_content'),
+		'$exclusive_like_dislike'    => (int)$pConfig->get($localUID, 'system', 'exclusive_like_dislike', false),
+		'$shortcut_icon'             => $shortcut_icon,
+		'$touch_icon'                => $touch_icon,
+		'$block_public'              => intval($config->get('system', 'block_public')),
+		'$stylesheets'               => $this->stylesheets,
 
-			// Dropzone
-			'$max_imagesize' => round(Images::getMaxUploadBytes() / 1000000, 0),
+		// Dropzone
+		'$max_imagesize' => round(Images::getMaxUploadBytes() / 1000000, 0),
 
-		]) . $this->page['htmlhead'];
-
-		if ($pConfig->get($localUID, 'accessibility', 'hide_empty_descriptions')) {
-			$this->page['htmlhead'] .= "<style>.empty-description {display: none;}</style>\n";
-		}
-		if ($pConfig->get($localUID, 'accessibility', 'hide_custom_emojis')) {
-			$this->page['htmlhead'] .= "<style>span.emoji.mastodon img {display: none;}</style>\n";
-		}
-	}
-
-	/**
-	 * Returns the complete URL of the current page, e.g.: http(s)://something.com/network
-	 *
-	 * Taken from http://webcheatsheet.com/php/get_current_page_url.php
-	 */
-	private function curPageURL(): string
-	{
-		$pageURL = 'http';
-		if (!empty($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) {
-			$pageURL .= "s";
-		}
-
-		$pageURL .= "://";
-
+	]) . $this->page['htmlhead'];
 		if ($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") {
 			$pageURL .= $_SERVER["SERVER_NAME"] . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
 		} else {
