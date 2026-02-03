@@ -137,7 +137,7 @@
             btnTextSpan.textContent = originalText;
         } else {
             preview_comment(id);
-            btnTextSpan.textContent = "Vorschau schließen";
+            btnTextSpan.textContent = "Close preview";
             previewPane.style.display = 'block';
         }
     }
