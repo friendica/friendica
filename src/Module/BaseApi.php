@@ -357,17 +357,6 @@ class BaseApi extends BaseModule
 	}
 
 	/**
-	 * Check if the app is known to support quoted posts
-	 *
-	 * @return bool
-	 */
-	public static function appSupportsQuotes(): bool
-	{
-		$token = OAuth::getCurrentApplicationToken();
-		return (!empty($token['name']) && in_array($token['name'], ['Fedilab']));
-	}
-
-	/**
 	 * Get current application token
 	 *
 	 * @return array token

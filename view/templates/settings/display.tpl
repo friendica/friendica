@@ -33,28 +33,28 @@
 	{{include file="field_select.tpl" field=$platform_icon_style}}
 	{{include file="field_checkbox.tpl" field=$embed_remote_media}}
 	{{include file="field_checkbox.tpl" field=$embed_media}}
-	<h2>{{$timeline_title}}</h2>
-	{{$timeline_explanation}}
-	<table class="table table-condensed table-striped table-bordered">
-	<thead>
-	<tr>
-		<th>{{$timeline_label}}</th>
-		<th>{{$timeline_descriptiom}}</th>
-		<th>{{$timeline_enable}}</th>
-		<th>{{$timeline_bookmark}}</th>
-	</tr>
-	</thead>
-	<tbody>
-	{{foreach $timelines as $t}}
-		<tr>
-			<td>{{$t.label}}</td>
-			<td>{{$t.description}}</td>
-			<td>{{include file="field_checkbox.tpl" field=$t.enable}}</td>
-			<td>{{include file="field_checkbox.tpl" field=$t.bookmark}}</td>
-		</tr>
-	{{/foreach}}
-	</tbody>
-	</table>
+	<h2 tabindex="0">{{$timeline_title}}</h2>
+	<p tabindex="0">{{$timeline_explanation}} {{$sortable}}</p>
+	<h3 tabindex="0">{{$timeline_enable}}</h3>
+	<div class="select timelines-widget sortable">
+		<input type="hidden" id="widget_timelineorder" name="widget_timelineorder" value=""/>
+		{{foreach $timelines as $t}}
+			{{include file="field_checkbox.tpl" field=$t.enable}}
+		{{/foreach}}
+		<div class="settings-submit-wrapper">
+			{{include file="field_checkbox.tpl" field=$reset_widget}}
+		</div>
+	</div>
+	<h3 tabindex="0">{{$timeline_bookmark}}</h3>
+	<div class="select timelines-menu sortable">
+		<input type="hidden" id="menu_timelineorder" name="menu_timelineorder" value=""/>
+		{{foreach $timelines as $t}}
+			{{include file="field_checkbox.tpl" field=$t.bookmark}}
+		{{/foreach}}
+		<div class="settings-submit-wrapper">
+			{{include file="field_checkbox.tpl" field=$reset_menu}}
+		</div>
+	</div>
 
 	<h2>{{$channel_title}}</h2>
 	{{include file="field_select.tpl" field=$channel_languages}}

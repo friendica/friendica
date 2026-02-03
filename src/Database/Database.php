@@ -723,13 +723,13 @@ class Database
 
 			if (($duration > $this->config->get('system', 'db_loglimit'))) {
 				$duration  = round($duration, 3);
-				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+				$backtrace = System::getCallstack();
 
 				@file_put_contents(
 					$this->config->get('system', 'db_log'),
 					DateTimeFormat::utcNow() . "\t" . $duration . "\t" .
-					basename($backtrace[1]['file']) . "\t" .
-					$backtrace[1]['line'] . "\t" . $backtrace[2]['function'] . "\t" .
+					basename($backtrace[0]['file']) . "\t" .
+					$backtrace[0]['line'] . "\t" . $backtrace[0]['function'] . "\t" .
 					substr($this->replaceParameters($sql, $args), 0, 4000) . "\n",
 					FILE_APPEND
 				);

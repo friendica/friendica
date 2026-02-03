@@ -382,25 +382,20 @@ function get_messages(int $uid, int $start, int $limit): array
 			c.`url`,
 			c.`thumb`,
 			c.`network`,
-			m2.`count`,
-			m2.`mailcreated`,
-			m2.`mailseen`
+			(SELECT COUNT(*) FROM `mail` WHERE `parent-uri` = m.`parent-uri` AND `uid` = ?) AS `count`,
+			(SELECT MAX(`created`) FROM `mail` WHERE `parent-uri` = m.`parent-uri` AND `uid` = ?) AS `mailcreated`,
+			(SELECT MIN(`seen`) FROM `mail` WHERE `parent-uri` = m.`parent-uri` AND `uid` = ?) AS `mailseen`
 		FROM `mail` m
-		JOIN (
-			SELECT
-				`parent-uri`,
-				MIN(`id`)      AS `id`,
-				COUNT(*)       AS `count`,
-				MAX(`created`) AS `mailcreated`,
-				MIN(`seen`)    AS `mailseen`
-			FROM `mail`
-			WHERE `uid` = ?
-			GROUP BY `parent-uri`
-		) m2 ON m.`parent-uri` = m2.`parent-uri` AND m.`id` = m2.`id`
 		LEFT JOIN `contact` c ON m.`contact-id` = c.`id`
 		WHERE m.`uid` = ?
-		ORDER BY m2.`mailcreated` DESC
-		LIMIT ?, ?', $uid, $uid, $start, $limit));
+			AND m.`id` IN (
+				SELECT MIN(`id`)
+				FROM `mail`
+				WHERE `uid` = ?
+				GROUP BY `parent-uri`
+			)
+		ORDER BY `mailcreated` DESC
+		LIMIT ?, ?', $uid, $uid, $uid, $uid, $uid, $start, $limit));
 }
 
 function render_messages(array $msg, string $t): string

@@ -18,11 +18,13 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\DI;
+use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Module\BaseNotifications;
 use Friendica\Module\Response;
 use Friendica\Navigation\Notifications\Factory\Introduction as IntroductionFactory;
 use Friendica\Navigation\Notifications\ValueObject\Introduction;
+use Friendica\Security\OpenWebAuth;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -102,6 +104,8 @@ class Introductions extends BaseNotifications
 			// We have to distinguish between these two because they use different data.
 			switch ($Introduction->getLabel()) {
 				case 'friend_suggestion':
+					$contact = Contact::getByURL($Introduction->getUrl());
+
 					$notificationContent[] = Renderer::replaceMacros($notificationSuggestions, [
 						'$type'                  => $Introduction->getLabel(),
 						'$str_notification_type' => $this->t('Notification type:'),
@@ -116,15 +120,15 @@ class Introductions extends BaseNotifications
 						'$photo'                 => $Introduction->getPhoto(),
 						'$fullname'              => $Introduction->getName(),
 						'$dfrn_url'              => $owner['url'],
-						'$url'                   => $Introduction->getUrl(),
-						'$zrl'                   => $Introduction->getZrl(),
+						'$url'                   => $contact['alias'] ?: $Introduction->getUrl(),
+						'$zrl'                   => OpenWebAuth::getZrlUrl($contact['alias'] ?: $Introduction->getUrl()),
 						'$lbl_url'               => $this->t('Profile URL'),
 						'$addr'                  => $Introduction->getAddr(),
 						'$action'                => 'contact/follow',
 						'$approve'               => $this->t('Approve'),
 						'$note'                  => $Introduction->getNote(),
 						'$ignore'                => $this->t('Ignore'),
-						'$discard'               => $this->t('Discard'),
+						'$discard'               => $this->t('Remove'),
 						'$is_mobile'             => $this->mode->isMobile(),
 					]);
 					break;
@@ -161,10 +165,12 @@ class Introductions extends BaseNotifications
 					$header .= ' (' . ContactSelector::networkToName($Introduction->getNetwork(), '', $gsid) . ')';
 
 					if ($Introduction->getNetwork() != Protocol::DIASPORA) {
-						$discard = $this->t('Discard');
+						$discard = $this->t('Remove');
 					} else {
 						$discard = '';
 					}
+
+					$contact = Contact::getByURL($Introduction->getUrl(), ['alias']);
 
 					$notificationContent[] = Renderer::replaceMacros($notificationTemplate, [
 						'$type'                  => $Introduction->getLabel(),
@@ -187,8 +193,8 @@ class Introductions extends BaseNotifications
 						'$lbl_connection_type'   => $helptext,
 						'$friend'                => $friend,
 						'$follower'              => $follower,
-						'$url'                   => $Introduction->getUrl(),
-						'$zrl'                   => $Introduction->getZrl(),
+						'$url'                   => $contact['alias'] ?: $Introduction->getUrl(),
+						'$zrl'                   => OpenWebAuth::getZrlUrl($contact['alias'] ?: $Introduction->getUrl()),
 						'$lbl_url'               => $this->t('Profile URL'),
 						'$addr'                  => $Introduction->getAddr(),
 						'$lbl_knowyou'           => $lbl_knowyou,

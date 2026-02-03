@@ -68,7 +68,9 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			$row['embed-type'],
 			$row['embed-html'],
 			$row['embed-width'],
-			$row['embed-height']
+			$row['embed-height'],
+			$row['page-type'],
+			$row['schematypes'] ? json_decode($row['schematypes'], true) : null
 		);
 	}
 
@@ -141,6 +143,8 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			'embed-html'      => $attachment['embed_html']    ?? null,
 			'embed-width'     => $attachment['embed_width']   ?? null,
 			'embed-height'    => $attachment['embed_height']  ?? null,
+			'page-type'       => $attachment['page_type']     ?? null,
+			'schematypes'     => null,
 			'attach-id'       => null,
 			'language'        => null,
 			'published'       => null,
@@ -190,10 +194,12 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			'embed-html'      => $data['embed']['html']         ?? null,
 			'embed-width'     => $data['embed']['width']        ?? null,
 			'embed-height'    => $data['embed']['height']       ?? null,
+			'page-type'       => $data['pagetype']              ?? null,
 			'attach-id'       => null,
 			'language'        => $data['language']  ?? null,
 			'published'       => $data['published'] ?? null,
 			'modified'        => $data['modified']  ?? null,
+			'schematypes'     => isset($data['schematypes']) ? json_encode($data['schematypes']) : null,
 		];
 
 		return $this->createFromTableRow($row);

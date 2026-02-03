@@ -323,16 +323,18 @@ class Conversation
 
 		$tpl = Renderer::getMarkupTemplate('jot-header.tpl');
 		$this->page['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$newpost'   => 'true',
-			'$geotag'    => $geotag,
-			'$nickname'  => $x['nickname'],
-			'$ispublic'  => $this->l10n->t('Visible to <strong>everybody</strong>'),
-			'$linkurl'   => $this->l10n->t('Please enter a image/video/audio/webpage URL:'),
-			'$term'      => $this->l10n->t('Tag term:'),
-			'$fileas'    => $this->l10n->t('Save to Folder'),
-			'$whereareu' => $this->l10n->t('Where are you right now?'),
-			'$delitems'  => $this->l10n->t("Delete item\x28s\x29?"),
-			'$is_mobile' => $this->mode->isMobile(),
+			'$newpost'       => 'true',
+			'$geotag'        => $geotag,
+			'$nickname'      => $x['nickname'],
+			'$ispublic'      => $this->l10n->t('Visible to <strong>everybody</strong>'),
+			'$linkurl'       => $this->l10n->t('Please enter a image/video/audio/webpage URL:'),
+			'$term'          => $this->l10n->t('Tag term:'),
+			'$fileas'        => $this->l10n->t('Save to Folder'),
+			'$whereareu'     => $this->l10n->t('Where are you right now?'),
+			'$delitems'      => $this->l10n->t("Delete item\x28s\x29?"),
+			'$postPublished' => $this->l10n->t('Post published.'),
+			'$goToPost'      => $this->l10n->t('Go to post'),
+			'$is_mobile'     => $this->mode->isMobile(),
 		]);
 
 		$jotplugins = $this->eventDispatcher->dispatch(

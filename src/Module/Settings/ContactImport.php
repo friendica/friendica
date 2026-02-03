@@ -20,6 +20,7 @@ use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
+use Friendica\Worker\AddContact;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -72,7 +73,7 @@ class ContactImport extends BaseSettings
 						// "http" or "@" to be present in the string.
 						// All other fields from the row will be ignored
 						if ((strpos($csvRow[0], '@') !== false) || Network::isValidHttpUrl($csvRow[0])) {
-							Worker::add(Worker::PRIORITY_MEDIUM, 'AddContact', $this->session->getLocalUserId(), trim($csvRow[0], '@'));
+							AddContact::add(Worker::PRIORITY_MEDIUM, $this->session->getLocalUserId(), trim($csvRow[0], '@'));
 						} else {
 							$this->logger->notice('Invalid account', ['url' => $csvRow[0]]);
 						}

@@ -27,6 +27,7 @@
 							{{if $lblsuggest}}<li role="menuitem"><a href="{{$contact_actions.suggest.url}}" title="{{$contact_actions.suggest.title}}">{{$contact_actions.suggest.label}}</a></li>{{/if}}
 							{{if $poll_enabled}}<li role="menuitem"><a href="{{$contact_actions.update.url}}" title="{{$contact_actions.update.title}}">{{$contact_actions.update.label}}</a></li>{{/if}}
 							{{if $contact_actions.updateprofile}}<li role="menuitem"><a href="{{$contact_actions.updateprofile.url}}" title="{{$contact_actions.updateprofile.title}}">{{$contact_actions.updateprofile.label}}</a></li>{{/if}}
+							{{if $contact_actions.fetchoutbox}}<li role="menuitem"><a href="{{$contact_actions.fetchoutbox.url}}" title="{{$contact_actions.fetchoutbox.title}}">{{$contact_actions.fetchoutbox.label}}</a></li>{{/if}}
 							<li class="divider"></li>
 							<li role="menuitem"><a href="#" title="{{$contact_actions.block.title}}" onclick="window.location.href='{{$contact_actions.block.url}}'; return false;">{{$contact_actions.block.label}}</a></li>
 							<li role="menuitem"><a href="#" title="{{$contact_actions.ignore.title}}" onclick="window.location.href='{{$contact_actions.ignore.url}}'; return false;">{{$contact_actions.ignore.label}}</a></li>

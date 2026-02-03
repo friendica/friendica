@@ -57,7 +57,7 @@ steps:
   composer_install:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     commands:
-      - git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
+      - git clone -b 2025.07-rc --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
       - export COMPOSER_HOME=.composer
       - ./bin/composer.phar validate
       - ./bin/composer.phar install --prefer-dist

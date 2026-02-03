@@ -48,6 +48,7 @@ class Tag
 	const CAN_ANNOUNCE = 20;
 	const CAN_LIKE     = 21;
 	const CAN_REPLY    = 22;
+	const CAN_QUOTE    = 23;
 
 	const ACCOUNT             = 1;
 	const GENERAL_COLLECTION  = 2;
@@ -71,7 +72,7 @@ class Tag
 	 * @param integer $target Target (default: null)
 	 * @return void
 	 */
-	public static function store(int $uriId, int $type, string $name, string $url = '', int $target = null)
+	public static function store(int $uriId, int $type, string $name, string $url = '', ?int $target = null)
 	{
 		if ($type == self::HASHTAG) {
 			// Trim Unicode non-word characters
@@ -120,7 +121,7 @@ class Tag
 		}
 
 		if (empty($cid)) {
-			if (!in_array($type, [self::TO, self::CC, self::BTO, self::BCC, self::AUDIENCE, self::ATTRIBUTED])) {
+			if (!in_array($type, [self::TO, self::CC, self::BTO, self::BCC, self::AUDIENCE, self::ATTRIBUTED, self::CAN_ANNOUNCE, self::CAN_LIKE, self::CAN_REPLY, self::CAN_QUOTE])) {
 				if (($type != self::HASHTAG) && !empty($url) && ($url != $name)) {
 					$url = strtolower($url);
 				} else {
@@ -212,7 +213,7 @@ class Tag
 	 * @param int    $type Type of tag
 	 * @return int Tag id
 	 */
-	public static function getID(string $name, string $url = '', int $type = null): int
+	public static function getID(string $name, string $url = '', ?int $type = null): int
 	{
 		$fields = ['name' => substr($name, 0, 96), 'url' => $url];
 
@@ -268,7 +269,7 @@ class Tag
 	 *
 	 * @return array Tag list
 	 */
-	public static function getFromBody(string $body, string $tags = null): array
+	public static function getFromBody(string $body, ?string $tags = null): array
 	{
 		if (is_null($tags)) {
 			$tags = self::TAG_CHARACTER[self::HASHTAG] . self::TAG_CHARACTER[self::MENTION] . self::TAG_CHARACTER[self::EXCLUSIVE_MENTION];
@@ -289,7 +290,7 @@ class Tag
 	 * @param string  $tags    Accepted tags
 	 * @return void
 	 */
-	public static function storeFromBody(int $uriId, string $body, string $tags = null)
+	public static function storeFromBody(int $uriId, string $body, ?string $tags = null)
 	{
 		$item = ['uri-id' => $uriId, 'body' => $body, 'quote-uri-id' => null];
 		self::storeFromArray($item, $tags);
@@ -302,7 +303,7 @@ class Tag
 	 * @param string  $tags    Accepted tags
 	 * @return void
 	 */
-	public static function storeFromArray(array $item, string $tags = null)
+	public static function storeFromArray(array $item, ?string $tags = null)
 	{
 		DI::logger()->info('Check for tags', ['uri-id' => $item['uri-id'], 'hash' => $tags]);
 

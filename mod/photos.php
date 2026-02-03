@@ -656,7 +656,7 @@ function photos_content()
 
 		$default_upload_box    = Renderer::replaceMacros(Renderer::getMarkupTemplate('photos_default_uploader_box.tpl'), []);
 		$default_upload_submit = Renderer::replaceMacros(Renderer::getMarkupTemplate('photos_default_uploader_submit.tpl'), [
-			'$submit' => DI::l10n()->t('Submit'),
+			'$submit' => DI::l10n()->t('Upload selected picture'),
 		]);
 
 		// Get the relevant size limits for uploads. Abbreviated var names: MaxImageSize -> mis; upload_max_filesize -> umf
@@ -772,12 +772,11 @@ function photos_content()
 				$album_e = $album;
 
 				$o .= Renderer::replaceMacros($edit_tpl, [
-					'$nametext'   => DI::l10n()->t('New album name: '),
-					'$nickname'   => $user['nickname'],
-					'$album'      => $album_e,
-					'$hexalbum'   => bin2hex($album),
-					'$submit'     => DI::l10n()->t('Submit'),
-					'$dropsubmit' => DI::l10n()->t('Delete Album')
+					'$nametext' => DI::l10n()->t('New album name: '),
+					'$nickname' => $user['nickname'],
+					'$album'    => $album_e,
+					'$hexalbum' => bin2hex($album),
+					'$submit'   => DI::l10n()->t('Save changes'),
 				]);
 			}
 		} elseif ($can_post) {
@@ -1022,7 +1021,7 @@ function photos_content()
 					];
 				}
 			}
-			$tags = ['title' => DI::l10n()->t('Tags: '), 'tags' => $tag_arr];
+			$tags = ['title' => DI::l10n()->t('Tags'), 'tags' => $tag_arr];
 			if ($cmd === 'edit' && !empty($tag_arr)) {
 				$tags['removeanyurl'] = 'post/' . $link_item['id'] . '/tag/remove?return=' . urlencode(DI::args()->getCommand());
 				$tags['removetitle']  = DI::l10n()->t('[Select tags to remove]');
@@ -1042,7 +1041,7 @@ function photos_content()
 				'$id'          => $ph[0]['id'],
 				'$album'       => ['albname', DI::l10n()->t('New album name'), $album_e, ''],
 				'$caption'     => ['desc', DI::l10n()->t('Caption'), $caption_e, ''],
-				'$tags'        => ['newtag', DI::l10n()->t('Add a Tag'), "", DI::l10n()->t('Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping')],
+				'$tags'        => ['newtag', DI::l10n()->t('Add a Tag'), "", "", "", "", "", DI::l10n()->t('Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping')],
 				'$rotate_none' => ['rotate', DI::l10n()->t('Do not rotate'), 0, '', true],
 				'$rotate_cw'   => ['rotate', DI::l10n()->t("Rotate CW \x28right\x29"), 1, ''],
 				'$rotate_ccw'  => ['rotate', DI::l10n()->t("Rotate CCW \x28left\x29"), 2, ''],
@@ -1053,7 +1052,7 @@ function photos_content()
 				'$aclselect'   => $aclselect_e,
 
 				'$item_id' => $link_item['id'] ?? 0,
-				'$submit'  => DI::l10n()->t('Submit'),
+				'$submit'  => DI::l10n()->t('Save changes'),
 				'$delete'  => DI::l10n()->t('Delete Photo'),
 
 				// ACL permissions box
@@ -1095,7 +1094,7 @@ function photos_content()
 						'$mytitle'     => DI::l10n()->t('This is you'),
 						'$myphoto'     => $contact['thumb'],
 						'$comment'     => DI::l10n()->t('Comment'),
-						'$submit'      => DI::l10n()->t('Submit'),
+						'$submit'      => DI::l10n()->t('Comment'),
 						'$preview'     => DI::l10n()->t('Preview'),
 						'$loading'     => DI::l10n()->t('Loading...'),
 						'$qcomment'    => $qcomment,
@@ -1151,7 +1150,7 @@ function photos_content()
 						'$mytitle'     => DI::l10n()->t('This is you'),
 						'$myphoto'     => $contact['thumb'],
 						'$comment'     => DI::l10n()->t('Comment'),
-						'$submit'      => DI::l10n()->t('Submit'),
+						'$submit'      => DI::l10n()->t('Comment'),
 						'$preview'     => DI::l10n()->t('Preview'),
 						'$qcomment'    => $qcomment,
 						'$rand_num'    => Crypto::randomDigits(12),
@@ -1231,7 +1230,7 @@ function photos_content()
 							'$mytitle'     => DI::l10n()->t('This is you'),
 							'$myphoto'     => $contact['thumb'],
 							'$comment'     => DI::l10n()->t('Comment'),
-							'$submit'      => DI::l10n()->t('Submit'),
+							'$submit'      => DI::l10n()->t('Comment'),
 							'$preview'     => DI::l10n()->t('Preview'),
 							'$qcomment'    => $qcomment,
 							'$rand_num'    => Crypto::randomDigits(12),

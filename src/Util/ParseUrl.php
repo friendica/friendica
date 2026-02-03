@@ -22,6 +22,7 @@ use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Embera\Embera;
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Model\Post;
 
 /**
@@ -46,10 +47,15 @@ class ParseUrl
 
 	/**
 	 * Fetch the content type of the given url
-	 * @param string $url    URL of the page
-	 * @param string $accept content-type to accept
-	 * @param int    $timeout
-	 * @return array content type
+	 *
+	 * Performs a HEAD (fallback to GET) and returns the detected
+	 * content type split into main type and subtype (e.g. ['text', 'html']).
+	 *
+	 * @param string $url     URL of the page
+	 * @param string $accept  content-type to accept
+	 * @param int    $timeout request timeout in seconds
+	 *
+	 * @return string[] Array with the main type and subtype (e.g. ['text','html'])
 	 */
 	public static function getContentType(string $url, string $accept = HttpClientAccept::DEFAULT, int $timeout = 0): array
 	{
@@ -160,6 +166,7 @@ class ParseUrl
 	 * @param string $url      The url of the page which should be scraped
 	 * @param string $mimetype Optional mimetype that had already been detected for this page
 	 * @param int    $count    Internal counter to avoid endless loops
+	 * @param bool   $songlink Try to retrieve an alternative player via song.link (default: true)
 	 *
 	 * @return array which contains needed data for embedding
 	 *    string 'url'      => The url of the parsed page
@@ -184,7 +191,7 @@ class ParseUrl
 	 * </body>
 	 * @endverbatim
 	 */
-	public static function getSiteinfo(string $url, string $mimetype = '', int $count = 1): array
+	public static function getSiteinfo(string $url, string $mimetype = '', int $count = 1, bool $songlink = true): array
 	{
 		if (empty($url)) {
 			return [
@@ -459,6 +466,9 @@ class ParseUrl
 					case 'og:description':
 						$siteinfo['text'] = trim($meta_tag['content']);
 						break;
+					case 'og:updated_time':
+						$siteinfo['modified'] = DateTimeFormat::utc(trim($meta_tag['content']));
+						break;
 					case 'og:site_name':
 						$siteinfo['publisher_name'] = trim($meta_tag['content']);
 						break;
@@ -494,17 +504,29 @@ class ParseUrl
 			}
 		}
 
+		$siteinfo['schematypes'] = [];
+
 		$list = $xpath->query("//script[@type='application/ld+json']");
 		foreach ($list as $node) {
 			if (!empty($node->nodeValue)) {
 				$jsonld = json_decode($node->nodeValue, true);
 				if (is_array($jsonld)) {
-					$siteinfo = self::parseParts($siteinfo, $jsonld);
+					$siteinfo = self::parseParts($siteinfo, $jsonld, true);
 				}
 			}
 		}
 
+		$siteinfo['schematypes'] = array_values(array_unique($siteinfo['schematypes']));
+
+		if (sizeof($siteinfo['schematypes']) === 0) {
+			unset($siteinfo['schematypes']);
+		}
+
 		$siteinfo = self::getOembedInfo($xpath, $siteinfo);
+
+		if ($songlink && isset($siteinfo['player']['embed']) && DI::config()->get('system', 'songlink')) {
+			$siteinfo = self::getSongLinkPlayer($siteinfo);
+		}
 
 		if (!empty($siteinfo['player']['stream'])) {
 			// Only add player data to media arrays if there is no duplicate
@@ -595,7 +617,7 @@ class ParseUrl
 
 		foreach (['audio', 'video'] as $element) {
 			if (!empty($siteinfo[$element])) {
-				array_walk($siteinfo[$element], function (&$media) use ($page_url, &$siteinfo) {
+				array_walk($siteinfo[$element], function (&$media) use ($page_url) {
 					$url         = '';
 					$embed       = '';
 					$content     = '';
@@ -630,9 +652,6 @@ class ParseUrl
 					}
 					if (!empty($embed)) {
 						$media['embed'] = $embed;
-						if (empty($siteinfo['player']['embed'])) {
-							$siteinfo['player']['embed'] = $embed;
-						}
 					}
 					if (!empty($content)) {
 						$media['src'] = $content;
@@ -743,21 +762,25 @@ class ParseUrl
 	/**
 	 * Parse the Json-Ld parts of a web page
 	 *
-	 * @param array $siteinfo
-	 * @param array $jsonld
+	 * Recursively parses JSON-LD structures and merges extracted information
+	 * into the given $siteinfo array.
 	 *
-	 * @return array siteinfo
+	 * @param array $siteinfo The current siteinfo to enrich
+	 * @param array $jsonld   The JSON-LD data to parse
+	 * @param bool  $root     Whether this call is the root element
+	 *
+	 * @return array The enriched siteinfo array
 	 */
-	private static function parseParts(array $siteinfo, array $jsonld): array
+	private static function parseParts(array $siteinfo, array $jsonld, bool $root): array
 	{
 		if (!empty($jsonld['@graph']) && is_array($jsonld['@graph'])) {
 			foreach ($jsonld['@graph'] as $part) {
 				if (!empty($part) && is_array($part)) {
-					$siteinfo = self::parseParts($siteinfo, $part);
+					$siteinfo = self::parseParts($siteinfo, $part, false);
 				}
 			}
 		} elseif (!empty($jsonld['@type'])) {
-			$siteinfo = self::parseJsonLd($siteinfo, $jsonld);
+			$siteinfo = self::parseJsonLd($siteinfo, $jsonld, $root);
 		} elseif (!empty($jsonld)) {
 			$keys         = array_keys($jsonld);
 			$numeric_keys = true;
@@ -769,7 +792,7 @@ class ParseUrl
 			if ($numeric_keys) {
 				foreach ($jsonld as $part) {
 					if (!empty($part) && is_array($part)) {
-						$siteinfo = self::parseParts($siteinfo, $part);
+						$siteinfo = self::parseParts($siteinfo, $part, false);
 					}
 				}
 			}
@@ -794,12 +817,16 @@ class ParseUrl
 	 *
 	 * @return array siteinfo
 	 */
-	private static function parseJsonLd(array $siteinfo, array $jsonld): array
+	private static function parseJsonLd(array $siteinfo, array $jsonld, bool $root): array
 	{
 		$type = JsonLD::fetchElement($jsonld, '@type');
 		if (empty($type)) {
 			DI::logger()->info('Empty type', ['url' => $siteinfo['url']]);
 			return $siteinfo;
+		}
+
+		if ($root) {
+			$siteinfo['schematypes'][] = $type;
 		}
 
 		// Silently ignore some types that aren't processed
@@ -1276,7 +1303,7 @@ class ParseUrl
 
 		$content = JsonLD::fetchElement($jsonld, 'uploadDate');
 		if (!empty($content) && is_string($content)) {
-			$media['uploaded'] = trim($content);
+			$media['uploaded'] = DateTimeFormat::utc($content);
 		}
 
 		$content = JsonLD::fetchElement($jsonld, 'image');
@@ -1301,10 +1328,14 @@ class ParseUrl
 	/**
 	 * Fetch oEmbed data
 	 *
-	 * @param DOMXPath $xpath
-	 * @param string   $url
+	 * Attempts to discover an oEmbed endpoint from common providers, the
+	 * page's <link> tags, or falls back to Embera. Returns an associative
+	 * array following the oEmbed specification or an empty array on failure.
 	 *
-	 * @return array oEmbed data
+	 * @param DOMXPath $xpath DOMXPath for the parsed document
+	 * @param string   $url   The original URL
+	 *
+	 * @return array Associative array with oEmbed fields, or empty array if not found
 	 */
 	private static function getOembedData(DOMXPath $xpath, string $url): array
 	{
@@ -1319,6 +1350,22 @@ class ParseUrl
 				$oembed .= '&lang=' . $systemLanguage;
 			}
 			DI::logger()->debug('Using Twitter oEmbed', ['url' => $url, 'oembed' => $oembed]);
+		}
+
+		if (in_array(parse_url(Strings::normaliseLink($url), PHP_URL_HOST), ['tidal.com'])) {
+			$oembed = 'https://oembed.tidal.com?url=' . urlencode($url);
+			DI::logger()->debug('Using Tidal oEmbed', ['url' => $url, 'oembed' => $oembed]);
+			// @todo Check how to support the parameters listed here: https://developer.tidal.com/documentation/embeds/embeds-code-generator
+		}
+
+		if (in_array(parse_url(Strings::normaliseLink($url), PHP_URL_HOST), ['link.deezer.com', 'deezer.com', 'www.deezer.com'])) {
+			$oembed = 'https://api.deezer.com/oembed?url=' . urlencode($url) . '&tracklist=true';
+			DI::logger()->debug('Using Deezer oEmbed', ['url' => $url, 'oembed' => $oembed]);
+			// @see https://developers.deezer.com/api/oembed
+		}
+
+		if (!$oembed) {
+			$oembed = self::fetchFromProviderList($url);
 		}
 
 		if (!$oembed) {
@@ -1346,9 +1393,82 @@ class ParseUrl
 			$data = current($urldata);
 			DI::logger()->debug('Found oEmbed JSON from Embera', ['url' => $url]);
 		}
+
+		if  (!isset($data['type']) || !isset($data['provider_url'])) {
+			return [];
+		}
+
+		// Some provider return "rich", although they should return "photo"
+		if ($data['type'] === 'rich' && in_array($data['provider_url'], ['https://www.pixiv.net/', 'https://www.pinterest.com'])) {
+			$data['type'] = 'photo';
+		}
+
 		return $data;
 	}
 
+	/**
+	 * Fetch the oEmbed provider from the oembed.com provider list
+	 *
+	 * @param string $url The url to fetch the oEmbed provider for
+	 *
+	 * @return string|null The oEmbed url or null if no provider was found
+	 */
+	private static function fetchFromProviderList(string $url): ?string
+	{
+		$cachekey = 'ParseUrl:fetchFromProviderList';
+
+		$providers = DI::cache()->get($cachekey);
+		if (!$providers) {
+			$providers_content = DI::httpClient()->fetch('https://oembed.com/providers.json', HttpClientAccept::JSON, 0, '', HttpClientRequest::SITEINFO);
+			if (!$providers_content) {
+				DI::logger()->warning('Could not fetch oEmbed provider list');
+				return null;
+			}
+			$providers = json_decode($providers_content, true);
+			if (!is_array($providers)) {
+				DI::logger()->warning('Could not decode oEmbed provider list');
+				return null;
+			}
+			DI::cache()->set($cachekey, $providers, Duration::WEEK);
+		}
+		$schemes = [];
+		foreach ($providers as $provider) {
+			if (!isset($provider['endpoints']) || !is_array($provider['endpoints'])) {
+				continue;
+			}
+			foreach ($provider['endpoints'] as $endpoint) {
+				if (!isset($endpoint['schemes']) || !is_array($endpoint['schemes'])) {
+					$schemes[rtrim($provider['provider_url'], '/') . '/*'] = str_replace('{format}', 'json', $endpoint['url']);
+					continue;
+				}
+				foreach ($endpoint['schemes'] as $scheme) {
+					$schemes[$scheme] = str_replace('{format}', 'json', $endpoint['url']);
+				}
+			}
+		}
+
+		foreach ($schemes as $scheme => $provider_url) {
+			$regex = str_replace(['.', '?', '*'], ['\.', '\?', '.*'], $scheme);
+			if (preg_match('~' . $regex . '~i', $url)) {
+				$oembed = $provider_url . (strpos($provider_url, '?') === false ? '?' : '&') . 'url=' . urlencode($url);
+				DI::logger()->debug('Found oEmbed provider from oembed.com list', ['url' => $url, 'oembed' => $oembed]);
+				return $oembed;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Merge oEmbed data into the existing siteinfo array.
+	 *
+	 * Maps known oEmbed fields to siteinfo keys, converts dates and logs
+	 * unknown fields for debugging purposes.
+	 *
+	 * @param array $siteinfo Current siteinfo
+	 * @param array $data     The oEmbed data
+	 *
+	 * @return array Enriched siteinfo
+	 */
 	private static function getSiteinfoFromoEmbed(array $siteinfo, array $data): array
 	{
 		// Youtube provides only basic information to some IP ranges.
@@ -1358,31 +1478,34 @@ class ParseUrl
 
 		$unknown_fields = $data;
 		foreach (['account_type', 'asset_type', 'author_unique_id', 'availability', 'brand',
-			'cache_age', 'category', 'currency_code', 'duration', 'embera_using_fake_response',
-			'embera_provider_name', 'embed_product_id', 'embed_type', 'flickr_type',
-			'height', 'html', 'images','iframe_url', 'is_plus', 'price', 'products',
-			'product_expiration', 'product_id', 'quantity', 'referrer', 'safety', 'success', 'type',
-			'thumbnail_credit', 'thumbnail_credit_url', 'thumbnail_credit_note',
+			'cache_age', 'category', 'collection', 'currency_code', 'duration', 'embera_using_fake_response',
+			'embera_provider_name', 'embed_product_id', 'embed_type', 'embed', 'entity', 'flickr_type',
+			'height', 'html', 'id', 'images','iframe_url', 'is_plus', 'photographer', 'price', 'products',
+			'product_expiration', 'product_id', 'quantity', 'ratio', 'referrer', 'safety', 'success',
+			'terms_of_use_url', 'type', 'thumbnail_credit', 'thumbnail_credit_url', 'thumbnail_credit_note',
 			'thumbnail_height', 'thumbnail_url_with_play_button', 'thumbnail_width',
-			'uri', 'url', 'version', 'video_id', 'web_page', 'web_page_short_url', 'width'] as $value) {
+			'uri', 'url', 'version', 'video_id', 'web_page', 'web_page_short_url', 'width', 'work_type'] as $value) {
 			unset($unknown_fields[$value]);
 		}
 
 		$fields = [
-			'title'            => 'title',
-			'description'      => 'text',
-			'summary'          => 'text',
-			'author_name'      => 'author_name',
-			'author_url'       => 'author_url',
-			'author'           => 'author_name',
-			'provider_name'    => 'publisher_name',
-			'provider_url'     => 'publisher_url',
-			'thumbnail_url'    => 'image',
-			'upload_date'      => 'published',
-			'publication_date' => 'published',
-			'license'          => 'license_name',
-			'license_url'      => 'license_url',
-			'license_id'       => 'license_id',
+			'title'             => 'title',
+			'caption'           => 'text',
+			'description'       => 'text',
+			'summary'           => 'text',
+			'video_description' => 'text',
+			'author_name'       => 'author_name',
+			'author_url'        => 'author_url',
+			'author'            => 'author_name',
+			'provider_name'     => 'publisher_name',
+			'provider_url'      => 'publisher_url',
+			'image'             => 'image',
+			'thumbnail_url'     => 'image',
+			'upload_date'       => 'published',
+			'publication_date'  => 'published',
+			'license'           => 'license_name',
+			'license_url'       => 'license_url',
+			'license_id'        => 'license_id',
 		];
 
 		foreach ($fields as $key => $value) {
@@ -1404,14 +1527,29 @@ class ParseUrl
 		return $siteinfo;
 	}
 
+	/**
+	 * Retrieve oEmbed information for the page and merge it into siteinfo.
+	 *
+	 * This will request oEmbed JSON (or fall back to embera) and apply
+	 * any appropriate transformations before adding embed/player data.
+	 *
+	 * @param DOMXPath $xpath    XPath object of the parsed document
+	 * @param array    $siteinfo Current siteinfo to be augmented
+	 *
+	 * @return array Augmented siteinfo
+	 */
 	private static function getOembedInfo(DOMXPath $xpath, array $siteinfo): array
 	{
 		$data = self::getOembedData($xpath, $siteinfo['url']);
-		if (empty($data) || !is_array($data)) {
+		if (!$data) {
 			return $siteinfo;
 		}
 
 		$siteinfo = self::getSiteinfoFromoEmbed($siteinfo, $data);
+
+		if (!self::isWantedEmbed($siteinfo, $data)) {
+			return $siteinfo;
+		}
 
 		if ($data['type'] == 'video' & empty($siteinfo['player']) && ($data['provider_url'] ?? '') == 'https://www.tiktok.com' && isset($data['embed_product_id']) && isset($data['thumbnail_width']) && isset($data['thumbnail_height'])) {
 			$siteinfo['embed']['type']    = $data['type'];
@@ -1424,8 +1562,16 @@ class ParseUrl
 			return $siteinfo;
 		}
 
+		if ($data['provider_url'] == 'https://www.pinterest.com' && isset($siteinfo['video'])) {
+			$data['type'] = 'video';
+		}
+
 		if (!isset($data['html'])) {
 			return $siteinfo;
+		}
+
+		if (strpos($data['html'], '&lt;') === 0) {
+			$data['html'] = html_entity_decode($data['html']);
 		}
 
 		unset($siteinfo['player']);
@@ -1455,7 +1601,7 @@ class ParseUrl
 					$curlResult = DI::httpClient()->head($link);
 					$redirect   = $curlResult->getRedirectUrl();
 					if (preg_match('#/(video|broadcasts)/#', $redirect)) {
-						$siteinfo['embed']['type']   = $data['type'];
+						$siteinfo['embed']['type']   = 'video';
 						$siteinfo['embed']['html']   = trim(str_replace('<blockquote class="twitter-tweet"', '<blockquote class="twitter-tweet" data-media-max-width="560"', $data['html']));
 						$siteinfo['embed']['width']  = is_numeric($data['width'] ?? '') ? $data['width']  : null;
 						$siteinfo['embed']['height'] = is_numeric($data['height'] ?? '') ? $data['height'] : null;
@@ -1468,7 +1614,13 @@ class ParseUrl
 			return $siteinfo;
 		}
 
-		if ($data['type'] != 'video' && ($siteinfo['pagetype'] ?? '') != 'video') {
+		if (isset($siteinfo['pagetype'])) {
+			$pagetype = explode('.', $siteinfo['pagetype'])[0];
+		} else {
+			$pagetype = '';
+		}
+
+		if (!in_array($data['type'], ['video', 'photo']) && $pagetype != 'video') {
 			return $siteinfo;
 		}
 
@@ -1479,6 +1631,106 @@ class ParseUrl
 		DI::logger()->debug('Fetched oEmbed HTML', ['provider' => $data['provider_url'], 'url' => $siteinfo['url']]);
 
 		return $siteinfo;
+	}
+
+	/**
+	 * Try to obtain a better embed player using the song.link service.
+	 *
+	 * If a better player is available via song.link (e.g. a non-YouTube
+	 * provider), fetch and merge that player's embed information.
+	 *
+	 * @param array $siteinfo Current siteinfo
+	 *
+	 * @return array Possibly modified siteinfo with 'player' set if found
+	 */
+	private static function getSongLinkPlayer(array $siteinfo): array
+	{
+		$service    = 'https://api.song.link/v1-alpha.1/links?url=' . urlencode($siteinfo['url']);
+		$curlResult = DI::httpClient()->get($service, HttpClientAccept::HTML, [HttpClientOptions::REQUEST => HttpClientRequest::SITEINFO]);
+		if (!$curlResult->isSuccess()) {
+			DI::logger()->debug('No song.link data', ['url' => $siteinfo['url'], 'code' => $curlResult->getReturnCode(), 'message' => $curlResult->getBodyString()]);
+			return $siteinfo;
+		}
+
+		$data = json_decode($curlResult->getBodyString());
+		if (!isset($data->linksByPlatform->youtube)) {
+			DI::logger()->debug('No Youtube link in returned data', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		$data2 = json_decode(json_encode($data), true);
+		if (sizeof($data2['linksByPlatform']) <= 2) {
+			DI::logger()->debug('Only Youtube links in returned data', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		if (!isset($data->pageUrl)) {
+			DI::logger()->debug('No pageUrl in returned data', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		if ($data->pageUrl === $siteinfo['url']) {
+			DI::logger()->debug('ParseUrl is already pageUrl', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		$data = self::getSiteinfo($data->pageUrl, '', 1, false);
+		if (!isset($data['player']['embed'])) {
+			DI::logger()->debug('No embed player', ['url' => $siteinfo['url']]);
+			return $siteinfo;
+		}
+
+		$siteinfo['player'] = $data['player'];
+		DI::logger()->debug('Embed player found', ['url' => $siteinfo['url']]);
+
+		return $siteinfo;
+	}
+
+	/**
+	 * Decide whether an oEmbed rich response should be used for embedding.
+	 *
+	 * Uses schema type and page metadata to avoid embedding rich content
+	 * that does not add value (e.g. articles) while keeping media embeds.
+	 *
+	 * @param array $siteinfo Current siteinfo
+	 * @param array $data     The oEmbed data
+	 *
+	 * @return bool True if the embed should be used, false otherwise
+	 */
+	private static function isWantedEmbed(array $siteinfo, array $data): bool
+	{
+		if (isset($siteinfo['player'])) {
+			return true;
+		}
+
+		if ($data['type'] !== 'rich') {
+			return true;
+		}
+
+		$pagetype = isset($siteinfo['pagetype']) ? explode('.', $siteinfo['pagetype'])[0] : '';
+		if (in_array($pagetype, ['episode', 'song', 'music', 'video'])) {
+			return true;
+		}
+
+		if (isset($siteinfo['schematypes'])) {
+			foreach (['AudioObject', 'MusicRecording', 'PodcastEpisode', 'PresentationDigitalDocument'] as $type) {
+				if (in_array($type, $siteinfo['schematypes'])) {
+					return true;
+				}
+			}
+
+			foreach (['Article', 'BackgroundNewsArticle', 'NewsArticle'] as $type) {
+				if (in_array($type, $siteinfo['schematypes'])) {
+					return false;
+				}
+			}
+		}
+
+		if (in_array($pagetype, ['article'])) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -1507,13 +1759,25 @@ class ParseUrl
 		$xpath = new DOMXPath($dom);
 
 		$nodes = $xpath->query('/html/body/*');
-		if ($nodes->length !== 1) {
+		if ($nodes->length !== 1 && $data['type'] != 'video') {
 			return $siteinfo;
 		}
 
 		/** @var DOMElement $iframe */
 		$iframe = $nodes->item(0);
-		if ($iframe->nodeName !== 'iframe') {
+		$found  = $iframe->nodeName == 'iframe';
+
+		// When the oEmbed data belongs to a video, we can safely use any iframe that we can fetch
+		if (!$found && $data['type'] == 'video') {
+			$nodes = $xpath->query('//iframe');
+			if ($nodes->length > 0) {
+				/** @var DOMElement $iframe */
+				$iframe = $nodes->item(0);
+				$found  = true;
+			}
+		}
+
+		if (!$found) {
 			return $siteinfo;
 		}
 

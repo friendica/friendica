@@ -389,6 +389,10 @@ final class ItemHelper
 			return true;
 		}
 
+		if (($restrictions & Item::CANT_QUOTE) && (!empty($item['quote-uri']) || !empty($item['quote-uri-id']))) {
+			return true;
+		}
+
 		return false;
 	}
 

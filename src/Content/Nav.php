@@ -224,12 +224,12 @@ class Nav
 
 		if ($this->session->isAuthenticated()) {
 			// user menu
-			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Conversations'), '', $this->l10n->t('Conversations you started')];
-			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/profile', $this->l10n->t('Profile'), '', $this->l10n->t('Your profile page')];
-			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/photos', $this->l10n->t('Photos'), '', $this->l10n->t('Your photos')];
-			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/media', $this->l10n->t('Media'), '', $this->l10n->t('Your postings with media')];
-			$nav['usermenu'][] = ['calendar/', $this->l10n->t('Calendar'), '', $this->l10n->t('Your calendar')];
-			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Your personal notes')];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Conversations'), '', $this->l10n->t('Conversations you started'), 'fa-commenting'];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/profile', $this->l10n->t('Profile'), '', $this->l10n->t('Your profile page'), 'fa-user'];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/photos', $this->l10n->t('Photos'), '', $this->l10n->t('Your photos'), 'fa-picture-o'];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/media', $this->l10n->t('Media'), '', $this->l10n->t('Your postings with media'), 'fa-edit'];
+			$nav['usermenu'][] = ['calendar/', $this->l10n->t('Calendar'), '', $this->l10n->t('Your calendar'), 'fa-calendar'];
+			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Your personal notes'), 'fa-book'];
 
 			// user info
 			$contact  = $this->database->selectFirst('contact', ['id', 'url', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'], ['uid' => $this->session->getLocalUserId(), 'self' => true]);
@@ -308,9 +308,9 @@ class Nav
 			// Don't show notifications for public communities
 			if ($this->session->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {
 				$nav['introductions']         = ['notifications/intros', $this->l10n->t('Introductions'), '', $this->l10n->t('Friend Requests')];
-				$nav['notifications']         = ['notifications',	$this->l10n->t('Notifications'), '', $this->l10n->t('Notifications')];
-				$nav['notifications']['all']  = ['notifications/system', $this->l10n->t('See all notifications'), '', ''];
-				$nav['notifications']['mark'] = ['', $this->l10n->t('Mark as seen'), '', $this->l10n->t('Mark all system notifications as seen')];
+				$nav['notifications']         = ['notifications', $this->l10n->t('Notifications'), '', $this->l10n->t('Notifications')];
+				$nav['notifications']['all']  = ['notifications/system?show=all', $this->l10n->t('View all'), '', ''];
+				$nav['notifications']['mark'] = ['', $this->l10n->t('Mark as read'), '', $this->l10n->t('Mark all system notifications as seen')];
 			}
 
 			$nav['messages']           = ['message', $this->l10n->t('Messages'), '', $this->l10n->t('Private mail')];

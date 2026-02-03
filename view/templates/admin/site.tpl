@@ -63,6 +63,8 @@
 		{{include file="field_select.tpl" field=$community_page_style}}
 		{{include file="field_input.tpl" field=$max_author_posts_community_page}}
 		{{include file="field_input.tpl" field=$max_server_posts_community_page}}
+		{{include file="field_checkbox.tpl" field=$display_local_media}}
+		{{include file="field_checkbox.tpl" field=$display_remote_media}}
 
 		{{if $mail_able}}
 			{{include file="field_checkbox.tpl" field=$mail_enabled}}
@@ -145,6 +147,7 @@
 		{{include file="field_input.tpl" field=$worker_load_cooldown}}
 		{{include file="field_checkbox.tpl" field=$worker_fastlane}}
 		{{include file="field_checkbox.tpl" field=$decoupled_receiver}}
+		{{include file="field_select.tpl" field=$fetch_replies}}
 		{{include file="field_input.tpl" field=$worker_defer_limit}}
 		{{include file="field_input.tpl" field=$worker_fetch_limit}}
 

@@ -510,6 +510,7 @@ function justifyPhotos() {
 		.justifiedGallery({
 			margins: 3,
 			border: 0,
+			captions: false,
 			sizeRangeSuffixes: {
 				lt48: "-6",
 				lt80: "-5",

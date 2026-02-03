@@ -16,11 +16,11 @@
 				<h3>{{$title}}</h3>
 			</button>
 			{{if ! $new_circle}}
-				<a class="circle-edit-tool pull-right widget-action faded-icon" id="sidebar-edit-circle" href="{{$circle_page}}" data-toggle="tooltip" title="{{$edit_circles_text}}">
+				<a class="widget-action-top pull-right widget-action faded-icon" id="sidebar-edit-circle" href="{{$circle_page}}" data-toggle="tooltip" title="{{$edit_circles_text}}">
 					<i class="fa fa-pencil" aria-hidden="true"></i>
 				</a>
 			{{else}}
-				<a class="circle-edit-tool pull-right widget-action faded-icon" id="sidebar-new-circle"
+				<a class="widget-action-top pull-right widget-action faded-icon" id="sidebar-new-circle"
 					onclick="javascript:$('#circle-new-form').fadeIn('fast');" data-toggle="tooltip" title="{{$createtext}}">
 					<i class="fa fa-plus" aria-hidden="true"></i>
 				</a>

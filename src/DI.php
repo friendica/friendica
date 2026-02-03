@@ -35,8 +35,6 @@ abstract class DI
 	 * @param Dice $dice             The Dice instance
 	 * @param bool $disableDepByHand If true, the database dependencies aren't set, thus any occurrence of logging or
 	 *                               profiling in database methods would lead to an error. This flag is for testing only.
-	 *
-	 * @return void
 	 */
 	public static function init(Dice $dice, bool $disableDepByHand = false)
 	{
@@ -63,10 +61,8 @@ abstract class DI
 	 * Returns a clone of the current dice instance
 	 *
 	 * @internal This useful for overloading the current instance with mocked methods during tests
-	 *
-	 * @return Dice
 	 */
-	public static function getDice()
+	public static function getDice(): Dice
 	{
 		return clone self::$dice;
 	}
@@ -80,25 +76,16 @@ abstract class DI
 		return self::$dice->create(AppHelper::class);
 	}
 
-	/**
-	 * @return Database\Database
-	 */
 	public static function dba(): Database\Database
 	{
 		return self::$dice->create(Database\Database::class);
 	}
 
-	/**
-	 * @return \Friendica\Database\Definition\DbaDefinition
-	 */
 	public static function dbaDefinition(): Database\Definition\DbaDefinition
 	{
 		return self::$dice->create(Database\Definition\DbaDefinition::class);
 	}
 
-	/**
-	 * @return \Friendica\Database\Definition\ViewDefinition
-	 */
 	public static function viewDefinition(): Database\Definition\ViewDefinition
 	{
 		return self::$dice->create(Database\Definition\ViewDefinition::class);
@@ -108,10 +95,7 @@ abstract class DI
 	// "App" namespace instances
 	//
 
-	/**
-	 * @return App\Arguments
-	 */
-	public static function args()
+	public static function args(): App\Arguments
 	{
 		return self::$dice->create(App\Arguments::class);
 	}
@@ -121,26 +105,17 @@ abstract class DI
 		return self::$dice->create(App\BaseURL::class);
 	}
 
-	/**
-	 * @return App\Mode
-	 */
-	public static function mode()
+	public static function mode(): App\Mode
 	{
 		return self::$dice->create(App\Mode::class);
 	}
 
-	/**
-	 * @return App\Page
-	 */
-	public static function page()
+	public static function page(): App\Page
 	{
 		return self::$dice->create(App\Page::class);
 	}
 
-	/**
-	 * @return App\Router
-	 */
-	public static function router()
+	public static function router(): App\Router
 	{
 		return self::$dice->create(App\Router::class);
 	}
@@ -149,26 +124,17 @@ abstract class DI
 	// "AtProtocol" namespace instances
 	//
 
-	/**
-	 * @return AtProtocol
-	 */
-	public static function atProtocol()
+	public static function atProtocol(): ATProtocol
 	{
 		return self::$dice->create(ATProtocol::class);
 	}
 
-	/**
-	 * @return ATProtocol\Actor
-	 */
-	public static function atpActor()
+	public static function atpActor(): ATProtocol\Actor
 	{
 		return self::$dice->create(ATProtocol\Actor::class);
 	}
 
-	/**
-	 * @return AtProtocol\Processor
-	 */
-	public static function atpProcessor()
+	public static function atpProcessor(): ATProtocol\Processor
 	{
 		return self::$dice->create(ATProtocol\Processor::class);
 	}
@@ -177,26 +143,17 @@ abstract class DI
 	// "Content" namespace instances
 	//
 
-	/**
-	 * @return Content\Item
-	 */
-	public static function contentItem()
+	public static function contentItem(): Content\Item
 	{
 		return self::$dice->create(Content\Item::class);
 	}
 
-	/**
-	 * @return Content\Conversation
-	 */
-	public static function conversation()
+	public static function conversation(): Content\Conversation
 	{
 		return self::$dice->create(Content\Conversation::class);
 	}
 
-	/**
-	 * @return Content\Text\BBCode\Video
-	 */
-	public static function bbCodeVideo()
+	public static function bbCodeVideo(): Content\Text\BBCode\Video
 	{
 		return self::$dice->create(Content\Text\BBCode\Video::class);
 	}
@@ -205,18 +162,12 @@ abstract class DI
 	// "Core" namespace instances
 	//
 
-	/**
-	 * @return Core\Cache\Capability\ICanCache
-	 */
-	public static function cache()
+	public static function cache(): Core\Cache\Capability\ICanCache
 	{
 		return self::$dice->create(Core\Cache\Capability\ICanCache::class);
 	}
 
-	/**
-	 * @return Core\Config\Capability\IManageConfigValues
-	 */
-	public static function config()
+	public static function config(): Core\Config\Capability\IManageConfigValues
 	{
 		return self::$dice->create(Core\Config\Capability\IManageConfigValues::class);
 	}
@@ -231,34 +182,22 @@ abstract class DI
 		return self::$dice->create(Core\KeyValueStorage\Capability\IManageKeyValuePairs::class);
 	}
 
-	/**
-	 * @return Core\PConfig\Capability\IManagePersonalConfigValues
-	 */
-	public static function pConfig()
+	public static function pConfig(): Core\PConfig\Capability\IManagePersonalConfigValues
 	{
 		return self::$dice->create(Core\PConfig\Capability\IManagePersonalConfigValues::class);
 	}
 
-	/**
-	 * @return Core\Lock\Capability\ICanLock
-	 */
-	public static function lock()
+	public static function lock(): Core\Lock\Capability\ICanLock
 	{
 		return self::$dice->create(Core\Lock\Capability\ICanLock::class);
 	}
 
-	/**
-	 * @return Core\L10n
-	 */
-	public static function l10n()
+	public static function l10n(): Core\L10n
 	{
 		return self::$dice->create(Core\L10n::class);
 	}
 
-	/**
-	 * @return Core\Worker\Repository\Process
-	 */
-	public static function process()
+	public static function process(): Core\Worker\Repository\Process
 	{
 		return self::$dice->create(Core\Worker\Repository\Process::class);
 	}
@@ -273,10 +212,7 @@ abstract class DI
 		return self::$dice->create(Core\Session\Capability\IHandleUserSessions::class);
 	}
 
-	/**
-	 * @return \Friendica\Core\Storage\Repository\StorageManager
-	 */
-	public static function storageManager()
+	public static function storageManager(): Core\Storage\Repository\StorageManager
 	{
 		return self::$dice->create(Core\Storage\Repository\StorageManager::class);
 	}
@@ -286,18 +222,12 @@ abstract class DI
 		return self::$dice->create(AddonHelper::class);
 	}
 
-	/**
-	 * @return \Friendica\Core\System
-	 */
-	public static function system()
+	public static function system(): Core\System
 	{
 		return self::$dice->create(Core\System::class);
 	}
 
-	/**
-	 * @return \Friendica\Navigation\SystemMessages
-	 */
-	public static function sysmsg()
+	public static function sysmsg(): SystemMessages
 	{
 		return self::$dice->create(SystemMessages::class);
 	}
@@ -323,20 +253,15 @@ abstract class DI
 		return self::$dice->create(LoggerSettingsCheck::class);
 	}
 
-	/**
-	 * @return LoggerInterface
-	 */
-	public static function logger()
+	public static function logger(): LoggerInterface
 	{
 		return self::$dice->create(LoggerInterface::class);
 	}
 
 	/**
 	 * @deprecated 2025.07 Use `DI::loggerManager()` and `DI::logger()` instead
-	 *
-	 * @return \Friendica\Core\Logger\Type\WorkerLogger
 	 */
-	public static function workerLogger()
+	public static function workerLogger(): Core\Logger\Type\WorkerLogger
 	{
 		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2025.07 and will be removed after 5 months, use `DI::logger()` instead.', E_USER_DEPRECATED);
 
@@ -357,138 +282,87 @@ abstract class DI
 	// "Factory" namespace instances
 	//
 
-	/**
-	 * @return Factory\Api\Mastodon\Account
-	 */
-	public static function mstdnAccount()
+	public static function mstdnAccount(): Factory\Api\Mastodon\Account
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Account::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Application
-	 */
-	public static function mstdnApplication()
+	public static function mstdnApplication(): Factory\Api\Mastodon\Application
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Application::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Attachment
-	 */
-	public static function mstdnAttachment()
+	public static function mstdnAttachment(): Factory\Api\Mastodon\Attachment
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Attachment::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Card
-	 */
-	public static function mstdnCard()
+	public static function mstdnCard(): Factory\Api\Mastodon\Card
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Card::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Conversation
-	 */
-	public static function mstdnConversation()
+	public static function mstdnConversation(): Factory\Api\Mastodon\Conversation
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Conversation::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Emoji
-	 */
-	public static function mstdnEmoji()
+	public static function mstdnEmoji(): Factory\Api\Mastodon\Emoji
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Emoji::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Error
-	 */
-	public static function mstdnError()
+	public static function mstdnError(): Factory\Api\Mastodon\Error
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Error::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Poll
-	 */
-	public static function mstdnPoll()
+	public static function mstdnPoll(): Factory\Api\Mastodon\Poll
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Poll::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Relationship
-	 */
-	public static function mstdnRelationship()
+	public static function mstdnRelationship(): Factory\Api\Mastodon\Relationship
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Relationship::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Status
-	 */
-	public static function mstdnStatus()
+	public static function mstdnStatus(): Factory\Api\Mastodon\Status
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Status::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\StatusSource
-	 */
-	public static function mstdnStatusSource()
+	public static function mstdnStatusSource(): Factory\Api\Mastodon\StatusSource
 	{
 		return self::$dice->create(Factory\Api\Mastodon\StatusSource::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\ScheduledStatus
-	 */
-	public static function mstdnScheduledStatus()
+	public static function mstdnScheduledStatus(): Factory\Api\Mastodon\ScheduledStatus
 	{
 		return self::$dice->create(Factory\Api\Mastodon\ScheduledStatus::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Subscription
-	 */
-	public static function mstdnSubscription()
+	public static function mstdnSubscription(): Factory\Api\Mastodon\Subscription
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Subscription::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\ListEntity
-	 */
-	public static function mstdnList()
+	public static function mstdnList(): Factory\Api\Mastodon\ListEntity
 	{
 		return self::$dice->create(Factory\Api\Mastodon\ListEntity::class);
 	}
 
-	/**
-	 * @return Factory\Api\Mastodon\Notification
-	 */
-	public static function mstdnNotification()
+	public static function mstdnNotification(): Factory\Api\Mastodon\Notification
 	{
 		return self::$dice->create(Factory\Api\Mastodon\Notification::class);
 	}
 
-	/**
-	 * @return Factory\Api\Twitter\Status
-	 */
-	public static function twitterStatus()
+	public static function twitterStatus(): Factory\Api\Twitter\Status
 	{
 		return self::$dice->create(Factory\Api\Twitter\Status::class);
 	}
 
-	/**
-	 * @return Factory\Api\Twitter\User
-	 */
-	public static function twitterUser()
+	public static function twitterUser(): Factory\Api\Twitter\User
 	{
 		return self::$dice->create(Factory\Api\Twitter\User::class);
 	}
@@ -501,34 +375,22 @@ abstract class DI
 	//
 	// "Model" namespace instances
 	//
-	/**
-	 * @return \Friendica\Core\Worker\Repository\Process
-	 */
-	public static function modelProcess()
+	public static function modelProcess(): Core\Worker\Repository\Process
 	{
 		return self::$dice->create(Core\Worker\Repository\Process::class);
 	}
 
-	/**
-	 * @return Model\User\Cookie
-	 */
-	public static function cookie()
+	public static function cookie(): Model\User\Cookie
 	{
 		return self::$dice->create(Model\User\Cookie::class);
 	}
 
-	/**
-	 * @return Core\Storage\Capability\ICanWriteToStorage
-	 */
-	public static function storage()
+	public static function storage(): Core\Storage\Capability\ICanWriteToStorage
 	{
 		return self::$dice->create(Core\Storage\Capability\ICanWriteToStorage::class);
 	}
 
-	/**
-	 * @return Model\Log\ParsedLogIterator
-	 */
-	public static function parsedLogIterator()
+	public static function parsedLogIterator(): Model\Log\ParsedLogIterator
 	{
 		return self::$dice->create(Model\Log\ParsedLogIterator::class);
 	}
@@ -546,10 +408,7 @@ abstract class DI
 	// "Network" namespace
 	//
 
-	/**
-	 * @return Network\HTTPClient\Capability\ICanSendHttpRequests
-	 */
-	public static function httpClient()
+	public static function httpClient(): Network\HTTPClient\Capability\ICanSendHttpRequests
 	{
 		return self::$dice->create(Network\HTTPClient\Capability\ICanSendHttpRequests::class);
 	}
@@ -558,44 +417,39 @@ abstract class DI
 	// "Repository" namespace
 	//
 
-	/**
-	 * @return Contact\FriendSuggest\Repository\FriendSuggest
-	 */
-	public static function fsuggest()
+	public static function fsuggest(): Contact\FriendSuggest\Repository\FriendSuggest
 	{
 		return self::$dice->create(Contact\FriendSuggest\Repository\FriendSuggest::class);
 	}
 
-	/**
-	 * @return Contact\FriendSuggest\Factory\FriendSuggest
-	 */
-	public static function fsuggestFactory()
+	public static function fsuggestFactory(): Contact\FriendSuggest\Factory\FriendSuggest
 	{
 		return self::$dice->create(Contact\FriendSuggest\Factory\FriendSuggest::class);
 	}
 
-	/**
-	 * @return Content\Conversation\Factory\Timeline
-	 */
-	public static function TimelineFactory()
+	public static function TimelineFactory(): Content\Conversation\Factory\Timeline
 	{
 		return self::$dice->create(Content\Conversation\Factory\Timeline::class);
 	}
 
-	/**
-	 * @return Content\Conversation\Factory\Community
-	 */
-	public static function CommunityFactory()
+	public static function CommunityFactory(): Content\Conversation\Factory\Community
 	{
 		return self::$dice->create(Content\Conversation\Factory\Community::class);
 	}
 
-	/**
-	 * @return Content\Conversation\Factory\Channel
-	 */
-	public static function ChannelFactory()
+	public static function ChannelFactory(): Content\Conversation\Factory\Channel
 	{
 		return self::$dice->create(Content\Conversation\Factory\Channel::class);
+	}
+
+	public static function ChannelPost(): Content\Conversation\Factory\ChannelPost
+	{
+		return self::$dice->create(Content\Conversation\Factory\ChannelPost::class);
+	}
+
+	public static function SystemChannelPost(): Content\Conversation\Factory\SystemChannelPost
+	{
+		return self::$dice->create(Content\Conversation\Factory\SystemChannelPost::class);
 	}
 
 	public static function userDefinedChannel(): Content\Conversation\Repository\UserDefinedChannel
@@ -603,26 +457,17 @@ abstract class DI
 		return self::$dice->create(Content\Conversation\Repository\UserDefinedChannel::class);
 	}
 
-	/**
-	 * @return Content\Conversation\Factory\Network
-	 */
-	public static function NetworkFactory()
+	public static function NetworkFactory(): Content\Conversation\Factory\Network
 	{
 		return self::$dice->create(Content\Conversation\Factory\Network::class);
 	}
 
-	/**
-	 * @return Contact\Introduction\Repository\Introduction
-	 */
-	public static function intro()
+	public static function intro(): Contact\Introduction\Repository\Introduction
 	{
 		return self::$dice->create(Contact\Introduction\Repository\Introduction::class);
 	}
 
-	/**
-	 * @return Contact\Introduction\Factory\Introduction
-	 */
-	public static function introFactory()
+	public static function introFactory(): Contact\Introduction\Factory\Introduction
 	{
 		return self::$dice->create(Contact\Introduction\Factory\Introduction::class);
 	}
@@ -710,10 +555,7 @@ abstract class DI
 	// "Protocol" namespace instances
 	//
 
-	/**
-	 * @return Protocol\Activity
-	 */
-	public static function activity()
+	public static function activity(): Protocol\Activity
 	{
 		return self::$dice->create(Protocol\Activity::class);
 	}
@@ -727,10 +569,7 @@ abstract class DI
 	// "Security" namespace instances
 	//
 
-	/**
-	 * @return \Friendica\Security\Authentication
-	 */
-	public static function auth()
+	public static function auth(): Security\Authentication
 	{
 		return self::$dice->create(Security\Authentication::class);
 	}
@@ -748,18 +587,12 @@ abstract class DI
 	// "Util" namespace instances
 	//
 
-	/**
-	 * @return Util\ACLFormatter
-	 */
-	public static function aclFormatter()
+	public static function aclFormatter(): Util\ACLFormatter
 	{
 		return self::$dice->create(Util\ACLFormatter::class);
 	}
 
-	/**
-	 * @return string
-	 */
-	public static function basePath()
+	public static function basePath(): string
 	{
 		/** @var BasePath */
 		$basePath = self::$dice->create(BasePath::class);
@@ -767,26 +600,17 @@ abstract class DI
 		return $basePath->getPath();
 	}
 
-	/**
-	 * @return Util\DateTimeFormat
-	 */
-	public static function dtFormat()
+	public static function dtFormat(): Util\DateTimeFormat
 	{
 		return self::$dice->create(Util\DateTimeFormat::class);
 	}
 
-	/**
-	 * @return Util\Profiler
-	 */
-	public static function profiler()
+	public static function profiler(): Util\Profiler
 	{
 		return self::$dice->create(Util\Profiler::class);
 	}
 
-	/**
-	 * @return Util\Emailer
-	 */
-	public static function emailer()
+	public static function emailer(): Util\Emailer
 	{
 		return self::$dice->create(Util\Emailer::class);
 	}

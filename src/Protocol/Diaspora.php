@@ -2395,6 +2395,7 @@ class Diaspora
 			if ($datarray['uid'] == 0) {
 				Item::distribute($message_id);
 			}
+			Item::addPostToChannel($datarray['uri-id'], $datarray['uid']);
 			return true;
 		} else {
 			return false;
@@ -2740,6 +2741,7 @@ class Diaspora
 			if ($datarray['uid'] == 0) {
 				Item::distribute($message_id);
 			}
+			Item::addPostToChannel($datarray['uri-id'], $datarray['uid']);
 			return true;
 		} else {
 			return false;

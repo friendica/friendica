@@ -1527,9 +1527,9 @@ class Transmitter
 	 *
 	 * @param array $tags Tag array
 	 * @param string $text Text containing tags like :tag:
-	 * @return string normalized text
+	 * @return string|null normalized text or null
 	 */
-	private static function addEmojiTags(array &$tags, string $text): string
+	private static function addEmojiTags(array &$tags, string $text): ?string
 	{
 		$emojis = Smilies::extractUsedSmilies($text, $normalized);
 		foreach ($emojis as $name => $url) {
@@ -1899,6 +1899,7 @@ class Transmitter
 					$real_quote               = true;
 					$data['_misskey_content'] = BBCode::removeSharedData($body);
 					$data['quoteUrl']         = $item['quote-uri'];
+					$data['quoteUri']         = $item['quote-uri'];
 					$body                     = DI::contentItem()->addShareLink($body, $item['quote-uri-id']);
 				} else {
 					$body = DI::contentItem()->addSharedPost($item, $body);
@@ -1925,6 +1926,10 @@ class Transmitter
 			$richbody = BBCode::replaceAttachment($richbody);
 
 			$data['contentMap'][$language] = BBCode::convertForUriId($item['uri-id'], $richbody, BBCode::EXTERNAL);
+
+			if ($data['content'] == '') {
+				$data['content'] = $data['contentMap'][$language];
+			}
 		}
 
 		if (!empty($item['quote-uri-id']) && ($item['quote-uri-id'] != $item['uri-id'])) {
@@ -1939,8 +1944,24 @@ class Transmitter
 			$data['diaspora:comment'] = $item['signed_text'];
 		}
 
+		// @todo full support of GoToSocial's interaction policy
+		// @see https://docs.gotosocial.org/en/latest/federation/interaction_policy/
+		if ($item['private'] != Item::PRIVATE) {
+			$data['interactionPolicy'] = [
+				'canQuote' => [
+					'automaticApproval' => [ActivityPub::PUBLIC_COLLECTION]
+				]
+			];
+		}
+
 		$data['attachment'] = self::createAttachmentList($item);
 		$data['tag']        = array_merge(self::createTagList($item, $data['quoteUrl'] ?? ''), $emojis);
+
+		$data['replies'] = [
+			'id'         => $item['uri'] . '/replies',
+			'type'       => 'Collection',
+			'totalItems' => Post::countPosts(['thr-parent-id' => $item['uri-id'], 'gravity' => Item::GRAVITY_COMMENT, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]])
+		];
 
 		if (empty($data['location']) && (!empty($item['coord']) || !empty($item['location']))) {
 			$data['location'] = self::createLocation($item);
@@ -2511,6 +2532,54 @@ class Transmitter
 		];
 
 		DI::logger()->info('Sending undo to ' . $target . ' for user ' . $owner['uid'] . ' with id ' . $objectId);
+
+		$signed = LDSignature::sign($data, $owner);
+		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
+	}
+
+	/**
+	 * Accepts a quote request
+	 *
+	 * @param string $remote_actor      Remote actor URL
+	 * @param string $remote_quote_id   Remote quote ID
+	 * @param string $remote_quote_guid Remote quote guid
+	 * @param string $local_actor       Local actor URL
+	 * @param string $local_quote_id    Local quote ID
+	 * @param string $request_id        Quote request ID
+	 * @param array  $owner             Sender owner-view record
+	 * @return bool success
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @throws \ImagickException
+	 * @throws \Exception
+	 */
+	public static function acceptQuoteRequest(string $remote_actor, string $remote_quote_id, string $remote_quote_guid, string $local_actor, string $local_quote_id, string $request_id, array $owner): bool
+	{
+		$profile = APContact::getByURL($remote_actor);
+		if (empty($profile['inbox'])) {
+			DI::logger()->warning('No inbox found for target', ['target' => $remote_actor, 'profile' => $profile]);
+			return false;
+		}
+
+		$objectId = DI::baseUrl() . '/activity/' . System::createGUID();
+
+		$data = [
+			'@context' => ActivityPub::CONTEXT,
+			'type'     => 'Accept',
+			'to'       => $remote_actor,
+			'id'       => $objectId,
+			'actor'    => $local_actor,
+			'object'   => [
+				'type'       => 'QuoteRequest',
+				'id'         => $request_id,
+				'actor'      => $remote_actor,
+				'object'     => $local_quote_id,
+				'instrument' => $remote_quote_id,
+			],
+			'result'     => $local_quote_id . '/quote_authorization/' . $remote_quote_guid,
+			'instrument' => self::getService(),
+		];
+
+		DI::logger()->info('Accept quote request', ['id' => $request_id, 'quote-id' => $local_quote_id, 'remote-id' => $remote_quote_id, 'actor' => $remote_actor, 'data' => $data]);
 
 		$signed = LDSignature::sign($data, $owner);
 		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);

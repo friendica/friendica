@@ -16,6 +16,7 @@ use Friendica\App\Mode;
 use Friendica\AppHelper;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Hook;
+use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -252,4 +253,21 @@ function frio_display_item(&$arr)
 		];
 	}
 	$arr['output']['follow_thread'] = $followThread;
+
+	$completeThread = [];
+	if (
+		DI::userSession()->getLocalUserId()
+		&& in_array($arr['item']['uid'], [0, DI::userSession()->getLocalUserId()])
+		&& $arr['item']['network'] == Protocol::ACTIVITYPUB
+		&& $arr['item']['gravity'] == Item::GRAVITY_PARENT
+		&& !$arr['item']['self']
+	) {
+		$completeThread = [
+			'menu'   => 'complete_thread',
+			'title'  => DI::l10n()->t('Complete Thread'),
+			'action' => 'doCompleteThread(' . $arr['item']['uri-id'] . ');',
+			'href'   => '#'
+		];
+	}
+	$arr['output']['complete_thread'] = $completeThread;
 }

@@ -27,7 +27,7 @@ class DisposableFullTextSearch
 		// would delete both check-full-text-search rows before the second object destruction is called, leading to unexpected behavior.
 		do {
 			// Maximum value is indicated by the INT UNSIGNED type of the check-full-text-search.pid field
-			$this->identifier = random_int(0, pow(2, 32) - 1);
+			$this->identifier = random_int(0, pow(2, 31) - 1);
 		} while ($this->db->exists('check-full-text-search', ['pid' => $this->identifier]));
 
 		// If the `exists()` call fails and return false because the database is unavailable, the `insert()` call will likely fail as well, which means

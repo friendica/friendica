@@ -23,6 +23,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Moderation\Entity\Report;
+use Friendica\Module\Moderation\Utils\ReportUtil;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ForbiddenException;
@@ -46,13 +47,16 @@ class Create extends BaseModule
 	private $factory;
 	/** @var \Friendica\Moderation\Repository\Report */
 	private $repository;
+	/** @var ReportUtil */
+	protected $reportUtil;
 
-	public function __construct(\Friendica\Moderation\Repository\Report $repository, \Friendica\Moderation\Factory\Report $factory, UserSession $session, App\Page $page, SystemMessages $systemMessages, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(\Friendica\Moderation\Repository\Report $repository, ReportUtil $reportUtil, \Friendica\Moderation\Factory\Report $factory, UserSession $session, App\Page $page, SystemMessages $systemMessages, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->systemMessages = $systemMessages;
 		$this->page           = $page;
+		$this->reportUtil     = $reportUtil;
 		$this->session        = $session;
 		$this->factory        = $factory;
 		$this->repository     = $repository;
@@ -305,23 +309,6 @@ class Create extends BaseModule
 			$contact = Contact::getById($request['cid']);
 		}
 
-		switch ($request['category'] ?? 0) {
-			case Report::CATEGORY_SPAM:      $category = $this->t('Spam');
-				break;
-			case Report::CATEGORY_ILLEGAL:   $category = $this->t('Illegal Content');
-				break;
-			case Report::CATEGORY_SAFETY:    $category = $this->t('Community Safety');
-				break;
-			case Report::CATEGORY_UNWANTED:  $category = $this->t('Unwanted Content/Behavior');
-				break;
-			case Report::CATEGORY_VIOLATION: $category = $this->t('Rules Violation');
-				break;
-			case Report::CATEGORY_OTHER:     $category = $this->t('Other');
-				break;
-
-			default: $category = '';
-		}
-
 		if (!empty($request['rule-ids'])) {
 			$rules = array_filter(System::getRules(true), function ($rule_id) use ($request) {
 				return in_array($rule_id, $request['rule-ids']);
@@ -339,7 +326,7 @@ class Create extends BaseModule
 			],
 
 			'$contact'  => $contact,
-			'$category' => $category,
+			'$category' => $this->reportUtil->getReportCategoryName($request['category'] ?? 0),
 			'$rules'    => $rules ?? [],
 			'$comment'  => BBCode::convertForUriId($contact['uri-id'] ?? 0, $this->session->get('report_comment') ?? '', BBCode::EXTERNAL),
 			'$posts'    => count($request['uri-ids'] ?? []),

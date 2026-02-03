@@ -248,14 +248,14 @@ $(function() {
 	var notifications_all = unescape($('<div>').append($("#nav-notifications-see-all").clone()).html()); //outerHtml hack
 	var notifications_mark = unescape($('<div>').append($("#nav-notifications-mark-all").clone()).html()); //outerHtml hack
 	var notifications_empty = unescape($("#nav-notifications-menu").html());
-	
+
 	/* Ensure loading is visible when notifications menu is opened (if no notifications loaded yet)*/
 	$('#nav-notifications-linkmenu, #nav-notifications-menu-btn').on('click', function() {
 		if ($("#nav-notifications-loading").length && $("#nav-notifications-empty").length) {
 			// Only show loading if we haven't loaded notifications yet
 			var menu = $("#nav-notifications-menu");
 			var hasNotifications = menu.find('.notif-item, li').not('#nav-notifications-loading, #nav-notifications-empty').length > 0;
-			var hasContent = menu.html().indexOf('nav-notifications-see-all') > -1;			
+			var hasContent = menu.html().indexOf('nav-notifications-see-all') > -1;
 			if (!hasNotifications && !hasContent) {
 				$("#nav-notifications-loading").show();
 				$("#nav-notifications-empty").hide();
@@ -319,7 +319,7 @@ $(function() {
 
 		// Hide loading state when we receive notification data
 		$("#nav-notifications-loading").hide();
-		
+
 		if (data.notifications.length == 0) {
 			$("#nav-notifications-empty").show();
 		} else {
@@ -328,9 +328,9 @@ $(function() {
 			// Preserve the loading and empty state elements when rebuilding the menu
 			var loadingElement = nnm.find("#nav-notifications-loading");
 			var emptyElement = nnm.find("#nav-notifications-empty");
-			
+
 			nnm.html(notifications_all + notifications_mark);
-			
+
 			// Re-add the loading and empty elements if they existed
 			if (loadingElement.length > 0) {
 				nnm.append(loadingElement);
@@ -754,6 +754,15 @@ function doFollowThread(ident) {
 	update_item = ident.toString();
 }
 
+function doCompleteThread(ident) {
+	unpause();
+	$('#like-rotator-' + ident.toString()).show();
+	$.post('item/' + ident.toString() + '/complete', NavUpdate);
+	liking = 1;
+	force_update = true;
+	update_item = ident.toString();
+}
+
 function doStar(ident) {
 	ident = ident.toString();
 	$('#like-rotator-' + ident).show();
@@ -1113,9 +1122,15 @@ Array.prototype.remove = function(item) {
 function previewTheme(elm) {
 	theme = $(elm).val();
 	$.getJSON('pretheme?theme=' + theme,function(data) {
-			$('#theme-preview').html('<div id="theme-desc">' + data.desc + '</div><div id="theme-version">' + data.version + '</div><div id="theme-credits">' + data.credits + '</div><a href="' + data.img + '"><img src="' + data.img + '" width="320" height="240" alt="' + theme + '" /></a>');
+			$('#theme-preview').html(`
+		<div id="theme-desc">${data.desc}</div>
+		<div id="theme-credits">${data.credits}</div>
+		<a href="${data.img}">
+			<img src="${data.img}" width="320" height="240" alt="${theme}" />
+		</a>
+		<div id="theme-version">${data.version}</div>
+	`);
 	});
-
 }
 
 // notification permission settings in localstorage

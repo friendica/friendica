@@ -111,8 +111,10 @@ class BaseSearch extends BaseModule
 	protected static function printResult(ResultList $results, Pager $pager, string $header = ''): string
 	{
 		if ($results->getTotal() == 0) {
-			DI::sysmsg()->addNotice(DI::l10n()->t('No matches'));
-			return '';
+			$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
+				'$title' => DI::l10n()->t('No results.')
+			]);
+			return $o;
 		}
 
 		$filtered = 0;

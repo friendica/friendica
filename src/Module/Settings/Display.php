@@ -32,6 +32,7 @@ use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -106,6 +107,10 @@ class Display extends BaseSettings
 		$update_content          = (int)$request['update_content'];
 		$embed_remote_media      = (bool)$request['embed_remote_media'];
 		$embed_media             = (bool)$request['embed_media'];
+		$widget_timelineorder    = trim($request['widget_timelineorder']);
+		$menu_timelineorder      = trim($request['menu_timelineorder']);
+		$widget_timeline_reset   = (bool)$request['widget_timeline_reset'];
+		$menu_timeline_reset     = (bool)$request['menu_timeline_reset'];
 
 		$enabled_timelines = [];
 		foreach ($enable as $code => $enabled) {
@@ -152,7 +157,16 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
 		$this->pConfig->set($uid, 'system', 'embed_remote_media', $embed_remote_media);
 		$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
-
+		if ($widget_timeline_reset) {
+			$this->pConfig->delete($uid, 'system', 'widget_timeline_order');
+		} else {
+			$this->pConfig->set($uid, 'system', 'widget_timeline_order', $widget_timelineorder);
+		}
+		if ($menu_timeline_reset) {
+			$this->pConfig->delete($uid, 'system', 'menu_timeline_order');
+		} else {
+			$this->pConfig->set($uid, 'system', 'menu_timeline_order', $menu_timelineorder);
+		}
 		$this->pConfig->set($uid, 'system', 'network_timelines', $network_timelines);
 		$this->pConfig->set($uid, 'system', 'enabled_timelines', $enabled_timelines);
 		$this->pConfig->set($uid, 'channel', 'languages', $channel_languages);
@@ -259,12 +273,13 @@ class Display extends BaseSettings
 			ContactSelector::SVG_WHITE       => $this->t('White'),
 		];
 
-		$preview_mode  = $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_LARGE);
+		$preview_mode  = $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_AUTO);
 		$preview_modes = [
 			BBCode::PREVIEW_NONE     => $this->t('No preview'),
 			BBCode::PREVIEW_NO_IMAGE => $this->t('No image'),
 			BBCode::PREVIEW_SMALL    => $this->t('Small Image'),
 			BBCode::PREVIEW_LARGE    => $this->t('Large Image'),
+			BBCode::PREVIEW_AUTO     => $this->t('Automatic image size'),
 		];
 
 		$bookmarked_timelines = $this->pConfig->get($uid, 'system', 'network_timelines', $this->getAvailableTimelines($uid, true)->column('code'));
@@ -275,11 +290,76 @@ class Display extends BaseSettings
 		$timelines = [];
 		foreach ($this->getAvailableTimelines($uid) as $timeline) {
 			$timelines[] = [
-				'label'       => $timeline->label,
-				'description' => $timeline->description,
-				'enable'      => ["enable[{$timeline->code}]", '', in_array($timeline->code, $enabled_timelines)],
-				'bookmark'    => ["bookmark[{$timeline->code}]", '', in_array($timeline->code, $bookmarked_timelines)],
+				'enable'   => ["enable[{$timeline->code}]", $timeline->label, in_array($timeline->code, $enabled_timelines), $timeline->description],
+				'bookmark' => ["bookmark[{$timeline->code}]", $timeline->label, in_array($timeline->code, $bookmarked_timelines), $timeline->description],
 			];
+		}
+		/*  GET CUSTOM TIMELINE ORDERS IF ANY
+			=================================
+			First we see if there is a custom order saved in user prefs, if there is we set working array to that.
+			If we have an array create a temporary array with the items in the correct order.
+			Lastly we modify the $timelines array with our new order for "enable", "bookmark", or both.
+		*/
+		$widget_timeline_order = json_decode($this->pConfig->get($uid, 'system', 'widget_timeline_order'));
+		$menu_timeline_order   = json_decode($this->pConfig->get($uid, 'system', 'menu_timeline_order'));
+		$temp_widget_order     = [];
+		$temp_menu_order       = [];
+		// do the sidebar widget order first...
+		if (!empty($widget_timeline_order)) {
+			$tmp = [];
+			$xtr = [];
+			foreach ($widget_timeline_order as $order) {
+				foreach ($timelines as $timeline) {
+					$name = str_replace(['enable[',']'], '', $timeline['enable'][0]);
+					if ($name == $order) {
+						$tmp[]['enable'] = $timeline['enable'];
+					}
+				}
+			}
+			// there could be custom or add-on channels not in our array, append those
+			foreach ($timelines as $timeline) {
+				$name = str_replace(['enable[',']'], '', $timeline['enable'][0]);
+				if (!in_array($name, $widget_timeline_order)) {
+					$xtr[]['enable'] = $timeline['enable'];
+				}
+			}
+			// combine our two temp arrays into one big temp array
+			$temp_widget_order = array_merge($tmp, $xtr);
+		}
+		// do the top menu order next...
+		if (!empty($menu_timeline_order)) {
+			$tmp = [];
+			$xtr = [];
+			foreach ($menu_timeline_order as $order) {
+				foreach ($timelines as $timeline) {
+					$name = str_replace(['bookmark[',']'], '', $timeline['bookmark'][0]);
+					if ($name == $order) {
+						$tmp[]['bookmark'] = $timeline['bookmark'];
+					}
+				}
+			}
+			// there could be custom or add-on channels unaccounted for in our array, append them
+			foreach ($timelines as $timeline) {
+				$name = str_replace(['bookmark[',']'], '', $timeline['bookmark'][0]);
+				if (!in_array($name, $menu_timeline_order)) {
+					$xtr[]['bookmark'] = $timeline['bookmark'];
+				}
+			}
+			// combine our two temp arrays into one big temp array
+			$temp_menu_order = array_merge($tmp, $xtr);
+		}
+		/*  now we need to alter the original timelines array directly...
+			in theory populated temp arrays should be same length as timelines
+		*/
+		for ($t = 0; $t < count($timelines);$t++) {
+			// only mod from populated widget array
+			if (count($temp_widget_order) > 0) {
+				$timelines[$t]['enable'] = $temp_widget_order[$t]['enable'];
+			}
+			// only mod from populated menu array
+			if (count($temp_menu_order) > 0) {
+				$timelines[$t]['bookmark'] = $temp_menu_order[$t]['bookmark'];
+			}
 		}
 
 		$first_day_of_week = $this->pConfig->get($uid, 'calendar', 'first_day_of_week', 0);
@@ -309,21 +389,31 @@ class Display extends BaseSettings
 
 		$tpl = Renderer::getMarkupTemplate('settings/display.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$ptitle'         => $this->t('Display Settings'),
-			'$submit'         => $this->t('Save Settings'),
-			'$d_tset'         => $this->t('General Theme Settings'),
-			'$d_ctset'        => $this->t('Custom Theme Settings'),
-			'$d_cset'         => $this->t('Content Settings'),
-			'$stitle'         => $this->t('Theme settings'),
-			'$timeline_title' => $this->t('Timelines'),
-			'$channel_title'  => $this->t('Channels'),
-			'$calendar_title' => $this->t('Calendar'),
+			'$ptitle'              => $this->t('Display Settings'),
+			'$submit'              => $this->t('Save Settings'),
+			'$d_cset'              => $this->t('Content Settings'),
+			'$stitle'              => $this->t('Theme settings'),
+			'$themes_title'        => $this->t('Themes'),
+			'$themes_settings_for' => $this->t('Settings for %s', Strings::ucFirst($theme_selected)),
+			'$theme_changed_text'  => $this->t('Note: If you switch the theme, you need to save changes before you can see the settings for the new theme below.'),
+			'$timeline_title'      => $this->t('Timelines'),
+			'$channel_title'       => $this->t('Channels'),
+			'$calendar_title'      => $this->t('Calendar'),
+			'$sortable'            => $this->t('Drag to reorder or tab to item with keyboard and move up/down with arrow keys'),
+			'$reset_widget'        => [
+				'0' => 'widget_timeline_reset',
+				'1' => $this->t('Reset order')
+			],
+			'$reset_menu' => [
+				'0' => 'menu_timeline_reset',
+				'1' => $this->t('Reset order')
+			],
 
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
 			'$uid'                 => $uid,
 
-			'$theme'        => ['theme', $this->t('Display Theme:'), $theme_selected, '', $themes, true],
-			'$mobile_theme' => ['mobile_theme', $this->t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, false],
+			'$theme'        => ['theme', $this->t('Display theme'), $theme_selected, '', $themes, true],
+			'$mobile_theme' => ['mobile_theme', $this->t('Mobile theme'), $mobile_theme_selected, '', $mobile_themes, false],
 			'$theme_config' => $theme_config,
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],
@@ -346,8 +436,8 @@ class Display extends BaseSettings
 
 			'$timeline_label'       => $this->t('Label'),
 			'$timeline_descriptiom' => $this->t('Description'),
-			'$timeline_enable'      => $this->t('Enable'),
-			'$timeline_bookmark'    => $this->t('Bookmark'),
+			'$timeline_enable'      => $this->t('Channels Widget'),
+			'$timeline_bookmark'    => $this->t('Top Menu'),
 			'$timelines'            => $timelines,
 			'$timeline_explanation' => $this->t('Enable timelines that you want to see in the channels widget. Bookmark timelines that you want to see in the top menu.'),
 

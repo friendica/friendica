@@ -187,12 +187,6 @@ can load different content into the jot modal (e.g. the item edit jot)
 	</div>
 </div>
 
-<script type="text/javascript">
-	$('iframe').load(function() {
-		this.style.height = this.contentWindow.document.body.offsetHeight + 'px';
-	});
-</script>
-
 <script>
 	dzFactory.setupDropzone('#jot-text-wrap', 'profile-jot-text');
 </script>

@@ -19,6 +19,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Module\BaseModeration;
+use Friendica\Module\Moderation\Utils\ReportUtil;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Util\DateTimeFormat;
@@ -29,12 +30,15 @@ class Reports extends BaseModeration
 {
 	/** @var Database */
 	private $database;
+	/** @var ReportUtil */
+	protected $reportUtil;
 
-	public function __construct(Database $database, Page $page, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(Database $database, Page $page, ReportUtil $reportUtil, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database = $database;
+		$this->database   = $database;
+		$this->reportUtil = $reportUtil;
 	}
 
 	protected function post(array $request = [])
@@ -72,8 +76,9 @@ LIMIT ?, ?",
 
 		$reports = [];
 		while ($report = $this->database->fetch($query)) {
-			$report['posts']   = [];
-			$report['created'] = DateTimeFormat::local($report['created'], DateTimeFormat::MYSQL);
+			$report['posts']    = [];
+			$report['created']  = DateTimeFormat::local($report['created'], DateTimeFormat::MYSQL);
+			$report['category'] = $this->reportUtil->getReportCategoryName($report['category-id']);
 
 			$reports[$report['id']] = $report;
 		}

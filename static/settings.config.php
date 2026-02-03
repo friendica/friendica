@@ -113,6 +113,14 @@ return [
 		// URL of the global directory.
 		'directory' => 'https://dir.friendica.social',
 
+		// display_local_media (Boolean)
+		// Display local media to visitors.
+		'display_local_media' => true,
+
+		// display_remote_media (Boolean)
+		// Display non local media to visitors.
+		'display_remote_media' => false,
+
 		// explicit_content (Boolean)
 		// Set this to announce that your node is used mostly for explicit content that might not be suited for minors.
 		'explicit_content' => false,
@@ -121,6 +129,15 @@ return [
 		// Prevents users from registering the specified nicknames on this node.
 		// Default value comprises classic role names from RFC 2142.
 		'forbidden_nicknames' => 'info, marketing, sales, support, abuse, noc, security, postmaster, hostmaster, usenet, news, webmaster, www, uucp, ftp, root, sysop',
+
+		// fetch_replies (Constant)
+		// Defines which missing replies should be fetched from remote servers.
+		// Your choices are:
+		// FETCH_REPLIES_ALL         = 0; // Fetch all missing replies (default)
+		// FETCH_REPLIES_NONE        = 1; // Do not fetch any missing replies
+		// FETCH_REPLIES_FOLLOWED    = 2; // Fetch only replies to posts from followed accounts
+		// FETCH_REPLIES_INTERACTION = 2; // Fetch only replies to posts with local interaction (likes, shares, replies
+		'fetch_replies' => \Friendica\Protocol\ActivityPub\Processor::FETCH_REPLIES_ALL,
 
 		// compute_circle_counts (Boolean)
 		// Compute contact circle level when counting unseen network posts.

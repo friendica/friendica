@@ -111,7 +111,9 @@ class Community extends Timeline
 		$items = $this->getCommunityItems();
 
 		if (!$this->database->isResult($items)) {
-			$this->systemMessages->addNotice($this->l10n->t('No results.'));
+			$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
+				'$title' => $this->l10n->t('No results.')
+			]);
 			return $o;
 		}
 

@@ -39,6 +39,15 @@ $(document).ready(function () {
 			addToModal(modalUrl);
 		}
 	});
+
+	// Click event listener for the photo delete link/button.
+	$("body").on("click", "#photo-delete-link", function () {
+		var modalUrl = $(this).attr("data-modal-url");
+
+		if (typeof modalUrl !== "undefined") {
+			addToModal(modalUrl);
+		}
+	});
 });
 
 $(window).load(function () {

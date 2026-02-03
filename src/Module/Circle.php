@@ -129,6 +129,7 @@ class Circle extends BaseModule
 
 	protected function content(array $request = []): string
 	{
+		DI::page()['title'] = DI::l10n()->t("Circles");
 		$change   = false;
 		$relation = $request['rel'] ?? '';
 

@@ -66,8 +66,6 @@ class ListTimeline extends BaseApi
 			'friendica_order' => TimelineOrderByTypes::ID, // Sort order options (defaults to ID)
 		], $request);
 
-		$display_quotes = self::appSupportsQuotes();
-
 		if (substr($this->parameters['id'], 0, 6) == 'group:') {
 			$items = $this->getStatusesForGroup($uid, $request);
 		} elseif (substr($this->parameters['id'], 0, 8) == 'channel:') {
@@ -79,7 +77,7 @@ class ListTimeline extends BaseApi
 		$statuses = [];
 		foreach ($items as $item) {
 			try {
-				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
 				$this->updateBoundaries($status, $item, $request['friendica_order']);
 				$statuses[] = $status;
 			} catch (\Throwable $th) {

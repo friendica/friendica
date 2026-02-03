@@ -57,6 +57,21 @@ class UpdateContact
 		return Worker::add($run_parameters, 'UpdateContact', $contact_id);
 	}
 
+	/**
+	 * Checks if the maximum number of allowed workers for this task is reached
+	 *
+	 * @return boolean
+	 */
+	public static function workerLimitReached(): bool
+	{
+		$update_limit = (int)DI::config()->get('system', 'contact_update_limit');
+		$updating     = Worker::countWorkersByCommand('UpdateContact');
+		if ($updating >= $update_limit) {
+			DI::logger()->info('The number of currently running jobs exceed the limit', ['updating' => $updating, 'limit' => $update_limit]);
+		}
+		return ($updating >= $update_limit);
+	}
+
 	public static function isUpdatable(int $contact_id): bool
 	{
 		$contact = Contact::selectFirst(['next-update', 'local-data', 'url', 'network', 'uid'], ['id' => $contact_id]);

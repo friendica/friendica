@@ -204,6 +204,10 @@ class DateTimeFormatTest extends MockedTestCase
 				'expected' => '2022-06-02 07:58:35',
 				's'        => 'Thu, 02 Jun 2022 16:58:35 Asia/Tokyo',
 			],
+			'microsecond timestamp' => [
+				'expected' => '2025-11-05 22:11:28',
+				's'        => '1762380688000'
+			],
 		];
 	}
 

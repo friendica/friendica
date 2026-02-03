@@ -2050,6 +2050,7 @@ class DFRN
 				if ($item['uid'] == 0) {
 					Item::distribute($posted_id);
 				}
+				Item::addPostToChannel($item['uri-id'], $item['uid']);
 
 				return;
 			}
@@ -2075,6 +2076,7 @@ class DFRN
 			if ($item['uid'] == 0) {
 				Item::distribute($posted_id);
 			}
+			Item::addPostToChannel($item['uri-id'], $item['uid']);
 		}
 	}
 

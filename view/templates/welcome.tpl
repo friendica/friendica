@@ -12,7 +12,7 @@
 		<h4>{{$started nofilter}}</h4>
 		<ul>
 			<li>
-				<a target="newmember" href="help/Quick-Start-guide">{{$walkthrough_link}}</a><br />
+				<a target="newmember" href="help/quick-start/guide">{{$walkthrough_link}}</a><br />
 				{{$walkthrough_txt nofilter}}
 			</li>
 		</ul>
@@ -70,7 +70,7 @@
 
 			{{if $newuser_private}}
 			<li>
-				<a target="newmember" href="help/Circles-and-Privacy">{{$private_link}}</a><br />
+				<a target="newmember" href="help/circles-and-privacy">{{$private_link}}</a><br />
 				{{$private_txt nofilter}}
 			</li>
 			{{/if}}

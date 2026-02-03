@@ -386,7 +386,7 @@ return [
 	'/contact'   => [
 		'[/]'                         => [Module\Contact::class,                [R::GET]],
 		'/{id:\d+}[/]'                => [Module\Contact\Profile::class,        [R::GET, R::POST]],
-		'/{id:\d+}/{action:block|ignore|collapse|update|updateprofile}'
+		'/{id:\d+}/{action:block|ignore|collapse|update|updateprofile|fetchoutbox}'
 		                              => [Module\Contact\Profile::class,        [R::GET]],
 		'/{id:\d+}/advanced'          => [Module\Contact\Advanced::class,       [R::GET, R::POST]],
 		'/{id:\d+}/conversations'     => [Module\Contact\Conversations::class,  [R::GET]],
@@ -467,6 +467,7 @@ return [
 	'/item/{id:\d+}'            => [
 		'/activity/{verb}' => [Module\Item\Activity::class,    [        R::POST]],
 		'/follow'          => [Module\Item\Follow::class,      [        R::POST]],
+		'/complete'        => [Module\Item\Complete::class,    [        R::POST]],
 		'/ignore'          => [Module\Item\Ignore::class,      [        R::POST]],
 		'/language'        => [Module\Item\Language::class,    [R::GET]],
 		'/pin'             => [Module\Item\Pin::class,         [        R::POST]],
@@ -492,10 +493,12 @@ return [
 	'/moderation'               => [
 		'[/]' => [Module\Moderation\Summary::class, [R::GET]],
 
-		'/blocklist/contact'       => [Module\Moderation\Blocklist\Contact::class,       [R::GET, R::POST]],
-		'/blocklist/server'        => [Module\Moderation\Blocklist\Server\Index::class,  [R::GET, R::POST]],
-		'/blocklist/server/add'    => [Module\Moderation\Blocklist\Server\Add::class,    [R::GET, R::POST]],
-		'/blocklist/server/import' => [Module\Moderation\Blocklist\Server\Import::class, [R::GET, R::POST]],
+		'/blocklist/contact'        => [Module\Moderation\Blocklist\Contact::class,         [R::GET, R::POST]],
+		'/blocklist/contact/export' => [Module\Moderation\Blocklist\Contact\Export::class,  [R::GET]],
+		'/blocklist/contact/import' => [Module\Moderation\Blocklist\Contact\Import::class,  [R::GET, R::POST]],
+		'/blocklist/server'         => [Module\Moderation\Blocklist\Server\Index::class,    [R::GET, R::POST]],
+		'/blocklist/server/add'     => [Module\Moderation\Blocklist\Server\Add::class,      [R::GET, R::POST]],
+		'/blocklist/server/import'  => [Module\Moderation\Blocklist\Server\Import::class,   [R::GET, R::POST]],
 
 		'/item/delete'          => [Module\Moderation\Item\Delete::class, [R::GET, R::POST]],
 		'/item/source[/{guid}]' => [Module\Moderation\Item\Source::class, [R::GET, R::POST]],
@@ -548,7 +551,11 @@ return [
 		'/token'       => [Module\OAuth\Token::class,       [R::POST]],
 	],
 
-	'/objects/{guid}[/{activity}]' => [Module\ActivityPub\Objects::class, [R::GET]],
+	'/objects/{guid}' => [
+		'[/]'                           => [Module\ActivityPub\Objects::class,            [R::GET]],
+		'/quote_authorization/{remote}' => [Module\ActivityPub\QuoteAuthorization::class, [R::GET]],
+		'/{activity}'                   => [Module\ActivityPub\Objects::class,            [R::GET]],
+	],
 
 	'/outbox/{nickname}' => [Module\ActivityPub\Outbox::class, [R::GET, R::POST]],
 	'/owa'               => [Module\Owa::class,                [R::GET]],

@@ -47,6 +47,58 @@ return [
 			INNER JOIN `application` ON `application-token`.`application-id` = `application`.`id`
 			INNER JOIN `user` ON `user`.`uid` = `application-token`.`uid` AND `user`.`verified` AND NOT `user`.`blocked` AND NOT `user`.`account_removed` AND NOT `user`.`account_expired`"
 	],
+	"channel-post-view" => [
+		"fields" => [
+			"channel" => ["channel-post", "channel"],
+			"uid" => ["channel-post", "uid"],
+			"uri-id" => ["channel-post", "uri-id"],
+			"owner-id" => ["post-engagement", "owner-id"],
+			"media-type" => ["post-engagement", "media-type"],
+			"language" => ["post-engagement", "language"],
+			"searchtext" => ["post-engagement", "searchtext"],
+			"size" => ["post-engagement", "size"],
+			"commented" => ["channel-post", "commented"],
+			"received" => ["channel-post", "received"],
+			"created" => ["channel-post", "created"],
+			"network" => ["post-engagement", "network"],
+			"contact-type" => ["ownercontact", "contact-type"],
+			"restricted" => ["post-engagement", "restricted"],
+			"comments" => "0",
+			"activities" => "0",
+		],
+		"query" => "FROM `channel-post`
+			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `channel-post`.`uri-id`
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `channel-post`.`uri-id`
+			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
+			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
+			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`"
+	],
+	"system-channel-post-view" => [
+		"fields" => [
+			"channel" => ["system-channel-post", "channel"],
+			"uid" => ["system-channel-post", "uid"],
+			"uri-id" => ["system-channel-post", "uri-id"],
+			"owner-id" => ["post-engagement", "owner-id"],
+			"media-type" => ["post-engagement", "media-type"],
+			"language" => ["post-engagement", "language"],
+			"searchtext" => ["post-engagement", "searchtext"],
+			"size" => ["post-engagement", "size"],
+			"commented" => ["system-channel-post", "commented"],
+			"received" => ["system-channel-post", "received"],
+			"created" => ["system-channel-post", "created"],
+			"network" => ["post-engagement", "network"],
+			"contact-type" => ["ownercontact", "contact-type"],
+			"restricted" => ["post-engagement", "restricted"],
+			"comments" => "0",
+			"activities" => "0",
+		],
+		"query" => "FROM `system-channel-post`
+			INNER JOIN `post-engagement` ON `post-engagement`.`uri-id` = `system-channel-post`.`uri-id`
+			INNER JOIN `post-thread` ON `post-thread`.`uri-id` = `system-channel-post`.`uri-id`
+			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread`.`author-id`
+			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread`.`owner-id`
+			WHERE NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`"
+	],
 	"circle-member-view" => [
 		"fields" => [
 			"id" => ["group_member", "id"],
@@ -102,7 +154,7 @@ return [
 			"created" => ["post-thread-user", "created"],
 			"network" => ["post-thread-user", "network"],
 			"protocol" => ["post-user", "protocol"],
-			"restricted" => ["post-engagement", "language"],
+			"restricted" => ["post-engagement", "restricted"],
 			"comments" => "0",
 			"activities" => "0",
 		],
@@ -223,7 +275,7 @@ return [
 			"created" => ["post-thread-user", "created"],
 			"network" => ["post-thread-user", "network"],
 			"protocol" => ["post-user", "protocol"],
-			"restricted" => ["post-searchindex", "language"],
+			"restricted" => ["post-searchindex", "restricted"],
 			"comments" => "0",
 			"activities" => "0",
 		],

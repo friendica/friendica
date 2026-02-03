@@ -1067,4 +1067,38 @@ class HTML
 	{
 		return ($text != html_entity_decode($text)) || ($text != strip_tags($text));
 	}
+
+	/**
+	 * Remove HTML elements with a specific class name
+	 *
+	 * @param string $html
+	 * @param string $className
+	 * @return string the HTML without the removed HTML element 
+	 */
+	public static function removeElementByClass(string $html, string $className): string
+	{
+		$dom = new DOMDocument();
+		libxml_use_internal_errors(true);
+
+		$dom->loadHTML(mb_convert_encoding('<span>' . $html . '</span>', 'HTML-ENTITIES', "UTF-8"), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		libxml_clear_errors();
+
+		$xpath = new DOMXPath($dom);
+
+		$nodes = $xpath->query("//*[contains(@class, '" . $className . "')]");
+		if (!$nodes || $nodes->length == 0) {
+			return $html;
+		}
+
+		foreach ($nodes as $node) {
+			$node->parentNode->removeChild($node);
+		}
+
+		$html = trim($dom->saveHTML());
+		if (substr($html, 0, 6) == '<span>' && substr($html, -7) == '</span>') {
+			$html = substr($html, 6, -7);
+		}
+
+		return $html;
+	}
 }

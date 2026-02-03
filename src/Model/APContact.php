@@ -68,7 +68,7 @@ class APContact
 
 			if (!empty($link['template']) && ($link['rel'] == ActivityNamespace::OSTATUSSUB)) {
 				$data['subscribe'] = $link['template'];
-			} elseif (!empty($link['href']) && !empty($link['type']) && ($link['rel'] == 'self') && ($link['type'] == 'application/activity+json')) {
+			} elseif (!empty($link['href']) && !empty($link['type']) && ($link['rel'] == 'self') && in_array($link['type'], ['application/activity+json', 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'])) {
 				$data['url'] = $link['href'];
 			} elseif (!empty($link['href']) && !empty($link['type']) && ($link['rel'] == ActivityNamespace::WEBFINGERPROFILE) && ($link['type'] == 'text/html')) {
 				$data['alias'] = $link['href'];
@@ -260,9 +260,21 @@ class APContact
 		if (is_array($apcontact['photo']) || !empty($compacted['as:icon']['as:url']['@id'])) {
 			$apcontact['photo'] = JsonLD::fetchElement($compacted['as:icon'], 'as:url', '@id');
 		} elseif (empty($apcontact['photo'])) {
-			$photo = JsonLD::fetchElementArray($compacted, 'as:icon', 'as:url');
-			if (!empty($photo[0]['@id'])) {
-				$apcontact['photo'] = $photo[0]['@id'];
+			$prevwidth  = 0;
+			$prevheight = 0;
+			$photo      = JsonLD::fetchElementArray($compacted, 'as:icon', 'as:url');
+			$heights    = JsonLD::fetchElementArray($compacted, 'as:icon', 'as:height');
+			$widths     = JsonLD::fetchElementArray($compacted, 'as:icon', 'as:width');
+			if (is_array($photo) && is_array($heights) && is_array($widths)) {
+				foreach ($photo as $key => $url) {
+					$height = $heights[$key]['@value'] ?? 0;
+					$width  = $widths[$key]['@value']  ?? 0;
+					if (($width >= $prevwidth) || ($height >= $prevheight)) {
+						$apcontact['photo'] = $url['@id'];
+					}
+					$prevwidth  = $width;
+					$prevheight = $height;
+				}
 			}
 		}
 

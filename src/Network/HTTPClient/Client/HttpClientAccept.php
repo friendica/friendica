@@ -32,4 +32,5 @@ class HttpClientAccept
 	public const VIDEO     = 'video/mp4,video/*;q=0.9,*/*;q=0.8';
 	public const XRD_XML   = 'application/xrd+xml,text/xml;q=0.9,*/*;q=0.8';
 	public const XML       = 'application/xml,text/xml;q=0.9,*/*;q=0.8';
+	public const HLS       = 'application/vnd.apple.mpegurl,application/x-mpegURL;q=0.9,*/*;q=0.8';
 }

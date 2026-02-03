@@ -93,12 +93,10 @@ class Statuses extends BaseApi
 			$items = Post::selectTimelineForUser($uid, ['uri-id'], $condition, $params);
 		}
 
-		$display_quotes = self::appSupportsQuotes();
-
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			try {
-				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
 				$this->updateBoundaries($status, $item, $request['friendica_order']);
 				$statuses[] = $status;
 			} catch (\Throwable $th) {

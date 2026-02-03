@@ -58,6 +58,7 @@ class BBCode
 	const PREVIEW_NO_IMAGE = 1;
 	const PREVIEW_LARGE    = 2;
 	const PREVIEW_SMALL    = 3;
+	const PREVIEW_AUTO     = 4;
 
 	/**
 	 * Fetches attachment data that were generated with the "attachment" element
@@ -412,7 +413,7 @@ class BBCode
 	 * @return string
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_LARGE, bool $embed = false): string
+	public static function convertAttachment(string $text, int $simplehtml = self::INTERNAL, array $data = [], int $uriid = 0, int $preview_mode = self::PREVIEW_AUTO, bool $embed = false): string
 	{
 		DI::profiler()->startRecording('rendering');
 		$data = $data ?: self::getAttachmentData($text);
@@ -443,19 +444,26 @@ class BBCode
 			$return = sprintf('<div class="type-%s">', $data['type']);
 		}
 
-		if ($embed && (($data['player_url'] != '' && $data['player_height'] != 0) || $data['embed_html'] != '')) {
+		if ($embed) {
 			$media = DI::postMediaFactory()->createFromAttachment($data, $uriid);
-			if ($data['player_url'] != '' && $data['player_height'] != 0) {
-				$return .= DI::postMediaRepository()->getPlayerIframe($media);
+			if ($media->hasPlayerUrl() && $media->hasPlayerHeight()) {
+				$embed_media = DI::postMediaRepository()->getPlayerIframe($media);
+			} elseif ($media->hasEmbedHtml() && !$media->isPhoto()) {
+				$embed_media = DI::postMediaRepository()->getEmbedIframe($media);
 			} else {
-				$return .= DI::postMediaRepository()->getEmbedIframe($media);
+				$embed_media = null;
 			}
-			$preview_mode = self::PREVIEW_NO_IMAGE;
-			unset($data['title']);
-			unset($data['url']);
-			unset($data['description']);
-			unset($data['provider_url']);
-			unset($data['provider_name']);
+
+			if ($embed_media) {
+				$return .= $embed_media;
+
+				$preview_mode = self::PREVIEW_NO_IMAGE;
+				unset($data['title']);
+				unset($data['url']);
+				unset($data['description']);
+				unset($data['provider_url']);
+				unset($data['provider_name']);
+			}
 		}
 
 		if ($preview_mode == self::PREVIEW_NO_IMAGE) {
@@ -464,7 +472,7 @@ class BBCode
 		}
 
 		if (!empty($data['title']) && !empty($data['url'])) {
-			$preview_class = $preview_mode == self::PREVIEW_LARGE ? 'attachment-image' : 'attachment-preview';
+			$preview_class = in_array($preview_mode, [self::PREVIEW_AUTO, self::PREVIEW_LARGE]) ? 'attachment-image' : 'attachment-preview';
 			if (!empty($data['image']) && empty($data['text']) && ($data['type'] == 'photo')) {
 				$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
 			} else {

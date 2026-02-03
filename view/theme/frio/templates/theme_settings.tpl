@@ -19,31 +19,28 @@
 {{if $scheme_accent}}
 <div class="form-group">
 	<p><label>{{$scheme_accent.1}}</label></p>
-	<label class="radio-inline">
-		<input type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_BLUE}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_BLUE}} checked{{/if}}>
-		<span style="border-radius: 10px; background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_BLUE}}; width: 20px; display: inline-block">&nbsp;</span>
-		{{$scheme_accent.3.blue}}
-	</label>
-	<label class="radio-inline">
-		<input type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_RED}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_RED}} checked{{/if}}>
-		<span style="border-radius: 10px; background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_RED}}; width: 20px; display: inline-block">&nbsp;</span>
-		{{$scheme_accent.3.red}}
-	</label>
-	<label class="radio-inline">
-		<input type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_PURPLE}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_PURPLE}} checked{{/if}}>
-		<span style="border-radius: 10px; background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_PURPLE}}; width: 20px; display: inline-block">&nbsp;</span>
-		{{$scheme_accent.3.purple}}
-	</label>
-	<label class="radio-inline">
-		<input type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_GREEN}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_GREEN}} checked{{/if}}>
-		<span style="border-radius: 10px; background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_GREEN}}; width: 20px; display: inline-block">&nbsp;</span>
-		{{$scheme_accent.3.green}}
-	</label>
-	<label class="radio-inline">
-		<input type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_PINK}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_PINK}} checked{{/if}}>
-		<span style="border-radius: 10px; background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_PINK}}; width: 20px; display: inline-block">&nbsp;</span>
-		{{$scheme_accent.3.pink}}
-	</label>
+	<div id="frio-accents">
+		<div>
+			<input id="blue" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_BLUE}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_BLUE}} checked{{/if}}>
+			<label for="blue" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_BLUE}}"></label>
+		</div>
+		<div>
+			<input id="red" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_RED}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_RED}} checked{{/if}}>
+			<label for="red" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_RED}}"></label>
+		</div>
+		<div>
+			<input id="purple" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_PURPLE}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_PURPLE}} checked{{/if}}>
+			<label for="purple" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_PURPLE}}"></label>
+		</div>
+		<div>
+			<input id="green" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_GREEN}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_GREEN}} checked{{/if}}>
+			<label for="green" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_GREEN}}"></label>
+		</div>
+		<div>
+			<input id="pink" type="radio" name="{{$scheme_accent.0}}" value="{{$smarty.const.FRIO_SCHEME_ACCENT_PINK}}" {{if $scheme_accent.2 == $smarty.const.FRIO_SCHEME_ACCENT_PINK}} checked{{/if}}>
+			<label for="pink" class="frio-accent" style="background-color: {{$smarty.const.FRIO_SCHEME_ACCENT_PINK}}"></label>
+		</div>
+	</div>
 </div>
 {{/if}}
 
@@ -211,7 +208,9 @@
 
 {{include file="field_checkbox.tpl" field=$always_open_compose}}
 
+{{if $admin_theme_settings}}
 <div class="settings-submit-wrapper pull-right">
 	<button type="submit" value="{{$submit}}" class="settings-submit btn btn-primary" name="frio-settings-submit">{{$submit}}</button>
 </div>
+{{/if}}
 <div class="clearfix"></div>

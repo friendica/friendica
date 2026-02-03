@@ -87,7 +87,6 @@ class Status extends BaseFactory
 	/**
 	 * @param int  $uriId           Uri-ID of the item
 	 * @param int  $uid             Item user
-	 * @param bool $display_quote   Display quoted posts
 	 * @param bool $reblog          Check for reblogged post
 	 * @param bool $in_reply_status Add an "in_reply_status" element
 	 *
@@ -95,7 +94,7 @@ class Status extends BaseFactory
 	 * @throws InternalServerErrorException
 	 * @throws ImagickException|NotFoundException
 	 */
-	public function createFromUriId(int $uriId, int $uid = 0, bool $display_quote = false, bool $reblog = true, bool $in_reply_status = true): \Friendica\Object\Api\Mastodon\Status
+	public function createFromUriId(int $uriId, int $uid = 0, bool $reblog = true, bool $in_reply_status = true): \Friendica\Object\Api\Mastodon\Status
 	{
 		$fields = ['uri-id', 'uid', 'author-id', 'causer-id', 'author-uri-id', 'author-link', 'author-gsid', 'causer-uri-id', 'post-reason', 'starred', 'app', 'title', 'body', 'raw-body', 'content-warning', 'question-id',
 			'created', 'edited', 'commented', 'received', 'changed', 'network', 'thr-parent-id', 'parent-author-id', 'language', 'uri', 'plink', 'private', 'vid', 'gravity', 'featured', 'has-media', 'quote-uri-id',
@@ -261,56 +260,12 @@ class Status extends BaseFactory
 			$poll = null;
 		}
 
-		if ($display_quote) {
-			$quote = self::createQuote($item, $uid);
+		$quote = self::createQuote($item, $uid);
 
-			$item['body'] = BBCode::removeSharedData($item['body']);
+		$item['body'] = BBCode::removeSharedData($item['body']);
 
-			if (!is_null($item['raw-body'])) {
-				$item['raw-body'] = BBCode::removeSharedData($item['raw-body']);
-			}
-		} else {
-			// We can always safely add attached activities. Real quotes are added to the body via "addSharedPost".
-			if (empty($item['quote-uri-id'])) {
-				$quote = self::createQuote($item, $uid);
-			} else {
-				$quote = [];
-			}
-
-			$shared = $this->contentItem->getSharedPost($item, ['uri-id']);
-			if (!empty($shared)) {
-				$shared_uri_id = $shared['post']['uri-id'];
-
-				foreach ($this->mstdnMentionFactory->createFromUriId($shared_uri_id)->getArrayCopy() as $mention) {
-					if (!in_array($mention, $mentions)) {
-						$mentions[] = $mention;
-					}
-				}
-
-				foreach ($this->mstdnTagFactory->createFromUriId($shared_uri_id) as $tag) {
-					if (!in_array($tag, $tags)) {
-						$tags[] = $tag;
-					}
-				}
-
-				foreach ($this->mstdnAttachmentFactory->createFromUriId($shared_uri_id) as $attachment) {
-					if (!in_array($attachment, $attachments)) {
-						$attachments[] = $attachment;
-					}
-				}
-
-				if (empty($card->toArray())) {
-					$card = $this->mstdnCardFactory->createFromUriId($shared_uri_id);
-				}
-			}
-
-			if (!is_null($item['raw-body'])) {
-				$item['raw-body'] = $this->contentItem->addSharedPost($item, $item['raw-body']);
-				$item['raw-body'] = Post\Media::addHTMLLinkToBody($uriId, $item['raw-body']);
-			} else {
-				$item['body'] = $this->contentItem->addSharedPost($item);
-				$item['body'] = Post\Media::addHTMLLinkToBody($uriId, $item['body']);
-			}
+		if (!is_null($item['raw-body'])) {
+			$item['raw-body'] = BBCode::removeSharedData($item['raw-body']);
 		}
 
 		$emojis = null;
@@ -330,7 +285,7 @@ class Status extends BaseFactory
 
 		if ($is_reshare) {
 			try {
-				$reshare = $this->createFromUriId($uriId, $uid, $display_quote, false, false)->toArray();
+				$reshare = $this->createFromUriId($uriId, $uid, false, false)->toArray();
 			} catch (\Exception $exception) {
 				DI::logger()->info('Reshare not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 				$reshare = [];
@@ -341,7 +296,7 @@ class Status extends BaseFactory
 
 		if ($in_reply_status && ($item['gravity'] == Item::GRAVITY_COMMENT)) {
 			try {
-				$in_reply = $this->createFromUriId($item['thr-parent-id'], $uid, $display_quote, false, false)->toArray();
+				$in_reply = $this->createFromUriId($item['thr-parent-id'], $uid, false, false)->toArray();
 			} catch (\Exception $exception) {
 				DI::logger()->info('Reply post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 				$in_reply = [];
@@ -382,7 +337,13 @@ class Status extends BaseFactory
 
 		if (!empty($quote_id) && ($quote_id != $item['uri-id'])) {
 			try {
-				$quote = $this->createFromUriId($quote_id, $uid, false, false, false)->toArray();
+				$quoted_status = $this->createFromUriId($quote_id, $uid, false, false)->toArray();
+				$quote         = [
+					'state'         => 'accepted',
+					'quoted_status' => $quoted_status,
+					'account'       => $quoted_status['account'],
+				];
+				$quote = array_merge($quote, $quoted_status);
 			} catch (\Exception $exception) {
 				DI::logger()->info('Quote not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 				$quote = [];

@@ -362,6 +362,11 @@ class Index extends BaseSettings
 		unset($profileFieldOrder['new']);
 
 		foreach ($profileFieldInputs as $id => $profileFieldInput) {
+			// Skip fields with empty labels - they will be deleted by saveCollectionForUser
+			if (empty($profileFieldInput['label'])) {
+				continue;
+			}
+
 			$permissionSet = $this->permissionSetRepo->selectOrCreate($this->permissionSetFactory->createFromString(
 				$uid,
 				$this->aclFormatter->toString($profileFieldInput['contact_allow'] ?? ''),

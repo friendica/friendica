@@ -66,8 +66,8 @@ use Psr\Log\LoggerInterface;
 class App
 {
 	const PLATFORM = 'Friendica';
-	const CODENAME = 'Interrupted Fern';
-	const VERSION  = '2025.07-rc';
+	const CODENAME = 'Blutwurz';
+	const VERSION  = '2026.04-dev';
 
 	/**
 	 * @internal

@@ -608,6 +608,19 @@ class Widget
 			}
 		}
 
+		$widget_timelineorder = json_decode(DI::pConfig()->get($uid, 'system', 'widget_timeline_order'));
+		if (!empty($widget_timelineorder)) {
+			$tmp = [];
+			foreach($widget_timelineorder as $order) {
+				foreach($channels as $channel) {
+					if($channel['ref'] == $order) {
+						$tmp[] = $channel;
+					}
+				}
+			}
+			$channels = $tmp;
+		}
+
 		return self::filter(
 			'channel',
 			DI::l10n()->t('Channels'),

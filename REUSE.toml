@@ -261,6 +261,11 @@ SPDX-FileCopyrightText = "2017 Dailymotion (http://www.dailymotion.com)"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
+path = "view/js/videojs/**"
+SPDX-FileCopyrightText = "Copyright 2010-present Video.js contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
 path = [ "images/rm-16.png", "images/rhash-16.png"]
 SPDX-FileCopyrightText = "Red Matrix Project"
 SPDX-License-Identifier = "MIT"

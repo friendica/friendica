@@ -15,53 +15,56 @@
 	</div>
 
 	<div class="media-body">
-		<div class='intro-enty-name'><h4 class="media-heading"><a href="{{$zrl}}">{{$fullname}}</a></h4></div>
-		<div class="intro-desc"><span class="intro-desc-label">{{$str_notification_type}}</span>&nbsp;{{$str_type}}</div>
-		{{* if the contact was suggestested by another contact, the contact who made the suggestion is displayed*}}
-		{{if $madeby}}<div class="intro-madeby"><span class="intro-madeby-label">{{$lbl_madeby}}</span>&nbsp;<a href="{{$madeby_zrl}}">{{$madeby}}</a></div>{{/if}}
+		<div class="intro-block">
+			<div>
+				<div class='intro-enty-name'><h4 class="media-heading"><a href="{{$zrl}}">{{$fullname}}</a></h4></div>
+				<div class="intro-desc"><span class="intro-desc-label">{{$str_notification_type}}</span>&nbsp;{{$str_type}}</div>
+				{{* if the contact was suggestested by another contact, the contact who made the suggestion is displayed*}}
+				{{if $madeby}}<div class="intro-madeby"><span class="intro-madeby-label">{{$lbl_madeby}}</span>&nbsp;<a href="{{$madeby_zrl}}">{{$madeby}}</a></div>{{/if}}
 
-		{{* Additional information of the contact *}}
-		<div class="intro-contact-info hidden-xs">
-			<div class="intro-url"><span class="intro-url-label">{{$lbl_url}}:&nbsp;</span><a href="{{$zrl}}">{{$url}}</a></div>
-			{{if $network}}<div class="intro-network"><span class="intro-network-label">{{$lbl_network}}</span>&nbsp;{{$network}}</div>{{/if}}
-			{{if $location}}<div class="intro-location"><span class="intro-location-label">{{$lbl_location}}</span>&nbsp;{{$location}}</div>{{/if}}
-			{{if $keywords}}<div class="intro-keywords"><span class="intro-keywords-label">{{$lbl_keywords}}</span>&nbsp;{{$keywords}}</div>{{/if}}
-			{{if $about}}<div class="intro-about"><span class="intro-about-label">{{$lbl_about}}</span>&nbsp;{{$about nofilter}}</div>{{/if}}
-			<div class="intro-knowyou"><span class="intro-knowyou-label">{{$lbl_knowyou}}</span>{{$knowyou}}</div>
-			<div class="intro-note intro-note-{{$intro_id}}">{{$note}}</div>
-		</div>
+				{{* Additional information of the contact *}}
+				<div class="intro-contact-info hidden-xs">
+					<div class="intro-url"><span class="intro-url-label">{{$lbl_url}}&nbsp;</span><a href="{{$zrl}}">{{$url}}</a></div>
+					{{if $network}}<div class="intro-network"><span class="intro-network-label">{{$lbl_network}}</span>&nbsp;{{$network}}</div>{{/if}}
+					{{if $location}}<div class="intro-location"><span class="intro-location-label">{{$lbl_location}}</span>&nbsp;{{$location}}</div>{{/if}}
+					{{if $keywords}}<div class="intro-keywords"><span class="intro-keywords-label">{{$lbl_keywords}}</span>&nbsp;{{$keywords}}</div>{{/if}}
+					{{if $about}}<div class="intro-about"><span class="intro-about-label">{{$lbl_about}}</span>&nbsp;{{$about nofilter}}</div>{{/if}}
+					<div class="intro-knowyou"><span class="intro-knowyou-label">{{$lbl_knowyou}}</span>&nbsp;{{$knowyou}}</div>
+					<div class="intro-note intro-note-{{$intro_id}}">{{$note}}</div>
+				</div>
 
-		{{* Additional information of the contact for mobile view *}}
-		<div class="intro-contact-info xs hidden-lg hidden-md hidden-sm">
-			<div class="intro-url"><span class="intro-url-label">{{$lbl_url}}:</span><a href="{{$zrl}}">{{$url}}</a></div>
-			{{if $network}}<div class="intro-network"><span class="intro-network-label">{{$lbl_network}}</span>{{$network}}</div>{{/if}}
-			{{if $location}}<div class="intro-location"><span class="intro-location-label">{{$lbl_location}}</span>{{$location}}</div>{{/if}}
-			{{if $keywords}}<div class="intro-keywords"><span class="intro-keywords-label">{{$lbl_keywords}}</span>{{$keywords}}</div>{{/if}}
-			{{if $about}}<div class="intro-about"><span class="intro-about-label">{{$lbl_about}}</span>{{$about nofilter}}</div>{{/if}}
-			<div class="intro-knowyou"><span class="intro-knowyou-label">{{$lbl_knowyou}}</span>{{$knowyou}}</div>
-			<div class="intro-note intro-note-{{$intro_id}}">{{$note}}</div>
-		</div>
+				{{* Additional information of the contact for mobile view *}}
+				<div class="intro-contact-info xs hidden-lg hidden-md hidden-sm">
+					<div class="intro-url"><span class="intro-url-label">{{$lbl_url}}</span><a href="{{$zrl}}">{{$url}}</a></div>
+					{{if $network}}<div class="intro-network"><span class="intro-network-label">{{$lbl_network}}</span>{{$network}}</div>{{/if}}
+					{{if $location}}<div class="intro-location"><span class="intro-location-label">{{$lbl_location}}</span>{{$location}}</div>{{/if}}
+					{{if $keywords}}<div class="intro-keywords"><span class="intro-keywords-label">{{$lbl_keywords}}</span>{{$keywords}}</div>{{/if}}
+					{{if $about}}<div class="intro-about"><span class="intro-about-label">{{$lbl_about}}</span>{{$about nofilter}}</div>{{/if}}
+					<div class="intro-knowyou"><span class="intro-knowyou-label">{{$lbl_knowyou}}</span>{{$knowyou}}</div>
+					<div class="intro-note intro-note-{{$intro_id}}">{{$note}}</div>
+				</div>
+			</div>
 
-		{{* On mobile touch devices we use buttons for approve, ignore && discard to have a better UX *}}
-		{{if $is_mobile}}
-		<form class="intro-form" action="notification/{{$intro_id}}" method="post">
-			<button class="btn btn-small btn-primary" type="button" onclick="addElmToModal('#intro-approve-wrapper-{{$intro_id}}');"><i class="fa fa-check" aria-hidden="true"></i> {{$approve}}</button>
-			{{if $discard}}
-				<button class="btn btn-small btn-warning intro-submit-discard" type="submit" name="submit" value="{{$discard}}"><i class="fa fa-trash-o" aria-hidden="true"></i> {{$discard}}</button>
-			{{/if}}
-			<button class="btn btn-small btn-danger intro-submit-ignore" type="submit" name="submit" value="{{$ignore}}"><i class="fa fa-ban" aria-hidden="true"></i> {{$ignore}}</button>
-		</form>
-		{{else}}
-		{{* The intro actions like approve, ignore, discard intro*}}
-		<div class="intro-actions pull-right nav-pills preferences">
-			<button class="btn-link intro-action-link" onclick="addElmToModal('#intro-approve-wrapper-{{$intro_id}}');" aria-label="{{$approve}}" title="{{$approve}}" data-toggle="tooltip"><i class="fa fa-check" aria-hidden="true"></i></button>
-
+			{{* On mobile touch devices we use buttons for approve, ignore && discard to have a better UX *}}
+			{{if $is_mobile}}
 			<form class="intro-form" action="notification/{{$intro_id}}" method="post">
-				<button class="btn-link intro-submit-ignore intro-action-link" type="submit" name="submit" value="{{$ignore}}" aria-label="{{$ignore}}" title="{{$ignore}}" data-toggle="tooltip"><i class="fa fa-ban" aria-hidden="true"></i></button>
-				{{if $discard}}<button class="btn-link intro-submit-discard intro-action-link" type="submit" name="submit" value="{{$discard}}" aria-label="{{$discard}}" title="{{$discard}}" data-toggle="tooltip"><i class="fa fa-trash-o" aria-hidden="true"></i></button>{{/if}}
+				<button class="btn btn-small btn-primary" type="button" onclick="addElmToModal('#intro-approve-wrapper-{{$intro_id}}');"><i class="fa fa-check" aria-hidden="true"></i> {{$approve}}</button>
+				{{if $discard}}
+					<button class="btn btn-small btn-warning intro-submit-discard" type="submit" name="submit" value="discard"><i class="fa fa-trash-o" aria-hidden="true"></i> {{$discard}}</button>
+				{{/if}}
+				<button class="btn btn-small btn-danger intro-submit-ignore" type="submit" name="submit" value="ignore"><i class="fa fa-ban" aria-hidden="true"></i> {{$ignore}}</button>
 			</form>
+			{{else}}
+			{{* The intro actions like approve, ignore, discard intro*}}
+			<div class="intro-actions nav-pills">
+				<button class="btn-link intro-action-link" onclick="addElmToModal('#intro-approve-wrapper-{{$intro_id}}');" aria-label="{{$approve}}" title="{{$approve}}" data-toggle="tooltip"><i class="fa fa-check" aria-hidden="true"></i></button>
+				<form class="intro-form" action="notification/{{$intro_id}}" method="post">
+					<button class="btn-link intro-submit-ignore intro-action-link" type="submit" name="submit" value="ignore" aria-label="{{$ignore}}" title="{{$ignore}}" data-toggle="tooltip"><i class="fa fa-ban" aria-hidden="true"></i></button>
+					{{if $discard}}<button class="btn-link intro-submit-discard intro-action-link" type="submit" name="submit" value="discard" aria-label="{{$discard}}" title="{{$discard}}" data-toggle="tooltip"><i class="fa fa-trash-o" aria-hidden="true"></i></button>{{/if}}
+				</form>
+			</div>
+			{{/if}}
 		</div>
-		{{/if}}
 
 		{{* This sections contains special settings for contact approval. We hide it by default and load this section in
 		a bootstrap modal in the case of approval *}}

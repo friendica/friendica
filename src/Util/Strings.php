@@ -530,7 +530,7 @@ class Strings
 	{
 		$shorthand = trim($shorthand);
 
-		if (ctype_digit($shorthand)) {
+		if (ctype_digit(ltrim($shorthand, '-'))) {
 			return (int) $shorthand;
 		}
 

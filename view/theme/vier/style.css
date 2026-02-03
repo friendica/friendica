@@ -2792,7 +2792,7 @@ a.mail-list-link {
 	font-weight: bold;
 	color: #FF0000;
 }
-#event-desc-text-edit-bb, #event-location-text-edit-bb {
+#event-desc-text-edit-bb {
 	float: none;
 }
 #event-start-text, #event-finish-text, #event-summary-text, #event-desc-text, #event-location-text {
@@ -3299,8 +3299,9 @@ fbrowser.photo .photo-album-image-wrapper { margin-left: 10px; }
 	text-align: center;
 }
 
-iframe,
+iframe.embed,
+.video-top-wrapper,
 video {
 	max-width: 100%;
-	max-height: 90vh;
+	max-height: calc(100vh - 150px);
 }

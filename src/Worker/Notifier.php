@@ -400,6 +400,8 @@ class Notifier
 
 				Post\DeliveryData::incrementQueueCount($target_item['uri-id'], $delivery_queue_count);
 			}
+
+			Item::addPostToChannel($target_item['parent-uri-id'], $sender_uid);
 		}
 
 		return;

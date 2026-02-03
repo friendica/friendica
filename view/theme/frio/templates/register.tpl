@@ -27,7 +27,7 @@
 		{{if $oidlabel}}
 		<div id="register-openid-wrapper" class="form-group">
 			<label for="register-openid" id="label-register-openid">{{$oidlabel}}</label>
-			<input type="text" maxlength="60" size="32" name="openid_url" class="openid form-control" id="register-openid" value="{{$openid}}">
+			<input type="text" maxlength="60" name="openid_url" class="openid form-control" id="register-openid" value="{{$openid}}">
 			<span class="help-block" id="openid_url_tip">{{$fillwith}}&nbsp;{{$fillext}}</span>
 		</div>
 		<div id="register-openid-end"></div>
@@ -36,7 +36,7 @@
 		{{if $invitations}}
 		<div id="register-invite-wrapper" class="form-group">
 			<label for="register-invite" id="label-register-invite">{{$invite_label}}</label>
-			<input type="text" maxlength="60" size="32" name="invite_id" id="register-invite" class="form-control" value="{{$invite_id}}">
+			<input type="text" maxlength="60" name="invite_id" id="register-invite" class="form-control" value="{{$invite_id}}">
 			<span class="help-block" id="invite_id_tip">{{$invite_desc nofilter}}</span>
 		</div>
 		<div id="register-name-end"></div>
@@ -44,7 +44,7 @@
 
 		<div id="register-name-wrapper" class="form-group">
 			<label for="register-name" id="label-register-name">{{$namelabel}}</label>
-			<input type="text" maxlength="60" size="32" name="username" id="register-name" class="form-control" value="{{$username}}" required autofocus>
+			<input type="text" maxlength="60" name="username" id="register-name" class="form-control" value="{{$username}}" required autofocus>
 		</div>
 		<div id="register-name-end"></div>
 
@@ -52,13 +52,13 @@
 		{{if !$additional}}
 			<div id="register-email-wrapper" class="form-group">
 				<label for="register-email" id="label-register-email">{{$addrlabel}}</label>
-				<input type="text" maxlength="60" size="32" name="field1" id="register-email" class="form-control" value="{{$email}}" required>
+				<input type="text" maxlength="60" name="field1" id="register-email" class="form-control" value="{{$email}}" required>
 			</div>
 			<div id="register-email-end"></div>
 
 			<div id="register-repeat-wrapper" class="form-group">
 				<label for="register-repeat" id="label-register-repeat">{{$addrlabel2}}</label>
-				<input type="text" maxlength="60" size="32" name="repeat" id="register-repeat" class="form-control" value="" required>
+				<input type="text" maxlength="60" name="repeat" id="register-repeat" class="form-control" value="" required>
 			</div>
 			<div id="register-repeat-end"></div>
 		{{/if}}

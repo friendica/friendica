@@ -886,6 +886,7 @@ class Event
 		$dformat       = DI::l10n()->t('l F d, Y \@ g:i A'); // Friday January 18, 2011 @ 8:01 AM.
 		$dformat_short = DI::l10n()->t('D g:i A'); // Fri 8:01 AM.
 		$tformat       = DI::l10n()->t('g:i A'); // 8:01 AM.
+		$tzformat      = DI::l10n()->t('e'); // Atlantic/Azores.
 
 		// Convert the time to different formats.
 		$dtstart_dt    = DI::l10n()->getDay(DateTimeFormat::local($item['event-start'], $dformat));
@@ -896,6 +897,7 @@ class Event
 		$date_short  = DateTimeFormat::local($item['event-start'], 'j');
 		$start_time  = DateTimeFormat::local($item['event-start'], $tformat);
 		$start_short = DI::l10n()->getDayShort(DateTimeFormat::local($item['event-start'], $dformat_short));
+		$timezone    = DateTimeFormat::local($item['event-start'], $tzformat);
 
 		// If the option 'nofinisch' isn't set, we need to format the finish date/time.
 		if (!$item['event-nofinish']) {
@@ -943,6 +945,7 @@ class Event
 			'$start_short'    => $start_short,
 			'$end_time'       => $end_time,
 			'$end_short'      => $end_short,
+			'$timezone'       => $timezone,
 			'$author_name'    => $item['author-name'],
 			'$author_link'    => $profile_link,
 			'$author_avatar'  => $item['author-avatar'],

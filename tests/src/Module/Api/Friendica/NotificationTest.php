@@ -43,7 +43,7 @@ class NotificationTest extends ApiTestCase
 	public function testWithXmlResult()
 	{
 		$date    = DateTimeFormat::local('2020-01-01 12:12:02');
-		$dateRel = Temporal::getRelativeDate('2020-01-01 07:12:02');
+		$dateRel = Temporal::getRelativeDate('2020-01-01 12:12:02');
 
 		$assertXml = <<<XML
 <?xml version="1.0"?>

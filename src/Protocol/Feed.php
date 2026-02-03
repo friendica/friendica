@@ -279,8 +279,7 @@ class Feed
 			return [];
 		}
 
-		$items          = [];
-		$creation_dates = [];
+		$items = [];
 
 		// Limit the number of items that are about to be fetched
 		$total_items = ($entries->length - 1);
@@ -289,7 +288,10 @@ class Feed
 			$total_items = $max_items;
 		}
 
-		$postings = self::importOlderEntries($entries, $total_items, $header, $author, $contact, $importer, $xpath, $atomns, $basepath, $dryRun);
+		$processed = self::processEntries($entries, $total_items, $header, $author, $contact, $importer, $xpath, $atomns, $basepath, $dryRun);
+
+		$postings       = $processed['postings'];
+		$creation_dates = $processed['creation_dates'];
 
 		if (!empty($postings)) {
 			$min_posting = DI::config()->get('system', 'minimum_posting_interval', 0);
@@ -358,9 +360,10 @@ class Feed
 		return $title;
 	}
 
-	private static function importOlderEntries(DOMNodeList $entries, int $total_items, array $header, array $author, array $contact, array $importer, DOMXPath $xpath, string $atomns, string $basepath, bool $dryRun): array
+	private static function processEntries(DOMNodeList $entries, int $total_items, array $header, array $author, array $contact, array $importer, DOMXPath $xpath, string $atomns, string $basepath, bool $dryRun): array
 	{
-		$postings = [];
+		$postings       = [];
+		$creation_dates = [];
 
 		// Importing older entries first
 		for ($i = $total_items; $i >= 0; --$i) {
@@ -685,29 +688,6 @@ class Feed
 					$taglist             = $fetch_further_information == LocalRelationship::FFI_BOTH ? PageInfo::getTagsFromUrl($item['plink'], $preview, $contact['ffi_keyword_denylist'] ?? '') : [];
 					$item['object-type'] = Activity\ObjectType::BOOKMARK;
 					$attachments         = [];
-
-					foreach (['audio', 'video'] as $elementname) {
-						if (!empty($data[$elementname])) {
-							foreach ($data[$elementname] as $element) {
-								if (!empty($element['src'])) {
-									$src = $element['src'];
-								} elseif (!empty($element['content'])) {
-									$src = $element['content'];
-								} else {
-									continue;
-								}
-
-								$attachments[] = [
-									'type'        => ($elementname == 'audio') ? Post\Media::AUDIO : Post\Media::VIDEO,
-									'url'         => $src,
-									'preview'     => $element['image']       ?? null,
-									'mimetype'    => $element['contenttype'] ?? null,
-									'name'        => $element['name']        ?? null,
-									'description' => $element['description'] ?? null,
-								];
-							}
-						}
-					}
 				}
 			} else {
 				if ($fetch_further_information == LocalRelationship::FFI_KEYWORD) {
@@ -762,7 +742,7 @@ class Feed
 			}
 		}
 
-		return $postings;
+		return ['postings' => $postings, 'creation_dates' => $creation_dates];
 	}
 
 	/**
@@ -1112,6 +1092,7 @@ class Feed
 	{
 		$root = $doc->createElementNS(ActivityNamespace::ATOM1, 'feed');
 		$doc->appendChild($root);
+		$root->setAttribute("xmlns:thr", ActivityNamespace::THREAD);
 
 		$title   = '';
 		$selfUri = '/feed/' . $owner['nick'] . '/';

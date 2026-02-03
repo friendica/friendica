@@ -30,6 +30,8 @@ class OptimizeTables
 		DBA::optimizeTable('parsed_url');
 		DBA::optimizeTable('session');
 		DBA::optimizeTable('post-engagement');
+		DBA::optimizeTable('channel-post');
+		DBA::optimizeTable('system-channel-post');
 		DBA::optimizeTable('check-full-text-search');
 
 		if (DI::config()->get('system', 'optimize_all_tables')) {

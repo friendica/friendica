@@ -1493,4 +1493,14 @@ class Worker
 
 		return $execute;
 	}
+
+	/**
+	 * Check if we are in worker mode
+	 *
+	 * @return boolean
+	 */
+	public static function isInWorkerMode(): bool
+	{
+		return (DI::logger() instanceof WorkerLogger);
+	}
 }

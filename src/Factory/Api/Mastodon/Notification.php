@@ -33,12 +33,11 @@ class Notification extends BaseFactory
 
 	/**
 	 * @param NotificationEntity $Notification
-	 * @param bool $display_quotes Display quoted posts
 	 *
 	 * @return MstdnNotification
 	 * @throws UnexpectedNotificationTypeException
 	 */
-	public function createFromNotification(NotificationEntity $Notification, bool $display_quotes): MstdnNotification
+	public function createFromNotification(NotificationEntity $Notification): MstdnNotification
 	{
 		$type = self::getType($Notification);
 
@@ -50,7 +49,7 @@ class Notification extends BaseFactory
 
 		if ($Notification->targetUriId) {
 			try {
-				$status = $this->mstdnStatusFactory->createFromUriId($Notification->targetUriId, $Notification->uid, $display_quotes);
+				$status = $this->mstdnStatusFactory->createFromUriId($Notification->targetUriId, $Notification->uid);
 			} catch (\Exception $exception) {
 				$status = null;
 			}

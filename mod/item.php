@@ -259,20 +259,22 @@ function item_process(array $post, array $request, bool $preview, string $return
 	// preview mode - prepare the body for display and send it via json
 	if ($preview) {
 		// We have to preset some fields, so that the conversation can be displayed
-		$post['id']             = -1;
-		$post['uri-id']         = -1;
-		$post['author-network'] = Protocol::DFRN;
-		$post['author-updated'] = '';
-		$post['author-alias']   = '';
-		$post['author-gsid']    = 0;
-		$post['author-uri-id']  = ItemURI::getIdByURI($post['author-link']);
-		$post['owner-updated']  = '';
-		$post['has-media']      = false;
-		$post['quote-uri-id']   = Item::getQuoteUriId($post['body'], $post['uid']);
-		$post['body']           = BBCode::removeSharedData(Item::setHashtags($post['body']));
-		$post['writable']       = true;
-		$post['sensitive']      = false;
-		$post['post-reason']    = Item::PR_LOCAL;
+		$post['id']                 = -1;
+		$post['uri-id']             = -1;
+		$post['author-network']     = Protocol::DFRN;
+		$post['author-updated']     = '';
+		$post['author-alias']       = '';
+		$post['author-gsid']        = 0;
+		$post['author-uri-id']      = ItemURI::getIdByURI($post['author-link']);
+		$post['owner-updated']      = '';
+		$post['has-media']          = false;
+		$post['quote-uri-id']       = Item::getQuoteUriId($post['body'], $post['uid']);
+		$post['body']               = BBCode::removeSharedData(Item::setHashtags($post['body']));
+		$post['writable']           = true;
+		$post['sensitive']          = false;
+		$post['post-reason']        = Item::PR_LOCAL;
+		$post['owner-contact-type'] = Contact::TYPE_PERSON;
+		$post['owner-network']      = Protocol::DFRN;
 
 		$o = DI::conversation()->render([$post], Conversation::MODE_SEARCH, false, true);
 

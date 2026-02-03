@@ -183,7 +183,7 @@ class Statuses extends BaseApi
 
 		Item::updateDisplayCache($post['uri-id']);
 
-		$this->jsonExit(DI::mstdnStatus()->createFromUriId($post['uri-id'], $uid, self::appSupportsQuotes()));
+		$this->jsonExit(DI::mstdnStatus()->createFromUriId($post['uri-id'], $uid));
 	}
 
 	protected function post(array $request = [])
@@ -345,7 +345,7 @@ class Statuses extends BaseApi
 		if (!empty($id)) {
 			$item = Post::selectFirst(['uri-id'], ['id' => $id]);
 			if (!empty($item['uri-id'])) {
-				$this->jsonExit(DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, self::appSupportsQuotes()));
+				$this->jsonExit(DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid));
 			}
 		}
 
@@ -396,7 +396,7 @@ class Statuses extends BaseApi
 			}
 		}
 
-		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes(), false));
+		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, false));
 	}
 
 	private function getApp(): string

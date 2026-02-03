@@ -8,6 +8,7 @@
 namespace Friendica\Module\Admin;
 
 use Friendica\App;
+use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Renderer;
 use Friendica\Core\Update;
@@ -91,11 +92,11 @@ class Summary extends BaseAdmin
 
 		// Legacy config file warning
 		if (file_exists('.htconfig.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/admin/config');
 		}
 
 		if (file_exists('config/local.ini.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/admin/config');
 		}
 
 		// Check server vitality
@@ -105,7 +106,7 @@ class Summary extends BaseAdmin
 				'<a href="%s">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href="%s">the installation page</a> for help.',
 				$well_known,
 				$well_known,
-				DI::baseUrl() . '/help/Install'
+				DI::baseUrl() . '/help/admin/install'
 			);
 		}
 
@@ -178,18 +179,42 @@ class Summary extends BaseAdmin
 			]
 		];
 
+		$addons = [];
+
+		$addonHelper = DI::addonHelper();
+		foreach ($addonHelper->getEnabledAddons() as $addonId) {
+			try {
+				$addonInfo = $addonHelper->getAddonInfo($addonId);
+			} catch (InvalidAddonException $th) {
+				$this->logger->error('Invalid addon found: ' . $addonId, ['exception' => $th]);
+				continue;
+			}
+
+			$info = [
+				'name'        => $addonInfo->getName(),
+				'description' => $addonInfo->getDescription(),
+				'version'     => $addonInfo->getVersion(),
+			];
+
+			$addons[] = [
+				$addonId,
+				$info,
+			];
+		}
+
 		$t = Renderer::getMarkupTemplate('admin/summary.tpl');
 		return Renderer::replaceMacros($t, [
-			'$title'          => DI::l10n()->t('Administration'),
-			'$page'           => DI::l10n()->t('Summary'),
-			'$queues'         => $queues,
-			'$version_label'  => DI::l10n()->t('Version'),
-			'$platform'       => App::PLATFORM,
-			'$codename'       => App::CODENAME,
-			'$build'          => DI::config()->get('system', 'build'),
-			'$addons'         => [DI::l10n()->t('Active addons'), DI::addonHelper()->getEnabledAddons()],
-			'$serversettings' => $server_settings,
-			'$warningtext'    => $warningtext,
+			'$title'              => DI::l10n()->t('Administration'),
+			'$page'               => DI::l10n()->t('Summary'),
+			'$queues'             => $queues,
+			'$version_label'      => DI::l10n()->t('Version'),
+			'$platform'           => App::PLATFORM,
+			'$codename'           => App::CODENAME,
+			'$build'              => DI::config()->get('system', 'build'),
+			'$addons'             => [DI::l10n()->t('Active addons'), $addons],
+			'$serversettings'     => $server_settings,
+			'$warningtext'        => $warningtext,
+			'$link_enable_addons' => DI::l10n()->t('Enable new addons'),
 		]);
 	}
 

@@ -30,6 +30,7 @@
 							{{if $lblsuggest}}<li><a role="menuitem" href="{{$contact_actions.suggest.url}}" title="{{$contact_actions.suggest.title}}">{{$contact_actions.suggest.label}}</a></li>{{/if}}
 							{{if $poll_enabled}}<li><a role="menuitem" href="{{$contact_actions.update.url}}" title="{{$contact_actions.update.title}}">{{$contact_actions.update.label}}</a></li>{{/if}}
 							{{if $contact_actions.updateprofile}}<li><a role="menuitem" href="{{$contact_actions.updateprofile.url}}" title="{{$contact_actions.updateprofile.title}}">{{$contact_actions.updateprofile.label}}</a></li>{{/if}}
+							{{if $contact_actions.fetchoutbox}}<li><a role="menuitem" href="{{$contact_actions.fetchoutbox.url}}" title="{{$contact_actions.fetchoutbox.title}}">{{$contact_actions.fetchoutbox.label}}</a></li>{{/if}}
 							{{if $lblsuggest || $poll_enabled || $contact_actions.updateprofile}}
 							<li class="divider"></li>
 							{{/if}}

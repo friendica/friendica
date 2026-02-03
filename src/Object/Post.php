@@ -216,6 +216,10 @@ class Post
 			$announceable = false;
 		}
 
+		if ($item['restrictions'] & Item::CANT_QUOTE) {
+			$shareable = false;
+		}
+
 		$edpost = false;
 
 		if (DI::userSession()->getLocalUserId()) {

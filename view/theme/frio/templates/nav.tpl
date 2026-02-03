@@ -24,6 +24,7 @@
 				<div class="topbar-nav">
 
 					{{* Buttons for the mobile view *}}
+					{{* Mobile user menu dropdown button *}}
 					<button type="button" class="navbar-toggle offcanvas-right-toggle pull-right"
 						aria-controls="offcanvasUsermenu" aria-haspopup="true">
 						<span class="sr-only">Toggle navigation</span>
@@ -34,7 +35,8 @@
 						<span class="sr-only">Toggle Search</span>
 						<i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i>
 					</button>
-					<button type="button" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
+					{{* Mobile left menu dropdown button *}}
+					<button type="button" id="mobile-left-menu" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
 						data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
 						<span class="sr-only">Toggle navigation</span>
 						<i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i>
@@ -124,13 +126,15 @@
 									{{* the following list entry must have the id "nav-notifications-mark-all". Without it this isn't visible. ....strange behavior :-/ *}}
 									<li id="nav-notifications-mark-all" class="dropdown-header">
 										<div class="arrow"></div>
-										{{$nav.notifications.1}}
-										<div class="dropdown-header-link">
-											<button role="menuitem" type="button" class="btn-link"
-												onclick="notificationMarkAll();" data-toggle="tooltip"
-												aria-label="{{$nav.notifications.mark.3}}"
-												title="{{$nav.notifications.mark.3}}">{{$nav.notifications.mark.1}}</button>
-										</div>
+										<header id="notifications-header">
+											<p id="notifications-title">{{$nav.notifications.1}}</p>
+											<header id="notifications-subheader">
+												<a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a>
+												<button role="menuitem" type="button" id="notifications-mark-as-read" class="btn-link"
+													onclick="notificationMarkAll();" data-toggle="tooltip">{{$nav.notifications.mark.1}}
+												</button>
+											</header>
+										</header>
 
 									</li>
 
@@ -195,20 +199,7 @@
 										<li>
 											<a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}"
 												title="{{$usermenu.3}}">
-
-												{{if $usermenu.0|str_ends_with:$nickname}}
-													<i class="fa fa-commenting"></i>
-												{{elseif $usermenu.0|str_ends_with:"/profile"}}
-													<i class="fa fa-user"></i>
-												{{elseif $usermenu.0|str_ends_with:"/photos"}}
-													<i class="fa fa-picture-o"></i>
-												{{elseif $usermenu.0|str_ends_with:"/media"}}
-													<i class="fa fa-edit"></i>
-												{{elseif $usermenu.0|str_ends_with:"calendar/"}}
-													<i class="fa fa-calendar"></i>
-												{{elseif $usermenu.0|str_ends_with:"notes/"}}
-													<i class="fa fa-book"></i>
-												{{/if}}
+												<i class="fa {{$usermenu.4}}"></i>
 												{{$usermenu.1}}
 											</a>
 										</li>
@@ -359,13 +350,15 @@
 							{{/if}}
 							<li class="list-group-item">
 								<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"
-									style="max-width:15px; max-height:15px; min-width:15px; min-height:15px; width:15px; height:15px;">
+									style="max-width:15px; max-height:15px; min-width:15px; min-height:15px; width:15px; height:15px;">&nbsp;
 								{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}){{/if}}
 							</li>
 							{{foreach $nav.usermenu as $usermenu}}
 								<li class="list-group-item">
 									<a role="menuitem" class="{{$usermenu.2}}"
-										href="{{$usermenu.0}}" title="{{$usermenu.3}}">{{$usermenu.1}}
+										href="{{$usermenu.0}}" title="{{$usermenu.3}}">
+										<i class="fa {{$usermenu.4}}"></i>&nbsp;
+										{{$usermenu.1}}
 									</a>
 								</li>
 							{{/foreach}}

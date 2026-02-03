@@ -34,7 +34,7 @@ jobs:
           tools: none
 
       - name: Clone addon repository
-        run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
+        run: git clone -b 2025.07-rc --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
         uses: "ramsey/composer-install@v2"
@@ -88,7 +88,7 @@ jobs:
           ini-values: apc.enabled=1, apc.enable_cli=1
 
       - name: Clone addon repository
-        run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
+        run: git clone -b 2025.07-rc --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       # Install composer dependencies and handle caching in one go.
       # @link https://github.com/marketplace/actions/install-php-dependencies-with-composer

@@ -50,15 +50,38 @@ class ActivityPub
 	const CONTEXT           = [
 		'https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1',
 		[
-			'ostatus'  => 'http://ostatus.org#',
-			'vcard'    => 'http://www.w3.org/2006/vcard/ns#',
-			'dfrn'     => 'http://purl.org/macgirvin/dfrn/1.0/',
-			'diaspora' => 'https://diasporafoundation.org/ns/',
-			'litepub'  => 'http://litepub.social/ns#',
-			'toot'     => 'http://joinmastodon.org/ns#',
+			'ostatus'            => 'http://ostatus.org#',
+			'vcard'              => 'http://www.w3.org/2006/vcard/ns#',
+			'dfrn'               => 'http://purl.org/macgirvin/dfrn/1.0/',
+			'diaspora'           => 'https://diasporafoundation.org/ns/',
+			'litepub'            => 'http://litepub.social/ns#',
+			'toot'               => 'http://joinmastodon.org/ns#',
+			'quote'              => 'https://w3id.org/fep/044f#quote',
+			'quoteUri'           => 'http://fedibird.com/ns#quoteUri',
+			'quoteAuthorization' => [
+				'@id'   => 'https://w3id.org/fep/044f#quoteAuthorization',
+				'@type' => '@id',
+			],
+			'gts'               => 'https://gotosocial.org/ns#',
+			'interactionPolicy' => [
+				'@id'   => 'gts:interactionPolicy',
+				'@type' => '@id',
+			],
+			'canQuote' => [
+				'@id'   => 'gts:canQuote',
+				'@type' => '@id',
+			],
+			'automaticApproval' => [
+				'@id'   => 'gts:automaticApproval',
+				'@type' => '@id',
+			],
+			'manualApproval' => [
+				'@id'   => 'gts:manualApproval',
+				'@type' => '@id',
+			],
 			'featured' => [
-				"@id"   => "toot:featured",
-				"@type" => "@id",
+				"@id"   => 'toot:featured',
+				"@type" => '@id',
 			],
 			'schema'                    => 'http://schema.org#',
 			'manuallyApprovesFollowers' => 'as:manuallyApprovesFollowers',
@@ -191,10 +214,11 @@ class ActivityPub
 	 *
 	 * @param string  $url
 	 * @param integer $uid User ID
+	 * @param integer $max Maximum number of activities to fetch (0 = all)
 	 * @return void
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function fetchOutbox(string $url, int $uid)
+	public static function fetchOutbox(string $url, int $uid, int $max = 0)
 	{
 		$data = HTTPSignature::fetch($url, $uid);
 		if (empty($data)) {
@@ -212,9 +236,14 @@ class ActivityPub
 			$items = [];
 		}
 
+		$count = 0;
 		foreach ($items as $activity) {
 			$ldactivity = JsonLD::compact($activity);
 			ActivityPub\Receiver::processActivity($ldactivity, '', $uid, true);
+			if ($max > 0 && ++$count >= $max) {
+				DI::logger()->info('Reached maximum number of activities to fetch', ['url' => $url, 'uid' => $uid, 'max' => $max]);
+				return;
+			}
 		}
 	}
 
@@ -250,6 +279,8 @@ class ActivityPub
 			$items = $data['first']['items'];
 		} elseif (!empty($data['first']) && is_string($data['first']) && ($data['first'] != $url)) {
 			return self::fetchItems($data['first'], $uid, $start_timestamp);
+		} elseif (isset($data['first']) && isset($data['first']['next']) && ($data['first']['next'] != $url)) {
+			return self::fetchItems($data['first']['next'], $uid, $start_timestamp);
 		} else {
 			return [];
 		}

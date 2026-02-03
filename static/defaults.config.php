@@ -143,6 +143,18 @@ return [
 		// Deny public access to the local user directory.
 		'block_local_dir' => false,
 
+		// channel_cache (Boolean)
+		// Pregenerate channel posts.
+		'channel_cache' => false,
+
+		// contact_add_limit (Integer)
+		// How many contacts should be added at a time?
+		'contact_add_limit' => 10,
+
+		// contact_discovery_limit (Integer)
+		// How many contacts relations should be checked at a time?
+		'contact_discovery_limit' => 10,
+
 		// contact_update_limit (Integer)
 		// How many contacts should be checked at a time?
 		'contact_update_limit' => 100,
@@ -370,6 +382,10 @@ return [
 		// The system timezone is used when no timezone is defined here.
 		'maintenance_end' => '03:00 +00:00',
 
+		// max_banner_width (Integer)
+		// Maximum width for profile banner images
+		'max_banner_width' => 960,
+
 		// max_connections (Integer)
 		// The maximum number of database connections which can be in use before the worker process is deferred to its next interval.
 		// When the system can't detect the maximum numbers of connection then this value can be used. Use 0 for auto-detection.
@@ -575,9 +591,17 @@ return [
 		// Show all themes including the unsupported ones.
 		'show_unsupported_themes' => false,
 
+		// songlink (Boolean)
+		// Use song.link (Odesli) to add multiple sources to embedded music
+		'songlink' => false,
+
 		// stats_key (String)
 		// A random string to be added to the /stats?key=... endpoint to enable the monitoring statistics
 		'stats_key' => '',
+
+		// system_channel_cache (Boolean)
+		// Pregenerate system channel posts.
+		'system_channel_cache' => false,
 
 		// throttle_limit_day (Integer)
 		// Maximum number of posts that a user can send per day with the API. 0 to disable daily throttling.
@@ -612,6 +636,10 @@ return [
 		// This length is checked once the username has been trimmed and multiple spaces have been collapsed into one.
 		// Minimum for this config value is 1. Maximum is 64 as the resulting profile URL mustn't be longer than 255 chars.
 		'username_max_length' => 48,
+
+		// videojs (Boolean)
+		// Experimental: Use Video.js as videoplayer. Since there are known issues, enabling is not recommended.
+		'videojs' => false,
 
 		// worker_cooldown (Float)
 		// Cooldown period in seconds before each worker function call.

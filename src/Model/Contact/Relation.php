@@ -178,7 +178,7 @@ class Relation
 					DBA::insert('contact-relation', $fields, Database::INSERT_UPDATE);
 					$following_counter++;
 				}
-			} else {
+			} elseif (!AddContact::workerLimitReached()) {
 				AddContact::add(Worker::PRIORITY_LOW, 0, $contact_url);
 			}
 		}

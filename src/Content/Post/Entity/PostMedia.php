@@ -42,6 +42,8 @@ use Psr\Http\Message\UriInterface;
  * @property-read ?string $embedHtml
  * @property-read ?int $embedWidth
  * @property-read ?int $embedHeight
+ * @property-read ?string $pageType
+ * @property-read ?array $schemaTypes
  * @property-read ?int $attachId
  * @property-read ?string $language
  * @property-read ?string $published
@@ -131,6 +133,10 @@ class PostMedia extends BaseEntity
 	protected $embedWidth;
 	/** @var ?int In pixels */
 	protected $embedHeight;
+	/** @var ?string */
+	protected $pageType;
+	/** @var ?array */
+	protected $schemaTypes;
 
 	public function __construct(
 		int $uriId,
@@ -164,7 +170,9 @@ class PostMedia extends BaseEntity
 		?string $embedType = null,
 		?string $embedHtml = null,
 		?int $embedWidth = null,
-		?int $embedHeight = null
+		?int $embedHeight = null,
+		?string $pageType = null,
+		?array $schemaTypes = null
 	) {
 		$this->uriId          = $uriId;
 		$this->url            = $url;
@@ -198,8 +206,120 @@ class PostMedia extends BaseEntity
 		$this->embedHtml      = $embedHtml;
 		$this->embedWidth     = $embedWidth;
 		$this->embedHeight    = $embedHeight;
+		$this->pageType       = $pageType;
+		$this->schemaTypes    = $schemaTypes;
 	}
 
+	/**
+	 * Checks if the media has a player url set
+	 *
+	 * @return boolean
+	 */
+	public function hasPlayerUrl(): bool
+	{
+		return !is_null($this->playerUrl) && $this->playerUrl !== '';
+	}
+
+	/**
+	 * Checks if the media has a player width set
+	 *
+	 * @return boolean
+	 */
+	public function hasPlayerWidth(): bool
+	{
+		return !is_null($this->playerWidth) && $this->playerWidth > 0;
+	}
+
+	/**
+	 * Checks if the media has a player height set
+	 *
+	 * @return boolean
+	 */
+	public function hasPlayerHeight(): bool
+	{
+		return !is_null($this->playerHeight) && $this->playerHeight > 0;
+	}
+
+	/**
+	 * Checks if the media has an embed html set
+	 *
+	 * @return boolean
+	 */
+	public function hasEmbedHtml(): bool
+	{
+		return !is_null($this->embedHtml) && $this->embedHtml !== '';
+	}
+
+	/**
+	 * Checks if the media has an embed width set
+	 *
+	 * @return boolean
+	 */
+	public function hasEmbedWidth(): bool
+	{
+		return !is_null($this->embedWidth) && $this->embedWidth > 0;
+	}
+
+	/**
+	 * Checks if the media has an embed height set
+	 *
+	 * @return boolean
+	 */
+	public function hasEmbedHeight(): bool
+	{
+		return !is_null($this->embedHeight) && $this->embedHeight > 0;
+	}
+
+	/**
+	 * Checks if the media is a photo
+	 *
+	 * @return boolean
+	 */
+	public function isPhoto(): bool
+	{
+		return $this->embedType === 'photo';
+	}
+
+	/**
+	 * Checks if the media is a video
+	 *
+	 * @return boolean
+	 */
+	public function isVideo(): bool
+	{
+		return $this->embedType === 'video' || $this->getPageType() === 'video';
+	}
+
+	/**
+	 * Checks if the media is an article
+	 *
+	 * @return boolean
+	 */
+	public function isArticle(): bool
+	{
+		if (is_array($this->schemaTypes)) {
+			foreach (['Article', 'BackgroundNewsArticle', 'NewsArticle'] as $type) {
+				if (in_array($type, $this->schemaTypes)) {
+					return true;
+				}
+			}
+		}
+
+		return in_array($this->getPageType(), ['article']);
+	}
+
+	/**
+	 * Get the page type. In case of a type with main und sub category (separated by `.`), only the main category is returned
+	 *
+	 * @return string|null
+	 */
+	public function getPageType(): ?string
+	{
+		if (is_null($this->pageType)) {
+			return null;
+		}
+		return explode('.', $this->pageType)[0];
+	}
 
 	/**
 	 * Get media link for given media id
@@ -313,7 +433,9 @@ class PostMedia extends BaseEntity
 			$this->embedType,
 			$this->embedHtml,
 			$this->embedWidth,
-			$this->embedHeight
+			$this->embedHeight,
+			$this->pageType,
+			$this->schemaTypes
 		);
 	}
 
@@ -351,7 +473,9 @@ class PostMedia extends BaseEntity
 			$this->embedType,
 			$this->embedHtml,
 			$this->embedWidth,
-			$this->embedHeight
+			$this->embedHeight,
+			$this->pageType,
+			$this->schemaTypes
 		);
 	}
 

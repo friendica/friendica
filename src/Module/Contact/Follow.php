@@ -119,7 +119,7 @@ class Follow extends BaseModule
 
 			$this->sysMessages->addNotice($this->t('The network type couldn\'t be detected. Contact can\'t be added.'));
 			$submit  = '';
-			$contact = ['url' => $url, 'network' => Protocol::PHANTOM, 'name' => $url, 'keywords' => ''];
+			$contact = ['url' => $url, 'network' => Protocol::PHANTOM, 'name' => $url, 'alias' => '', 'keywords' => ''];
 		}
 
 		$protocol = Contact::getProtocol($contact['url'], $contact['network']);
@@ -159,8 +159,8 @@ class Follow extends BaseModule
 
 			'$action'   => $requestUrl,
 			'$name'     => $contact['name'],
-			'$url'      => $contact['url'],
-			'$zrl'      => OpenWebAuth::getZrlUrl($contact['url']),
+			'$url'      => $contact['alias'] ?: $contact['url'],
+			'$zrl'      => OpenWebAuth::getZrlUrl($contact['alias'] ?: $contact['url']),
 			'$myaddr'   => $myaddr,
 			'$keywords' => $contact['keywords'],
 
@@ -173,7 +173,8 @@ class Follow extends BaseModule
 		if (!in_array($protocol, [Protocol::PHANTOM, Protocol::MAIL])) {
 			$this->page['aside'] = VCard::getHTML($contact, false, true);
 
-			$output .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'),
+			$output .= Renderer::replaceMacros(
+				Renderer::getMarkupTemplate('section_title.tpl'),
 				['$title' => $this->t('Posts and Replies')]
 			);
 

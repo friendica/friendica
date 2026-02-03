@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -34,7 +33,7 @@ class Notifications extends BaseApi
 			$id = $this->parameters['id'];
 			try {
 				$notification = DI::notification()->selectOneForUser($uid, ['id' => $id]);
-				$this->jsonExit(DI::mstdnNotification()->createFromNotification($notification, self::appSupportsQuotes()));
+				$this->jsonExit(DI::mstdnNotification()->createFromNotification($notification));
 			} catch (\Exception $e) {
 				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 			}
@@ -132,7 +131,7 @@ class Notifications extends BaseApi
 
 			foreach ($Notifications as $Notification) {
 				try {
-					$mstdnNotifications[] = DI::mstdnNotification()->createFromNotification($Notification, self::appSupportsQuotes());
+					$mstdnNotifications[] = DI::mstdnNotification()->createFromNotification($Notification);
 					self::setBoundaries($Notification->id);
 				} catch (\Exception $e) {
 					// Skip this notification

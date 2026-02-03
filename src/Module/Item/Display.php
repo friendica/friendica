@@ -31,6 +31,8 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Util\Profiler;
 use Friendica\Network\HTTPException;
 use Friendica\Content\Widget;
+use Friendica\Core\System;
+use Friendica\DI;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -87,7 +89,9 @@ class Display extends BaseModule
 		$item    = null;
 		$itemUid = $this->session->getLocalUserId();
 
-		$fields = ['uri-id', 'parent-uri-id', 'author-id', 'author-link', 'contact-id', 'contact-contact-type', 'body', 'uid', 'guid', 'gravity'];
+		$fields = ['uri-id', 'parent-uri-id', 'author-id', 'author-link', 'contact-id', 'contact-contact-type', 'body', 'uid', 'guid', 'gravity',
+			'plink', 'origin', 'uri', 'post-reason', 'owner-contact-type', 'owner-network', 'owner-id', 'guid',
+			'author-network', 'author-alias', 'private'];
 
 		// Does the local user have this item?
 		if ($this->session->getLocalUserId()) {
@@ -122,6 +126,12 @@ class Display extends BaseModule
 			$this->page['aside'] = '';
 			$displayNotFound     = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
 			return $displayNotFound->content();
+		}
+
+		$plink = Item::getPlink($item);
+
+		if (!$this->session->getLocalUserId() && isset($plink['href']) && !DI::baseUrl()->isLocalUrl($plink['href'])) {
+			System::externalRedirect($plink['href']);
 		}
 
 		if ($item['gravity'] != Item::GRAVITY_PARENT) {

@@ -225,6 +225,12 @@
 							</li>
 						{{/if}}
 
+						{{if $item.complete_thread}}
+							<li role="menuitem">
+								<a id="complete_thread-{{$item.id}}" href="javascript:{{$item.complete_thread.action}}" class="btn-link" title="{{$item.complete_thread.title}}"><i class="fa fa-download" aria-hidden="true"></i>&nbsp;{{$item.complete_thread.title}}</a>
+							</li>
+						{{/if}}
+
 						{{if $item.language}}
 						<li role="menuitem">
 							<a id="language-{{$item.id}}" href="javascript:displayLanguage({{$item.uriid}});" class="btn-link filer-item" title="{{$item.language}}"><i class="fa fa-language" aria-hidden="true"></i>&nbsp;{{$item.language}}</a>
@@ -241,7 +247,7 @@
 							</li>
 						{{/if}}
 
-						{{if ($item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread) && ($item.ignore || $item.drop.dropping)}}
+						{{if ($item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread || $item.complete_thread) && ($item.ignore || $item.drop.dropping)}}
 							<li class="divider"><hr></li>
 						{{/if}}
 

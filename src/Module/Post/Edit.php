@@ -99,10 +99,12 @@ class Edit extends BaseModule
 		]);
 
 		$this->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('jot-header.tpl'), [
-			'$ispublic'  => '&nbsp;',
-			'$geotag'    => '',
-			'$nickname'  => $this->session->getLocalUserNickname(),
-			'$is_mobile' => $this->mode->isMobile(),
+			'$ispublic'      => '&nbsp;',
+			'$geotag'        => '',
+			'$nickname'      => $this->session->getLocalUserNickname(),
+			'$postPublished' => $this->t('Post published.'),
+			'$goToPost'      => $this->t('Go to post'),
+			'$is_mobile'     => $this->mode->isMobile(),
 		]);
 
 		if (strlen($item['allow_cid']) || strlen($item['allow_gid']) || strlen($item['deny_cid']) || strlen($item['deny_gid'])) {

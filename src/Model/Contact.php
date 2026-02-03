@@ -36,6 +36,9 @@ use Friendica\Util\Images;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
+use Friendica\Worker\AddContact;
+use Friendica\Worker\ContactDiscovery;
+use Friendica\Worker\ContactDiscoveryForUser;
 use Friendica\Worker\UpdateContact;
 
 /**
@@ -251,7 +254,7 @@ class Contact
 		Contact\User::insertForContactArray($contact);
 
 		if ((empty($contact['baseurl']) || empty($contact['gsid'])) && Probe::isProbable($contact['network'])) {
-			DI::logger()->debug('Update missing baseurl', ['id' => $contact['id'], 'url' => $contact['url'], 'callstack' => System::callstack(4, 0, true)]);
+			DI::logger()->debug('Update missing baseurl', ['id' => $contact['id'], 'url' => $contact['url'], 'callstack' => System::callstack(4, 0)]);
 			UpdateContact::add(['priority' => Worker::PRIORITY_MEDIUM, 'dont_fork' => true], $contact['id']);
 		}
 
@@ -409,7 +412,7 @@ class Contact
 		}
 
 		// Update the contact in the background if needed
-		if (UpdateContact::isUpdatable($contact['id'])) {
+		if (UpdateContact::isUpdatable($contact['id']) && !UpdateContact::workerLimitReached()) {
 			try {
 				UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id']);
 			} catch (\InvalidArgumentException $e) {
@@ -1367,7 +1370,7 @@ class Contact
 	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function getIdForURL(string $url = null, int $uid = 0, $update = null, array $default = []): int
+	public static function getIdForURL(?string $url = null, int $uid = 0, $update = null, array $default = []): int
 	{
 		$contact_id = 0;
 
@@ -1381,7 +1384,7 @@ class Contact
 		if (!empty($contact)) {
 			$contact_id = $contact['id'];
 
-			if (UpdateContact::isUpdatable($contact['id'])) {
+			if (UpdateContact::isUpdatable($contact['id']) && !UpdateContact::workerLimitReached()) {
 				try {
 					UpdateContact::add(['priority' => Worker::PRIORITY_LOW, 'dont_fork' => true], $contact['id']);
 				} catch (\InvalidArgumentException $e) {
@@ -1629,7 +1632,7 @@ class Contact
 	 * @return string posts in HTML
 	 * @throws Exception
 	 */
-	public static function getPostsFromUrl(string $contact_url, int $uid, bool $only_media = false, string $last_created = null): string
+	public static function getPostsFromUrl(string $contact_url, int $uid, bool $only_media = false, ?string $last_created = null): string
 	{
 		return self::getPostsFromId(self::getIdForURL($contact_url), $uid, $only_media, $last_created);
 	}
@@ -1644,7 +1647,7 @@ class Contact
 	 * @return string posts in HTML
 	 * @throws Exception
 	 */
-	public static function getPostsFromId(int $cid, int $uid, bool $only_media = false, string $last_created = null): string
+	public static function getPostsFromId(int $cid, int $uid, bool $only_media = false, ?string $last_created = null): string
 	{
 		$contact = DBA::selectFirst('contact', ['contact-type', 'network', 'name', 'nick'], ['id' => $cid]);
 		if (!DBA::isResult($contact)) {
@@ -1671,7 +1674,7 @@ class Contact
 
 		if ($only_media) {
 			$condition = DBA::mergeConditions($condition, [
-				"`uri-id` IN (SELECT `uri-id` FROM `post-media` WHERE `type` IN (?, ?, ?))",
+				"`uri-id` IN (SELECT `uri-id` FROM `post-media` WHERE `type` IN (?, ?, ?, ?))",
 				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::HLS
 			]);
 		}
@@ -1834,7 +1837,7 @@ class Contact
 	 * @param string $reason Block reason
 	 * @return bool Whether it was successful
 	 */
-	public static function block(int $cid, string $reason = null): bool
+	public static function block(int $cid, ?string $reason = null): bool
 	{
 		$return = self::update(['blocked' => true, 'block_reason' => $reason], ['id' => $cid]);
 
@@ -3003,8 +3006,8 @@ class Contact
 		if (!$update) {
 			self::updateContact($id, $uid, $uriid, $contact['url'], ['failed' => false, 'local-data' => $has_local_data, 'last-update' => $updated, 'next-update' => $success_next_update, 'success_update' => $updated]);
 
-			if (Contact\Relation::isDiscoverable($ret['url'])) {
-				Worker::add(Worker::PRIORITY_LOW, 'ContactDiscovery', $ret['url']);
+			if (Contact\Relation::isDiscoverable($ret['url']) && !ContactDiscovery::workerLimitReached()) {
+				ContactDiscovery::add(Worker::PRIORITY_LOW, $ret['url']);
 			}
 
 			// Update the public contact
@@ -3047,8 +3050,8 @@ class Contact
 
 		self::updateContact($id, $uid, $ret['uri-id'], $ret['url'], $ret);
 
-		if (Contact\Relation::isDiscoverable($ret['url'])) {
-			Worker::add(Worker::PRIORITY_LOW, 'ContactDiscovery', $ret['url']);
+		if (Contact\Relation::isDiscoverable($ret['url']) && !ContactDiscovery::workerLimitReached()) {
+			ContactDiscovery::add(Worker::PRIORITY_LOW, $ret['url']);
 		}
 
 		return true;
@@ -3512,7 +3515,7 @@ class Contact
 			return;
 		}
 
-		Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $contact['uid']);
+		ContactDiscoveryForUser::add(Worker::PRIORITY_LOW, $contact['uid']);
 
 		self::clearFollowerFollowingEndpointCache($contact['uid']);
 
@@ -3544,7 +3547,7 @@ class Contact
 			self::update(['rel' => self::FOLLOWER, 'pending' => false], ['id' => $contact['id']]);
 		}
 
-		Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $contact['uid']);
+		ContactDiscoveryForUser::add(Worker::PRIORITY_LOW, $contact['uid']);
 	}
 
 	/**
@@ -3753,10 +3756,11 @@ class Contact
 	 */
 	public static function canReceivePrivateMessages(array $contact): bool
 	{
-		$protocol = $contact['network'] ?? $contact['protocol'] ?? Protocol::PHANTOM;
-		$self     = $contact['self']    ?? false;
+		$protocol = $contact['network']      ?? $contact['protocol'] ?? Protocol::PHANTOM;
+		$self     = $contact['self']         ?? false;
+		$type     = $contact['contact-type'] ?? Contact::TYPE_UNKNOWN;
 
-		return in_array($protocol, [Protocol::DFRN, Protocol::DIASPORA, Protocol::ACTIVITYPUB]) && !$self;
+		return in_array($protocol, [Protocol::DFRN, Protocol::DIASPORA, Protocol::ACTIVITYPUB]) && !$self && ($type != Contact::TYPE_COMMUNITY);
 	}
 
 	/**
@@ -3845,7 +3849,7 @@ class Contact
 			}
 			$contact = self::getByURL($url, false, ['id', 'network', 'next-update']);
 			if (empty($contact['id']) && Network::isValidHttpUrl($url)) {
-				Worker::add(Worker::PRIORITY_LOW, 'AddContact', 0, $url);
+				AddContact::add(Worker::PRIORITY_LOW, 0, $url);
 				++$added;
 			} elseif (!empty($contact['network']) && Protocol::supportsProbe($contact['network']) && ($contact['next-update'] < DateTimeFormat::utcNow())) {
 				try {

@@ -97,13 +97,11 @@ class Tag extends BaseApi
 
 		$items = DBA::select('tag-search-view', ['uri-id'], $condition, $params);
 
-		$display_quotes = self::appSupportsQuotes();
-
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			self::setBoundaries($item['uri-id']);
 			try {
-				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
 			} catch (\Exception $exception) {
 				$this->logger->info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 			}

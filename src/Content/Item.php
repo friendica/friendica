@@ -373,11 +373,15 @@ class Item
 	public function photoMenu(array $item, string $formSecurityToken): string
 	{
 		$this->profiler->startRecording('rendering');
-		$sub_link    = $contact_url = $pm_url = $status_link = '';
+		$sub_link    = $contact_url = $pm_url = $status_link = $complete_url = '';
 		$photos_link = $posts_link = $block_link = $ignore_link = $collapse_link = $ignoreserver_link = '';
 
 		if ($this->userSession->getLocalUserId() && $this->userSession->getLocalUserId() == $item['uid'] && $item['gravity'] == ItemModel::GRAVITY_PARENT && !$item['self'] && !$item['mention']) {
 			$sub_link = 'javascript:doFollowThread(' . $item['id'] . '); return false;';
+		}
+
+		if ($this->userSession->getLocalUserId() && $this->userSession->getLocalUserId() === $item['uid'] && $item['network'] === Protocol::ACTIVITYPUB && $item['gravity'] === ItemModel::GRAVITY_PARENT && !$item['self']) {
+			$complete_url = 'javascript:doCompleteThread(' . $item['uri-id'] . '); return false;';
 		}
 
 		$author = [
@@ -396,14 +400,12 @@ class Item
 
 		$cid       = 0;
 		$pcid      = $item['author-id'];
-		$network   = '';
 		$rel       = 0;
 		$condition = ['uid' => $this->userSession->getLocalUserId(), 'uri-id' => $item['author-uri-id']];
-		$contact   = DBA::selectFirst('contact', ['id', 'network', 'rel'], $condition);
+		$contact   = DBA::selectFirst('contact', ['id', 'network', 'rel', 'contact-type', 'protocol', 'self'], $condition);
 		if (DBA::isResult($contact)) {
-			$cid     = $contact['id'];
-			$network = $contact['network'];
-			$rel     = $contact['rel'];
+			$cid = $contact['id'];
+			$rel = $contact['rel'];
 		}
 
 		if (!empty($pcid)) {
@@ -423,7 +425,7 @@ class Item
 			$contact_url = 'contact/' . $cid;
 			$posts_link  = $contact_url . '/posts';
 
-			if (in_array($network, [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA])) {
+			if (Contact::canReceivePrivateMessages($contact)) {
 				$pm_url = 'message/new/' . $cid;
 			}
 		}
@@ -431,6 +433,7 @@ class Item
 		if ($this->userSession->getLocalUserId()) {
 			$menu = [
 				$this->l10n->t('Follow Thread')                               => $sub_link,
+				$this->l10n->t('Complete Thread')                             => $complete_url,
 				$this->l10n->t('View Status')                                 => $status_link,
 				$this->l10n->t('View Profile')                                => $profile_link,
 				$this->l10n->t('View Photos')                                 => $photos_link,

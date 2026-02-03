@@ -12,7 +12,7 @@
 		</div>
 
 		<div id="photo-album-edit-submit">
-			<input class="btn-primary btn btn-small" id="photo-album-edit-submit" type="submit" name="submit" value="{{$submit}}" />
+			<input class="btn btn-primary" id="photo-album-edit-submit" type="submit" name="submit" value="{{$submit}}" />
 		</div>
 	</form>
 </div>

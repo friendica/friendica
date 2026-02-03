@@ -20,9 +20,9 @@ class Create extends BaseUsers
 
 		self::checkFormSecurityTokenRedirectOnError('moderation/users/create', 'admin_users_create');
 
-		$nu_name     = $request['new_user_name'] ?? '';
+		$nu_name     = $request['new_user_name']     ?? '';
 		$nu_nickname = $request['new_user_nickname'] ?? '';
-		$nu_email    = $request['new_user_email'] ?? '';
+		$nu_email    = $request['new_user_email']    ?? '';
 		$nu_language = DI::config()->get('system', 'language');
 
 		if ($nu_name !== '' && $nu_email !== '' && $nu_nickname !== '') {
@@ -44,18 +44,19 @@ class Create extends BaseUsers
 		$t = Renderer::getMarkupTemplate('moderation/users/create.tpl');
 		return self::getTabsHTML('all') . Renderer::replaceMacros($t, [
 			// strings //
-			'$title'  => $this->t('Administration'),
-			'$page'   => $this->t('New User'),
-			'$submit' => $this->t('Add User'),
+			'$title'       => $this->t('Moderation'),
+			'$page'        => $this->t('Create user'),
+			'$description' => $this->t('Type in the details for the new user to be created.'),
+			'$submit'      => $this->t('Create user'),
 
 			'$form_security_token' => self::getFormSecurityToken('admin_users_create'),
 
 			// values //
 			'$query_string' => $this->args->getQueryString(),
 
-			'$newusername'     => ['new_user_name', $this->t('Name'), '', $this->t('Name of the new user.')],
-			'$newusernickname' => ['new_user_nickname', $this->t('Nickname'), '', $this->t('Nickname of the new user.')],
-			'$newuseremail'    => ['new_user_email', $this->t('Email'), '', $this->t('Email address of the new user.'), '', '', 'email'],
+			'$newusername'     => ['new_user_name', '', '', '', true, 'autofocus', '', $this->t('Display name')],
+			'$newusernickname' => ['new_user_nickname', '', '', '', true, '', '', $this->t('Nickname')],
+			'$newuseremail'    => ['new_user_email', '', '', '', true, 'email', '', $this->t('Email')],
 		]);
 	}
 }

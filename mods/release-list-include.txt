@@ -13,7 +13,6 @@ doc/
 images/
 mod/
 mods/
-spec/
 src/
 static/
 vendor/

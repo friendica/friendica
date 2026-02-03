@@ -12,24 +12,25 @@ use Friendica\Event\ArrayFilterEvent;
 
 class Feature
 {
-	const ACCOUNTS          = 'accounts';
 	const ADD_ABSTRACT      = 'add_abstract';
-	const ARCHIVE           = 'archive';
 	const CATEGORIES        = 'categories';
-	const CHANNELS          = 'channels';
-	const CIRCLES           = 'circles';
 	const COMMUNITY         = 'community';
 	const EXPLICIT_MENTIONS = 'explicit_mentions';
-	const FOLDERS           = 'folders';
-	const GROUPS            = 'forumlist_profile';
 	const MEMBER_SINCE      = 'profile_membersince';
-	const NETWORKS          = 'networks';
-	const NOSHARER          = 'nosharer';
 	const PHOTO_LOCATION    = 'photo_location';
 	const PUBLIC_CALENDAR   = 'public_calendar';
-	const SEARCHES          = 'searches';
 	const TAGCLOUD          = 'tagadelic';
-	const TRENDING_TAGS     = 'trending_tags';
+	// The different widgets:
+	const ACCOUNTS      = 'accounts';
+	const ARCHIVE       = 'archive';
+	const CIRCLES       = 'circles';
+	const CHANNELS      = 'channels';
+	const FOLDERS       = 'folders';
+	const GROUPS        = 'forumlist_profile';
+	const NETWORKS      = 'networks';
+	const NOSHARER      = 'nosharer';
+	const SEARCHES      = 'searches';
+	const TRENDING_TAGS = 'trending_tags';
 
 	/**
 	 * check if feature is enabled

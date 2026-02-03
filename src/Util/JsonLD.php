@@ -60,6 +60,12 @@ class JsonLD
 			case 'https://purl.archive.org/socialweb/webfinger':
 				$url = DI::basePath() . '/static/socialweb-webfinger.jsonld';
 				break;
+			case 'https://www.w3.org/ns/cid/v1':
+				$url = DI::basePath() . '/static/cid-v1.jsonld';
+				break;
+			case 'https://w3id.org/security/data-integrity/v2':
+				$url = DI::basePath() . '/static/data-integrity-v2.jsonld';
+				break;
 			default:
 				switch (parse_url($url, PHP_URL_PATH)) {
 					case '/schemas/litepub-0.1.jsonld':
@@ -165,6 +171,8 @@ class JsonLD
 			'misskey'   => (object)['@id' => 'https://misskey-hub.net/ns#', '@type' => '@id'],
 			'pixelfed'  => (object)['@id' => 'http://pixelfed.org/ns#', '@type' => '@id'],
 			'lemmy'     => (object)['@id' => 'https://join-lemmy.org/ns#', '@type' => '@id'],
+			'quote'     => (object)['@id' => 'https://w3id.org/fep/044f#', '@type' => '@id'],
+			'gts'       => (object)['@id' => 'https://gotosocial.org/ns#', '@type' => '@id'],
 		];
 
 		$orig_json = $json;

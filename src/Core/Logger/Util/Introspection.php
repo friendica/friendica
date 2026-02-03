@@ -73,7 +73,7 @@ class Introspection implements IHaveCallIntrospections
 			'line'       => $trace[$i - 1]['line'] ?? null,
 			'function'   => $trace[$i]['function'] ?? null,
 			'request-id' => $this->requestId,
-			'stack'      => System::callstack(15, 0, true, ['Friendica\Core\Logger\Type\StreamLogger', 'Friendica\Core\Logger\Type\AbstractLogger', 'Friendica\Core\Logger\Type\WorkerLogger', 'Friendica\Core\Logger']),
+			'stack'      => System::callstack(15, 1, ['Friendica\Core\Logger\Type\StreamLogger', 'Friendica\Core\Logger\Type\AbstractLogger', 'Friendica\Core\Logger\Type\WorkerLogger', 'Friendica\Core\Logger']),
 		];
 	}
 

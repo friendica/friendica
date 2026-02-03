@@ -1178,9 +1178,10 @@ class User
 	{
 		$return = ['user' => null, 'password' => ''];
 
-		$using_invites = DI::config()->get('system', 'invitation_only');
+		$using_invites  = DI::config()->get('system', 'invitation_only', false);
+		$ignore_invites = (array_key_exists('ignore_invites', $data) && is_bool($data['ignore_invites'])) ? $data['ignore_invites'] : false;
+		$invite_id      = (array_key_exists('invite_id', $data) && is_string($data['invite_id'])) ? trim($data['invite_id']) : '';
 
-		$invite_id  = !empty($data['invite_id'])  ? trim($data['invite_id'])  : '';
 		$username   = !empty($data['username'])   ? trim($data['username'])   : '';
 		$nickname   = !empty($data['nickname'])   ? trim($data['nickname'])   : '';
 		$email      = !empty($data['email'])      ? trim($data['email'])      : '';
@@ -1201,7 +1202,9 @@ class User
 			$password = $password1;
 		}
 
-		if ($using_invites) {
+
+		// Users created by the console or from the moderation page ignore invites
+		if ($using_invites && !$ignore_invites) {
 			if (!$invite_id) {
 				throw new Exception(DI::l10n()->t('An invitation is required.'));
 			}
@@ -1620,12 +1623,13 @@ class User
 		}
 
 		$result = self::create([
-			'username' => $name,
-			'email'    => $email,
-			'nickname' => $nick,
-			'verified' => 1,
-			'language' => $lang,
-			'photo'    => $avatar
+			'ignore_invites' => true,
+			'username'       => $name,
+			'email'          => $email,
+			'nickname'       => $nick,
+			'verified'       => 1,
+			'language'       => $lang,
+			'photo'          => $avatar
 		]);
 
 		$user     = $result['user'];

@@ -13,6 +13,26 @@
 
 	{{* We organize the settings in collapsable panel-groups *}}
 	<div class="panel-group panel-group-settings" id="admin-settings" role="tablist" aria-multiselectable="true">
+		{{* CSV Import/Export Section *}}
+		<div class="panel">
+			<div class="panel-heading section-subtitle-wrapper" role="tab" id="admin-settings-contactblock-import">
+				<h4>
+					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-contactblock-import-collapse" aria-expanded="false" aria-controls="admin-settings-contactblock-import-collapse">
+						{{$importexport}}
+					</button>
+				</h4>
+			</div>
+
+			<div id="admin-settings-contactblock-import-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-contactblock-import">
+				<div class="form-group">
+					<a href="{{$baseurl}}/moderation/blocklist/contact/import" class="btn btn-primary">{{$import_csv}}</a>
+				</div>
+				<div class="form-group">
+					<a href="{{$baseurl}}/moderation/blocklist/contact/export" class="btn btn-default">{{$export_csv}}</a>
+				</div>
+			</div>
+		</div>
+
 		{{* The form for entering user profile which should be blocked *}}
 		<div class="panel">
 			<div class="panel-heading section-subtitle-wrapper" role="tab" id="admin-settings-contactblock-block">
