@@ -527,9 +527,9 @@ class Circle
 
 		$display_circles = [
 			[
-				'text'     => DI::l10n()->t('Everybody'),
+				'text'     => DI::l10n()->t('All accounts'),
 				'id'       => 0,
-				'selected' => (($circle_id === 'everyone') ? 'circle-selected' : ''),
+				'selected' => $circle_id ? false : true,
 				'href'     => $every,
 			]
 		];
