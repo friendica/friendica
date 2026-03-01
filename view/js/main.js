@@ -233,13 +233,10 @@ $(function() {
 		close_last_popup_menu();
 	});
 
-	// fancyboxes
+	// Colorbox - related docs: https://www.jacklmoore.com/colorbox/
+	/* Not used by frio. Used in two photos templates */
 	$("a.popupbox").colorbox({
 		'inline' : true,
-		'transition' : 'elastic',
-		'maxWidth' : '100%'
-	});
-	$("a.ajax-popupbox").colorbox({
 		'transition' : 'elastic',
 		'maxWidth' : '100%'
 	});
