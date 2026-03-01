@@ -11,7 +11,7 @@
 		<div id="event-title-end"></div>
 		{{foreach $events as $event}}
 			<div class="event-list" id="event-{{$event.id}}">
-				<button class="btn-link" onclick='addToModal("calendar/event/show/{{$event.id}}")'>{{$event.title}}</button>
+				<a data-fancybox href="javascript:" data-type="ajax" data-src="calendar/event/show/{{$event.id}}" href="calendar/event/show/{{$event.id}}">{{$event.title}}</a>
 			  - {{$event.date}}
 			</div>
 		{{/foreach}}

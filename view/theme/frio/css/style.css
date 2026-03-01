@@ -4104,6 +4104,9 @@ div.login-form, .login-content-wrapper,
 	margin-left: 30px;
 	width: 60px;
 }
+.event-wrapper.fancybox-content {
+	width: clamp(200px, 80vw, 900px);
+}
 
 /**
  * The event-card
