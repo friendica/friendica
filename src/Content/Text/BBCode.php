@@ -474,12 +474,12 @@ class BBCode
 		if (!empty($data['title']) && !empty($data['url'])) {
 			$preview_class = in_array($preview_mode, [self::PREVIEW_AUTO, self::PREVIEW_LARGE]) ? 'attachment-image' : 'attachment-preview';
 			if (!empty($data['image']) && empty($data['text']) && ($data['type'] == 'photo')) {
-				$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
+				$return .= sprintf('<a href="%s" data-fancybox="gallery" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
 			} else {
 				if (!empty($data['image'])) {
-					$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a><br>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
+					$return .= sprintf('<a href="%s" data-fancybox="gallery" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="' . $preview_class . '" /></a><br>', $data['url'], self::proxyUrl($data['image'], $simplehtml, $uriid), $data['title']);
 				} elseif (!empty($data['preview'])) {
-					$return .= sprintf('<a href="%s" target="_blank" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $data['url'], self::proxyUrl($data['preview'], $simplehtml, $uriid), $data['title']);
+					$return .= sprintf('<a href="%s" data-fancybox="gallery" rel="noopener noreferrer"><img src="%s" alt="" title="%s" class="attachment-preview" /></a><br>', $data['url'], self::proxyUrl($data['preview'], $simplehtml, $uriid), $data['title']);
 				}
 				$return .= sprintf('<h4><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></h4>', $data['url'], $data['title']);
 			}
