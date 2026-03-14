@@ -169,7 +169,7 @@ class Relay
 	{
 		$detected = [];
 		$quality  = DI::config()->get('system', 'relay_language_quality');
-		foreach (Item::getLanguageArray($body, DI::config()->get('system', 'relay_languages'), $uri_id, $author_id) as $language => $reliability) {
+		foreach (DI::contentItem()->getLanguageArray($body, DI::config()->get('system', 'relay_languages'), $uri_id, $author_id) as $language => $reliability) {
 			if (($reliability >= $quality) && ($quality > 0)) {
 				$detected[] = $language;
 			}

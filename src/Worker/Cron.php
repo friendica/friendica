@@ -88,6 +88,10 @@ class Cron
 			// Update interaction scores
 			Worker::add(Worker::PRIORITY_LOW, 'UpdateScores');
 
+			if (DI::config()->get('system', 'optimize_tables')) {
+				DBA::optimizeTable('check-full-text-search');
+			}
+
 			DI::keyValue()->set('last_cron_hourly', time());
 		}
 
@@ -137,7 +141,8 @@ class Cron
 			// Update contact relations for our users
 			$users = DBA::select('user', ['uid'], ["`verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired` AND `uid` > ?", 0]);
 			while ($user = DBA::fetch($users)) {
-				Worker::add(Worker::PRIORITY_LOW, 'ContactDiscoveryForUser', $user['uid']);
+				ContactDiscoveryForUser::add(Worker::PRIORITY_LOW, $user['uid']);
+
 			}
 			DBA::close($users);
 

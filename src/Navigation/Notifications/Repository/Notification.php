@@ -45,7 +45,7 @@ class Notification extends BaseRepository
 	 */
 	private function selectOne(array $condition, array $params = []): NotificationEntity
 	{
-		$fields = $this->_selectFirstRowAsArray( $condition, $params);
+		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
 		return $this->factory->createFromTableRow($fields);
 	}

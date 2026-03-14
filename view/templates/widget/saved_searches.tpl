@@ -25,7 +25,7 @@
 			{{/foreach}}
 		</ul>
 		<div class="clear"></div>
-	</div>>
+	</div>
 </nav>
 <script>
 	initWidget('saved-search-list', 'saved-search-list-inflated');

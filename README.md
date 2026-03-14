@@ -12,7 +12,7 @@ You can control the privacy scope of your content.
 Being part of the Fediverse allows you to be free from data-harvesting corporations.
 Enjoy open social communication, independent of any specific provider.
 
-[Join Friendica](https://dir.friendica.social/servers) today or set up [your own Friendica instance](doc/Install.md).
+[Join Friendica](https://dir.friendica.social/servers) today or set up [your own Friendica instance](doc/en/admin/install.md).
 
 ### Friendica on desktop
 

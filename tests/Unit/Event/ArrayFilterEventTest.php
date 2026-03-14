@@ -68,7 +68,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::PROFILE_SETTINGS_POST, 'friendica.data.profile_settings_post'],
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'friendica.data.moderation_users_tabs'],
 			[ArrayFilterEvent::ACL_LOOKUP_END, 'friendica.data.acl_lookup_end'],
-			[ArrayFilterEvent::OEMBED_FETCH_END, 'friendica.data.oembed_fetch_end'],
 			[ArrayFilterEvent::PAGE_INFO, 'friendica.data.page_info'],
 			[ArrayFilterEvent::SMILEY_LIST, 'friendica.data.smiley_list'],
 			[ArrayFilterEvent::BBCODE_TO_HTML_START, 'friendica.data.bbcode_to_html_start'],

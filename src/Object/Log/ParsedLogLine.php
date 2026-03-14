@@ -12,7 +12,7 @@ namespace Friendica\Object\Log;
  */
 class ParsedLogLine
 {
-	const REGEXP = '/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[^ ]*) (\w+) \[(\w*)\]: (.*)/';
+	public const REGEXP = '/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[^ ]*) (\w+) \[(\w*)\]: (.*)/';
 
 	/** @var int */
 	public $id = 0;
@@ -62,13 +62,13 @@ class ParsedLogLine
 			$jsonsource = null;
 		} else {
 			// here we hope that there will not be the string ' - {' inside the $jsonsource value
-			list($logline, $jsonsource) = explode(' - {', $logline);
-			$jsonsource                 = '{' . $jsonsource;
+			[$logline, $jsonsource] = explode(' - {', $logline);
+			$jsonsource             = '{' . $jsonsource;
 		}
 
 		$jsondata = null;
 		if (strpos($logline, '{"') > 0) {
-			list($logline, $jsondata) = explode('{"', $logline, 2);
+			[$logline, $jsondata] = explode('{"', $logline, 2);
 
 			$jsondata = '{"' . $jsondata;
 		}

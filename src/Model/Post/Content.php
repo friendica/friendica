@@ -7,7 +7,7 @@
 
 namespace Friendica\Model\Post;
 
-use \BadMethodCallException;
+use BadMethodCallException;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -75,6 +75,16 @@ class Content
 		return DBA::delete('post-content', $conditions);
 	}
 
+	/**
+	 * Check if a post-content entry exists for the given URI ID
+	 *
+	 * @param integer $uri_id
+	 * @return boolean exists?
+	 */
+	public static function exists(int $uri_id): bool
+	{
+		return DBA::exists('post-content', ['uri-id' => $uri_id]);
+	}
 
 	/**
 	 * Search posts for given content

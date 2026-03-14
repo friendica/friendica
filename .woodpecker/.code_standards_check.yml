@@ -20,11 +20,14 @@ steps:
         - '.composer'
     volumes:
       - /tmp/drone-cache:/tmp/cache
+
   composer_install:
-    image: composer
+    image: friendicaci/php8.3:php8.3.17
     commands:
+      - mkdir addon # create empty addon folder to appease composer
       - export COMPOSER_HOME=.composer
-      - ./bin/composer.phar run cs:install
+      - ./bin/composer.phar install --prefer-dist
+
   rebuild_cache:
     image: meltwater/drone-cache:dev
     settings:
@@ -36,6 +39,7 @@ steps:
         - '.composer'
     volumes:
       - /tmp/drone-cache:/tmp/cache
+
   check:
     image: php:8.3
     commands:
@@ -49,4 +53,4 @@ steps:
           CHANGED_FILES="$(git diff --name-only --diff-filter=ACMRTUXB ${CI_COMMIT_SHA})";
         fi
       - EXTRA_ARGS="--path-mode=intersection -- $${CHANGED_FILES}";
-      - ./bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer check --config=.php-cs-fixer.dist.php -v --diff --using-cache=no $${EXTRA_ARGS}
+      - ./vendor/bin/php-cs-fixer check --config=.php-cs-fixer.dist.php -v --diff --using-cache=no $${EXTRA_ARGS}

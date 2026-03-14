@@ -36,7 +36,7 @@ $is_singleuser_class = $is_singleuser ? "is-singleuser" : "is-not-singleuser";
 			echo $page['title'];
 		} ?></title>
 		<meta request="<?php echo htmlspecialchars($_REQUEST['pagename'] ?? '') ?>">
-		<script  type="text/javascript">var baseurl = "<?php echo (string)DI::baseUrl(); ?>";</script>
+		<script  type="text/javascript">var baseurl = "<?php echo (string) DI::baseUrl(); ?>";</script>
 		<script type="text/javascript">var frio = "<?php echo 'view/theme/frio'; ?>";</script>
 <?php
 		// Because we use minimal for modals the header and the included js stuff should be only loaded
@@ -54,14 +54,14 @@ $scheme = frio_scheme_get_current_for_user($uid);
 if ($scheme != FRIO_CUSTOM_SCHEME) {
 	if (file_exists('view/theme/frio/scheme/' . $scheme . '.php')) {
 		$schemefile    = 'view/theme/frio/scheme/' . $scheme . '.php';
-		$scheme_accent = DI::pConfig()->get($uid, 'frio', 'scheme_accent') ?:
-				DI::config()->get('frio', 'scheme_accent') ?: FRIO_SCHEME_ACCENT_BLUE;
+		$scheme_accent = DI::pConfig()->get($uid, 'frio', 'scheme_accent')
+				?: DI::config()->get('frio', 'scheme_accent') ?: FRIO_SCHEME_ACCENT_BLUE;
 
 		require_once $schemefile;
 	}
 }
 
-$nav_bg = $nav_bg ?? DI::pConfig()->get($uid, 'frio', 'nav_bg', DI::config()->get('frio', 'nav_bg', '#708fa0'));
+$nav_bg ??= DI::pConfig()->get($uid, 'frio', 'nav_bg', DI::config()->get('frio', 'nav_bg', '#708fa0'));
 
 echo '<meta name="theme-color" content="' . $nav_bg . '" />';
 ?>
@@ -76,8 +76,8 @@ echo '<meta name="theme-color" content="' . $nav_bg . '" />';
 			str_replace(
 				"~system.banner~",
 				DI::config()->get('system', 'banner'),
-				$page['nav']
-			)
+				$page['nav'],
+			),
 		);
 	};
 

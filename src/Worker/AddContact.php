@@ -57,4 +57,19 @@ class AddContact
 		DI::logger()->debug('Add contact', ['uid' => $uid, 'url' => $url]);
 		return Worker::add($run_parameters, 'AddContact', 0, $url);
 	}
+
+	/**
+	 * Checks if the maximum number of allowed workers for this task is reached
+	 *
+	 * @return boolean
+	 */
+	public static function workerLimitReached(): bool
+	{
+		$add_limit = (int)DI::config()->get('system', 'contact_add_limit');
+		$adding    = Worker::countWorkersByCommand('AddContact');
+		if ($adding >= $add_limit) {
+			DI::logger()->info('The number of currently running jobs exceed the limit', ['adding' => $adding, 'limit' => $add_limit]);
+		}
+		return ($adding >= $add_limit);
+	}
 }

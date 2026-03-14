@@ -180,6 +180,11 @@ main .nav-tabs > li.active > a:hover {
 	background: none;
 	color: $font_color_darker;
 }
+
+.wall-item-actions .btn {
+	box-shadow: none;
+	-webkit-box-shadow: none;
+}
 .btn.focus,
 .btn:focus,
 .btn:hover {

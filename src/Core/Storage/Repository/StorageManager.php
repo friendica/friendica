@@ -34,11 +34,11 @@ use Psr\Log\LoggerInterface;
 class StorageManager
 {
 	// Default tables to look for data
-	const TABLES = ['photo', 'attach'];
+	public const TABLES = ['photo', 'attach'];
 
 	// Default storage backends
 	/** @var string[]  */
-	const DEFAULT_BACKENDS = [
+	public const DEFAULT_BACKENDS = [
 		Type\Filesystem::NAME,
 		Type\Database::NAME,
 	];
@@ -240,12 +240,12 @@ class StorageManager
 	 */
 	public function isValidBackend(string $name = null, array $validBackends = null): bool
 	{
-		$validBackends = $validBackends ?? array_merge(
+		$validBackends ??= array_merge(
 			$this->validBackends,
 			[
 				Type\SystemResource::getName(),
 				Type\ExternalResource::getName(),
-			]
+			],
 		);
 		return in_array($name, $validBackends);
 	}
@@ -373,7 +373,7 @@ class StorageManager
 				$table,
 				['id', 'data', 'backend-class', 'backend-ref'],
 				['`backend-class` IS NULL or `backend-class` != ?', $destination::getName()],
-				['limit' => $limit]
+				['limit' => $limit],
 			);
 
 			while ($resource = $this->dba->fetch($resources)) {

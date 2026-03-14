@@ -41,11 +41,11 @@ class Community extends Timeline
 	 * Type of the community page
 	 * @{
 	 */
-	const DISABLED         = -2;
-	const DISABLED_VISITOR = -1;
-	const LOCAL            = 0;
-	const GLOBAL           = 1;
-	const LOCAL_AND_GLOBAL = 2;
+	public const DISABLED         = -2;
+	public const DISABLED_VISITOR = -1;
+	public const LOCAL            = 0;
+	public const GLOBAL           = 1;
+	public const LOCAL_AND_GLOBAL = 2;
 
 	protected $pageStyle;
 
@@ -77,13 +77,8 @@ class Community extends Timeline
 			'$content'                    => '',
 			'$header'                     => '',
 			'$show_global_community_hint' => ($this->selectedTab == CommunityEntity::GLOBAL) && $this->config->get('system', 'show_global_community_hint'),
-			'$global_community_hint'      => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users.")
+			'$global_community_hint'      => $this->l10n->t("This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users."),
 		]);
-
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll')) {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => $this->args->getQueryString()]);
-		}
 
 		if (!$this->raw) {
 			$tabs    = $this->getTabArray($this->community->getTimelines($this->session->isAuthenticated()), 'community');
@@ -111,22 +106,24 @@ class Community extends Timeline
 		$items = $this->getCommunityItems();
 
 		if (!$this->database->isResult($items)) {
-			$this->systemMessages->addNotice($this->l10n->t('No results.'));
+			$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
+				'$title' => $this->l10n->t('No results.'),
+			]);
 			return $o;
 		}
 
-		$o .= $this->conversation->render($items, Conversation::MODE_COMMUNITY, false, false, 'received', $this->session->getLocalUserId());
+		$o .= $this->conversation->render($items, Conversation::MODE_COMMUNITY, $this->raw, false, 'received', $this->session->getLocalUserId());
 
 		$pager = new BoundariesPager(
 			$this->l10n,
 			$this->args->getQueryString(),
 			$items[array_key_first($items)]['received'],
 			$items[array_key_last($items)]['received'],
-			$this->itemsPerPage
+			$this->itemsPerPage,
 		);
 
-		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll')) {
-			$o .= HTML::scrollLoader();
+		if ($this->pConfig->get($this->session->getLocalUserId(), 'system', 'infinite_scroll', true)) {
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$o .= $pager->renderMinimal(count($items));
 		}

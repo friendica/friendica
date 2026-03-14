@@ -8,6 +8,10 @@
 namespace Friendica\Object;
 
 use Exception;
+use FFMpeg\Coordinate\TimeCode;
+use FFMpeg\FFMpeg;
+use Friendica\Core\Cache\Enum\Duration;
+use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Util\Images;
 use Imagick;
@@ -48,8 +52,8 @@ class Image
 	public function __construct(string $data, string $type = '', string $filename = '', bool $imagick = true)
 	{
 		$this->filename = $filename;
-		$type = Images::addMimeTypeByDataIfInvalid($type, $data);
-		$type = Images::addMimeTypeByExtensionIfInvalid($type, $filename);
+		$type           = Images::addMimeTypeByDataIfInvalid($type, $data);
+		$type           = Images::addMimeTypeByExtensionIfInvalid($type, $filename);
 
 		if (Images::isSupportedMimeType($type)) {
 			$this->originType = $this->outputType = Images::getImageTypeByMimeType($type);
@@ -108,7 +112,7 @@ class Image
 	private function isAnimatedWebP(string $data)
 	{
 		$header_format = 'A4Riff/I1Filesize/A4Webp/A4Vp/A74Chunk';
-		$header = @unpack($header_format, $data);
+		$header        = @unpack($header_format, $data);
 
 		if (!isset($header['Riff']) || strtoupper($header['Riff']) !== 'RIFF') {
 			return false;
@@ -348,7 +352,7 @@ class Image
 			return false;
 		}
 
-		$width = $this->getWidth();
+		$width  = $this->getWidth();
 		$height = $this->getHeight();
 
 		$scale = Images::getScalingDimensions($width, $height, $max);
@@ -363,12 +367,11 @@ class Image
 	 * Rotates image
 	 *
 	 * @param integer $degrees degrees to rotate image
-	 * @return mixed
 	 */
-	public function rotate(int $degrees)
+	public function rotate(int $degrees): void
 	{
 		if (!$this->isValid()) {
-			return false;
+			return;
 		}
 
 		if ($this->isImagick()) {
@@ -393,12 +396,11 @@ class Image
 	 *
 	 * @param boolean $horiz optional, default true
 	 * @param boolean $vert  optional, default false
-	 * @return mixed
 	 */
-	public function flip(bool $horiz = true, bool $vert = false)
+	public function flip(bool $horiz = true, bool $vert = false): void
 	{
 		if (!$this->isValid()) {
-			return false;
+			return;
 		}
 
 		if ($this->isImagick()) {
@@ -414,8 +416,8 @@ class Image
 			return;
 		}
 
-		$w = imagesx($this->image);
-		$h = imagesy($this->image);
+		$w       = imagesx($this->image);
+		$h       = imagesy($this->image);
 		$flipped = imagecreate($w, $h);
 		if ($horiz) {
 			for ($x = 0; $x < $w; $x++) {
@@ -471,7 +473,7 @@ class Image
 			return;
 		}
 
-		$ort = isset($exif['IFD0']['Orientation']) ? $exif['IFD0']['Orientation'] : 1;
+		$ort = $exif['IFD0']['Orientation'] ?? 1;
 
 		switch ($ort) {
 			case 1: // nothing
@@ -523,7 +525,7 @@ class Image
 			return false;
 		}
 
-		$width = $this->getWidth();
+		$width  = $this->getWidth();
 		$height = $this->getHeight();
 
 		if ((!$width) || (!$height)) {
@@ -532,22 +534,22 @@ class Image
 
 		if ($width < $min && $height < $min) {
 			if ($width > $height) {
-				$dest_width = $min;
+				$dest_width  = $min;
 				$dest_height = intval(($height * $min) / $width);
 			} else {
-				$dest_width = intval(($width * $min) / $height);
+				$dest_width  = intval(($width * $min) / $height);
 				$dest_height = $min;
 			}
 		} else {
 			if ($width < $min) {
-				$dest_width = $min;
+				$dest_width  = $min;
 				$dest_height = intval(($height * $min) / $width);
 			} else {
 				if ($height < $min) {
-					$dest_width = intval(($width * $min) / $height);
+					$dest_width  = intval(($width * $min) / $height);
 					$dest_height = $min;
 				} else {
-					$dest_width = $width;
+					$dest_width  = $width;
 					$dest_height = $height;
 				}
 			}
@@ -622,7 +624,7 @@ class Image
 				imagedestroy($this->image);
 			}
 
-			$this->image = $dest;
+			$this->image  = $dest;
 			$this->width  = imagesx($this->image);
 			$this->height = imagesy($this->image);
 		}
@@ -799,9 +801,9 @@ class Image
 					}
 					$row[] = [$colors['r'], $colors['g'], $colors['b']];
 				} else {
-					$index = imagecolorat($image->image, $x, $y);
+					$index  = imagecolorat($image->image, $x, $y);
 					$colors = @imagecolorsforindex($image->image, $index);
-					$row[] = [$colors['red'], $colors['green'], $colors['blue']];
+					$row[]  = [$colors['red'], $colors['green'], $colors['blue']];
 				}
 			}
 			$pixels[] = $row;
@@ -830,7 +832,7 @@ class Image
 
 		if ($this->isImagick()) {
 			$this->image = new Imagick();
-			$draw  = new ImagickDraw();
+			$draw        = new ImagickDraw();
 			$this->image->newImage($scaled['width'], $scaled['height'], '', 'png');
 		} else {
 			$this->image = imagecreatetruecolor($scaled['width'], $scaled['height']);
@@ -861,4 +863,90 @@ class Image
 
 		$this->scaleUp(min($width, $height));
 	}
+
+	/**
+	 * Create a preview image for the provided video URL using ffmpeg.
+	 * The result is cached for one day.
+	 *
+	 * @param string $url Video URL
+	 * @return string binary image data or empty string
+	 */
+	private function getPreviewImageForVideoUrlCached(string $url): string
+	{
+		$cacheKey = 'getPreviewImageForVideoUrl:' . sha1($url);
+
+		$preview = DI::cache()->get($cacheKey);
+
+		if (!$preview) {
+			$preview = $this->getPreviewImageForVideoUrl($url);
+			if (!$preview) {
+				return '';
+			}
+
+			DI::cache()->set($cacheKey, base64_encode($preview), Duration::DAY);
+		} else {
+			$preview = base64_decode($preview);
+		}
+
+		return $preview;
+	}
+
+	/**
+	 * Create a preview image for the provided video URL using ffmpeg
+	 *
+	 * @param string $url Video URL
+	 * @return string binary image data or empty string
+	 */
+	private function getPreviewImageForVideoUrl($url): string
+	{
+		$preview = '';
+
+		$timestamp = microtime(true);
+
+		try {
+			$ffmpeg = FFMpeg::create();
+			/** @var \FFMpeg\Media\Video $video */
+			$video = $ffmpeg->open($url);
+			$frame = $video->frame(TimeCode::fromSeconds(0));
+
+			$tempfile = tempnam(System::getTempPath(), 'videopreview-');
+			$frame->save($tempfile);
+			$preview = file_get_contents($tempfile);
+			unlink($tempfile);
+			$runtime = number_format(microtime(true) - $timestamp, 3);
+			DI::logger()->debug('Created video preview', ['runtime' => $runtime, 'url' => $url]);
+		} catch (\Throwable $th) {
+			$runtime = number_format(microtime(true) - $timestamp, 3);
+			DI::logger()->notice('Got exception', ['runtime' => $runtime, 'url' => $url, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
+		}
+
+		return $preview;
+	}
+
+	/**
+	 * Create a preview image for the provided video URL using ffmpeg
+	 *
+	 * @param string $url Video URL
+	 * @param bool   $cached optional, default true
+	 * @return boolean Success
+	 */
+	public function getFromVideoUrl(string $url, bool $cached = true): bool
+	{
+		if (!$url) {
+			return false;
+		}
+
+		if (!DI::config()->get('system', 'ffmpeg_installed')) {
+			return false;
+		}
+
+		if ($cached) {
+			$data = $this->getPreviewImageForVideoUrlCached($url);
+		} else {
+			$data = $this->getPreviewImageForVideoUrl($url);
+		}
+
+		return($this->loadData($data));
+	}
+
 }

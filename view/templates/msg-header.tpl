@@ -23,6 +23,16 @@
 		);
 
 		$("#prvmail-text").bbco_autocomplete('bbcode');
+
+		// Validate message form - disable submit button if message is empty
+		function validateMessageForm() {
+			var messageText = $('#prvmail-text').val().trim();
+			$('#prvmail-submit').prop('disabled', messageText.length === 0);
+		}
+
+		// Check on page load and on input
+		validateMessageForm();
+		$('#prvmail-text').on('input keyup', validateMessageForm);
 	});
 
 	function jotGetLink() {

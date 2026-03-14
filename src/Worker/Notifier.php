@@ -103,12 +103,12 @@ class Notifier
 			// find ancestors
 			$condition   = ['id' => $target_id, 'visible' => true];
 			$target_item = Post::selectFirst(Item::DELIVER_FIELDLIST, $condition);
-			$target_item = Post\Media::addHTMLAttachmentToItem($target_item);
-
 			if (!DBA::isResult($target_item) || !intval($target_item['parent'])) {
 				DI::logger()->info('No target item', ['cmd' => $cmd, 'target' => $target_id]);
 				return;
 			}
+
+			$target_item = Post\Media::addHTMLAttachmentToItem($target_item);
 
 			if (!empty($target_item['contact-uid'])) {
 				$uid = $target_item['contact-uid'];
@@ -332,6 +332,11 @@ class Notifier
 		$ap_contacts = $apdelivery['contacts'];
 		$delivery_queue_count += $apdelivery['count'];
 
+		if ($target_item['verb'] === Activity::VIEW) {
+			DI::logger()->info('Not delivering view activities', ['guid' => $target_item['guid'], 'uri-id' => $target_item['uri-id']]);
+			return;
+		}
+
 		if (!$only_ap_delivery) {
 			if (empty($delivery_contacts_stmt)) {
 				$condition = ['id' => $recipients, 'self' => false, 'uid' => [0, $uid],
@@ -384,7 +389,7 @@ class Notifier
 			$delivery_queue_count += self::delivery($cmd, $post_uriid, $sender_uid, $target_item, $parent, $thr_parent, $owner, $batch_delivery, false, $contacts, $ap_contacts, $conversants);
 		}
 
-		if (!empty($target_item)) {
+		if ($target_item) {
 			DI::logger()->info('Calling hooks for ' . $cmd . ' ' . $target_id);
 
 			Hook::fork($appHelper->getQueueValue('priority'), 'notifier_normal', $target_item);
@@ -400,6 +405,8 @@ class Notifier
 
 				Post\DeliveryData::incrementQueueCount($target_item['uri-id'], $delivery_queue_count);
 			}
+
+			Item::addPostToChannel($target_item['parent-uri-id'], $sender_uid);
 		}
 
 		return;
@@ -680,6 +687,12 @@ class Notifier
 		// Posts from Diaspora contacts are transmitted via Diaspora
 		if ($target_item['network'] == Protocol::DIASPORA) {
 			DI::logger()->info('Post network is Diaspora, so no AP delivery');
+			return ['count' => 0, 'contacts' => []];
+		}
+
+		// "View" is not delivered
+		if ($target_item['verb'] === Activity::VIEW) {
+			DI::logger()->info('Not delivering view activities', ['guid' => $target_item['guid'], 'uri-id' => $target_item['uri-id']]);
 			return ['count' => 0, 'contacts' => []];
 		}
 

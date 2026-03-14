@@ -88,7 +88,8 @@ class Index extends BaseSettings
 		return Renderer::replaceMacros($tpl, [
 			'$l10n' => [
 				'title'         => $this->t('Remote server settings'),
-				'desc'          => $this->t('Here you can find all the remote servers you have taken individual moderation actions against. For a list of servers your node has blocked, please check out the <a href="friendica">Information</a> page.'),
+				'desc1'         => $this->t('Here you can find all the remote servers you have taken individual moderation actions against. For a list of servers your node has blocked, please check out the <a href="friendica">Information</a> page.'),
+				'desc2'         => $this->t('This includes ignored servers. You can ignore a server by clicking the "More" options button on a post, and selecting the option to "Ignore" the server the given post is from.'),
 				'siteName'      => $this->t('Server Name'),
 				'ignored'       => $this->t('Ignored'),
 				'ignored_title' => $this->t("You won't see any content from this server including reshares in your Network page, the community pages and individual conversations."),
@@ -97,7 +98,8 @@ class Index extends BaseSettings
 				'submit'        => $this->t('Save changes'),
 			],
 
-			'$count' => $total,
+			'$count'      => $total,
+			'$no_servers' => $this->t('You have not taken individual moderation actions against any servers.'),
 
 			'$servers' => $servers,
 

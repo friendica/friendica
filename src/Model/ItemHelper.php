@@ -58,7 +58,7 @@ final class ItemHelper
 
 	public function prepareItemData(array $item, bool $notify): array
 	{
-		$item['guid'] = Item::guid($item, $notify);
+		$item['guid'] = $this->itemContent->guid($item, $notify);
 		$item['uri']  = substr(trim($item['uri'] ?? '') ?: Item::newURI($item['guid']), 0, 255);
 
 		// Store URI data
@@ -92,7 +92,7 @@ final class ItemHelper
 				$item['uid'],
 				Protocol::ACTIVITYPUB,
 				Protocol::DIASPORA,
-				Protocol::DFRN
+				Protocol::DFRN,
 			];
 
 			$existing = Post::selectFirst(['id', 'network'], $condition);
@@ -105,7 +105,7 @@ final class ItemHelper
 						'uid'              => $item['uid'],
 						'network'          => $item['network'],
 						'existing_id'      => $existing['id'],
-						'existing_network' => $existing['network']
+						'existing_network' => $existing['network'],
 					]);
 				}
 
@@ -134,7 +134,7 @@ final class ItemHelper
 
 		$condition = [
 			'uri-id'  => $item['uri-id'], 'uid' => $item['uid'],
-			'network' => [$item['network'], Protocol::DFRN]
+			'network' => [$item['network'], Protocol::DFRN],
 		];
 		if (Post::exists($condition)) {
 			$this->logger->notice('duplicated item with the same uri found.', $condition);
@@ -214,15 +214,15 @@ final class ItemHelper
 		}
 
 		// We haven't invented time travel by now.
-		if ($item['edited'] > $item['received'] ) {
+		if ($item['edited'] > $item['received']) {
 			$item['edited'] = $item['received'] ;
 		}
 
-		if ($item['changed'] > $item['received'] ) {
+		if ($item['changed'] > $item['received']) {
 			$item['changed'] = $item['received'] ;
 		}
 
-		if ($item['commented'] > $item['received'] ) {
+		if ($item['commented'] > $item['received']) {
 			$item['commented'] = $item['received'] ;
 		}
 
@@ -236,13 +236,13 @@ final class ItemHelper
 
 		$default = [
 			'url'   => $item['author-link'], 'name' => $item['author-name'],
-			'photo' => $item['author-avatar'], 'network' => $item['network']
+			'photo' => $item['author-avatar'], 'network' => $item['network'],
 		];
 		$item['author-id'] = ($item['author-id'] ?? 0) ?: Contact::getIdForURL($item['author-link'], 0, null, $default);
 
 		$default = [
 			'url'   => $item['owner-link'], 'name' => $item['owner-name'],
-			'photo' => $item['owner-avatar'], 'network' => $item['network']
+			'photo' => $item['owner-avatar'], 'network' => $item['network'],
 		];
 		$item['owner-id'] = ($item['owner-id'] ?? 0) ?: Contact::getIdForURL($item['owner-link'], 0, null, $default);
 
@@ -264,9 +264,12 @@ final class ItemHelper
 			'uid', 'uri', 'parent-uri', 'id', 'deleted',
 			'uri-id', 'parent-uri-id', 'restrictions', 'verb',
 			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid',
-			'wall', 'private', 'origin', 'author-id'
+			'wall', 'private', 'origin', 'author-id',
 		];
-		$condition = ['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => $item['uid']];
+
+		$uids = $item['verb'] === Activity::VIEW ? [0, $item['uid']] : $item['uid'];
+
+		$condition = ['uri-id' => [$item['thr-parent-id'], $item['parent-uri-id']], 'uid' => $uids];
 		$params    = ['order' => ['id' => false]];
 		$parent    = Post::selectFirst($fields, $condition, $params);
 
@@ -298,7 +301,7 @@ final class ItemHelper
 		$condition = [
 			'uri-id'        => $parent['parent-uri-id'],
 			'parent-uri-id' => $parent['parent-uri-id'],
-			'uid'           => $parent['uid']
+			'uid'           => $parent['uid'],
 		];
 		$params          = ['order' => ['id' => false]];
 		$toplevel_parent = Post::selectFirst($fields, $condition, $params);
@@ -354,7 +357,7 @@ final class ItemHelper
 		}
 
 		// If its a post that originated here then tag the thread as "mention"
-		if ($item['origin'] && $item['uid']) {
+		if ($item['origin'] && $item['uid'] && $item['verb'] !== Activity::VIEW) {
 			$this->database->update('post-thread-user', ['mention' => true], ['uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
 			$this->logger->info('tagged thread as mention', ['parent' => $parent_id, 'parent-uri-id' => $item['parent-uri-id'], 'uid' => $item['uid']]);
 		}
@@ -365,7 +368,7 @@ final class ItemHelper
 		return $item;
 	}
 
-	private function hasRestrictions(array $item, int $author_id, int $restrictions = null): bool
+	private function hasRestrictions(array $item, int $author_id, ?int $restrictions = null): bool
 	{
 		if (empty($restrictions) || ($author_id == $item['author-id'])) {
 			return false;
@@ -386,6 +389,20 @@ final class ItemHelper
 		}
 
 		if (($restrictions & Item::CANT_LIKE) && in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::ATTEND, Activity::ATTENDMAYBE, Activity::ATTENDNO])) {
+			return true;
+		}
+
+		if (($restrictions & Item::CANT_QUOTE) && (!empty($item['quote-uri']) || !empty($item['quote-uri-id']))) {
+			return true;
+		}
+
+		if ($item['uid'] != 0 && Contact\User::isBlocked($item['author-id'], $item['uid'])) {
+			$this->logger->debug('Author is blocked by the user, post is ignored.', ['author' => $item['author-id'], 'uid' => $item['uid']]);
+			return true;
+		}
+
+		if ($item['uid'] != 0 && Contact\User::isIsBlocked($author_id, $item['uid'])) {
+			$this->logger->debug('User is blocked by the author, post is ignored.', ['author' => $author_id, 'uid' => $item['uid']]);
 			return true;
 		}
 

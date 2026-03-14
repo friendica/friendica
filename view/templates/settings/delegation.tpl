@@ -22,7 +22,7 @@
             {{include file="field_select.tpl" field=$parent_user}}
             {{include file="field_password.tpl" field=$parent_password}}
 			<div class="submit">
-				<button type="submit" name="delegate" value="{{$l10n.submit}}">{{$l10n.submit}}</button>
+				<button type="submit" class="btn btn-primary" name="delegate" value="{{$l10n.submit}}">{{$l10n.submit}}</button>
 			</div>
 		</form>
 	</div>

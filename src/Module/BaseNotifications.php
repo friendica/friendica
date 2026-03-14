@@ -155,7 +155,7 @@ abstract class BaseNotifications extends BaseModule
 		foreach (self::URL_TYPES as $type => $url) {
 			$tabs[] = [
 				'label'     => $this->t(self::PRINT_TYPES[$type]),
-				'url'       => 'notifications/' . $url,
+				'url'       => 'notifications/' . $url . (($url == "personal") ? "?show=all" : ""),
 				'sel'       => (($selected == $url) ? 'active' : ''),
 				'id'        => $type . '-tab',
 				'accesskey' => self::ACCESS_KEYS[$type],

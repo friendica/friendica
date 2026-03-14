@@ -68,11 +68,11 @@ class Notification extends BaseModule
 			$intro = $this->introductionRepo->selectOneById($request_id, DI::userSession()->getLocalUserId());
 
 			switch ($_POST['submit']) {
-				case $this->l10n->t('Discard'):
+				case "discard":
 					Contact\Introduction::discard($intro);
 					$this->introductionRepo->delete($intro);
 					break;
-				case $this->l10n->t('Ignore'):
+				case "ignore":
 					$intro->ignore();
 					$this->introductionRepo->save($intro);
 					break;
@@ -144,11 +144,11 @@ class Notification extends BaseModule
 			$Notify->setSeen();
 			$this->notifyRepo->save($Notify);
 		} else {
-			if ($Notify->uriId) {
-				$this->notificationRepo->setAllSeenForUser($Notify->uid, ['target-uri-id' => $Notify->uriId]);
-			}
-
 			$this->notifyRepo->setAllSeenForRelatedNotify($Notify);
+		}
+
+		if ($Notify->uriId) {
+			$this->notificationRepo->setAllSeenForUser($Notify->uid, ['target-uri-id' => $Notify->uriId]);
 		}
 
 		if ((string)$Notify->link) {

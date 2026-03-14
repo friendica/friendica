@@ -38,7 +38,7 @@ class ShowTest extends ApiTestCase
 	{
 		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'id' => 1
+				'id' => 1,
 			]);
 
 		$json = $this->toJson($response);
@@ -55,12 +55,12 @@ class ShowTest extends ApiTestCase
 	public function testApiStatusesShowWithConversation()
 	{
 		// @todo: This call is needed for this test
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'id'           => 1,
-				'conversation' => 1
+				'conversation' => 1,
 			]);
 
 		$json = $this->toJson($response);

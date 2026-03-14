@@ -98,7 +98,7 @@ class Index extends BaseSearch
 			'name'        => 'search-header',
 			'$title'      => DI::l10n()->t('Search'),
 			'$title_size' => 3,
-			'$content'    => HTML::search($search, 'search-box', false)
+			'$content'    => HTML::search($search, 'search-box', false),
 		]);
 
 		if (!$search) {
@@ -136,7 +136,9 @@ class Index extends BaseSearch
 		// Tags don't look like an URL and the fulltext search does only work with natural words
 		if (parse_url($search, PHP_URL_SCHEME) && parse_url($search, PHP_URL_HOST)) {
 			$this->logger->info('Skipping tag and fulltext search since the search looks like a URL.', ['q' => $search]);
-			DI::sysmsg()->addNotice(DI::l10n()->t('No results.'));
+			$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
+				'$title' => DI::l10n()->t('No results.'),
+			]);
 			return $o;
 		}
 
@@ -152,14 +154,14 @@ class Index extends BaseSearch
 				DI::userSession()->getLocalUserId(),
 				'system',
 				'itemspage_mobile_network',
-				DI::config()->get('system', 'itemspage_network_mobile')
+				DI::config()->get('system', 'itemspage_network_mobile'),
 			);
 		} else {
 			$itemsPerPage = DI::pConfig()->get(
 				DI::userSession()->getLocalUserId(),
 				'system',
 				'itemspage_network',
-				DI::config()->get('system', 'itemspage_network')
+				DI::config()->get('system', 'itemspage_network'),
 			);
 		}
 
@@ -186,14 +188,11 @@ class Index extends BaseSearch
 
 		if (empty($items)) {
 			if (empty($last_uriid)) {
-				DI::sysmsg()->addNotice(DI::l10n()->t('No results.'));
+				$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
+					'$title' => DI::l10n()->t('No results.'),
+				]);
 			}
 			return $o;
-		}
-
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll')) {
-			$tpl = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
-			$o .= Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
 		}
 
 		if ($tag) {
@@ -203,15 +202,15 @@ class Index extends BaseSearch
 		}
 
 		$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
-			'$title' => $title
+			'$title' => $title,
 		]);
 
 		$this->logger->info('Start Conversation.', ['q' => $search]);
 
 		$o .= DI::conversation()->render($items, Conversation::MODE_SEARCH, false, false, 'commented', DI::userSession()->getLocalUserId());
 
-		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll')) {
-			$o .= HTML::scrollLoader();
+		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
+			$o .= HTML::scrollLoader($request);
 		} else {
 			$o .= $pager->renderMinimal($count);
 		}
@@ -239,7 +238,7 @@ class Index extends BaseSearch
 	{
 		$search = Network::convertToIdn($search);
 		$isUrl  = !empty(parse_url($search, PHP_URL_SCHEME));
-		$isAddr = (bool)preg_match('/^@?([a-z0-9.-_]+@[a-z0-9.-_:]+)$/i', trim($search), $matches);
+		$isAddr = (bool) preg_match('/^@?([a-z0-9.-_]+@[a-z0-9.-_:]+)$/i', trim($search), $matches);
 
 		if (!$isUrl && !$isAddr) {
 			return;

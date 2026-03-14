@@ -101,7 +101,7 @@ class Security
 			$circleIds = '<<>>'; // should be impossible to match
 
 			foreach (Circle::getIdsByContactId($remote_contact) as $circleId) {
-				$circleIds .= '|<' . intval($circleId) . '>';
+				$circleIds .= '|<' . $circleId . '>';
 			}
 
 			$sql = sprintf(

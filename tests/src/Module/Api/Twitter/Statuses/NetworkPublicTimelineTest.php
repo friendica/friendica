@@ -23,11 +23,11 @@ class NetworkPublicTimelineTest extends ApiTestCase
 	public function testApiStatusesNetworkpublicTimeline()
 	{
 		// @todo: This call is needed for this test
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'max_id' => 10
+				'max_id' => 10,
 			]);
 
 		$json = $this->toJson($response);
@@ -48,11 +48,11 @@ class NetworkPublicTimelineTest extends ApiTestCase
 	public function testApiStatusesNetworkpublicTimelineWithNegativePage()
 	{
 		// @todo: This call is needed for this test
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'page' => -2
+				'page' => -2,
 			]);
 
 		$json = $this->toJson($response);
@@ -87,16 +87,16 @@ class NetworkPublicTimelineTest extends ApiTestCase
 	public function testApiStatusesNetworkpublicTimelineWithRss()
 	{
 		// @todo: This call is needed for this test
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
-			'extension' => ICanCreateResponses::TYPE_RSS
+			'extension' => ICanCreateResponses::TYPE_RSS,
 		]))->run($this->httpExceptionMock, [
-			'page' => -2
+			'page' => -2,
 		]);
 
 		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 
-		self::assertXml((string)$response->getBody(), 'statuses');
+		self::assertXml((string) $response->getBody(), 'statuses');
 	}
 }

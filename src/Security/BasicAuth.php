@@ -70,7 +70,7 @@ class BasicAuth
 
 		// Support for known clients that doesn't send a source name
 		if (empty($source) && !empty($_SERVER['HTTP_USER_AGENT'])) {
-			if(strpos($_SERVER['HTTP_USER_AGENT'], "Twidere") !== false) {
+			if (strpos($_SERVER['HTTP_USER_AGENT'], "Twidere") !== false) {
 				$source = 'Twidere';
 			}
 
@@ -112,7 +112,7 @@ class BasicAuth
 		if (!empty($_SERVER['REDIRECT_REMOTE_USER'])) {
 			$userpass = base64_decode(substr($_SERVER["REDIRECT_REMOTE_USER"], 6));
 			if (!empty($userpass) && strpos($userpass, ':')) {
-				list($name, $password)    = explode(':', $userpass);
+				[$name, $password]        = explode(':', $userpass);
 				$_SERVER['PHP_AUTH_USER'] = $name;
 				$_SERVER['PHP_AUTH_PW']   = $password;
 			}

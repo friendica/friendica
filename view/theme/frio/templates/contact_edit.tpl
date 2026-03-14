@@ -30,6 +30,7 @@
 							{{if $lblsuggest}}<li><a role="menuitem" href="{{$contact_actions.suggest.url}}" title="{{$contact_actions.suggest.title}}">{{$contact_actions.suggest.label}}</a></li>{{/if}}
 							{{if $poll_enabled}}<li><a role="menuitem" href="{{$contact_actions.update.url}}" title="{{$contact_actions.update.title}}">{{$contact_actions.update.label}}</a></li>{{/if}}
 							{{if $contact_actions.updateprofile}}<li><a role="menuitem" href="{{$contact_actions.updateprofile.url}}" title="{{$contact_actions.updateprofile.title}}">{{$contact_actions.updateprofile.label}}</a></li>{{/if}}
+							{{if $contact_actions.fetchoutbox}}<li><a role="menuitem" href="{{$contact_actions.fetchoutbox.url}}" title="{{$contact_actions.fetchoutbox.title}}">{{$contact_actions.fetchoutbox.label}}</a></li>{{/if}}
 							{{if $lblsuggest || $poll_enabled || $contact_actions.updateprofile}}
 							<li class="divider"></li>
 							{{/if}}
@@ -48,7 +49,7 @@
 
 					{{* Block with status information about the contact *}}
 					<ul>
-						{{if $relation_text}}<li><div id="contact-edit-rel">{{$relation_text}}</div></li>{{/if}}
+						{{if $relation_text}}<li><div id="contact-edit-rel">{{$con}} {{$relation_text}}</div></li>{{/if}}
 						{{if $nettype}}<li><div id="contact-edit-nettype">{{$nettype}}</div></li>{{/if}}
 
 						{{if $poll_enabled}}
@@ -61,7 +62,7 @@
 						{{/if}}
 
 						{{if $lost_contact}}<li><div id="lost-contact-message">{{$lost_contact}}</div></li>{{/if}}
-						{{if $insecure}}<li><div id="insecure-message">{{$insecure}}</div></li>	{{/if}}
+						{{if $insecure}}<li><div id="insecure-message">{{$insecure}}</div></li>{{/if}}
 						{{if $blocked && !$pending}}<li><div id="block-message">{{$blocked}}</div></li>{{/if}}
 						{{if $pending}}<li><div id="pending-message">{{$pending}}</div></li>{{/if}}
 						{{if $ignored}}<li><div id="ignore-message">{{$ignored}}</div></li>{{/if}}

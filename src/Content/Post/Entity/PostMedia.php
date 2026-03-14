@@ -35,6 +35,19 @@ use Psr\Http\Message\UriInterface;
  * @property-read ?string $publisherName
  * @property-read ?UriInterface $publisherImage
  * @property-read ?string $blurhash
+ * @property-read ?UriInterface $playerUrl
+ * @property-read ?int $playerWidth
+ * @property-read ?int $playerHeight
+ * @property-read ?string $embedType
+ * @property-read ?string $embedHtml
+ * @property-read ?int $embedWidth
+ * @property-read ?int $embedHeight
+ * @property-read ?string $pageType
+ * @property-read ?array $schemaTypes
+ * @property-read ?int $attachId
+ * @property-read ?string $language
+ * @property-read ?string $published
+ * @property-read ?string $modified
  */
 class PostMedia extends BaseEntity
 {
@@ -98,6 +111,32 @@ class PostMedia extends BaseEntity
 	 * @see https://blurha.sh/
 	 */
 	protected $blurhash;
+	/** @var ?UriInterface Player URL */
+	protected $playerUrl;
+	/** @var ?int In pixels */
+	protected $playerWidth;
+	/** @var ?int In pixels */
+	protected $playerHeight;
+	/** @var ?int */
+	protected $attachId;
+	/** @var ?string */
+	protected $language;
+	/** @var ?string (Datetime) */
+	protected $published;
+	/** @var ?string (Datetime) */
+	protected $modified;
+	/** @var ?string */
+	protected $embedType;
+	/** @var ?string */
+	protected $embedHtml;
+	/** @var ?int In pixels */
+	protected $embedWidth;
+	/** @var ?int In pixels */
+	protected $embedHeight;
+	/** @var ?string */
+	protected $pageType;
+	/** @var ?array */
+	protected $schemaTypes;
 
 	public function __construct(
 		int $uriId,
@@ -120,7 +159,20 @@ class PostMedia extends BaseEntity
 		?string $publisherName = null,
 		?UriInterface $publisherImage = null,
 		?string $blurhash = null,
-		int $id = null
+		?UriInterface $playerUrl = null,
+		?int $playerWidth = null,
+		?int $playerHeight = null,
+		?int $id = null,
+		?int $attachId = null,
+		?string $language = null,
+		?string $published = null,
+		?string $modified = null,
+		?string $embedType = null,
+		?string $embedHtml = null,
+		?int $embedWidth = null,
+		?int $embedHeight = null,
+		?string $pageType = null,
+		?array $schemaTypes = null
 	) {
 		$this->uriId          = $uriId;
 		$this->url            = $url;
@@ -142,9 +194,132 @@ class PostMedia extends BaseEntity
 		$this->publisherName  = $publisherName;
 		$this->publisherImage = $publisherImage;
 		$this->blurhash       = $blurhash;
+		$this->playerUrl      = $playerUrl;
+		$this->playerWidth    = $playerWidth;
+		$this->playerHeight   = $playerHeight;
 		$this->id             = $id;
+		$this->attachId       = $attachId;
+		$this->language       = $language;
+		$this->published      = $published;
+		$this->modified       = $modified;
+		$this->embedType      = $embedType;
+		$this->embedHtml      = $embedHtml;
+		$this->embedWidth     = $embedWidth;
+		$this->embedHeight    = $embedHeight;
+		$this->pageType       = $pageType;
+		$this->schemaTypes    = $schemaTypes;
 	}
 
+	/**
+	 * Checks if the media has a player url set
+	 *
+	 * @return boolean
+	 */
+	public function hasPlayerUrl(): bool
+	{
+		return !is_null($this->playerUrl) && $this->playerUrl !== '';
+	}
+
+	/**
+	 * Checks if the media has a player width set
+	 *
+	 * @return boolean
+	 */
+	public function hasPlayerWidth(): bool
+	{
+		return !is_null($this->playerWidth) && $this->playerWidth > 0;
+	}
+
+	/**
+	 * Checks if the media has a player height set
+	 *
+	 * @return boolean
+	 */
+	public function hasPlayerHeight(): bool
+	{
+		return !is_null($this->playerHeight) && $this->playerHeight > 0;
+	}
+
+	/**
+	 * Checks if the media has an embed html set
+	 *
+	 * @return boolean
+	 */
+	public function hasEmbedHtml(): bool
+	{
+		return !is_null($this->embedHtml) && $this->embedHtml !== '';
+	}
+
+	/**
+	 * Checks if the media has an embed width set
+	 *
+	 * @return boolean
+	 */
+	public function hasEmbedWidth(): bool
+	{
+		return !is_null($this->embedWidth) && $this->embedWidth > 0;
+	}
+
+	/**
+	 * Checks if the media has an embed height set
+	 *
+	 * @return boolean
+	 */
+	public function hasEmbedHeight(): bool
+	{
+		return !is_null($this->embedHeight) && $this->embedHeight > 0;
+	}
+
+	/**
+	 * Checks if the media is a photo
+	 *
+	 * @return boolean
+	 */
+	public function isPhoto(): bool
+	{
+		return $this->embedType === 'photo';
+	}
+
+	/**
+	 * Checks if the media is a video
+	 *
+	 * @return boolean
+	 */
+	public function isVideo(): bool
+	{
+		return $this->embedType === 'video' || $this->getPageType() === 'video';
+	}
+
+	/**
+	 * Checks if the media is an article
+	 *
+	 * @return boolean
+	 */
+	public function isArticle(): bool
+	{
+		if (is_array($this->schemaTypes)) {
+			foreach (['Article', 'BackgroundNewsArticle', 'NewsArticle'] as $type) {
+				if (in_array($type, $this->schemaTypes)) {
+					return true;
+				}
+			}
+		}
+
+		return in_array($this->getPageType(), ['article']);
+	}
+
+	/**
+	 * Get the page type. In case of a type with main und sub category (separated by `.`), only the main category is returned
+	 *
+	 * @return string|null
+	 */
+	public function getPageType(): ?string
+	{
+		if (is_null($this->pageType)) {
+			return null;
+		}
+		return explode('.', $this->pageType)[0];
+	}
 
 	/**
 	 * Get media link for given media id
@@ -247,7 +422,20 @@ class PostMedia extends BaseEntity
 			$this->publisherName,
 			$this->publisherImage,
 			$this->blurhash,
+			$this->playerUrl,
+			$this->playerWidth,
+			$this->playerHeight,
 			$this->id,
+			$this->attachId,
+			$this->language,
+			$this->published,
+			$this->modified,
+			$this->embedType,
+			$this->embedHtml,
+			$this->embedWidth,
+			$this->embedHeight,
+			$this->pageType,
+			$this->schemaTypes
 		);
 	}
 
@@ -274,7 +462,20 @@ class PostMedia extends BaseEntity
 			$this->publisherName,
 			$this->publisherImage,
 			$this->blurhash,
+			$this->playerUrl,
+			$this->playerWidth,
+			$this->playerHeight,
 			$this->id,
+			$this->attachId,
+			$this->language,
+			$this->published,
+			$this->modified,
+			$this->embedType,
+			$this->embedHtml,
+			$this->embedWidth,
+			$this->embedHeight,
+			$this->pageType,
+			$this->schemaTypes
 		);
 	}
 

@@ -83,25 +83,25 @@ class Counts
 		$counts = [];
 
 		$activity_verbs = [
-			Activity::LIKE,
-			Activity::DISLIKE,
-			Activity::ATTEND,
-			Activity::ATTENDMAYBE,
-			Activity::ATTENDNO,
-			Activity::ANNOUNCE,
-			Activity::VIEW,
-			Activity::READ,
+			Verb::getID(Activity::LIKE),
+			Verb::getID(Activity::DISLIKE),
+			Verb::getID(Activity::ATTEND),
+			Verb::getID(Activity::ATTENDMAYBE),
+			Verb::getID(Activity::ATTENDNO),
+			Verb::getID(Activity::ANNOUNCE),
+			Verb::getID(Activity::VIEW),
+			Verb::getID(Activity::READ),
 		];
 
-		$verbs = array_merge($activity_verbs, [Activity::EMOJIREACT, Activity::POST]);
+		$verbs = array_merge($activity_verbs, [Verb::getID(Activity::EMOJIREACT), Verb::getID(Activity::POST)]);
 
-		$condition  = DBA::mergeConditions($condition, ['verb' => $verbs]);
+		$condition  = DBA::mergeConditions($condition, ['vid' => $verbs]);
 		$countquery = DBA::select('post-counts-view', [], $condition);
 		while ($count = DBA::fetch($countquery)) {
 			if (!empty($count['reaction'])) {
 				$count['verb'] = Activity::EMOJIREACT;
 				$count['vid']  = Verb::getID($count['verb']);
-			} elseif (in_array($count['verb'], $activity_verbs)) {
+			} elseif (in_array($count['vid'], $activity_verbs)) {
 				$count['reaction'] = $count['verb'];
 			}
 			$counts[] = $count;

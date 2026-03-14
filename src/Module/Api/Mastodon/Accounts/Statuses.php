@@ -56,7 +56,7 @@ class Statuses extends BaseApi
 		if ($request['pinned']) {
 			$condition = ['author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED], 'type' => Post\Collection::FEATURED];
 		} elseif ($request['only_media']) {
-			$condition = ['author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED], 'type' => [Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO]];
+			$condition = ['author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED], 'type' => [Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::HLS]];
 		} elseif (!$uid) {
 			$condition = [
 				'author-id' => $id, 'private' => [Item::PUBLIC, Item::UNLISTED],
@@ -93,12 +93,10 @@ class Statuses extends BaseApi
 			$items = Post::selectTimelineForUser($uid, ['uri-id'], $condition, $params);
 		}
 
-		$display_quotes = self::appSupportsQuotes();
-
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			try {
-				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
 				$this->updateBoundaries($status, $item, $request['friendica_order']);
 				$statuses[] = $status;
 			} catch (\Throwable $th) {

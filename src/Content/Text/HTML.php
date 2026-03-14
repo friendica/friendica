@@ -55,7 +55,7 @@ class HTML
 
 		$xpath = new DOMXPath($doc);
 
-		/** @var \DOMNode[] $list */
+		/** @var \DOMNodeList<\DOMNode>|false $list */
 		$list = $xpath->query("//" . $tag);
 		foreach ($list as $node) {
 			$attr = [];
@@ -153,7 +153,7 @@ class HTML
 					"<li>",
 					"</li>",
 				],
-				$message
+				$message,
 			);
 
 			// remove namespaces
@@ -172,6 +172,7 @@ class HTML
 			@$doc->loadHTML($message, LIBXML_HTML_NODEFDTD);
 
 			XML::deleteNode($doc, 'style');
+			XML::deleteNode($doc, 'script');
 			XML::deleteNode($doc, 'head');
 			XML::deleteNode($doc, 'title');
 			XML::deleteNode($doc, 'meta');
@@ -208,7 +209,7 @@ class HTML
 				'div',
 				['style' => 'border:none;border-left:solid blue 1.5pt;padding:0cm 0cm 0cm 4.0pt'],
 				'[quote]',
-				'[/quote]'
+				'[/quote]',
 			);
 
 			// MyBB-Stuff
@@ -243,7 +244,7 @@ class HTML
 
 			$elements = [
 				'b', 'del', 'em', 'i', 'ins', 'kbd', 'mark',
-				's', 'samp', 'strong', 'sub', 'sup', 'u', 'var'
+				's', 'samp', 'strong', 'sub', 'sup', 'u', 'var',
 			];
 			foreach ($elements as $element) {
 				self::tagToBBCode($doc, $element, [], '[' . $element . ']', '[/' . $element . ']');
@@ -347,7 +348,7 @@ class HTML
 			$message = str_replace(
 				['[b][b]', '[/b][/b]', '[i][i]', '[/i][/i]'],
 				['[b]', '[/b]', '[i]', '[/i]'],
-				$message
+				$message,
 			);
 
 			// Handling Yahoo style of mails
@@ -366,7 +367,7 @@ class HTML
 
 				return $prefix . "\n" . html_entity_decode($matches[2]) . "\n" . '[/code]';
 			},
-			$message
+			$message,
 		);
 
 		$message = trim($message);
@@ -401,7 +402,7 @@ class HTML
 		}
 
 		$parts = array_merge($base, parse_url($url));
-		$url2  = (string)Uri::fromParts((array)$parts);
+		$url2  = (string) Uri::fromParts((array) $parts);
 
 		return str_replace($url, $url2, $link);
 	}
@@ -435,7 +436,7 @@ class HTML
 				function ($match) use ($basepath) {
 					return self::qualifyURLsSub($match, $basepath);
 				},
-				$body
+				$body,
 			);
 		}
 		return $body;
@@ -530,7 +531,7 @@ class HTML
 			// A list of some links that should be ignored
 			$list = [
 				"/user/", "/tag/", "/group/", "/circle/", "/profile/", "/search?search=", "/search?tag=", "mailto:", "/u/", "/node/",
-				"//plus.google.com/", "//twitter.com/"
+				"//plus.google.com/", "//twitter.com/",
 			];
 			foreach ($list as $listitem) {
 				if (strpos($treffer[1], $listitem) !== false) {
@@ -659,7 +660,7 @@ class HTML
 
 		if (!$compact && ($message != '')) {
 			foreach ($urls as $id => $url) {
-				if ($url != '' && strpos($message, $url) === false) {
+				if ($url != '' && strpos($message, (string) $url) === false) {
 					$message .= "\n" . $url . ' ';
 				}
 			}
@@ -707,19 +708,19 @@ class HTML
 		$s = preg_replace(
 			'#<object[^>]+>(.*?)https?://www.youtube.com/((?:v|cp)/[A-Za-z0-9\-_=]+)(.*?)</object>#ism',
 			'[youtube]$2[/youtube]',
-			$s
+			$s,
 		);
 
 		$s = preg_replace(
 			'#<iframe[^>](.*?)https?://www.youtube.com/embed/([A-Za-z0-9\-_=]+)(.*?)</iframe>#ism',
 			'[youtube]$2[/youtube]',
-			$s
+			$s,
 		);
 
 		$s = preg_replace(
 			'#<iframe[^>](.*?)https?://player.vimeo.com/video/([0-9]+)(.*?)</iframe>#ism',
 			'[vimeo]$2[/vimeo]',
-			$s
+			$s,
 		);
 
 		return $s;
@@ -771,12 +772,19 @@ class HTML
 	 * @return string html for loader
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function scrollLoader(): string
+	public static function scrollLoader(array $request = []): string
 	{
+		if (in_array($request['mode'] ?? '', ['minimal', 'raw'])) {
+			return '';
+		}
+
+		$tpl    = Renderer::getMarkupTemplate('infinite_scroll_head.tpl');
+		$loader = Renderer::replaceMacros($tpl, ['$reload_uri' => DI::args()->getQueryString()]);
+
 		$tpl = Renderer::getMarkupTemplate("scroll_loader.tpl");
-		return Renderer::replaceMacros($tpl, [
+		return $loader . Renderer::replaceMacros($tpl, [
 			'wait' => DI::l10n()->t('Loading more entries...'),
-			'end'  => DI::l10n()->t('The end')
+			'end'  => DI::l10n()->t('The end'),
 		]);
 	}
 
@@ -831,7 +839,7 @@ class HTML
 			'$name'   => $contact['name'],
 			'title'   => $contact['name'] . ' [' . $contact['addr'] . ']',
 			'$parkle' => $sparkle,
-			'$redir'  => $redir
+			'$redir'  => $redir,
 		]);
 	}
 
@@ -852,14 +860,14 @@ class HTML
 		if (strpos($s, '#') === 0) {
 			$mode = 'tag';
 		}
-		$save_label = $mode === 'text' ? DI::l10n()->t('Save') : DI::l10n()->t('Follow');
+		$action_text = DI::l10n()->t('Save search');
 
 		$values = [
 			'$s'            => $s,
 			'$q'            => urlencode($s),
 			'$id'           => $id,
 			'$search_label' => DI::l10n()->t('Search'),
-			'$save_label'   => $save_label,
+			'$action_text'  => $action_text,
 			'$search_hint'  => DI::l10n()->t('@name, !group, #tags, content'),
 			'$mode'         => $mode,
 			'$return_url'   => bin2hex(Search::getSearchPath($s)),
@@ -869,7 +877,7 @@ class HTML
 			$values['$search_options'] = [
 				'fulltext' => DI::l10n()->t('Full Text'),
 				'tags'     => DI::l10n()->t('Tags'),
-				'contacts' => DI::l10n()->t('Contacts')
+				'contacts' => DI::l10n()->t('Contacts'),
 			];
 
 			if (DI::config()->get('system', 'poco_local_search')) {
@@ -898,7 +906,7 @@ class HTML
 				'$reasons'   => $reasons,
 				'$rnd'       => Strings::getRandomHex(8),
 				'$openclose' => DI::l10n()->t('Click to open/close'),
-				'$html'      => $html
+				'$html'      => $html,
 			]);
 		}
 
@@ -946,7 +954,7 @@ class HTML
 				' . implode('|', $allowedIframeDomains) . '
 			)
 			(?:/|$) # Prevents bogus domains like youtube.com.fake.tld
-			%xi'
+			%xi',
 		);
 
 		$config->set('Attr.AllowedRel', [
@@ -1018,7 +1026,7 @@ class HTML
 	 */
 	public static function checkRelMeLink(DOMDocument $doc, UriInterface $meUrl): bool
 	{
-		$xpath = new \DOMXpath($doc);
+		$xpath = new \DOMXPath($doc);
 
 		// This expression checks that "me" is among the space-delimited values of the "rel" attribute.
 		// And that the href attribute contains exactly the provided URL
@@ -1065,5 +1073,39 @@ class HTML
 	public static function isHTML(string $text): bool
 	{
 		return ($text != html_entity_decode($text)) || ($text != strip_tags($text));
+	}
+
+	/**
+	 * Remove HTML elements with a specific class name
+	 *
+	 * @param string $html
+	 * @param string $className
+	 * @return string the HTML without the removed HTML element
+	 */
+	public static function removeElementByClass(string $html, string $className): string
+	{
+		$dom = new DOMDocument();
+		libxml_use_internal_errors(true);
+
+		$dom->loadHTML(mb_convert_encoding('<span>' . $html . '</span>', 'HTML-ENTITIES', "UTF-8"), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		libxml_clear_errors();
+
+		$xpath = new DOMXPath($dom);
+
+		$nodes = $xpath->query("//*[contains(@class, '" . $className . "')]");
+		if (!$nodes || $nodes->length == 0) {
+			return $html;
+		}
+
+		foreach ($nodes as $node) {
+			$node->parentNode->removeChild($node);
+		}
+
+		$html = trim($dom->saveHTML());
+		if (substr($html, 0, 6) == '<span>' && substr($html, -7) == '</span>') {
+			$html = substr($html, 6, -7);
+		}
+
+		return $html;
 	}
 }

@@ -39,7 +39,7 @@ class Revoke extends BaseModule
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->dba     = $dba;
+		$this->dba = $dba;
 
 		if (!DI::userSession()->getLocalUserId()) {
 			return;
@@ -82,7 +82,7 @@ class Revoke extends BaseModule
 			return Login::form($_SERVER['REQUEST_URI']);
 		}
 
-		Nav::setSelected('contact');
+		Nav::setSelected('contacts');
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('contact_drop_confirm.tpl'), [
 			'$l10n' => [

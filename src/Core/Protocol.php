@@ -22,43 +22,43 @@ use Friendica\Protocol\Diaspora;
 class Protocol
 {
 	// Native support
-	const ACTIVITYPUB = 'apub';    // ActivityPub (Pleroma, Mastodon, Osada, ...)
-	const DFRN        = 'dfrn';    // Friendica, Mistpark, other DFRN implementations
-	const DIASPORA    = 'dspr';    // Diaspora, Hubzilla, Socialhome, Ganggo
-	const FEED        = 'feed';    // RSS/Atom feeds with no known "post/notify" protocol
-	const MAIL        = 'mail';    // IMAP/POP
+	public const ACTIVITYPUB = 'apub';    // ActivityPub (Pleroma, Mastodon, Osada, ...)
+	public const DFRN        = 'dfrn';    // Friendica, Mistpark, other DFRN implementations
+	public const DIASPORA    = 'dspr';    // Diaspora, Hubzilla, Socialhome, Ganggo
+	public const FEED        = 'feed';    // RSS/Atom feeds with no known "post/notify" protocol
+	public const MAIL        = 'mail';    // IMAP/POP
 
-	const NATIVE_SUPPORT = [self::DFRN, self::DIASPORA, self::FEED, self::MAIL, self::ACTIVITYPUB];
+	public const NATIVE_SUPPORT = [self::DFRN, self::DIASPORA, self::FEED, self::MAIL, self::ACTIVITYPUB];
 
-	const FEDERATED = [self::DFRN, self::DIASPORA, self::ACTIVITYPUB];
+	public const FEDERATED = [self::DFRN, self::DIASPORA, self::ACTIVITYPUB];
 
-	const SUPPORT_PRIVATE = [self::DFRN, self::DIASPORA, self::MAIL, self::ACTIVITYPUB, self::PUMPIO];
+	public const SUPPORT_PRIVATE = [self::DFRN, self::DIASPORA, self::MAIL, self::ACTIVITYPUB, self::PUMPIO];
 
 	// Supported through a connector
-	const BLUESKY   = 'bsky';    // Bluesky
-	const DIASPORA2 = 'dspc';    // Diaspora connector
-	const DISCOURSE = 'dscs';    // Discourse
-	const PNUT      = 'pnut';    // pnut.io
-	const PUMPIO    = 'pump';    // pump.io
-	const TUMBLR    = 'tmbl';    // Tumblr
-	const TWITTER   = 'twit';    // Twitter
+	public const BLUESKY   = 'bsky';    // Bluesky
+	public const DIASPORA2 = 'dspc';    // Diaspora connector
+	public const DISCOURSE = 'dscs';    // Discourse
+	public const PNUT      = 'pnut';    // pnut.io
+	public const PUMPIO    = 'pump';    // pump.io
+	public const TUMBLR    = 'tmbl';    // Tumblr
+	public const TWITTER   = 'twit';    // Twitter
 
 	// Dead protocols
-	const APPNET    = 'apdn';    // app.net - Dead protocol
-	const FACEBOOK  = 'face';    // Facebook API - Not working anymore, API is closed
-	const GPLUS     = 'goog';    // Google+ - Dead in 2019
-	const OSTATUS   = 'stat';    // GNU Social and other OStatus implementations
-	const STATUSNET = 'stac';    // Statusnet connector
+	public const APPNET    = 'apdn';    // app.net - Dead protocol
+	public const FACEBOOK  = 'face';    // Facebook API - Not working anymore, API is closed
+	public const GPLUS     = 'goog';    // Google+ - Dead in 2019
+	public const OSTATUS   = 'stat';    // GNU Social and other OStatus implementations
+	public const STATUSNET = 'stac';    // Statusnet connector
 
 	// Currently unsupported
-	const ICALENDAR = 'ical';    // iCalendar
-	const LINKEDIN  = 'lnkd';    // LinkedIn
-	const MYSPACE   = 'mysp';    // MySpace
-	const NEWS      = 'nntp';    // Network News Transfer Protocol
-	const XMPP      = 'xmpp';    // XMPP
-	const ZOT       = 'zot!';    // Zot!
+	public const ICALENDAR = 'ical';    // iCalendar
+	public const LINKEDIN  = 'lnkd';    // LinkedIn
+	public const MYSPACE   = 'mysp';    // MySpace
+	public const NEWS      = 'nntp';    // Network News Transfer Protocol
+	public const XMPP      = 'xmpp';    // XMPP
+	public const ZOT       = 'zot!';    // Zot!
 
-	const PHANTOM = 'unkn';    // Place holder
+	public const PHANTOM = 'unkn';    // Place holder
 
 	/**
 	 * Returns whether the provided protocol supports following
@@ -75,7 +75,7 @@ class Protocol
 
 		$hook_data = [
 			'protocol' => $protocol,
-			'result'   => null
+			'result'   => null,
 		];
 
 		$eventDispatcher = DI::eventDispatcher();
@@ -102,7 +102,7 @@ class Protocol
 
 		$hook_data = [
 			'protocol' => $protocol,
-			'result'   => null
+			'result'   => null,
 		];
 
 		$eventDispatcher = DI::eventDispatcher();
@@ -131,7 +131,7 @@ class Protocol
 			return true;
 		}
 
-		$protocol = $protocol ?? $contact['protocol'];
+		$protocol ??= $contact['protocol'];
 
 		if ($protocol == self::DIASPORA) {
 			$contact = Diaspora::sendShare($owner, $contact);
@@ -340,7 +340,7 @@ class Protocol
 
 		$hook_data = [
 			'protocol' => $protocol,
-			'result'   => null
+			'result'   => null,
 		];
 
 		$eventDispatcher = DI::eventDispatcher();

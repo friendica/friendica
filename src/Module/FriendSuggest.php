@@ -91,7 +91,13 @@ class FriendSuggest extends BaseModule
 	{
 		$cid = intval($this->parameters['contact']);
 
-		$contact = $this->dba->selectFirst('contact', [], ['id' => $cid, 'uid' => DI::userSession()->getLocalUserId()]);
+		$ucid = ContactModel::getUserContactId($cid, DI::userSession()->getLocalUserId());
+		if (!$ucid) {
+			DI::sysmsg()->addNotice($this->t('Contact not found.'));
+			$this->baseUrl->redirect();
+		}
+
+		$contact = ContactModel::getById($ucid);
 		if (empty($contact)) {
 			DI::sysmsg()->addNotice($this->t('Contact not found.'));
 			$this->baseUrl->redirect();

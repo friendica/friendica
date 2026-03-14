@@ -447,7 +447,7 @@ abstract class BaseModule implements ICanHandleRequests
 				'sel'   => $current == 'following' ? 'active' : '',
 			],
 			[
-				'label' => DI::l10n()->t('Mutual friends'),
+				'label' => DI::l10n()->t('Friends'),
 				'url'   => $baseUrl . '/contacts/mutuals',
 				'sel'   => $current == 'mutuals' ? 'active' : '',
 			],

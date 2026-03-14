@@ -303,8 +303,8 @@ class XML
 			$tag        = $data['tag'];
 			$type       = $data['type'];
 			$level      = $data['level'];
-			$attributes = isset($data['attributes']) ? $data['attributes'] : null;
-			$value      = isset($data['value']) ? $data['value'] : null;
+			$attributes = $data['attributes'] ?? null;
+			$value      = $data['value']      ?? null;
 
 			$result          = [];
 			$attributes_data = [];
@@ -341,7 +341,7 @@ class XML
 				if (!is_array($current) || (!in_array($tag, array_keys($current)))) { // Insert New tag
 					$current[$tag] = $result;
 					if ($attributes_data) {
-						$current[$tag. '_attr'] = $attributes_data;
+						$current[$tag . '_attr'] = $attributes_data;
 					}
 					$repeated_tag_index[$tag . '_' . $level] = 1;
 
@@ -355,9 +355,9 @@ class XML
 						$current[$tag]                           = [$current[$tag], $result]; // This will combine the existing item and the new item together to make an array
 						$repeated_tag_index[$tag . '_' . $level] = 2;
 
-						if (isset($current[$tag.'_attr'])) { // The attribute of the last(0th) tag must be moved as well
-							$current[$tag]['0_attr'] = $current[$tag.'_attr'];
-							unset($current[$tag.'_attr']);
+						if (isset($current[$tag . '_attr'])) { // The attribute of the last(0th) tag must be moved as well
+							$current[$tag]['0_attr'] = $current[$tag . '_attr'];
+							unset($current[$tag . '_attr']);
 						}
 					}
 					$last_item_index = $repeated_tag_index[$tag . '_' . $level] - 1;
@@ -369,7 +369,7 @@ class XML
 					$current[$tag]                           = $result;
 					$repeated_tag_index[$tag . '_' . $level] = 1;
 					if ($priority == 'tag' and $attributes_data) {
-						$current[$tag. '_attr'] = $attributes_data;
+						$current[$tag . '_attr'] = $attributes_data;
 					}
 				} else { // If taken, put all things inside a list(array)
 					if (isset($current[$tag][0]) and is_array($current[$tag])) { // If it is already an array...
@@ -385,10 +385,10 @@ class XML
 						$current[$tag]                           = [$current[$tag], $result]; //...Make it an array using the existing value and the new value
 						$repeated_tag_index[$tag . '_' . $level] = 1;
 						if ($priority == 'tag' and $get_attributes) {
-							if (isset($current[$tag.'_attr'])) { // The attribute of the last(0th) tag must be moved as well
+							if (isset($current[$tag . '_attr'])) { // The attribute of the last(0th) tag must be moved as well
 
-								$current[$tag]['0_attr'] = $current[$tag.'_attr'];
-								unset($current[$tag.'_attr']);
+								$current[$tag]['0_attr'] = $current[$tag . '_attr'];
+								unset($current[$tag . '_attr']);
 							}
 
 							if ($attributes_data) {

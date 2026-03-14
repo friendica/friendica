@@ -116,7 +116,7 @@ class Unfollow extends \Friendica\BaseModule
 			'$myaddr'         => $self['url'],
 			'$action'         => $this->baseUrl . '/contact/unfollow',
 			'$keywords'       => '',
-			'$keywords_label' => ''
+			'$keywords_label' => '',
 		]);
 
 		$this->page['aside'] = Widget\VCard::getHTML(Contact::getByURL($contact['url'], false), false, true);
@@ -124,7 +124,7 @@ class Unfollow extends \Friendica\BaseModule
 		$o .= Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), ['$title' => $this->t('Posts and Replies')]);
 
 		// Show last public posts
-		$o .= Contact::getPostsFromUrl($contact['url'], $this->userSession->getLocalUserId());
+		$o .= Contact::getPostsFromUrl($contact['url'], $this->userSession->getLocalUserId(), false, $request);
 
 		return $o;
 	}

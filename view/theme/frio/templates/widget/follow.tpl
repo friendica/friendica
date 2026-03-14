@@ -11,7 +11,7 @@
 	<form action="contact/follow" method="post">
 		{{* The input field - For visual consistence we are using a search input field*}}
 		<div class="form-group form-group-search">
-			<input id="side-follow-url" class="search-input form-control form-search" type="text" name="follow-url" value="{{$value}}" placeholder="{{$hint}}" data-toggle="tooltip" title="{{$hint}}" />
+			<input id="side-follow-url" class="search-input form-control form-search" type="text" name="follow-url" value="{{$value}}" placeholder="{{$hint}}" data-toggle="tooltip" />
 			<button id="side-follow-submit" class="btn btn-default btn-sm form-button-search" type="submit">{{$follow}}</button>
 		</div>
 	</form>

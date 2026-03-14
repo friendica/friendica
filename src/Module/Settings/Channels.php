@@ -8,6 +8,7 @@
 namespace Friendica\Module\Settings;
 
 use Friendica\App;
+use Friendica\Content\Conversation\Entity\UserDefinedChannel as EntityUserDefinedChannel;
 use Friendica\Content\Conversation\Factory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -15,6 +16,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\Worker;
 use Friendica\Model\Circle;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
@@ -82,6 +84,9 @@ class Channels extends BaseSettings
 			$saved = $this->channel->save($channel);
 			$this->logger->debug('New channel added', ['saved' => $saved]);
 			$this->enableTimeline($uid, $saved->code);
+			if ($this->config->get('system', 'channel_cache')) {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'UpdateChannelPosts', $saved->code, $uid);
+			}
 			return;
 		}
 
@@ -115,6 +120,9 @@ class Channels extends BaseSettings
 			$saved = $this->channel->save($channel);
 			$this->logger->debug('Save channel', ['id' => $id, 'saved' => $saved]);
 			$this->enableTimeline($uid, $id);
+			if ($this->config->get('system', 'channel_cache')) {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'UpdateChannelPosts', $id, $uid);
+			}
 		}
 	}
 
@@ -133,17 +141,17 @@ class Channels extends BaseSettings
 		if (in_array($account_type, [User::ACCOUNT_TYPE_COMMUNITY, User::ACCOUNT_TYPE_RELAY])) {
 			$intro   = $this->t('This page can be used to define the channels that will automatically be reshared by your account.');
 			$circles = [
-				0 => $this->l10n->t('Global Community')
+				EntityUserDefinedChannel::CIRCLE_GLOBAL => $this->l10n->t('Global Community')
 			];
 		} else {
 			$intro   = $this->t('This page can be used to define your own channels.');
 			$circles = [
-				0  => $this->l10n->t('Global Community'),
-				-5 => $this->l10n->t('Latest Activity'),
-				-4 => $this->l10n->t('Latest Posts'),
-				-3 => $this->l10n->t('Latest Creation'),
-				-1 => $this->l10n->t('Following'),
-				-2 => $this->l10n->t('Followers'),
+				EntityUserDefinedChannel::CIRCLE_GLOBAL    => $this->l10n->t('Global Community'),
+				EntityUserDefinedChannel::CIRCLE_ACTIVITY  => $this->l10n->t('Latest Activity'),
+				EntityUserDefinedChannel::CIRCLE_POSTS     => $this->l10n->t('Latest Posts'),
+				EntityUserDefinedChannel::CIRCLE_CREATION  => $this->l10n->t('Latest Creation'),
+				EntityUserDefinedChannel::CIRCLE_FOLLOWING => $this->l10n->t('Following'),
+				EntityUserDefinedChannel::CIRCLE_FOLLOWERS => $this->l10n->t('Followers'),
 			];
 		}
 
@@ -151,7 +159,7 @@ class Channels extends BaseSettings
 			$circles[$circle['id']] = $circle['name'];
 		}
 
-		$languages         = $this->l10n->getLanguageCodes(true);
+		$languages         = $this->l10n->getLanguageCodes(true, true);
 		$channel_languages = User::getWantedLanguages($uid);
 
 		$channels = [];
@@ -194,7 +202,7 @@ class Channels extends BaseSettings
 		$t = Renderer::getMarkupTemplate('settings/channels.tpl');
 
 		$exclude_tags_translation = $this->t('Comma separated list of tags. If a post contain any of these tags, then it will not be part of this channel.');
-		// @deprecated 2025.04 this translation is scheduled for removal as a new translation has been added without the typo
+		// @deprecated 2025.07 this translation is scheduled for removal as a new translation has been added without the typo
 		$exclude_tags_translation = $this->t('Comma separated list of tags. If a post contain any of these tags, then it will not be part of nthis channel.');
 
 		return Renderer::replaceMacros($t, [
@@ -207,7 +215,7 @@ class Channels extends BaseSettings
 			'exclude_tags' => ["new_exclude_tags", $this->t("Exclude Tags"), '', $exclude_tags_translation],
 			'min_size'     => ["new_min_size", $this->t("Minimum Size"), '', $this->t('Minimum post size. Leave empty for no minimum size. The size is calculated without links, attached posts, mentions or hashtags.')],
 			'max_size'     => ["new_max_size", $this->t("Maximum Size"), '', $this->t('Maximum post size. Leave empty for no maximum size. The size is calculated without links, attached posts, mentions or hashtags.')],
-			'text_search'  => ["new_text_search", $this->t("Full Text Search"), '', $this->t('Search terms for the body, supports the "boolean mode" operators from MariaDB. See the help for a complete list of operators and additional keywords: %s', '<a href="help/Channels">help/Channels</a>')],
+			'text_search'  => ["new_text_search", $this->t("Full Text Search"), '', $this->t('Search terms for the body, supports the "boolean mode" operators from MariaDB. See the help for a complete list of operators and additional keywords: %s', '<a href="help/channels">help/channels</a>')],
 			'image'        => ['new_image', $this->t("Images"), false, $this->t("Check to display images in the channel.")],
 			'video'        => ["new_video", $this->t("Videos"), false, $this->t("Check to display videos in the channel.")],
 			'audio'        => ["new_audio", $this->t("Audio"), false, $this->t("Check to display audio in the channel.")],

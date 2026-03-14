@@ -35,9 +35,9 @@ use GuzzleHttp\Psr7\Uri;
 class PostUpdate
 {
 	// Needed for the helper function to read from the legacy term table
-	const OBJECT_TYPE_POST = 1;
+	public const OBJECT_TYPE_POST = 1;
 
-	const VERSION = 1550;
+	public const VERSION = 1550;
 
 	/**
 	 * Calls the post update functions
@@ -185,7 +185,7 @@ class PostUpdate
 			Protocol::DIASPORA,
 			Protocol::OSTATUS,
 			Protocol::ACTIVITYPUB,
-			0
+			0,
 		);
 
 		while ($contact = DBA::fetch($contacts)) {
@@ -193,7 +193,7 @@ class PostUpdate
 			Contact::removeDuplicates($contact['nurl'], $contact['uid']);
 		}
 
-		DBA::close($contact);
+		DBA::close($contacts);
 		DI::keyValue()->set('post_update_version', 1322);
 
 		DI::logger()->info('Done');
@@ -348,7 +348,7 @@ class PostUpdate
 			Tag::MENTION,
 			Tag::EXCLUSIVE_MENTION,
 			Tag::IMPLICIT_MENTION,
-			$id
+			$id,
 		);
 
 		if (DBA::errorNo() != 0) {
@@ -357,7 +357,7 @@ class PostUpdate
 		}
 
 		while ($term = DBA::fetch($terms)) {
-			if (($term['type'] == Tag::MENTION) && !empty($term['url']) && !strstr($term['body'], $term['url'])) {
+			if (($term['type'] == Tag::MENTION) && !empty($term['url']) && !strstr($term['body'], (string) $term['url'])) {
 				$condition = ['nurl' => Strings::normaliseLink($term['url']), 'uid' => 0, 'deleted' => false];
 				$contact   = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
 				if (!DBA::isResult($contact)) {
@@ -366,7 +366,7 @@ class PostUpdate
 					$contact   = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
 				}
 
-				if (DBA::isResult($contact) && (!strstr($term['body'], $contact['url']) && (empty($contact['alias']) || !strstr($term['body'], $contact['alias'])))) {
+				if (DBA::isResult($contact) && (!strstr($term['body'], (string) $contact['url']) && (empty($contact['alias']) || !strstr($term['body'], (string) $contact['alias'])))) {
 					$term['type'] = Tag::IMPLICIT_MENTION;
 				}
 			}
@@ -507,7 +507,7 @@ class PostUpdate
 			'term',
 			['oid'],
 			["`type` IN (?, ?) AND `oid` >= ?", Category::CATEGORY, Category::FILE, $id],
-			['order' => ['oid'], 'limit' => 1000, 'group_by' => ['oid']]
+			['order' => ['oid'], 'limit' => 1000, 'group_by' => ['oid']],
 		);
 
 		if (DBA::errorNo() != 0) {
@@ -651,7 +651,7 @@ class PostUpdate
 			DBA::update(
 				'contact',
 				['gsid' => GServer::getRealID($contact['baseurl'], true), 'baseurl' => GServer::cleanURL($contact['baseurl'])],
-				['id'   => $contact['id']]
+				['id'   => $contact['id']],
 			);
 
 			++$rows;
@@ -706,7 +706,7 @@ class PostUpdate
 			DBA::update(
 				'apcontact',
 				['gsid' => GServer::getRealID($apcontact['baseurl'], true), 'baseurl' => GServer::cleanURL($apcontact['baseurl'])],
-				['url'  => $apcontact['url']]
+				['url'  => $apcontact['url']],
 			);
 
 			++$rows;
@@ -1079,7 +1079,7 @@ class PostUpdate
 			WHERE NOT `source` IS NULL AND `conversation`.`protocol` = ? AND `uri-id` > ? LIMIT ?",
 			Conversation::PARCEL_ACTIVITYPUB,
 			$id,
-			1000
+			1000,
 		);
 
 		if (DBA::errorNo() != 0) {
@@ -1239,12 +1239,12 @@ class PostUpdate
 
 			$parts = parse_url($contact['url']);
 			unset($parts['path']);
-			$server = (string)Uri::fromParts($parts);
+			$server = (string) Uri::fromParts($parts);
 
 			DBA::update(
 				'contact',
 				['gsid' => GServer::getRealID($server, true), 'baseurl' => GServer::cleanURL($server)],
-				['id'   => $contact['id']]
+				['id'   => $contact['id']],
 			);
 
 			++$rows;
@@ -1333,10 +1333,10 @@ class PostUpdate
 			return true;
 		}
 
-		$id = (int)(DI::keyValue()->get('post_update_version_1544_id') ?? 0);
+		$id = (int) (DI::keyValue()->get('post_update_version_1544_id') ?? 0);
 		if ($id == 0) {
 			$post = Post::selectFirstPost(['uri-id'], [], ['order' => ['uri-id' => true]]);
-			$id   = (int)($post['uri-id'] ?? 0);
+			$id   = (int) ($post['uri-id'] ?? 0);
 		}
 
 		DI::logger()->info('Start', ['uri-id' => $id]);
@@ -1398,10 +1398,10 @@ class PostUpdate
 		}
 		DBA::close($engagements);
 
-		$id = (int)(DI::keyValue()->get('post_update_version_1550_id') ?? 0);
+		$id = (int) (DI::keyValue()->get('post_update_version_1550_id') ?? 0);
 		if ($id == 0) {
 			$post = Post::selectFirstPost(['uri-id'], [], ['order' => ['uri-id' => true]]);
-			$id   = (int)($post['uri-id'] ?? 0);
+			$id   = (int) ($post['uri-id'] ?? 0);
 		}
 
 		DI::logger()->info('Start', ['uri-id' => $id]);

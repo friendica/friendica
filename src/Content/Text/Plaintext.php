@@ -17,7 +17,7 @@ use IntlChar;
 class Plaintext
 {
 	// Assumed length of an URL when shortened via the network's own url shortener (e.g. Twitter)
-	const URL_LENGTH = 23;
+	public const URL_LENGTH = 23;
 
 	/**
 	 * Shortens message
@@ -37,8 +37,8 @@ class Plaintext
 			return mb_substr(mb_substr(trim($msg), 0, $limit), 0, -3) . $ellipsis;
 		}
 
-		$lines = explode("\n", $msg);
-		$msg = "";
+		$lines   = explode("\n", $msg);
+		$msg     = "";
 		$recycle = html_entity_decode("&#x2672; ", ENT_QUOTES, 'UTF-8');
 		foreach ($lines as $row => $line) {
 			if (mb_strlen(trim($msg . "\n" . $line)) <= $limit) {
@@ -138,13 +138,13 @@ class Plaintext
 
 			if ($post['type'] == 'text') {
 				$post['type'] = 'link';
-				$post['url'] = $item['plink'];
+				$post['url']  = $item['plink'];
 			}
 		}
 
 		$html = BBCode::convertForUriId($item['uri-id'], $post['text'] . ($post['after'] ?? ''), $htmlmode);
-		$msg = HTML::toPlaintext($html, 0, true);
-		$msg = trim(html_entity_decode($msg, ENT_QUOTES, 'UTF-8'));
+		$msg  = HTML::toPlaintext($html, 0, true);
+		$msg  = trim(html_entity_decode($msg, ENT_QUOTES, 'UTF-8'));
 
 		$complete_msg = $msg;
 
@@ -170,8 +170,8 @@ class Plaintext
 
 			// If the link is already contained in the post, then it needn't to be added again
 			// But: if the link is beyond the limit, then it has to be added.
-			if (($link != '') && strstr($msg, $link)) {
-				$pos = strpos($msg, $link);
+			if (($link != '') && strstr($msg, (string) $link)) {
+				$pos = strpos($msg, (string) $link);
 
 				// Will the text be shortened in the link?
 				// Or is the link the last item in the post?
@@ -200,7 +200,7 @@ class Plaintext
 				$msg = str_replace('  ', ' ', $msg);
 			}
 
-			if (!in_array($link, ['', $item['plink']]) && ($post['type'] != 'photo') && (strpos($complete_msg, $link) === false)) {
+			if (!in_array($link, ['', $item['plink']]) && ($post['type'] != 'photo') && (strpos($complete_msg, (string) $link) === false)) {
 				$complete_msg .= "\n" . $link;
 			}
 
@@ -215,7 +215,7 @@ class Plaintext
 				if (($post['type'] == 'text') && isset($post['url'])) {
 					$post['url'] = $item['plink'];
 				} elseif (!isset($post['url'])) {
-					$limit = $limit - self::URL_LENGTH;
+					$limit       = $limit - self::URL_LENGTH;
 					$post['url'] = $item['plink'];
 				} elseif (strpos($item['body'], '[share') !== false) {
 					$post['url'] = $item['plink'];
@@ -250,7 +250,7 @@ class Plaintext
 		$limit = $baselimit;
 
 		while ($message) {
-			$pos_word = mb_strpos($message, ' ');
+			$pos_word      = mb_strpos($message, ' ');
 			$pos_paragraph = mb_strpos($message, "\n");
 
 			if (($pos_word !== false) && ($pos_paragraph !== false)) {
@@ -260,8 +260,8 @@ class Plaintext
 			} elseif ($pos_paragraph !== false) {
 				$pos = $pos_paragraph + 1;
 			} else {
-				$word     = $message;
-				$message  = '';
+				$word    = $message;
+				$message = '';
 			}
 
 			if (trim($message)) {
@@ -324,7 +324,7 @@ class Plaintext
 
 		// Remove mentions and hashtag links
 		$URLSearchString = '^\[\]';
-		$post['text'] = preg_replace("/([#!@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $item['body']);
+		$post['text']    = preg_replace("/([#!@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $item['body']);
 
 		// Remove abstract
 		$post['text'] = BBCode::stripAbstract($post['text']);
@@ -382,10 +382,10 @@ class Plaintext
 			$page = Post\Media::getByURIId($item['quote-uri-id'], [Post\Media::HTML]);
 		}
 		if (!empty($page)) {
-			$post['type']          = 'link';
-			$post['url']           = $page[0]['url'];
-			$post['description']   = $page[0]['description'];
-			$post['title']         = $page[0]['name'];
+			$post['type']        = 'link';
+			$post['url']         = $page[0]['url'];
+			$post['description'] = $page[0]['description'];
+			$post['title']       = $page[0]['name'];
 
 			if (empty($post['image']) && !empty($page[0]['preview'])) {
 				$post['image'] = $page[0]['preview'];

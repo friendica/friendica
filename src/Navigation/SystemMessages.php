@@ -54,7 +54,7 @@ class SystemMessages
 
 	public function addInfo(string $message)
 	{
-		$sysmsg = $this->getNotices();
+		$sysmsg = $this->getInfos();
 
 		$sysmsg[] = $message;
 

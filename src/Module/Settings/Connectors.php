@@ -63,15 +63,15 @@ class Connectors extends BaseSettings
 			$this->pconfig->set($this->session->getLocalUserId(), 'system', 'api_auto_attach', intval($request['api_auto_attach']));
 			$this->pconfig->set($this->session->getLocalUserId(), 'system', 'article_mode', intval($request['article_mode']));
 		} elseif (!empty($request['mail-submit']) && function_exists('imap_open') && !$this->config->get('system', 'imap_disabled')) {
-			$mail_server       =                 $request['mail_server'] ?? '';
-			$mail_port         =                 $request['mail_port'] ?? '';
+			$mail_server       = $request['mail_server'] ?? '';
+			$mail_port         = $request['mail_port']   ?? '';
 			$mail_ssl          = strtolower(trim($request['mail_ssl'] ?? ''));
-			$mail_user         =                 $request['mail_user'] ?? '';
-			$mail_pass         =            trim($request['mail_pass'] ?? '');
-			$mail_action       =            trim($request['mail_action'] ?? '');
-			$mail_movetofolder =            trim($request['mail_movetofolder'] ?? '');
-			$mail_replyto      =                 $request['mail_replyto'] ?? '';
-			$mail_pubmail      =                 $request['mail_pubmail'] ?? '';
+			$mail_user         = $request['mail_user'] ?? '';
+			$mail_pass         = trim($request['mail_pass'] ?? '');
+			$mail_action       = trim($request['mail_action'] ?? '');
+			$mail_movetofolder = trim($request['mail_movetofolder'] ?? '');
+			$mail_replyto      = $request['mail_replyto'] ?? '';
+			$mail_pubmail      = $request['mail_pubmail'] ?? '';
 
 			if (!$this->database->exists('mailacct', ['uid' => $this->session->getLocalUserId()])) {
 				$this->database->insert('mailacct', ['uid' => $this->session->getLocalUserId()]);
@@ -118,14 +118,14 @@ class Connectors extends BaseSettings
 	{
 		parent::content($request);
 
-		$accept_only_sharer      =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'accept_only_sharer'));
+		$accept_only_sharer      = intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'accept_only_sharer'));
 		$enable_cw               = !intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'disable_cw'));
 		$enable_smart_shortening = !intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'no_intelligent_shortening'));
-		$simple_shortening       =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'simple_shortening'));
-		$attach_link_title       =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'attach_link_title'));
-		$api_spoiler_title       =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'api_spoiler_title', true));
-		$api_auto_attach         =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'api_auto_attach', false));
-		$article_mode            =  intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'article_mode'));
+		$simple_shortening       = intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'simple_shortening'));
+		$attach_link_title       = intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'attach_link_title'));
+		$api_spoiler_title       = intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'api_spoiler_title', true));
+		$api_auto_attach         = intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'api_auto_attach', false));
+		$article_mode            = intval($this->pconfig->get($this->session->getLocalUserId(), 'system', 'article_mode'));
 
 		$connector_settings_forms = [];
 		foreach ($this->database->selectToArray('hook', ['file', 'function'], ['hook' => 'connector_settings']) as $hook) {
@@ -136,10 +136,10 @@ class Connectors extends BaseSettings
 			$connector_settings_forms[$data['connector']] = Renderer::replaceMacros($tpl, [
 				'$connector' => $data['connector'],
 				'$title'     => $data['title'],
-				'$image'     => $data['image'] ?? '',
+				'$image'     => $data['image']   ?? '',
 				'$enabled'   => $data['enabled'] ?? true,
 				'$open'      => ($this->parameters['connector'] ?? '') === $data['connector'],
-				'$html'      => $data['html'] ?? '',
+				'$html'      => $data['html']   ?? '',
 				'$submit'    => $data['submit'] ?? $this->t('Save Settings'),
 			]);
 		}
@@ -161,7 +161,7 @@ class Connectors extends BaseSettings
 			$mail_disabled = $this->t('Email access is disabled on this site.');
 		}
 
-		$mail_server       = $mail_account['server']       ?? '';
+		$mail_server       = $mail_account['server'] ?? '';
 		$mail_port         = (!empty($mail_account['port']) && is_numeric($mail_account['port'])) ? (int)$mail_account['port'] : '';
 		$mail_ssl          = $mail_account['ssltype']      ?? '';
 		$mail_user         = $mail_account['user']         ?? '';
@@ -223,7 +223,7 @@ class Connectors extends BaseSettings
 			'$mail_pass'         => ['mail_pass', $this->t('Email password:'), '', ''],
 			'$mail_replyto'      => ['mail_replyto', $this->t('Reply-to address:'), $mail_replyto, 'Optional'],
 			'$mail_pubmail'      => ['mail_pubmail', $this->t('Send public posts to all email contacts:'), $mail_pubmail, ''],
-			'$mail_action'       => ['mail_action', $this->t('Action after import:'), $mail_action, '', [0 => $this->t('None'), 1 => $this->t('Delete'), 2 => $this->t('Mark as seen'), 3 => $this->t('Move to folder')]],
+			'$mail_action'       => ['mail_action', $this->t('Action after import:'), $mail_action, '', [0 => $this->t('None'), 1 => $this->t('Delete'), 2 => $this->t('Mark as read'), 3 => $this->t('Move to folder')]],
 			'$mail_movetofolder' => ['mail_movetofolder', $this->t('Move to folder:'), $mail_movetofolder, ''],
 			'$submit'            => $this->t('Save Settings'),
 		]);

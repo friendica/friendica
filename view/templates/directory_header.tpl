@@ -18,6 +18,7 @@
 		<span class="dirsearch-desc">{{$desc}}</span>
 		<input type="text" name="search" id="directory-search" class="search-input" onfocus="this.select();" value="{{$search}}" />
 		<input type="submit" name="submit" id="directory-search-submit" value="{{$submit}}" class="button" />
+		<p id="num-results">{{$num_results_text}}</p>
 	</form>
 </div>
 
@@ -29,6 +30,8 @@
 
 {{foreach $contacts as $contact}}
 	{{include file="contact/entry.tpl"}}
+{{foreachelse}}
+	<div class="no-results">{{$no_results}}</div>
 {{/foreach}}
 
 <div class="directory-end"></div>

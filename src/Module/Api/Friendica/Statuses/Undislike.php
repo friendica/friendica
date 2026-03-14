@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Friendica\Statuses;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
@@ -35,6 +34,6 @@ class Undislike extends BaseApi
 
 		Item::performActivity($item['id'], 'undislike', $uid);
 
-		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid, self::appSupportsQuotes())->toArray());
+		$this->jsonExit(DI::mstdnStatus()->createFromUriId($this->parameters['id'], $uid)->toArray());
 	}
 }

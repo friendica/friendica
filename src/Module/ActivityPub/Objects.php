@@ -81,7 +81,13 @@ class Objects extends BaseModule
 		$last_modified = $item['changed'];
 		Network::checkEtagModified($etag, $last_modified);
 
-		if (empty($this->parameters['activity']) && ($item['gravity'] != Item::GRAVITY_ACTIVITY)) {
+		if (($this->parameters['activity'] ?? '') === 'replies') {
+			$posts         = Post::toArray(Post::selectPosts(['uri'], ['thr-parent-id' => $item['uri-id'], 'gravity' => Item::GRAVITY_COMMENT, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]]));
+			$data          = ['@context' => ActivityPub::CONTEXT];
+			$data['id']    = DI::baseUrl() . '/' . DI::args()->getQueryString();
+			$data['type']  = 'OrderedCollection';
+			$data['items'] = array_column($posts, 'uri');
+		} elseif (!isset($this->parameters['activity']) && ($item['gravity'] !== Item::GRAVITY_ACTIVITY)) {
 			$activity = ActivityPub\Transmitter::createCachedActivityFromItem($item['id'], false, true);
 			if (empty($activity['type'])) {
 				throw new HTTPException\NotFoundException();
@@ -99,7 +105,7 @@ class Objects extends BaseModule
 		} elseif (empty($this->parameters['activity']) || in_array(
 			$this->parameters['activity'],
 			['Create', 'Announce', 'Update', 'Like', 'Dislike', 'Accept', 'Reject',
-				'TentativeAccept', 'Follow', 'Add']
+				'TentativeAccept', 'Follow', 'Add', 'Delete']
 		)) {
 			$data = ActivityPub\Transmitter::createCachedActivityFromItem($item['id']);
 			if (empty($data)) {

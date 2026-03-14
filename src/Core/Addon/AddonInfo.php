@@ -51,8 +51,8 @@ final class AddonInfo
 					continue;
 				}
 
-				list($type, $v) = $addon_info;
-				$type           = strtolower($type);
+				[$type, $v] = $addon_info;
+				$type       = strtolower($type);
 
 				if ($type === 'author' || $type === 'maintainer') {
 					$r = preg_match("|([^<]+)<([^>]+)>|", $v, $m);

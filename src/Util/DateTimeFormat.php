@@ -121,6 +121,10 @@ class DateTimeFormat
 			$s = 'now';
 		}
 
+		if (is_numeric($s) && ($s > time() * 100)) {
+			$s = number_format($s / 1000, 0, '.', '');
+		}
+
 		// Lowest possible datetime value
 		if (substr($s, 0, 10) <= '0001-01-01') {
 			$d = new DateTime('now', new DateTimeZone('UTC'));

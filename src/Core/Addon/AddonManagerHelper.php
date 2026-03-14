@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Core\Addon;
 
+use Friendica\Core\Addon\Exception\AddonInvalidConfigFileException;
 use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -268,6 +269,34 @@ final class AddonManagerHelper implements AddonHelper
 		}
 
 		return AddonInfo::fromString($addonId, $matches[0]);
+	}
+
+	/**
+	 * Returns a dependency config array for a given addon
+	 *
+	 * This will load a potential config-file from the static directory, like `addon/{addonId}/static/dependencies.config.php`
+	 *
+	 * @throws AddonInvalidConfigFileException If the config file doesn't return an array
+	 *
+	 * @return array the config as array or empty array if no config file was found
+	 */
+	public function getAddonDependencyConfig(string $addonId): array
+	{
+		$addonId = Strings::sanitizeFilePathItem(trim($addonId));
+
+		$configFile = $this->getAddonPath() . '/' . $addonId . '/static/dependencies.config.php';
+
+		if (!file_exists($configFile)) {
+			return [];
+		}
+
+		$config = include($configFile);
+
+		if (!is_array($config)) {
+			throw new AddonInvalidConfigFileException('Error loading config file ' . $configFile);
+		}
+
+		return $config;
 	}
 
 	/**

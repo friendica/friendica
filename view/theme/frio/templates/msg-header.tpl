@@ -17,5 +17,15 @@
 		if ($el.length) {
 			$el.scrollTop($el.get(0).scrollHeight);
 		}
+
+		// Validate message form - disable submit button if message is empty
+		function validateMessageForm() {
+			var messageText = $('#comment-edit-text-input').val().trim();
+			$('#prvmail-submit').prop('disabled', messageText.length === 0);
+		}
+
+		// Check on page load and on input
+		validateMessageForm();
+		$('#comment-edit-text-input').on('input keyup', validateMessageForm);
 	});
 </script>

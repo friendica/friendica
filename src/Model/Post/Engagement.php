@@ -108,11 +108,12 @@ class Engagement
 			'network'      => $parent['network'],
 			'restricted'   => !in_array($item['network'], Protocol::FEDERATED) || ($parent['private'] != Item::PUBLIC),
 			'comments'     => DBA::count('post', ['parent-uri-id' => $item['parent-uri-id'], 'gravity' => Item::GRAVITY_COMMENT]),
+			'views'        => DBA::count('post', ['parent-uri-id' => $item['parent-uri-id'], 'gravity' => Item::GRAVITY_ACTIVITY, 'vid' => [Verb::getID(Activity::VIEW), Verb::getID(Activity::READ)]]),
 			'activities'   => DBA::count('post', [
 				"`parent-uri-id` = ? AND `gravity` = ? AND NOT `vid` IN (?, ?, ?)",
 				$item['parent-uri-id'], Item::GRAVITY_ACTIVITY,
 				Verb::getID(Activity::FOLLOW), Verb::getID(Activity::VIEW), Verb::getID(Activity::READ)
-			])
+			]),
 		];
 		if (!$store && ($engagement['comments'] == 0) && ($engagement['activities'] == 0)) {
 			DI::logger()->debug('No media, follower, subscribed tags, comments or activities. Engagement not stored', ['fields' => $engagement]);
@@ -379,7 +380,7 @@ class Engagement
 		DI::logger()->notice('Cleared expired engagements', ['limit' => $limit, 'rows' => DBA::affectedRows()]);
 	}
 
-	private static function getCreationDateLimit(bool $forDeletion): string
+	public static function getCreationDateLimit(bool $forDeletion): string
 	{
 		$posts = DI::config()->get('channel', 'engagement_post_limit');
 		if (!empty($posts)) {

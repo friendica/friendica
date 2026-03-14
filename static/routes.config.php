@@ -33,40 +33,40 @@ $profileRoutes = [
 
 $apiRoutes = [
 	'/account' => [
-		'/verify_credentials[.{extension:json|xml|rss|atom}]'      => [Module\Api\Twitter\Account\VerifyCredentials::class,  [R::GET         ]],
-		'/rate_limit_status[.{extension:json|xml|rss|atom}]'       => [Module\Api\Twitter\Account\RateLimitStatus::class,    [R::GET         ]],
-		'/update_profile[.{extension:json|xml|rss|atom}]'          => [Module\Api\Twitter\Account\UpdateProfile::class,      [        R::POST]],
-		'/update_profile_image[.{extension:json|xml|rss|atom}]'    => [Module\Api\Twitter\Account\UpdateProfileImage::class, [        R::POST]],
+		'/verify_credentials[.{extension:json|xml|rss|atom}]'   => [Module\Api\Twitter\Account\VerifyCredentials::class,  [R::GET         ]],
+		'/rate_limit_status[.{extension:json|xml|rss|atom}]'    => [Module\Api\Twitter\Account\RateLimitStatus::class,    [R::GET         ]],
+		'/update_profile[.{extension:json|xml|rss|atom}]'       => [Module\Api\Twitter\Account\UpdateProfile::class,      [        R::POST]],
+		'/update_profile_image[.{extension:json|xml|rss|atom}]' => [Module\Api\Twitter\Account\UpdateProfileImage::class, [        R::POST]],
 	],
 
-	'/blocks/ids[.{extension:json|xml|rss|atom}]'                  => [Module\Api\Twitter\Blocks\Ids::class,               [R::GET         ]],
-	'/blocks/list[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Blocks\Lists::class,             [R::GET         ]],
-	'/conversation/show[.{extension:json|xml|rss|atom}]'           => [Module\Api\GNUSocial\Statusnet\Conversation::class, [R::GET         ]],
-	'/conversation/show/{id:\d+}[.{extension:json|xml|rss|atom}]'  => [Module\Api\GNUSocial\Statusnet\Conversation::class, [R::GET         ]],
-	'/direct_messages' => [
-		'/all[.{extension:json|xml|rss|atom}]'                     => [Module\Api\Twitter\DirectMessages\All::class,          [R::GET         ]],
-		'/conversation[.{extension:json|xml|rss|atom}]'            => [Module\Api\Twitter\DirectMessages\Conversation::class, [R::GET         ]],
-		'/destroy[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\DirectMessages\Destroy::class,      [        R::POST]],
-		'/new[.{extension:json|xml|rss|atom}]'                     => [Module\Api\Twitter\DirectMessages\NewDM::class,        [        R::POST]],
-		'/sent[.{extension:json|xml|rss|atom}]'                    => [Module\Api\Twitter\DirectMessages\Sent::class,         [R::GET         ]],
+	'/blocks/ids[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Blocks\Ids::class,               [R::GET         ]],
+	'/blocks/list[.{extension:json|xml|rss|atom}]'                => [Module\Api\Twitter\Blocks\Lists::class,             [R::GET         ]],
+	'/conversation/show[.{extension:json|xml|rss|atom}]'          => [Module\Api\GNUSocial\Statusnet\Conversation::class, [R::GET         ]],
+	'/conversation/show/{id:\d+}[.{extension:json|xml|rss|atom}]' => [Module\Api\GNUSocial\Statusnet\Conversation::class, [R::GET         ]],
+	'/direct_messages'                                            => [
+		'/all[.{extension:json|xml|rss|atom}]'          => [Module\Api\Twitter\DirectMessages\All::class,          [R::GET         ]],
+		'/conversation[.{extension:json|xml|rss|atom}]' => [Module\Api\Twitter\DirectMessages\Conversation::class, [R::GET         ]],
+		'/destroy[.{extension:json|xml|rss|atom}]'      => [Module\Api\Twitter\DirectMessages\Destroy::class,      [        R::POST]],
+		'/new[.{extension:json|xml|rss|atom}]'          => [Module\Api\Twitter\DirectMessages\NewDM::class,        [        R::POST]],
+		'/sent[.{extension:json|xml|rss|atom}]'         => [Module\Api\Twitter\DirectMessages\Sent::class,         [R::GET         ]],
 	],
-	'/direct_messages[.{extension:json|xml|rss|atom}]'             => [Module\Api\Twitter\DirectMessages\Inbox::class,     [R::GET, R::POST]],
+	'/direct_messages[.{extension:json|xml|rss|atom}]' => [Module\Api\Twitter\DirectMessages\Inbox::class,     [R::GET, R::POST]],
 
-	'/externalprofile/show[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Users\Show::class,               [R::GET         ]],
-	'/favorites/create[.{extension:json|xml|rss|atom}]'            => [Module\Api\Twitter\Favorites\Create::class,         [        R::POST]],
-	'/favorites/destroy[.{extension:json|xml|rss|atom}]'           => [Module\Api\Twitter\Favorites\Destroy::class,        [        R::POST]],
-	'/favorites[.{extension:json|xml|rss|atom}]'                   => [Module\Api\Twitter\Favorites::class,                [R::GET         ]],
-	'/followers/ids[.{extension:json|xml|rss|atom}]'               => [Module\Api\Twitter\Followers\Ids::class,            [R::GET         ]],
-	'/followers/list[.{extension:json|xml|rss|atom}]'              => [Module\Api\Twitter\Followers\Lists::class,          [R::GET         ]],
-	'/friends/ids[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Friends\Ids::class,              [R::GET         ]],
-	'/friends/list[.{extension:json|xml|rss|atom}]'                => [Module\Api\Twitter\Friends\Lists::class,            [R::GET         ]],
-	'/friendships/destroy[.{extension:json|xml|rss|atom}]'         => [Module\Api\Twitter\Friendships\Destroy::class,      [        R::POST]],
-	'/friendships/incoming[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Friendships\Incoming::class,     [R::GET         ]],
-	'/friendships/show[.{extension:json|xml|rss|atom}]'            => [Module\Api\Twitter\Friendships\Show::class,         [R::GET         ]],
+	'/externalprofile/show[.{extension:json|xml|rss|atom}]' => [Module\Api\Twitter\Users\Show::class,               [R::GET         ]],
+	'/favorites/create[.{extension:json|xml|rss|atom}]'     => [Module\Api\Twitter\Favorites\Create::class,         [        R::POST]],
+	'/favorites/destroy[.{extension:json|xml|rss|atom}]'    => [Module\Api\Twitter\Favorites\Destroy::class,        [        R::POST]],
+	'/favorites[.{extension:json|xml|rss|atom}]'            => [Module\Api\Twitter\Favorites::class,                [R::GET         ]],
+	'/followers/ids[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Followers\Ids::class,            [R::GET         ]],
+	'/followers/list[.{extension:json|xml|rss|atom}]'       => [Module\Api\Twitter\Followers\Lists::class,          [R::GET         ]],
+	'/friends/ids[.{extension:json|xml|rss|atom}]'          => [Module\Api\Twitter\Friends\Ids::class,              [R::GET         ]],
+	'/friends/list[.{extension:json|xml|rss|atom}]'         => [Module\Api\Twitter\Friends\Lists::class,            [R::GET         ]],
+	'/friendships/destroy[.{extension:json|xml|rss|atom}]'  => [Module\Api\Twitter\Friendships\Destroy::class,      [        R::POST]],
+	'/friendships/incoming[.{extension:json|xml|rss|atom}]' => [Module\Api\Twitter\Friendships\Incoming::class,     [R::GET         ]],
+	'/friendships/show[.{extension:json|xml|rss|atom}]'     => [Module\Api\Twitter\Friendships\Show::class,         [R::GET         ]],
 
 	'/friendica' => [
-		'/activity/{verb:attendmaybe|attendno|attendyes|dislike|like|unattendmaybe|unattendno|unattendyes|undislike|unlike}[.{extension:json|xml|rss|atom}]'
-			=> [Module\Api\Friendica\Activity::class, [        R::POST]],
+		'/activity/{verb:attendmaybe|attendno|attendyes|dislike|like|unattendmaybe|unattendno|unattendyes|undislike|unlike}[.{extension:json|xml|rss|atom}]' => [Module\Api\Friendica\Activity::class, [        R::POST]],
+
 		'/statuses/{id:\d+}/dislike'                               => [Module\Api\Friendica\Statuses\Dislike::class,       [        R::POST]],
 		'/statuses/{id:\d+}/disliked_by'                           => [Module\Api\Friendica\Statuses\DislikedBy::class,    [R::GET         ]],
 		'/statuses/{id:\d+}/undislike'                             => [Module\Api\Friendica\Statuses\Undislike::class,     [        R::POST]],
@@ -74,7 +74,7 @@ $apiRoutes = [
 		'/notification[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Notification::class,           [R::GET         ]],
 		'/notifications[.{extension:json|xml|rss|atom}]'           => [Module\Api\Friendica\Notification::class,           [R::GET         ]],
 		'/direct_messages_setseen[.{extension:json|xml|rss|atom}]' => [Module\Api\Friendica\DirectMessages\Setseen::class, [        R::POST]],
-		'/direct_messages_search[.{extension:json|xml|rss|atom}]'  => [Module\Api\Friendica\DirectMessages\Search ::class, [R::GET         ]],
+		'/direct_messages_search[.{extension:json|xml|rss|atom}]'  => [Module\Api\Friendica\DirectMessages\Search::class, [R::GET         ]],
 		'/events[.{extension:json|xml|rss|atom}]'                  => [Module\Api\Friendica\Events\Index::class,           [R::GET         ]],
 		'/event_create[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Events\Create::class,          [        R::POST]],
 		'/event_delete[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Events\Delete::class,          [        R::POST]],
@@ -85,35 +85,35 @@ $apiRoutes = [
 
 		// Backward compatibility
 		// @deprecated
-		'/group_show[.{extension:json|xml|rss|atom}]'              => [Module\Api\Friendica\Circle\Show::class,            [R::GET         ]],
-		'/group_create[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Circle\Create::class,          [        R::POST]],
-		'/group_delete[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Circle\Delete::class,          [        R::POST]],
-		'/group_update[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Circle\Update::class,          [        R::POST]],
+		'/group_show[.{extension:json|xml|rss|atom}]'   => [Module\Api\Friendica\Circle\Show::class,            [R::GET         ]],
+		'/group_create[.{extension:json|xml|rss|atom}]' => [Module\Api\Friendica\Circle\Create::class,          [        R::POST]],
+		'/group_delete[.{extension:json|xml|rss|atom}]' => [Module\Api\Friendica\Circle\Delete::class,          [        R::POST]],
+		'/group_update[.{extension:json|xml|rss|atom}]' => [Module\Api\Friendica\Circle\Update::class,          [        R::POST]],
 
-		'/profile/show[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Profile\Show::class,           [R::GET         ]],
-		'/photoalbums[.{extension:json|xml|rss|atom}]'             => [Module\Api\Friendica\Photoalbum\Index::class,       [R::GET         ]],
-		'/photoalbum[.{extension:json|xml|rss|atom}]'              => [Module\Api\Friendica\Photoalbum\Show::class,        [R::GET         ]],
-		'/photoalbum/delete[.{extension:json|xml|rss|atom}]'       => [Module\Api\Friendica\Photoalbum\Delete::class,      [        R::POST]],
-		'/photoalbum/update[.{extension:json|xml|rss|atom}]'       => [Module\Api\Friendica\Photoalbum\Update::class,      [        R::POST]],
-		'/photos/list[.{extension:json|xml|rss|atom}]'             => [Module\Api\Friendica\Photo\Lists::class,            [R::GET         ]],
-		'/photo/create[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Photo\Create::class,           [        R::POST]],
-		'/photo/delete[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Photo\Delete::class,           [        R::POST]],
-		'/photo/update[.{extension:json|xml|rss|atom}]'            => [Module\Api\Friendica\Photo\Update::class,           [        R::POST]],
-		'/photo[.{extension:json|xml|rss|atom}]'                   => [Module\Api\Friendica\Photo::class,                  [R::GET         ]],
+		'/profile/show[.{extension:json|xml|rss|atom}]'      => [Module\Api\Friendica\Profile\Show::class,           [R::GET         ]],
+		'/photoalbums[.{extension:json|xml|rss|atom}]'       => [Module\Api\Friendica\Photoalbum\Index::class,       [R::GET         ]],
+		'/photoalbum[.{extension:json|xml|rss|atom}]'        => [Module\Api\Friendica\Photoalbum\Show::class,        [R::GET         ]],
+		'/photoalbum/delete[.{extension:json|xml|rss|atom}]' => [Module\Api\Friendica\Photoalbum\Delete::class,      [        R::POST]],
+		'/photoalbum/update[.{extension:json|xml|rss|atom}]' => [Module\Api\Friendica\Photoalbum\Update::class,      [        R::POST]],
+		'/photos/list[.{extension:json|xml|rss|atom}]'       => [Module\Api\Friendica\Photo\Lists::class,            [R::GET         ]],
+		'/photo/create[.{extension:json|xml|rss|atom}]'      => [Module\Api\Friendica\Photo\Create::class,           [        R::POST]],
+		'/photo/delete[.{extension:json|xml|rss|atom}]'      => [Module\Api\Friendica\Photo\Delete::class,           [        R::POST]],
+		'/photo/update[.{extension:json|xml|rss|atom}]'      => [Module\Api\Friendica\Photo\Update::class,           [        R::POST]],
+		'/photo[.{extension:json|xml|rss|atom}]'             => [Module\Api\Friendica\Photo::class,                  [R::GET         ]],
 	],
 
-	'/gnusocial/config[.{extension:json|xml|rss|atom}]'            => [Module\Api\GNUSocial\GNUSocial\Config::class,  [R::GET         ]],
-	'/gnusocial/version[.{extension:json|xml|rss|atom}]'           => [Module\Api\GNUSocial\GNUSocial\Version::class, [R::GET         ]],
-	'/help/test[.{extension:json|xml|rss|atom}]'                   => [Module\Api\GNUSocial\Help\Test::class,         [R::GET         ]],
+	'/gnusocial/config[.{extension:json|xml|rss|atom}]'  => [Module\Api\GNUSocial\GNUSocial\Config::class,  [R::GET         ]],
+	'/gnusocial/version[.{extension:json|xml|rss|atom}]' => [Module\Api\GNUSocial\GNUSocial\Version::class, [R::GET         ]],
+	'/help/test[.{extension:json|xml|rss|atom}]'         => [Module\Api\GNUSocial\Help\Test::class,         [R::GET         ]],
 
 	'/lists' => [
-		'/create[.{extension:json|xml|rss|atom}]'                  => [Module\Api\Twitter\Lists\Create::class,    [        R::POST]],
-		'/destroy[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Lists\Destroy::class,   [        R::POST]],
-		'/list[.{extension:json|xml|rss|atom}]'                    => [Module\Api\Twitter\Lists\Lists::class,     [R::GET         ]],
-		'/ownerships[.{extension:json|xml|rss|atom}]'              => [Module\Api\Twitter\Lists\Ownership::class, [R::GET         ]],
-		'/statuses[.{extension:json|xml|rss|atom}]'                => [Module\Api\Twitter\Lists\Statuses::class,  [R::GET         ]],
-		'/subscriptions[.{extension:json|xml|rss|atom}]'           => [Module\Api\Twitter\Lists\Lists::class,     [R::GET         ]],
-		'/update[.{extension:json|xml|rss|atom}]'                  => [Module\Api\Twitter\Lists\Update::class,    [        R::POST]],
+		'/create[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Lists\Create::class,    [        R::POST]],
+		'/destroy[.{extension:json|xml|rss|atom}]'       => [Module\Api\Twitter\Lists\Destroy::class,   [        R::POST]],
+		'/list[.{extension:json|xml|rss|atom}]'          => [Module\Api\Twitter\Lists\Lists::class,     [R::GET         ]],
+		'/ownerships[.{extension:json|xml|rss|atom}]'    => [Module\Api\Twitter\Lists\Ownership::class, [R::GET         ]],
+		'/statuses[.{extension:json|xml|rss|atom}]'      => [Module\Api\Twitter\Lists\Statuses::class,  [R::GET         ]],
+		'/subscriptions[.{extension:json|xml|rss|atom}]' => [Module\Api\Twitter\Lists\Lists::class,     [R::GET         ]],
+		'/update[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Lists\Update::class,    [        R::POST]],
 	],
 
 	'/media/upload[.{extension:json|xml|rss|atom}]'                    => [Module\Api\Twitter\Media\Upload::class,             [        R::POST]],
@@ -127,41 +127,40 @@ $apiRoutes = [
 	'/statusnet/version[.{extension:json|xml|rss|atom}]'               => [Module\Api\GNUSocial\GNUSocial\Version::class,      [R::GET         ]],
 
 	'/statuses' => [
-		'/destroy[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Statuses\Destroy::class,               [        R::POST]],
-		'/destroy/{id:\d+}[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Statuses\Destroy::class,               [        R::POST]],
-		'/followers[.{extension:json|xml|rss|atom}]'               => [Module\Api\Twitter\Followers\Lists::class,                [R::GET         ]],
-		'/friends[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Friends\Lists::class,                  [R::GET         ]],
-		'/friends_timeline[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Statuses\HomeTimeline::class,          [R::GET         ]],
-		'/home_timeline[.{extension:json|xml|rss|atom}]'           => [Module\Api\Twitter\Statuses\HomeTimeline::class,          [R::GET         ]],
-		'/mediap[.{extension:json|xml|rss|atom}]'                  => [Module\Api\Twitter\Statuses\Update::class,                [        R::POST]],
-		'/mentions[.{extension:json|xml|rss|atom}]'                => [Module\Api\Twitter\Statuses\Mentions::class,              [R::GET         ]],
-		'/mentions_timeline[.{extension:json|xml|rss|atom}]'       => [Module\Api\Twitter\Statuses\Mentions::class,              [R::GET         ]],
-		'/networkpublic_timeline[.{extension:json|xml|rss|atom}]'  => [Module\Api\Twitter\Statuses\NetworkPublicTimeline::class, [R::GET         ]],
-		'/public_timeline[.{extension:json|xml|rss|atom}]'         => [Module\Api\Twitter\Statuses\PublicTimeline::class,        [R::GET         ]],
-		'/replies[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Statuses\Mentions::class,              [R::GET         ]],
-		'/retweet[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Statuses\Retweet::class,               [        R::POST]],
-		'/retweet/{id:\d+}[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Statuses\Retweet::class,               [        R::POST]],
-		'/show[.{extension:json|xml|rss|atom}]'                    => [Module\Api\Twitter\Statuses\Show::class,                  [R::GET         ]],
-		'/show/{id:\d+}[.{extension:json|xml|rss|atom}]'           => [Module\Api\Twitter\Statuses\Show::class,                  [R::GET         ]],
-		'/update[.{extension:json|xml|rss|atom}]'                  => [Module\Api\Twitter\Statuses\Update::class,                [        R::POST]],
-		'/update_with_media[.{extension:json|xml|rss|atom}]'       => [Module\Api\Twitter\Statuses\Update::class,                [        R::POST]],
-		'/user_timeline[.{extension:json|xml|rss|atom}]'           => [Module\Api\Twitter\Statuses\UserTimeline::class,          [R::GET         ]],
+		'/destroy[.{extension:json|xml|rss|atom}]'                => [Module\Api\Twitter\Statuses\Destroy::class,               [        R::POST]],
+		'/destroy/{id:\d+}[.{extension:json|xml|rss|atom}]'       => [Module\Api\Twitter\Statuses\Destroy::class,               [        R::POST]],
+		'/followers[.{extension:json|xml|rss|atom}]'              => [Module\Api\Twitter\Followers\Lists::class,                [R::GET         ]],
+		'/friends[.{extension:json|xml|rss|atom}]'                => [Module\Api\Twitter\Friends\Lists::class,                  [R::GET         ]],
+		'/friends_timeline[.{extension:json|xml|rss|atom}]'       => [Module\Api\Twitter\Statuses\HomeTimeline::class,          [R::GET         ]],
+		'/home_timeline[.{extension:json|xml|rss|atom}]'          => [Module\Api\Twitter\Statuses\HomeTimeline::class,          [R::GET         ]],
+		'/mediap[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Statuses\Update::class,                [        R::POST]],
+		'/mentions[.{extension:json|xml|rss|atom}]'               => [Module\Api\Twitter\Statuses\Mentions::class,              [R::GET         ]],
+		'/mentions_timeline[.{extension:json|xml|rss|atom}]'      => [Module\Api\Twitter\Statuses\Mentions::class,              [R::GET         ]],
+		'/networkpublic_timeline[.{extension:json|xml|rss|atom}]' => [Module\Api\Twitter\Statuses\NetworkPublicTimeline::class, [R::GET         ]],
+		'/public_timeline[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Statuses\PublicTimeline::class,        [R::GET         ]],
+		'/replies[.{extension:json|xml|rss|atom}]'                => [Module\Api\Twitter\Statuses\Mentions::class,              [R::GET         ]],
+		'/retweet[.{extension:json|xml|rss|atom}]'                => [Module\Api\Twitter\Statuses\Retweet::class,               [        R::POST]],
+		'/retweet/{id:\d+}[.{extension:json|xml|rss|atom}]'       => [Module\Api\Twitter\Statuses\Retweet::class,               [        R::POST]],
+		'/show[.{extension:json|xml|rss|atom}]'                   => [Module\Api\Twitter\Statuses\Show::class,                  [R::GET         ]],
+		'/show/{id:\d+}[.{extension:json|xml|rss|atom}]'          => [Module\Api\Twitter\Statuses\Show::class,                  [R::GET         ]],
+		'/update[.{extension:json|xml|rss|atom}]'                 => [Module\Api\Twitter\Statuses\Update::class,                [        R::POST]],
+		'/update_with_media[.{extension:json|xml|rss|atom}]'      => [Module\Api\Twitter\Statuses\Update::class,                [        R::POST]],
+		'/user_timeline[.{extension:json|xml|rss|atom}]'          => [Module\Api\Twitter\Statuses\UserTimeline::class,          [R::GET         ]],
 	],
 
 	'/users' => [
-		'/lookup[.{extension:json|xml|rss|atom}]'                  => [Module\Api\Twitter\Users\Lookup::class, [R::GET         ]],
-		'/search[.{extension:json|xml|rss|atom}]'                  => [Module\Api\Twitter\Users\Search::class, [R::GET         ]],
-		'/show[.{extension:json|xml|rss|atom}]'                    => [Module\Api\Twitter\Users\Show::class,   [R::GET         ]],
-		'/show/{id:\d+}[.{extension:json|xml|rss|atom}]'           => [Module\Api\Twitter\Users\Show::class,   [R::GET         ]],
+		'/lookup[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Users\Lookup::class, [R::GET         ]],
+		'/search[.{extension:json|xml|rss|atom}]'        => [Module\Api\Twitter\Users\Search::class, [R::GET         ]],
+		'/show[.{extension:json|xml|rss|atom}]'          => [Module\Api\Twitter\Users\Show::class,   [R::GET         ]],
+		'/show/{id:\d+}[.{extension:json|xml|rss|atom}]' => [Module\Api\Twitter\Users\Show::class,   [R::GET         ]],
 	],
-	'/whoami'                                                      => [Module\ActivityPub\Whoami::class, [R::GET         ]],
+	'/whoami' => [Module\ActivityPub\Whoami::class, [R::GET         ]],
 ];
 
 return [
 	'/' => [Module\Home::class, [R::GET]],
 
 	'/.well-known' => [
-		'/host-meta'      => [Module\WellKnown\HostMeta::class,     [R::GET]],
 		'/nodeinfo'       => [Module\WellKnown\NodeInfo::class,     [R::GET]],
 		'/security.txt'   => [Module\WellKnown\SecurityTxt::class,  [R::GET]],
 		'/webfinger'      => [Module\Xrd::class,                    [R::GET]],
@@ -179,149 +178,149 @@ return [
 	'/api' => [
 		''     => $apiRoutes,
 		'/1.1' => $apiRoutes,
-		'/v1' => [
-			'/accounts'                          => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
-			'/accounts/{id:\d+}'                 => [Module\Api\Mastodon\Accounts::class,                 [R::GET         ]],
-			'/accounts/{id:\d+}/statuses'        => [Module\Api\Mastodon\Accounts\Statuses::class,        [R::GET         ]],
-			'/accounts/{id:\d+}/featured_tags'   => [Module\Api\Mastodon\Accounts\FeaturedTags::class,    [R::GET         ]], // Dummy, not supported
-			'/accounts/{id:\d+}/followers'       => [Module\Api\Mastodon\Accounts\Followers::class,       [R::GET         ]],
-			'/accounts/{id:\d+}/following'       => [Module\Api\Mastodon\Accounts\Following::class,       [R::GET         ]],
-			'/accounts/{id:\d+}/lists'           => [Module\Api\Mastodon\Accounts\Lists::class,           [R::GET         ]],
-			'/accounts/{id:\d+}/identity_proofs' => [Module\Api\Mastodon\Accounts\IdentityProofs::class,  [R::GET         ]], // Dummy, not supported
-			'/accounts/{id:\d+}/follow'          => [Module\Api\Mastodon\Accounts\Follow::class,          [        R::POST]],
-			'/accounts/{id:\d+}/unfollow'        => [Module\Api\Mastodon\Accounts\Unfollow::class,        [        R::POST]],
-			'/accounts/{id:\d+}/block'           => [Module\Api\Mastodon\Accounts\Block::class,           [        R::POST]],
-			'/accounts/{id:\d+}/unblock'         => [Module\Api\Mastodon\Accounts\Unblock::class,         [        R::POST]],
-			'/accounts/{id:\d+}/mute'            => [Module\Api\Mastodon\Accounts\Mute::class,            [        R::POST]],
-			'/accounts/{id:\d+}/unmute'          => [Module\Api\Mastodon\Accounts\Unmute::class,          [        R::POST]],
-			'/accounts/{id:\d+}/pin'             => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
-			'/accounts/{id:\d+}/unpin'           => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
-			'/accounts/{id:\d+}/note'            => [Module\Api\Mastodon\Accounts\Note::class,            [        R::POST]],
+		'/v1'  => [
+			'/accounts'                                => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/accounts/{id:\d+}'                       => [Module\Api\Mastodon\Accounts::class,                 [R::GET         ]],
+			'/accounts/{id:\d+}/statuses'              => [Module\Api\Mastodon\Accounts\Statuses::class,        [R::GET         ]],
+			'/accounts/{id:\d+}/featured_tags'         => [Module\Api\Mastodon\Accounts\FeaturedTags::class,    [R::GET         ]], // Dummy, not supported
+			'/accounts/{id:\d+}/followers'             => [Module\Api\Mastodon\Accounts\Followers::class,       [R::GET         ]],
+			'/accounts/{id:\d+}/following'             => [Module\Api\Mastodon\Accounts\Following::class,       [R::GET         ]],
+			'/accounts/{id:\d+}/lists'                 => [Module\Api\Mastodon\Accounts\Lists::class,           [R::GET         ]],
+			'/accounts/{id:\d+}/identity_proofs'       => [Module\Api\Mastodon\Accounts\IdentityProofs::class,  [R::GET         ]], // Dummy, not supported
+			'/accounts/{id:\d+}/follow'                => [Module\Api\Mastodon\Accounts\Follow::class,          [        R::POST]],
+			'/accounts/{id:\d+}/unfollow'              => [Module\Api\Mastodon\Accounts\Unfollow::class,        [        R::POST]],
+			'/accounts/{id:\d+}/block'                 => [Module\Api\Mastodon\Accounts\Block::class,           [        R::POST]],
+			'/accounts/{id:\d+}/unblock'               => [Module\Api\Mastodon\Accounts\Unblock::class,         [        R::POST]],
+			'/accounts/{id:\d+}/mute'                  => [Module\Api\Mastodon\Accounts\Mute::class,            [        R::POST]],
+			'/accounts/{id:\d+}/unmute'                => [Module\Api\Mastodon\Accounts\Unmute::class,          [        R::POST]],
+			'/accounts/{id:\d+}/pin'                   => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/accounts/{id:\d+}/unpin'                 => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/accounts/{id:\d+}/note'                  => [Module\Api\Mastodon\Accounts\Note::class,            [        R::POST]],
 			'/accounts/{id:\d+}/remove_from_followers' => [Module\Api\Mastodon\Unimplemented::class,      [        R::POST]], // not supported
-			'/accounts/familiar_followers'       => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/accounts/lookup'                   => [Module\Api\Mastodon\Accounts\Lookup::class,          [R::GET         ]],
-			'/accounts/relationships'            => [Module\Api\Mastodon\Accounts\Relationships::class,   [R::GET         ]],
-			'/accounts/search'                   => [Module\Api\Mastodon\Accounts\Search::class,          [R::GET         ]],
-			'/accounts/update_credentials'       => [Module\Api\Mastodon\Accounts\UpdateCredentials::class, [R::PATCH     ]],
-			'/accounts/verify_credentials'       => [Module\Api\Mastodon\Accounts\VerifyCredentials::class, [R::GET       ]],
-			'/accounts/{name}'                   => [Module\Api\Mastodon\Accounts::class,                 [R::GET         ]],
-			'/admin/accounts/{id:\d+}'           => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/admin/accounts/{id:\d+}/{action}'  => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
-			'/admin/dimensions'                  => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
-			'/admin/measures'                    => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
-			'/admin/retention'                   => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
-			'/admin/trends/links'                => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/admin/trends/statuses'             => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/admin/trends/tags'                 => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/admin/reports'                     => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/admin/reports/{id:\d+}'            => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/admin/reports/{id:\d+}/{action}'   => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
-			'/announcements'                     => [Module\Api\Mastodon\Announcements::class,            [R::GET         ]], // Dummy, not supported
-			'/announcements/{id:\d+}/dismiss'    => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/accounts/familiar_followers'             => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/accounts/lookup'                         => [Module\Api\Mastodon\Accounts\Lookup::class,          [R::GET         ]],
+			'/accounts/relationships'                  => [Module\Api\Mastodon\Accounts\Relationships::class,   [R::GET         ]],
+			'/accounts/search'                         => [Module\Api\Mastodon\Accounts\Search::class,          [R::GET         ]],
+			'/accounts/update_credentials'             => [Module\Api\Mastodon\Accounts\UpdateCredentials::class, [R::PATCH     ]],
+			'/accounts/verify_credentials'             => [Module\Api\Mastodon\Accounts\VerifyCredentials::class, [R::GET       ]],
+			'/accounts/{name}'                         => [Module\Api\Mastodon\Accounts::class,                 [R::GET         ]],
+			'/admin/accounts/{id:\d+}'                 => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/admin/accounts/{id:\d+}/{action}'        => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/admin/dimensions'                        => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/admin/measures'                          => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/admin/retention'                         => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/admin/trends/links'                      => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/admin/trends/statuses'                   => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/admin/trends/tags'                       => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/admin/reports'                           => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/admin/reports/{id:\d+}'                  => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/admin/reports/{id:\d+}/{action}'         => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/announcements'                           => [Module\Api\Mastodon\Announcements::class,            [R::GET         ]], // Dummy, not supported
+			'/announcements/{id:\d+}/dismiss'          => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
 			'/announcements/{id:\d+}/reactions/{name}' => [Module\Api\Mastodon\Unimplemented::class,      [R::PUT, R::DELETE]], // not supported
-			'/apps'                              => [Module\Api\Mastodon\Apps::class,                     [        R::POST]],
-			'/apps/verify_credentials'           => [Module\Api\Mastodon\Apps\VerifyCredentials::class,   [R::GET         ]],
-			'/blocks'                            => [Module\Api\Mastodon\Blocks::class,                   [R::GET         ]],
-			'/bookmarks'                         => [Module\Api\Mastodon\Bookmarks::class,                [R::GET         ]],
-			'/conversations'                     => [Module\Api\Mastodon\Conversations::class,            [R::GET         ]],
-			'/conversations/{id:\d+}'            => [Module\Api\Mastodon\Conversations::class,            [R::DELETE      ]],
-			'/conversations/{id:\d+}/read'       => [Module\Api\Mastodon\Conversations\Read::class,       [R::POST        ]],
-			'/custom_emojis'                     => [Module\Api\Mastodon\CustomEmojis::class,             [R::GET         ]],
-			'/domain_blocks'                     => [Module\Api\Mastodon\Unimplemented::class,            [R::GET, R::POST, R::DELETE]], // not supported
-			'/directory'                         => [Module\Api\Mastodon\Directory::class,                [R::GET         ]],
-			'/emails/confirmations'              => [Module\Api\Mastodon\Unimplemented::class,            [R::POST        ]], // not supported
-			'/endorsements'                      => [Module\Api\Mastodon\Endorsements::class,             [R::GET         ]], // Dummy, not supported
-			'/favourites'                        => [Module\Api\Mastodon\Favourited::class,               [R::GET         ]],
-			'/featured_tags'                     => [Module\Api\Mastodon\Unimplemented::class,            [R::GET, R::POST]], // not supported
-			'/featured_tags/{id:\d+}'            => [Module\Api\Mastodon\Unimplemented::class,            [R::DELETE      ]], // not supported
-			'/featured_tags/suggestions'         => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/filters/{id:\d+}'                  => [Module\Api\Mastodon\Unimplemented::class,            [R::GET, R::POST, R::PUT, R::DELETE]], // not supported
-			'/follow_requests'                   => [Module\Api\Mastodon\FollowRequests::class,           [R::GET         ]],
-			'/follow_requests/{id:\d+}/{action}' => [Module\Api\Mastodon\FollowRequests::class,           [        R::POST]],
-			'/followed_tags'                     => [Module\Api\Mastodon\FollowedTags::class,             [R::GET         ]],
-			'/instance'                          => [Module\Api\Mastodon\Instance::class,                 [R::GET         ]],
-			'/instance/activity'                 => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // @todo
-			'/instance/domain_blocks'            => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // @todo
-			'/instance/extended_description'     => [Module\Api\Mastodon\Instance\ExtendedDescription::class, [R::GET         ]],
-			'/instance/peers'                    => [Module\Api\Mastodon\Instance\Peers::class,           [R::GET         ]],
-			'/instance/rules'                    => [Module\Api\Mastodon\Instance\Rules::class,           [R::GET         ]],
-			'/lists'                             => [Module\Api\Mastodon\Lists::class,                    [R::GET, R::POST]],
-			'/lists/{id:\d+}'                    => [Module\Api\Mastodon\Lists::class,                    [R::GET, R::PUT, R::DELETE]],
-			'/lists/{id:\d+}/accounts'           => [Module\Api\Mastodon\Lists\Accounts::class,           [R::GET, R::POST, R::DELETE]],
-			'/markers'                           => [Module\Api\Mastodon\Markers::class,                  [R::GET, R::POST]],
-			'/media/{id}'                        => [Module\Api\Mastodon\Media::class,                    [R::GET, R::PUT ]],
-			'/mutes'                             => [Module\Api\Mastodon\Mutes::class,                    [R::GET         ]],
-			'/notifications'                     => [Module\Api\Mastodon\Notifications::class,            [R::GET         ]],
-			'/notifications/{id:\d+}'            => [Module\Api\Mastodon\Notifications::class,            [R::GET         ]],
-			'/notifications/clear'               => [Module\Api\Mastodon\Notifications\Clear::class,      [        R::POST]],
-			'/notifications/{id:\d+}/dismiss'    => [Module\Api\Mastodon\Notifications\Dismiss::class,    [        R::POST]],
-			'/polls/{id:\d+}'                    => [Module\Api\Mastodon\Polls::class,                    [R::GET         ]],
-			'/polls/{id:\d+}/votes'              => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
-			'/preferences'                       => [Module\Api\Mastodon\Preferences::class,              [R::GET         ]],
-			'/push/subscription'                 => [Module\Api\Mastodon\PushSubscription::class,         [R::GET, R::POST, R::PUT, R::DELETE]],
-			'/reports'                           => [Module\Api\Mastodon\Reports::class,                  [        R::POST]],
-			'/scheduled_statuses'                => [Module\Api\Mastodon\ScheduledStatuses::class,        [R::GET         ]],
-			'/scheduled_statuses/{id:\d+}'       => [Module\Api\Mastodon\ScheduledStatuses::class,        [R::GET, R::PUT, R::DELETE]],
-			'/statuses'                          => [Module\Api\Mastodon\Statuses::class,                 [        R::POST]],
-			'/statuses/{id:\d+}'                 => [Module\Api\Mastodon\Statuses::class,                 [R::GET, R::PUT, R::DELETE]],
-			'/statuses/{id:\d+}/card'            => [Module\Api\Mastodon\Statuses\Card::class,            [R::GET         ]],
-			'/statuses/{id:\d+}/context'         => [Module\Api\Mastodon\Statuses\Context::class,         [R::GET         ]],
-			'/statuses/{id:\d+}/reblogged_by'    => [Module\Api\Mastodon\Statuses\RebloggedBy::class,     [R::GET         ]],
-			'/statuses/{id:\d+}/favourited_by'   => [Module\Api\Mastodon\Statuses\FavouritedBy::class,    [R::GET         ]],
-			'/statuses/{id:\d+}/favourite'       => [Module\Api\Mastodon\Statuses\Favourite::class,       [        R::POST]],
-			'/statuses/{id:\d+}/unfavourite'     => [Module\Api\Mastodon\Statuses\Unfavourite::class,     [        R::POST]],
-			'/statuses/{id:\d+}/reblog'          => [Module\Api\Mastodon\Statuses\Reblog::class,          [        R::POST]],
-			'/statuses/{id:\d+}/unreblog'        => [Module\Api\Mastodon\Statuses\Unreblog::class,        [        R::POST]],
-			'/statuses/{id:\d+}/bookmark'        => [Module\Api\Mastodon\Statuses\Bookmark::class,        [        R::POST]],
-			'/statuses/{id:\d+}/unbookmark'      => [Module\Api\Mastodon\Statuses\Unbookmark::class,      [        R::POST]],
-			'/statuses/{id:\d+}/mute'            => [Module\Api\Mastodon\Statuses\Mute::class,            [        R::POST]],
-			'/statuses/{id:\d+}/unmute'          => [Module\Api\Mastodon\Statuses\Unmute::class,          [        R::POST]],
-			'/statuses/{id:\d+}/pin'             => [Module\Api\Mastodon\Statuses\Pin::class,             [        R::POST]],
-			'/statuses/{id:\d+}/unpin'           => [Module\Api\Mastodon\Statuses\Unpin::class,           [        R::POST]],
-			'/statuses/{id:\d+}/history'         => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/statuses/{id:\d+}/source'          => [Module\Api\Mastodon\Statuses\Source::class,          [R::GET         ]],
-			'/streaming/direct'                  => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/streaming/hashtag'                 => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/streaming/hashtag/local'           => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/streaming/health'                  => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/streaming/list'                    => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/streaming/public'                  => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/streaming/public/local'            => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/streaming/public/remote'           => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/streaming/user'                    => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/streaming/user/notification'       => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
-			'/suggestions/{id:\d+}'              => [Module\Api\Mastodon\Unimplemented::class,            [R::DELETE      ]], // not implemented
-			'/tags/{hashtag}'                    => [Module\Api\Mastodon\Tags::class,                     [R::GET         ]],
-			'/tags/{hashtag}/follow'             => [Module\Api\Mastodon\Tags\Follow::class,              [        R::POST]],
-			'/tags/{hashtag}/unfollow'           => [Module\Api\Mastodon\Tags\Unfollow::class,            [        R::POST]],
-			'/timelines/direct'                  => [Module\Api\Mastodon\Timelines\Direct::class,         [R::GET         ]],
-			'/timelines/home'                    => [Module\Api\Mastodon\Timelines\Home::class,           [R::GET         ]],
-			'/timelines/list/{id}'               => [Module\Api\Mastodon\Timelines\ListTimeline::class,   [R::GET         ]],
-			'/timelines/public'                  => [Module\Api\Mastodon\Timelines\PublicTimeline::class, [R::GET         ]],
-			'/timelines/tag/{hashtag}'           => [Module\Api\Mastodon\Timelines\Tag::class,            [R::GET         ]],
-			'/trends'                            => [Module\Api\Mastodon\Trends\Tags::class,              [R::GET         ]],
-			'/trends/links'                      => [Module\Api\Mastodon\Trends\Links::class,             [R::GET         ]],
-			'/trends/statuses'                   => [Module\Api\Mastodon\Trends\Statuses::class,          [R::GET         ]],
-			'/trends/tags'                       => [Module\Api\Mastodon\Trends\Tags::class,              [R::GET         ]],
+			'/apps'                                    => [Module\Api\Mastodon\Apps::class,                     [        R::POST]],
+			'/apps/verify_credentials'                 => [Module\Api\Mastodon\Apps\VerifyCredentials::class,   [R::GET         ]],
+			'/blocks'                                  => [Module\Api\Mastodon\Blocks::class,                   [R::GET         ]],
+			'/bookmarks'                               => [Module\Api\Mastodon\Bookmarks::class,                [R::GET         ]],
+			'/conversations'                           => [Module\Api\Mastodon\Conversations::class,            [R::GET         ]],
+			'/conversations/{id:\d+}'                  => [Module\Api\Mastodon\Conversations::class,            [R::DELETE      ]],
+			'/conversations/{id:\d+}/read'             => [Module\Api\Mastodon\Conversations\Read::class,       [R::POST        ]],
+			'/custom_emojis'                           => [Module\Api\Mastodon\CustomEmojis::class,             [R::GET         ]],
+			'/domain_blocks'                           => [Module\Api\Mastodon\Unimplemented::class,            [R::GET, R::POST, R::DELETE]], // not supported
+			'/directory'                               => [Module\Api\Mastodon\Directory::class,                [R::GET         ]],
+			'/emails/confirmations'                    => [Module\Api\Mastodon\Unimplemented::class,            [R::POST        ]], // not supported
+			'/endorsements'                            => [Module\Api\Mastodon\Endorsements::class,             [R::GET         ]], // Dummy, not supported
+			'/favourites'                              => [Module\Api\Mastodon\Favourited::class,               [R::GET         ]],
+			'/featured_tags'                           => [Module\Api\Mastodon\Unimplemented::class,            [R::GET, R::POST]], // not supported
+			'/featured_tags/{id:\d+}'                  => [Module\Api\Mastodon\Unimplemented::class,            [R::DELETE      ]], // not supported
+			'/featured_tags/suggestions'               => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/filters/{id:\d+}'                        => [Module\Api\Mastodon\Unimplemented::class,            [R::GET, R::POST, R::PUT, R::DELETE]], // not supported
+			'/follow_requests'                         => [Module\Api\Mastodon\FollowRequests::class,           [R::GET         ]],
+			'/follow_requests/{id:\d+}/{action}'       => [Module\Api\Mastodon\FollowRequests::class,           [        R::POST]],
+			'/followed_tags'                           => [Module\Api\Mastodon\FollowedTags::class,             [R::GET         ]],
+			'/instance'                                => [Module\Api\Mastodon\Instance::class,                 [R::GET         ]],
+			'/instance/activity'                       => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // @todo
+			'/instance/domain_blocks'                  => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // @todo
+			'/instance/extended_description'           => [Module\Api\Mastodon\Instance\ExtendedDescription::class, [R::GET         ]],
+			'/instance/peers'                          => [Module\Api\Mastodon\Instance\Peers::class,           [R::GET         ]],
+			'/instance/rules'                          => [Module\Api\Mastodon\Instance\Rules::class,           [R::GET         ]],
+			'/lists'                                   => [Module\Api\Mastodon\Lists::class,                    [R::GET, R::POST]],
+			'/lists/{id:\d+}'                          => [Module\Api\Mastodon\Lists::class,                    [R::GET, R::PUT, R::DELETE]],
+			'/lists/{id:\d+}/accounts'                 => [Module\Api\Mastodon\Lists\Accounts::class,           [R::GET, R::POST, R::DELETE]],
+			'/markers'                                 => [Module\Api\Mastodon\Markers::class,                  [R::GET, R::POST]],
+			'/media/{id}'                              => [Module\Api\Mastodon\Media::class,                    [R::GET, R::PUT ]],
+			'/mutes'                                   => [Module\Api\Mastodon\Mutes::class,                    [R::GET         ]],
+			'/notifications'                           => [Module\Api\Mastodon\Notifications::class,            [R::GET         ]],
+			'/notifications/{id:\d+}'                  => [Module\Api\Mastodon\Notifications::class,            [R::GET         ]],
+			'/notifications/clear'                     => [Module\Api\Mastodon\Notifications\Clear::class,      [        R::POST]],
+			'/notifications/{id:\d+}/dismiss'          => [Module\Api\Mastodon\Notifications\Dismiss::class,    [        R::POST]],
+			'/polls/{id:\d+}'                          => [Module\Api\Mastodon\Polls::class,                    [R::GET         ]],
+			'/polls/{id:\d+}/votes'                    => [Module\Api\Mastodon\Unimplemented::class,            [        R::POST]], // not supported
+			'/preferences'                             => [Module\Api\Mastodon\Preferences::class,              [R::GET         ]],
+			'/push/subscription'                       => [Module\Api\Mastodon\PushSubscription::class,         [R::GET, R::POST, R::PUT, R::DELETE]],
+			'/reports'                                 => [Module\Api\Mastodon\Reports::class,                  [        R::POST]],
+			'/scheduled_statuses'                      => [Module\Api\Mastodon\ScheduledStatuses::class,        [R::GET         ]],
+			'/scheduled_statuses/{id:\d+}'             => [Module\Api\Mastodon\ScheduledStatuses::class,        [R::GET, R::PUT, R::DELETE]],
+			'/statuses'                                => [Module\Api\Mastodon\Statuses::class,                 [        R::POST]],
+			'/statuses/{id:\d+}'                       => [Module\Api\Mastodon\Statuses::class,                 [R::GET, R::PUT, R::DELETE]],
+			'/statuses/{id:\d+}/card'                  => [Module\Api\Mastodon\Statuses\Card::class,            [R::GET         ]],
+			'/statuses/{id:\d+}/context'               => [Module\Api\Mastodon\Statuses\Context::class,         [R::GET         ]],
+			'/statuses/{id:\d+}/reblogged_by'          => [Module\Api\Mastodon\Statuses\RebloggedBy::class,     [R::GET         ]],
+			'/statuses/{id:\d+}/favourited_by'         => [Module\Api\Mastodon\Statuses\FavouritedBy::class,    [R::GET         ]],
+			'/statuses/{id:\d+}/favourite'             => [Module\Api\Mastodon\Statuses\Favourite::class,       [        R::POST]],
+			'/statuses/{id:\d+}/unfavourite'           => [Module\Api\Mastodon\Statuses\Unfavourite::class,     [        R::POST]],
+			'/statuses/{id:\d+}/reblog'                => [Module\Api\Mastodon\Statuses\Reblog::class,          [        R::POST]],
+			'/statuses/{id:\d+}/unreblog'              => [Module\Api\Mastodon\Statuses\Unreblog::class,        [        R::POST]],
+			'/statuses/{id:\d+}/bookmark'              => [Module\Api\Mastodon\Statuses\Bookmark::class,        [        R::POST]],
+			'/statuses/{id:\d+}/unbookmark'            => [Module\Api\Mastodon\Statuses\Unbookmark::class,      [        R::POST]],
+			'/statuses/{id:\d+}/mute'                  => [Module\Api\Mastodon\Statuses\Mute::class,            [        R::POST]],
+			'/statuses/{id:\d+}/unmute'                => [Module\Api\Mastodon\Statuses\Unmute::class,          [        R::POST]],
+			'/statuses/{id:\d+}/pin'                   => [Module\Api\Mastodon\Statuses\Pin::class,             [        R::POST]],
+			'/statuses/{id:\d+}/unpin'                 => [Module\Api\Mastodon\Statuses\Unpin::class,           [        R::POST]],
+			'/statuses/{id:\d+}/history'               => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/statuses/{id:\d+}/source'                => [Module\Api\Mastodon\Statuses\Source::class,          [R::GET         ]],
+			'/streaming/direct'                        => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/streaming/hashtag'                       => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/streaming/hashtag/local'                 => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/streaming/health'                        => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/streaming/list'                          => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/streaming/public'                        => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/streaming/public/local'                  => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/streaming/public/remote'                 => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/streaming/user'                          => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/streaming/user/notification'             => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not implemented
+			'/suggestions/{id:\d+}'                    => [Module\Api\Mastodon\Unimplemented::class,            [R::DELETE      ]], // not implemented
+			'/tags/{hashtag}'                          => [Module\Api\Mastodon\Tags::class,                     [R::GET         ]],
+			'/tags/{hashtag}/follow'                   => [Module\Api\Mastodon\Tags\Follow::class,              [        R::POST]],
+			'/tags/{hashtag}/unfollow'                 => [Module\Api\Mastodon\Tags\Unfollow::class,            [        R::POST]],
+			'/timelines/direct'                        => [Module\Api\Mastodon\Timelines\Direct::class,         [R::GET         ]],
+			'/timelines/home'                          => [Module\Api\Mastodon\Timelines\Home::class,           [R::GET         ]],
+			'/timelines/list/{id}'                     => [Module\Api\Mastodon\Timelines\ListTimeline::class,   [R::GET         ]],
+			'/timelines/public'                        => [Module\Api\Mastodon\Timelines\PublicTimeline::class, [R::GET         ]],
+			'/timelines/tag/{hashtag}'                 => [Module\Api\Mastodon\Timelines\Tag::class,            [R::GET         ]],
+			'/trends'                                  => [Module\Api\Mastodon\Trends\Tags::class,              [R::GET         ]],
+			'/trends/links'                            => [Module\Api\Mastodon\Trends\Links::class,             [R::GET         ]],
+			'/trends/statuses'                         => [Module\Api\Mastodon\Trends\Statuses::class,          [R::GET         ]],
+			'/trends/tags'                             => [Module\Api\Mastodon\Trends\Tags::class,              [R::GET         ]],
 		],
 		'/v2' => [
-			'/instance'                          => [Module\Api\Mastodon\InstanceV2::class,            [R::GET         ]], // not supported
+			'/instance' => [Module\Api\Mastodon\InstanceV2::class,            [R::GET         ]], // not supported
 		],
 		'/v{version:\d+}' => [
-			'/admin/accounts'                    => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
-			'/filters'                           => [Module\Api\Mastodon\Filters::class,                  [R::GET         ]], // Dummy, not supported
-			'/media'                             => [Module\Api\Mastodon\Media::class,                    [        R::POST]],
-			'/search'                            => [Module\Api\Mastodon\Search::class,                   [R::GET         ]],
-			'/suggestions'                       => [Module\Api\Mastodon\Suggestions::class,              [R::GET         ]],
+			'/admin/accounts' => [Module\Api\Mastodon\Unimplemented::class,            [R::GET         ]], // not supported
+			'/filters'        => [Module\Api\Mastodon\Filters::class,                  [R::GET         ]], // Dummy, not supported
+			'/media'          => [Module\Api\Mastodon\Media::class,                    [        R::POST]],
+			'/search'         => [Module\Api\Mastodon\Search::class,                   [R::GET         ]],
+			'/suggestions'    => [Module\Api\Mastodon\Suggestions::class,              [R::GET         ]],
 		],
-		'/meta'                                  => [Module\Api\Mastodon\Unimplemented::class, [R::POST        ]], // not supported
-		'/oembed'                                => [Module\Api\Mastodon\Unimplemented::class, [R::GET         ]],
-		'/proofs'                                => [Module\Api\Mastodon\Proofs::class,        [R::GET         ]], // Dummy, not supported
+		'/meta'   => [Module\Api\Mastodon\Unimplemented::class, [R::POST        ]], // not supported
+		'/oembed' => [Module\Api\Mastodon\Unimplemented::class, [R::GET         ]],
+		'/proofs' => [Module\Api\Mastodon\Proofs::class,        [R::GET         ]], // Dummy, not supported
 	],
 
-	'/about[/more]'                              => [Module\About::class, [R::GET]],
+	'/about[/more]' => [Module\About::class, [R::GET]],
 
-	'/admin'               => [
+	'/admin' => [
 		'[/]' => [Module\Admin\Summary::class, [R::GET]],
 
 		'/addons'         => [Module\Admin\Addons\Index::class,   [R::GET, R::POST]],
@@ -350,20 +349,20 @@ return [
 
 		'/tos' => [Module\Admin\Tos::class, [R::GET, R::POST]],
 	],
-	'/amcd'                => [Module\AccountManagementControlDocument::class, [R::GET]],
-	'/acctlink'            => [Module\Acctlink::class,     [R::GET]],
-	'/apps'                => [Module\Apps::class,         [R::GET]],
-	'/attach/{item:\d+}'   => [Module\Attach::class,       [R::GET]],
+	'/amcd'              => [Module\AccountManagementControlDocument::class, [R::GET]],
+	'/acctlink'          => [Module\Acctlink::class,     [R::GET]],
+	'/apps'              => [Module\Apps::class,         [R::GET]],
+	'/attach/{item:\d+}' => [Module\Attach::class,       [R::GET]],
 
 	// Mastodon route used by Fedifind to follow people who set their Webfinger address in their Twitter bio
 	'/authorize_interaction' => [Module\Contact\Follow::class, [R::GET, R::POST]],
 
-	'/babel'               => [Module\Debug\Babel::class,  [R::GET, R::POST]],
-	'/debug/ap'            => [Module\Debug\ActivityPubConversion::class,  [R::GET, R::POST]],
+	'/babel'    => [Module\Debug\Babel::class,  [R::GET, R::POST]],
+	'/debug/ap' => [Module\Debug\ActivityPubConversion::class,  [R::GET, R::POST]],
 
 	'/blocklist/domain/download' => [Module\Blocklist\Domain\Download::class, [R::GET]],
 
-	'/bookmarklet'         => [Module\Bookmarklet::class,  [R::GET]],
+	'/bookmarklet' => [Module\Bookmarklet::class,  [R::GET]],
 
 	'/calendar' => [
 		'[/]'                                           => [Module\Calendar\Show::class,       [R::GET         ]],
@@ -381,13 +380,14 @@ return [
 	'/channel[/{content}]'   => [Module\Conversation\Channel::class,   [R::GET]],
 	'/community[/{content}]' => [Module\Conversation\Community::class, [R::GET]],
 
-	'/compose[/{type}]'    => [Module\Item\Compose::class, [R::GET, R::POST]],
+	'/compose[/{type}]' => [Module\Item\Compose::class, [R::GET, R::POST]],
 
-	'/contact'   => [
-		'[/]'                         => [Module\Contact::class,                [R::GET]],
-		'/{id:\d+}[/]'                => [Module\Contact\Profile::class,        [R::GET, R::POST]],
-		'/{id:\d+}/{action:block|ignore|collapse|update|updateprofile}'
-		                              => [Module\Contact\Profile::class,        [R::GET]],
+	'/contact' => [
+		'[/]'          => [Module\Contact::class,                [R::GET]],
+		'/{id:\d+}[/]' => [Module\Contact\Profile::class,        [R::GET, R::POST]],
+
+		'/{id:\d+}/{action:block|ignore|collapse|update|updateprofile|fetchoutbox}' => [Module\Contact\Profile::class,        [R::GET]],
+
 		'/{id:\d+}/advanced'          => [Module\Contact\Advanced::class,       [R::GET, R::POST]],
 		'/{id:\d+}/conversations'     => [Module\Contact\Conversations::class,  [R::GET]],
 		'/{id:\d+}/contacts[/{type}]' => [Module\Contact\Contacts::class,       [R::GET]],
@@ -420,36 +420,37 @@ return [
 	'/display/feed-item/{uri-id}[.atom]'                     => [Module\Item\Feed::class,    [R::GET]],
 	'/display/feed-item/{uri-id}/{mode:conversation}[.atom]' => [Module\Item\Feed::class,    [R::GET]],
 
-	'/featured/{nickname}'      => [Module\ActivityPub\Featured::class, [R::GET]],
+	'/featured/{nickname}' => [Module\ActivityPub\Featured::class, [R::GET]],
 
 	'/feed/{nickname}[/{type:posts|comments|replies|activity}]' => [Module\Feed::class, [R::GET]],
 
 	'/feedtest' => [Module\Debug\Feed::class, [R::GET]],
 
-	'/fetch'             => [
+	'/fetch' => [
 		'/post/{guid}'           => [Module\Diaspora\Fetch::class, [R::GET]],
 		'/status_message/{guid}' => [Module\Diaspora\Fetch::class, [R::GET]],
 		'/reshare/{guid}'        => [Module\Diaspora\Fetch::class, [R::GET]],
 	],
-	'/filed'                => [Module\Search\Filed::class,          [R::GET]],
-	'/filer[/{id:\d+}]'     => [Module\Filer\SaveTag::class,         [R::GET]],
-	'/filerm/{id:\d+}'      => [Module\Filer\RemoveTag::class,       [R::GET, R::POST]],
-	'/follow_confirm'       => [Module\FollowConfirm::class,         [R::POST]],
-	'/followers/{nickname}' => [Module\ActivityPub\Followers::class, [R::GET]],
-	'/following/{nickname}' => [Module\ActivityPub\Following::class, [R::GET]],
+	'/filed'                     => [Module\Search\Filed::class,          [R::GET]],
+	'/filer[/{id:\d+}]'          => [Module\Filer\SaveTag::class,         [R::GET]],
+	'/filerm/{id:\d+}'           => [Module\Filer\RemoveTag::class,       [R::GET, R::POST]],
+	'/follow_confirm'            => [Module\FollowConfirm::class,         [R::POST]],
+	'/followers/{nickname}'      => [Module\ActivityPub\Followers::class, [R::GET]],
+	'/following/{nickname}'      => [Module\ActivityPub\Following::class, [R::GET]],
 	'/friendica[/{format:json}]' => [Module\Friendica::class,        [R::GET]],
-	'/friendica/inbox'      => [Module\ActivityPub\Inbox::class,     [R::GET, R::POST]],
-	'/friendica/outbox'     => [Module\ActivityPub\Outbox::class,    [R::GET]],
+	'/friendica/inbox'           => [Module\ActivityPub\Inbox::class,     [R::GET, R::POST]],
+	'/friendica/outbox'          => [Module\ActivityPub\Outbox::class,    [R::GET]],
 
 	'/fsuggest/{contact:\d+}' => [Module\FriendSuggest::class,  [R::GET, R::POST]],
 
-	'/circle'              => [
-		'[/]'                         => [Module\Circle::class, [R::GET, R::POST]],
-		'/{circle:\d+}'               => [Module\Circle::class, [R::GET, R::POST]],
-		'/none'                       => [Module\Circle::class, [R::GET, R::POST]],
-		'/new'                        => [Module\Circle::class, [R::GET, R::POST]],
-		'/drop/{circle:\d+}'          => [Module\Circle::class, [R::GET, R::POST]],
-		'/{circle:\d+}/{contact:\d+}' => [Module\Circle::class, [R::GET, R::POST]],
+	'/circle' => [
+		'[/]'                                              => [Module\Circle::class, [R::GET, R::POST]],
+		'/{circle:\d+}'                                    => [Module\Circle::class, [R::GET, R::POST]],
+		'/none'                                            => [Module\Circle::class, [R::GET, R::POST]],
+		'/new'                                             => [Module\Circle::class, [R::GET, R::POST]],
+		'/drop/{circle:\d+}'                               => [Module\Circle::class, [R::GET, R::POST]],
+		'/markread/{circle:\d+}'                           => [Module\Circle::class, [R::GET, R::POST]],
+		'/{circle:\d+}/{contact:\d+}'                      => [Module\Circle::class, [R::GET, R::POST]],
 		'/{circle:\d+}/{command:add|remove}/{contact:\d+}' => [Module\Circle::class, [R::GET, R::POST]],
 	],
 	'/hashtag'                    => [Module\Hashtag::class,           [R::GET]],
@@ -459,14 +460,15 @@ return [
 	'/inbox[/{nickname}]'         => [Module\ActivityPub\Inbox::class, [R::GET, R::POST]],
 	'/invite'                     => [Module\Invite::class,            [R::GET, R::POST]],
 
-	'/install'         => [
-		'[/]'                    => [Module\Install::class, [R::GET, R::POST]],
-		'/testrewrite'           => [Module\Install::class, [R::GET]],
+	'/install' => [
+		'[/]'          => [Module\Install::class, [R::GET, R::POST]],
+		'/testrewrite' => [Module\Install::class, [R::GET]],
 	],
 
-	'/item/{id:\d+}'            => [
+	'/item/{id:\d+}' => [
 		'/activity/{verb}' => [Module\Item\Activity::class,    [        R::POST]],
 		'/follow'          => [Module\Item\Follow::class,      [        R::POST]],
+		'/complete'        => [Module\Item\Complete::class,    [        R::POST]],
 		'/ignore'          => [Module\Item\Ignore::class,      [        R::POST]],
 		'/language'        => [Module\Item\Language::class,    [R::GET]],
 		'/pin'             => [Module\Item\Pin::class,         [        R::POST]],
@@ -474,12 +476,13 @@ return [
 		'/star'            => [Module\Item\Star::class,        [        R::POST]],
 	],
 
-	'/localtime'          => [Module\Debug\Localtime::class, [R::GET, R::POST]],
-	'/login'              => [Module\Security\Login::class,  [R::GET, R::POST]],
-	'/logout'             => [Module\Security\Logout::class, [R::GET, R::POST]],
-	'/magic'              => [Module\Magic::class,           [R::GET]],
-	'/manifest'           => [Module\Manifest::class,        [R::GET]],
-	'/manifest.json'      => [Module\Manifest::class,        [R::GET]],
+	'/localtime'             => [Module\Debug\Localtime::class, [R::GET, R::POST]],
+	'/login'                 => [Module\Security\Login::class,  [R::GET, R::POST]],
+	'/logout'                => [Module\Security\Logout::class, [R::GET, R::POST]],
+	'/lostpass[/{token}]'    => [Module\LostPass::class, [R::GET, R::POST]],
+	'/magic'                 => [Module\Magic::class,           [R::GET]],
+	'/manifest'              => [Module\Manifest::class,        [R::GET]],
+	'/manifest.json'         => [Module\Manifest::class,        [R::GET]],
 	'/friendica.webmanifest' => [Module\Manifest::class,     [R::GET]],
 
 	'/media' => [
@@ -489,13 +492,15 @@ return [
 		'/photo/upload'            => [Module\Media\Photo\Upload::class,       [       R::POST]],
 	],
 
-	'/moderation'               => [
+	'/moderation' => [
 		'[/]' => [Module\Moderation\Summary::class, [R::GET]],
 
-		'/blocklist/contact'       => [Module\Moderation\Blocklist\Contact::class,       [R::GET, R::POST]],
-		'/blocklist/server'        => [Module\Moderation\Blocklist\Server\Index::class,  [R::GET, R::POST]],
-		'/blocklist/server/add'    => [Module\Moderation\Blocklist\Server\Add::class,    [R::GET, R::POST]],
-		'/blocklist/server/import' => [Module\Moderation\Blocklist\Server\Import::class, [R::GET, R::POST]],
+		'/blocklist/contact'        => [Module\Moderation\Blocklist\Contact::class,         [R::GET, R::POST]],
+		'/blocklist/contact/export' => [Module\Moderation\Blocklist\Contact\Export::class,  [R::GET]],
+		'/blocklist/contact/import' => [Module\Moderation\Blocklist\Contact\Import::class,  [R::GET, R::POST]],
+		'/blocklist/server'         => [Module\Moderation\Blocklist\Server\Index::class,    [R::GET, R::POST]],
+		'/blocklist/server/add'     => [Module\Moderation\Blocklist\Server\Add::class,      [R::GET, R::POST]],
+		'/blocklist/server/import'  => [Module\Moderation\Blocklist\Server\Import::class,   [R::GET, R::POST]],
 
 		'/item/delete'          => [Module\Moderation\Item\Delete::class, [R::GET, R::POST]],
 		'/item/source[/{guid}]' => [Module\Moderation\Item\Source::class, [R::GET, R::POST]],
@@ -510,30 +515,32 @@ return [
 		'/users/deleted'                  => [Module\Moderation\Users\Deleted::class, [R::GET         ]],
 		'/users/create'                   => [Module\Moderation\Users\Create::class,  [R::GET, R::POST]],
 	],
-	'/newmember'          => [Module\Welcome::class,         [R::GET]],
-	'/nodeinfo/1.0'       => [Module\NodeInfo110::class,     [R::GET]],
-	'/nodeinfo/2.0'       => [Module\NodeInfo120::class,     [R::GET]],
-	'/nodeinfo/2.0.json'  => [Module\NodeInfo120::class,     [R::GET]],
-	'/nodeinfo/2.1'       => [Module\NodeInfo121::class,     [R::GET]],
-	'/nodeinfo/2.2'       => [Module\NodeInfo122::class,     [R::GET]],
-	'/nocircle'           => [Module\Circle::class,          [R::GET]],
+	'/newmember'         => [Module\Welcome::class,         [R::GET]],
+	'/nodeinfo/1.0'      => [Module\NodeInfo110::class,     [R::GET]],
+	'/nodeinfo/2.0'      => [Module\NodeInfo120::class,     [R::GET]],
+	'/nodeinfo/2.0.json' => [Module\NodeInfo120::class,     [R::GET]],
+	'/nodeinfo/2.1'      => [Module\NodeInfo121::class,     [R::GET]],
+	'/nodeinfo/2.2'      => [Module\NodeInfo122::class,     [R::GET]],
+	'/nocircle'          => [Module\Circle::class,          [R::GET]],
 
 	'/noscrape' => [
 		'/{nick}'         => [Module\NoScrape::class, [R::GET]],
 		'/{profile}/view' => [Module\NoScrape::class, [R::GET]],
 	],
 
+	'/notes' => [Module\Profile\Notes::class,         [R::GET, R::POST]],
+
 	'/notifications' => [
-		'/network[/json]'    => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
-		'/system[/json]'     => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
-		'/personal[/json]'   => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
-		'/home[/json]'       => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
-		'/intros[/json]'     => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
-		'/intros/all[/json]' => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
+		'/network[/json]'              => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
+		'/system[/json]'               => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
+		'/personal[/json]'             => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
+		'/home[/json]'                 => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
+		'/intros[/json]'               => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
+		'/intros/all[/json]'           => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
 		'/intros/{contact:\d+}[/json]' => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
 	],
 
-	'/notification'         => [
+	'/notification' => [
 		'[/]'       => [Module\Notifications\Notification::class, [R::GET]],
 		'/mark/all' => [Module\Notifications\Notification::class, [R::GET]],
 		'/{id:\d+}' => [Module\Notifications\Notification::class, [R::GET, R::POST]],
@@ -548,7 +555,11 @@ return [
 		'/token'       => [Module\OAuth\Token::class,       [R::POST]],
 	],
 
-	'/objects/{guid}[/{activity}]' => [Module\ActivityPub\Objects::class, [R::GET]],
+	'/objects/{guid}' => [
+		'[/]'                           => [Module\ActivityPub\Objects::class,            [R::GET]],
+		'/quote_authorization/{remote}' => [Module\ActivityPub\QuoteAuthorization::class, [R::GET]],
+		'/{activity}'                   => [Module\ActivityPub\Objects::class,            [R::GET]],
+	],
 
 	'/outbox/{nickname}' => [Module\ActivityPub\Outbox::class, [R::GET, R::POST]],
 	'/owa'               => [Module\Owa::class,                [R::GET]],
@@ -570,31 +581,31 @@ return [
 		'/{type}/{customsize:\d+}/{nickname_ext}'                  => [Module\Photo::class, [R::GET]],
 	],
 
-	'/ping'              => [Module\Notifications\Ping::class, [R::GET]],
+	'/ping' => [Module\Notifications\Ping::class, [R::GET]],
 
 	'/post' => [
-		'/{post_id}/edit'                                          => [Module\Post\Edit::class,       [R::GET         ]],
-		'/{post_id}/share'                                         => [Module\Post\Share::class,      [R::GET         ]],
-		'/{item_id}/tag/add'                                       => [Module\Post\Tag\Add::class,    [        R::POST]],
-		'/{item_id}/tag/remove[/{tag_name}]'                       => [Module\Post\Tag\Remove::class, [R::GET, R::POST]],
+		'/{post_id}/edit'                    => [Module\Post\Edit::class,       [R::GET         ]],
+		'/{post_id}/share'                   => [Module\Post\Share::class,      [R::GET         ]],
+		'/{item_id}/tag/add'                 => [Module\Post\Tag\Add::class,    [        R::POST]],
+		'/{item_id}/tag/remove[/{tag_name}]' => [Module\Post\Tag\Remove::class, [R::GET, R::POST]],
 	],
 
-	'/pretheme'          => [Module\ThemeDetails::class, [R::GET]],
-	'/probe'             => [Module\Debug\Probe::class,  [R::GET]],
+	'/pretheme' => [Module\ThemeDetails::class, [R::GET]],
+	'/probe'    => [Module\Debug\Probe::class,  [R::GET]],
 
 	'/profile/{nickname}' => $profileRoutes,
 	'/u/{nickname}'       => $profileRoutes,
 	'/~{nickname}'        => $profileRoutes,
 
-	'/ostatus/subscribe'             => [Module\OStatus\Subscribe::class,        [R::GET         ]],
-	'/poco'                          => [Module\User\PortableContacts::class,    [R::GET         ]],
+	'/ostatus/subscribe' => [Module\OStatus\Subscribe::class,        [R::GET         ]],
+	'/poco'              => [Module\User\PortableContacts::class,    [R::GET         ]],
 
 	'/search' => [
-		'[/]'                  => [Module\Search\Index::class, [R::GET         ]],
-		'/acl'                 => [Module\Search\Acl::class,   [R::GET, R::POST]],
-		'/saved/add'           => [Module\Search\Saved::class, [R::GET         ]],
-		'/saved/remove'        => [Module\Search\Saved::class, [R::GET         ]],
-		'/user/tags'           => [Module\Search\Tags::class,  [        R::POST]],
+		'[/]'           => [Module\Search\Index::class, [R::GET         ]],
+		'/acl'          => [Module\Search\Acl::class,   [R::GET, R::POST]],
+		'/saved/add'    => [Module\Search\Saved::class, [R::GET         ]],
+		'/saved/remove' => [Module\Search\Saved::class, [R::GET         ]],
+		'/user/tags'    => [Module\Search\Tags::class,  [        R::POST]],
 	],
 
 	'/receive' => [
@@ -613,7 +624,7 @@ return [
 			'[/]'                  => [Module\Settings\Server\Index::class,  [R::GET, R::POST]],
 			'/{gsid:\d+}/{action}' => [Module\Settings\Server\Action::class, [R::GET, R::POST]],
 		],
-		'[/]'         => [Module\Settings\Account::class,               [R::GET, R::POST]],
+		'[/]'      => [Module\Settings\Account::class,               [R::GET, R::POST]],
 		'/account' => [
 			'[/]'     => [Module\Settings\Account::class,               [R::GET, R::POST]],
 			'/{open}' => [Module\Settings\Account::class,               [R::GET, R::POST]],
@@ -626,14 +637,14 @@ return [
 		'/features'                        => [Module\Settings\Features::class,         [R::GET, R::POST]],
 		'/importcontacts'                  => [Module\Settings\ContactImport::class,    [R::GET, R::POST]],
 		'/oauth'                           => [Module\Settings\OAuth::class,            [R::GET, R::POST]],
-		'/profile' => [
-			'[/]'                  => [Module\Settings\Profile\Index::class,       [R::GET, R::POST]],
-			'/photo[/new]'         => [Module\Settings\Profile\Photo\Index::class, [R::GET, R::POST]],
-			'/photo/crop/{guid}'   => [Module\Settings\Profile\Photo\Crop::class,  [R::GET, R::POST]],
+		'/profile'                         => [
+			'[/]'                => [Module\Settings\Profile\Index::class,       [R::GET, R::POST]],
+			'/photo[/new]'       => [Module\Settings\Profile\Photo\Index::class, [R::GET, R::POST]],
+			'/photo/crop/{guid}' => [Module\Settings\Profile\Photo\Crop::class,  [R::GET, R::POST]],
 		],
 		'/removeme'              => [Module\Settings\RemoveMe::class,              [R::GET, R::POST]],
 		'/userexport[/{action}]' => [Module\Settings\UserExport::class,            [R::GET         ]],
-		'/2fa' => [
+		'/2fa'                   => [
 			'[/]'           => [Module\Settings\TwoFactor\Index::class,       [R::GET, R::POST]],
 			'/recovery'     => [Module\Settings\TwoFactor\Recovery::class,    [R::GET, R::POST]],
 			'/app_specific' => [Module\Settings\TwoFactor\AppSpecific::class, [R::GET, R::POST]],
@@ -646,42 +657,45 @@ return [
 	'/stats/caching' => [Module\StatsCaching::class, [R::GET]],
 
 	'/network' => [
-		'[/{content}]'                => [Module\Conversation\Network::class, [R::GET]],
-		'/archive/{from:\d\d\d\d-\d\d-\d\d}[/{to:\d\d\d\d-\d\d-\d\d}]' => [Module\Conversation\Network::class, [R::GET]],
-		'/circle/{circle_id:\d+}'     => [Module\Conversation\Network::class, [R::GET]],
+		'[/{content}]'                                                  => [Module\Conversation\Network::class, [R::GET]],
+		'/archive/{from:\d\d\d\d-\d\d-\d\d}[/{to:\d\d\d\d\-\d\d-\d\d}]' => [Module\Conversation\Network::class, [R::GET]],
+		'/circle/{circle_id:\d+}'                                       => [Module\Conversation\Network::class, [R::GET]],
 	],
 
-	'/randprof'                      => [Module\RandomProfile::class,         [R::GET]],
-	'/register'                      => [Module\Register::class,              [R::GET, R::POST]],
-	'/robots.txt'                    => [Module\RobotsTxt::class,             [R::GET]],
-	'/rsd.xml'                       => [Module\ReallySimpleDiscovery::class, [R::GET]],
-	'/smilies[/json]'                => [Module\Smilies::class,               [R::GET]],
-	'/statistics.json'               => [Module\Statistics::class,            [R::GET]],
-	'/toggle_mobile'                 => [Module\ToggleMobile::class,          [R::GET]],
-	'/tos'                           => [Module\Tos::class,                   [R::GET]],
+	'/randprof'        => [Module\RandomProfile::class,         [R::GET]],
+	'/register'        => [Module\Register::class,              [R::GET, R::POST]],
+	'/robots.txt'      => [Module\RobotsTxt::class,             [R::GET]],
+	'/rsd.xml'         => [Module\ReallySimpleDiscovery::class, [R::GET]],
+	'/smilies[/json]'  => [Module\Smilies::class,               [R::GET]],
+	'/statistics.json' => [Module\Statistics::class,            [R::GET]],
+	'/toggle_mobile'   => [Module\ToggleMobile::class,          [R::GET]],
+	'/tos'             => [Module\Tos::class,                   [R::GET]],
 
 	'/ping_network' => [
-		'[/]'                        => [Module\Ping\Network::class, [R::GET]],
-		'/archive/{from:\d\d\d\d-\d\d-\d\d}[/{to:\d\d\d\d-\d\d-\d\d}]' => [Module\Ping\Network::class, [R::GET]],
-		'/group/{contact_id:\d+}'    => [Module\Ping\Network::class, [R::GET]],
-		'/circle/{circle_id:\d+}'    => [Module\Ping\Network::class, [R::GET]],
+		'[/]'                                                           => [Module\Ping\Network::class, [R::GET]],
+		'/archive/{from:\d\d\d\d-\d\d-\d\d}[/{to:\d\d\d\d\-\d\d-\d\d}]' => [Module\Ping\Network::class, [R::GET]],
+		'/group/{contact_id:\d+}'                                       => [Module\Ping\Network::class, [R::GET]],
+		'/circle/{circle_id:\d+}'                                       => [Module\Ping\Network::class, [R::GET]],
 	],
 
-	'/update_channel[/{content}]'    => [Module\Update\Channel::class,        [R::GET]],
-	'/update_community[/{content}]'  => [Module\Update\Community::class,      [R::GET]],
+	'/update_channel[/{content}]'   => [Module\Update\Channel::class,        [R::GET]],
+	'/update_community[/{content}]' => [Module\Update\Community::class,      [R::GET]],
 
-	'/update_display'                => [Module\Update\Display::class, [R::GET]],
+	'/update_contact/{id:\d+}/conversations' => [Module\Update\Contact::class, [R::GET]],
+
+	'/update_display' => [Module\Update\Display::class, [R::GET]],
 
 	'/update_network' => [
-		'[/]'                        => [Module\Update\Network::class, [R::GET]],
-		'/archive/{from:\d\d\d\d-\d\d-\d\d}[/{to:\d\d\d\d-\d\d-\d\d}]' => [Module\Update\Network::class, [R::GET]],
-		'/group/{contact_id:\d+}'    => [Module\Update\Network::class, [R::GET]],
-		'/circle/{circle_id:\d+}'    => [Module\Update\Network::class, [R::GET]],
+		'[/]'                                                           => [Module\Update\Network::class, [R::GET]],
+		'/archive/{from:\d\d\d\d-\d\d-\d\d}[/{to:\d\d\d\d\-\d\d-\d\d}]' => [Module\Update\Network::class, [R::GET]],
+		'/group/{contact_id:\d+}'                                       => [Module\Update\Network::class, [R::GET]],
+		'/circle/{circle_id:\d+}'                                       => [Module\Update\Network::class, [R::GET]],
 	],
 
-	'/update_profile'                => [Module\Update\Profile::class,        [R::GET]],
+	'/update_notes'   => [Module\Update\Notes::class,          [R::GET]],
+	'/update_profile' => [Module\Update\Profile::class,        [R::GET]],
 
-	'/user/import'                   => [Module\User\Import::class,           [R::GET, R::POST]],
+	'/user/import' => [Module\User\Import::class,           [R::GET, R::POST]],
 
 	'/view/theme/{theme}/style.pcss' => [Module\Theme::class,                 [R::GET]],
 	'/viewsrc/{item:\d+}'            => [Module\Debug\ItemBody::class,        [R::GET]],

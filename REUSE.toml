@@ -7,7 +7,6 @@ SPDX-PackageDownloadLocation = "https://friendi.ca"
 path = [
      "database.sql",
      "composer.*",
-     "bin/dev/php-cs-fixer/composer.*",
      "doc/**",
      "spec/*",
      "tests/**",
@@ -258,6 +257,11 @@ SPDX-License-Identifier = "CC0-1.0"
 [[annotations]]
 path = "view/js/hls/**"
 SPDX-FileCopyrightText = "2017 Dailymotion (http://www.dailymotion.com)"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = "view/js/videojs/**"
+SPDX-FileCopyrightText = "Copyright 2010-present Video.js contributors"
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]

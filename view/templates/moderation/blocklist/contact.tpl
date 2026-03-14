@@ -17,6 +17,13 @@
 <div id="adminpage">
 	<h1>{{$title}} - {{$page}}</h1>
 	<p>{{$description nofilter}}</p>
+
+	<h3>{{$h_newblock}}</h3>
+	<p>
+		<a href="{{$baseurl}}/moderation/blocklist/contact/import" class="btn btn-primary">{{$import_csv}}</a>
+		<a href="{{$baseurl}}/moderation/blocklist/contact/export" class="btn btn-default">{{$export_csv}}</a>
+	</p>
+
 	<form action="{{$baseurl}}/moderation/blocklist/contact" method="post">
         <input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 

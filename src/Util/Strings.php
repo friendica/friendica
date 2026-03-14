@@ -96,17 +96,17 @@ class Strings
 			'v',
 			'w', 'wh',
 			'x',
-			'z', 'zh'
+			'z', 'zh',
 		];
 
 		$midcons = [
 			'ck', 'ct', 'gn', 'ld', 'lf', 'lm', 'lt', 'mb', 'mm', 'mn', 'mp',
-			'nd', 'ng', 'nk', 'nt', 'rn', 'rp', 'rt'
+			'nd', 'ng', 'nk', 'nt', 'rn', 'rp', 'rt',
 		];
 
 		$noend = [
 			'bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr',
-			'kh', 'kl', 'kr', 'mn', 'pl', 'pr', 'rh', 'tr', 'qu', 'wh', 'q'
+			'kh', 'kl', 'kr', 'mn', 'pl', 'pr', 'rh', 'tr', 'qu', 'wh', 'q',
 		];
 
 		$start = mt_rand(0, 2);
@@ -444,7 +444,7 @@ class Strings
 	{
 		$string_length = mb_strlen($string);
 
-		$length = $length ?? $string_length;
+		$length ??= $string_length;
 
 		if ($start < 0) {
 			$start = max(0, $string_length + $start);
@@ -494,7 +494,7 @@ class Strings
 
 				return $return;
 			},
-			$text
+			$text,
 		);
 
 		if (is_null($return)) {
@@ -513,7 +513,7 @@ class Strings
 				}
 				return $return;
 			},
-			$text
+			$text,
 		);
 
 		return $text;
@@ -530,7 +530,7 @@ class Strings
 	{
 		$shorthand = trim($shorthand);
 
-		if (ctype_digit($shorthand)) {
+		if (ctype_digit(ltrim($shorthand, '-'))) {
 			return (int) $shorthand;
 		}
 
@@ -609,5 +609,25 @@ class Strings
 	public static function getTagArrayByString(string $tag_list): array
 	{
 		return explode(',', self::cleanTags($tag_list));
+	}
+
+	/**
+	 * Convert the first character of a string to uppercase.
+	 * Handles the missing base function mb_ucfirst() gracefully.
+	 *
+	 * @param string $string
+	 * @return string String with first character in uppercase
+	 */
+	public static function ucFirst(string $string): string
+	{
+		if (function_exists('mb_ucfirst')) {
+			return mb_ucfirst($string);
+		}
+
+		if (function_exists('mb_substr') && function_exists('mb_strtoupper')) {
+			return mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
+		}
+
+		return ucfirst($string);
 	}
 }

@@ -17,7 +17,7 @@ class PoToPhp extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	const DQ_ESCAPE = "__DQ__";
+	public const DQ_ESCAPE = "__DQ__";
 
 	protected function getHelp()
 	{
@@ -39,7 +39,7 @@ HELP;
 	protected function doExecute(): int
 	{
 		if ($this->getOption('v')) {
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -116,7 +116,7 @@ HELP;
 				$out .= self::escapePhpString($entry->getAsString(PoTokens::TRANSLATED)) . ';' . "\n";
 			} else {
 				$out .= '[' . "\n";
-				foreach($entry->getAsStringArray(PoTokens::TRANSLATED) as $key => $msgstr) {
+				foreach ($entry->getAsStringArray(PoTokens::TRANSLATED) as $key => $msgstr) {
 					$out .= "\t" . $key . ' => ' . self::escapePhpString($msgstr) . ',' . "\n";
 				};
 
@@ -130,7 +130,7 @@ HELP;
 	private function createPluralSelectFunctionString(string $pluralForms, string $lang): string
 	{
 		$return = $this->convertCPluralConditionToPhpReturnStatement(
-			$pluralForms
+			$pluralForms,
 		);
 
 		$fnname = 'string_plural_select_' . $lang;
@@ -191,14 +191,14 @@ HELP;
 		}
 
 		if ($q === false || $s < $q) {
-			list($then, $else) = explode(':', $string, 2);
-			$node['then']      = $then;
-			$parsedElse        = [];
+			[$then, $else] = explode(':', $string, 2);
+			$node['then']  = $then;
+			$parsedElse    = [];
 			self::parse($else, $parsedElse);
 			$node['else'] = $parsedElse;
 		} else {
-			list($if, $thenelse) = explode('?', $string, 2);
-			$node['if']          = $if;
+			[$if, $thenelse] = explode('?', $string, 2);
+			$node['if']      = $if;
 			self::parse($thenelse, $node);
 		}
 	}

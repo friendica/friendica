@@ -12,6 +12,7 @@ namespace Friendica\Test\Unit\Core\Addon;
 use Exception;
 use Friendica\Core\Addon\AddonInfo;
 use Friendica\Core\Addon\AddonManagerHelper;
+use Friendica\Core\Addon\Exception\AddonInvalidConfigFileException;
 use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -79,6 +80,76 @@ class AddonManagerHelperTest extends TestCase
 		$this->expectExceptionMessage('Could not find valid comment block in addon file:');
 
 		$addonManagerHelper->getAddonInfo('helloaddon');
+	}
+
+	public function testGetAddonDependencyConfigReturnsArray(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'static' => [
+					'dependencies.config.php' => <<<PHP
+					<?php
+					return [
+						'foo' => 'bar',
+					];
+					PHP,
+				],
+			]
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(Database::class),
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->assertSame(['foo' => 'bar'], $addonManagerHelper->getAddonDependencyConfig('helloaddon'));
+	}
+
+	public function testGetAddonDependencyConfigWithoutConfigFileReturnsEmptyArray(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => []
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(Database::class),
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->assertSame([], $addonManagerHelper->getAddonDependencyConfig('helloaddon'));
+	}
+
+	public function testGetAddonDependencyConfigWithoutReturningAnArrayThrowsException(): void
+	{
+		$root = vfsStream::setup(__FUNCTION__ . '_addons', 0777, [
+			'helloaddon' => [
+				'static' => [
+					'dependencies.config.php' => '<?php return null;',
+				],
+			]
+		]);
+
+		$addonManagerHelper = new AddonManagerHelper(
+			$root->url(),
+			$this->createStub(Database::class),
+			$this->createStub(IManageConfigValues::class),
+			$this->createStub(ICanCache::class),
+			$this->createStub(LoggerInterface::class),
+			$this->createStub(Profiler::class)
+		);
+
+		$this->expectException(AddonInvalidConfigFileException::class);
+		$this->expectExceptionMessageMatches('#Error loading config file .+/helloaddon/static/dependencies\.config\.php#');
+
+		$addonManagerHelper->getAddonDependencyConfig('helloaddon');
 	}
 
 	public function testEnabledAddons(): void

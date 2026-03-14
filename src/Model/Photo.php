@@ -436,6 +436,10 @@ class Photo
 		$storage     = '';
 		$img_str     = $image->asString();
 
+		if (!is_string($img_str)) {
+			return false;
+		}
+
 		try {
 			if (DBA::isResult($existing_photo)) {
 				$backend_ref = (string)$existing_photo['backend-ref'];
@@ -904,7 +908,7 @@ class Photo
 		$fields = [
 			'allow_cid'  => $str_contact_allow, 'allow_gid' => $str_circle_allow,
 			'deny_cid'   => $str_contact_deny, 'deny_gid' => $str_circle_deny,
-			'accessible' => DI::pConfig()->get($uid, 'system', 'accessible-photos', false)
+			'accessible' => (bool)DI::pConfig()->get($uid, 'system', 'accessible-photos', false)
 		];
 
 		$condition = ['resource-id' => $image_rid, 'uid' => $uid];
@@ -1389,8 +1393,10 @@ class Photo
 		$resource_id = self::newResource();
 		$album       = DI::l10n()->t(self::BANNER_PHOTOS);
 
-		if ($width > 960) {
-			$image->scaleDown(960);
+		$max_banner_width = DI::config()->get('system', 'max_banner_width');
+
+		if ($width > $max_banner_width && $max_banner_width > 0) {
+			$image->scaleDown($max_banner_width);
 		}
 
 		$r = self::store($image, $uid, 0, $resource_id, $filename, $album, 3, self::USER_BANNER);

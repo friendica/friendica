@@ -7,8 +7,8 @@
 
 namespace Friendica\Console;
 
-use \RecursiveDirectoryIterator;
-use \RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 /**
  * Extracts translation strings from the Friendica project's files to be exported
@@ -41,7 +41,7 @@ HELP;
 	protected function doExecute(): int
 	{
 		if ($this->getOption('v')) {
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -64,16 +64,16 @@ HELP;
 			['index.php'],
 			glob('mod/*'),
 			glob('addon/*/*'),
-			$this->globRecursive('src')
+			$this->globRecursive('src'),
 		);
 
 		foreach ($files as $file) {
 			$str = file_get_contents($file);
 
-			$pat = '|->t\(([^\)]*+)[\)]|';
+			$pat  = '|->t\(([^\)]*+)[\)]|';
 			$patt = '|->tt\(([^\)]*+)[\)]|';
 
-			$matches = [];
+			$matches   = [];
 			$matchestt = [];
 
 			preg_match_all($pat, $str, $matches);
@@ -86,7 +86,7 @@ HELP;
 			if (!empty($matches[1])) {
 				foreach ($matches[1] as $long_match) {
 					$match_arr = preg_split('/(?<=[\'"])\s*,/', $long_match);
-					$match = $match_arr[0];
+					$match     = $match_arr[0];
 					if (!in_array($match, $arr)) {
 						if (substr($match, 0, 1) == '$') {
 							continue;
@@ -139,7 +139,7 @@ HELP;
 	private function globRecursive(string $path): array
 	{
 		$dir_iterator = new RecursiveDirectoryIterator($path);
-		$iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+		$iterator     = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
 
 		$return = [];
 		foreach ($iterator as $file) {

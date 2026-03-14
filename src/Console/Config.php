@@ -85,14 +85,14 @@ HELP;
 		parent::__construct($argv);
 
 		$this->appMode = $appMode;
-		$this->config = $config;
+		$this->config  = $config;
 	}
 
 	protected function doExecute(): int
 	{
 		if ($this->getOption('v')) {
 			$this->out('Executable: ' . $this->executable);
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -102,8 +102,8 @@ HELP;
 		}
 
 		if (count($this->args) == 3) {
-			$cat = $this->getArgument(0);
-			$key = $this->getArgument(1);
+			$cat   = $this->getArgument(0);
+			$key   = $this->getArgument(1);
 			$value = $this->getArgument(2);
 
 			if (is_array($this->config->get($cat, $key))) {
@@ -116,16 +116,16 @@ HELP;
 
 			$result = $this->config->set($cat, $key, $value);
 			if ($result) {
-				$this->out("{$cat}.{$key} <= " .
-				           $this->config->get($cat, $key));
+				$this->out("{$cat}.{$key} <= "
+						   . $this->config->get($cat, $key));
 			} else {
 				$this->out("Unable to set {$cat}.{$key}");
 			}
 		}
 
 		if (count($this->args) == 2) {
-			$cat = $this->getArgument(0);
-			$key = $this->getArgument(1);
+			$cat   = $this->getArgument(0);
+			$key   = $this->getArgument(1);
 			$value = $this->config->get($this->getArgument(0), $this->getArgument(1));
 
 			if (is_array($value)) {

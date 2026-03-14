@@ -647,7 +647,7 @@ class Network
 	 * @param string|null $uri
 	 * @return UriInterface|null
 	 */
-	public static function createUriFromString(string $uri = null): ?UriInterface
+	public static function createUriFromString(?string $uri): ?UriInterface
 	{
 		if (empty($uri)) {
 			return null;

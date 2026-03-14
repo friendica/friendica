@@ -13,7 +13,7 @@ if (php_sapi_name() !== 'cli') {
 	exit();
 }
 
-// Ensure that te console is executed from the base path of the installation
+// Ensure console is executed from the base path of the installation
 chdir(dirname(__DIR__));
 
 require dirname(__DIR__) . '/vendor/autoload.php';

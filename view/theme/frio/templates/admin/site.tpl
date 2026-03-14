@@ -136,14 +136,13 @@
 				<div id="admin-settings-corporate-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-corporate">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$allowed_sites}}
-						{{include file="field_checkbox.tpl" field=$no_oembed_rich_content}}
-						{{include file="field_input.tpl" field=$allowed_oembed}}
 						{{include file="field_checkbox.tpl" field=$block_public}}
 						{{include file="field_checkbox.tpl" field=$force_publish}}
 						{{include file="field_select.tpl" field=$community_page_style}}
 						{{include file="field_input.tpl" field=$max_author_posts_community_page}}
 						{{include file="field_input.tpl" field=$max_server_posts_community_page}}
-
+						{{include file="field_checkbox.tpl" field=$display_local_media}}
+						{{include file="field_checkbox.tpl" field=$display_remote_media}}
 						{{if $mail_able}}
 							{{include file="field_checkbox.tpl" field=$mail_enabled}}
 						{{else}}
@@ -299,6 +298,7 @@
 						{{include file="field_input.tpl" field=$worker_load_cooldown}}
 						{{include file="field_checkbox.tpl" field=$worker_fastlane}}
 						{{include file="field_checkbox.tpl" field=$decoupled_receiver}}
+						{{include file="field_select.tpl" field=$fetch_replies}}
 						{{include file="field_input.tpl" field=$worker_defer_limit}}
 						{{include file="field_input.tpl" field=$worker_fetch_limit}}
 					</div>

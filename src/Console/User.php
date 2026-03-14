@@ -86,7 +86,7 @@ HELP;
 	protected function doExecute(): int
 	{
 		if ($this->getOption('v')) {
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -490,9 +490,9 @@ HELP;
 					}
 				}
 
-				if (array_key_exists($category, $values) and
-					array_key_exists($key, $values[$category]) and
-					$values[$category][$key] == $value) {
+				if (array_key_exists($category, $values)
+					and array_key_exists($key, $values[$category])
+					and $values[$category][$key] == $value) {
 					throw new RuntimeException('Value not changed');
 				}
 

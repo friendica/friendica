@@ -28,10 +28,11 @@ use Friendica\Module\Special\DisplayNotFound;
 use Friendica\Navigation\Notifications\Repository\Notification;
 use Friendica\Navigation\Notifications\Repository\Notify;
 use Friendica\Protocol\ActivityPub;
-use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Network\HTTPException;
 use Friendica\Content\Widget;
+use Friendica\Core\System;
+use Friendica\DI;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -88,7 +89,9 @@ class Display extends BaseModule
 		$item    = null;
 		$itemUid = $this->session->getLocalUserId();
 
-		$fields = ['uri-id', 'parent-uri-id', 'author-id', 'author-link', 'body', 'uid', 'guid', 'gravity'];
+		$fields = ['id', 'uri-id', 'parent-uri-id', 'author-id', 'author-link', 'contact-id', 'contact-contact-type', 'body', 'uid', 'guid', 'gravity',
+			'plink', 'origin', 'uri', 'post-reason', 'owner-contact-type', 'owner-network', 'owner-id', 'guid',
+			'author-network', 'author-alias', 'private'];
 
 		// Does the local user have this item?
 		if ($this->session->getLocalUserId()) {
@@ -121,8 +124,14 @@ class Display extends BaseModule
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
-			$displayNotFound = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
+			$displayNotFound     = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
 			return $displayNotFound->content();
+		}
+
+		$plink = Item::getPlink($item);
+
+		if (!$this->session->getLocalUserId() && isset($plink['href']) && !DI::baseUrl()->isLocalUrl($plink['href'])) {
+			System::externalRedirect($plink['href']);
 		}
 
 		if ($item['gravity'] != Item::GRAVITY_PARENT) {
@@ -139,6 +148,10 @@ class Display extends BaseModule
 			$this->notify->setAllSeenForUser($this->session->getLocalUserId(), ['parent-uri-id' => $item['parent-uri-id']]);
 		}
 
+		if ($this->session->getLocalUserId() != 0) {
+			$this->contentItem->setViewed($item['uri-id'], $this->session->getLocalUserId());
+		}
+
 		$this->displaySidebar($item);
 		$this->displayHead($item['uri-id'], $item['parent-uri-id']);
 
@@ -150,6 +163,9 @@ class Display extends BaseModule
 		}
 
 		$output .= $this->getDisplayData($item);
+
+		$author              = Contact::getByURLForUser($item['author-link'], $this->session->getLocalUserId());
+		$this->page['title'] = $this->l10n->t("Post by %s", $author['name']);
 
 		return $output;
 	}
@@ -173,7 +189,11 @@ class Display extends BaseModule
 		}
 
 		if ($author === []) {
-			$author = Contact::getById($item['author-id']);
+			if ($item['contact-contact-type'] == Contact::TYPE_COMMUNITY) {
+				$author = Contact::getById($item['contact-id']);
+			} else {
+				$author = Contact::getById($item['author-id']);
+			}
 		}
 
 		if ($this->baseUrl->isLocalUrl($author['url'])) {
@@ -195,7 +215,7 @@ class Display extends BaseModule
 		}
 
 		if (!empty($parent)) {
-			$pageUid         = $parent['uid'];
+			$pageUid = $parent['uid'];
 			if ($this->session->getRemoteContactID($pageUid)) {
 				$itemUid = $parent['uid'];
 			}
@@ -237,7 +257,7 @@ class Display extends BaseModule
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
-			$displayNotFound = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
+			$displayNotFound     = new DisplayNotFound($this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters);
 			return $displayNotFound->content();
 		}
 

@@ -9,7 +9,7 @@
 	<form id="fsuggest-form" action="fsuggest/{{$contact_id}}" method="post">
 		{{include file="field_select.tpl" field=$fsuggest_select}}
 		<div id="fsuggest-submit-wrapper">
-			<input id="fsuggest-submit" type="submit" name="submit" value="{{$submit}}" />
+			<button class="btn btn-primary" id="fsuggest-submit" type="submit" name="submit" value="{{$submit}}">{{$submit}}</button>
 		</div>
 	</form>
 </div>

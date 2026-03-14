@@ -103,12 +103,12 @@ class PageInfo
 
 		// It maybe is a rich content, but if it does have everything that a link has,
 		// then treat it that way
-		if (($data['type'] == 'rich') && is_string($data['title']) &&
-			is_string($data['text']) && !empty($data['images'])) {
+		if (($data['type'] == 'rich') && is_string($data['title'])
+			&& is_string($data['text']) && !empty($data['images'])) {
 			$data['type'] = 'link';
 		}
 
-		$data['title'] = $data['title'] ?? '';
+		$data['title'] ??= '';
 
 		if ((($data['type'] != 'link') && ($data['type'] != 'video') && ($data['type'] != 'photo')) || ($data['title'] == $data['url'])) {
 			return '';
@@ -223,7 +223,7 @@ class PageInfo
 			$hashtag = str_replace(
 				[' ', '+', '/', '.', '#', "'"],
 				['', '', '', '', '', ''],
-				$keyword
+				$keyword,
 			);
 
 			$taglist[] = $hashtag;

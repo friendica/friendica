@@ -84,8 +84,13 @@ class Register extends BaseModule
 		}
 
 		if (!DI::userSession()->getLocalUserId() && self::getPolicy() === self::CLOSED) {
-			DI::sysmsg()->addNotice(DI::l10n()->t('Permission denied.'));
-			return '';
+			$tpl = Renderer::getMarkupTemplate('register_closed.tpl');
+			return Renderer::replaceMacros($tpl, [
+				'$title'       => DI::l10n()->t('Registration Closed'),
+				'$message'     => DI::l10n()->t('Registration is currently closed on this node.'),
+				'$explanation' => DI::l10n()->t('The administrators have decided to limit new registrations. This could be temporary or permanent.'),
+				'$find_server' => BBCode::convertForUriId(User::getSystemUriId(), DI::l10n()->t('You can find other open Friendica servers at %s where you can register.', '[url=https://dir.friendica.social/servers]dir.friendica.social/servers[/url]')),
+			]);
 		}
 
 		$max_dailies = intval(DI::config()->get('system', 'max_daily_registrations'));
@@ -131,6 +136,9 @@ class Register extends BaseModule
 
 		$ask_password = !DBA::count('contact');
 
+		// Retrieve system messages to display on the registration page
+		$notices = DI::sysmsg()->flushNotices();
+
 		$tpl = Renderer::getMarkupTemplate('register.tpl');
 
 		$hook_data = [
@@ -144,13 +152,14 @@ class Register extends BaseModule
 		$tpl = $hook_data['template'] ?? $tpl;
 
 		$o = Renderer::replaceMacros($tpl, [
+			'$notices'               => $notices,
 			'$invitations'           => DI::config()->get('system', 'invitation_only'),
 			'$permonly'              => self::getPolicy() === self::APPROVE,
 			'$permonlybox'           => ['permonlybox', DI::l10n()->t('Note for the admin'), '', DI::l10n()->t('Leave a message for the admin, why you want to join this node'), DI::l10n()->t('Required')],
 			'$invite_desc'           => DI::l10n()->t('Membership on this site is by invitation only.'),
 			'$invite_label'          => DI::l10n()->t('Your invitation code: '),
 			'$invite_id'             => $invite_id,
-			'$regtitle'              => DI::l10n()->t('Registration'),
+			'$regtitle'              => DI::l10n()->t('Create an account'),
 			'$registertext'          => BBCode::convertForUriId(User::getSystemUriId(), DI::config()->get('config', 'register_text', '')),
 			'$fillwith'              => $fillwith,
 			'$fillext'               => $fillext,

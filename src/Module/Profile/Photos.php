@@ -11,17 +11,14 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\App\Page;
 use Friendica\AppHelper;
-use Friendica\Content\Feature;
 use Friendica\Content\Pager;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
-use Friendica\Model\Item;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
 use Friendica\Module\Response;
@@ -135,25 +132,6 @@ class Photos extends \Friendica\Module\BaseProfile
 
 		$album = $album ?: $newalbum ?: DateTimeFormat::localNow('Y');
 
-		/*
-		 * We create a wall item for every photo, but we don't want to
-		 * overwhelm the data stream with a hundred newly uploaded photos.
-		 * So we will make the first photo uploaded to this album in the last several hours
-		 * visible by default, the rest will become visible over time when and if
-		 * they acquire comments, likes, dislikes, and/or tags
-		 */
-
-		$r = Photo::selectToArray([], ['`album` = ? AND `uid` = ? AND `created` > ?', $album, $this->owner['uid'], DateTimeFormat::utc('now - 3 hours')]);
-		if (!$r || ($album == $this->t(Photo::PROFILE_PHOTOS))) {
-			$visible = 1;
-		} else {
-			$visible = 0;
-		}
-
-		if (!empty($request['not_visible']) && $request['not_visible'] !== 'false') {
-			$visible = 0;
-		}
-
 		$hook_data = [
 			'src'      => '',
 			'filename' => '',
@@ -218,7 +196,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			return;
 		}
 
-		$this->logger->info('photos: upload: received file: ' . $filename . ' as ' . $src . ' ('. $type . ') ' . $filesize . ' bytes');
+		$this->logger->info('photos: upload: received file: ' . $filename . ' as ' . $src . ' (' . $type . ') ' . $filesize . ' bytes');
 
 		$maximagesize = Strings::getBytesFromShorthand($this->config->get('system', 'maximagesize'));
 
@@ -262,7 +240,6 @@ class Photos extends \Friendica\Module\BaseProfile
 			return;
 		}
 
-		$exif = $image->orient($src);
 		@unlink($src);
 
 		$max_length = $this->config->get('system', 'max_image_length');
@@ -279,52 +256,8 @@ class Photos extends \Friendica\Module\BaseProfile
 			return;
 		}
 
-		$uri = Item::newURI();
-
-		// Create item container
-		$lat = $lon = null;
-		if (!empty($exif['GPS']) && Feature::isEnabled($this->owner['uid'], Feature::PHOTO_LOCATION)) {
-			$lat = Photo::getGps($exif['GPS']['GPSLatitude'], $exif['GPS']['GPSLatitudeRef']);
-			$lon = Photo::getGps($exif['GPS']['GPSLongitude'], $exif['GPS']['GPSLongitudeRef']);
-		}
-
-		$arr = [];
-		if ($lat && $lon) {
-			$arr['coord'] = $lat . ' ' . $lon;
-		}
-
-		$arr['guid']          = System::createUUID();
-		$arr['uid']           = $this->owner['uid'];
-		$arr['uri']           = $uri;
-		$arr['post-type']     = Item::PT_IMAGE;
-		$arr['wall']          = 1;
-		$arr['resource-id']   = $resource_id;
-		$arr['contact-id']    = $this->owner['id'];
-		$arr['owner-name']    = $this->owner['name'];
-		$arr['owner-link']    = $this->owner['url'];
-		$arr['owner-avatar']  = $this->owner['thumb'];
-		$arr['author-name']   = $this->owner['name'];
-		$arr['author-link']   = $this->owner['url'];
-		$arr['author-avatar'] = $this->owner['thumb'];
-		$arr['title']         = '';
-		$arr['allow_cid']     = $str_contact_allow;
-		$arr['allow_gid']     = $str_circle_allow;
-		$arr['deny_cid']      = $str_contact_deny;
-		$arr['deny_gid']      = $str_circle_deny;
-		$arr['visible']       = $visible;
-		$arr['origin']        = 1;
-
-		$arr['body'] = Images::getBBCodeByResource($resource_id, $this->owner['nickname'], $preview, $image->getExt());
-
-		$item_id = Item::insert($arr);
 		// Update the photo albums cache
 		Photo::clearAlbumCache($this->owner['uid']);
-
-		// addon uploaders should call "exit()" within the PHOTO_UPLOAD_END event
-		// if they do not wish to be redirected
-		$this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => $item_id]),
-		);
 
 		$this->baseUrl->redirect($this->session->get('photo_return') ?? 'profile/' . $this->owner['nickname'] . '/photos');
 	}
@@ -380,7 +313,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			$this->owner['uid'],
 			Photo::DEFAULT,
 			$pager->getStart(),
-			$pager->getItemsPerPage()
+			$pager->getItemsPerPage(),
 		));
 
 		$photos = array_map(function ($photo) {
@@ -400,7 +333,7 @@ class Photos extends \Friendica\Module\BaseProfile
 
 		$tpl = Renderer::getMarkupTemplate('photos_head.tpl');
 		$this->page['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$ispublic' => $this->t('everybody')
+			'$ispublic' => $this->t('everybody'),
 		]);
 
 		if ($albums = Photo::getAlbums($this->owner['uid'])) {
@@ -410,7 +343,7 @@ class Photos extends \Friendica\Module\BaseProfile
 					'total'     => $album['total'],
 					'url'       => 'photos/' . $this->owner['nickname'] . '/album/' . bin2hex($album['album']),
 					'urlencode' => urlencode($album['album']),
-					'bin2hex'   => bin2hex($album['album'])
+					'bin2hex'   => bin2hex($album['album']),
 				];
 			}, $albums);
 
@@ -419,7 +352,7 @@ class Photos extends \Friendica\Module\BaseProfile
 				'$title'    => $this->t('Photo Albums'),
 				'$recent'   => $this->t('Recent Photos'),
 				'$albums'   => $albums,
-				'$upload'   => [$this->t('Upload New Photos'), 'photos/' . $this->owner['nickname'] . '/upload'],
+				'$upload'   => [$this->t('Upload photo'), 'photos/' . $this->owner['nickname'] . '/upload'],
 				'$can_post' => $this->session->getLocalUserId() && $this->owner['uid'] == $this->session->getLocalUserId(),
 			]);
 		}
@@ -437,11 +370,12 @@ class Photos extends \Friendica\Module\BaseProfile
 
 		$tpl = Renderer::getMarkupTemplate('photos_recent.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$title'    => $this->t('Recent Photos'),
-			'$can_post' => $is_owner,
-			'$upload'   => [$this->t('Upload New Photos'), 'photos/' . $this->owner['nickname'] . '/upload'],
-			'$photos'   => $photos,
-			'$paginate' => $pager->renderFull($total),
+			'$title'      => $this->t('Recent Photos'),
+			'$can_post'   => $is_owner,
+			'$upload'     => [$this->t('Upload photo'), 'photos/' . $this->owner['nickname'] . '/upload'],
+			'$photos'     => $photos,
+			'$paginate'   => $pager->renderFull($total),
+			'upload_text' => $this->t('Upload photo'),
 		]);
 
 		return $o;

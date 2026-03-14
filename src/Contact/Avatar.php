@@ -20,7 +20,7 @@ use Friendica\Util\Proxy;
  */
 class Avatar
 {
-	const BASE_PATH = '/avatar/';
+	public const BASE_PATH = '/avatar/';
 
 	/**
 	 * Returns a field array with locally cached avatar pictures
@@ -215,7 +215,7 @@ class Avatar
 		}
 
 		$avatarpath = parse_url(self::baseUrl(), PHP_URL_PATH);
-		$pos        = strpos($parts['path'], $avatarpath);
+		$pos        = strpos($parts['path'], (string) $avatarpath);
 		if ($pos !== 0) {
 			return '';
 		}

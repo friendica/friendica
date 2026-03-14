@@ -15,7 +15,7 @@
 			{{$addon_settings_form nofilter}}
 		</form>
 {{foreachelse}}
-		<div class="alert alert-info" role="alert">{{$no_addon_settings_configured}}</div>
+		{{$no_addon_settings_configured}}
 {{/foreach}}
 	</div>
 

@@ -33,8 +33,8 @@
 			<div class="js-section toggle-section-content hidden">
 
 				<div id="profile-photo-upload-wrapper">
-					<label id="profile-photo-upload-label" for="profile-photo-upload">{{$l10n.profile_photo}}:</label>
-					<input name="userfile" type="file" id="profile-photo-upload" size="48"/>
+					<label id="profile-photo-upload-label" for="profile-photo-upload">{{$l10n.profpic_upload_new_header}}:</label>
+					<input name="userfile" type="file" id="profile-photo-upload" required/>
 				</div>
 
 				<div class="profile-edit-submit-wrapper">

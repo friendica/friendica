@@ -32,9 +32,9 @@ class BaseCollection extends \ArrayIterator
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param mixed $key
+	 * @param mixed $value
 	 */
-	#[\ReturnTypeWillChange]
 	public function offsetSet($key, $value): void
 	{
 		if (is_null($key)) {
@@ -45,9 +45,8 @@ class BaseCollection extends \ArrayIterator
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param mixed $key
 	 */
-	#[\ReturnTypeWillChange]
 	public function offsetUnset($key): void
 	{
 		if ($this->offsetExists($key)) {
@@ -136,7 +135,7 @@ class BaseCollection extends \ArrayIterator
 
 				return new $class($array);
 			},
-			array_chunk($this->getArrayCopy(), $length)
+			array_chunk($this->getArrayCopy(), $length),
 		);
 	}
 

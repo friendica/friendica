@@ -27,7 +27,7 @@ class WebFinger extends BaseModule
 		$res  = '';
 
 		if (!empty($addr)) {
-			$res = Probe::lrdd($addr);
+			$res = Probe::getWebfingerArray($addr);
 			$res = print_r($res, true);
 		}
 

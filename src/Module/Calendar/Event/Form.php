@@ -108,8 +108,10 @@ class Form extends BaseModule
 		$share_disabled = '';
 
 		if (empty($orig_event)) {
-			$orig_event = User::getById($this->session->getLocalUserId(),
-				['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid']);
+			$orig_event = User::getById(
+				$this->session->getLocalUserId(),
+				['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid']
+			);
 		} elseif ($orig_event['allow_cid'] !== '<' . $this->session->getLocalUserId() . '>'
 				   || $orig_event['allow_gid']
 				   || $orig_event['deny_cid']
@@ -206,14 +208,14 @@ class Form extends BaseModule
 				true
 			),
 
-			'$n_text'    => $this->t('Finish date/time is not known or not relevant'),
+			'$n_text'    => $this->t('End date/time is unknown or irrelevant'),
 			'$n_checked' => $n_checked,
-			'$f_text'    => $this->t('Event Finishes:'),
+			'$f_text'    => $this->t('Event ends:'),
 			'$f_dsel'    => Temporal::getDateTimeField(
 				new \DateTime(),
 				\DateTime::createFromFormat('Y', intval($fyear) + 5),
 				\DateTime::createFromFormat('Y-m-d H:i', "$fyear-$fmonth-$fday $fhour:$fminute"),
-				$this->t('Event Finishes:'),
+				$this->t('Event ends:'),
 				'finish_text',
 				true,
 				true,
@@ -230,7 +232,7 @@ class Form extends BaseModule
 			'$sh_text'     => $this->t('Share this event'),
 			'$share'       => ['share', $this->t('Share this event'), $share_checked, '', $share_disabled],
 			'$sh_checked'  => $share_checked,
-			'$nofinish'    => ['nofinish', $this->t('Finish date/time is not known or not relevant'), $n_checked],
+			'$nofinish'    => ['nofinish', $this->t('End date/time is unknown or irrelevant'), $n_checked],
 			'$preview'     => $this->t('Preview'),
 			'$acl'         => $acl,
 			'$submit'      => $this->t('Submit'),

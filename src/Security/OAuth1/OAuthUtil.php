@@ -12,12 +12,12 @@ class OAuthUtil
 	public static function urlencode_rfc3986($input)
 	{
 		if (is_array($input)) {
-			return array_map(['Friendica\Security\OAuth1\OAuthUtil', 'urlencode_rfc3986'], $input);
-		} else if (is_scalar($input)) {
+			return array_map([\Friendica\Security\OAuth1\OAuthUtil::class, 'urlencode_rfc3986'], $input);
+		} elseif (is_scalar($input)) {
 			return str_replace(
 				'+',
 				' ',
-				str_replace('%7E', '~', rawurlencode($input))
+				str_replace('%7E', '~', rawurlencode($input)),
 			);
 		} else {
 			return '';
@@ -72,10 +72,10 @@ class OAuthUtil
 			// request
 			$out = [];
 			foreach ($headers as $key => $value) {
-				$key       = str_replace(
+				$key = str_replace(
 					" ",
 					"-",
-					ucwords(strtolower(str_replace("-", " ", $key)))
+					ucwords(strtolower(str_replace("-", " ", $key))),
 				);
 				$out[$key] = $value;
 			}
@@ -83,20 +83,22 @@ class OAuthUtil
 			// otherwise we don't have apache and are just going to have to hope
 			// that $_SERVER actually contains what we need
 			$out = [];
-			if (isset($_SERVER['CONTENT_TYPE']))
+			if (isset($_SERVER['CONTENT_TYPE'])) {
 				$out['Content-Type'] = $_SERVER['CONTENT_TYPE'];
-			if (isset($_ENV['CONTENT_TYPE']))
+			}
+			if (isset($_ENV['CONTENT_TYPE'])) {
 				$out['Content-Type'] = $_ENV['CONTENT_TYPE'];
+			}
 
 			foreach ($_SERVER as $key => $value) {
 				if (substr($key, 0, 5) == "HTTP_") {
 					// this is chaos, basically it is just there to capitalize the first
 					// letter of every word that is not an initial HTTP and strip HTTP
 					// code from przemek
-					$key       = str_replace(
+					$key = str_replace(
 						" ",
 						"-",
-						ucwords(strtolower(str_replace("_", " ", substr($key, 5))))
+						ucwords(strtolower(str_replace("_", " ", substr($key, 5)))),
 					);
 					$out[$key] = $value;
 				}
@@ -110,7 +112,9 @@ class OAuthUtil
 	// array('a' => array('b','c'), 'd' => 'e')
 	public static function parse_parameters($input)
 	{
-		if (!isset($input) || !$input) return [];
+		if (!isset($input) || !$input) {
+			return [];
+		}
 
 		$pairs = explode('&', $input);
 

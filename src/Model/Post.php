@@ -608,6 +608,17 @@ class Post
 	}
 
 	/**
+	 * Retrieves a list of up to 100 unseen posts for a user
+	 * @param int $uid User ID
+	 * @return array Array containing the URI IDs of unseen posts
+	 */
+	public static function getUnseenPosts(int $uid): array
+	{
+		$posts = DBA::selectToArray('post-user', ['uri-id'], ['unseen' => true, 'uid' => $uid], ['limit' => 100]);
+		return array_column($posts, 'uri-id');
+	}
+
+	/**
 	 * Update existing post entries
 	 *
 	 * @param array $fields    The fields that are to be changed

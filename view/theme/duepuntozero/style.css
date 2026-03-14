@@ -1237,12 +1237,6 @@ input#dfrn-url {
   max-height: 160px;
   overflow: hidden;
 }
-.type-link .oembed {
-}
-.oembed.video .embed_video > div {
-    position: absolute; top: 0px; left: 0px;
-    background: rgba(0, 0, 0, 0.5) url(shiny.png) no-repeat scroll center center;
-}
 
 .shared_header a {
   color: black;
@@ -3050,14 +3044,12 @@ aside input[type='text'] {
 .acpopup {
 	background-color:#ffffff;
 	overflow:auto;
-	z-index:100000;
 	border:1px solid #cccccc;
 }
 .acpopup-mce {
 	max-height:150px;
 	background-color:#ffffff;
 	overflow:auto;
-	z-index:100000;
 	border:1px solid #cccccc;
 }
 .acpopupitem {

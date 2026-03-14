@@ -58,13 +58,11 @@ class Statuses extends BaseApi
 		$condition = ["NOT `private` AND `commented` > ? AND `created` > ?", DateTimeFormat::utc('now -1 day'), DateTimeFormat::utc('now -1 week')];
 		$condition = DBA::mergeConditions($condition, ['network' => Protocol::FEDERATED]);
 
-		$display_quotes = self::appSupportsQuotes();
-
 		$trending = [];
 		$statuses = Post::selectPostThread(['uri-id'], $condition, ['limit' => [$request['offset'], $request['limit']],  'order' => ['total-actors' => true]]);
 		while ($status = Post::fetch($statuses)) {
 			try {
-				$trending[] = DI::mstdnStatus()->createFromUriId($status['uri-id'], $uid, $display_quotes);
+				$trending[] = DI::mstdnStatus()->createFromUriId($status['uri-id'], $uid);
 			} catch (\Exception $exception) {
 				$this->logger->info('Post not fetchable', ['uri-id' => $status['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 			}

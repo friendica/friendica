@@ -20,7 +20,7 @@ use Friendica\Object\Image;
 class Images
 {
 	// @todo add IMAGETYPE_AVIF once our minimal supported PHP version is 8.1.0
-	const IMAGETYPES = [IMAGETYPE_WEBP, IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF, IMAGETYPE_BMP];
+	public const IMAGETYPES = [IMAGETYPE_WEBP, IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF, IMAGETYPE_BMP];
 
 	/**
 	 * Get the Imagick format for the given image type
@@ -377,11 +377,40 @@ class Images
 					$data['description'] = $media['description'];
 				}
 			}
+
+			try {
+				$stream = fopen('php://memory', 'r+');
+				fwrite($stream, $img_str);
+				rewind($stream);
+				$exif = @exif_read_data($stream, 'ANY_TAG, IFD0, EXIF, APP12, GPS, INTEROP');
+				fclose($stream);
+				if (is_array($exif)) {
+					$data['exif'] = self::sanitizeExifArray($exif);
+				}
+			} catch (\Exception $e) {
+				DI::logger()->error('Exception when trying to read EXIF data', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+			}
 		}
 
 		$data['size'] = $filesize;
 
 		return $data;
+	}
+
+	/**
+	 * Sanitize EXIF array by removing invalid UTF-8 characters from strings
+	 *
+	 * @param array $exif
+	 * @return array
+	 */
+	private static function sanitizeExifArray(array $exif): array
+	{
+		array_walk_recursive($exif, function (&$value) {
+			if (is_string($value)) {
+				$value = trim(iconv('UTF-8', 'UTF-8//IGNORE', $value));
+			}
+		});
+		return $exif;
 	}
 
 	/**
@@ -454,7 +483,7 @@ class Images
 		return self::getBBCodeByUrl(
 			DI::baseUrl() . '/photos/' . $nickname . '/image/' . $resource_id,
 			DI::baseUrl() . '/photo/' . $resource_id . '-' . $preview . $ext,
-			$description
+			$description,
 		);
 	}
 

@@ -13,7 +13,6 @@ use Friendica\Core\Storage\Exception\InvalidClassStorageException;
 use Friendica\Core\Storage\Capability\ICanConfigureStorage;
 use Friendica\Core\Storage\Capability\ICanWriteToStorage;
 use Friendica\Module\BaseAdmin;
-use Friendica\Util\Strings;
 
 class Storage extends BaseAdmin
 {
@@ -62,7 +61,7 @@ class Storage extends BaseAdmin
 			}
 		}
 
-		if (!empty($_POST['submit_save_set']) && DI::config()->isWritable('storage', 'name') ) {
+		if (!empty($_POST['submit_save_set']) && DI::config()->isWritable('storage', 'name')) {
 			try {
 				$newstorage = DI::storageManager()->getWritableStorageByName($storagebackend);
 

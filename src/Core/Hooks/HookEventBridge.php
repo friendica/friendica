@@ -82,7 +82,6 @@ final class HookEventBridge
 		ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'profile_post',
 		ArrayFilterEvent::MODERATION_USERS_TABS           => 'moderation_users_tabs',
 		ArrayFilterEvent::ACL_LOOKUP_END                  => 'acl_lookup_end',
-		ArrayFilterEvent::OEMBED_FETCH_END                => 'oembed_fetch_url',
 		ArrayFilterEvent::PAGE_INFO                       => 'page_info_data',
 		ArrayFilterEvent::SMILEY_LIST                     => 'smilie',
 		ArrayFilterEvent::BBCODE_TO_HTML_START            => 'bbcode',
@@ -177,7 +176,6 @@ final class HookEventBridge
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
 			ArrayFilterEvent::ACL_LOOKUP_END                  => 'onArrayFilterEvent',
-			ArrayFilterEvent::OEMBED_FETCH_END                => 'onOembedFetchEndEvent',
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::BBCODE_TO_HTML_START            => 'onBbcodeToHtmlEvent',
@@ -330,20 +328,6 @@ final class HookEventBridge
 		$profile = (array) $data['profile'] ?? [];
 
 		$data['profile'] = static::callHook($event->getName(), $profile);
-
-		$event->setArray($data);
-	}
-
-	/**
-	 * Map the OEMBED_FETCH_END event to `oembed_fetch_url` hook
-	 */
-	public static function onOembedFetchEndEvent(ArrayFilterEvent $event): void
-	{
-		$data = $event->getArray();
-
-		$url = (string) $data['url'] ?? '';
-
-		$data['url'] = static::callHook($event->getName(), $url);
 
 		$event->setArray($data);
 	}

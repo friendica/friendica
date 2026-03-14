@@ -23,6 +23,7 @@ use Friendica\Util\Map;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
 use Friendica\Util\XML;
+use IntlDateFormatter;
 
 /**
  * functions for interacting with the event database table
@@ -37,12 +38,10 @@ class Event
 
 		$uriid = $event['uri-id'] ?? $uriid;
 
-		$bd_format = DI::l10n()->t('l F d, Y \@ g:i A \G\M\TP (e)'); // Friday October 29, 2021 @ 9:15 AM GMT-04:00 (America/New_York)
-
-		$event_start = DI::l10n()->getDay(DateTimeFormat::local($event['start'], $bd_format));
+		$event_start = DI::l10n()->formatDateTime($event['start'], IntlDateFormatter::FULL, IntlDateFormatter::LONG);
 
 		if (!empty($event['finish'])) {
-			$event_end = DI::l10n()->getDay(DateTimeFormat::local($event['finish'], $bd_format));
+			$event_end = DI::l10n()->formatDateTime($event['finish'], IntlDateFormatter::FULL, IntlDateFormatter::LONG);
 		} else {
 			$event_end = '';
 		}
@@ -459,7 +458,7 @@ class Event
 
 			'dtstart_label'  => DI::l10n()->t('Starts:'),
 			'dtend_label'    => DI::l10n()->t('Finishes:'),
-			'location_label' => DI::l10n()->t('Location:')
+			'location_label' => DI::l10n()->t('Location:'),
 		];
 	}
 
@@ -542,7 +541,7 @@ class Event
 			  AND `event`.`uid` = ?
 			  $sql_perms",
 			$event_id,
-			$owner_uid
+			$owner_uid,
 		));
 		if (empty($events)) {
 			throw new NotFoundException(DI::l10n()->t('Event not found.'));
@@ -607,7 +606,7 @@ class Event
 			$owner_uid,
 			$start,
 			$start,
-			$finish
+			$finish,
 		));
 
 		$events = self::removeDuplicates($events);
@@ -636,8 +635,7 @@ class Event
 
 		$start = DateTimeFormat::local($event['start'], 'c');
 		$j     = DateTimeFormat::local($event['start'], 'j');
-		$day   = DateTimeFormat::local($event['start'], $fmt);
-		$day   = DI::l10n()->getDay($day);
+		$day   = DI::l10n()->fullDate($event['start']);
 
 		if ($event['nofinish']) {
 			$end = null;
@@ -658,7 +656,7 @@ class Event
 
 		$title = strip_tags(BBCode::convertForUriId($event['uri-id'], $event['summary']));
 		if (!$title) {
-			list($title, $_trash) = explode("<br", BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['desc'])), BBCode::TWITTER_API);
+			[$title, $_trash] = explode("<br", BBCode::convertForUriId($event['uri-id'], Strings::escapeHtml($event['desc'])), BBCode::TWITTER_API);
 		}
 
 		$event['author-link'] = Contact::magicLink($event['author-link']);
@@ -710,11 +708,11 @@ class Event
 					$time_format = "%H:%M:%S";
 					$date_format = "%Y-%m-%d";
 
-					$o .= '"' . $event['summary'] . '", "' . strftime($date_format, $tmp1) .
-						'", "' . strftime($time_format, $tmp1) . '", "' . $event['desc'] .
-						'", "' . strftime($date_format, $tmp2) .
-						'", "' . strftime($time_format, $tmp2) .
-						'", "' . $event['location'] . '"' . PHP_EOL;
+					$o .= '"' . $event['summary'] . '", "' . strftime($date_format, $tmp1)
+						. '", "' . strftime($time_format, $tmp1) . '", "' . $event['desc']
+						. '", "' . strftime($date_format, $tmp2)
+						. '", "' . strftime($time_format, $tmp2)
+						. '", "' . $event['location'] . '"' . PHP_EOL;
 				}
 				break;
 
@@ -882,28 +880,26 @@ class Event
 		$same_date = false;
 		$finish    = false;
 
-		// Set the different time formats.
-		$dformat       = DI::l10n()->t('l F d, Y \@ g:i A'); // Friday January 18, 2011 @ 8:01 AM.
-		$dformat_short = DI::l10n()->t('D g:i A'); // Fri 8:01 AM.
-		$tformat       = DI::l10n()->t('g:i A'); // 8:01 AM.
-
 		// Convert the time to different formats.
-		$dtstart_dt    = DI::l10n()->getDay(DateTimeFormat::local($item['event-start'], $dformat));
+		$dtstart_dt    = DI::l10n()->fullDateTime($item['event-start']);
 		$dtstart_title = DateTimeFormat::utc($item['event-start'], DateTimeFormat::ATOM);
 		// Format: Jan till Dec.
-		$month_short = DI::l10n()->getDayShort(DateTimeFormat::local($item['event-start'], 'M'));
+		$month_short = DI::l10n()->formatDateTimeByPattern($item['event-start'], 'MMM');
 		// Format: 1 till 31.
-		$date_short  = DateTimeFormat::local($item['event-start'], 'j');
-		$start_time  = DateTimeFormat::local($item['event-start'], $tformat);
-		$start_short = DI::l10n()->getDayShort(DateTimeFormat::local($item['event-start'], $dformat_short));
+		$date_short  = DI::l10n()->formatDateTimeByPattern($item['event-start'], 'd');
+		$start_time  = DI::l10n()->formatDateTime($item['event-start'], IntlDateFormatter::NONE, IntlDateFormatter::SHORT);
+		$start_day   = DI::l10n()->formatDateTimeByPattern($item['event-start'], 'eeee');
+		$start_short = $start_day . ' ' . $start_time;
+		$timezone    = DI::l10n()->formatDateTimeByPattern($item['event-start'], 'vvvv');
 
 		// If the option 'nofinisch' isn't set, we need to format the finish date/time.
 		if (!$item['event-nofinish']) {
 			$finish      = true;
-			$dtend_dt    = DI::l10n()->getDay(DateTimeFormat::local($item['event-finish'], $dformat));
+			$dtend_dt    = DI::l10n()->fullDateTime($item['event-finish']);
 			$dtend_title = DateTimeFormat::utc($item['event-finish'], DateTimeFormat::ATOM);
-			$end_short   = DI::l10n()->getDayShort(DateTimeFormat::utc($item['event-finish'], $dformat_short));
-			$end_time    = DateTimeFormat::local($item['event-finish'], $tformat);
+			$end_time    = DI::l10n()->formatDateTime($item['event-finish'], IntlDateFormatter::NONE, IntlDateFormatter::SHORT);
+			$end_day     = DI::l10n()->formatDateTimeByPattern($item['event-finish'], 'eeee');
+			$end_short   = $end_day . ' ' . $end_time;
 			// Check if start and finish time is at the same day.
 			if (substr($dtstart_title, 0, 10) === substr($dtend_title, 0, 10)) {
 				$same_date = true;
@@ -921,7 +917,7 @@ class Event
 			'id'      => $item['author-id'],
 			'network' => $item['author-network'],
 			'url'     => $item['author-link'],
-			'alias'   => $item['author-alias']
+			'alias'   => $item['author-alias'],
 		];
 		$profile_link = Contact::magicLinkByContact($author);
 
@@ -943,6 +939,7 @@ class Event
 			'$start_short'    => $start_short,
 			'$end_time'       => $end_time,
 			'$end_short'      => $end_short,
+			'$timezone'       => $timezone,
 			'$author_name'    => $item['author-name'],
 			'$author_link'    => $profile_link,
 			'$author_avatar'  => $item['author-avatar'],
@@ -1024,7 +1021,7 @@ class Event
 			'uid'   => $contact['uid'],
 			'cid'   => $contact['id'],
 			'start' => DateTimeFormat::utc($birthday),
-			'type'  => 'birthday'
+			'type'  => 'birthday',
 		];
 		if (DBA::exists('event', $condition)) {
 			return false;

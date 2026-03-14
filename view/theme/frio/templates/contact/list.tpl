@@ -11,6 +11,8 @@ at the suggest page and also at many other places *}}
 
 	{{$tab_str nofilter}}
 
+	{{$additional_text}}
+
 	<ul id="viewcontact_wrapper{{if $id}}-{{$id}}{{/if}}" class="viewcontact_wrapper media-list">
 {{foreach $contacts as $contact}}
 		<li>{{include file="contact/entry.tpl"}}</li>

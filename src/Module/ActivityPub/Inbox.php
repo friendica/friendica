@@ -53,6 +53,9 @@ class Inbox extends BaseApi
 			$inbox = ActivityPub\ClientToServer::getPublicInbox($uid, $page, $request['max_id'] ?? null);
 		}
 
+		// Relaxed CORS header already authorized
+		header('Access-Control-Allow-Origin: *');
+
 		$this->jsonExit($inbox, 'application/activity+json');
 	}
 

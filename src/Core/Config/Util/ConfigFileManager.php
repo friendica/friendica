@@ -25,21 +25,21 @@ class ConfigFileManager
 	 *
 	 * @var string
 	 */
-	const CONFIG_HTCONFIG = 'htconfig';
+	public const CONFIG_HTCONFIG = 'htconfig';
 
 	/**
 	 * The config file, where overrides per admin page/console are saved at
 	 *
 	 * @var string
 	 */
-	const CONFIG_DATA_FILE = 'node.config.php';
+	public const CONFIG_DATA_FILE = 'node.config.php';
 
 	/**
 	 * The sample string inside the configs, which shouldn't get loaded
 	 *
 	 * @var string
 	 */
-	const SAMPLE_END = '-sample';
+	public const SAMPLE_END = '-sample';
 
 	/**
 	 * @var string
@@ -161,10 +161,10 @@ class ConfigFileManager
 	 */
 	public function loadAddonConfig(string $name): array
 	{
-		$filepath = $this->addonDir . DIRECTORY_SEPARATOR . // /var/www/html/addon/
-					$name . DIRECTORY_SEPARATOR .           // openstreetmap/
-					'config' . DIRECTORY_SEPARATOR .        // config/
-					$name . ".config.php";                  // openstreetmap.config.php
+		$filepath = $this->addonDir . DIRECTORY_SEPARATOR // /var/www/html/addon/
+					. $name . DIRECTORY_SEPARATOR           // openstreetmap/
+					. 'config' . DIRECTORY_SEPARATOR        // config/
+					. $name . ".config.php";                  // openstreetmap.config.php
 
 		if (!file_exists($filepath)) {
 			return [];
@@ -182,8 +182,8 @@ class ConfigFileManager
 	 */
 	protected function loadEnvConfig(): array
 	{
-		$filepath = $this->staticDir . DIRECTORY_SEPARATOR .   // /var/www/html/static/
-					"env.config.php";                          // env.config.php
+		$filepath = $this->staticDir . DIRECTORY_SEPARATOR   // /var/www/html/static/
+					. "env.config.php";                          // env.config.php
 
 		if (!file_exists($filepath)) {
 			return [];
@@ -220,9 +220,9 @@ class ConfigFileManager
 		$sampleEnd = self::SAMPLE_END . ($ini ? '.ini.php' : '.config.php');
 
 		foreach ($files as $filename) {
-			if (fnmatch($filePattern, $filename) &&
-				substr_compare($filename, $sampleEnd, -strlen($sampleEnd)) &&
-				$filename !== self::CONFIG_DATA_FILE) {
+			if (fnmatch($filePattern, $filename)
+				&& substr_compare($filename, $sampleEnd, -strlen($sampleEnd))
+				&& $filename !== self::CONFIG_DATA_FILE) {
 				$found[] = $this->configDir . '/' . $filename;
 			}
 		}
@@ -257,7 +257,6 @@ class ConfigFileManager
 
 		// map the legacy configuration structure to the current structure
 		foreach ($htConfigCategories as $htConfigCategory) {
-			/** @phpstan-ignore-next-line $a->config could be modified after `include $fullName` */
 			if (is_array($a->config[$htConfigCategory])) {
 				$keys = array_keys($a->config[$htConfigCategory]);
 

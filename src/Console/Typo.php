@@ -49,7 +49,7 @@ HELP;
 	protected function doExecute(): int
 	{
 		if ($this->getOption('v')) {
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -128,7 +128,7 @@ HELP;
 		}
 
 		$output = [];
-		$ret = 0;
+		$ret    = 0;
 		exec("$php_path -l $file", $output, $ret);
 		if ($ret !== 0) {
 			throw new \RuntimeException('Parse error found in ' . $file . ', scan stopped.');

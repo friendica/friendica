@@ -24,7 +24,7 @@ Some parts of this template will be moved by js to other places (see theme.js) -
 					<div class="col-md-8">
 						{{* The button to save searches *}}
 						{{if $s}}
-						<a href="search/saved/add?term={{$q}}&amp;return_url={{$return_url}}" class="btn btn-primary btn-small pull-right">{{$save_label}}</a>
+						<a href="search/saved/add?term={{$q}}&amp;return_url={{$return_url}}" class="btn btn-primary btn-small pull-right">{{$action_text}}</a>
 						{{/if}}
 
 						{{* The select popup menu to select what kind of results the user would like to search for *}}
@@ -39,7 +39,7 @@ Some parts of this template will be moved by js to other places (see theme.js) -
 							</div>
 						</div>
 						{{/if}}
-						
+
 					</div>
 				</div>
 				<div class="col-md-2"></div>
@@ -47,18 +47,14 @@ Some parts of this template will be moved by js to other places (see theme.js) -
 				<div class="clearfix"></div>
 
 			</div>
-			
+
 		</form>
 	</div>
 
 {{if $s}}
-	<a href="search/saved/add?term={{$q}}&amp;return_url={{$return_url}}" class="btn btn-sm btn-primary pull-right" id="search-save" title="{{$save_label}}" aria-label="{{$save_label}}" value="{{$save_label}}" data-toggle="tooltip">
-	{{if $mode == "tag"}}
-		<i class="fa fa-plus fa-2x" aria-hidden="true"></i>
-	{{else}}
-		<i class="fa fa-floppy-o fa-2x" aria-hidden="true"></i>
-	{{/if}}
-		<span class="sr-only">{{$save_label}}</span>
+	<a href="search/saved/add?term={{$q}}&amp;return_url={{$return_url}}" class="action-button btn btn-primary pull-right" id="search-save">
+		<i class="fa fa-lg fa-floppy-o" aria-hidden="true"></i>
+		<span>{{$action_text}}</span>
 	</a>
 {{/if}}
 </div>

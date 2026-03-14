@@ -24,10 +24,11 @@ use Friendica\Util\Temporal;
 
 function message_init()
 {
-	$tabs = '';
+	$tabs               = '';
+	DI::page()['title'] = DI::l10n()->t('Messages');
 
 	if (DI::args()->getArgc() > 1 && is_numeric(DI::args()->getArgv()[1])) {
-		$tabs = render_messages(get_messages(DI::userSession()->getLocalUserId(), 0, 5), 'mail_list.tpl');
+		$tabs = render_messages(get_messages(DI::userSession()->getLocalUserId(), 0, 15), 'mail_list.tpl');
 	}
 
 	$new = [
@@ -45,7 +46,7 @@ function message_init()
 
 	$head_tpl = Renderer::getMarkupTemplate('message-head.tpl');
 	DI::page()['htmlhead'] .= Renderer::replaceMacros($head_tpl, [
-		'$base' => (string)DI::baseUrl()
+		'$base' => (string) DI::baseUrl(),
 	]);
 }
 
@@ -146,7 +147,7 @@ function message_content()
 				DI::baseUrl()->redirect('message');
 			}
 
-			DI::baseUrl()->redirect('message/' . $conversation['id'] );
+			DI::baseUrl()->redirect('message/' . $conversation['id']);
 		} else {
 			$parentmail = DBA::selectFirst('mail', ['parent-uri'], ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()]);
 			if (DBA::isResult($parentmail)) {
@@ -166,7 +167,7 @@ function message_content()
 		$tpl = Renderer::getMarkupTemplate('msg-header.tpl');
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 			'$nickname' => DI::userSession()->getLocalUserNickname(),
-			'$linkurl'  => DI::l10n()->t('Please enter a link URL:')
+			'$linkurl'  => DI::l10n()->t('Please enter a link URL:'),
 		]);
 
 		$recipientId = DI::args()->getArgv()[2] ?? null;
@@ -187,7 +188,7 @@ function message_content()
 			'$upload'      => DI::l10n()->t('Upload photo'),
 			'$insert'      => DI::l10n()->t('Insert web link'),
 			'$wait'        => DI::l10n()->t('Please wait'),
-			'$submit'      => DI::l10n()->t('Submit')
+			'$submit'      => DI::l10n()->t('Send Message'),
 		]);
 		return $o;
 	}
@@ -231,14 +232,14 @@ function message_content()
 			WHERE `mail`.`uid` = ? AND `mail`.`id` = ?
 			LIMIT 1",
 			DI::userSession()->getLocalUserId(),
-			DI::args()->getArgv()[1]
+			DI::args()->getArgv()[1],
 		);
 		if (DBA::isResult($message)) {
 			$contact_id = $message['contact-id'];
 
 			$params = [
 				DI::userSession()->getLocalUserId(),
-				$message['parent-uri']
+				$message['parent-uri'],
 			];
 
 			if ($message['convid']) {
@@ -255,7 +256,7 @@ function message_content()
 				WHERE `mail`.`uid` = ?
 				$sql_extra
 				ORDER BY `mail`.`created` ASC",
-				...$params
+				...$params,
 			);
 
 			$messages = DBA::toArray($messages_stmt);
@@ -273,7 +274,7 @@ function message_content()
 		$tpl = Renderer::getMarkupTemplate('msg-header.tpl');
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, [
 			'$nickname' => DI::userSession()->getLocalUserNickname(),
-			'$linkurl'  => DI::l10n()->t('Please enter a link URL:')
+			'$linkurl'  => DI::l10n()->t('Please enter a link URL:'),
 		]);
 
 		$mails   = [];
@@ -343,8 +344,8 @@ function message_content()
 			'$parent'      => $parent,
 			'$upload'      => DI::l10n()->t('Upload photo'),
 			'$insert'      => DI::l10n()->t('Insert web link'),
-			'$submit'      => DI::l10n()->t('Submit'),
-			'$wait'        => DI::l10n()->t('Please wait')
+			'$submit'      => DI::l10n()->t('Send Message'),
+			'$wait'        => DI::l10n()->t('Please wait'),
 		]);
 
 		return $o;
@@ -381,25 +382,20 @@ function get_messages(int $uid, int $start, int $limit): array
 			c.`url`,
 			c.`thumb`,
 			c.`network`,
-			m2.`count`,
-			m2.`mailcreated`,
-			m2.`mailseen`
+			(SELECT COUNT(*) FROM `mail` WHERE `parent-uri` = m.`parent-uri` AND `uid` = ?) AS `count`,
+			(SELECT MAX(`created`) FROM `mail` WHERE `parent-uri` = m.`parent-uri` AND `uid` = ?) AS `mailcreated`,
+			(SELECT MIN(`seen`) FROM `mail` WHERE `parent-uri` = m.`parent-uri` AND `uid` = ?) AS `mailseen`
 		FROM `mail` m
-		JOIN (
-			SELECT
-				`parent-uri`,
-				MIN(`id`)      AS `id`,
-				COUNT(*)       AS `count`,
-				MAX(`created`) AS `mailcreated`,
-				MIN(`seen`)    AS `mailseen`
-			FROM `mail`
-			WHERE `uid` = ?
-			GROUP BY `parent-uri`
-		) m2 ON m.`parent-uri` = m2.`parent-uri` AND m.`id` = m2.`id`
 		LEFT JOIN `contact` c ON m.`contact-id` = c.`id`
 		WHERE m.`uid` = ?
-		ORDER BY m2.`mailcreated` DESC
-		LIMIT ?, ?', $uid, $uid, $start, $limit));
+			AND m.`id` IN (
+				SELECT MIN(`id`)
+				FROM `mail`
+				WHERE `uid` = ?
+				GROUP BY `parent-uri`
+			)
+		ORDER BY `mailcreated` DESC
+		LIMIT ?, ?', $uid, $uid, $uid, $uid, $uid, $start, $limit));
 }
 
 function render_messages(array $msg, string $t): string

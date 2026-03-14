@@ -7,10 +7,10 @@
  *
  * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
  * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
- * 
+ *
  * Restructured by Rabzuarus (https://friendica.kommune4.de/profile/rabuzarus)
  * to use it in the decentralized social network Friendica (https://friendi.ca).
- * 
+ *
  * Version: 1.4.0
  */
 (function ($) {
@@ -70,7 +70,7 @@
 
 		/**
 		 * Initialize the plugin
-		 * 
+		 *
 		 * @returns {void}
 		 */
 		var init = function() {
@@ -96,7 +96,7 @@
 
 		/**
 		 * Reset some values.
-		 * 
+		 *
 		 * @returns {void}
 		 */
 		var resetPreview = function() {
@@ -108,10 +108,10 @@
 		/**
 		 * Crawl a text string if it contains an url and try
 		 * to attach it.
-		 * 
+		 *
 		 * If no text is passed to crawlText() we take
 		 * the previous word before the cursor of the textarea.
-		 * 
+		 *
 		 * @param {string} text (optional)
 		 * @returns {void}
 		 */
@@ -120,7 +120,7 @@
 			images = '';
 			isExtern = false;
 
-			// If no text is passed to crawlText() we 
+			// If no text is passed to crawlText() we
 			// take the previous word before the cursor.
 			if (typeof text === 'undefined') {
 				text = getPrevWord(id);
@@ -153,7 +153,7 @@
 		/**
 		 * Process the attachment data according to
 		 * its content type (image, audio, video, attachment)
-		 * 
+		 *
 		 * @param {object} result
 		 * @returns {void}
 		 */
@@ -175,7 +175,7 @@
 
 		/**
 		 * Fetch the content of link which should be attached.
-		 * 
+		 *
 		 * @param {string} binurl Link which should be attached as hexadecimal string.
 		 * @param {type} callback
 		 * @returns {void}
@@ -195,7 +195,7 @@
 
 		/*
 		 * Add a [img] bbtag with the image url to the jot editor.
-		 * 
+		 *
 		 * @param {type} data
 		 * @returns {void}
 		 */
@@ -209,7 +209,7 @@
 
 		/*
 		 * Add a [audio] bbtag with the audio url to the jot editor.
-		 * 
+		 *
 		 * @param {type} data
 		 * @returns {void}
 		 */
@@ -223,7 +223,7 @@
 
 		/*
 		 * Add a [video] bbtag with the video url to the jot editor.
-		 * 
+		 *
 		 * @param {type} data
 		 * @returns {void}
 		 */
@@ -238,7 +238,7 @@
 		/**
 		 * Process all attachment data and show up a html
 		 * attachment preview.
-		 * 
+		 *
 		 * @param {obj} data Attachment data.
 		 * @returns {void}
 		 */
@@ -271,7 +271,7 @@
 		/**
 		 * Construct the attachment html from the attachment template and
 		 * add it to the DOM.
-		 * 
+		 *
 		 * @param {object} data Attachment data.
 		 * @returns {void}
 		 */
@@ -294,7 +294,7 @@
 		/**
 		 * Add the attachment title and the description
 		 * to the attachment preview.
-		 * 
+		 *
 		 * @param {object} data Attachment data.
 		 * @returns {void}
 		 */
@@ -318,7 +318,7 @@
 
 		/**
 		 * Add the host to the attachment preview.
-		 * 
+		 *
 		 * @param {string} url The url of the link attachment.
 		 * @returns {void}
 		 */
@@ -333,15 +333,15 @@
 
 		/**
 		 * Add preview images to the attachment.
-		 * 
+		 *
 		 * @param {array} images
-		 * 
+		 *
 		 * @returns {void}
 		 */
 		var addImagesToAttachment = function(images) {
 			var imageClass = 'attachment-preview';
-	
-			if (Array.isArray(images)) {
+
+			if (Array.isArray(images) && images.length > 0) {
 				$('#previewImages_' + id).show();
 				$('#attachmentImageSrc_' + id).val(bin2hex(images[photoNumber].src));
 				$('#attachmentImageWidth_' + id).val(images[photoNumber].width);
@@ -405,7 +405,7 @@
 
 		/**
 		 * Add event listener to control the attachment preview.
-		 * 
+		 *
 		 * @returns {void}
 		 */
 		var processEventListener = function() {
@@ -504,7 +504,7 @@
 
 		/**
 		 * Convert attachment bbcode into an array.
-		 * 
+		 *
 		 * @param {string} content Text content with the attachment bbcode.
 		 * @returns {object || null}
 		 */
@@ -620,7 +620,7 @@
 		/**
 		 * Process txt content and if it contains attachment bbcode
 		 * add it to the attachment preview .
-		 * 
+		 *
 		 * @param {string} content
 		 * @returns {void}
 		 */
@@ -638,7 +638,7 @@
 		/**
 		 * Add an Attachment with data from an old bbcode
 		 * generated attachment.
-		 * 
+		 *
 		 * @param {object} json The attachment data.
 		 * @returns {void}
 		 */
@@ -682,7 +682,7 @@
 				$('#previewImage_' + id).html(appendImage);
 				$('#attachmentImageSrc_' + id).val(bin2hex(image));
 
-				// We need to add the image width and height when it is 
+				// We need to add the image width and height when it is
 				// loaded.
 				$('<img/>' ,{
 					load : function(){
@@ -699,7 +699,7 @@
 
 		/**
 		 * Add missing default properties to the input data object.
-		 * 
+		 *
 		 * @param {object} obj Input data.
 		 * @returns {object}
 		 */
@@ -749,7 +749,7 @@
 
 		/**
 		 * Destroy the plugin.
-		 * 
+		 *
 		 * @returns {void}
 		 */
 		var destroy = function() {
@@ -783,7 +783,7 @@
 				.replace(/\'/g, '&#39;'); // '&apos;' is not valid HTML 4
 		};
 
-		// Initialize LinkPreview 
+		// Initialize LinkPreview
 		init();
 
 		return {
@@ -807,10 +807,10 @@
 
 	/**
 	* Get in a textarea the previous word before the cursor.
-	* 
+	*
 	* @param {object} text Textarea element.
 	* @param {integer} caretPos Cursor position.
-	* 
+	*
 	* @returns {string} Previous word.
 	*/
 	function returnWord(text, caretPos) {
@@ -841,7 +841,7 @@
 
 	/**
 	 * Get in a textarea the previous word before the cursor.
-	 * 
+	 *
 	 * @param {string} id The ID of a textarea element.
 	 * @returns {sting|null} Previous word or null if no word is available.
 	 */
@@ -857,7 +857,7 @@
 
 	/**
 	 * Get the cursor position in an text element.
-	 * 
+	 *
 	 * @param {object} ctrl Textarea element.
 	 * @returns {integer} Position of the cursor.
 	 */

@@ -23,16 +23,16 @@ class DBA
 	/**
 	 * Lowest possible date value
 	 */
-	const NULL_DATE     = '0001-01-01';
+	public const NULL_DATE = '0001-01-01';
 	/**
 	 * Lowest possible datetime value
 	 */
-	const NULL_DATETIME = '0001-01-01 00:00:00';
+	public const NULL_DATETIME = '0001-01-01 00:00:00';
 
 	/**
 	 * Lowest possible datetime(6) value
 	 */
-	const NULL_DATETIME6 = '0001-01-01 00:00:00.000000';
+	public const NULL_DATETIME6 = '0001-01-01 00:00:00.000000';
 
 	public static function connect(): bool
 	{
@@ -130,11 +130,11 @@ class DBA
 	 */
 	public static function cleanQuery(string $sql): string
 	{
-		$search = ["\t", "\n", "\r", "  "];
+		$search  = ["\t", "\n", "\r", "  "];
 		$replace = [' ', ' ', ' ', ' '];
 		do {
 			$oldsql = $sql;
-			$sql = str_replace($search, $replace, $sql);
+			$sql    = str_replace($search, $replace, $sql);
 		} while ($oldsql != $sql);
 
 		return $sql;
@@ -518,8 +518,8 @@ class DBA
 			'.',
 			array_map(
 				function (string $identifier) { return '`' . str_replace('`', '``', $identifier) . '`'; },
-				explode('.', $identifier)
-			)
+				explode('.', $identifier),
+			),
 		);
 	}
 
@@ -571,16 +571,14 @@ class DBA
 		if (count($condition) < 1) {
 			return ['1'];
 		}
-
-		reset($condition);
-		$first_key = key($condition);
+		$first_key = array_key_first($condition);
 
 		if (is_int($first_key)) {
 			// Already collapsed
 			return $condition;
 		}
 
-		$values = [];
+		$values           = [];
 		$condition_string = "";
 		foreach ($condition as $field => $value) {
 			if ($condition_string != "") {
@@ -594,7 +592,7 @@ class DBA
 					 * In case of mixed types, cast all as string.
 					 * Logic needs to be consistent with DBA::p() data types.
 					 */
-					$is_int = false;
+					$is_int   = false;
 					$is_alpha = false;
 					foreach ($value as $single_value) {
 						if (is_int($single_value)) {
@@ -607,13 +605,13 @@ class DBA
 					if ($is_int && $is_alpha) {
 						foreach ($value as &$ref) {
 							if (is_int($ref)) {
-								$ref = (string)$ref;
+								$ref = (string) $ref;
 							}
 						}
 						unset($ref); //Prevent accidental re-use.
 					}
 
-					$values = array_merge($values, array_values($value));
+					$values       = array_merge($values, array_values($value));
 					$placeholders = substr(str_repeat("?, ", count($value)), 0, -2);
 					$condition_string .= self::quoteIdentifier($field) . " IN (" . $placeholders . ")";
 				} else {
@@ -647,7 +645,7 @@ class DBA
 		}
 
 		$conditionStrings = [];
-		$result = [];
+		$result           = [];
 
 		foreach ($conditions as $key => $condition) {
 			if (!$condition) {

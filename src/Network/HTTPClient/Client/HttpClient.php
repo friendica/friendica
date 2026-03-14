@@ -93,7 +93,7 @@ class HttpClient implements ICanSendHttpRequests
 			}
 		}
 		$parts['path'] = implode('/', $parts2);
-		$url           = (string)Uri::fromParts((array)$parts);
+		$url           = (string) Uri::fromParts((array) $parts);
 
 		if (Network::isUrlBlocked($url)) {
 			$this->logger->info('Domain is blocked.', ['url' => $url]);
@@ -147,8 +147,8 @@ class HttpClient implements ICanSendHttpRequests
 
 		$conf[RequestOptions::ON_HEADERS] = function (ResponseInterface $response) use ($opts) {
 			if (
-				!empty($opts[HttpClientOptions::CONTENT_LENGTH]) &&
-				(int)$response->getHeaderLine('Content-Length') > $opts[HttpClientOptions::CONTENT_LENGTH]
+				!empty($opts[HttpClientOptions::CONTENT_LENGTH])
+				&& (int) $response->getHeaderLine('Content-Length') > $opts[HttpClientOptions::CONTENT_LENGTH]
 			) {
 				throw new TransferException('The file is too big!');
 			}
@@ -168,14 +168,14 @@ class HttpClient implements ICanSendHttpRequests
 			return new GuzzleResponse($response, $url);
 		} catch (TransferException $exception) {
 			if (
-				$exception instanceof RequestException &&
-				$exception->hasResponse()
+				$exception instanceof RequestException
+				&& $exception->hasResponse()
 			) {
 				return new GuzzleResponse($exception->getResponse(), $url, $exception->getCode(), '');
 			} else {
 				return new CurlResult($this->logger, $url, '', ['http_code' => 500], $exception->getCode(), '');
 			}
-		} catch (InvalidArgumentException | \InvalidArgumentException $argumentException) {
+		} catch (InvalidArgumentException|\InvalidArgumentException $argumentException) {
 			$this->logger->info('Invalid Argument for HTTP call.', ['url' => $url, 'method' => $method, 'exception' => $argumentException]);
 			return new CurlResult($this->logger, $url, '', ['http_code' => 500], $argumentException->getCode(), $argumentException->getMessage());
 		} finally {
@@ -198,7 +198,7 @@ class HttpClient implements ICanSendHttpRequests
 	public function get(string $url, string $accept_content = HttpClientAccept::DEFAULT, array $opts = []): ICanHandleHttpResponses
 	{
 		// In case there is no
-		$opts[HttpClientOptions::ACCEPT_CONTENT] = $opts[HttpClientOptions::ACCEPT_CONTENT] ?? $accept_content;
+		$opts[HttpClientOptions::ACCEPT_CONTENT] ??= $accept_content;
 
 		return $this->request('get', $url, $opts);
 	}
@@ -279,7 +279,7 @@ class HttpClient implements ICanSendHttpRequests
 					HttpClientOptions::TIMEOUT   => $timeout,
 					HttpClientOptions::COOKIEJAR => $cookiejar,
 					HttpClientOptions::REQUEST   => $request,
-				]
+				],
 			);
 			return $ret->getBodyString();
 		} catch (\Throwable $th) {
@@ -291,7 +291,7 @@ class HttpClient implements ICanSendHttpRequests
 	private function getUserAgent(string $type = ''): string
 	{
 		// @see https://developers.whatismybrowser.com/learn/browser-detection/user-agents/user-agent-best-practices
-		$userAgent = App::PLATFORM . '/' . App::VERSION  . ' DatabaseVersion/' . DB_UPDATE_VERSION;
+		$userAgent = App::PLATFORM . '/' . App::VERSION . ' DatabaseVersion/' . DB_UPDATE_VERSION;
 		if ($type != '') {
 			$userAgent .= ' Request/' . $type;
 		}

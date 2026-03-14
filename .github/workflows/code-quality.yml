@@ -37,12 +37,12 @@ jobs:
       - name: Clone addon repository
         run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
-      - name: Install PHP-CS-Fixer
-        run: composer install --working-dir=bin/dev/php-cs-fixer
+      - name: Install Composer dependencies
+        uses: "ramsey/composer-install@v2"
 
       - name: Run PHP-CS-Fixer
         continue-on-error: true
-        run: bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix --diff --dry-run
+        run: vendor/bin/php-cs-fixer fix --diff --dry-run
 
   phpstan:
     name: PHPStan (PHP ${{ matrix.php }})

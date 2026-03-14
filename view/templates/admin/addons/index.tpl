@@ -12,7 +12,7 @@
 	{{$noplugshint}}
 	</div>
 {{else}}
-	<a class="btn" href="{{$baseurl}}/admin/{{$function}}?action=reload&amp;t={{$form_security_token}}">{{$reload}}</a>
+	<p><a class="btn btn-primary" href="{{$baseurl}}/admin/{{$function}}?action=reload&amp;t={{$form_security_token}}">{{$reload}}</a></p>
 	<ul id="addonslist">
 	{{foreach $addons as $p}}
 		<li class="addon {{$p.1}}">

@@ -37,7 +37,7 @@ class Attachment extends BaseFactory
 	public function createFromUriId(int $uriId): array
 	{
 		$attachments = [];
-		foreach (Post\Media::getByURIId($uriId, [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE]) as $attachment) {
+		foreach (Post\Media::getByURIId($uriId, [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HLS]) as $attachment) {
 			$attachments[] = $this->createFromMediaArray($attachment);
 		}
 

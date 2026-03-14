@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -15,7 +16,7 @@ require_once 'view/theme/frio/theme.php';
 require_once 'view/theme/frio/php/scheme.php';
 require_once 'view/theme/frio/php/PHPColors/Color.php';
 
-$schemecssfile = false;
+$schemecssfile   = false;
 $scheme_modified = 0;
 
 /*
@@ -74,7 +75,7 @@ if (DI::mode()->has(\Friendica\App\Mode::MAINTENANCEDISABLED)) {
 if (!$login_bg_image && !$login_bg_color) {
 	$login_bg_image = 'img/login_bg.jpg';
 }
-$login_bg_color = $login_bg_color ?: '#ededed';
+$login_bg_color = $login_bg_color ?: '#fff';
 
 $scheme = Strings::sanitizeFilePathItem($scheme);
 
@@ -94,14 +95,14 @@ $contentbg_transp = $contentbg_transp != '' ? $contentbg_transp : 100;
 // Some colors are calculated to don't have too many selection
 // fields in the theme settings.
 if (!isset($menu_background_hover_color)) {
-	$mbhc = new Color($nav_bg);
+	$mbhc   = new Color($nav_bg);
 	$mcolor = $mbhc->getHex();
 
 	if ($mbhc->isLight($mcolor, 75)) {
-		$menu_is = 'light';
+		$menu_is                     = 'light';
 		$menu_background_hover_color = '#' . $mbhc->darken(5);
 	} else {
-		$menu_is = 'dark';
+		$menu_is                     = 'dark';
 		$menu_background_hover_color = '#' . $mbhc->lighten(5);
 	}
 }
@@ -115,7 +116,7 @@ if (!isset($nav_icon_hover_color)) {
 	}
 }
 if (!isset($link_hover_color)) {
-	$lhc = new Color($link_color);
+	$lhc    = new Color($link_color);
 	$lcolor = $lhc->getHex();
 
 	if ($lhc->isLight($lcolor, 75)) {
@@ -133,24 +134,24 @@ if (!isset($bg_image_option)) {
 switch ($bg_image_option) {
 	case 'stretch':
 		$background_size_img = '100%';
-		$background_repeat = 'no-repeat';
+		$background_repeat   = 'no-repeat';
 		break;
 	case 'cover':
 		$background_size_img = 'cover';
-		$background_repeat = 'no-repeat';
+		$background_repeat   = 'no-repeat';
 		break;
 	case 'repeat':
 		$background_size_img = 'auto';
-		$background_repeat = 'repeat';
+		$background_repeat   = 'repeat';
 		break;
 	case 'contain':
 		$background_size_img = 'contain';
-		$background_repeat = 'repeat';
+		$background_repeat   = 'repeat';
 		break;
 
 	default:
 		$background_size_img = 'auto';
-		$background_repeat = 'no-repeat';
+		$background_repeat   = 'no-repeat';
 		break;
 }
 
@@ -173,9 +174,9 @@ $options = [
 	'$background_repeat'           => $background_repeat,
 	'$login_bg_image'              => $login_bg_image,
 	'$login_bg_color'              => $login_bg_color,
-	'$font_color_darker'           => $font_color_darker ?? '#222',
+	'$font_color_darker'           => $font_color_darker  ?? '#222',
 	'$font_color_lighter'          => $font_color_lighter ?? '#aaa',
-	'$font_color'                  => $font_color ?? '#444',
+	'$font_color'                  => $font_color         ?? '#444',
 ];
 
 $css_tpl = file_get_contents('view/theme/frio/css/style.css');
@@ -208,8 +209,11 @@ header('Last-Modified: ' . $modified);
 /// @todo Check if this works at all (possibly clients are sending only the one or the other header) - compare with mod/photo.php
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
 	$cached_modified = gmdate('r', strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']));
-	$cached_etag = str_replace(['"', '-gzip'], ['', ''],
-				stripslashes($_SERVER['HTTP_IF_NONE_MATCH']));
+	$cached_etag     = str_replace(
+		['"', '-gzip'],
+		['', ''],
+		stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])
+	);
 
 	if (($cached_modified == $modified) && ($cached_etag == $etag)) {
 		throw new NotModifiedException();

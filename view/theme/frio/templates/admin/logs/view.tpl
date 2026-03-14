@@ -7,24 +7,22 @@
 <div id="adminpage">
 	<h1>{{$title}} - {{$page}}</h1>
 
-	<h2>{{$logname}}</h2>
+	<p>{{$logname}}</p>
 	{{if $error }}
 		<div id="admin-error-message-wrapper" class="alert alert-warning">
 			<p>{{$error nofilter}}</p>
 		</div>
 	{{else}}
 		<form method="get" class="row">
-			<div class="col-xs-8">
-				<div class="form-group form-group-search">
+			<div class="col-xs-12">
+				<div id="admin-logs-search" class="form-group form-group-search">
 					<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
-						type="text" name="q" data-toggle="tooltip" title="{{$l10n.Search_in_logs}}"
+						type="text" name="q"
 						placeholder="{{$l10n.Search}}" value="{{$q}}">
-					<button class="btn btn-default btn-sm form-button-search"
-						type="submit">{{$l10n.Search}}</button>
+					<button class="btn btn-lg btn-primary"
+						type="submit"><i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i></button>
+						<a href="{{$baseurl}}/admin/logs/view" class="btn btn-default">{{$l10n.Show_all}}</a>
 				</div>
-			</div>
-			<div class="xol-xs-4">
-				<a href="{{$baseurl}}/admin/logs/view" class="btn btn-default">{{$l10n.Show_all}}</a>
 			</div>
 		</form>
 

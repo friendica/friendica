@@ -8,6 +8,9 @@
 	<div id="jot">
 		<div id="profile-jot-desc" class="jothidden">&nbsp;</div>
 		<input name="title" id="jot-title" type="text" placeholder="{{$placeholdertitle}}" title="{{$placeholdertitle}}" value="{{$title}}" class="jothidden" style="display:none" dir="auto" />
+		{{if $placeholdersummary}}
+		<input name="summary" id="jot-summary" type="text" placeholder="{{$placeholdersummary}}" title="{{$placeholdersummary}}" value="{{$summary}}" class="jothidden" style="display:none" dir="auto" />
+		{{/if}}
 		{{if $placeholdercategory}}
 		<input name="category" id="jot-category" type="text" placeholder="{{$placeholdercategory}}" title="{{$placeholdercategory}}" value="{{$category}}" class="jothidden" style="display:none" dir="auto" />
 		{{/if}}
@@ -53,6 +56,7 @@
 	<div style="display: none;">
 		<div id="profile-jot-acl-wrapper" style="width:auto;height:auto;overflow:auto;">
 			{{$acl nofilter}}
+			{{include file="field_checkbox.tpl" field=$sensitive}}
 			{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
 			{{if $created_at}}{{$created_at nofilter}}{{/if}}
 		</div>

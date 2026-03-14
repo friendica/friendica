@@ -37,7 +37,7 @@ class Widget
 			'$desc'    => DI::l10n()->t('Enter address or web location'),
 			'$hint'    => DI::l10n()->t('user@x.tld, x.tld/user'),
 			'$value'   => $value,
-			'$follow'  => DI::l10n()->t('Connect')
+			'$follow'  => DI::l10n()->t('Connect'),
 		]);
 	}
 
@@ -48,6 +48,12 @@ class Widget
 	 */
 	public static function findPeople(): string
 	{
+		// Langs in friendica are all lowercase and dash separated (e.g. da-dk) - in the directory
+		// they're underscore separated, with the latter part being uppercase (e.g. da_DK)
+		$directory_user_lang_string = "";
+		if (DI::userSession()->get('language')) {
+			$directory_user_lang_string = "&lang=" . DI::l10n()->langToLocaleCode(DI::userSession()->get('language'));
+		}
 		$global_dir = Search::getGlobalDirectory();
 
 		if (DI::config()->get('system', 'invitation_only')) {
@@ -70,7 +76,7 @@ class Widget
 		$nv['random']          = DI::l10n()->t('Random Profile');
 		$nv['inv']             = DI::l10n()->t('Invite Friends');
 		$nv['directory']       = DI::l10n()->t('Global Directory');
-		$nv['global_dir']      = OpenWebAuth::getZrlUrl($global_dir, true);
+		$nv['global_dir']      = OpenWebAuth::getZrlUrl($global_dir, true) . $directory_user_lang_string;
 		$nv['local_directory'] = DI::l10n()->t('Local Directory');
 
 		$aside        = [];
@@ -224,7 +230,7 @@ class Widget
 		$options = array_map(function ($circle) {
 			return [
 				'ref'  => $circle['id'],
-				'name' => $circle['name']
+				'name' => $circle['name'],
 			];
 		}, Circle::getByUserId(DI::userSession()->getLocalUserId()));
 
@@ -235,7 +241,7 @@ class Widget
 			DI::l10n()->t('Everyone'),
 			$baseurl,
 			$options,
-			$selected
+			$selected,
 		);
 	}
 
@@ -256,7 +262,7 @@ class Widget
 		$options = [
 			['ref' => 'followers', 'name' => DI::l10n()->t('Followers')],
 			['ref' => 'following', 'name' => DI::l10n()->t('Following')],
-			['ref' => 'mutuals', 'name' => DI::l10n()->t('Mutual friends')],
+			['ref' => 'mutuals', 'name' => DI::l10n()->t('Friends')],
 			['ref' => 'nothing', 'name' => DI::l10n()->t('No relationship')],
 		];
 
@@ -267,7 +273,7 @@ class Widget
 			DI::l10n()->t('All Contacts'),
 			$baseurl,
 			$options,
-			$selected
+			$selected,
 		);
 	}
 
@@ -308,7 +314,7 @@ class Widget
 			DI::l10n()->t('All Protocols'),
 			$baseurl,
 			$nets,
-			$selected
+			$selected,
 		);
 	}
 
@@ -338,7 +344,7 @@ class Widget
 			DI::l10n()->t('Everything'),
 			$baseurl,
 			$terms,
-			$selected
+			$selected,
 		);
 	}
 
@@ -369,7 +375,7 @@ class Widget
 			DI::l10n()->t('Everything'),
 			$baseurl,
 			$terms,
-			$selected
+			$selected,
 		);
 	}
 
@@ -426,7 +432,7 @@ class Widget
 			'$nickname' => $nickname,
 			'$linkmore' => $total > 5 ? 'true' : '',
 			'$more'     => DI::l10n()->t('show more'),
-			'$contacts' => $entries
+			'$contacts' => $entries,
 		]);
 	}
 
@@ -475,7 +481,7 @@ class Widget
 
 		$ret = [];
 
-		$cachekey = 'Widget::postedByYear' . $uid . '-' . (int)$wall;
+		$cachekey = 'Widget::postedByYear' . $uid . '-' . (int) $wall;
 		$dthen    = DI::cache()->get($cachekey);
 		if (empty($dthen)) {
 			$dthen = Item::firstPostDate($uid, $wall);
@@ -505,7 +511,7 @@ class Widget
 				$dend        = substr($dnow, 0, 8) . Temporal::getDaysInMonth(intval($dnow), intval(substr($dnow, 5)));
 				$start_month = DateTimeFormat::utc($dstart, 'Y-m-d');
 				$end_month   = DateTimeFormat::utc($dend, 'Y-m-d');
-				$str         = DI::l10n()->getDay(DateTimeFormat::utc($dnow, 'F'));
+				$str         = DI::l10n()->formatDateTimeByPattern($dnow, 'LLLL');
 
 				if (empty($ret[$dyear])) {
 					$ret[$dyear] = [];
@@ -535,7 +541,7 @@ class Widget
 			'$onthisdate'  => DI::l10n()->t('On this date'),
 			'$thisday'     => $thisday,
 			'$nextday'     => $nextday,
-			'$cutoffday'   => $cutoffday
+			'$cutoffday'   => $cutoffday,
 		]);
 
 		return $o;
@@ -566,7 +572,7 @@ class Widget
 			DI::l10n()->t('All'),
 			$base,
 			$accounts,
-			$accounttype
+			$accounttype,
 		);
 	}
 
@@ -608,6 +614,19 @@ class Widget
 			}
 		}
 
+		$widget_timelineorder = json_decode(DI::pConfig()->get($uid, 'system', 'widget_timeline_order'));
+		if (!empty($widget_timelineorder)) {
+			$tmp = [];
+			foreach ($widget_timelineorder as $order) {
+				foreach ($channels as $channel) {
+					if ($channel['ref'] == $order) {
+						$tmp[] = $channel;
+					}
+				}
+			}
+			$channels = $tmp;
+		}
+
 		return self::filter(
 			'channel',
 			DI::l10n()->t('Channels'),
@@ -615,7 +634,7 @@ class Widget
 			'',
 			$base,
 			$channels,
-			$channelname
+			$channelname,
 		);
 	}
 }
