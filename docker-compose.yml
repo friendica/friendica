@@ -1,0 +1,98 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: .docker/php/Dockerfile
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - ./.docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+    env_file:
+      - path: ./.docker/.dist.env
+        required: true # default
+      - path: ./.env.local
+        required: false
+    environment:
+      - PHP_MEMORY_LIMIT=${PHP_MEMORY_LIMIT:-512M}
+      - PHP_MAX_EXECUTION_TIME=${PHP_MAX_EXECUTION_TIME:-300}
+      - MYSQL_HOST=${MYSQL_HOST:-db}
+      - MYSQL_USER=${MYSQL_USER:-friendica}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-friendica}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-friendica}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+    depends_on:
+      - db
+    networks:
+      - friendica-network
+    expose:
+      - "9000"
+
+  nginx:
+    image: nginx:latest
+    env_file:
+      - path: ./.docker/.dist.env
+        required: true # default
+      - path: ./.env.local
+        required: false
+    ports:
+      - "${NGINX_PORT:-8080}:80"
+    volumes:
+      - .:/var/www/html
+      - ./.docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+    networks:
+      - friendica-network
+
+  db:
+    image: mariadb:latest
+    env_file:
+      - path: ./.docker/.dist.env
+        required: true # default
+      - path: ./.env.local
+        required: false
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-friendica}
+      - MYSQL_USER=${MYSQL_USER:-friendica}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-friendica}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./.docker/mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    networks:
+      - friendica-network
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -p\"$${MYSQL_ROOT_PASSWORD:-root}\" --protocol=tcp || exit 1"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    env_file:
+      - path: ./.docker/.dist.env
+        required: false
+      - path: ./.env.local
+        required: false
+    ports:
+      - ${PHPMYADMIN_PORT:-8086}:80
+    environment:
+      - PMA_HOST=${MYSQL_HOST:-db}
+      - PMA_PORT=${MYSQL_PORT:-3306}
+      - PMA_USER=root
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD:-root}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - friendica-network
+
+volumes:
+  mariadb_data:
+
+networks:
+  friendica-network:
+    driver: bridge
