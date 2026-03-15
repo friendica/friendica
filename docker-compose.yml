@@ -35,7 +35,7 @@ services:
       - path: ./.env.local
         required: false
     ports:
-      - "${NGINX_PORT:-8080}:80"
+      - "${SERVER_PORT:-8080}:80"
     volumes:
       - .:/var/www/html
       - ./.docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
@@ -56,15 +56,17 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE:-friendica}
       - MYSQL_USER=${MYSQL_USER:-friendica}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-friendica}
+      - MYSQL_CHARSET=utf8mb4
+      - MYSQL_COLLATION=utf8mb4_unicode_ci
     volumes:
       - mariadb_data:/var/lib/mysql
-      - ./.docker/mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./.docker/mariadb/01-init.sh:/docker-entrypoint-initdb.d/01-init.sh
     ports:
       - "${MYSQL_PORT:-3306}:3306"
     networks:
       - friendica-network
     healthcheck:
-      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -p\"$${MYSQL_ROOT_PASSWORD:-root}\" --protocol=tcp || exit 1"]
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -p\"${MYSQL_ROOT_PASSWORD:-root}\" --protocol=tcp || exit 1"]
       start_period: 10s
       interval: 10s
       timeout: 5s

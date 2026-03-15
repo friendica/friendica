@@ -21,7 +21,7 @@ return [
 	// ****************************************************************
 
 	'config' => [
-		'admin_email' => 'admin@'.getenv('ServerAlias'),
+		'admin_email' => 'admin@example.com',
 		'sitename' => 'Friendica Social Network',
 		'register_policy' => \Friendica\Module\Register::OPEN,
 		'register_text' => '',
@@ -30,7 +30,7 @@ return [
 	'system' => [
 		'default_timezone' => 'UTC',
 		'language' => 'en',
-		'basepath' => getenv('workspaceFolder'),
-		'url' => 'http://'.getenv('ServerName').':'.getenv('ServerPort'),
+		'basepath' => getenv('PROJECT_DIR'),
+		'url' => 'http://'.getenv('SERVER_NAME').':'.getenv('SERVER_PORT'),
 	],
 ];
