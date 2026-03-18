@@ -19,7 +19,7 @@ use Redis;
  */
 class RedisCache extends AbstractCache implements ICanCacheInMemory
 {
-	const NAME = 'redis';
+	public const NAME = 'redis';
 
 	/**
 	 * @var Redis
@@ -43,7 +43,7 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 		$redis_host = $config->get('system', 'redis_host');
 		$redis_port = $config->get('system', 'redis_port');
 		$redis_pw   = $config->get('system', 'redis_password');
-		$redis_db   = (int)$config->get('system', 'redis_db', 0);
+		$redis_db   = (int) $config->get('system', 'redis_db', 0);
 
 		try {
 			if (is_numeric($redis_port) && $redis_port > -1) {
@@ -133,12 +133,12 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 				return $this->redis->setex(
 					$cacheKey,
 					$ttl,
-					$cached
+					$cached,
 				);
 			} else {
 				return $this->redis->set(
 					$cacheKey,
-					$cached
+					$cached,
 				);
 			}
 		} catch (\RedisException $e) {

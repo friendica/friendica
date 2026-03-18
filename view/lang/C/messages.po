@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.04-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-15 22:51+0000\n"
+"POT-Creation-Date: 2026-03-18 17:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -917,7 +917,7 @@ msgid "Tumblr"
 msgstr ""
 
 #: src/Content/ContactSelector.php:137
-msgid "AT Protocol"
+msgid "Bluesky"
 msgstr ""
 
 #: src/Content/ContactSelector.php:165
@@ -1513,7 +1513,7 @@ msgid "Add categories to your posts"
 msgstr ""
 
 #: src/Content/Feature.php:121 src/Model/Profile.php:812
-#: src/Module/Admin/Summary.php:207 src/Module/Item/Compose.php:188
+#: src/Module/Admin/Summary.php:215 src/Module/Item/Compose.php:188
 #: src/Module/Moderation/Report/Create.php:282
 #: src/Module/Moderation/Summary.php:65
 msgid "Summary"
@@ -2089,33 +2089,33 @@ msgstr ""
 msgid "last"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:923
+#: src/Content/Text/BBCode.php:922
 #, php-format
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:951 src/Model/Item.php:3750
+#: src/Content/Text/BBCode.php:950 src/Model/Item.php:3750
 #: src/Model/Item.php:3756 src/Model/Item.php:3757
 msgid "Link to source"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1741 src/Content/Text/HTML.php:908
+#: src/Content/Text/BBCode.php:1740 src/Content/Text/HTML.php:908
 msgid "Click to open/close"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1796
+#: src/Content/Text/BBCode.php:1795
 msgid "$1 wrote:"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1870 src/Content/Text/BBCode.php:1871
+#: src/Content/Text/BBCode.php:1869 src/Content/Text/BBCode.php:1870
 msgid "Encrypted content"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:2187
+#: src/Content/Text/BBCode.php:2186
 msgid "Invalid source protocol"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:2206
+#: src/Content/Text/BBCode.php:2205
 msgid "Invalid link protocol"
 msgstr ""
 
@@ -3701,7 +3701,7 @@ msgstr ""
 #: src/Module/Admin/Federation.php:218 src/Module/Admin/Logs/Settings.php:74
 #: src/Module/Admin/Logs/View.php:71 src/Module/Admin/Queue.php:64
 #: src/Module/Admin/Site.php:457 src/Module/Admin/Storage.php:123
-#: src/Module/Admin/Summary.php:206 src/Module/Admin/Themes/Details.php:82
+#: src/Module/Admin/Summary.php:214 src/Module/Admin/Themes/Details.php:82
 #: src/Module/Admin/Themes/Index.php:103 src/Module/Admin/Tos.php:63
 #: src/Module/Moderation/Users/Pending.php:82
 msgid "Administration"
@@ -5259,38 +5259,43 @@ msgstr ""
 msgid "<a href=\"%s\">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href=\"%s\">the installation page</a> for help."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:133
+#: src/Module/Admin/Summary.php:117
+#, php-format
+msgid "Your cache is configured to use %s, but the system is currently using the database as fallback. This results in poor performance. Please check if your cache service is running."
+msgstr ""
+
+#: src/Module/Admin/Summary.php:141
 #, php-format
 msgid "Friendica's system.basepath was updated from '%s' to '%s'. Please remove the system.basepath from your db to avoid differences."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:143
+#: src/Module/Admin/Summary.php:151
 #, php-format
 msgid "Friendica's current system.basepath '%s' is wrong and the config file '%s' isn't used."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:153
+#: src/Module/Admin/Summary.php:161
 #, php-format
 msgid "Friendica's current system.basepath '%s' is not equal to the config file '%s'. Please fix your configuration."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:165
+#: src/Module/Admin/Summary.php:173
 msgid "Message queues"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:168
+#: src/Module/Admin/Summary.php:176
 msgid "Server Settings"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:209
+#: src/Module/Admin/Summary.php:217
 msgid "Version"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:213
+#: src/Module/Admin/Summary.php:221
 msgid "Active addons"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:216
+#: src/Module/Admin/Summary.php:224
 msgid "Enable new addons"
 msgstr ""
 

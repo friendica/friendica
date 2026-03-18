@@ -28,7 +28,7 @@ class Cache
 	/**
 	 * @var string The default cache if nothing set
 	 */
-	const DEFAULT_TYPE = Type\DatabaseCache::NAME;
+	public const DEFAULT_TYPE = Type\DatabaseCache::NAME;
 	/** @var ICanCreateInstances */
 	protected $instanceCreator;
 	/** @var IManageConfigValues */
@@ -92,7 +92,7 @@ class Cache
 			if ($strategy !== self::DEFAULT_TYPE) {
 				// Log the fallback if logger is already available
 				try {
-					DI::logger()->error('Configured cache driver {driver} is not available, application will fall back to {fallback}', [
+					DI::logger()->error('Configured cache driver is not available, application will fall back to default', [
 						'driver'   => $strategy,
 						'fallback' => self::DEFAULT_TYPE,
 						'error'    => $e->getMessage(),
