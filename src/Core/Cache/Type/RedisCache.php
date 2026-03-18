@@ -81,7 +81,11 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 			$search = $prefix . '*';
 		}
 
-		$list = $this->redis->keys($this->getCacheKey($search));
+		try {
+			$list = $this->redis->keys($this->getCacheKey($search));
+		} catch (\RedisException $e) {
+			throw new CachePersistenceException('Redis connection failed during getAllKeys', $e);
+		}
 
 		return $this->getOriginalKeys($list);
 	}
@@ -94,9 +98,13 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 		$return   = null;
 		$cacheKey = $this->getCacheKey($key);
 
-		$cached = $this->redis->get($cacheKey);
-		if ($cached === false && !$this->redis->exists($cacheKey)) {
-			return null;
+		try {
+			$cached = $this->redis->get($cacheKey);
+			if ($cached === false && !$this->redis->exists($cacheKey)) {
+				return null;
+			}
+		} catch (\RedisException $e) {
+			throw new CachePersistenceException('Redis connection failed during get', $e);
 		}
 
 		$value = unserialize($cached);
@@ -120,17 +128,21 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 
 		$cached = serialize($value);
 
-		if ($ttl > 0) {
-			return $this->redis->setex(
-				$cacheKey,
-				$ttl,
-				$cached
-			);
-		} else {
-			return $this->redis->set(
-				$cacheKey,
-				$cached
-			);
+		try {
+			if ($ttl > 0) {
+				return $this->redis->setex(
+					$cacheKey,
+					$ttl,
+					$cached
+				);
+			} else {
+				return $this->redis->set(
+					$cacheKey,
+					$cached
+				);
+			}
+		} catch (\RedisException $e) {
+			throw new CachePersistenceException('Redis connection failed during set', $e);
 		}
 	}
 
@@ -140,7 +152,11 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 	public function delete(string $key): bool
 	{
 		$cacheKey = $this->getCacheKey($key);
-		$this->redis->del($cacheKey);
+		try {
+			$this->redis->del($cacheKey);
+		} catch (\RedisException $e) {
+			throw new CachePersistenceException('Redis connection failed during delete', $e);
+		}
 		// Redis doesn't have an error state for del()
 		return true;
 	}
@@ -153,7 +169,11 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 		if ($outdated) {
 			return true;
 		} else {
-			return $this->redis->flushAll();
+			try {
+				return $this->redis->flushAll();
+			} catch (\RedisException $e) {
+				throw new CachePersistenceException('Redis connection failed during clear', $e);
+			}
 		}
 	}
 
@@ -165,7 +185,11 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 		$cacheKey = $this->getCacheKey($key);
 		$cached   = serialize($value);
 
-		return $this->redis->setnx($cacheKey, $cached);
+		try {
+			return $this->redis->setnx($cacheKey, $cached);
+		} catch (\RedisException $e) {
+			throw new CachePersistenceException('Redis connection failed during add', $e);
+		}
 	}
 
 	/**
@@ -177,17 +201,21 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 
 		$newCached = serialize($newValue);
 
-		$this->redis->watch($cacheKey);
-		// If the old value isn't what we expected, somebody else changed the key meanwhile
-		if ($this->get($key) === $oldValue) {
-			if ($ttl > 0) {
-				$result = $this->redis->multi()->setex($cacheKey, $ttl, $newCached)->exec();
-			} else {
-				$result = $this->redis->multi()->set($cacheKey, $newCached)->exec();
+		try {
+			$this->redis->watch($cacheKey);
+			// If the old value isn't what we expected, somebody else changed the key meanwhile
+			if ($this->get($key) === $oldValue) {
+				if ($ttl > 0) {
+					$result = $this->redis->multi()->setex($cacheKey, $ttl, $newCached)->exec();
+				} else {
+					$result = $this->redis->multi()->set($cacheKey, $newCached)->exec();
+				}
+				return $result !== false;
 			}
-			return $result !== false;
+			$this->redis->unwatch();
+		} catch (\RedisException $e) {
+			throw new CachePersistenceException('Redis connection failed during compareSet', $e);
 		}
-		$this->redis->unwatch();
 		return false;
 	}
 
@@ -198,30 +226,38 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 	{
 		$cacheKey = $this->getCacheKey($key);
 
-		$this->redis->watch($cacheKey);
-		// If the old value isn't what we expected, somebody else changed the key meanwhile
-		if ($this->get($key) === $value) {
-			$this->redis->multi()->del($cacheKey)->exec();
-			return true;
+		try {
+			$this->redis->watch($cacheKey);
+			// If the old value isn't what we expected, somebody else changed the key meanwhile
+			if ($this->get($key) === $value) {
+				$this->redis->multi()->del($cacheKey)->exec();
+				return true;
+			}
+			$this->redis->unwatch();
+		} catch (\RedisException $e) {
+			throw new CachePersistenceException('Redis connection failed during compareDelete', $e);
 		}
-		$this->redis->unwatch();
 		return false;
 	}
 
 	/** {@inheritDoc} */
 	public function getStats(): array
 	{
-		$info = $this->redis->info();
+		try {
+			$info = $this->redis->info();
 
-		return [
-			'version'           => $info['redis_version']     ?? null,
-			'entries'           => $this->redis->dbSize()     ?? null,
-			'used_memory'       => $info['used_memory']       ?? null,
-			'connected_clients' => $info['connected_clients'] ?? null,
-			'uptime'            => $info['uptime_in_seconds'] ?? null,
-			'hits'              => $info['keyspace_hits']     ?? null,
-			'misses'            => $info['keyspace_misses']   ?? null,
-			'evictions'         => $info['evicted_keys']      ?? null,
-		];
+			return [
+				'version'           => $info['redis_version']     ?? null,
+				'entries'           => $this->redis->dbSize()     ?? null,
+				'used_memory'       => $info['used_memory']       ?? null,
+				'connected_clients' => $info['connected_clients'] ?? null,
+				'uptime'            => $info['uptime_in_seconds'] ?? null,
+				'hits'              => $info['keyspace_hits']     ?? null,
+				'misses'            => $info['keyspace_misses']   ?? null,
+				'evictions'         => $info['evicted_keys']      ?? null,
+			];
+		} catch (\RedisException $e) {
+			throw new CachePersistenceException('Redis connection failed during getStats', $e);
+		}
 	}
 }

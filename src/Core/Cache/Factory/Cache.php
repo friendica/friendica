@@ -13,6 +13,7 @@ use Friendica\Core\Cache\Exception\InvalidCacheDriverException;
 use Friendica\Core\Cache\Type;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hooks\Capability\ICanCreateInstances;
+use Friendica\DI;
 use Friendica\Util\Profiler;
 
 /**
@@ -82,8 +83,30 @@ class Cache
 	 */
 	protected function create(string $strategy): ICanCache
 	{
-		/** @var ICanCache $cache */
-		$cache = $this->instanceCreator->create(ICanCache::class, $strategy);
+		try {
+			/** @var ICanCache $cache */
+			$cache = $this->instanceCreator->create(ICanCache::class, $strategy);
+		} catch (CachePersistenceException|InvalidCacheDriverException $e) {
+			// If the configured cache (e.g. Redis) is not available, fall back to database cache
+			// to keep the application functional with degraded performance
+			if ($strategy !== self::DEFAULT_TYPE) {
+				// Log the fallback if logger is already available
+				try {
+					DI::logger()->error('Configured cache driver {driver} is not available, application will fall back to {fallback}', [
+						'driver'   => $strategy,
+						'fallback' => self::DEFAULT_TYPE,
+						'error'    => $e->getMessage(),
+					]);
+				} catch (\Throwable $logEx) {
+					// Logger not available yet, ignore
+				}
+				/** @var ICanCache $cache */
+				$cache = $this->instanceCreator->create(ICanCache::class, self::DEFAULT_TYPE);
+			} else {
+				// Database cache itself failed - this is a critical issue
+				throw $e;
+			}
+		}
 
 		$profiling = $this->config->get('system', 'profiling', false);
 

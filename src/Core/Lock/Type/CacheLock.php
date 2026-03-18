@@ -10,7 +10,6 @@ namespace Friendica\Core\Lock\Type;
 use Friendica\Core\Cache\Capability\ICanCacheInMemory;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Exception\CachePersistenceException;
-use Friendica\Core\Lock\Exception\LockPersistenceException;
 
 class CacheLock extends AbstractLock
 {
@@ -70,7 +69,9 @@ class CacheLock extends AbstractLock
 				}
 			} while (!$got_lock && ((time() - $start) < $timeout));
 		} catch (CachePersistenceException $exception) {
-			throw new LockPersistenceException(sprintf('Cannot acquire lock for key %s', $key), $exception);
+			// Cache unavailable (e.g. Redis down) - treat as lock not acquired
+			// This allows the application to continue with degraded performance
+			return false;
 		}
 
 		return $got_lock;
@@ -90,7 +91,8 @@ class CacheLock extends AbstractLock
 				$return = $this->cache->compareDelete($lockKey, getmypid());
 			}
 		} catch (CachePersistenceException $exception) {
-			throw new LockPersistenceException(sprintf('Cannot release lock for key %s (override %b)', $key, $override), $exception);
+			// Cache unavailable (e.g. Redis down) - treat as released
+			return true;
 		}
 		$this->markRelease($key);
 
@@ -106,7 +108,8 @@ class CacheLock extends AbstractLock
 		try {
 			$lock = $this->cache->get($lockKey);
 		} catch (CachePersistenceException $exception) {
-			throw new LockPersistenceException(sprintf('Cannot check lock state for key %s', $key), $exception);
+			// Cache unavailable (e.g. Redis down) - treat as not locked
+			return false;
 		}
 		return isset($lock) && ($lock !== false);
 	}
@@ -127,7 +130,8 @@ class CacheLock extends AbstractLock
 		try {
 			$locks = $this->cache->getAllKeys(self::CACHE_PREFIX . $prefix);
 		} catch (CachePersistenceException $exception) {
-			throw new LockPersistenceException(sprintf('Cannot get locks with prefix %s', $prefix), $exception);
+			// Cache unavailable (e.g. Redis down) - return empty list
+			return [];
 		}
 
 		array_walk($locks, function (&$lock) {

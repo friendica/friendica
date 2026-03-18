@@ -109,6 +109,14 @@ class Summary extends BaseAdmin
 			);
 		}
 
+		// Check if cache fallback is active (e.g. Redis configured but DatabaseCache is running)
+		$configured_cache = DI::config()->get('system', 'cache_driver', 'database');
+		$distributed_cache = DI::config()->get('system', 'distributed_cache_driver', 'database');
+		$current_cache = DI::cache()->getName();
+		if ($current_cache === 'database' && ($configured_cache !== 'database' || $distributed_cache !== 'database')) {
+			$warningtext[] = DI::l10n()->t('Your cache is configured to use %s, but the system is currently using the database as fallback. This results in poor performance. Please check if your cache service is running.', $configured_cache !== 'database' ? $configured_cache : $distributed_cache);
+		}
+
 		// Check logfile permission
 		if (($return = DI::logCheck()->checkLogfile()) !== null) {
 			$warningtext[] = $return;
