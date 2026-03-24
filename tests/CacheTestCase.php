@@ -8,7 +8,6 @@
 namespace Friendica\Test;
 
 use Friendica\Core\Cache\Capability\ICanCache;
-use Friendica\Test\MockedTestCase;
 use Friendica\Util\PidFile;
 
 abstract class CacheTestCase extends MockedTestCase
@@ -239,5 +238,18 @@ abstract class CacheTestCase extends MockedTestCase
 		} else {
 			self::expectNotToPerformAssertions();
 		}
+	}
+
+	/**
+	 * Test that cache operations work without throwing unexpected exceptions
+	 * This verifies the basic contract of the cache interface
+	 * @small
+	 */
+	public function testCacheOperations()
+	{
+		self::assertTrue($this->instance->set('test_key', 'test_value'));
+		self::assertEquals('test_value', $this->instance->get('test_key'));
+		self::assertTrue($this->instance->delete('test_key'));
+		self::assertNull($this->instance->get('test_key'));
 	}
 }

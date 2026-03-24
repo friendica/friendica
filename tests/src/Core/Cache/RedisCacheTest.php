@@ -74,4 +74,33 @@ class RedisCacheTest extends MemoryCacheTestCase
 		self::assertGreaterThan(0, $stats['connected_clients']);
 		self::assertGreaterThan(0, $stats['uptime']);
 	}
+
+	/**
+	 * Test that CachePersistenceException is thrown when Redis connection fails
+	 * @small
+	 */
+	public function testCachePersistenceExceptionOnConnectionFailure()
+	{
+		$configMock = Mockery::mock(IManageConfigValues::class);
+		$configMock
+			->shouldReceive('get')
+			->with('system', 'redis_host')
+			->andReturn('invalid_host_that_does_not_exist');
+		$configMock
+			->shouldReceive('get')
+			->with('system', 'redis_port')
+			->andReturn(12345);
+		$configMock
+			->shouldReceive('get')
+			->with('system', 'redis_db', 0)
+			->andReturn(0);
+		$configMock
+			->shouldReceive('get')
+			->with('system', 'redis_password')
+			->andReturn(null);
+
+		$this->expectException(\Friendica\Core\Cache\Exception\CachePersistenceException::class);
+
+		new RedisCache('localhost', $configMock);
+	}
 }
