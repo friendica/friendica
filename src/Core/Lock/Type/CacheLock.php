@@ -9,7 +9,6 @@ namespace Friendica\Core\Lock\Type;
 
 use Friendica\Core\Cache\Capability\ICanCacheInMemory;
 use Friendica\Core\Cache\Enum\Duration;
-use Friendica\Core\Cache\Exception\CachePersistenceException;
 
 class CacheLock extends AbstractLock
 {
@@ -45,34 +44,28 @@ class CacheLock extends AbstractLock
 
 		$lockKey = self::getLockKey($key);
 
-		try {
-			do {
-				$lock = $this->cache->get($lockKey);
-				// When we do want to lock something that was already locked by us.
-				if ((int) $lock == getmypid()) {
+		do {
+			$lock = $this->cache->get($lockKey);
+			// When we do want to lock something that was already locked by us.
+			if ((int) $lock == getmypid()) {
+				$got_lock = true;
+			}
+
+			// When we do want to lock something new
+			if (is_null($lock)) {
+				// At first initialize it with "0"
+				$this->cache->add($lockKey, 0);
+				// Now the value has to be "0" because otherwise the key was used by another process meanwhile
+				if ($this->cache->compareSet($lockKey, 0, getmypid(), $ttl)) {
 					$got_lock = true;
+					$this->markAcquire($key);
 				}
+			}
 
-				// When we do want to lock something new
-				if (is_null($lock)) {
-					// At first initialize it with "0"
-					$this->cache->add($lockKey, 0);
-					// Now the value has to be "0" because otherwise the key was used by another process meanwhile
-					if ($this->cache->compareSet($lockKey, 0, getmypid(), $ttl)) {
-						$got_lock = true;
-						$this->markAcquire($key);
-					}
-				}
-
-				if (!$got_lock && ($timeout > 0)) {
-					usleep(random_int(10000, 200000));
-				}
-			} while (!$got_lock && ((time() - $start) < $timeout));
-		} catch (CachePersistenceException $exception) {
-			// Cache unavailable (e.g. Redis down) - treat as lock not acquired
-			// This allows the application to continue with degraded performance
-			return false;
-		}
+			if (!$got_lock && ($timeout > 0)) {
+				usleep(random_int(10000, 200000));
+			}
+		} while (!$got_lock && ((time() - $start) < $timeout));
 
 		return $got_lock;
 	}
@@ -84,15 +77,10 @@ class CacheLock extends AbstractLock
 	{
 		$lockKey = self::getLockKey($key);
 
-		try {
-			if ($override) {
-				$return = $this->cache->delete($lockKey);
-			} else {
-				$return = $this->cache->compareDelete($lockKey, getmypid());
-			}
-		} catch (CachePersistenceException $exception) {
-			// Cache unavailable (e.g. Redis down) - treat as released
-			return true;
+		if ($override) {
+			$return = $this->cache->delete($lockKey);
+		} else {
+			$return = $this->cache->compareDelete($lockKey, getmypid());
 		}
 		$this->markRelease($key);
 
@@ -105,12 +93,7 @@ class CacheLock extends AbstractLock
 	public function isLocked(string $key): bool
 	{
 		$lockKey = self::getLockKey($key);
-		try {
-			$lock = $this->cache->get($lockKey);
-		} catch (CachePersistenceException $exception) {
-			// Cache unavailable (e.g. Redis down) - treat as not locked
-			return false;
-		}
+		$lock    = $this->cache->get($lockKey);
 		return isset($lock) && ($lock !== false);
 	}
 
@@ -127,12 +110,7 @@ class CacheLock extends AbstractLock
 	 */
 	public function getLocks(string $prefix = ''): array
 	{
-		try {
-			$locks = $this->cache->getAllKeys(self::CACHE_PREFIX . $prefix);
-		} catch (CachePersistenceException $exception) {
-			// Cache unavailable (e.g. Redis down) - return empty list
-			return [];
-		}
+		$locks = $this->cache->getAllKeys(self::CACHE_PREFIX . $prefix);
 
 		array_walk($locks, function (&$lock) {
 			$lock = substr($lock, strlen(self::CACHE_PREFIX));
