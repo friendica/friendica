@@ -4,7 +4,7 @@ Die Docker-Umgebung für die lokale Entwicklung ist mit den folgenden Services k
 
 ## Services
 
-- **PHP 7.4** - PHP-FPM mit allen notwendigen Erweiterungen für Friendica
+- **PHP 8.2** - PHP-FPM mit allen notwendigen Erweiterungen für Friendica
 - **Nginx** - Webserver auf Port 8080
 - **MariaDB** - Datenbankserver
 
