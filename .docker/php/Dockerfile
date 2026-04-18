@@ -1,9 +1,9 @@
 FROM php:8.2-fpm
 
-# Installiere docker-php-extension-installer
+# Install docker-php-extension-installer
 COPY --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
 
-# Update und installiere System-Dependencies
+# Update and install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     mariadb-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Installiere PHP-Erweiterungen mit docker-php-extension-installer
+# Install PHP extensions with docker-php-extension-installer
 RUN install-php-extensions \
     apcu \
     gd \
@@ -31,24 +31,24 @@ RUN install-php-extensions \
     intl \
     opcache
 
-# Installiere Composer
+# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Build Arguments für UID/GID des Host-Users
+# Build arguments for UID/GID of the host user
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-# Ordne www-data die gleiche UID/GID wie der Host-User zu
+# Assign www-data the same UID/GID as the host user
 RUN groupmod -g ${USER_GID} www-data
 RUN usermod -u ${USER_UID} -g ${USER_GID} www-data
 
 RUN mkdir -p /var/www/.composer
 RUN chown -R www-data:www-data /var/www
 
-# Setze das Arbeitsverzeichnis
+# Set the working directory
 WORKDIR /var/www/html
 
-# Setze den User auf www-data
+# Set the user to www-data
 USER www-data
 
 EXPOSE 9000

@@ -1,77 +1,77 @@
 # Friendica Docker Development Environment
 
-Die Docker-Umgebung für die lokale Entwicklung ist mit den folgenden Services konfiguriert:
+The Docker environment for local development is configured with the following services:
 
 ## Services
 
-- **PHP 8.2** - PHP-FPM mit allen notwendigen Erweiterungen für Friendica
-- **Nginx** - Webserver auf Port 8080
-- **MariaDB** - Datenbankserver
+- **PHP 8.2** - PHP-FPM with all necessary extensions for Friendica
+- **Nginx** - Web server on port 8080
+- **MariaDB** - Database server
 
 ## Quick Start
 
-### Umgebung starten:
+### Start environment:
 ```bash
 docker compose up -d
 ```
 
-### Friendica installieren
+### Install Friendica
 ```bash
 docker compose exec php composer install
 docker compose exec php bin/console autoinstall -av -f .docker/autoinstall.config.php
 ```
 
-### Logs ansehen:
+### View logs:
 ```bash
 docker compose logs -f php
 docker compose logs -f nginx
 docker compose logs -f mariadb
 ```
 
-### Umgebung stoppen:
+### Stop environment:
 ```bash
 docker compose down
 ```
 
-## Zugriff
+## Access
 
-- **Friendica-Anwendung**: http://localhost:8080
+- **Friendica application**: http://localhost:8080
 - **MySQL/MariaDB**: localhost:3306
-  - Benutzer: `friendica`
-  - Passwort: `friendica_`
-  - Datenbank: `friendica`
+  - User: `friendica`
+  - Password: `friendica_`
+  - Database: `friendica`
 
-## Datenbankzugang über CLI
+## Database access via CLI
 
 ```bash
 docker compose exec mariadb mysql -u friendica -p friendica friendica
 ```
 
-## Container-Namen
+## Container names
 
-- `friendica-php` - PHP Container
-- `friendica-nginx` - Nginx Container
-- `friendica-mariadb` - MariaDB Container
+- `friendica-php` - PHP container
+- `friendica-nginx` - Nginx container
+- `friendica-mariadb` - MariaDB container
 
-## Konfiguration anpassen
+## Adjust configuration
 
-### PHP-Konfiguration
-Die PHP-Konfiguration befindet sich in `.docker/php/php.ini`
+### PHP configuration
+The PHP configuration is located in `.docker/php/php.ini`
 
-### Nginx-Konfiguration
-Die Nginx-Konfiguration befindet sich in `.docker/nginx/nginx.conf`
+### Nginx configuration
+The Nginx configuration is located in `.docker/nginx/nginx.conf`
 
-### Umgebungsvariablen
-Die Umgebungsvariablen können in `docker compose.yml` unter `services.php.environment` angepasst werden.
+### Environment variables
+Environment variables can be adjusted in `docker compose.yml` under `services.php.environment`.
 
 ## Troubleshooting
 
-### Container neustarten:
+### Restart container:
 ```bash
 docker compose restart php
 ```
 
-### Volumes löschen und neustart:
+### Delete volumes and restart:
 ```bash
 docker compose down -v
 docker compose up -d
@@ -82,8 +82,8 @@ docker compose up -d
 docker compose exec php composer install
 ```
 
-## Wichtige Hinweise
+## Important notes
 
-- Das gesamte Projektverzeichnis wird in den PHP-Container gemountet
-- MariaDB-Daten werden in einem Volume gespeichert
-- Diese Konfiguration ist für die lokale Entwicklung optimiert
+- The entire project directory is mounted in the PHP container
+- MariaDB data is stored in a volume
+- This configuration is optimized for local development
