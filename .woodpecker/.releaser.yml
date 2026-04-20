@@ -7,8 +7,6 @@ labels:
   location: friendica
   type: releaser
 
-skip_clone: true
-
 matrix:
   include:
     - PHP_MAJOR_VERSION: 8.5
@@ -20,14 +18,6 @@ when:
   event: tag
 
 steps:
-  clone:
-    image: alpine/git
-    commands:
-      - git clone $CI_REPO_CLONE_URL .
-      - git checkout $CI_COMMIT_BRANCH
-      - git fetch origin $CI_COMMIT_REF
-      - git merge $CI_COMMIT_SHA
-
   restore_cache:
     image: meltwater/drone-cache:dev
     settings:

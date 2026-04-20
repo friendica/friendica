@@ -28,19 +28,7 @@ when:
     exclude: [ stable ]
   event: [ pull_request, push ]
 
-skip_clone: true
-
 steps:
-  clone:
-    image: alpine/git
-    commands:
-      - git config --global user.email "no-reply@friendi.ca"
-      - git config --global user.name "Friendica"
-      - git config --global --add safe.directory $CI_WORKSPACE
-      - git clone $CI_REPO_CLONE_URL .
-      - git checkout $CI_COMMIT_BRANCH
-      - git fetch origin $CI_COMMIT_REF
-      - git merge $CI_COMMIT_SHA
   php-lint:
     image: php:${PHP_MAJOR_VERSION}
     commands:
@@ -80,14 +68,14 @@ steps:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     when:
       matrix:
-        PHP_MAJOR_VERSION: 8.3
+        PHP_MAJOR_VERSION: 8.5
     commands:
       - bin/composer.phar run phpstan;
   phpstan-addons:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     when:
       matrix:
-        PHP_MAJOR_VERSION: 8.3
+        PHP_MAJOR_VERSION: 8.5
     commands:
       - bin/composer.phar run phpstan-addons;
   test:
@@ -116,8 +104,7 @@ steps:
     image: friendicaci/codecov
     when:
       matrix:
-        PHP_MAJOR_VERSION: 8.2
-        PHP_VERSION: 8.2.28
+        PHP_MAJOR_VERSION: 8.5
       repo:
         - friendica/friendica
     commands:
