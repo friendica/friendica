@@ -269,7 +269,7 @@ Zeilen</code></td>
   [/tr]<br>
 [/table]</td>
   <td>
-	<table>
+	<table class="table">
       <tbody>
         <tr>
           <th>Kopfzeile 1</th>
@@ -293,7 +293,7 @@ Zeilen</code></td>
 <tr>
   <td>[table border=0]</td>
   <td>
-	<table border="0">
+	<table class="table" border="0">
       <tbody>
         <tr>
           <th>Kopfzeile 1</th>
@@ -317,7 +317,7 @@ Zeilen</code></td>
 <tr>
   <td>[table border=1]</td>
   <td>
-	<table border="1">
+	<table class="table" border="1">
       <tbody>
         <tr>
           <th>Kopfzeile 1</th>

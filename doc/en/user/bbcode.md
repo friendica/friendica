@@ -291,7 +291,7 @@ code</code></td>
   [/tr]<br>
 [/table]</td>
   <td>
-	<table>
+	<table class="table">
       <tbody>
         <tr>
           <th>Header 1</th>
@@ -315,7 +315,7 @@ code</code></td>
 <tr>
   <td>[table border=0]</td>
   <td>
-	<table border="0">
+	<table class="table" border="0">
       <tbody>
         <tr>
           <th>Header 1</th>
@@ -339,7 +339,7 @@ code</code></td>
 <tr>
   <td>[table border=1]</td>
   <td>
-	<table border="1">
+	<table class="table" border="1">
       <tbody>
         <tr>
           <th>Header 1</th>

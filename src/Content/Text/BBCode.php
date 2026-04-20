@@ -1707,10 +1707,10 @@ class BBCode
 		$text = preg_replace("/\[th\](.*?)\[\/th\]/sm", '<th>$1</th>', $text);
 		$text = preg_replace("/\[td\](.*?)\[\/td\]/sm", '<td>$1</td>', $text);
 		$text = preg_replace("/\[tr\](.*?)\[\/tr\]/sm", '<tr>$1</tr>', $text);
-		$text = preg_replace("/\[table\](.*?)\[\/table\]/sm", '</p><table>$1</table><p>', $text);
+		$text = preg_replace("/\[table\](.*?)\[\/table\]/sm", '</p><table class="table">$1</table><p>', $text);
 
-		$text = preg_replace("/\[table border=1\](.*?)\[\/table\]/sm", '</p><table border="1" >$1</table><p>', $text);
-		$text = preg_replace("/\[table border=0\](.*?)\[\/table\]/sm", '</p><table border="0" >$1</table><p>', $text);
+		$text = preg_replace("/\[table border=1\](.*?)\[\/table\]/sm", '</p><table class="table" border="1">$1</table><p>', $text);
+		$text = preg_replace("/\[table border=0\](.*?)\[\/table\]/sm", '</p><table class="table" border="0">$1</table><p>', $text);
 
 		return $text;
 	}
