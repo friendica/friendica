@@ -489,3 +489,7 @@ figure.img-allocated-height {
 .dropzone:not(textarea) {
 	color: #ccc;
 }
+
+.text-muted {
+	color: $font_color_darker;
+}

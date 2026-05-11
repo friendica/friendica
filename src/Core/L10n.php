@@ -632,7 +632,7 @@ class L10n
 	 */
 	public function relativeDateTime(string $datestring): string
 	{
-		return $this->formatDateTime($datestring, IntlDateFormatter::RELATIVE_FULL, IntlDateFormatter::SHORT);
+		return $this->formatDateTime($datestring, IntlDateFormatter::RELATIVE_MEDIUM, IntlDateFormatter::SHORT);
 	}
 
 	/**

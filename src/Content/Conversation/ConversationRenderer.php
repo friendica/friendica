@@ -500,6 +500,7 @@ final readonly class ConversationRenderer
 				'network_svg'          => ContactSelector::networkToSVG($item['network'], $item['author-gsid'], '', $viewerUid),
 				'linktitle'            => $this->l10n->t('View %s\'s profile @ %s', $profileName, $item['author-link']),
 				'profile_url'          => $profileLink,
+				'profile_addr'         => $item['author-addr'] ?? '',
 				'item_photo_menu_html' => $this->item->photoMenu($item, $formSecurityToken),
 				'name'                 => $profileName,
 				'sparkle'              => $sparkle,

@@ -124,29 +124,42 @@ as the value of $top_child_total (this is done at the end of this file)
 
 		{{* contact info header*}}
 		<div class="contact-info">
-			<div class="preferences">
-				{{if $item.network_svg && $item.plink}}
-					<span class="wall-item-network"><a href="{{$item.plink.href}}" class="plink u-url" target="_blank"><img class="network-svg" src="{{$item.network_svg}}" alt="{{$item.network_name}} - {{$item.plink.title}}" title="{{$item.network_name}} - {{$item.plink.title}}" loading="lazy"/></a></span>
-				{{elseif $item.plink}}
-       				<a href="{{$item.plink.href}}" class="plink u-url" aria-label="{{$item.plink.title}}" title="{{$item.network_name}} - {{$item.plink.title}}" target="_blank">{{$item.network_name}}</a>
-				{{elseif $item.network_svg}}
-					<span class="wall-item-network"><img class="network-svg" src="{{$item.network_svg}}" title="{{$item.network_name}}" loading="lazy" aria-hidden="true"/></span>
-    			{{else}}
-        			<span class="wall-item-network" title="{{$item.app}}">{{$item.network_name}}</span>
-    			{{/if}}
-			</div>
 		{{if $item.thread_level==1}}
-			<div class="hidden-sm hidden-xs media-body"><!-- <= For computer -->
+			<div> <!-- <= Post header -->
 				<h1 class="media-heading">
-					<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-name-link userinfo hover-card">
-						<span class="wall-item-name {{$item.sparkle}}">{{$item.name}}</span>
-					</a>
-				{{if $item.owner_url}}
-					{{$item.via}}
-					<a href="{{$item.owner_url}}" target="redir" title="{{$item.olinktitle}}" class="wall-item-name-link userinfo hover-card">
-						<span class="wall-item-name {{$item.osparkle}}" id="wall-item-ownername-{{$item.id}}">{{$item.owner_name}}</span>
-					</a>
-				{{/if}}
+					<div>
+						<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-name-link userinfo hover-card">
+							<span class="wall-item-name {{$item.sparkle}}">{{$item.name}}</span>
+						</a>
+						{{include file="network_profile_address.tpl" item=$item}}
+					</div>
+					{{if $item.owner_url}}
+						<div>
+							{{$item.via}}
+							<a href="{{$item.owner_url}}" target="redir" title="{{$item.olinktitle}}" class="wall-item-name-link userinfo hover-card">
+								<span class="wall-item-name {{$item.osparkle}}" id="wall-item-ownername-{{$item.id}}">{{$item.owner_name}}</span>
+							</a>
+							{{include file="network_profile_address.tpl" item=$item}}
+						</div>
+					{{/if}}
+					<div class="preferences">
+						{{if $item.owner_self}}
+							{{include file="sub/delivery_count.tpl" delivery=$item.delivery}}
+							<span aria-hidden="true">&middot;</span>
+						{{/if}}
+						{{if $item.direction}}
+							{{include file="sub/direction.tpl" direction=$item.direction}}
+							<span aria-hidden="true">&middot;</span>
+						{{/if}}
+						{{if $item.drop.pagedrop}}
+							<span aria-hidden="true">
+								{{if $item.drop}}
+									<input type="checkbox" title="{{$item.drop.select}}" name="itemselected[]" id="checkbox-{{$item.id}}" class="item-select" value="{{$item.id}}" />
+									<label for="checkbox-{{$item.id}}"></label>
+								{{/if}}
+							</span>
+						{{/if}}
+					</div>
 				</h1>
 
 				<div class="additional-info text-muted">
@@ -154,73 +167,45 @@ as the value of $top_child_total (this is done at the end of this file)
 						<a href="{{$item.plink.orig}}">
 							<time class="time dt-published" title="{{$item.localtime}}" data-toggle="tooltip" datetime="{{$item.utc}}">{{$item.ago}}</time>
 						</a>
-						{{if $item.owner_self}}
-							{{include file="sub/delivery_count.tpl" delivery=$item.delivery}}
-						{{/if}}
-						{{if $item.direction}}
-							{{include file="sub/direction.tpl" direction=$item.direction}}
-						{{/if}}
 						{{if $item.pinned}}
-							<span aria-hidden="true">&bull;</span> <i class="ri ri-pushpin-line" aria-hidden="true" title="{{$item.pinned}}"></i>
+							<span aria-hidden="true">&middot;</span> <i class="ri ri-pushpin-line" aria-hidden="true" title="{{$item.pinned}}"></i>
 							<span class="sr-only">{{$item.pinned}}</span>
 						{{/if}}
 						{{if $item.connector}}
-							<span aria-hidden="true">&bull;</span>
+							<span aria-hidden="true">&middot;</span>
 							<i class="ri ri-plug-line" title="{{$item.connector}}" aria-hidden="true"></i>
 						{{else}}
-							<span aria-hidden="true">&bull;</span>
+							<span aria-hidden="true">&middot;</span>
 							<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
 								<i class="ri {{if $item.private == 1}}ri-lock-line{{elseif $item.private == 0}}ri-global-line{{else}}ri-eye-off-line{{/if}}" aria-hidden="true"></i>
 							</span>
 						{{/if}}
+						{{if $item.location_html}}
+						<span id="wall-item-location-{{$item.id}}" class="wall-item-location">
+							<small><span class="location">({{$item.location_html nofilter}})</span></small>
+						</span>
+						{{/if}}
 					</div>
-
-					{{if $item.location_html}}
-					<div id="wall-item-location-{{$item.id}}" class="wall-item-location">
-						<small><span class="location">({{$item.location_html nofilter}})</span></small>
-					</div>
-					{{/if}}
 				</div>
 				{{* @todo $item.created have to be inserted *}}
 			</div>
 
-			{{* contact info header for smartphones *}}
-			<div class="contact-info-xs hidden-lg hidden-md"><!-- <= For smartphone (responsive) -->
-				<h1 class="media-heading">
-					<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-name-link userinfo hover-card"><span>{{$item.name}}</span></a>
-					<p class="text-muted">
-						<small>
-							<a href="{{$item.plink.orig}}">
-								<time class="time" class="wall-item-ago" datetime="{{$item.utc}}">{{$item.ago}}</time>
-							</a>
-							{{if $item.location_html}}&nbsp;&mdash;&nbsp;({{$item.location_html nofilter}}){{/if}}
-							{{if $item.owner_self}}
-								{{include file="sub/delivery_count.tpl" delivery=$item.delivery}}
-							{{/if}}
-							{{if $item.direction}}
-								{{include file="sub/direction.tpl" direction=$item.direction}}
-							{{/if}}
-							{{if $item.connector}}
-								<span aria-hidden="true">&bull;</span>
-								<span title="{{$item.connector}}">
-									<i class="ri ri-plug-line" aria-hidden="true"></i>
-								</span>
-							{{else}}
-								<span aria-hidden="true">&bull;</span>
-								<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
-								<i class="ri {{if $item.private == 1}}ri-lock-line{{elseif $item.private == 0}}ri-global-line{{else}}ri-eye-off-line{{/if}}" aria-hidden="true"></i>
-								</span>
-							{{/if}}
-						</small>
-					</p>
-				</h1>
-			</div>
 		{{else}} {{* End of if $item.thread_level == 1 *}}
 			{{* contact info header for comments *}}
 			<div class="contact-info-comment">
 				<h2 class="media-heading">
-					<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-name-link userinfo hover-card"><span class="fakelink">{{$item.name}}</span></a>
-					<span class="text-muted">
+					<div>
+						<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-name-link userinfo hover-card">
+							<strong><span class="fakelink">{{$item.name}}</span></strong>
+						</a>
+						{{include file="network_profile_address.tpl" item=$item}}
+					</div>
+					{{if $item.owner_self}}
+						{{include file="sub/delivery_count.tpl" delivery=$item.delivery}}
+					{{/if}}
+					{{if $item.direction}}
+						{{include file="sub/direction.tpl" direction=$item.direction}}
+					{{/if}}
 				</h2>
 				<small>
 					{{if $item.parentguid}}
@@ -240,20 +225,14 @@ as the value of $top_child_total (this is done at the end of this file)
 						<time class="time" title="{{$item.localtime}}" data-toggle="tooltip" datetime="{{$item.utc}}">{{$item.ago}}</time>
 					</a>
 					{{if $item.location_html}}&nbsp;&mdash;&nbsp;({{$item.location_html nofilter}}){{/if}}
-					{{if $item.owner_self}}
-						{{include file="sub/delivery_count.tpl" delivery=$item.delivery}}
-					{{/if}}
-					{{if $item.direction}}
-						{{include file="sub/direction.tpl" direction=$item.direction}}
-					{{/if}}
 					{{if $item.connector}}
 						<span title="{{$item.connector}}">
-							<span aria-hidden="true">&bull;</span>
+							<span aria-hidden="true">&middot;</span>
 							<i class="ri ri-plug-line" aria-hidden="true"></i>
 						</span>
 					{{else}}
 						<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
-							<span aria-hidden="true">&bull;</span>
+							<span aria-hidden="true">&middot;</span>
 							<i class="ri {{if $item.private == 1}}ri-lock-line{{elseif $item.private == 0}}ri-global-line{{else}}ri-eye-off-line{{/if}}" aria-hidden="true"></i>
 						</span>
 					{{/if}}
@@ -271,7 +250,7 @@ as the value of $top_child_total (this is done at the end of this file)
 		{{* item content *}}
 		<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}" lang="{{$item.lang}}">
 			{{if $item.title}}
-			<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h3 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name" target="_blank">{{$item.title}}</a></h3><br /></span>
+			<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h3 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name" target="_blank">{{$item.title}}</a></h3></span>
 			{{/if}}
 			{{if $item.summary}}
 			<summary class="wall-item-summary" id="wall-item-summary-{{$item.id}}">{{$item.summary}}</summary>
@@ -541,14 +520,6 @@ as the value of $top_child_total (this is done at the end of this file)
 				{{/if}}
 			</ul>
 		</span>
-		{{if $item.drop.pagedrop}}
-		<span class="pull-right checkbox" aria-hidden="true">
-			{{if $item.drop}}
-				<input type="checkbox" title="{{$item.drop.select}}" name="itemselected[]" id="checkbox-{{$item.id}}" class="item-select" value="{{$item.id}}" />
-				<label for="checkbox-{{$item.id}}"></label>
-			{{/if}}
-		</span>
-		{{/if}}
 		</span>
 			<div class="wall-item-actions-items btn-toolbar btn-group visible-xs" role="group">
 				<div class="wall-item-actions-row">

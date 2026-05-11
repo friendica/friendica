@@ -1945,6 +1945,11 @@ aside .panel-body {
 	transition: all 0.25s ease-in-out;
 }
 
+.wall-item-addr {
+	font-size: 13.6px;
+	font-weight: normal;
+}
+
 /* wall items */
 .wall-item-container {
 	border-top: 1px solid rgba(255, 255, 255, 0.8);
@@ -2027,18 +2032,20 @@ aside .panel-body {
 	position: relative;
 }
 
+.media .preferences {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
 /* Workaround for Firefox where the post heading covers the avatar, preventing hovercard interaction,
  48px is the width of the avatar image and should be adjusted accordingly if it ever changes. */
 .media .dropdown.pull-left + .contact-info {
 	margin-left: 48px;
 }
 
-.preferences {
-	position: absolute;
-	right: 0;
-	top: 0;
-}
 #profile-edit-links .preferences {
+	position: absolute;
 	top: 15px;
 	right: 15px;
 }
@@ -2081,9 +2088,6 @@ blockquote.shared_content {
 .contact-info h1.media-heading {
 	font-size: 15px;
 	font-weight: 700;
-}
-.media .contact-info-comment {
-	display: table-cell;
 }
 .media .contact-info-comment {
 	margin: 0 0 5px;
@@ -2442,7 +2446,7 @@ button[disabled] {
 	width: 20px;
 	height: 20px;
 	border-radius: 4px;
-	padding: 2px;
+	padding: 1px;
 }
 
 /*
@@ -2660,13 +2664,16 @@ ul.dropdown-menu li:hover {
 
 /* Media Classes */
 p.wall-item-announce,
-.media .time,
 .media .shared-time,
 .media .delivery,
 .media .location,
 .media .location a {
 	font-size: 11px;
 	color: $font_color_darker;
+}
+.media .time {
+	color: $font_color_darker;
+	font-size: 12px;
 }
 .media-list > li {
 	padding: 10px;
@@ -3953,6 +3960,12 @@ main .nav-tabs > li.active > a:hover {
 There are for some reasons empty <a> tags. I don't know why */
 .textcomplete-item .contact-wrapper a {
 	padding: 0;
+}
+
+.tread-wrapper h1, .contact-info-comment h2 {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
 }
 
 /* hovercard fix */
