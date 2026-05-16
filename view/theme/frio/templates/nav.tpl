@@ -84,16 +84,6 @@
 							</li>
 						{{/if}}
 
-						{{if $nav.messages}}
-							<li class="nav-segment">
-								<a accesskey="m" id="nav-messages-link" href="{{$nav.messages.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
-									aria-label="{{$nav.messages.1}}" title="{{$nav.messages.1}}"
-									class="nav-menu {{$sel.messages}}"><i class="fa fa-envelope fa-lg fa-fw"
-										aria-hidden="true"></i><span id="mail-update"
-										class="nav-mail-badge badge nav-notification"></span></a>
-							</li>
-						{{/if}}
-
 						{{if $nav.calendar}}
 							<li class="nav-segment hidden-xs">
 								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
@@ -108,6 +98,39 @@
 									aria-label="{{$nav.contacts.1}}" title="{{$nav.contacts.1}}"
 									class="nav-menu {{$sel.contacts}} {{$nav.contacts.2}}"><i
 										class="fa fa-users fa-lg fa-fw"></i></a>
+							</li>
+						{{/if}}
+
+					</ul>
+				</div>
+
+				{{* This is the right part of the NavBar. It includes the search and the user menu *}}
+				<div class="topbar-actions pull-right">
+					<ul class="nav">
+
+						{{* The search box *}}
+						{{if $nav.search}}
+							<li id="search-box" class="hidden-xs">
+								<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
+									<div class="form-group form-group-search">
+										<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
+											type="search" name="q" placeholder="{{$search_placeholder}}">
+										<button class="btn btn-primary btn-md form-button-search" type="submit">
+											<i class="fa fa-search" aria-hidden="true"></i>
+											<span class="sr-only">{{$nav.search.1}}</span>
+										</button>
+									</div>
+								</form>
+							</li>
+						{{/if}}
+
+						{{if $nav.messages}}
+							<li class="nav-segment">
+								<a accesskey="m" id="nav-messages-link" href="{{$nav.messages.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
+									aria-label="{{$nav.messages.1}}" title="{{$nav.messages.1}}"
+									class="nav-menu {{$sel.messages}}"><i class="fa fa-envelope fa-lg fa-fw"
+										aria-hidden="true"></i><span id="mail-update"
+										class="nav-mail-badge badge nav-notification"></span></a>
 							</li>
 						{{/if}}
 
@@ -145,29 +168,6 @@
 								<p role="menuitem" class="text-muted text-center"><i>{{$emptynotifications}}</i></p>
 							</li>
 								</ul>
-							</li>
-						{{/if}}
-
-					</ul>
-				</div>
-
-				{{* This is the right part of the NavBar. It includes the search and the user menu *}}
-				<div class="topbar-actions pull-right">
-					<ul class="nav">
-
-						{{* The search box *}}
-						{{if $nav.search}}
-							<li id="search-box" class="hidden-xs">
-								<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
-									<div class="form-group form-group-search">
-										<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
-											type="search" name="q" placeholder="{{$search_placeholder}}">
-										<button class="btn btn-primary btn-md form-button-search" type="submit">
-											<i class="fa fa-search" aria-hidden="true"></i>
-											<span class="sr-only">{{$nav.search.1}}</span>
-										</button>
-									</div>
-								</form>
 							</li>
 						{{/if}}
 
