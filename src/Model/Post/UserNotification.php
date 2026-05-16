@@ -26,17 +26,17 @@ use Friendica\Util\Strings;
 class UserNotification
 {
 	// Notification types
-	const TYPE_NONE                   = 0;
-	const TYPE_EXPLICIT_TAGGED        = 1;
-	const TYPE_IMPLICIT_TAGGED        = 2;
-	const TYPE_THREAD_COMMENT         = 4;
-	const TYPE_DIRECT_COMMENT         = 8;
-	const TYPE_COMMENT_PARTICIPATION  = 16;
-	const TYPE_ACTIVITY_PARTICIPATION = 32;
-	const TYPE_DIRECT_THREAD_COMMENT  = 64;
-	const TYPE_SHARED                 = 128;
-	const TYPE_FOLLOW                 = 256;
-	const TYPE_QUOTED                 = 512;
+	public const TYPE_NONE                   = 0;
+	public const TYPE_EXPLICIT_TAGGED        = 1;
+	public const TYPE_IMPLICIT_TAGGED        = 2;
+	public const TYPE_THREAD_COMMENT         = 4;
+	public const TYPE_DIRECT_COMMENT         = 8;
+	public const TYPE_COMMENT_PARTICIPATION  = 16;
+	public const TYPE_ACTIVITY_PARTICIPATION = 32;
+	public const TYPE_DIRECT_THREAD_COMMENT  = 64;
+	public const TYPE_SHARED                 = 128;
+	public const TYPE_FOLLOW                 = 256;
+	public const TYPE_QUOTED                 = 512;
 
 	/**
 	 * Insert a new user notification entry
@@ -330,8 +330,8 @@ class UserNotification
 	 */
 	private static function insertNotificationByItem(int $type, int $uid, array $item): void
 	{
-		if (($item['verb'] != Activity::ANNOUNCE) && ($item['gravity'] == Item::GRAVITY_ACTIVITY) &&
-			!in_array($type, [self::TYPE_DIRECT_COMMENT, self::TYPE_DIRECT_THREAD_COMMENT])) {
+		if (($item['verb'] != Activity::ANNOUNCE) && ($item['gravity'] == Item::GRAVITY_ACTIVITY)
+			&& !in_array($type, [self::TYPE_DIRECT_COMMENT, self::TYPE_DIRECT_THREAD_COMMENT])) {
 			// Activities are only stored when performed on the user's post or comment
 			return;
 		}
@@ -342,13 +342,13 @@ class UserNotification
 			$type,
 			$item['author-id'],
 			$item['gravity'] == Item::GRAVITY_ACTIVITY ? $item['thr-parent-id'] : $item['uri-id'],
-			$item['parent-uri-id']
+			$item['parent-uri-id'],
 		);
 
 		try {
 			$notification = DI::notification()->save($notification);
 			Subscription::pushByNotification($notification);
-		} catch (Exception $e) {
+		} catch (Exception) {
 
 		}
 	}
@@ -367,13 +367,13 @@ class UserNotification
 		$notification = DI::notificationFactory()->createForRelationship(
 			$uid,
 			$actor,
-			$verb
+			$verb,
 		);
 		try {
 			$notification = DI::notification()->save($notification);
 			Subscription::pushByNotification($notification);
 			return true;
-		} catch (Exception $e) {
+		} catch (Exception) {
 			return false;
 		}
 	}

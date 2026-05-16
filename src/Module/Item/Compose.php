@@ -78,7 +78,7 @@ class Compose extends BaseModule
 
 	protected function post(array $request = [])
 	{
-		if (!empty($_REQUEST['body'])) {
+		if (!empty($request['body'])) {
 			$_REQUEST['return'] = 'network';
 			require_once 'mod/item.php';
 			item_post();
@@ -131,10 +131,10 @@ class Compose extends BaseModule
 				$type          = 'post';
 				$doesFederate  = true;
 
-				$contact_allow = $_REQUEST['contact_allow'] ?? '';
-				$circle_allow  = $_REQUEST['circle_allow']  ?? '';
-				$contact_deny  = $_REQUEST['contact_deny']  ?? '';
-				$circle_deny   = $_REQUEST['circle_deny']   ?? '';
+				$contact_allow = $request['contact_allow'] ?? '';
+				$circle_allow  = $request['circle_allow']  ?? '';
+				$contact_deny  = $request['contact_deny']  ?? '';
+				$circle_deny   = $request['circle_deny']   ?? '';
 
 				if ($contact_allow
 					. $circle_allow
@@ -149,11 +149,13 @@ class Compose extends BaseModule
 				break;
 		}
 
-		$title    = $_REQUEST['title']    ?? '';
-		$category = $_REQUEST['category'] ?? '';
-		$body     = $_REQUEST['body']     ?? '';
-		$location = $_REQUEST['location'] ?? $user['default-location'];
-		$wall     = $_REQUEST['wall']     ?? $type == 'post';
+		$title     = $request['title']     ?? '';
+		$summary   = $request['summary']   ?? '';
+		$sensitive = $request['sensitive'] ?? false;
+		$category  = $request['category']  ?? '';
+		$body      = $request['body']      ?? '';
+		$location  = $request['location']  ?? $user['default-location'];
+		$wall      = $request['wall']      ?? $type == 'post';
 
 		$jotplugins = $this->eventDispatcher->dispatch(
 			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
@@ -172,7 +174,7 @@ class Compose extends BaseModule
 				new DateTime('now'),
 				null,
 				$this->l10n->t('Created at'),
-				'created_at'
+				'created_at',
 			);
 		} else {
 			$created_at = '';
@@ -183,9 +185,10 @@ class Compose extends BaseModule
 			'$l10n' => [
 				'compose_title'        => $compose_title,
 				'default'              => '',
+				'summary'              => $this->l10n->t('Summary'),
 				'visibility_title'     => $this->l10n->t('Visibility'),
 				'mytitle'              => $this->l10n->t('This is you'),
-				'submit'               => $this->l10n->t('Submit'),
+				'submit'               => $this->l10n->t('Post'),
 				'edbold'               => $this->l10n->t('Bold'),
 				'editalic'             => $this->l10n->t('Italic'),
 				'eduline'              => $this->l10n->t('Underline'),
@@ -204,14 +207,15 @@ class Compose extends BaseModule
 				'location_disabled'    => $this->l10n->t('Location services are disabled. Please check the website\'s permissions on your device'),
 				'wait'                 => $this->l10n->t('Please wait'),
 				'placeholdertitle'     => $this->l10n->t('Set title'),
+				'placeholdersummary'   => Feature::isEnabled($this->session->getLocalUserId(), Feature::SUMMARY) ? $this->l10n->t('Set summary, abstract or spoiler text') : '',
 				'placeholdercategory'  => Feature::isEnabled($this->session->getLocalUserId(), Feature::CATEGORIES) ? $this->l10n->t('Categories (comma-separated list)') : '',
 				'always_open_compose'  => $this->pConfig->get(
 					$this->session->getLocalUserId(),
 					'frio',
 					'always_open_compose',
-					$this->config->get('frio', 'always_open_compose', false)
-				) ? '' :
-						$this->l10n->t('You can make this page always open when you use the New Post button in the <a href="/settings/display">Theme Customization settings</a>.'),
+					$this->config->get('frio', 'always_open_compose', false),
+				) ? ''
+						: $this->l10n->t('If you want to always use this editor for posting, you can configure the New Post button to always open it in your <a href="/settings/display">Theme settings</a>.'),
 			],
 
 			'$id'           => 0,
@@ -220,15 +224,18 @@ class Compose extends BaseModule
 			'$wall'         => $wall,
 			'$mylink'       => $this->baseUrl->remove($contact['url']),
 			'$myphoto'      => $this->baseUrl->remove($contact['thumb']),
+			'$sensitive'    => ['sensitive', $this->l10n->t('Sensitive post'), $request['sensitive'] ?? false],
 			'$scheduled_at' => Temporal::getDateTimeField(
 				new DateTime(),
 				new DateTime('now + 6 months'),
 				null,
 				$this->l10n->t('Scheduled at'),
-				'scheduled_at'
+				'scheduled_at',
 			),
 			'$created_at' => $created_at,
 			'$title'      => $title,
+			'$summary'    => $summary,
+			'sensitive'   => $sensitive,
 			'$category'   => $category,
 			'$body'       => $body,
 			'$location'   => $location,

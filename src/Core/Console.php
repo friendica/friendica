@@ -41,36 +41,42 @@ class Console extends \Asika\SimpleConsole\Console
 Usage: bin/console [--version] [-h|--help|-?] <command> [<args>] [-v]
 
 Commands:
-	addon                  Addon management
-	cache                  Manage node cache
-	clearavatarcache       Clear the file based avatar cache
-	config                 Edit site config
-	contact                Contact management
-	createdoxygen          Generate Doxygen headers
 	daemon                 Interact with the Friendica daemon
+	help                   Show help about a command, e.g (bin/console help config)
 	jetstream              Interact with the Jetstream daemon
 	worker                 Start worker process
-	dbstructure            Do database updates
-	docbloxerrorchecker    Check the file tree for DocBlox errors
-	extract                Generate translation string file for the Friendica project (deprecated)
-	globalcommunityblock   Block remote profile from interacting with this node
-	globalcommunitysilence Silence a profile from the global community page
-	archivecontact         Archive a contact when you know that it isn't existing anymore
-	help                   Show help about a command, e.g (bin/console help config)
-	autoinstall            Starts automatic installation of friendica based on values from htconfig.php
-	lock                   Edit site locks
-	maintenance            Set maintenance mode for this node
-	movetoavatarcache      Move cached avatars to the file based avatar cache
-	mergecontacts          Merge duplicated contact entries
-	user                   User management
-	php2po                 Generate a messages.po file from a strings.php file
-	po2php                 Generate a strings.php file from a messages.po file
-	typo                   Checks for parse errors in Friendica files
-	postupdate             Execute pending post update scripts (can last days)
-	relocate               Update node base URL
-	serverblock            Manage blocked servers
-	storage                Manage storage backend
-	relay                  Manage ActivityPub relay servers
+
+	node management
+		archivecontact         Archive a contact when you know that it isn't existing anymore
+		cache                  Manage node cache
+		contact                Contact management
+		globalcommunityblock   Block remote profile from interacting with this node
+		globalcommunitysilence Silence a profile from the global community page
+		lock                   Edit site locks
+		mergecontacts          Merge duplicated contact entries
+		serverblock            Manage blocked servers
+		relay                  Manage ActivityPub relay servers
+		user                   User management
+
+	node configuration
+		addon                  Addon management
+		autoinstall            Starts automatic installation of friendica based on values from htconfig.php
+		clearavatarcache       Clear the file based avatar cache
+		config                 Edit site config
+		dbstructure            Do database updates
+		maintenance            Set maintenance mode for this node
+		movetoavatarcache      Move cached avatars to the file based avatar cache
+		postupdate             Execute pending post update scripts (can last days)
+		relocate               Update node base URL
+		storage                Manage storage backend
+
+	developer
+		createdoxygen          Generate Doxygen headers
+		docbloxerrorchecker    Check the file tree for DocBlox errors
+		extract                Generate translation string file for the Friendica project (deprecated)
+		php2po                 Generate a messages.po file from a strings.php file
+		po2php                 Generate a strings.php file from a messages.po file
+		typo                   Checks for parse errors in Friendica files
 
 Options:
 	-h|--help|-? Show help information

@@ -65,10 +65,10 @@ class Magic extends BaseModule
 
 		$this->logger->debug('Invoked', ['request' => $request]);
 
-		$addr     = (string) $request['addr'] ?? '';
-		$bdest    = (string) $request['bdest'] ?? '';
-		$dest     = (string) $request['dest'] ?? '';
-		$owa      = intval($request['owa'] ?? 0);
+		$addr  = (string) ($request['addr'] ?? '');
+		$bdest = (string) ($request['bdest'] ?? '');
+		$dest  = (string) ($request['dest'] ?? '');
+		$owa   = intval($request['owa'] ?? 0);
 
 		// bdest is preferred as it is hex-encoded and can survive url rewrite and argument parsing
 		if ($bdest !== '') {
@@ -86,7 +86,7 @@ class Magic extends BaseModule
 
 		if ($contact !== []) {
 			// Redirect if the contact is already authenticated on this site.
-			if ($this->appHelper->getContactId() && strpos($contact['nurl'], Strings::normaliseLink($this->baseUrl)) !== false) {
+			if ($this->appHelper->getContactId() && str_contains($contact['nurl'], Strings::normaliseLink($this->baseUrl))) {
 				$this->logger->info('Contact is already authenticated, redirecting to destination.', ['dest' => $dest]);
 				System::externalRedirect($dest);
 			}
@@ -146,7 +146,7 @@ class Magic extends BaseModule
 		$header = HTTPSignature::createSig(
 			$header,
 			$owner['prvkey'],
-			'acct:' . $owner['addr']
+			'acct:' . $owner['addr'],
 		);
 
 		$this->logger->info('Fetch from remote system', ['openwebauth' => $openwebauth, 'headers' => $header]);

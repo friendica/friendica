@@ -22,6 +22,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Event\ArrayFilterEvent;
@@ -77,7 +78,7 @@ class Profile extends BaseModule
 		Page $page,
 		IManageConfigValues $config,
 		array $server,
-		array $parameters = []
+		array $parameters = [],
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -186,7 +187,7 @@ class Profile extends BaseModule
 			}
 		}
 
-		if (empty($contact['network']) && ContactModel::isLocal($contact['url']) ) {
+		if (empty($contact['network']) && ContactModel::isLocal($contact['url'])) {
 			$contact['network']  = Protocol::DFRN;
 			$contact['protocol'] = Protocol::ACTIVITYPUB;
 		}
@@ -212,6 +213,10 @@ class Profile extends BaseModule
 
 			if ($cmd === 'updateprofile') {
 				$this->updateContactFromProbe($contact['id']);
+			}
+
+			if ($cmd === 'fetchoutbox') {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'FetchOutbox', $contact['id'], 0);
 			}
 
 			if ($cmd === 'block') {
@@ -275,22 +280,23 @@ class Profile extends BaseModule
 		$this->page['aside'] .= $vcard_widget . $circles_widget;
 
 		$o = '';
-		Nav::setSelected('contact');
+		Nav::setSelected('contacts');
 
 		$_SESSION['return_path'] = $this->args->getQueryString();
 
 		$this->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('contact_head.tpl'), [
 		]);
 
+		$con = $this->t('Connection:');
 		switch ($localRelationship->rel) {
 			case ContactModel::FRIEND:
-				$relation_text = $this->t('You are mutual friends with %s', $contact['name']);
+				$relation_text = $this->t('Friend');
 				break;
 			case ContactModel::FOLLOWER:
-				$relation_text = $this->t('You are sharing with %s', $contact['name']);
+				$relation_text = $this->t('Follows you');
 				break;
 			case ContactModel::SHARING:
-				$relation_text = $this->t('%s is sharing with you', $contact['name']);
+				$relation_text = $this->t('You follow');
 				break;
 			default:
 				$relation_text = '';
@@ -301,7 +307,7 @@ class Profile extends BaseModule
 		}
 
 		$url = ContactModel::magicLinkByContact($contact);
-		if (strpos($url, 'contact/redir/') === 0) {
+		if (str_starts_with($url, 'contact/redir/')) {
 			$sparkle = ' class="sparkle" ';
 		} else {
 			$sparkle = '';
@@ -314,9 +320,9 @@ class Profile extends BaseModule
 			$this->logger->notice('Empty gsid for contact', ['contact' => $contact]);
 		}
 
-		$serverIgnored = $contact['gsid'] &&
-			$this->userGServer->isIgnoredByUser($this->session->getLocalUserId(), $contact['gsid']) ?
-				$this->t('This contact is on a server you ignored.')
+		$serverIgnored = $contact['gsid']
+			&& $this->userGServer->isIgnoredByUser($this->session->getLocalUserId(), $contact['gsid'])
+				? $this->t('This contact is on a server you ignored.')
 				: '';
 
 		$last_update = (($contact['last-update'] <= DBA::NULL_DATETIME) ? $this->t('Never') : DateTimeFormat::local($contact['last-update'], 'D, j M Y, g:i A'));
@@ -329,6 +335,8 @@ class Profile extends BaseModule
 		$poll_enabled = in_array($contact['network'], [Protocol::DFRN, Protocol::FEED, Protocol::MAIL]);
 
 		$nettype = $this->t('Network type: %s', ContactSelector::networkToName($contact['network'], $contact['protocol'], $contact['gsid']));
+
+		ContactModule::setPageTitle($contact);
 
 		// tabs
 		$tab_str = ContactModule::getTabsHTML($contact, ContactModule::TAB_PROFILE);
@@ -346,8 +354,8 @@ class Profile extends BaseModule
 					LocalRelationshipEntity::FFI_NONE        => $this->t('Disabled'),
 					LocalRelationshipEntity::FFI_INFORMATION => $this->t('Fetch information'),
 					LocalRelationshipEntity::FFI_KEYWORD     => $this->t('Fetch keywords'),
-					LocalRelationshipEntity::FFI_BOTH        => $this->t('Fetch information and keywords')
-				]
+					LocalRelationshipEntity::FFI_BOTH        => $this->t('Fetch information and keywords'),
+				],
 			];
 		}
 
@@ -357,23 +365,23 @@ class Profile extends BaseModule
 		if ($contact['network'] == Protocol::FEED) {
 			$remote_self_options = [
 				LocalRelationshipEntity::MIRROR_DEACTIVATED => $this->t('No mirroring'),
-				LocalRelationshipEntity::MIRROR_OWN_POST    => $this->t('Mirror as my own posting')
+				LocalRelationshipEntity::MIRROR_OWN_POST    => $this->t('Mirror as my own posting'),
 			];
 		} elseif ($contact['network'] == Protocol::ACTIVITYPUB) {
 			$remote_self_options = [
 				LocalRelationshipEntity::MIRROR_DEACTIVATED    => $this->t('No mirroring'),
-				LocalRelationshipEntity::MIRROR_NATIVE_RESHARE => $this->t('Native reshare')
+				LocalRelationshipEntity::MIRROR_NATIVE_RESHARE => $this->t('Native reshare'),
 			];
 		} elseif ($contact['network'] == Protocol::DFRN) {
 			$remote_self_options = [
 				LocalRelationshipEntity::MIRROR_DEACTIVATED    => $this->t('No mirroring'),
 				LocalRelationshipEntity::MIRROR_OWN_POST       => $this->t('Mirror as my own posting'),
-				LocalRelationshipEntity::MIRROR_NATIVE_RESHARE => $this->t('Native reshare')
+				LocalRelationshipEntity::MIRROR_NATIVE_RESHARE => $this->t('Native reshare'),
 			];
 		} else {
 			$remote_self_options = [
 				LocalRelationshipEntity::MIRROR_DEACTIVATED => $this->t('No mirroring'),
-				LocalRelationshipEntity::MIRROR_OWN_POST    => $this->t('Mirror as my own posting')
+				LocalRelationshipEntity::MIRROR_OWN_POST    => $this->t('Mirror as my own posting'),
 			];
 		}
 
@@ -410,6 +418,7 @@ class Profile extends BaseModule
 			'$reason'                    => trim($contact['reason'] ?? ''),
 			'$infedit'                   => $this->t('Edit contact notes'),
 			'$common_link'               => 'contact/' . $contact['id'] . '/contacts/common',
+			'$con'                       => $con,
 			'$relation_text'             => $relation_text,
 			'$visit'                     => $this->t('Visit %s\'s profile [%s]', $contact['name'], $contact['url']),
 			'$blockunblock'              => $this->t('Block/Unblock contact'),
@@ -443,7 +452,7 @@ class Profile extends BaseModule
 			'$sparkle'                   => $sparkle,
 			'$url'                       => $url,
 			'$profileurllabel'           => $this->t('Profile URL'),
-			'$profileurl'                => $contact['url'],
+			'$profileurl'                => ContactModel::getProfileLink($contact),
 			'$account_type'              => ContactModel::getAccountType($contact['contact-type']),
 			'$location'                  => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['location']),
 			'$location_label'            => $this->t('Location:'),
@@ -466,7 +475,7 @@ class Profile extends BaseModule
 				$this->t('Mirror postings from this contact'),
 				$localRelationship->remoteSelf,
 				$this->t('Mark this contact as remote_self, this will cause friendica to repost new entries from this contact.'),
-				$remote_self_options
+				$remote_self_options,
 			],
 			'$channel_settings_label' => $this->t('Channel Settings'),
 			'$frequency_label'        => $this->t('Frequency of this contact in relevant channels'),
@@ -553,6 +562,16 @@ class Profile extends BaseModule
 				'title' => '',
 				'sel'   => '',
 				'id'    => 'updateprofile',
+			];
+		}
+
+		if (in_array($contact['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN])) {
+			$contact_actions['fetchoutbox'] = [
+				'label' => $this->t('Fetch latest posts'),
+				'url'   => 'contact/' . $contact['id'] . '/fetchoutbox?t=' . $formSecurityToken,
+				'title' => '',
+				'sel'   => '',
+				'id'    => 'fetchoutbox',
 			];
 		}
 

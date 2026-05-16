@@ -22,12 +22,12 @@ class Delayed
 	 * The content of the post is posted as is. Connector settings are using the default settings.
 	 * This is used for automated scheduled posts via feeds or from the API.
 	 */
-	const PREPARED = 0;
+	public const PREPARED = 0;
 	/**
 	 * Like PREPARED, but additionally the connector settings can differ.
 	 * This is used when manually publishing scheduled posts.
 	 */
-	const PREPARED_NO_HOOK = 2;
+	public const PREPARED_NO_HOOK = 2;
 
 	/**
 	 * Insert a new delayed post
@@ -48,13 +48,16 @@ class Delayed
 			return 0;
 		}
 
-		if (empty($delayed)) {
-			$min_posting = DI::config()->get('system', 'minimum_posting_interval', 0);
+		$delayed_timestamp = 0;
 
-			$last_publish = DI::pConfig()->get($item['uid'], 'system', 'last_publish', 0, true);
-			$next_publish = max($last_publish + (60 * $min_posting), time());
-			$delayed      = date(DateTimeFormat::MYSQL, $next_publish);
-			DI::pConfig()->set($item['uid'], 'system', 'last_publish', $next_publish);
+		if (empty($delayed)) {
+			$system_min_posting = DI::config()->get('system', 'minimum_posting_interval');
+			$user_min_posting   = DI::pConfig()->get($item['uid'], 'system', 'minimum_posting_interval', 0, true);
+			$min_posting        = max($system_min_posting, $user_min_posting) * 60;
+			$last_publish       = DI::pConfig()->get($item['uid'], 'system', 'last_publish', 0, true);
+			$next_publish       = max($last_publish + $min_posting, time());
+			$delayed_timestamp  = $next_publish;
+			$delayed            = date(DateTimeFormat::MYSQL, $delayed_timestamp);
 		}
 
 		DI::logger()->notice('Adding post for delayed publishing', ['uid' => $item['uid'], 'delayed' => $delayed, 'uri' => $uri]);

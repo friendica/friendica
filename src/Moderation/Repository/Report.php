@@ -104,4 +104,16 @@ final class Report extends \Friendica\BaseRepository
 
 		return $this->factory->createFromTableRow($fields, $reportPosts, $reportRules);
 	}
+
+	/**
+	 * Update the status of a report
+	 *
+	 * @param int $reportId
+	 * @param int $status One of Entity Report::STATUS_*
+	 * @return bool
+	 */
+	public function setStatus(int $reportId, int $status): bool
+	{
+		return $this->db->update(self::$table_name, ['status' => $status], ['id' => $reportId]);
+	}
 }

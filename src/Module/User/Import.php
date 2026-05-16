@@ -22,6 +22,7 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
+use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
@@ -35,7 +36,8 @@ use Psr\Log\LoggerInterface;
 
 class Import extends \Friendica\BaseModule
 {
-	const IMPORT_DEBUG = false;
+	public const IMPORT_DEBUG = false;
+	public const MEMORY_LIMIT = 67108864; // 64MB
 
 	/** @var IManageConfigValues */
 	private $config;
@@ -219,6 +221,13 @@ class Import extends \Friendica\BaseModule
 		5. send message to dfrn contacts
 		*/
 
+		$available_memory = Strings::getBytesFromShorthand(ini_get('memory_limit'));
+		$available_memory = $available_memory > 0 ? ($available_memory / 2) : self::MEMORY_LIMIT;
+		if ($file['size'] > $available_memory) {
+			$this->systemMessages->addNotice($this->t('Account file size is too high'));
+			return;
+		}
+
 		$account = json_decode(file_get_contents($file['tmp_name']), true);
 		if ($account === null) {
 			$this->systemMessages->addNotice($this->t('Error decoding account file'));
@@ -238,12 +247,17 @@ class Import extends \Friendica\BaseModule
 			return;
 		}
 
+		if (in_array(strtolower($account['user']['email']), User::getAdminEmailList())) {
+			$this->systemMessages->addNotice($this->t('Cannot use that email.'));
+			return;
+		}
+
 		// Backward compatibility
-		$account['circle'] = $account['circle'] ?? $account['group'];
-		$account['circle_member'] = $account['circle_member'] ?? $account['group_member'];
+		$account['circle'] ??= $account['group'];
+		$account['circle_member'] ??= $account['group_member'];
 
 		$oldBaseUrl = $account['baseurl'];
-		$newBaseUrl = (string)$this->baseUrl;
+		$newBaseUrl = (string) $this->baseUrl;
 
 		$oldAddr = str_replace('http://', '@', Strings::normaliseLink($oldBaseUrl));
 		$newAddr = str_replace('http://', '@', Strings::normaliseLink($newBaseUrl));
@@ -400,9 +414,17 @@ class Import extends \Friendica\BaseModule
 
 			$r = Photo::store(
 				new Image($photo['data'], $photo['type'], $photo['filename']),
-				$photo['uid'], $photo['contact-id'], //0
-				$photo['resource-id'], $photo['filename'], $photo['album'], $photo['scale'], $photo['profile'], //1
-				$photo['allow_cid'], $photo['allow_gid'], $photo['deny_cid'], $photo['deny_gid']
+				$photo['uid'],
+				$photo['contact-id'],
+				$photo['resource-id'],
+				$photo['filename'],
+				$photo['album'],
+				$photo['scale'],
+				$photo['profile'],
+				$photo['allow_cid'],
+				$photo['allow_gid'],
+				$photo['deny_cid'],
+				$photo['deny_gid'],
 			);
 
 			if ($r === false) {

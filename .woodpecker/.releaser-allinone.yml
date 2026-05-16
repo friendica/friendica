@@ -1,0 +1,89 @@
+# SPDX-FileCopyrightText: 2010 - 2024 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# This prevents executing this pipeline at other servers than ci.friendi.ca
+labels:
+  location: friendica
+  type: releaser
+
+matrix:
+  include:
+    - PHP_MAJOR_VERSION: 8.5
+      PHP_VERSION: 8.5.5
+
+when:
+  repo: friendica/friendica
+  branch: stable
+  event: tag
+
+steps:
+  clone_friendica_addon:
+    image: alpine/git
+    commands:
+      - git config --global user.email "no-reply@friendi.ca"
+      - git config --global user.name "Friendica"
+      - git clone https://github.com/friendica/friendica-addons.git addon
+      - cd addon/
+      - git checkout $CI_COMMIT_BRANCH
+  restore_cache:
+    image: meltwater/drone-cache:dev
+    settings:
+      backend: "filesystem"
+      restore: true
+      cache_key: "{{ .Repo.Name }}_php{{PHP_MAJOR_VERSION}}_{{ arch }}_{{ os }}"
+      archive_format: "gzip"
+      mount:
+        - '.composer'
+    volumes:
+      - /tmp/drone-cache:/tmp/cache
+  composer_install:
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
+    commands:
+      - export COMPOSER_HOME=.composer
+      - ./bin/composer.phar validate
+      - ./bin/composer.phar install --no-dev --optimize-autoloader
+    volumes:
+      - /etc/hosts:/etc/hosts
+  create_artifacts:
+    image: debian
+    commands:
+      - apt-get update
+      - apt-get install bzip2
+      - mkdir ./build
+      - export VERSION="$(cat VERSION)"
+      - export RELEASE="friendica-all-in-one-$VERSION"
+      - export ARTIFACT="$RELEASE.tar.gz"
+      - tar
+        --transform "s,^,$RELEASE/,S"
+        -X mods/release-list-exclude.txt
+        -T mods/release-list-include.txt
+        -cvzf ./build/$ARTIFACT
+      - cd ./build
+      - sha256sum "$ARTIFACT" > "$ARTIFACT.sum256"
+      - chmod 664 ./*
+      - ls -lh
+      - cat "$ARTIFACT.sum256"
+      - sha256sum "$ARTIFACT"
+  sign_artifacts:
+    image: plugins/gpgsign
+    settings:
+      key:
+        from_secret: gpg_key
+      passphrase:
+        from_secret: gpg_password
+      files:
+        - build/*
+      exclude:
+        - build/*.sum256
+      detach_sign: true
+    when:
+      repo: friendica/friendica
+      branch: stable
+      event: tag
+  publish_artifacts:
+    image: alpine
+    commands:
+      - cp -fr build/* /tmp/friendica_files/
+    volumes:
+      - files:/tmp/friendica_files

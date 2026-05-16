@@ -7,7 +7,10 @@ labels:
   location: friendica
   type: releaser
 
-skip_clone: true
+matrix:
+  include:
+    - PHP_MAJOR_VERSION: 8.5
+      PHP_VERSION: 8.5.5
 
 when:
   repo: friendica/friendica
@@ -15,32 +18,24 @@ when:
   event: tag
 
 steps:
-  clone:
-    image: alpine/git
-    commands:
-      - git clone $CI_REPO_CLONE_URL .
-      - git checkout $CI_COMMIT_BRANCH
-      - git fetch origin $CI_COMMIT_REF
-      - git merge $CI_COMMIT_SHA
-
   restore_cache:
     image: meltwater/drone-cache:dev
     settings:
       backend: "filesystem"
       restore: true
-      cache_key: "{{ .Repo.Name }}_php7.4_{{ arch }}_{{ os }}"
+      cache_key: "{{ .Repo.Name }}_php{{PHP_MAJOR_VERSION}}_{{ arch }}_{{ os }}"
       archive_format: "gzip"
       mount:
         - '.composer'
     volumes:
       - /tmp/drone-cache:/tmp/cache
   composer_install:
-    image: friendicaci/php8.2:php8.2.28
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     commands:
       - mkdir addon # create empty addon folder to appease composer
       - export COMPOSER_HOME=.composer
-      - composer validate
-      - composer install --no-dev --optimize-autoloader
+      - ./bin/composer.phar validate
+      - ./bin/composer.phar install --no-dev --optimize-autoloader
     volumes:
       - /etc/hosts:/etc/hosts
   create_artifacts:

@@ -36,15 +36,15 @@ class Mention extends BaseDataTransferObject
 	 */
 	public function __construct(BaseURL $baseUrl, array $tag, array $contact)
 	{
-		$this->id       = (string)($contact['id'] ?? 0);
+		$this->id       = (string) ($contact['id'] ?? 0);
 		$this->username = $tag['name'];
 		$this->url      = $tag['url'];
 
 		if (!empty($contact)) {
-			$this->acct =
-				strpos($contact['url'], $baseUrl . '/') === 0 ?
-					$contact['nick'] :
-					$contact['addr'];
+			$this->acct
+				= str_starts_with($contact['url'], $baseUrl . '/')
+					? $contact['nick']
+					: $contact['addr'];
 
 			$this->username = $contact['nick'];
 		} else {

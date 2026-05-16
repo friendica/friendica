@@ -67,6 +67,7 @@ var Browser = {
 	event: '',
 	folder: '',
 	id: null,
+	currentRequest: null,
 
 	init: function (nickname, type, hash) {
 		Browser.nickname = nickname;
@@ -91,8 +92,12 @@ var Browser = {
 			$('.error').addClass('hidden');
 		});
 
-		// Click on album link
-		$('.fbrowser').on('click', '.folders button, .path button', function (e) {
+		// Remove existing delegated event handlers first to prevent multiple registrations
+		// when the filebrowser is opened multiple times
+		$('body').off('click.fbrowser');
+
+		// Click on album link - use delegated event on body with namespace
+		$('body').on('click.fbrowser', '.fbrowser .folders button, .fbrowser .path button', function (e) {
 			e.preventDefault();
 			let url = Browser._getUrl("none", this.dataset.folder);
 			Browser.folder = this.dataset.folder;
@@ -100,8 +105,8 @@ var Browser = {
 			Browser.loadContent(url);
 		});
 
-		//Embed on click
-		$('.fbrowser').on('click', '.photo-album-photo-link', function (e) {
+		//Embed on click - use delegated event on body with namespace
+		$('body').on('click.fbrowser', '.fbrowser .photo-album-photo-link', function (e) {
 			e.preventDefault();
 
 			let embed = '';
@@ -137,8 +142,8 @@ var Browser = {
 			autosize.update($('.text-autosize'));
 		});
 
-		// EventListener for switching between photo and file mode
-		$('.fbrowser').on('click', '.fbswitcher .btn', function (e) {
+		// EventListener for switching between photo and file mode - use delegated event on body with namespace
+		$('body').on('click.fbrowser', '.fbrowser .fbswitcher .btn', function (e) {
 			e.preventDefault();
 			Browser.type = this.getAttribute('data-mode');
 			$('.fbrowser')
@@ -217,16 +222,31 @@ var Browser = {
 
 	// Load new content (e.g. change photo album)
 	loadContent: function (url) {
+		// Abort any pending request to prevent race conditions
+		if (Browser.currentRequest) {
+			Browser.currentRequest.abort();
+		}
+
 		$('.fbrowser-content').hide();
 		$('.fbrowser .profile-rotator-wrapper').show();
 
-		// load new content to fbrowser window
-		$('.fbrowser').load(url, function (responseText, textStatus) {
-			$('.profile-rotator-wrapper').hide();
-			if (textStatus === 'success') {
-				$(".fbrowser_content").show();
-				Browser.postLoad();
+		// Use $.ajax instead of .load() to get better control over the request
+		Browser.currentRequest = $.ajax({
+			url: url,
+			type: 'GET'
+		}).done(function(data) {
+			$('.fbrowser').html(data);
+			Browser.postLoad();
+		}).fail(function(xhr, status) {
+			// Only show error if it's not an abort (abort is intentional when switching quickly)
+			if (status !== 'abort') {
+				$('.error span').html('Failed to load content');
+				$('.error').removeClass('hidden');
 			}
+		}).always(function() {
+			$('.profile-rotator-wrapper').hide();
+			$('.fbrowser-content').show();
+			Browser.currentRequest = null;
 		});
 	},
 

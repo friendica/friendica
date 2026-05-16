@@ -44,7 +44,7 @@ class UserGServer extends BaseRepository
 	{
 		try {
 			return $this->selectOneByUserAndServer($uid, $gsid, $hydrate);
-		} catch (NotFoundException $e) {
+		} catch (NotFoundException) {
 			return $this->factory->createFromUserAndServer($uid, $gsid, $hydrate ? $this->gserverRepository->selectOneById($gsid) : null);
 		}
 	}

@@ -9,6 +9,7 @@ namespace Friendica\Module\Item;
 
 use Friendica\App;
 use Friendica\BaseModule;
+use Friendica\Content\Item as ContentItem;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Model\Item;
@@ -25,12 +26,15 @@ class Language extends BaseModule
 {
 	/** @var IHandleUserSessions */
 	private $session;
+	/** @var ContentItem */
+	private $item;
 
-	public function __construct(IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(ContentItem $item, IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->session = $session;
+		$this->item    = $item;
 	}
 
 	protected function rawContent(array $request = [])
@@ -48,6 +52,6 @@ class Language extends BaseModule
 			throw new HTTPException\NotFoundException();
 		}
 
-		$this->httpExit(Item::getLanguageMessage($item));
+		$this->httpExit($this->item->getLanguageMessage($item));
 	}
 }

@@ -38,7 +38,7 @@ class TagCloud
 		$r = self::tagadelic($uid, $count, $owner_id, $flags, $type);
 		if (count($r)) {
 			$contact = DBA::selectFirst('contact', ['url'], ['uid' => $uid, 'self' => true]);
-			$url = DI::baseUrl()->remove($contact['url']);
+			$url     = DI::baseUrl()->remove($contact['url']);
 
 			$tags = [];
 			foreach ($r as $rr) {
@@ -50,9 +50,9 @@ class TagCloud
 			}
 
 			$tpl = Renderer::getMarkupTemplate('widget/tagcloud.tpl');
-			$o = Renderer::replaceMacros($tpl, [
+			$o   = Renderer::replaceMacros($tpl, [
 				'$title' => DI::l10n()->t('Tags'),
-				'$tags'  => $tags
+				'$tags'  => $tags,
 			]);
 		}
 		return $o;
@@ -74,7 +74,7 @@ class TagCloud
 	private static function tagadelic($uid, $count = 0, $owner_id = 0, $flags = '', $type = Tag::HASHTAG)
 	{
 		$sql_options = Item::getPermissionsSQLByUserId($uid, 'post-user-view');
-		$limit = $count ? sprintf('LIMIT %d', intval($count)) : '';
+		$limit       = $count ? sprintf('LIMIT %d', intval($count)) : '';
 
 		if ($flags) {
 			if ($flags === 'wall') {
@@ -87,13 +87,14 @@ class TagCloud
 		}
 
 		// Fetch tags
-		$tag_stmt = DBA::p("SELECT `name`, COUNT(`name`) AS `total` FROM `tag-search-view`
+		$tag_stmt = DBA::p(
+			"SELECT `name`, COUNT(`name`) AS `total` FROM `tag-search-view`
 			LEFT JOIN `post-user-view` ON `tag-search-view`.`uri-id` = `post-user-view`.`uri-id` AND `tag-search-view`.`uid` = `post-user-view`.`uid`
 			WHERE `tag-search-view`.`uid` = ?
 			AND `post-user-view`.`visible` AND NOT `post-user-view`.`deleted`
 			$sql_options
 			GROUP BY `name` ORDER BY `total` DESC $limit",
-			$uid
+			$uid,
 		);
 		if (!DBA::isResult($tag_stmt)) {
 			return [];
@@ -113,9 +114,9 @@ class TagCloud
 	private static function tagCalc(array $arr)
 	{
 		$tags = [];
-		$min = 1000000000.0;
-		$max = -1000000000.0;
-		$x = 0;
+		$min  = 1000000000.0;
+		$max  = -1000000000.0;
+		$x    = 0;
 
 		if (!$arr) {
 			return [];
@@ -125,15 +126,15 @@ class TagCloud
 			$tags[$x][0] = $rr['name'];
 			$tags[$x][1] = log($rr['total']);
 			$tags[$x][2] = 0;
-			$min = min($min, $tags[$x][1]);
-			$max = max($max, $tags[$x][1]);
-			$x ++;
+			$min         = min($min, $tags[$x][1]);
+			$max         = max($max, $tags[$x][1]);
+			$x++;
 		}
 
 		usort($tags, [self::class, 'tagsSort']);
 		$range = max(0.01, $max - $min) * 1.0001;
 
-		for ($x = 0; $x < count($tags); $x ++) {
+		for ($x = 0; $x < count($tags); $x++) {
 			$tags[$x][2] = 1 + floor(9 * ($tags[$x][1] - $min) / $range);
 		}
 
@@ -150,9 +151,6 @@ class TagCloud
 	 */
 	private static function tagsSort($a, $b)
 	{
-		if (strtolower($a[0]) == strtolower($b[0])) {
-			return 0;
-		}
-		return ((strtolower($a[0]) < strtolower($b[0])) ? -1 : 1);
+		return strtolower($a[0]) <=> strtolower($b[0]);
 	}
 }

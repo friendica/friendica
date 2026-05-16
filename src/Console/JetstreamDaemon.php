@@ -93,7 +93,7 @@ HELP;
 						'jetstream' => [
 							'pidfile' => '/path/to/jetstream.pid',
 						],
-					TXT
+					TXT,
 			);
 		}
 
@@ -101,7 +101,7 @@ HELP;
 		Hook::loadHooks();
 
 		if (!$this->addonHelper->isAddonEnabled('bluesky')) {
-			throw new RuntimeException("Bluesky has to be enabled.\n");
+			throw new RuntimeException("the AT Protocol addon has to be enabled.\n");
 		}
 
 		$pidfile = $this->config->get('jetstream', 'pidfile');

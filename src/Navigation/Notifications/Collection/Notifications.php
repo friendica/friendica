@@ -28,7 +28,7 @@ class Notifications extends BaseCollection
 			throw new \Exception(sprintf(
 				'BaseCollection::map() should return instance of %s, but returns %s instead.',
 				Notifications::class,
-				get_class($notifications),
+				$notifications::class,
 			));
 		}
 
@@ -46,7 +46,7 @@ class Notifications extends BaseCollection
 			throw new \Exception(sprintf(
 				'BaseCollection::map() should return instance of %s, but returns %s instead.',
 				Notifications::class,
-				get_class($notifications),
+				$notifications::class,
 			));
 		}
 

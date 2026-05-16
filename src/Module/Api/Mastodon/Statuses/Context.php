@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Statuses;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
@@ -46,7 +45,7 @@ class Context extends BaseApi
 
 		$parent = Post::selectOriginal(['uri-id', 'parent-uri-id'], ['uri-id' => $id]);
 		if (DBA::isResult($parent)) {
-			$id = $parent['uri-id'];
+			$id        = $parent['uri-id'];
 			$params    = ['order' => ['uri-id' => true]];
 			$condition = ['parent-uri-id' => $parent['parent-uri-id'], 'gravity' => [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT]];
 
@@ -59,7 +58,7 @@ class Context extends BaseApi
 			}
 
 			if (!empty($request['min_id'])) {
-				$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", $request['min_id']]);
+				$condition       = DBA::mergeConditions($condition, ["`uri-id` > ?", $request['min_id']]);
 				$params['order'] = ['uri-id'];
 			}
 
@@ -112,11 +111,9 @@ class Context extends BaseApi
 
 		asort($ancestors);
 
-		$display_quotes = self::appSupportsQuotes();
-
 		foreach (array_slice($ancestors, 0, $request['limit']) as $ancestor) {
 			try {
-				$statuses['ancestors'][] = DI::mstdnStatus()->createFromUriId($ancestor, $uid, $display_quotes);
+				$statuses['ancestors'][] = DI::mstdnStatus()->createFromUriId($ancestor, $uid);
 			} catch (\Throwable $th) {
 				$this->logger->info('Post not fetchable', ['uri-id' => $ancestor, 'uid' => $uid, 'error' => $th]);
 			}
@@ -128,7 +125,7 @@ class Context extends BaseApi
 
 		foreach (array_slice($descendants, 0, $request['limit']) as $descendant) {
 			try {
-				$statuses['descendants'][] = DI::mstdnStatus()->createFromUriId($descendant, $uid, $display_quotes);
+				$statuses['descendants'][] = DI::mstdnStatus()->createFromUriId($descendant, $uid);
 			} catch (\Throwable $th) {
 				$this->logger->info('Post not fetchable', ['uri-id' => $descendant, 'uid' => $uid, 'error' => $th]);
 			}

@@ -39,7 +39,7 @@ class VCard
 		$contact_url = Contact::getProfileLink($contact);
 
 		if ($contact['network'] != '') {
-			$network_link = Strings::formatNetworkName($contact['network'], $contact_url);
+			$network_link = Strings::formatNetworkName($contact['network'], $contact_url, $contact['gsid']);
 			$network_svg  = ContactSelector::networkToSVG($contact['network'], $contact['gsid'], '', DI::userSession()->getLocalUserId());
 		} else {
 			$network_link = '';

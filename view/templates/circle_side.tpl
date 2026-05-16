@@ -7,12 +7,18 @@
 <nav>
 	<span id="circle-sidebar-inflated" class="widget inflated fakelink">
 		<button class="fakelink" onclick="openCloseWidget('circle-sidebar', 'circle-sidebar-inflated');" aria-expanded="false">
-			<h3>{{$title}}</h3>
+			<h3>
+				<i class="fa fa-user-circle" aria-hidden="true"></i>
+				{{$title}}
+			</h3>
 		</button>
 	</span>
 	<div class="widget" id="circle-sidebar">
 		<button class="fakelink" onclick="openCloseWidget('circle-sidebar', 'circle-sidebar-inflated');" aria-expanded="false">
-			<h3>{{$title}}</h3>
+			<h3>
+				<i class="fa fa-user-circle" aria-hidden="true"></i>
+				{{$title}}
+			</h3>
 		</button>
 
 		<div id="sidebar-circle-list">

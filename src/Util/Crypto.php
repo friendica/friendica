@@ -56,7 +56,7 @@ class Crypto
 	 */
 	public static function rsaToPem(string $key)
 	{
-		return (string)PublicKeyLoader::load($key);
+		return (string) PublicKeyLoader::load($key);
 	}
 
 	/**
@@ -69,7 +69,7 @@ class Crypto
 		$openssl_options = [
 			'digest_alg'       => 'sha1',
 			'private_key_bits' => $bits,
-			'encrypt_key'      => false
+			'encrypt_key'      => false,
 		];
 
 		$conf = DI::config()->get('system', 'openssl_conf_file');
@@ -160,10 +160,10 @@ class Crypto
 	private static function encapsulateOther($data, $pubkey, $alg)
 	{
 		if (!$pubkey) {
-			DI::logger()->notice('no key. data: '.$data);
+			DI::logger()->notice('no key. data: ' . $data);
 		}
 		$fn = 'encrypt' . strtoupper($alg);
-		if (method_exists(__CLASS__, $fn)) {
+		if (method_exists(self::class, $fn)) {
 			$result         = ['encrypted' => true];
 			$key            = random_bytes(256);
 			$iv             = random_bytes(256);
@@ -262,7 +262,7 @@ class Crypto
 	{
 		$fn = 'decrypt' . strtoupper($alg);
 
-		if (method_exists(__CLASS__, $fn)) {
+		if (method_exists(self::class, $fn)) {
 			openssl_private_decrypt(Strings::base64UrlDecode($data['key']), $k, $prvkey);
 			openssl_private_decrypt(Strings::base64UrlDecode($data['iv']), $i, $prvkey);
 

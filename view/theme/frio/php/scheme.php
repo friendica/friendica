@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -29,17 +30,17 @@ require_once 'view/theme/frio/theme.php';
 
 function get_scheme_info($scheme)
 {
-	$theme = DI::appHelper()->getCurrentTheme();
+	$theme     = DI::appHelper()->getCurrentTheme();
 	$themepath = 'view/theme/' . $theme . '/';
-	$scheme = Strings::sanitizeFilePathItem($scheme) ?: FRIO_DEFAULT_SCHEME;
+	$scheme    = Strings::sanitizeFilePathItem($scheme) ?: FRIO_DEFAULT_SCHEME;
 
 	$info = [
-		'name' => $scheme,
+		'name'        => $scheme,
 		'description' => '',
-		'author' => [],
-		'version' => '',
-		'overwrites' => [],
-		'accented' => false,
+		'author'      => [],
+		'version'     => '',
+		'overwrites'  => [],
+		'accented'    => false,
 	];
 
 	if (!is_file($themepath . 'scheme/' . $scheme . '.php')) {
@@ -59,8 +60,8 @@ function get_scheme_info($scheme)
 				if (count($values) < 2) {
 					continue;
 				}
-				list($k, $v) = $values;
-				$k = strtolower($k);
+				[$k, $v] = $values;
+				$k       = strtolower($k);
 				if ($k == 'author') {
 					$r = preg_match('|([^<]+)<([^>]+)>|', $v, $m);
 					if ($r) {
@@ -98,7 +99,7 @@ function frio_scheme_get_list(): array
 	foreach (glob('view/theme/frio/scheme/*.php') ?: [] as $file) {
 		$scheme = basename($file, '.php');
 		if (!in_array($scheme, ['default', 'light', 'dark', 'black'])) {
-			$scheme_info = get_scheme_info($scheme);
+			$scheme_info      = get_scheme_info($scheme);
 			$schemes[$scheme] = $scheme_info['name'] ?? ucfirst($scheme);
 		}
 	}
@@ -125,8 +126,7 @@ function frio_scheme_get_current_for_user(int $uid)
 {
 	$available = array_keys(frio_scheme_get_list());
 
-	$scheme =
-		DI::pConfig()->get($uid, 'frio', 'scheme') ?:
+	$scheme = DI::pConfig()->get($uid, 'frio', 'scheme') ?:
 			DI::pConfig()->get($uid, 'frio', 'schema') ?:
 				DI::config()->get('frio', 'scheme') ?:
 					DI::config()->get('frio', 'schema');

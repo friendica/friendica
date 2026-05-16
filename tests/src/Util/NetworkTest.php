@@ -24,4 +24,38 @@ class NetworkTest extends TestCase
 		self::assertNull(Network::createUriFromString(''));
 		self::assertNull(Network::createUriFromString(null));
 	}
+
+	/**
+	 * Test for isValidAtUrl function
+	 * Tests valid and invalid AT Protocol URLs
+	 */
+	public function testIsValidAtUrl()
+	{
+		// Valid AT Protocol URL with proper format at://repo/collection/rkey
+		self::assertTrue(Network::isValidAtUrl('at://did:plc:geqiabvo4b4jnfv2paplzcge/app.bsky.feed.post/abc123'));
+
+		// Another valid AT Protocol URL
+		self::assertTrue(Network::isValidAtUrl('at://did:key:z6MkhaXgBZDvotDkL5257faWYB3cbRwEeAe1YvyQbxC/app.bsky.actor.profile/self'));
+
+		// HTTP URL (not AT Protocol)
+		self::assertFalse(Network::isValidAtUrl('https://example.com'));
+
+		// HTTP URL (valid URL but wrong protocol)
+		self::assertFalse(Network::isValidAtUrl('http://test.example.com/profile'));
+
+		// Malformed AT URL - missing parts
+		self::assertFalse(Network::isValidAtUrl('at://did:plc:abc/collection'));
+
+		// Malformed AT URL - too many parts
+		self::assertFalse(Network::isValidAtUrl('at://did:plc:abc/collection/rkey/extra'));
+
+		// Invalid format - no at:// prefix
+		self::assertFalse(Network::isValidAtUrl('did:plc:geqiabvo4b4jnfv2paplzcge/app.bsky.feed.post/abc123'));
+
+		// Empty string
+		self::assertFalse(Network::isValidAtUrl(''));
+
+		// Whitespace only
+		self::assertFalse(Network::isValidAtUrl('   '));
+	}
 }

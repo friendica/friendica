@@ -60,20 +60,18 @@ class PermissionSet extends BaseEntity
 	 */
 	public function isPublic(): bool
 	{
-		return (($this->id === PermissionSetRepository::PUBLIC) ||
-				(is_null($this->id) &&
-				 empty($this->allow_cid) &&
-				 empty($this->allow_gid) &&
-				 empty($this->deny_cid) &&
-				 empty($this->deny_gid)));
+		return (($this->id === PermissionSetRepository::PUBLIC)
+				|| (is_null($this->id)
+				 && empty($this->allow_cid)
+				 && empty($this->allow_gid)
+				 && empty($this->deny_cid)
+				 && empty($this->deny_gid)));
 	}
 
 	/**
 	 * Creates a new Entity with a new allowed_cid list (wipes the id because it isn't the same entity anymore)
 	 *
 	 * @param array $allow_cid
-	 *
-	 * @return $this
 	 */
 	public function withAllowedContacts(array $allow_cid): PermissionSet
 	{

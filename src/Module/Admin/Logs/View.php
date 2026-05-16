@@ -15,7 +15,7 @@ use Psr\Log\LogLevel;
 
 class View extends BaseAdmin
 {
-	const LIMIT = 500;
+	public const LIMIT = 500;
 
 	protected function content(array $request = []): string
 	{
@@ -45,7 +45,7 @@ class View extends BaseAdmin
 			'context' => ['', 'index', 'worker', 'daemon'],
 		];
 		$filters = [
-			'level'   => $_GET['level'] ?? '',
+			'level'   => $_GET['level']   ?? '',
 			'context' => $_GET['context'] ?? '',
 		];
 		foreach ($filters as $k => $v) {
@@ -63,16 +63,15 @@ class View extends BaseAdmin
 					->withLimit(self::LIMIT)
 					->withFilters($filters)
 					->withSearch($search);
-			} catch (\Exception $e) {
+			} catch (\Exception) {
 				$error = DI::l10n()->t('Couldn\'t open <strong>%1$s</strong> log file.<br/>Check to see if file %1$s is readable.', $f);
 			}
 		}
 		return Renderer::replaceMacros($t, [
-			'$title'         => DI::l10n()->t('Administration'),
-			'$page'          => DI::l10n()->t('View Logs'),
-			'$l10n'          => [
-				'Search'                => DI::l10n()->t('Search'),
-				'Search_in_logs'        => DI::l10n()->t('Search in logs'),
+			'$title' => DI::l10n()->t('Administration'),
+			'$page'  => DI::l10n()->t('View Logs'),
+			'$l10n'  => [
+				'Search'                => DI::l10n()->t('Search in logs'),
 				'Show_all'              => DI::l10n()->t('Show all'),
 				'Date'                  => DI::l10n()->t('Date'),
 				'Level'                 => DI::l10n()->t('Level'),
@@ -96,7 +95,7 @@ class View extends BaseAdmin
 			'$filters'       => $filters,
 			'$filtersvalues' => $filters_valid_values,
 			'$error'         => $error,
-			'$logname'       => DI::config()->get('system', 'logfile'),
+			'$logname'       => DI::l10n()->t('Current log path: %s', DI::config()->get('system', 'logfile')),
 		]);
 	}
 }

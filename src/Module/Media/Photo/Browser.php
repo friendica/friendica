@@ -69,13 +69,20 @@ class Browser extends BaseModule
 
 		$tpl    = Renderer::getMarkupTemplate('media/browser.tpl');
 		$output = Renderer::replaceMacros($tpl, [
-			'$type'     => 'photo',
-			'$path'     => $path,
-			'$folders'  => $albums,
-			'$files'    => $photosArray,
-			'$cancel'   => $this->t('Cancel'),
-			'$nickname' => $this->session->getLocalUserNickname(),
-			'$upload'   => $this->t('Upload'),
+			'$type'                 => 'photo',
+			'$path'                 => $path,
+			'$folders'              => $albums,
+			'$files'                => $photosArray,
+			'$cancel'               => $this->t('Cancel'),
+			'$nickname'             => $this->session->getLocalUserNickname(),
+			'$upload'               => $this->t('Upload'),
+			'$photos_text'          => $this->t('Photos'),
+			'$files_text'           => $this->t('Files'),
+			'$aria_close'           => $this->t('Close'),
+			'$aria_breadcrumb'      => $this->t('Breadcrumb'),
+			'$aria_mode_switch'     => $this->t('Switch between photo and attachment mode'),
+			'$aria_album_nav'       => $this->t('Album navigation'),
+			'$aria_browser_content' => $this->t('Browser content'),
 		]);
 
 		if (empty($request['mode'])) {
@@ -99,7 +106,8 @@ class Browser extends BaseModule
 				Proxy::PIXEL_MEDIUM,
 				Proxy::PIXEL_MEDIUM
 			],
-			['order' => ['scale']]);
+			['order' => ['scale']]
+		);
 		$scale = $photo['scale'] ?? $record['loq'];
 
 		return [

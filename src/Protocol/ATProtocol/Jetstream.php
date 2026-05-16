@@ -12,17 +12,19 @@ namespace Friendica\Protocol\ATProtocol;
 
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
+use Friendica\Core\Logger\Capability\DefaultContextLogger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Protocol\ATProtocol;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
 /**
- * Class to handle the Bluesky Jetstream firehose
+ * Class to handle the AT Protocol Jetstream firehose
  *
  * Existing collections:
  * app.bsky.feed.like, app.bsky.graph.follow, app.bsky.feed.repost, app.bsky.feed.post, app.bsky.graph.block,
@@ -38,6 +40,23 @@ use stdClass;
  */
 class Jetstream
 {
+	/**
+	 * Maximum drift values in seconds for the threads completion.
+	 * If the drift is higher than this value, only a few posts in a thread will be fetched.
+	 */
+	public const MAX_DRIFT_THREAD_COMPLETION = 30;
+	/**
+	 * Maximum drift values in seconds for the DID cap.
+	 * If the drift is higher than this value, the number of DIDs will be capped.
+	 */
+	public const MAX_DRIFT_DID_CAP = 60;
+	/**
+	 * Maximum drift values in seconds for creating posts.
+	 * If the drift is higher than this value, posts and reshares will not be created.
+	 * The other collections will still be processed.
+	 */
+	public const MAX_DRIFT_CREATE_POSTS = 1200;
+
 	private $uids   = [];
 	private $self   = [];
 	private $capped = false;
@@ -63,6 +82,16 @@ class Jetstream
 	/** @var \WebSocket\Client */
 	private $client;
 
+	/**
+	 * Initialize the Jetstream service.
+	 *
+	 * @param LoggerInterface $logger
+	 * @param IManageConfigValues $config
+	 * @param IManageKeyValuePairs $keyValue
+	 * @param ATProtocol $atprotocol
+	 * @param Actor $actor
+	 * @param Processor $processor
+	 */
 	public function __construct(LoggerInterface $logger, IManageConfigValues $config, IManageKeyValuePairs $keyValue, ATProtocol $atprotocol, Actor $actor, Processor $processor)
 	{
 		$this->logger     = $logger;
@@ -71,10 +100,12 @@ class Jetstream
 		$this->atprotocol = $atprotocol;
 		$this->actor      = $actor;
 		$this->processor  = $processor;
+
+		$this->atprotocol->setApiForUser(0);
 	}
 
 	/**
-	 * Listen to incoming webstream messages from Jetstream
+	 * Listen to incoming Jetstream WebSocket messages
 	 *
 	 * @return void
 	 */
@@ -84,6 +115,8 @@ class Jetstream
 		$timeout_limit = 10;
 		$timestamp     = $this->keyValue->get('jetstream_timestamp') ?? 0;
 		$cursor        = '';
+		$this->logger->notice('Start listening');
+
 		while (true) {
 			if ($timestamp) {
 				$cursor = '&cursor=' . $timestamp;
@@ -93,11 +126,11 @@ class Jetstream
 			$this->syncContacts();
 			try {
 				// @todo make the path configurable
-				$this->client = new \WebSocket\Client('wss://jetstream1.us-west.bsky.network/subscribe?requireHello=true' . $cursor);
+				$this->client = new \WebSocket\Client('wss://' . $this->atprotocol->getJetstream() . '/subscribe?requireHello=true' . $cursor);
 				$this->client->setTimeout($timeout);
 				$this->client->setLogger($this->logger);
 			} catch (\WebSocket\ConnectionException $e) {
-				$this->logger->error('Error while trying to establish the connection', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+				$this->logger->error('Error while trying to establish the connection', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 				echo "Connection wasn't established.\n";
 				exit(1);
 			}
@@ -106,7 +139,12 @@ class Jetstream
 			while (true) {
 				try {
 					$message = $this->client->receive();
-					$data    = json_decode($message);
+
+					if (empty($message)) {
+						$this->logger->notice('Empty message received');
+						break;
+					}
+					$data = json_decode($message);
 					if (is_object($data)) {
 						$timestamp = $data->time_us;
 						$this->route($data);
@@ -124,19 +162,24 @@ class Jetstream
 							break;
 						}
 						$this->logger->notice('Timeout', ['duration' => $timeout_duration, 'timestamp' => $timestamp, 'code' => $e->getCode(), 'message' => $e->getMessage()]);
+						break;
 					} else {
-						$this->logger->error('Error', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+						$this->logger->error('Error while trying to receive a message', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 						break;
 					}
+				} catch (\Exception $e) {
+					$this->logger->error('General error while trying to receive a message', ['capped' => $this->capped, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+					break;
 				}
 				$last_timeout = time();
 			}
 			try {
 				$this->client->close();
 			} catch (\WebSocket\ConnectionException $e) {
-				$this->logger->error('Error while trying to close the connection', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+				$this->logger->error('Error while trying to close the connection', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 			}
 		}
+		$this->logger->notice('Stop listening');
 	}
 
 	/**
@@ -146,7 +189,7 @@ class Jetstream
 	 */
 	private function incrementMessages(): void
 	{
-		$packets = (int)($this->keyValue->get('jetstream_messages') ?? 0);
+		$packets = (int) ($this->keyValue->get('jetstream_messages') ?? 0);
 		if ($packets >= PHP_INT_MAX) {
 			$packets = 0;
 		}
@@ -171,7 +214,7 @@ class Jetstream
 	}
 
 	/**
-	 * Set options like the followed DIDs
+	 * Set stream options like the followed DIDs
 	 *
 	 * @return void
 	 */
@@ -182,7 +225,7 @@ class Jetstream
 			return;
 		}
 
-		$contacts = Contact::selectToArray(['uid', 'url'], ['uid' => $active_uids, 'network' => Protocol::BLUESKY, 'rel' => [Contact::FRIEND, Contact::SHARING]]);
+		$contacts = Contact::selectToArray(['uid', 'url'], ['uid' => $active_uids, 'network' => Protocol::ATPROTO, 'rel' => [Contact::FRIEND, Contact::SHARING]]);
 
 		$self = [];
 		foreach ($active_uids as $uid) {
@@ -202,17 +245,17 @@ class Jetstream
 
 		$dids = array_keys($uids);
 		if (count($dids) > $did_limit) {
-			$contacts = Contact::selectToArray(['url'], ['uid' => $active_uids, 'network' => Protocol::BLUESKY, 'rel' => [Contact::FRIEND, Contact::SHARING]], ['order' => ['last-item' => true]]);
+			$contacts = Contact::selectToArray(['url'], ['uid' => $active_uids, 'network' => Protocol::ATPROTO, 'rel' => [Contact::FRIEND, Contact::SHARING]], ['order' => ['last-item' => true]]);
 			$dids     = $this->addDids($contacts, $uids, $did_limit, array_keys($self));
 		}
 
 		if (count($dids) < $did_limit) {
-			$contacts = Contact::selectToArray(['url'], ['uid' => $active_uids, 'network' => Protocol::BLUESKY, 'rel' => Contact::FOLLOWER], ['order' => ['last-item' => true]]);
+			$contacts = Contact::selectToArray(['url'], ['uid' => $active_uids, 'network' => Protocol::ATPROTO, 'rel' => Contact::FOLLOWER], ['order' => ['last-item' => true]]);
 			$dids     = $this->addDids($contacts, $uids, $did_limit, $dids);
 		}
 
 		if (!$this->capped && count($dids) < $did_limit) {
-			$condition = ["`uid` = ? AND `network` = ? AND EXISTS(SELECT `author-id` FROM `post-user` WHERE `author-id` = `contact`.`id` AND `post-user`.`uid` != ?)", 0, Protocol::BLUESKY, 0];
+			$condition = ["`uid` = ? AND `network` = ? AND EXISTS(SELECT `author-id` FROM `post-user` WHERE `author-id` = `contact`.`id` AND `post-user`.`uid` != ?)", 0, Protocol::ATPROTO, 0];
 			$contacts  = Contact::selectToArray(['url'], $condition, ['order' => ['last-item' => true], 'limit' => $did_limit]);
 			$dids      = $this->addDids($contacts, $uids, $did_limit, $dids);
 		}
@@ -224,15 +267,15 @@ class Jetstream
 		$update = [
 			'type'    => 'options_update',
 			'payload' => [
-				'wantedCollections'   => ['app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.like', 'app.bsky.graph.block', 'app.bsky.actor.profile', 'app.bsky.graph.follow'],
+				'wantedCollections'   => ['app.bsky.feed.post', 'app.bsky.feed.repost', 'app.bsky.feed.like', 'app.bsky.graph.block', 'app.bsky.actor.profile', 'app.bsky.graph.follow', 'site.standard.publication', 'site.standard.document', 'site.standard.graph.subscription'],
 				'wantedDids'          => $dids,
-				'maxMessageSizeBytes' => 1000000
-			]
+				'maxMessageSizeBytes' => 1000000,
+			],
 		];
 		try {
 			$this->client->send(json_encode($update));
 		} catch (\WebSocket\ConnectionException $e) {
-			$this->logger->error('Error while trying to send options.', ['code' => $e->getCode(), 'message' => $e->getMessage()]);
+			$this->logger->error('Error while trying to send options.', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 		}
 	}
 
@@ -240,7 +283,7 @@ class Jetstream
 	 * Returns an array of DIDs provided by an array of contacts
 	 *
 	 * @param array   $contacts  Array of contact records
-	 * @param array   $uids      Array with the user ids with enabled bluesky timeline import
+	 * @param array   $uids      Array with the user ids with enabled AT Protocol timeline import
 	 * @param integer $did_limit Maximum limit of entries
 	 * @param array   $dids      Array of DIDs that are added to the output list
 	 * @return array DIDs
@@ -267,7 +310,16 @@ class Jetstream
 	 */
 	private function route(stdClass $data): void
 	{
-		Item::incrementInbound(Protocol::BLUESKY);
+		$previousContext = [];
+
+		if ($this->logger instanceof DefaultContextLogger) {
+			$previousContext = $this->logger->replaceDefaultContext([
+				'jetstream_id' => Strings::getRandomHex(7),
+			]);
+		}
+
+		Item::incrementInbound(Protocol::ATPROTO);
+		$this->atprotocol->setApiForUser(0);
 
 		switch ($data->kind) {
 			case 'account':
@@ -283,6 +335,10 @@ class Jetstream
 			case 'commit':
 				$this->routeCommits($data);
 				break;
+		}
+
+		if ($this->logger instanceof DefaultContextLogger) {
+			$this->logger->replaceDefaultContext($previousContext);
 		}
 	}
 
@@ -353,7 +409,7 @@ class Jetstream
 		$drift = max(0, round(time() - $data->time_us / 1000000));
 		$this->keyValue->set('jetstream_drift', $drift);
 
-		if ($drift > 60 && !$this->capped) {
+		if ($drift > self::MAX_DRIFT_DID_CAP && !$this->capped) {
 			$this->capped = true;
 			$this->setOptions();
 			$this->logger->notice('Drift is too high, dids will be capped');
@@ -380,7 +436,9 @@ class Jetstream
 				break;
 
 			case 'create':
-				$this->processor->createPost($data, $this->uids[$data->did] ?? [0], ($drift > 30));
+				if ($drift < self::MAX_DRIFT_CREATE_POSTS) {
+					$this->processor->createPost($data, $this->uids[$data->did] ?? [0], true);
+				}
 				break;
 
 			default:
@@ -404,7 +462,9 @@ class Jetstream
 				break;
 
 			case 'create':
-				$this->processor->createRepost($data, $this->uids[$data->did] ?? [0], ($drift > 30));
+				if ($drift < self::MAX_DRIFT_CREATE_POSTS) {
+					$this->processor->createRepost($data, $this->uids[$data->did] ?? [0], ($drift > self::MAX_DRIFT_THREAD_COMPLETION));
+				}
 				break;
 
 			default:

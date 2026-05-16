@@ -74,7 +74,7 @@ HELP;
 	{
 		if ($this->getOption('v')) {
 			$this->out('Executable: ' . $this->executable);
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -85,7 +85,7 @@ HELP;
 
 		if ($this->getOption('v')) {
 			$this->out('Lock Driver Name: ' . $this->lock->getName());
-			$this->out('Lock Driver Class: ' . get_class($this->lock));
+			$this->out('Lock Driver Class: ' . $this->lock::class);
 		}
 
 		switch ($this->getArgument(0)) {

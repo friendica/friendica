@@ -34,7 +34,7 @@ class Contacts extends BaseModule
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->userSession = $userSession;
-		$this->page = $page;
+		$this->page        = $page;
 	}
 
 	protected function content(array $request = []): string
@@ -43,9 +43,9 @@ class Contacts extends BaseModule
 			throw new HTTPException\ForbiddenException();
 		}
 
-		$cid = $this->parameters['id'];
-		$type = $this->parameters['type'] ?? 'all';
-		$accounttype = $request['accounttype'] ?? '';
+		$cid           = $this->parameters['id'];
+		$type          = $this->parameters['type'] ?? 'all';
+		$accounttype   = $request['accounttype']   ?? '';
 		$accounttypeid = User::getAccountTypeByString($accounttype);
 
 		if (!$cid) {
@@ -85,7 +85,7 @@ class Contacts extends BaseModule
 				$total = Model\Contact\Relation::countMutuals($cid, $condition);
 				break;
 			case 'common':
-				$total = Model\Contact\Relation::countCommon($localContactId, $cid, $condition);
+				$total          = Model\Contact\Relation::countCommon($localContactId, $cid, $condition);
 				$noresult_label = $this->t('No common contacts.');
 				break;
 			default:
@@ -93,37 +93,39 @@ class Contacts extends BaseModule
 		}
 
 		$pager = new Pager($this->l10n, $this->args->getQueryString(), 30);
-		$desc = '';
+		$desc  = '';
 
 		switch ($type) {
 			case 'followers':
 				$friends = Model\Contact\Relation::listFollowers($cid, $condition, $pager->getItemsPerPage(), $pager->getStart());
-				$title = $this->tt('Follower (%s)', 'Followers (%s)', $total);
+				$title   = $this->tt('Follower (%s)', 'Followers (%s)', $total);
 				break;
 			case 'following':
 				$friends = Model\Contact\Relation::listFollows($cid, $condition, $pager->getItemsPerPage(), $pager->getStart());
-				$title = $this->tt('Following (%s)', 'Following (%s)', $total);
+				$title   = $this->tt('Following (%s)', 'Following (%s)', $total);
 				break;
 			case 'mutuals':
 				$friends = Model\Contact\Relation::listMutuals($cid, $condition, $pager->getItemsPerPage(), $pager->getStart());
-				$title = $this->tt('Mutual friend (%s)', 'Mutual friends (%s)', $total);
-				$desc = $this->t(
+				$title   = $this->tt('Friend (%s)', 'Friends (%s)', $total);
+				$desc    = $this->t(
 					'These contacts both follow and are followed by <strong>%s</strong>.',
 					htmlentities($contact['name'], ENT_COMPAT, 'UTF-8')
 				);
 				break;
 			case 'common':
 				$friends = Model\Contact\Relation::listCommon($localContactId, $cid, $condition, $pager->getItemsPerPage(), $pager->getStart());
-				$title = $this->tt('Common contact (%s)', 'Common contacts (%s)', $total);
-				$desc = $this->t(
+				$title   = $this->tt('Common contact (%s)', 'Common contacts (%s)', $total);
+				$desc    = $this->t(
 					'Both <strong>%s</strong> and yourself have publicly interacted with these contacts (follow, comment or likes on public posts).',
 					htmlentities($contact['name'], ENT_COMPAT, 'UTF-8')
 				);
 				break;
 			default:
 				$friends = Model\Contact\Relation::listAll($cid, $condition, $pager->getItemsPerPage(), $pager->getStart());
-				$title = $this->tt('Contact (%s)', 'Contacts (%s)', $total);
+				$title   = $this->tt('Contact (%s)', 'Contacts (%s)', $total);
 		}
+
+		Module\Contact::setPageTitle($contact);
 
 		$o = Module\Contact::getTabsHTML($contact, Module\Contact::TAB_CONTACTS);
 
@@ -135,7 +137,7 @@ class Contacts extends BaseModule
 				$contact = Model\Contact::selectFirst(
 					[],
 					['uri-id' => $contact['uri-id'], 'uid' => [0, $this->userSession->getLocalUserId()]],
-					['order' => ['uid' => 'DESC']]
+					['order'  => ['uid' => 'DESC']]
 				);
 				return Module\Contact::getContactTemplateVars($contact);
 			},
@@ -144,11 +146,11 @@ class Contacts extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('profile/contacts.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
-			'$title'    => $title,
-			'$desc'     => $desc,
-			'$tabs'     => $tabs,
+			'$title' => $title,
+			'$desc'  => $desc,
+			'$tabs'  => $tabs,
 
-			'$noresult_label'  => $noresult_label,
+			'$noresult_label' => $noresult_label,
 
 			'$contacts' => $contacts,
 			'$paginate' => $pager->renderFull($total),

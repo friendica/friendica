@@ -46,8 +46,16 @@ class UploadTest extends ApiTestCase
 		$this->expectException(UnauthorizedException::class);
 		AuthTestConfig::$authenticated = false;
 
-		(new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run($this->httpExceptionMock);
+		(new class (DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []) extends Upload {
+			public function jsonError(int $httpCode, $content, string $content_type = 'application/json')
+			{
+				if ($httpCode === 401) {
+					throw new UnauthorizedException(json_encode($content));
+				}
+
+				parent::jsonError($httpCode, $content, $content_type);
+			}
+		})->run($this->httpExceptionMock);
 	}
 
 	/**
@@ -61,8 +69,8 @@ class UploadTest extends ApiTestCase
 		$_FILES = [
 			'media' => [
 				'id'       => 666,
-				'tmp_name' => 'tmp_name'
-			]
+				'tmp_name' => 'tmp_name',
+			],
 		];
 
 		(new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
@@ -84,8 +92,8 @@ class UploadTest extends ApiTestCase
 				'height'   => 666,
 				'tmp_name' => $this->getTempImage(),
 				'name'     => 'spacer.png',
-				'type'     => 'image/png'
-			]
+				'type'     => 'image/png',
+			],
 		];
 
 		$response = (new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))

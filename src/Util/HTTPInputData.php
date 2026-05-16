@@ -36,12 +36,12 @@ class HTTPInputData
 		$content_type = array_shift($content_parts);
 
 		foreach ($content_parts as $part) {
-			if (strpos($part, 'boundary') !== false) {
+			if (str_contains($part, 'boundary')) {
 				$part = explode('=', $part, 2);
 				if (!empty($part[1])) {
 					$boundary = '--' . $part[1];
 				}
-			} elseif (strpos($part, 'charset') !== false) {
+			} elseif (str_contains($part, 'charset')) {
 				$part = explode('=', $part, 2);
 				if (!empty($part[1])) {
 					$encoding = $part[1];
@@ -111,7 +111,7 @@ class HTTPInputData
 		$headers = [];
 
 		foreach (explode("\r\n", $raw_headers) as $header) {
-			if (strpos($header, ':') === false) {
+			if (!str_contains($header, ':')) {
 				continue;
 			}
 			[$name, $value] = explode(':', $header, 2);
@@ -159,7 +159,7 @@ class HTTPInputData
 			$error = UPLOAD_ERR_CANT_WRITE;
 		} else {
 			$lastLine = null;
-			while (($chunk = fgets($stream, 8096)) !== false && strpos($chunk, $boundary) !== 0) {
+			while (($chunk = fgets($stream, 8096)) !== false && !str_starts_with($chunk, $boundary)) {
 				if ($lastLine !== null) {
 					if (!fwrite($fileHandle, $lastLine)) {
 						$error = UPLOAD_ERR_CANT_WRITE;
@@ -181,7 +181,7 @@ class HTTPInputData
 			'type'     => $contentType,
 			'tmp_name' => $tmpnam,
 			'error'    => $error,
-			'size'     => filesize($tmpnam)
+			'size'     => filesize($tmpnam),
 		];
 	}
 
@@ -190,7 +190,7 @@ class HTTPInputData
 		$fullValue = '';
 		$lastLine  = null;
 
-		while (($chunk = fgets($stream)) !== false && strpos($chunk, $boundary) !== 0) {
+		while (($chunk = fgets($stream)) !== false && !str_starts_with($chunk, $boundary)) {
 			if ($lastLine !== null) {
 				$fullValue .= $lastLine;
 			}
@@ -206,7 +206,7 @@ class HTTPInputData
 			$encoding = '';
 
 			foreach (explode(';', $headers['content-type']) as $part) {
-				if (strpos($part, 'charset') !== false) {
+				if (str_contains($part, 'charset')) {
 					$part = explode($part, '=', 2);
 					if (isset($part[1])) {
 						$encoding = $part[1];

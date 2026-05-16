@@ -69,7 +69,7 @@ class FriendSuggest extends BaseRepository
 	{
 		try {
 			return $this->selectOne(['id' => $id]);
-		} catch (NotFoundException $e) {
+		} catch (NotFoundException) {
 			throw new FriendSuggestNotFoundException(sprintf('No FriendSuggest found for id %d', $id));
 		}
 	}
@@ -81,7 +81,7 @@ class FriendSuggest extends BaseRepository
 	{
 		try {
 			return $this->select(['cid' => $cid]);
-		} catch (\Exception $e) {
+		} catch (\Exception) {
 			throw new FriendSuggestPersistenceException(sprintf('Cannot select FriendSuggestion for contact %d', $cid));
 		}
 	}

@@ -35,27 +35,39 @@ class Relation
 	/**
 	 * No discovery of followers/followings
 	 */
-	const DISCOVERY_NONE = 0;
+	public const DISCOVERY_NONE = 0;
 	/**
 	 * Discover followers/followings of local contacts
 	 */
-	const DISCOVERY_LOCAL = 1;
+	public const DISCOVERY_LOCAL = 1;
 	/**
 	 * Discover followers/followings of local contacts and contacts that visibly interacted on the system
 	 */
-	const DISCOVERY_INTERACTOR = 2;
+	public const DISCOVERY_INTERACTOR = 2;
 	/**
 	 * Discover followers/followings of all contacts
 	 */
-	const DISCOVERY_ALL = 3;
+	public const DISCOVERY_ALL = 3;
 
-	public static function store(int $target, int $actor, string $interaction_date)
+	/**
+	 * Store an interaction between two contacts. This is used to keep track of followers and followings and to discover new contacts based on interactions.
+	 *
+	 * @param integer $target
+	 * @param integer $actor
+	 * @param string $interaction_date
+	 * @param string $target_network
+	 * @param string $actor_network
+	 * @return void
+	 */
+	public static function store(int $target, int $actor, string $interaction_date, string $target_network, string $actor_network)
 	{
 		if ($actor == $target) {
 			return;
 		}
 
-		DBA::insert('contact-relation', ['last-interaction' => $interaction_date, 'cid' => $target, 'relation-cid' => $actor], Database::INSERT_UPDATE);
+		$network = self::getInteractionNetwork($target_network, $actor_network, $target, $actor);
+
+		DBA::insert('contact-relation', ['last-interaction' => $interaction_date, 'cid' => $target, 'relation-cid' => $actor, 'network' => $network], Database::INSERT_UPDATE);
 	}
 
 	/**
@@ -178,7 +190,7 @@ class Relation
 					DBA::insert('contact-relation', $fields, Database::INSERT_UPDATE);
 					$following_counter++;
 				}
-			} else {
+			} elseif (!AddContact::workerLimitReached()) {
 				AddContact::add(Worker::PRIORITY_LOW, 0, $contact_url);
 			}
 		}
@@ -387,12 +399,12 @@ class Relation
 				$cid,
 				0,
 				$uid, Contact::FRIEND, Contact::SHARING,
-				Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $uid
+				Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $uid,
 			],
 			[
 				'order' => ['last-item' => true],
 				'limit' => $totallimit,
-			]
+			],
 		);
 
 		while ($contact = DBA::fetch($results)) {
@@ -420,7 +432,7 @@ class Relation
 			AND NOT `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE `uri-id` = `contact`.`uri-id` AND `uid` = ?)",
 				$cid, 0, $uid, Contact::FRIEND, Contact::SHARING,
 				Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $uid],
-			['order' => ['last-item' => true], 'limit' => $totallimit]
+			['order' => ['last-item' => true], 'limit' => $totallimit],
 		);
 
 		while ($contact = DBA::fetch($results)) {
@@ -443,7 +455,7 @@ class Relation
 			AND NOT `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE `uri-id` = `contact`.`uri-id` AND `uid` = ?)",
 				$uid, Contact::FOLLOWER, 0,
 				Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $uid],
-			['order' => ['last-item' => true], 'limit' => $totallimit]
+			['order' => ['last-item' => true], 'limit' => $totallimit],
 		);
 
 		while ($contact = DBA::fetch($results)) {
@@ -466,7 +478,7 @@ class Relation
 			AND NOT `uri-id` IN (SELECT `uri-id` FROM `account-suggestion` WHERE `uri-id` = `contact`.`uri-id` AND `uid` = ?)",
 				$uid, Contact::FRIEND, Contact::SHARING, 0,
 				Protocol::ACTIVITYPUB, Protocol::DFRN, $diaspora, $uid],
-			['order' => ['last-item' => true], 'limit' => $totallimit]
+			['order' => ['last-item' => true], 'limit' => $totallimit],
 		);
 
 		while ($contact = DBA::fetch($results)) {
@@ -620,7 +632,7 @@ class Relation
 		$condition1 = DBA::mergeConditions($condition, ["`cid` = ? and `follows`", $cid]);
 		$condition2 = DBA::mergeConditions($condition, ["`relation-cid` = ? and `follows`", $cid]);
 		$sql1       = "SELECT `contact`.`id` FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `relation-cid` WHERE " . array_shift($condition1);
-		$sql2       = "SELECT `contact`.`id` FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " .array_shift($condition2);
+		$sql2       = "SELECT `contact`.`id` FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " . array_shift($condition2);
 		$union      = array_merge($condition1, $condition2);
 		$sql        = $sql1 . " UNION " . $sql2;
 
@@ -649,7 +661,7 @@ class Relation
 		$condition1 = DBA::mergeConditions($condition, ["`cid` = ? and `follows`", $cid]);
 		$condition2 = DBA::mergeConditions($condition, ["`relation-cid` = ? and `follows`", $cid]);
 		$sql1       = "SELECT `contact`.* FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `relation-cid` WHERE " . array_shift($condition1);
-		$sql2       = "SELECT `contact`.* FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " .array_shift($condition2);
+		$sql2       = "SELECT `contact`.* FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " . array_shift($condition2);
 		$union      = array_merge($condition1, $condition2);
 		$sql        = $sql1 . " UNION " . $sql2;
 		if ($count > 0) {
@@ -674,7 +686,7 @@ class Relation
 		$condition1 = DBA::mergeConditions($condition, ["`relation-cid` = ?", $sourceId]);
 		$condition2 = DBA::mergeConditions($condition, ["`relation-cid` = ?", $targetId]);
 		$sql1       = "SELECT `contact`.`id` FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " . array_shift($condition1);
-		$sql2       = "SELECT `contact`.`id` FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " .array_shift($condition2);
+		$sql2       = "SELECT `contact`.`id` FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " . array_shift($condition2);
 		$union      = array_merge($condition1, $condition2);
 		$sql        = $sql1 . " INTERSECT " . $sql2;
 
@@ -705,7 +717,7 @@ class Relation
 		$condition1 = DBA::mergeConditions($condition, ["`relation-cid` = ?", $sourceId]);
 		$condition2 = DBA::mergeConditions($condition, ["`relation-cid` = ?", $targetId]);
 		$sql1       = "SELECT `contact`.* FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " . array_shift($condition1);
-		$sql2       = "SELECT `contact`.* FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " .array_shift($condition2);
+		$sql2       = "SELECT `contact`.* FROM `contact-relation` INNER JOIN `contact` ON `contact`.`id` = `cid` WHERE " . array_shift($condition2);
 		$union      = array_merge($condition1, $condition2);
 		$sql        = $sql1 . " INTERSECT " . $sql2;
 		if ($count > 0) {
@@ -730,7 +742,7 @@ class Relation
 			$condition,
 			['`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)
 			AND `id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)',
-				$sourceId, $targetId]
+				$sourceId, $targetId],
 		);
 
 		return DI::dba()->count('contact', $condition);
@@ -754,14 +766,14 @@ class Relation
 			$condition,
 			["`id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)
 			AND `id` IN (SELECT `relation-cid` FROM `contact-relation` WHERE `cid` = ? AND `follows`)",
-				$sourceId, $targetId]
+				$sourceId, $targetId],
 		);
 
 		return DI::dba()->selectToArray(
 			'contact',
 			[],
 			$condition,
-			['limit' => [$offset, $count], 'order' => [$shuffle ? 'RAND()' : 'name']]
+			['limit' => [$offset, $count], 'order' => [$shuffle ? 'RAND()' : 'name']],
 		);
 	}
 
@@ -780,7 +792,7 @@ class Relation
 			$condition,
 			["`id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`)
 			AND `id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`)",
-				$sourceId, $targetId]
+				$sourceId, $targetId],
 		);
 
 		return DI::dba()->count('contact', $condition);
@@ -804,14 +816,14 @@ class Relation
 			$condition,
 			["`id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`)
 			AND `id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `follows`)",
-				$sourceId, $targetId]
+				$sourceId, $targetId],
 		);
 
 		return DI::dba()->selectToArray(
 			'contact',
 			[],
 			$condition,
-			['limit' => [$offset, $count], 	'order' => [$shuffle ? 'RAND()' : 'name']]
+			['limit' => [$offset, $count], 	'order' => [$shuffle ? 'RAND()' : 'name']],
 		);
 	}
 
@@ -829,27 +841,23 @@ class Relation
 		DI::logger()->debug('Calculation - start', ['uid' => $uid, 'cid' => $contact_id, 'days' => $days]);
 
 		$follow = Verb::getID(Activity::FOLLOW);
-		$view   = Verb::getID(Activity::VIEW);
-		$read   = Verb::getID(Activity::READ);
 
 		DBA::update('contact-relation', ['score' => 0, 'relation-score' => 0, 'thread-score' => 0, 'relation-thread-score' => 0], ['relation-cid' => $contact_id]);
 
 		$total = DBA::fetchFirst(
-			"SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?)",
+			"SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND `post`.`vid` != ?",
 			$contact_id,
 			DateTimeFormat::utc('now - ' . $days . ' day'),
 			$uid,
 			$contact_id,
 			$follow,
-			$view,
-			$read
 		);
 
 		DI::logger()->debug('Calculate relation-score', ['uid' => $uid, 'total' => $total['activity']]);
 
 		$interactions = DBA::p(
 			"SELECT `post`.`author-id`, count(*) AS `activity`, EXISTS(SELECT `pid` FROM `account-user-view` WHERE `pid` = `post`.`author-id` AND `uid` = ? AND `rel` IN (?, ?)) AS `follows`
-			FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?) GROUP BY `post`.`author-id`",
+			FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND `post`.`vid` != ? GROUP BY `post`.`author-id`",
 			$uid,
 			Contact::SHARING,
 			Contact::FRIEND,
@@ -858,31 +866,27 @@ class Relation
 			$uid,
 			$contact_id,
 			$follow,
-			$view,
-			$read
 		);
 		while ($interaction = DBA::fetch($interactions)) {
-			$score = min((int)(($interaction['activity'] / $total['activity']) * 65535), 65535);
+			$score = min((int) (($interaction['activity'] / $total['activity']) * 65535), 65535);
 			DBA::update('contact-relation', ['relation-score' => $score, 'follows' => $interaction['follows']], ['relation-cid' => $contact_id, 'cid' => $interaction['author-id']]);
 		}
 		DBA::close($interactions);
 
 		$total = DBA::fetchFirst(
-			"SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?)",
+			"SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND `post`.`vid` != ?",
 			$contact_id,
 			DateTimeFormat::utc('now - ' . $days . ' day'),
 			$uid,
 			$contact_id,
 			$follow,
-			$view,
-			$read
 		);
 
 		DI::logger()->debug('Calculate relation-thread-score', ['uid' => $uid, 'total' => $total['activity']]);
 
 		$interactions = DBA::p(
 			"SELECT `post`.`author-id`, count(*) AS `activity`, EXISTS(SELECT `pid` FROM `account-user-view` WHERE `pid` = `post`.`author-id` AND `uid` = ? AND `rel` IN (?, ?)) AS `follows`
-			FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?) GROUP BY `post`.`author-id`",
+			FROM `post-user` INNER JOIN `post` ON `post`.`uri-id` = `post-user`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND `post`.`vid` != ? GROUP BY `post`.`author-id`",
 			$uid,
 			Contact::SHARING,
 			Contact::FRIEND,
@@ -891,69 +895,59 @@ class Relation
 			$uid,
 			$contact_id,
 			$follow,
-			$view,
-			$read
 		);
 		while ($interaction = DBA::fetch($interactions)) {
-			$score = min((int)(($interaction['activity'] / $total['activity']) * 65535), 65535);
+			$score = min((int) (($interaction['activity'] / $total['activity']) * 65535), 65535);
 			DBA::update('contact-relation', ['relation-thread-score' => $score, 'follows' => !empty($interaction['follows'])], ['relation-cid' => $contact_id, 'cid' => $interaction['author-id']]);
 		}
 		DBA::close($interactions);
 
 		$total = DBA::fetchFirst(
-			"SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?)",
+			"SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND `post`.`vid` != ?",
 			$contact_id,
 			DateTimeFormat::utc('now - ' . $days . ' day'),
 			$uid,
 			$contact_id,
 			$follow,
-			$view,
-			$read
 		);
 
 		DI::logger()->debug('Calculate score', ['uid' => $uid, 'total' => $total['activity']]);
 
 		$interactions = DBA::p(
-			"SELECT `post`.`author-id`, count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?) GROUP BY `post`.`author-id`",
+			"SELECT `post`.`author-id`, count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`thr-parent-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND `post`.`vid` != ? GROUP BY `post`.`author-id`",
 			$contact_id,
 			DateTimeFormat::utc('now - ' . $days . ' day'),
 			$uid,
 			$contact_id,
 			$follow,
-			$view,
-			$read
 		);
 		while ($interaction = DBA::fetch($interactions)) {
-			$score = min((int)(($interaction['activity'] / $total['activity']) * 65535), 65535);
+			$score = min((int) (($interaction['activity'] / $total['activity']) * 65535), 65535);
 			DBA::update('contact-relation', ['score' => $score], ['relation-cid' => $contact_id, 'cid' => $interaction['author-id']]);
 		}
 		DBA::close($interactions);
 
 		$total = DBA::fetchFirst(
-			"SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?)",
+			"SELECT count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND `post`.`vid` != ?",
 			$contact_id,
 			DateTimeFormat::utc('now - ' . $days . ' day'),
 			$uid,
 			$contact_id,
 			$follow,
-			$view,
-			$read
 		);
 
 		DI::logger()->debug('Calculate thread-score', ['uid' => $uid, 'total' => $total['activity']]);
 
 		$interactions = DBA::p(
-			"SELECT `post`.`author-id`, count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND NOT `post`.`vid` IN (?, ?, ?) GROUP BY `post`.`author-id`",
+			"SELECT `post`.`author-id`, count(*) AS `activity` FROM `post-user` INNER JOIN `post` ON `post-user`.`uri-id` = `post`.`parent-uri-id` WHERE `post-user`.`author-id` = ? AND `post-user`.`received` >= ? AND `post-user`.`uid` = ? AND `post`.`author-id` != ? AND `post`.`vid` != ? GROUP BY `post`.`author-id`",
 			$contact_id,
 			DateTimeFormat::utc('now - ' . $days . ' day'),
 			$uid,
 			$contact_id,
 			$follow,
-			$view,
-			$read
 		);
 		while ($interaction = DBA::fetch($interactions)) {
-			$score = min((int)(($interaction['activity'] / $total['activity']) * 65535), 65535);
+			$score = min((int) (($interaction['activity'] / $total['activity']) * 65535), 65535);
 			DBA::update('contact-relation', ['thread-score' => $score], ['relation-cid' => $contact_id, 'cid' => $interaction['author-id']]);
 		}
 		DBA::close($interactions);
@@ -962,7 +956,7 @@ class Relation
 			"SELECT count(*) AS `posts` FROM `post-thread-user` WHERE EXISTS(SELECT `cid` FROM `contact-relation` WHERE `cid` = `post-thread-user`.`author-id` AND `relation-cid` = ? AND `follows`) AND `uid` = ? AND `created` > ?",
 			$contact_id,
 			$uid,
-			DateTimeFormat::utc('now - ' . $days . ' day')
+			DateTimeFormat::utc('now - ' . $days . ' day'),
 		);
 
 		DI::logger()->debug('Calculate post-score', ['uid' => $uid, 'total' => $total['posts']]);
@@ -971,14 +965,45 @@ class Relation
 			"SELECT `author-id`, count(*) AS `posts` FROM `post-thread-user` WHERE EXISTS(SELECT `cid` FROM `contact-relation` WHERE `cid` = `post-thread-user`.`author-id` AND `relation-cid` = ? AND `follows`) AND `uid` = ? AND `created` > ? GROUP BY `author-id`",
 			$contact_id,
 			$uid,
-			DateTimeFormat::utc('now - ' . $days . ' day')
+			DateTimeFormat::utc('now - ' . $days . ' day'),
 		);
 		while ($post = DBA::fetch($posts)) {
-			$score = min((int)(($post['posts'] / $total['posts']) * 65535), 65535);
+			$score = min((int) (($post['posts'] / $total['posts']) * 65535), 65535);
 			DBA::update('contact-relation', ['post-score' => $score], ['relation-cid' => $contact_id, 'cid' => $post['author-id']]);
 		}
 		DBA::close($posts);
 
 		DI::logger()->debug('Calculation - end', ['uid' => $uid]);
+	}
+
+	/**
+	 * Get the network that should be used for interactions between two contacts based on their network.
+	 *
+	 * @param string $target_network The network of the target contact
+	 * @param string $actor_network  The network of the actor contact
+	 * @param int    $target         The contact id of the target contact
+	 * @param int    $actor          The contact id of the actor contact
+	 * @return string|null The network that should be used for interactions between the two contacts, or null if no suitable network is found
+	 */
+	public static function getInteractionNetwork(string $target_network, string $actor_network, int $target, int $actor): ?string
+	{
+		$target_network = $target_network === Protocol::DFRN ? Protocol::ACTIVITYPUB : $target_network;
+		$actor_network  = $actor_network === Protocol::DFRN ? Protocol::ACTIVITYPUB : $actor_network;
+
+		if (!in_array($target_network, Protocol::FEDERATED)) {
+			$network = $target_network;
+		} elseif (!in_array($actor_network, Protocol::FEDERATED)) {
+			$network = $actor_network;
+		} elseif ($target_network === $actor_network) {
+			$network = $actor_network;
+		} elseif ($actor_network === Protocol::DIASPORA) {
+			$network = $actor_network;
+		} elseif ($target_network === Protocol::DIASPORA) {
+			$network = $target_network;
+		} else {
+			$network = null;
+			DI::logger()->warning('Unhandled network relation', ['target' => $target_network, 'actor' => $actor_network, 'tcid' => $target, 'acid' => $actor]);
+		}
+		return $network;
 	}
 }

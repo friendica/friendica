@@ -5,7 +5,7 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <div id="exception" class="generic-page-wrapper">
-    <img class="hare" src="images/friendica-404_svg_flexy-o-hare.png"/>
+    <img class="hare" src="images/friendica-404_svg_flaxy-o-hare.png" title="Flaxy O'Hare"/>
     <h1>{{$title}}</h1>
     <p>{{$message}}</p>
 {{if $thrown}}

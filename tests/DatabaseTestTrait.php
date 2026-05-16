@@ -31,7 +31,7 @@ trait DatabaseTestTrait
 		try {
 			// Rollbacks every DB usage so we don't commit anything into the DB
 			StaticDatabase::statRollback();
-		} catch (\PDOException $exception) {
+		} catch (\PDOException) {
 			print_r("Found already rolled back transaction");
 		}
 	}

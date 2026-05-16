@@ -24,8 +24,8 @@ class Maintenance extends BaseModule
 	{
 		$reason = DI::config()->get('system', 'maintenance_reason') ?? '';
 
-		if ((substr(Strings::normaliseLink($reason), 0, 7) === 'http://') ||
-			(substr(Strings::normaliseLink($reason), 0, 8) === 'https://')) {
+		if ((str_starts_with(Strings::normaliseLink($reason), 'http://'))
+			|| (str_starts_with(Strings::normaliseLink($reason), 'https://'))) {
 			System::externalRedirect($reason, 307);
 		}
 
@@ -36,11 +36,11 @@ class Maintenance extends BaseModule
 		$tpl = Renderer::getMarkupTemplate('exception.tpl');
 
 		return Renderer::replaceMacros($tpl, [
-			'$title' => DI::l10n()->t('System down for maintenance'),
-			'$message' => DI::l10n()->t('This Friendica node is currently in maintenance mode, either automatically because it is self-updating or manually by the node administrator. This condition should be temporary, please come back in a few minutes.'),
-			'$thrown' => $reason,
+			'$title'       => DI::l10n()->t('System down for maintenance'),
+			'$message'     => DI::l10n()->t('This Friendica node is currently in maintenance mode, either automatically because it is self-updating or manually by the node administrator. This condition should be temporary, please come back in a few minutes.'),
+			'$thrown'      => $reason,
 			'$stack_trace' => '',
-			'$trace' => '',
+			'$trace'       => '',
 		]);
 	}
 }

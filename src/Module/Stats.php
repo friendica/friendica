@@ -92,8 +92,8 @@ class Stats extends BaseModule
 		$statistics = [
 			'cron' => [
 				'lastExecution' => [
-					'datetime'  => date(DateTimeFormat::JSON, (int)$this->keyValue->get('last_cron')),
-					'timestamp' => (int)$this->keyValue->get('last_cron'),
+					'datetime'  => date(DateTimeFormat::JSON, (int) $this->keyValue->get('last_cron')),
+					'timestamp' => (int) $this->keyValue->get('last_cron'),
 				],
 			],
 			'worker' => [
@@ -150,7 +150,7 @@ class Stats extends BaseModule
 					Protocol::OSTATUS     => intval($this->keyValue->get('stats_packets_outbound_' . Protocol::OSTATUS) ?? 0),
 					Protocol::FEED        => intval($this->keyValue->get('stats_packets_outbound_' . Protocol::FEED) ?? 0),
 					Protocol::MAIL        => intval($this->keyValue->get('stats_packets_outbound_' . Protocol::MAIL) ?? 0),
-				]
+				],
 			],
 			'reports' => [
 				'newest' => [
@@ -181,8 +181,8 @@ class Stats extends BaseModule
 		];
 
 		if ($this->addonHelper->isAddonEnabled('bluesky')) {
-			$statistics['packets']['inbound'][Protocol::BLUESKY]  = intval($this->keyValue->get('stats_packets_inbound_' . Protocol::BLUESKY) ?? 0);
-			$statistics['packets']['outbound'][Protocol::BLUESKY] = intval($this->keyValue->get('stats_packets_outbound_' . Protocol::BLUESKY) ?? 0);
+			$statistics['packets']['inbound'][Protocol::ATPROTO]  = intval($this->keyValue->get('stats_packets_inbound_' . Protocol::ATPROTO) ?? 0);
+			$statistics['packets']['outbound'][Protocol::ATPROTO] = intval($this->keyValue->get('stats_packets_outbound_' . Protocol::ATPROTO) ?? 0);
 		}
 		if ($this->addonHelper->isAddonEnabled('tumblr')) {
 			$statistics['packets']['inbound'][Protocol::TUMBLR]  = intval($this->keyValue->get('stats_packets_inbound_' . Protocol::TUMBLR) ?? 0);

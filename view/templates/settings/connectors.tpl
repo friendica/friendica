@@ -25,6 +25,7 @@
 		{{include file="field_checkbox.tpl" field=$api_spoiler_title}}
 		{{include file="field_checkbox.tpl" field=$api_auto_attach}}
 		{{include file="field_select.tpl" field=$article_mode}}
+		{{include file="field_input.tpl" field=$minimum_posting_interval}}
 
 		<div class="settings-submit-wrapper">
 			<input type="submit" id="general-submit" name="general-submit" class="settings-submit" value="{{$submit}}"/>

@@ -7,6 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <base href="{{$baseurl}}/" />
 <meta name="generator" content="{{$generator}}" />
+<link rel="stylesheet" href="view/asset/fork-awesome/css/fork-awesome.min.css?v={{$VERSION}}" type="text/css" media="screen" />
 <link rel="stylesheet" href="view/global.css?v={{$VERSION}}" type="text/css" media="all" />
 <link rel="stylesheet" href="view/asset/jquery-colorbox/example5/colorbox.css?v={{$VERSION}}" type="text/css" media="screen" />
 <link rel="stylesheet" href="view/asset/jgrowl/jquery.jgrowl.min.css?v={{$VERSION}}" type="text/css" media="screen" />
@@ -41,7 +42,7 @@
 <script type="text/javascript" src="view/js/modernizr.js?v={{$VERSION}}"></script>
 <script type="text/javascript" src="view/asset/jquery/dist/jquery.min.js?v={{$VERSION}}"></script>
 <script type="text/javascript" src="view/js/jquery.textinputs.js?v={{$VERSION}}"></script>
-<script type="text/javascript" src="view/asset/textcomplete/dist/textcomplete.min.js?v={{$VERSION}}"></script>
+<script type="text/javascript" src="view/asset/jquery-textcomplete/dist/jquery.textcomplete.min.js?v={{$VERSION}}"></script>
 <script type="text/javascript" src="view/js/autocomplete.js?v={{$VERSION}}"></script>
 <script type="text/javascript" src="view/asset/jquery-colorbox/jquery.colorbox-min.js?v={{$VERSION}}"></script>
 <script type="text/javascript" src="view/asset/jgrowl/jquery.jgrowl.min.js?v={{$VERSION}}"></script>

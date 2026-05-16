@@ -214,8 +214,8 @@
 
 						{{if $item.star}}
 							<li role="menuitem">
-								<a id="star-{{$item.id}}" href="javascript:doStar({{$item.id}});" class="btn-link {{$item.star.classdo}}" title="{{$item.star.do}}"><i class="fa fa-star-o" aria-hidden="true"></i>&nbsp;{{$item.star.do}}</a>
-								<a id="unstar-{{$item.id}}" href="javascript:doStar({{$item.id}});" class="btn-link {{$item.star.classundo}}" title="{{$item.star.undo}}"><i class="fa fa-star" aria-hidden="true"></i>&nbsp;{{$item.star.undo}}</a>
+								<a id="star-{{$item.id}}" href="javascript:doStar({{$item.id}});" class="btn-link {{$item.star.classdo}}" title="{{$item.star.do}}"><i class="fa fa-bookmark-o" aria-hidden="true"></i>&nbsp;{{$item.star.do}}</a>
+								<a id="unstar-{{$item.id}}" href="javascript:doStar({{$item.id}});" class="btn-link {{$item.star.classundo}}" title="{{$item.star.undo}}"><i class="fa fa-bookmark" aria-hidden="true"></i>&nbsp;{{$item.star.undo}}</a>
 							</li>
 						{{/if}}
 
@@ -225,14 +225,20 @@
 							</li>
 						{{/if}}
 
+						{{if $item.complete_thread}}
+							<li role="menuitem">
+								<a id="complete_thread-{{$item.id}}" href="javascript:{{$item.complete_thread.action}}" class="btn-link" title="{{$item.complete_thread.title}}"><i class="fa fa-download" aria-hidden="true"></i>&nbsp;{{$item.complete_thread.title}}</a>
+							</li>
+						{{/if}}
+
 						{{if $item.language}}
 						<li role="menuitem">
-							<a id="language-{{$item.id}}" href="javascript:displayLanguage({{$item.uriid}});" class="btn-link filer-item language-icon" title="{{$item.language}}"><i class="fa fa-language" aria-hidden="true"></i>&nbsp;{{$item.language}}</a>
+							<a id="language-{{$item.id}}" href="javascript:displayLanguage({{$item.uriid}});" class="btn-link filer-item" title="{{$item.language}}"><i class="fa fa-language" aria-hidden="true"></i>&nbsp;{{$item.language}}</a>
 						</li>
 						{{/if}}
 
 						<li role="menuitem">
-							<a id="searchtext-{{$item.id}}" href="javascript:displaySearchText({{$item.uriid}});" class="btn-link filer-item search-icon" title="{{$item.searchtext}}"><i class="fa fa-search" aria-hidden="true"></i>&nbsp;{{$item.searchtext}}</a>
+							<a id="searchtext-{{$item.id}}" href="javascript:displaySearchText({{$item.uriid}});" class="btn-link filer-item" title="{{$item.searchtext}}"><i class="fa fa-file-text" aria-hidden="true"></i>&nbsp;{{$item.searchtext}}</a>
 						</li>
 
 						{{if $item.browsershare}}
@@ -241,7 +247,7 @@
 							</li>
 						{{/if}}
 
-						{{if ($item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread) && ($item.ignore || $item.drop.dropping)}}
+						{{if ($item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread || $item.complete_thread) && ($item.ignore || $item.drop.dropping)}}
 							<li class="divider"><hr></li>
 						{{/if}}
 

@@ -50,6 +50,9 @@ class OAuth extends BaseSettings
 		parent::content($request);
 
 		$applications = $this->database->selectToArray('application-view', ['id', 'uid', 'name', 'website', 'scopes', 'created_at'], ['uid' => $this->session->getLocalUserId()]);
+		foreach ($applications as $key => $row) {
+			$applications[$key]['created_at'] = $this->l10n->fullDateTime($row['created_at']);
+		}
 
 		$tpl = Renderer::getMarkupTemplate('settings/oauth.tpl');
 		return Renderer::replaceMacros($tpl, [
@@ -59,6 +62,7 @@ class OAuth extends BaseSettings
 			'$website'             => $this->t('Home Page'),
 			'$created_at'          => $this->t('Created'),
 			'$delete'              => $this->t('Remove authorization'),
+			'$no_connected_apps'   => $this->t('You have no connected apps.'),
 			'$apps'                => $applications,
 		]);
 	}

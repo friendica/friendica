@@ -16,14 +16,14 @@ $(document).ready(function () {
 	$(window).scroll(function () {
 		let currentScroll = $(this).scrollTop();
 
-		// Top of the page or going down = hide the button
-		if (!scrollStart || !currentScroll || currentScroll > scrollStart) {
+		// Top of the page or going up = hide the button
+		if (!scrollStart || !currentScroll || currentScroll < scrollStart) {
 			$("#back-to-top").fadeOut();
 			scrollStart = currentScroll;
 		}
 
-		// Going up enough = show the button
-		if (scrollStart - currentScroll > 100) {
+		// Going down enough = show the button
+		if (currentScroll - scrollStart > 100) {
 			$("#back-to-top").fadeIn();
 			scrollStart = currentScroll;
 		}
@@ -63,17 +63,6 @@ $(document).ready(function () {
 	// move the tabbar to the second nav bar
 	$("section .tabbar-wrapper").first().appendTo("#topbar-second > .container > #tabmenu");
 
-	// add mask css url to the logo-img container
-	//
-	// This is for firefox - we use a mask which looks like the friendica logo to apply user colors
-	// to the friendica logo (the mask is in nav.tpl at the bottom). To make it work we need to apply the
-	// correct url. The only way which comes to my mind was to do this with js
-	// So we apply the correct url (with the link to the id of the mask) after the page is loaded.
-	if ($("#logo-img").length) {
-		var pageurl = "url('" + window.location.href + "#logo-mask')";
-		$("#logo-img").css({ mask: pageurl });
-	}
-
 	// make responsive tabmenu with flexmenu.js
 	// the menupoints which doesn't fit in the second nav bar will moved to a
 	// dropdown menu. Look at common_tabs.tpl
@@ -83,21 +72,6 @@ $(document).ready(function () {
 		popupAbsolute: false,
 		target: ".flex-target",
 	});
-
-	// add mention-link button to the second navbar
-	let $mentionButton = $("#mention-link-button");
-	if ($mentionButton.length) {
-		$mentionButton.appendTo("#topbar-second > .container > #navbar-button").addClass("pull-right");
-		$("#mention-link").addClass("btn-sm ");
-		$("#mention-link > span i").addClass("fa-2x");
-		if ($mentionButton.hasClass("modal-open")) {
-			$mentionButton.on("click", function (e) {
-				e.preventDefault();
-				jotShow();
-			});
-		}
-	}
-
 
 	// add Jot button to the second navbar
 	let $jotButton = $("#jotOpen");
@@ -174,9 +148,8 @@ $(document).ready(function () {
 
 		// temporary workaround to avoid 'undefined' being displayed (issue #9789)
 		// https://github.com/friendica/friendica/issues/9789
-		// TODO: find a way to localize this string
 		if (typeof searchText === "undefined") {
-			searchText = "No results";
+			searchText = "";
 		}
 		// insert the plain text in a <h4> heading and give it a class
 		var newText = '<h4 class="search-heading">' + searchText + "</h4>";
@@ -328,6 +301,10 @@ $(document).ready(function () {
 			return true;
 		}
 
+		if ($(event.target).closest(".fg-emoji-container").length) {
+			return true;
+		}
+
 		var $dontclosethis = $(event.target).closest(".wall-item-comment-wrapper").find(".comment-edit-form");
 		$(".wall-item-comment-wrapper .comment-edit-submit-wrapper:visible").each(function () {
 			var $parent = $(this).parent(".comment-edit-form");
@@ -469,6 +446,9 @@ $(document).ready(function () {
 	} catch(err) {
 		$('.button-browser-share').hide();
 	}
+
+	// initialize autosize for the textareas
+	autosize($("textarea.text-autosize"));
 });
 
 function openClose(theID) {
@@ -534,6 +514,7 @@ function justifyPhotos() {
 		.justifiedGallery({
 			margins: 3,
 			border: 0,
+			captions: false,
 			sizeRangeSuffixes: {
 				lt48: "-6",
 				lt80: "-5",
@@ -549,6 +530,7 @@ function justifyPhotos() {
 }
 
 // Load a js script to the html head.
+// Currently Only used to load browser.js, which could possibly be handled in a better way
 function loadScript(url, callback) {
 	// Check if the script is already in the html head.
 	var oscript = $('head script[src="' + url + '"]');

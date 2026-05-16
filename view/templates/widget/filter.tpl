@@ -5,14 +5,31 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <nav>
+	{{if $type == "channel"}}
+		{{assign var="icon" value="fa-th-large"}}
+	{{else if $type == "accounttype"}}
+		{{assign var="icon" value="fa-umbrella"}}
+	{{else if $type == "rel"}}
+		{{assign var="icon" value="fa-exchange"}}
+	{{else if $type == "circle"}}
+		{{assign var="icon" value="fa-user-circle"}}
+	{{else}} {{* fallback to type="file" *}}
+		{{assign var="icon" value="fa-folder"}}
+	{{/if}}
 	<span id="{{$type}}-sidebar-inflated" class="widget inflated fakelink">
 		<button class="fakelink" onclick="openCloseWidget('{{$type}}-sidebar', '{{$type}}-sidebar-inflated');" aria-expanded="false">
-			<h3>{{$title}}</h3>
+			<h3>
+				<i class="fa {{$icon}}" aria-hidden="true"></i>
+				{{$title}}
+			</h3>
 		</button>
 	</span>
 	<div id="{{$type}}-sidebar" class="widget">
 		<button class="fakelink" onclick="openCloseWidget('{{$type}}-sidebar', '{{$type}}-sidebar-inflated');" aria-expanded="true">
-			<h3>{{$title}}</h3>
+			<h3>
+				<i class="fa {{$icon}}" aria-hidden="true"></i>
+			{{$title}}
+			</h3>
 		</button>
 		<div id="{{$type}}-desc">{{$desc nofilter}}</div>
 		<ul class="{{$type}}-ul">

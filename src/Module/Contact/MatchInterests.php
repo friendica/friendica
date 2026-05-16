@@ -85,8 +85,11 @@ class MatchInterests extends BaseModule
 		$this->page['aside'] .= Widget::follow();
 
 		if (empty($profile['pub_keywords']) && empty($profile['prv_keywords'])) {
-			$this->systemMessages->addNotice($this->t('No keywords to match. Please add keywords to your profile.'));
-			return '';
+			$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('contact/list.tpl'), [
+				'$title'           => $this->t('Profile Match'),
+				'$additional_text' => $this->t('No keywords to match. Please add keywords to your profile.')
+			]);
+			return $o;
 		}
 
 		if ($this->mode->isMobile()) {
@@ -132,14 +135,16 @@ class MatchInterests extends BaseModule
 			$entries = $this->parseContacts(json_decode($result->getBodyString()), $entries, $limit);
 		}
 
+		$additional_text = '';
 		if (empty($entries)) {
-			$this->systemMessages->addNotice($this->t('No matches'));
+			$additional_text = $this->t('No matches');
 		}
 
 		$tpl = Renderer::getMarkupTemplate('contact/list.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$title'    => $this->t('Profile Match'),
-			'$contacts' => array_slice($entries, 0, $limit),
+			'$title'           => $this->t('Profile Match'),
+			'$contacts'        => array_slice($entries, 0, $limit),
+			'$additional_text' => $additional_text,
 		]);
 	}
 

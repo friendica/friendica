@@ -142,7 +142,7 @@ class Photo extends BaseApi
 			throw new HTTPException\NotFoundException();
 		}
 
-		$cacheable = ($photo['allow_cid'] . $photo['allow_gid'] . $photo['deny_cid'] . $photo['deny_gid'] === '') && (isset($photo['cacheable']) ? $photo['cacheable'] : true);
+		$cacheable = ($photo['allow_cid'] . $photo['allow_gid'] . $photo['deny_cid'] . $photo['deny_gid'] === '') && ($photo['cacheable'] ?? true);
 
 		$stamp    = microtime(true);
 		$imgdata  = '';
@@ -239,7 +239,7 @@ class Photo extends BaseApi
 				'scale'  => $scale, 'resource' => $photo['resource-id'],
 				'total'  => number_format($total, 3), 'fetch' => number_format($fetch, 3),
 				'data'   => number_format($data, 3), 'checksum' => number_format($checksum, 3),
-				'output' => number_format($output, 3), 'rest' => number_format($rest, 3)
+				'output' => number_format($output, 3), 'rest' => number_format($rest, 3),
 			]);
 		}
 
@@ -272,6 +272,20 @@ class Photo extends BaseApi
 					$height = $media['height'];
 				}
 
+				if (empty($url) && ($media['type'] == Post\Media::VIDEO) && DI::config()->get('system', 'ffmpeg_installed')) {
+					$image = new Image('', image_type_to_mime_type(IMAGETYPE_JPEG));
+					$image->getFromVideoUrl($media['url']);
+					if ($image->isValid()) {
+						return MPhoto::createPhotoForImageData($image->asString());
+					}
+				}
+
+				if (empty($url) && isset($media['blurhash']) && isset($media['width']) && isset($media['height'])) {
+					$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
+					$image->getFromBlurHash($media['blurhash'], $media['width'], $media['height']);
+					return MPhoto::createPhotoForImageData($image->asString());
+				}
+
 				if (empty($url)) {
 					return false;
 				}
@@ -280,7 +294,7 @@ class Photo extends BaseApi
 					return MPhoto::getPhoto($matches[1], $matches[2], self::getCurrentUserID());
 				}
 
-				return MPhoto::createPhotoForExternalResource($url, (int)DI::userSession()->getLocalUserId(), $media['mimetype'] ?? '', $media['blurhash'], $width, $height);
+				return MPhoto::createPhotoForExternalResource($url, (int) DI::userSession()->getLocalUserId(), $media['mimetype'] ?? '', $media['blurhash'], $width, $height);
 			case 'media':
 				$media = DBA::selectFirst('post-media', ['url', 'height', 'width', 'mimetype', 'uri-id', 'blurhash'], ['id' => $id, 'type' => Post\Media::IMAGE]);
 				if (empty($media)) {
@@ -291,14 +305,14 @@ class Photo extends BaseApi
 					return MPhoto::getPhoto($matches[1], $matches[2], self::getCurrentUserID());
 				}
 
-				return MPhoto::createPhotoForExternalResource($media['url'], (int)DI::userSession()->getLocalUserId(), $media['mimetype'], $media['blurhash'], $media['width'], $media['height']);
+				return MPhoto::createPhotoForExternalResource($media['url'], (int) DI::userSession()->getLocalUserId(), $media['mimetype'] ?? '', $media['blurhash'], $media['width'], $media['height']);
 			case 'link':
 				$link = DBA::selectFirst('post-link', ['url', 'mimetype', 'blurhash', 'width', 'height'], ['id' => $id]);
 				if (empty($link)) {
 					return false;
 				}
 
-				return MPhoto::createPhotoForExternalResource($link['url'], (int)DI::userSession()->getLocalUserId(), $link['mimetype'] ?? '', $link['blurhash'] ?? '', $link['width'] ?? 0, $link['height'] ?? 0);
+				return MPhoto::createPhotoForExternalResource($link['url'], (int) DI::userSession()->getLocalUserId(), $link['mimetype'] ?? '', $link['blurhash'] ?? '', $link['width'] ?? 0, $link['height'] ?? 0);
 			case 'contact':
 				$fields  = ['uid', 'uri-id', 'url', 'nurl', 'avatar', 'photo', 'blurhash', 'xmpp', 'addr', 'network', 'failed', 'updated', 'next-update'];
 				$contact = Contact::getById($id, $fields);

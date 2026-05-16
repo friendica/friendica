@@ -170,6 +170,22 @@ class Queue
 	}
 
 	/**
+	 * Process a queue entry by its URI and type.
+	 *
+	 * @param string $url  The URI of the activity (e.g., 'https://example.com/activity/123')
+	 * @param string $type Type of the activity (e.g., 'as:Create', 'as:Follow')
+	 * @return boolean
+	 */
+	public static function processByUri(string $url, string $type): bool
+	{
+		$entry = DBA::selectFirst('inbox-entry', ['id'], ['object-id' => $url, 'type' => $type]);
+		if (empty($entry['id'])) {
+			return false;
+		}
+		return self::process($entry['id'], false);
+	}
+
+	/**
 	 * Process the activity with the given id
 	 *
 	 * @param integer $id

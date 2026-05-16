@@ -14,23 +14,24 @@ use Friendica\BaseModule;
 use Friendica\Content\Conversation\Collection\Timelines;
 use Friendica\Content\Conversation\Entity\Channel as ChannelEntity;
 use Friendica\Content\Conversation\Entity\Community;
-use Friendica\Content\Conversation\Entity\UserDefinedChannel as UserDefinedChannelEntity;
+use Friendica\Content\Conversation\Entity\UserDefinedChannel as EntityUserDefinedChannel;
+use Friendica\Content\Conversation\Factory\Activity as ActivityFactory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Cache\Capability\ICanCache;
-use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\Worker;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
-use Friendica\Model\Post\Engagement;
 use Friendica\Model\Post\SearchIndex;
+use Friendica\Model\Verb;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Network\HTTPException\ForbiddenException;
@@ -84,8 +85,9 @@ class Timeline extends BaseModule
 	protected $cache;
 	/** @var UserDefinedChannel */
 	protected $channelRepository;
+	protected ActivityFactory $activityFactory;
 
-	public function __construct(UserDefinedChannel $channel, Mode $mode, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server = [], array $parameters = [])
+	public function __construct(UserDefinedChannel $channel, Mode $mode, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, ActivityFactory $activityFactory, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server = [], array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -96,6 +98,7 @@ class Timeline extends BaseModule
 		$this->pConfig           = $pConfig;
 		$this->config            = $config;
 		$this->cache             = $cache;
+		$this->activityFactory   = $activityFactory;
 	}
 
 	/**
@@ -117,14 +120,14 @@ class Timeline extends BaseModule
 				$this->session->getLocalUserId(),
 				'system',
 				'itemspage_mobile_network',
-				$this->config->get('system', 'itemspage_network_mobile')
+				$this->config->get('system', 'itemspage_network_mobile'),
 			);
 		} else {
 			$this->itemsPerPage = $this->pConfig->get(
 				$this->session->getLocalUserId(),
 				'system',
 				'itemspage_network',
-				$this->config->get('system', 'itemspage_network')
+				$this->config->get('system', 'itemspage_network'),
 			);
 		}
 
@@ -295,8 +298,7 @@ class Timeline extends BaseModule
 			$selected_items = $items;
 		}
 
-		$condition = ['unseen' => true, 'uid' => $uid, 'parent-uri-id' => array_column($selected_items, 'uri-id')];
-		$this->setItemsSeenByCondition($condition);
+		$this->setItemsSeenForUser($uid);
 
 		return $selected_items;
 	}
@@ -309,74 +311,112 @@ class Timeline extends BaseModule
 	 */
 	private function getRawChannelItems(array $request, int $uid): array
 	{
-		$table = 'post-engagement';
+		$cache = $this->config->get('system', 'system_channel_cache');
 
-		$condition = [];
+		if ($cache) {
+			$table      = 'system-channel-post-view';
+			$condition  = ["`channel` = ? AND `uid` = ?", $this->selectedTab, $uid];
+			$activities = null;
+		} else {
+			$table      = 'post-engagement';
+			$condition  = [];
+			$activities = $this->activityFactory->getActivities($uid);
+		}
 
 		if ($this->selectedTab == ChannelEntity::WHATSHOT) {
-			if (!is_null($this->accountType)) {
-				$condition = ["(`comments` > ? OR `activities` > ?) AND `contact-type` = ?", $this->getMedianComments($uid, 4), $this->getMedianActivities($uid, 4), $this->accountType];
-			} else {
-				$condition = ["(`comments` > ? OR `activities` > ?) AND `contact-type` != ?", $this->getMedianComments($uid, 4), $this->getMedianActivities($uid, 4), Contact::TYPE_COMMUNITY];
+			if (!$cache) {
+				if (!is_null($this->accountType)) {
+					$condition = ["(`comments` > ? OR `activities` > ? OR `views` > ?) AND `contact-type` = ?", $activities->medianComments, $activities->medianActivities, $activities->medianViews, $this->accountType];
+				} else {
+					$condition = ["(`comments` > ? OR `activities` > ? OR `views` > ?) AND `contact-type` != ?", $activities->medianComments, $activities->medianActivities, $activities->medianViews, Contact::TYPE_COMMUNITY];
+				}
 			}
 		} elseif ($this->selectedTab == ChannelEntity::FORYOU) {
-			$cid = Contact::getPublicIdByUserId($uid);
+			if (!$cache) {
+				$cid = Contact::getPublicIdByUserId($uid);
 
-			$condition = [
-				"(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `relation-thread-score` > ?) OR
-				((`comments` >= ? OR `activities` >= ?) AND `owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)) OR
-				(`owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`notify_new_posts` OR `channel-frequency` = ?))))",
-				$cid, $this->getMedianRelationThreadScore($cid, 4), $this->getMedianComments($uid, 4), $this->getMedianActivities($uid, 4), $cid,
-				$uid, Contact\User::FREQUENCY_ALWAYS
-			];
+				$condition = [
+					"(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `relation-thread-score` > ?) OR
+					((`comments` >= ? OR `activities` >= ? OR `views` >= ?) AND `owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?)) OR
+					(`owner-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`notify_new_posts` OR `channel-frequency` = ?))))",
+					$cid, $activities->medianThreadScore, $activities->medianComments, $activities->medianActivities, $activities->medianViews, $cid,
+					$uid, Contact\User::FREQUENCY_ALWAYS,
+				];
+			}
 		} elseif ($this->selectedTab == ChannelEntity::DISCOVER) {
-			$cid = Contact::getPublicIdByUserId($uid);
+			if (!$cache) {
+				$cid = Contact::getPublicIdByUserId($uid);
 
-			$condition = [
-				"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND NOT `follows`) AND
-				(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND NOT `follows` AND `relation-thread-score` > ?) OR
-				`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `cid` = ? AND `relation-thread-score` > ?) OR
-				((`comments` >= ? OR `activities` >= ?) AND
-				(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `cid` = ? AND `relation-thread-score` > ?)) OR
-				(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `relation-thread-score` > ?))))",
-				$cid, $cid, $this->getMedianRelationThreadScore($cid, 4), $cid, $this->getMedianRelationThreadScore($cid, 4),
-				$this->getMedianComments($uid, 4), $this->getMedianActivities($uid, 4), $cid, 0, $cid, 0
-			];
-
+				$condition = [
+					"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND NOT `follows`) AND
+					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND NOT `follows` AND `relation-thread-score` > ?) OR
+					`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `cid` = ? AND `relation-thread-score` > ?) OR
+					((`comments` >= ? OR `activities` >= ? OR `views` >= ?) AND
+					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `cid` = ? AND `relation-thread-score` > ?)) OR
+					(`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `relation-cid` = ? AND `relation-thread-score` > ?))))",
+					$cid, $cid, $activities->medianThreadScore, $cid, $activities->medianThreadScore,
+					$activities->medianComments, $activities->medianActivities, $activities->medianViews, $cid, 0, $cid, 0,
+				];
+			}
 		} elseif ($this->selectedTab == ChannelEntity::FOLLOWERS) {
-			$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` = ?)", $uid, Contact::FOLLOWER];
+			if (!$cache) {
+				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` = ?)", $uid, Contact::FOLLOWER];
+			}
 		} elseif ($this->selectedTab == ChannelEntity::SHARERSOFSHARERS) {
-			$cid = Contact::getPublicIdByUserId($uid);
+			if (!$cache) {
+				$cid = Contact::getPublicIdByUserId($uid);
 
-			// @todo Suggest posts from contacts that are followed most by our followers
-			$condition = [
-				"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `last-interaction` > ?
-				AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
-				AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?))",
-				DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $this->getMedianRelationThreadScore($cid, 4), $cid
-			];
+				// @todo Suggest posts from contacts that are followed most by our followers
+				$condition = [
+					"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `last-interaction` > ?
+					AND `relation-cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `relation-thread-score` >= ?)
+					AND NOT `cid` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ?))",
+					DateTimeFormat::utc('now - ' . $this->config->get('channel', 'sharer_interaction_days') . ' day'), $cid, $activities->medianThreadScore, $cid,
+				];
+			}
 		} elseif ($this->selectedTab == ChannelEntity::QUIETSHARERS) {
-			$cid = Contact::getPublicIdByUserId($uid);
+			if (!$cache) {
+				$cid = Contact::getPublicIdByUserId($uid);
 
-			$condition = [
-				"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `post-score` <= ?)",
-				$cid, $this->getMedianPostScore($cid, 2)
-			];
+				$condition = [
+					"`owner-id` IN (SELECT `cid` FROM `contact-relation` WHERE `follows` AND `relation-cid` = ? AND `post-score` <= ?)",
+					$cid, $activities->medianPostScore,
+				];
+			}
 		} elseif ($this->selectedTab == ChannelEntity::IMAGE) {
-			$condition = ["`media-type` & ?", 1];
+			if (!$cache) {
+				$condition = ["`media-type` & ?", 1];
+			}
 		} elseif ($this->selectedTab == ChannelEntity::VIDEO) {
-			$condition = ["`media-type` & ?", 2];
+			if (!$cache) {
+				$condition = ["`media-type` & ?", 2];
+			}
 		} elseif ($this->selectedTab == ChannelEntity::AUDIO) {
-			$condition = ["`media-type` & ?", 4];
+			if (!$cache) {
+				$condition = ["`media-type` & ?", 4];
+			}
 		} elseif ($this->selectedTab == ChannelEntity::LANGUAGE) {
-			$condition = ["`language` = ?", User::getLanguageCode($uid)];
+			if (!$cache) {
+				$condition = ["`language` = ?", User::getLanguageCode($uid)];
+			}
 		} elseif (is_numeric($this->selectedTab) && !empty($channel = $this->channelRepository->selectById($this->selectedTab, $uid))) {
-			$condition = $this->getUserChannelConditions($channel, $uid);
-			if (in_array($channel->circle, [-3, -4, -5])) {
-				$table       = SearchIndex::getSearchView();
-				$condition   = DBA::mergeConditions($condition, ['uid' => $uid]);
-				$orders      = ['-3' => 'created', '-4' => 'received', '-5' => 'commented'];
-				$this->order = $orders[$channel->circle];
+			if (!$this->config->get('system', 'channel_cache')) {
+				$condition = $this->channelRepository->getCondition($channel, $uid);
+				if (in_array($channel->circle, [EntityUserDefinedChannel::CIRCLE_CREATION, EntityUserDefinedChannel::CIRCLE_POSTS, EntityUserDefinedChannel::CIRCLE_ACTIVITY])) {
+					$table     = SearchIndex::getSearchView();
+					$condition = DBA::mergeConditions($condition, ['uid' => $uid]);
+				}
+			} else {
+				$condition = ['channel' => $this->selectedTab];
+				$table     = 'channel-post-view';
+			}
+			if (in_array($channel->circle, [EntityUserDefinedChannel::CIRCLE_CREATION, EntityUserDefinedChannel::CIRCLE_POSTS, EntityUserDefinedChannel::CIRCLE_ACTIVITY])) {
+				$orders = [
+					EntityUserDefinedChannel::CIRCLE_CREATION => 'created',
+					EntityUserDefinedChannel::CIRCLE_POSTS    => 'received',
+					EntityUserDefinedChannel::CIRCLE_ACTIVITY => 'commented',
+				];
+				$this->order = $orders[(int) $channel->circle];
 			}
 		}
 
@@ -387,7 +427,7 @@ class Timeline extends BaseModule
 		}
 
 		if (($this->selectedTab != ChannelEntity::LANGUAGE) && !is_numeric($this->selectedTab)) {
-			$condition = $this->addLanguageCondition($uid, $condition);
+			$condition = $this->channelRepository->addLanguageCondition($uid, $condition);
 		}
 
 		$condition = DBA::mergeConditions($condition, ["(NOT `restricted` OR EXISTS(SELECT `id` FROM `post-user` WHERE `uid` = ? AND `uri-id` = `$table`.`uri-id`))", $uid]);
@@ -443,238 +483,9 @@ class Timeline extends BaseModule
 			$items = array_reverse($items, true);
 		}
 
-		$condition = ['unseen' => true, 'uid' => $uid, 'parent-uri-id' => array_column($items, 'uri-id')];
-		$this->setItemsSeenByCondition($condition);
+		$this->setItemsSeenForUser($uid);
 
 		return $items;
-	}
-
-	private function getUserChannelConditions(UserDefinedChannelEntity $channel, int $uid): array
-	{
-		$condition = [];
-
-		if (!empty($channel->circle)) {
-			if ($channel->circle == -1) {
-				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` IN (?, ?))", $uid, Contact::SHARING, Contact::FRIEND];
-			} elseif ($channel->circle == -2) {
-				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` = ?)", $uid, Contact::FOLLOWER];
-			} elseif ($channel->circle > 0) {
-				$condition = DBA::mergeConditions($condition, ["`owner-id` IN (SELECT `pid` FROM `group_member` INNER JOIN `account-user-view` ON `group_member`.`contact-id` = `account-user-view`.`id` WHERE `gid` = ? AND `account-user-view`.`uid` = ?)", $channel->circle, $uid]);
-			}
-		}
-
-		if (!empty($channel->fullTextSearch)) {
-			if (!empty($channel->includeTags)) {
-				$additional = $this->addIncludeTags($channel->includeTags);
-			} else {
-				$additional = '';
-			}
-
-			if (!empty($channel->excludeTags)) {
-				foreach (explode(',', mb_strtolower($channel->excludeTags)) as $tag) {
-					$additional .= ' -tag:' . $tag;
-				}
-			}
-
-			if (!empty($channel->mediaType)) {
-				$additional .= $this->addMediaTerms($channel->mediaType);
-			}
-
-			$additional .= $this->addLanguageSearchTerms($uid, $channel->languages);
-
-			if ($additional) {
-				$searchterms = '+(' . trim($channel->fullTextSearch) . ')' . $additional;
-			} else {
-				$searchterms = $channel->fullTextSearch;
-			}
-
-			$condition = DBA::mergeConditions($condition, ["MATCH (`searchtext`) AGAINST (? IN BOOLEAN MODE)", Engagement::escapeKeywords($searchterms)]);
-		} else {
-			if (!empty($channel->includeTags)) {
-				$search       = explode(',', mb_strtolower($channel->includeTags));
-				$placeholders = substr(str_repeat("?, ", count($search)), 0, -2);
-				$condition    = DBA::mergeConditions($condition, array_merge(["`uri-id` IN (SELECT `uri-id` FROM `post-tag` INNER JOIN `tag` ON `tag`.`id` = `post-tag`.`tid` WHERE `post-tag`.`type` = 1 AND `name` IN (" . $placeholders . "))"], $search));
-			}
-
-			if (!empty($channel->excludeTags)) {
-				$search       = explode(',', mb_strtolower($channel->excludeTags));
-				$placeholders = substr(str_repeat("?, ", count($search)), 0, -2);
-				$condition    = DBA::mergeConditions($condition, array_merge(["NOT `uri-id` IN (SELECT `uri-id` FROM `post-tag` INNER JOIN `tag` ON `tag`.`id` = `post-tag`.`tid` WHERE `post-tag`.`type` = 1 AND `name` IN (" . $placeholders . "))"], $search));
-			}
-
-			if (!empty($channel->mediaType)) {
-				$condition = DBA::mergeConditions($condition, ["`media-type` & ?", $channel->mediaType]);
-			}
-
-			// For "addLanguageCondition" to work, the condition must not be empty
-			$condition = $this->addLanguageCondition($uid, $condition ?: ["true"], $channel->languages);
-		}
-
-		if (!is_null($channel->minSize)) {
-			$condition = DBA::mergeConditions($condition, ["`size` >= ?", $channel->minSize]);
-		}
-
-		if (!is_null($channel->maxSize)) {
-			$condition = DBA::mergeConditions($condition, ["`size` <= ?", $channel->maxSize]);
-		}
-
-		return $condition;
-	}
-
-	private function addIncludeTags(string $includeTags): string
-	{
-		$tagterms = '';
-		foreach (explode(',', mb_strtolower($includeTags)) as $tag) {
-			$tagterms .= ' tag:' . $tag;
-		}
-
-		if ($tagterms) {
-			return ' +(' . trim($tagterms) . ')';
-		} else {
-			return '';
-		}
-	}
-
-	private function addMediaTerms(int $mediaType): string
-	{
-		$mediaterms = '';
-		if ($mediaType & 1) {
-			$mediaterms .= ' media:image';
-		}
-
-		if ($mediaType & 2) {
-			$mediaterms .= ' media:video';
-		}
-
-		if ($mediaType & 4) {
-			$mediaterms .= ' media:audio';
-		}
-
-		if ($mediaterms) {
-			return ' +(' . trim($mediaterms) . ')';
-		} else {
-			return '';
-		}
-	}
-
-	private function addLanguageSearchTerms(int $uid, $languages = null): string
-	{
-		$langterms = '';
-		foreach ($languages ?: User::getWantedLanguages($uid) as $language) {
-			$langterms .= ' language:' . $language;
-		}
-
-		if ($langterms) {
-			return ' +(' . trim($langterms) . ')';
-		} else {
-			return '';
-		}
-	}
-
-	private function addLanguageCondition(int $uid, array $condition, $languages = null): array
-	{
-		$conditions = [];
-		foreach ($languages ?: User::getWantedLanguages($uid) as $language) {
-			$conditions[] = "`language` = ?";
-			$condition[]  = $language;
-		}
-
-		if (!empty($conditions)) {
-			$condition[0] .= " AND (" . implode(' OR ', $conditions) . ")";
-		}
-		return $condition;
-	}
-
-	private function getMedianComments(int $uid, int $divider): int
-	{
-		$languages = User::getWantedLanguages($uid);
-		$cache_key = 'Channel:getMedianComments:' . $divider . ':' . implode(':', $languages);
-		$comments  = $this->cache->get($cache_key);
-		if (!empty($comments)) {
-			return $comments;
-		}
-
-		$condition = ["`contact-type` != ? AND `comments` > ? AND NOT `restricted`", Contact::TYPE_COMMUNITY, 0];
-		$condition = $this->addLanguageCondition($uid, $condition);
-
-		$limit    = $this->database->count('post-engagement', $condition) / $divider;
-		$post     = $this->database->selectToArray('post-engagement', ['comments'], $condition, ['order' => ['comments' => true], 'limit' => [$limit, 1]]);
-		$comments = $post[0]['comments'] ?? 0;
-		if (empty($comments)) {
-			return 0;
-		}
-
-		$this->cache->set($cache_key, $comments, Duration::HALF_HOUR);
-		$this->logger->debug('Calculated median comments', ['divider' => $divider, 'languages' => $languages, 'median' => $comments]);
-		return $comments;
-	}
-
-	private function getMedianActivities(int $uid, int $divider): int
-	{
-		$languages  = User::getWantedLanguages($uid);
-		$cache_key  = 'Channel:getMedianActivities:' . $divider . ':' . implode(':', $languages);
-		$activities = $this->cache->get($cache_key);
-		if (!empty($activities)) {
-			return $activities;
-		}
-
-		$condition = ["`contact-type` != ? AND `activities` > ? AND NOT `restricted`", Contact::TYPE_COMMUNITY, 0];
-		$condition = $this->addLanguageCondition($uid, $condition);
-
-		$limit      = $this->database->count('post-engagement', $condition) / $divider;
-		$post       = $this->database->selectToArray('post-engagement', ['activities'], $condition, ['order' => ['activities' => true], 'limit' => [$limit, 1]]);
-		$activities = $post[0]['activities'] ?? 0;
-		if (empty($activities)) {
-			return 0;
-		}
-
-		$this->cache->set($cache_key, $activities, Duration::HALF_HOUR);
-		$this->logger->debug('Calculated median activities', ['divider' => $divider, 'languages' => $languages, 'median' => $activities]);
-		return $activities;
-	}
-
-	private function getMedianRelationThreadScore(int $cid, int $divider): int
-	{
-		$cache_key = 'Channel:getThreadScore:' . $cid . ':' . $divider;
-		$score     = $this->cache->get($cache_key);
-		if (!empty($score)) {
-			return $score;
-		}
-
-		$condition = ["`relation-cid` = ? AND `relation-thread-score` > ?", $cid, 0];
-
-		$limit    = $this->database->count('contact-relation', $condition) / $divider;
-		$relation = $this->database->selectToArray('contact-relation', ['relation-thread-score'], $condition, ['order' => ['relation-thread-score' => true], 'limit' => [$limit, 1]]);
-		$score    = $relation[0]['relation-thread-score'] ?? 0;
-		if (empty($score)) {
-			return 0;
-		}
-
-		$this->cache->set($cache_key, $score, Duration::HALF_HOUR);
-		$this->logger->debug('Calculated median score', ['cid' => $cid, 'divider' => $divider, 'median' => $score]);
-		return $score;
-	}
-
-	private function getMedianPostScore(int $cid, int $divider): int
-	{
-		$cache_key = 'Channel:getPostScore:' . $cid . ':' . $divider;
-		$score     = $this->cache->get($cache_key);
-		if (!empty($score)) {
-			return $score;
-		}
-
-		$condition = ["`relation-cid` = ? AND `post-score` > ?", $cid, 0];
-
-		$limit    = $this->database->count('contact-relation', $condition) / $divider;
-		$relation = $this->database->selectToArray('contact-relation', ['post-score'], $condition, ['order' => ['post-score' => true], 'limit' => [$limit, 1]]);
-		$score    = $relation[0]['post-score'] ?? 0;
-		if (empty($score)) {
-			return 0;
-		}
-
-		$this->cache->set($cache_key, $score, Duration::HALF_HOUR);
-		$this->logger->debug('Calculated median score', ['cid' => $cid, 'divider' => $divider, 'median' => $score]);
-		return $score;
 	}
 
 	/**
@@ -693,20 +504,14 @@ class Timeline extends BaseModule
 
 		$maxpostperauthor = 0;
 		if ($this->selectedTab == Community::LOCAL) {
-			$maxpostperauthor = (int)$this->config->get('system', 'max_author_posts_community_page');
+			$maxpostperauthor = (int) $this->config->get('system', 'max_author_posts_community_page');
 			$key              = 'author-id';
 		} elseif ($this->selectedTab == Community::GLOBAL) {
-			$maxpostperauthor = (int)$this->config->get('system', 'max_server_posts_community_page');
+			$maxpostperauthor = (int) $this->config->get('system', 'max_server_posts_community_page');
 			$key              = 'author-gsid';
 		}
 
 		if ($maxpostperauthor === 0) {
-			$this->setItemsSeenByCondition([
-				'unseen'        => true,
-				'uid'           => $this->session->getLocalUserId(),
-				'parent-uri-id' => array_column($items, 'uri-id')
-			]);
-
 			return $items;
 		}
 
@@ -748,9 +553,6 @@ class Timeline extends BaseModule
 				$items = $this->selectItems();
 			}
 		}
-
-		$condition = ['unseen' => true, 'uid' => $this->session->getLocalUserId(), 'parent-uri-id' => array_column($selected_items, 'uri-id')];
-		$this->setItemsSeenByCondition($condition);
 
 		return $selected_items;
 	}
@@ -821,7 +623,7 @@ class Timeline extends BaseModule
 
 		$uriids = array_keys($items);
 
-		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'verb' => Activity::POST]) as $count) {
+		foreach (Post\Counts::get(['parent-uri-id' => $uriids, 'vid' => Verb::getID(Activity::POST)]) as $count) {
 			$items[$count['parent-uri-id']]['comments'] += $count['count'];
 		}
 
@@ -834,22 +636,18 @@ class Timeline extends BaseModule
 	}
 
 	/**
-	 * Sets items as seen
-	 *
-	 * @param array $condition The array with the SQL condition
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * Sets all unseen items for a user as seen
+	 * @param int $uid User ID
 	 */
-	protected function setItemsSeenByCondition(array $condition)
+	protected function setItemsSeenForUser(int $uid)
 	{
-		if (empty($condition) || $this->ping) {
-			return;
+		$posts = Post::getUnseenPosts($uid);
+		if (!empty($posts)) {
+			Item::update(['unseen' => false], ['unseen' => true, 'uid' => $uid, 'uri-id' => $posts]);
 		}
 
-		$unseen = Post::exists($condition);
-
-		if ($unseen) {
-			/// @todo handle huge "unseen" updates in the background to avoid timeout errors
-			Item::update(['unseen' => false], $condition);
+		if (count($posts) == 100) {
+			Worker::add(Worker::PRIORITY_MEDIUM, 'SetSeen', $uid);
 		}
 	}
 }

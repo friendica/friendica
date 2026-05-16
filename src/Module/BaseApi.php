@@ -35,12 +35,13 @@ use Psr\Log\LoggerInterface;
 
 class BaseApi extends BaseModule
 {
-	const LOG_PREFIX = 'API {action} - ';
+	public const LOG_PREFIX = 'API {action} - ';
 
-	const SCOPE_READ   = 'read';
-	const SCOPE_WRITE  = 'write';
-	const SCOPE_FOLLOW = 'follow';
-	const SCOPE_PUSH   = 'push';
+	public const SCOPE_READ   = 'read';
+	public const SCOPE_WRITE  = 'write';
+	public const SCOPE_FOLLOW = 'follow';
+	public const SCOPE_PUSH   = 'push';
+	public const SCOPE_ANY    = 'any';
 
 	/**
 	 * @var array
@@ -357,17 +358,6 @@ class BaseApi extends BaseModule
 	}
 
 	/**
-	 * Check if the app is known to support quoted posts
-	 *
-	 * @return bool
-	 */
-	public static function appSupportsQuotes(): bool
-	{
-		$token = OAuth::getCurrentApplicationToken();
-		return (!empty($token['name']) && in_array($token['name'], ['Fedilab']));
-	}
-
-	/**
 	 * Get current application token
 	 *
 	 * @return array token
@@ -396,22 +386,32 @@ class BaseApi extends BaseModule
 			$uid = BasicAuth::getCurrentUserID(false);
 		}
 
-		return (int)$uid;
+		return (int) $uid;
 	}
 
 	/**
 	 * Check if the provided scope does exist.
 	 * halts execution on missing scope or when not logged in.
 	 *
-	 * @param string $scope the requested scope (read, write, follow, push)
+	 * @param string $scope the requested scope (read, write, follow, push, any)
 	 */
 	public function checkAllowedScope(string $scope)
 	{
-		$token = self::getCurrentApplication();
+		try {
+			$token = self::getCurrentApplication();
+		} catch (HTTPException\UnauthorizedException $th) {
+			$this->logAndJsonError(401, $this->errorFactory->Unauthorized($th->getMessage()));
+		} catch (\Throwable $th) {
+			$this->logAndJsonError(403, $this->errorFactory->Forbidden($th->getMessage()));
+		}
 
 		if (empty($token)) {
 			$this->logger->notice('Empty application token');
 			$this->logAndJsonError(403, $this->errorFactory->Forbidden());
+		}
+
+		if ($scope === self::SCOPE_ANY) {
+			return;
 		}
 
 		if (!isset($token[$scope])) {
@@ -479,7 +479,7 @@ class BaseApi extends BaseModule
 		}
 	}
 
-	public static function getContactIDForSearchterm(string $screen_name = null, string $profileurl = null, int $cid = null, int $uid)
+	public static function getContactIDForSearchterm(?string $screen_name, ?string $profileurl, ?int $cid, int $uid)
 	{
 		if (!empty($cid)) {
 			return $cid;
@@ -490,7 +490,7 @@ class BaseApi extends BaseModule
 		}
 
 		if (empty($cid) && !empty($screen_name)) {
-			if (strpos($screen_name, '@') !== false) {
+			if (str_contains($screen_name, '@')) {
 				return Contact::getIdForURL($screen_name, 0, false);
 			}
 
@@ -516,6 +516,6 @@ class BaseApi extends BaseModule
 	protected function logAndJsonError(int $errorno, Error $error)
 	{
 		$this->logger->info('API Error', ['no' => $errorno, 'error' => $error->toArray(), 'method' => $this->args->getMethod(), 'command' => $this->args->getQueryString(), 'user-agent' => $this->server['HTTP_USER_AGENT'] ?? '']);
-		$this->jsonError(403, $error->toArray());
+		$this->jsonError($errorno, $error->toArray());
 	}
 }

@@ -27,6 +27,8 @@
 			<i class="fa fa-globe"></i>
 		{{elseif $direction.direction == 10}}
 			<i class="fa fa-inbox"></i>
+		{{elseif $direction.direction == 11}}
+			<i class="fa fa-sticky-note"></i>
 		{{/if}}
 	</span>
 {{/if}}

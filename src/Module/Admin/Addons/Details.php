@@ -8,6 +8,8 @@
 namespace Friendica\Module\Admin\Addons;
 
 use Friendica\Content\Text\Markdown;
+use Friendica\Core\Addon\AddonInfo;
+use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -45,6 +47,7 @@ class Details extends BaseAdmin
 		$addonHelper = DI::addonHelper();
 
 		$addon = Strings::sanitizeFilePathItem($this->parameters['addon']);
+
 		if (!is_file("addon/$addon/$addon.php")) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Addon not found.'));
 			$addonHelper->uninstallAddon($addon);
@@ -91,12 +94,18 @@ class Details extends BaseAdmin
 			$func($admin_form);
 		}
 
-		$addonInfo = $addonHelper->getAddonInfo($addon);
+		try {
+			$addonInfo = $addonHelper->getAddonInfo($addon);
+		} catch (InvalidAddonException $th) {
+			$this->logger->error('Invalid addon found: ' . $addon, ['exception' => $th]);
+			DI::sysmsg()->addNotice(DI::l10n()->t('Invalid Addon found.'));
+
+			$addonInfo = AddonInfo::fromArray(['id' => $addon, 'name' => $addon]);
+		}
 
 		$addonAuthors = [];
 
 		foreach ($addonInfo->getAuthors() as $addonAuthor) {
-			$addonAuthor['link'] = 'foo@bar.com';
 			if (array_key_exists('link', $addonAuthor) && empty(parse_url($addonAuthor['link'], PHP_URL_SCHEME))) {
 				$contact = Contact::getByURL($addonAuthor['link'], false);
 

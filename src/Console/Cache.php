@@ -80,7 +80,7 @@ HELP;
 	{
 		if ($this->getOption('v')) {
 			$this->out('Executable: ' . $this->executable);
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -91,7 +91,7 @@ HELP;
 
 		if ($this->getOption('v')) {
 			$this->out('Cache Driver Name: ' . $this->cache->getName());
-			$this->out('Cache Driver Class: ' . get_class($this->cache));
+			$this->out('Cache Driver Class: ' . $this->cache::class);
 		}
 
 		switch ($this->getArgument(0)) {

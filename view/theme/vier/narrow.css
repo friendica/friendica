@@ -8,11 +8,11 @@
   display: none;
 }
 
-nav ul li .menu-popup {
+nav#topbar-first ul li .menu-popup {
   left: auto;
   right: 0px;
 }
 
-nav #nav-search-box #nav-search-text {
+nav#topbar-first #nav-search-box #nav-search-text {
   width: 100px;
 }

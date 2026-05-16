@@ -1,2 +1,8 @@
+addon/.tx
+addon/.git
+addon/.editorconfig
+addon/.gitattributes
+addon/.woodpecker
+addon/**/*/messages.po
 view/lang/*/messages.po
 view/smarty3/compiled/*

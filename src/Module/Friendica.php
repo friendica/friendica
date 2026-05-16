@@ -54,7 +54,7 @@ class Friendica extends BaseModule
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = []
+		array $parameters = [],
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -93,9 +93,9 @@ class Friendica extends BaseModule
 			];
 		}
 
-		$tos = ($this->config->get('system', 'tosdisplay')) ?
-			$this->t('Read about the <a href="%1$s/tos">Terms of Service</a> of this node.', $this->baseUrl) :
-			'';
+		$tos = ($this->config->get('system', 'tosdisplay'))
+			? $this->t('Read about the <a href="%1$s/tos">Terms of Service</a> of this node.', $this->baseUrl)
+			: '';
 
 		$blockList = $this->config->get('system', 'blocklist') ?? [];
 
@@ -127,7 +127,7 @@ class Friendica extends BaseModule
 				'<strong>' . App::VERSION . '</strong>',
 				$this->baseUrl,
 				'<strong>' . $this->config->get('system', 'build') . '/' . DB_UPDATE_VERSION . '</strong>',
-				'<strong>' . $this->keyValue->get('post_update_version') . '/' . PostUpdate::VERSION . '</strong>'
+				'<strong>' . $this->keyValue->get('post_update_version') . '/' . PostUpdate::VERSION . '</strong>',
 			),
 			'friendica' => $this->t('Please visit <a href="https://friendi.ca">Friendi.ca</a> to learn more about the Friendica project.'),
 			'bugs'      => $this->t('Bug reports and issues: please visit') . ' ' . '<a href="https://github.com/friendica/friendica/issues?state=open">' . $this->t('the bugtracker at github') . '</a>',
@@ -152,7 +152,7 @@ class Friendica extends BaseModule
 				header('Access-Control-Allow-Origin: *');
 				header('Cache-Control: max-age=23200, stale-while-revalidate=23200');
 				$this->jsonExit($data, 'application/activity+json');
-			} catch (HTTPException\NotFoundException $e) {
+			} catch (HTTPException\NotFoundException) {
 				$this->jsonError(404, ['error' => 'Record not found']);
 			}
 		}
@@ -160,7 +160,7 @@ class Friendica extends BaseModule
 		$register_policies = [
 			Register::CLOSED  => 'REGISTER_CLOSED',
 			Register::APPROVE => 'REGISTER_APPROVE',
-			Register::OPEN    => 'REGISTER_OPEN'
+			Register::OPEN    => 'REGISTER_OPEN',
 		];
 
 		$register_policy_int = Register::getPolicy();
@@ -196,7 +196,7 @@ class Friendica extends BaseModule
 
 		$data = [
 			'version'          => App::VERSION,
-			'url'              => (string)$this->baseUrl,
+			'url'              => (string) $this->baseUrl,
 			'addons'           => $visible_addons,
 			'locked_features'  => $locked_features,
 			'explicit_content' => intval($this->config->get('system', 'explicit_content', 0)),

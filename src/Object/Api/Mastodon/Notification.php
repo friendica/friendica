@@ -20,13 +20,18 @@ use Friendica\Util\DateTimeFormat;
 class Notification extends BaseDataTransferObject
 {
 	/* From the Mastodon documentation:
+	 * - admin.sign_up  = Someone signed up (optionally sent to admins)
+	 * - admin.report   = A new report has been filed
 	 * - follow         = Someone followed you
 	 * - follow_request = Someone requested to follow you
 	 * - mention        = Someone mentioned you in their status
 	 * - reblog         = Someone boosted one of your statuses
 	 * - favourite      = Someone favourited one of your statuses
 	 * - poll           = A poll you have voted in or created has ended
+	 * - quote          = Someone quoted one of your posts
+	 * - quoted_update  = A status you have quoted has been edited
 	 * - status         = Someone you enabled notifications for has posted a status
+	 * - update         = A status you boosted with has been edited
 	 */
 	public const TYPE_FOLLOW       = 'follow';
 	public const TYPE_INTRODUCTION = 'follow_request';
@@ -56,7 +61,7 @@ class Notification extends BaseDataTransferObject
 	 */
 	public function __construct(int $id, string $type, \DateTime $created_at, Account $account = null, Status $status = null, bool $dismissed = false)
 	{
-		$this->id         = (string)$id;
+		$this->id         = (string) $id;
 		$this->type       = $type;
 		$this->created_at = $created_at->format(DateTimeFormat::JSON);
 		$this->account    = $account->toArray();

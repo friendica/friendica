@@ -112,7 +112,7 @@ class Media extends BaseApi
 
 			try {
 				$attachment = DI::mstdnAttachment()->createFromId($this->parameters['id'] . '1');
-			} catch (InternalServerErrorException $th) {
+			} catch (InternalServerErrorException) {
 				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 			}
 

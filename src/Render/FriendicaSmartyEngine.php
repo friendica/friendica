@@ -17,10 +17,10 @@ use Friendica\Util\Strings;
  */
 final class FriendicaSmartyEngine extends TemplateEngine
 {
-	static $name = 'smarty3';
+	public static $name = 'smarty3';
 
-	const FILE_PREFIX = 'file:';
-	const STRING_PREFIX = 'string:';
+	public const FILE_PREFIX   = 'file:';
+	public const STRING_PREFIX = 'string:';
 
 	/** @var FriendicaSmarty */
 	private $smarty;
@@ -41,9 +41,9 @@ final class FriendicaSmartyEngine extends TemplateEngine
 		if (!is_writable($work_dir)) {
 			$admin_message = DI::l10n()->t('The folder %s must be writable by webserver.', $work_dir);
 			DI::logger()->critical($admin_message);
-			$message = DI::userSession()->isSiteAdmin() ?
-				$admin_message :
-				DI::l10n()->t('Friendica can\'t display this page at the moment, please contact the administrator.');
+			$message = DI::userSession()->isSiteAdmin()
+				? $admin_message
+				: DI::l10n()->t('Friendica can\'t display this page at the moment, please contact the administrator.');
 			throw new ServiceUnavailableException($message);
 		}
 	}
@@ -68,7 +68,7 @@ final class FriendicaSmartyEngine extends TemplateEngine
 		// "middleware": inject variables into templates
 		$arr = [
 			'template' => basename($this->smarty->filename ?? ''),
-			'vars' => $vars
+			'vars'     => $vars,
 		];
 		Hook::callAll('template_vars', $arr);
 		$vars = $arr['vars'];
@@ -92,7 +92,7 @@ final class FriendicaSmartyEngine extends TemplateEngine
 	public function getTemplateFile(string $file, string $subDir = '')
 	{
 		// Make sure $root ends with a slash /
-		if ($subDir !== '' && substr($subDir, -1, 1) !== '/') {
+		if ($subDir !== '' && !str_ends_with($subDir, '/')) {
 			$subDir = $subDir . '/';
 		}
 

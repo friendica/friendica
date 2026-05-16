@@ -19,12 +19,12 @@ use Friendica\Util\Writer\DbaDefinitionSqlWriter;
  */
 class DBStructure
 {
-	const UPDATE_NOT_CHECKED = 0; // Database check wasn't executed before
-	const UPDATE_SUCCESSFUL  = 1; // Database check was successful
-	const UPDATE_FAILED      = 2; // Database check failed
+	public const UPDATE_NOT_CHECKED = 0; // Database check wasn't executed before
+	public const UPDATE_SUCCESSFUL  = 1; // Database check was successful
+	public const UPDATE_FAILED      = 2; // Database check failed
 
-	const RENAME_COLUMN      = 0;
-	const RENAME_PRIMARY_KEY = 1;
+	public const RENAME_COLUMN      = 0;
+	public const RENAME_PRIMARY_KEY = 1;
 
 	/**
 	 * Set a database version to trigger update functions
@@ -71,12 +71,13 @@ class DBStructure
 		$old_tables = ['fserver', 'gcign', 'gcontact', 'gcontact-relation', 'gfollower' ,'glink', 'item-delivery-data',
 			'item-activity', 'item-content', 'item_id', 'participation', 'poll', 'poll_result', 'queue', 'retriever_rule',
 			'deliverq', 'dsprphotoq', 'ffinder', 'sign', 'spam', 'term', 'user-item', 'thread', 'item', 'challenge',
-			'auth_codes', 'tokens', 'clients', 'profile_check', 'host', 'conversation', 'fcontact', 'addon', 'push_subscriber'];
+			'auth_codes', 'tokens', 'clients', 'profile_check', 'host', 'conversation', 'fcontact', 'addon',
+			'push_subscriber', 'oembed'];
 
 		$tables = DBA::selectToArray(
 			'INFORMATION_SCHEMA.TABLES',
 			['TABLE_NAME'],
-			['TABLE_SCHEMA' => DBA::databaseName(), 'TABLE_TYPE' => 'BASE TABLE']
+			['TABLE_SCHEMA' => DBA::databaseName(), 'TABLE_TYPE' => 'BASE TABLE'],
 		);
 
 		if (empty($tables)) {
@@ -112,13 +113,13 @@ class DBStructure
 		$tables = DBA::selectToArray(
 			'information_schema.tables',
 			['table_name'],
-			['engine' => 'MyISAM', 'table_schema' => DBA::databaseName()]
+			['engine' => 'MyISAM', 'table_schema' => DBA::databaseName()],
 		);
 
 		$tables = array_merge($tables, DBA::selectToArray(
 			'information_schema.tables',
 			['table_name'],
-			['engine' => 'InnoDB', 'ROW_FORMAT' => ['COMPACT', 'REDUNDANT'], 'table_schema' => DBA::databaseName()]
+			['engine' => 'InnoDB', 'ROW_FORMAT' => ['COMPACT', 'REDUNDANT'], 'table_schema' => DBA::databaseName()],
 		));
 
 		if (!DBA::isResult($tables)) {
@@ -149,7 +150,7 @@ class DBStructure
 		echo DI::l10n()->t(
 			"\nError %d occurred during database update:\n%s\n",
 			DBA::errorNo(),
-			DBA::errorMessage()
+			DBA::errorMessage(),
 		);
 
 		return DI::l10n()->t('Errors encountered performing database changes: ') . $message . '<br />';
@@ -200,7 +201,7 @@ class DBStructure
 	 */
 	public static function getUpdateStatus(): int
 	{
-		return (int)DI::config()->get('system', 'dbupdate') ?? static::UPDATE_NOT_CHECKED;
+		return (int) DI::config()->get('system', 'dbupdate') ?? static::UPDATE_NOT_CHECKED;
 	}
 
 	/**
@@ -268,8 +269,8 @@ class DBStructure
 		}
 
 		// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
-		if ((version_compare(DBA::serverInfo(), '5.7.4') >= 0) &&
-			!(strpos(DBA::serverInfo(), 'MariaDB') !== false)) {
+		if ((version_compare(DBA::serverInfo(), '5.7.4') >= 0)
+			&& !(str_contains(DBA::serverInfo(), 'MariaDB'))) {
 			$ignore = '';
 		} else {
 			$ignore = ' IGNORE';
@@ -304,7 +305,7 @@ class DBStructure
 					} else {
 						$new_index_definition = "__NOT_SET__";
 					}
-					if ($current_index_definition != $new_index_definition && substr($indexName, 0, 6) != 'local_') {
+					if ($current_index_definition != $new_index_definition && !str_starts_with($indexName, 'local_')) {
 						$sql2 = DbaDefinitionSqlWriter::dropIndex($indexName);
 						if ($sql3 == "") {
 							$sql3 = "ALTER" . $ignore . " TABLE `" . $name . "` " . $sql2;
@@ -471,7 +472,7 @@ class DBStructure
 
 					if ($field_definition['Collation'] != $parameters['Collation']) {
 						$sql2 = DbaDefinitionSqlWriter::modifyTableField($fieldName, $parameters);
-						if (($sql3 == "") || (substr($sql3, -2, 2) == "; ")) {
+						if (($sql3 == "") || (str_ends_with($sql3, "; "))) {
 							$sql3 .= "ALTER" . $ignore . " TABLE `" . $name . "` " . $sql2;
 						} else {
 							$sql3 .= ", " . $sql2;
@@ -481,7 +482,7 @@ class DBStructure
 			}
 
 			if ($sql3 != "") {
-				if (substr($sql3, -2, 2) != "; ") {
+				if (!str_ends_with($sql3, "; ")) {
 					$sql3 .= ";";
 				}
 
@@ -533,21 +534,21 @@ class DBStructure
 			['COLUMN_NAME', 'COLUMN_TYPE', 'IS_NULLABLE', 'COLUMN_DEFAULT', 'EXTRA',
 				'COLUMN_KEY', 'COLLATION_NAME', 'COLUMN_COMMENT'],
 			["`TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?",
-				DBA::databaseName(), $table]
+				DBA::databaseName(), $table],
 		);
 
 		$foreign_keys = DBA::selectToArray(
 			'INFORMATION_SCHEMA.KEY_COLUMN_USAGE',
 			['COLUMN_NAME', 'CONSTRAINT_NAME', 'REFERENCED_TABLE_NAME', 'REFERENCED_COLUMN_NAME'],
 			["`TABLE_SCHEMA` = ? AND `TABLE_NAME` = ? AND `REFERENCED_TABLE_SCHEMA` IS NOT NULL",
-				DBA::databaseName(), $table]
+				DBA::databaseName(), $table],
 		);
 
 		$table_status = DBA::selectFirst(
 			'INFORMATION_SCHEMA.TABLES',
 			['ENGINE', 'TABLE_COLLATION', 'TABLE_COMMENT'],
 			["`TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?",
-				DBA::databaseName(), $table]
+				DBA::databaseName(), $table],
 		);
 
 		$fielddata   = [];
@@ -616,7 +617,7 @@ class DBStructure
 			'fields'       => $fielddata,
 			'indexes'      => $indexdata,
 			'foreign_keys' => $foreigndata,
-			'table_status' => $table_status
+			'table_status' => $table_status,
 		];
 	}
 
@@ -625,7 +626,7 @@ class DBStructure
 		$foreign_table = array_keys($parameters['foreign'])[0];
 		$foreign_field = array_values($parameters['foreign'])[0];
 
-		return $tableName . '-' . $fieldName. '-' . $foreign_table. '-' . $foreign_field;
+		return $tableName . '-' . $fieldName . '-' . $foreign_table . '-' . $foreign_field;
 	}
 
 	/**
@@ -664,7 +665,7 @@ class DBStructure
 						return " CHANGE `" . $from . "` `" . $to[0] . "` " . $to[1];
 					},
 					$columns,
-					array_keys($columns)
+					array_keys($columns),
 				));
 				break;
 			case self::RENAME_PRIMARY_KEY:
@@ -746,7 +747,7 @@ class DBStructure
 		return DBA::exists(
 			'INFORMATION_SCHEMA.KEY_COLUMN_USAGE',
 			["`TABLE_SCHEMA` = ? AND `TABLE_NAME` = ? AND `COLUMN_NAME` = ? AND `REFERENCED_TABLE_SCHEMA` IS NOT NULL",
-				DBA::databaseName(), $table, $field]
+				DBA::databaseName(), $table, $field],
 		);
 	}
 
@@ -928,7 +929,7 @@ class DBStructure
 
 		$processes = DBA::select('information_schema.processlist', ['info'], [
 			'db'      => DBA::databaseName(),
-			'command' => ['Query', 'Execute']
+			'command' => ['Query', 'Execute'],
 		]);
 
 		while ($process = DBA::fetch($processes)) {

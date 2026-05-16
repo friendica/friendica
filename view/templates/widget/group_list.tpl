@@ -20,18 +20,30 @@
 	<span id="group-list-sidebar-inflated" class="widget inflated fakelink">
 		<button class="fakelink" onclick="openCloseWidget('group-list-sidebar', 'group-list-sidebar-inflated');"
 			aria-expanded="false">
-			<h3>{{$title}}</h3>
+			<h3>
+				<i class="fa fa-users" aria-hidden="true"></i>
+				{{$title}}
+			</h3>
 		</button>
 	</span>
 	<div id="group-list-sidebar" class="widget">
 		<div id="sidebar-group-header" class="sidebar-widget-header">
 			<button class="fakelink" onclick="openCloseWidget('group-list-sidebar', 'group-list-sidebar-inflated');" aria-expanded="true">
-				<h3>{{$title}}</h3>
+				<h3>
+					<i class="fa fa-users" aria-hidden="true"></i>
+					{{$title}}
+				</h3>
 			</button>
-			<a class="group-new-tool pull-right widget-action faded-icon" id="sidebar-new-group"
+			<a class="pull-right widget-action widget-action-top faded-icon" id="sidebar-new-group"
 				href="{{$new_group_page}}" data-toggle="tooltip" title="{{$create_new_group}}">
 				<i class="fa fa-plus" aria-hidden="true"></i>
 			</a>
+			{{if $addon_group_directory_enabled}}
+				<a class="pull-right widget-action widget-action-top faded-icon" id="sidebar-group-directory"
+					href="/groupdirectory" data-toggle="tooltip" title="{{$visit_groupdirectory}}">
+					<i class="fa fa-search" aria-hidden="true"></i>
+				</a>
+			{{/if}}
 		</div>
 		<div id="sidebar-group-list" class="sidebar-widget-list">
 			{{* The list of available groups *}}

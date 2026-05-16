@@ -20,7 +20,7 @@ use Psr\Log\NullLogger;
 /**
  * The logger factory for the StreamLogger instance
  *
- * @deprecated 2025.02 Implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead
+ * @deprecated 2026.01 Implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead
  * @see StreamLoggerFactory
  * @see StreamLoggerClass
  */
@@ -40,11 +40,11 @@ class StreamLogger extends AbstractLoggerTypeFactory
 	 */
 	public function create(IManageConfigValues $config, string $logfile = null, string $channel = null): LoggerInterface
 	{
-		@trigger_error('Class `' . __CLASS__ . '` is deprecated since 2025.02 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
+		@trigger_error('Class `' . self::class . '` is deprecated since 2026.01 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
 
 		$fileSystem = new FileSystem();
 
-		$logfile = $logfile ?? $config->get('system', 'logfile');
+		$logfile ??= $config->get('system', 'logfile');
 		if (!@file_exists($logfile) || !@is_writable($logfile)) {
 			throw new LoggerArgumentException(sprintf('%s is not a valid logfile', $logfile));
 		}
@@ -80,8 +80,8 @@ class StreamLogger extends AbstractLoggerTypeFactory
 		$logfile     = $config->get('system', 'dlogfile');
 		$developerIp = $config->get('system', 'dlogip');
 
-		if ((!isset($developerIp) || !$debugging) &&
-			(!is_file($logfile) || is_writable($logfile))) {
+		if ((!isset($developerIp) || !$debugging)
+			&& (!is_file($logfile) || is_writable($logfile))) {
 			return new NullLogger();
 		}
 

@@ -5,7 +5,7 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <div class="generic-page-wrapper">
-	<h1>{{$title}} <a href="help/Two-Factor-Authentication" title="{{$help_label}}" class="btn btn-default btn-sm"><i aria-hidden="true" class="fa fa-question fa-2x"></i></a></h1>
+	<h1>{{$title}} <a href="help/user/two-factor-authentication" title="{{$help_label}}" class="btn btn-default btn-sm"><i aria-hidden="true" class="fa fa-question fa-2x"></i></a></h1>
 	<div>{{$message nofilter}}</div>
 
 	<div class="text-center">

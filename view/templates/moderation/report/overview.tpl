@@ -10,9 +10,13 @@
 
 	<h3>{{$h_reports}}</h3>
 	{{if $reports}}
+		<form method="post">
 		<table class="table table-condensed table-striped table-bordered">
 			<thead>
 				<tr>
+					<th>
+					<input type="checkbox" id="select-all-reports" title="{{$select_all}}">
+					</th>
 					{{foreach $th_reports as $th}}
 					<th>
 					{{$th}}
@@ -23,6 +27,9 @@
 			<tbody>
 				{{foreach $reports as $report}}
 				<tr>
+					<td>
+						<input type="checkbox" name="report_ids[]" value="{{$report.id}}" class="report-checkbox">
+					</td>
 					<td>
 						{{$report.created}}
 					</td>
@@ -36,7 +43,7 @@
 				</tr>
 				{{if $report.posts}}
 				<tr>
-					<td colspan="5">
+					<td colspan="6">
 					<table class="table table-condensed table-striped table-bordered">
 					{{foreach $report.posts as $post}}
 						<tr>
@@ -55,8 +62,34 @@
 				{{/foreach}}
 			</tbody>
 		</table>
+		<button type="submit" name="close_reports" value="1" class="btn btn-primary">{{$close_reports}}</button>
+		</form>
 		{{$paginate nofilter}}
 	{{else}}
 		<p>{{$no_data}}</p>
 	{{/if}}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	var selectAllCheckbox = document.getElementById('select-all-reports');
+	var reportCheckboxes = document.querySelectorAll('.report-checkbox');
+
+	if (selectAllCheckbox) {
+		selectAllCheckbox.addEventListener('change', function() {
+			reportCheckboxes.forEach(function(checkbox) {
+				checkbox.checked = selectAllCheckbox.checked;
+			});
+		});
+
+		reportCheckboxes.forEach(function(checkbox) {
+			checkbox.addEventListener('change', function() {
+				var allChecked = Array.from(reportCheckboxes).every(function(cb) {
+					return cb.checked;
+				});
+				selectAllCheckbox.checked = allChecked;
+			});
+		});
+	}
+});
+</script>

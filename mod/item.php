@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -46,7 +47,7 @@ function item_post()
 	$eventDispatcher = DI::eventDispatcher();
 
 	$_REQUEST = $eventDispatcher->dispatch(
-		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_START, $_REQUEST)
+		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_START, $_REQUEST),
 	)->getArray();
 
 	$return_path = $_REQUEST['return'] ?? '';
@@ -97,18 +98,20 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	$post['edit'] = $post;
 	$post['file'] = Post\Category::getTextByURIId($post['uri-id'], $post['uid']);
 
-	Post\Media::deleteByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HTML]);
+	Post\Media::deleteByURIId($post['uri-id'], [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HTML, Post\Media::HLS]);
 	$post = item_process($post, $request, $preview, $return_path);
 
 	$fields = [
-		'title'    => $post['title'],
-		'body'     => $post['body'],
-		'attach'   => $post['attach'],
-		'file'     => $post['file'],
-		'location' => $post['location'],
-		'coord'    => $post['coord'],
-		'edited'   => DateTimeFormat::utcNow(),
-		'changed'  => DateTimeFormat::utcNow()
+		'title'           => $post['title'],
+		'content-warning' => $post['content-warning'],
+		'sensitive'       => $post['sensitive'],
+		'body'            => $post['body'],
+		'attach'          => $post['attach'],
+		'file'            => $post['file'],
+		'location'        => $post['location'],
+		'coord'           => $post['coord'],
+		'edited'          => DateTimeFormat::utcNow(),
+		'changed'         => DateTimeFormat::utcNow(),
 	];
 
 	$fields['body'] = Item::setHashtags($fields['body']);
@@ -259,20 +262,22 @@ function item_process(array $post, array $request, bool $preview, string $return
 	// preview mode - prepare the body for display and send it via json
 	if ($preview) {
 		// We have to preset some fields, so that the conversation can be displayed
-		$post['id']             = -1;
-		$post['uri-id']         = -1;
-		$post['author-network'] = Protocol::DFRN;
-		$post['author-updated'] = '';
-		$post['author-alias']   = '';
-		$post['author-gsid']    = 0;
-		$post['author-uri-id']  = ItemURI::getIdByURI($post['author-link']);
-		$post['owner-updated']  = '';
-		$post['has-media']      = false;
-		$post['quote-uri-id']   = Item::getQuoteUriId($post['body'], $post['uid']);
-		$post['body']           = BBCode::removeSharedData(Item::setHashtags($post['body']));
-		$post['writable']       = true;
-		$post['sensitive']      = false;
-		$post['post-reason']    = Item::PR_LOCAL;
+		$post['id']                 = -1;
+		$post['uri-id']             = -1;
+		$post['author-network']     = Protocol::DFRN;
+		$post['author-updated']     = '';
+		$post['author-alias']       = '';
+		$post['author-gsid']        = 0;
+		$post['author-uri-id']      = ItemURI::getIdByURI($post['author-link']);
+		$post['owner-updated']      = '';
+		$post['has-media']          = false;
+		$post['quote-uri-id']       = Item::getQuoteUriId($post['body'], $post['uid']);
+		$post['body']               = BBCode::removeSharedData(Item::setHashtags($post['body']));
+		$post['writable']           = true;
+		$post['sensitive']          = false;
+		$post['post-reason']        = Item::PR_LOCAL;
+		$post['owner-contact-type'] = Contact::TYPE_PERSON;
+		$post['owner-network']      = Protocol::DFRN;
 
 		$o = DI::conversation()->render([$post], Conversation::MODE_SEARCH, false, true);
 
@@ -286,7 +291,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 	];
 
 	$hook_data = $eventDispatcher->dispatch(
-		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data)
+		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data),
 	)->getArray();
 
 	$post = $hook_data['item'] ?? $post;
@@ -295,19 +300,29 @@ function item_process(array $post, array $request, bool $preview, string $return
 	unset($post['self']);
 	unset($post['api_source']);
 
+	$scheduled_at = '';
 	if (!empty($request['scheduled_at'])) {
 		$scheduled_at = DateTimeFormat::convert($request['scheduled_at'], 'UTC', DI::appHelper()->getTimeZone());
-		if ($scheduled_at > DateTimeFormat::utcNow()) {
-			unset($post['created']);
-			unset($post['edited']);
-			unset($post['commented']);
-			unset($post['received']);
-			unset($post['changed']);
-
-			Post\Delayed::add($post['uri'], $post, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED_NO_HOOK, $scheduled_at);
-			item_post_return(DI::baseUrl(), $return_path);
-		}
+	} else {
+		$scheduled_at = DI::contentItem()->getAutomaticScheduledAt($post['uid']);
 	}
+
+	if ($scheduled_at > DateTimeFormat::utcNow()) {
+		unset($post['created']);
+		unset($post['edited']);
+		unset($post['commented']);
+		unset($post['received']);
+		unset($post['changed']);
+
+		$id = Post\Delayed::add($post['uri'], $post, Worker::PRIORITY_HIGH, Post\Delayed::PREPARED_NO_HOOK, $scheduled_at);
+		if ($id && empty($request['scheduled_at'])) {
+			DI::contentItem()->setAutomaticScheduledAt($post['uid'], $scheduled_at);
+		}
+
+		item_post_return(DI::baseUrl(), $return_path);
+	}
+
+	$post['created'] = $scheduled_at;
 
 	if (!empty($post['cancel'])) {
 		DI::logger()->info('mod_item: post cancelled by addon.');
@@ -490,7 +505,7 @@ function item_redirect_after_action(array $item, string $returnUrlHex)
 		}
 	} else {
 		// if unknown location or deleting top level post called from display
-		if (empty($return_url) || strpos($return_url, 'display') !== false) {
+		if (empty($return_url) || str_contains($return_url, 'display')) {
 			DI::baseUrl()->redirect('network');
 			//NOTREACHED
 		} else {

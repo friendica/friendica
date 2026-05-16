@@ -65,14 +65,16 @@ class Account extends BaseDataTransferObject
 	protected $statuses_count;
 	/** @var string|null (Datetime) */
 	protected $last_status_at = null;
-	/** @var bool */
-	protected $hide_collections = false;
+	/** @var bool|null */
+	protected $hide_collections;
 	/** @var Emoji[] */
 	protected $emojis;
 	/** @var Account|null */
 	protected $moved = null;
 	/** @var Field[]|null */
 	protected $fields = null;
+	/** @var Source|null */
+	protected $source = null;
 
 	/**
 	 * Creates an account record from a public contact record. Expects all contact table fields to be set.
@@ -82,15 +84,15 @@ class Account extends BaseDataTransferObject
 	 * @param Fields  $fields  Profile fields
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(BaseURL $baseUrl, array $account, Fields $fields)
+	public function __construct(BaseURL $baseUrl, array $account, Fields $fields, ?Source $source)
 	{
-		$this->id       = (string)$account['pid'];
+		$this->id       = (string) $account['pid'];
 		$this->username = $account['nick'];
-		$this->acct     = strpos($account['url'], $baseUrl . '/') === 0 ?
-				$account['nick'] :
-				$account['addr'];
+		$this->acct     = str_starts_with($account['url'], $baseUrl . '/')
+				? $account['nick']
+				: $account['addr'];
 		$this->display_name = $account['name'];
-		$this->locked       = (bool)$account['manually-approve'];
+		$this->locked       = (bool) $account['manually-approve'];
 		$this->bot          = ($account['contact-type'] == Contact::TYPE_NEWS);
 		$this->discoverable = !$account['unsearchable'];
 		$this->indexable    = $this->discoverable;
@@ -99,7 +101,7 @@ class Account extends BaseDataTransferObject
 		$this->created_at = DateTimeFormat::utc($account['created'] ?: DBA::NULL_DATETIME, DateTimeFormat::JSON);
 
 		$this->note            = BBCode::convertForUriId($account['uri-id'], $account['about'], BBCode::EXTERNAL);
-		$this->url             = $account['alias'] ?: $account['url'];
+		$this->url             = Contact::getProfileLink($account);
 		$this->uri             = $account['url'];
 		$this->avatar          = Contact::getAvatarUrlForId($account['id'] ?? 0 ?: $account['pid'], Proxy::SIZE_SMALL, $account['updated'], $account['guid'] ?? '');
 		$this->avatar_static   = Contact::getAvatarUrlForId($account['id'] ?? 0 ?: $account['pid'], Proxy::SIZE_SMALL, $account['updated'], $account['guid'] ?? '', true);
@@ -115,6 +117,7 @@ class Account extends BaseDataTransferObject
 		// No custom emojis per account in Friendica
 		$this->emojis = [];
 		$this->fields = $fields->getArrayCopy();
+		$this->source = $source;
 	}
 
 	/**
@@ -128,6 +131,10 @@ class Account extends BaseDataTransferObject
 
 		if (empty($account['moved'])) {
 			unset($account['moved']);
+		}
+
+		if (empty($account['source'])) {
+			unset($account['source']);
 		}
 
 		return $account;

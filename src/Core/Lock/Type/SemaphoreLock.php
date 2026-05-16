@@ -72,7 +72,7 @@ class SemaphoreLock extends AbstractLock
 				$success = @sem_release(self::$semaphore[$key]);
 				unset(self::$semaphore[$key]);
 				$this->markRelease($key);
-			} catch (\Exception $exception) {
+			} catch (\Exception) {
 				$success = false;
 			}
 		}
@@ -111,7 +111,7 @@ class SemaphoreLock extends AbstractLock
 			$result = [];
 
 			foreach ($keys as $key) {
-				if (strpos($key, $prefix) === 0) {
+				if (str_starts_with($key, $prefix)) {
 					array_push($result, $key);
 				}
 			}

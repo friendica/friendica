@@ -79,8 +79,8 @@ class Edit extends BaseModule
 		}
 
 		$fields = [
-			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'gravity',
-			'body', 'title', 'uri-id', 'wall', 'post-type', 'guid'
+			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'gravity', 'sensitive',
+			'body', 'title', 'content-warning', 'uri-id', 'wall', 'post-type', 'guid',
 		];
 
 		$item = Post::selectFirstForUser($this->session->getLocalUserId(), $fields, [
@@ -99,10 +99,12 @@ class Edit extends BaseModule
 		]);
 
 		$this->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('jot-header.tpl'), [
-			'$ispublic'  => '&nbsp;',
-			'$geotag'    => '',
-			'$nickname'  => $this->session->getLocalUserNickname(),
-			'$is_mobile' => $this->mode->isMobile(),
+			'$ispublic'      => '&nbsp;',
+			'$geotag'        => '',
+			'$nickname'      => $this->session->getLocalUserNickname(),
+			'$postPublished' => $this->t('Post published.'),
+			'$goToPost'      => $this->t('Go to post'),
+			'$is_mobile'     => $this->mode->isMobile(),
 		]);
 
 		if (strlen($item['allow_cid']) || strlen($item['allow_gid']) || strlen($item['deny_cid']) || strlen($item['deny_gid'])) {
@@ -151,6 +153,8 @@ class Edit extends BaseModule
 			'$public'              => $this->t('Public post'),
 			'$title'               => $item['title'],
 			'$placeholdertitle'    => $this->t('Set title'),
+			'$summary'             => $item['content-warning'],
+			'$placeholdersummary'  => (Feature::isEnabled($this->session->getLocalUserId(), Feature::SUMMARY) ? $this->t('Set summary, abstract or spoiler text') : ''),
 			'$category'            => Post\Category::getCSVByURIId($item['uri-id'], $this->session->getLocalUserId(), Post\Category::CATEGORY),
 			'$placeholdercategory' => (Feature::isEnabled($this->session->getLocalUserId(), Feature::CATEGORIES) ? $this->t("Categories \x28comma-separated list\x29") : ''),
 			'$emtitle'             => $this->t('Example: bob@example.com, mary@example.com'),
@@ -175,7 +179,7 @@ class Edit extends BaseModule
 
 			//jot nav tab (used in some themes)
 			'$message'      => $this->t('Message'),
-			'$browser'      => $this->t('Browser'),
+			'$browser'      => $this->t('Add file'),
 			'$shortpermset' => $this->t('Permissions'),
 
 			'$compose_link_title' => $this->t('Open Compose page'),

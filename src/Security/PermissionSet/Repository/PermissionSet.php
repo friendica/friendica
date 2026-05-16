@@ -24,7 +24,7 @@ use Psr\Log\LoggerInterface;
 class PermissionSet extends BaseRepository
 {
 	/** @var int Virtual permission set id for public permission */
-	const PUBLIC = 0;
+	public const PUBLIC = 0;
 
 	/** @var PermissionSetFactory */
 	protected $factory;
@@ -121,7 +121,7 @@ class PermissionSet extends BaseRepository
 			if (!empty($user_contact_str) && $this->db->exists('contact', [
 				'id'      => $cid,
 				'uid'     => $uid,
-				'blocked' => false
+				'blocked' => false,
 			])) {
 				$circle_ids = Circle::getIdsByContactId($cid);
 			}
@@ -132,13 +132,13 @@ class PermissionSet extends BaseRepository
 			}
 
 			if (!empty($user_contact_str)) {
-				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR LOCATE(?, `deny_cid`) OR deny_gid REGEXP ?)
-				AND (LOCATE(?, allow_cid) OR LOCATE(?, allow_cid) OR allow_gid REGEXP ? OR (allow_cid = '' AND allow_gid = '')))",
+				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR LOCATE(?, `deny_cid`) OR CAST(deny_gid AS BINARY) REGEXP BINARY ?)
+				AND (LOCATE(?, allow_cid) OR LOCATE(?, allow_cid) OR  CAST(allow_gid AS BINARY) REGEXP BINARY ? OR (allow_cid = '' AND allow_gid = '')))",
 					$uid, $user_contact_str, $public_contact_str, $circle_str,
 					$user_contact_str, $public_contact_str, $circle_str];
 			} else {
-				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR deny_gid REGEXP ?)
-				AND (LOCATE(?, allow_cid) OR allow_gid REGEXP ? OR (allow_cid = '' AND allow_gid = '')))",
+				$condition = ["`uid` = ? AND (NOT (LOCATE(?, `deny_cid`) OR CAST(deny_gid AS BINARY) REGEXP BINARY ?)
+				AND (LOCATE(?, allow_cid) OR CAST(allow_gid AS BINARY) REGEXP BINARY ? OR (allow_cid = '' AND allow_gid = '')))",
 					$uid, $public_contact_str, $circle_str, $public_contact_str, $circle_str];
 			}
 
@@ -169,7 +169,7 @@ class PermissionSet extends BaseRepository
 
 		return $this->selectOrCreate($this->factory->createFromString(
 			$uid,
-			$this->aclFormatter->toString($self_contact['id'])
+			$this->aclFormatter->toString($self_contact['id']),
 		));
 	}
 
@@ -201,7 +201,7 @@ class PermissionSet extends BaseRepository
 
 		try {
 			return $this->selectOne($this->convertToTableRow($permissionSet));
-		} catch (NotFoundException $exception) {
+		} catch (NotFoundException) {
 			return $this->save($permissionSet);
 		} catch (Exception $exception) {
 			throw new PermissionSetPersistenceException(sprintf('Cannot select PermissionSet %d', $permissionSet->id ?? 0), $exception);

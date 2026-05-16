@@ -11,7 +11,7 @@
 	<div id="site-location">{{$sitelocation}}</div>
 	<div id="banner">{{$banner nofilter}}</div>
 </header>
-<nav role="menubar">
+<nav id="topbar-first" role="menubar">
 	<ul>
 		<li class="mobile-aside-toggle" style="display:none;">
 			<a href="#">
@@ -36,10 +36,10 @@
 				</a>
 			</li>
 		{{/if}}
-		{{if $nav.events}}
-			<li role="menuitem" id="nav-calendar-link" class="nav-menu {{$sel.events}}">
-				<a accesskey="e" class="{{$nav.events.2}} desktop-view" href="{{$nav.events.0}}" title="{{$nav.events.3}}">{{$nav.events.1}}</a>
-				<a class="{{$nav.events.2}} mobile-view" href="{{$nav.events.0}}" title="{{$nav.events.3}}"><i class="icon s22 icon-calendar"></i></a>
+		{{if $nav.calendar}}
+			<li role="menuitem" id="nav-calendar-link" class="nav-menu {{$sel.calendar}}">
+				<a accesskey="e" class="{{$nav.calendar.2}} desktop-view" href="{{$nav.calendar.0}}" title="{{$nav.calendar.3}}">{{$nav.calendar.1}}</a>
+				<a class="{{$nav.calendar.2}} mobile-view" href="{{$nav.calendar.0}}" title="{{$nav.calendar.3}}"><i class="icon s22 icon-calendar"></i></a>
 			</li>
 		{{/if}}
 		{{if $nav.channel}}
@@ -128,7 +128,7 @@
 		{{if $nav.search}}
 			<li role="search" id="nav-search-box">
 				<form method="get" action="{{$nav.search.0}}">
-					<input accesskey="s" id="nav-search-text" class="nav-menu-search" type="text" value="" name="q" placeholder=" {{$search_hint}}">
+					<input accesskey="s" id="nav-search-text" class="nav-menu-search" type="text" value="" name="q" placeholder=" {{$search_placeholder}}">
 					<select name="search-option">
 						<option value="fulltext">{{$nav.searchoption.0}}</option>
 						<option value="tags">{{$nav.searchoption.1}}</option>

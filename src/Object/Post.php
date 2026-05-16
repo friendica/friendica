@@ -23,7 +23,6 @@ use Friendica\Protocol\Activity;
 use Friendica\Util\Crypto;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
-use Friendica\Util\Temporal;
 use GuzzleHttp\Psr7\Uri;
 use InvalidArgumentException;
 
@@ -36,7 +35,7 @@ class Post
 	private $template            = null;
 	private $available_templates = [
 		'wall'      => 'wall_thread.tpl',
-		'wall2wall' => 'wallwall_thread.tpl'
+		'wall2wall' => 'wallwall_thread.tpl',
 	];
 	private $comment_box_template = 'comment_item.tpl';
 	private $toplevel             = false;
@@ -80,7 +79,7 @@ class Post
 			'id'      => $this->getDataValue('author-id'),
 			'network' => $this->getDataValue('author-network'),
 			'url'     => $this->getDataValue('author-link'),
-			'alias'   => $this->getDataValue('author-alias')
+			'alias'   => $this->getDataValue('author-alias'),
 		];
 		$this->redirect_url = Contact::magicLinkByContact($author);
 		if (!$this->isToplevel()) {
@@ -165,8 +164,8 @@ class Post
 		if (strtotime($item['edited']) - strtotime($item['created']) > 1) {
 			$edited = [
 				'label'    => DI::l10n()->t('This entry was edited'),
-				'date'     => DateTimeFormat::local($item['edited'], 'r'),
-				'relative' => Temporal::getRelativeDate($item['edited']),
+				'date'     => DI::l10n()->fullDateTime($item['edited']),
+				'relative' => DI::l10n()->relativeDateTime($item['edited']),
 			];
 		}
 		$sparkle = '';
@@ -195,7 +194,7 @@ class Post
 		$connector = !in_array($item['network'], Protocol::NATIVE_SUPPORT) && ($item['protocol'] != Conversation::PARCEL_JETSTREAM) ? DI::l10n()->t('Connector Message') : false;
 
 		$shareable    = in_array($conv->getProfileOwner(), [0, DI::userSession()->getLocalUserId()]) && $item['private'] != Item::PRIVATE;
-		$announceable = $shareable && in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::TWITTER, Protocol::TUMBLR, Protocol::BLUESKY]);
+		$announceable = $shareable && in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Protocol::TWITTER, Protocol::TUMBLR, Protocol::ATPROTO]);
 		$commentable  = ($item['network'] != Protocol::TUMBLR);
 		$likeable     = true;
 
@@ -216,14 +215,22 @@ class Post
 			$announceable = false;
 		}
 
+		if ($item['restrictions'] & Item::CANT_QUOTE) {
+			$shareable = false;
+		}
+
 		$edpost = false;
 
 		if (DI::userSession()->getLocalUserId()) {
+			if ($commentable && Contact\User::isIsBlocked($item['author-id'], DI::userSession()->getLocalUserId())) {
+				$commentable = false;
+			}
+
 			if (Strings::compareLink(DI::session()->get('my_url'), $item['author-link'])) {
 				if ($item['event-id'] != 0) {
-					$edpost = ['calendar/event/edit/' . $item['event-id'], DI::l10n()->t('Edit')];
+					$edpost = ['calendar/event/edit/' . $item['event-id'], DI::l10n()->t('Edit event')];
 				} else {
-					$edpost = [sprintf('post/%s/edit', $item['id']), DI::l10n()->t('Edit')];
+					$edpost = [sprintf('post/%s/edit', $item['id']), DI::l10n()->t('Edit post')];
 				}
 			}
 			$dropping = in_array($item['uid'], [0, DI::userSession()->getLocalUserId()]);
@@ -243,7 +250,7 @@ class Post
 		$origin = $item['origin'] || $item['parent-origin'];
 
 		if (!empty($item['featured'])) {
-			$pinned = DI::l10n()->t('Pinned item');
+			$pinned = DI::l10n()->t('Pinned to your wall');
 		}
 
 		$drop         = false;
@@ -278,7 +285,7 @@ class Post
 				'author_id'  => $item['author-id'],
 			];
 			$report = [
-				'label' => DI::l10n()->t('Report post'),
+				'label' => DI::l10n()->t('Report this post'),
 				'href'  => 'moderation/report/create?' . http_build_query(['cid' => $item['author-id'], 'uri-ids' => [$item['uri-id']]]),
 			];
 			$authorBaseUri = new Uri($item['author-baseurl'] ?? '');
@@ -309,7 +316,7 @@ class Post
 			$profile_link = $item['author-link'];
 		}
 
-		if (strpos($profile_link, 'contact/redir/') === 0) {
+		if (str_starts_with($profile_link, 'contact/redir/')) {
 			$sparkle = ' sparkle';
 		}
 
@@ -382,21 +389,23 @@ class Post
 				$ignored_thread = PostModel\ThreadUser::getIgnored($item['uri-id'], DI::userSession()->getLocalUserId());
 				if ($item['mention'] || $ignored_thread) {
 					$ignore_thread = [
-						'do'        => DI::l10n()->t('Ignore thread'),
-						'undo'      => DI::l10n()->t('Unignore thread'),
-						'toggle'    => DI::l10n()->t('Toggle ignore status'),
+						'do'   => DI::l10n()->t('Turn off related notifications'),
+						'undo' => DI::l10n()->t('Turn on related notifications'),
+						// NOTE: Toggle is currently unused
+						//'toggle'    => DI::l10n()->t('Toggle notifications for this post'),
 						'classdo'   => $ignored_thread ? 'hidden' : '',
 						'classundo' => $ignored_thread ? '' : 'hidden',
-						'ignored'   => DI::l10n()->t('Ignored'),
+						'ignored'   => DI::l10n()->t('Notifications turned off for this post'),
 					];
 				}
 
 				$isstarred = (($item['starred']) ? 'starred' : 'unstarred');
 
 				$star = [
-					'do'        => DI::l10n()->t('Add star'),
-					'undo'      => DI::l10n()->t('Remove star'),
-					'toggle'    => DI::l10n()->t('Toggle star status'),
+					'do'   => DI::l10n()->t('Bookmark'),
+					'undo' => DI::l10n()->t('Remove bookmark'),
+					// NOTE: Toggle is currently unused
+					//'toggle'    => DI::l10n()->t('Toggle bookmark status'),
 					'classdo'   => $item['starred'] ? 'hidden' : '',
 					'classundo' => $item['starred'] ? '' : 'hidden',
 					'starred'   => DI::l10n()->t('Starred'),
@@ -407,17 +416,18 @@ class Post
 						$ispinned = ($item['featured'] ? 'pinned' : 'unpinned');
 
 						$pin = [
-							'do'        => DI::l10n()->t('Pin'),
-							'undo'      => DI::l10n()->t('Unpin'),
-							'toggle'    => DI::l10n()->t('Toggle pin status'),
+							'do'   => DI::l10n()->t('Pin to your wall'),
+							'undo' => DI::l10n()->t('Unpin from your wall'),
+							// NOTE: Toggle is currently unused
+							//'toggle'    => DI::l10n()->t('Toggle pin status'),
 							'classdo'   => $item['featured'] ? 'hidden' : '',
 							'classundo' => $item['featured'] ? '' : 'hidden',
-							'pinned'    => DI::l10n()->t('Pinned'),
+							'pinned'    => DI::l10n()->t('Pinned to your wall'),
 						];
 					}
 
 					$tagger = [
-						'add'   => DI::l10n()->t('Add tag'),
+						'add'   => DI::l10n()->t('Add tag to post'),
 						'class' => '',
 					];
 				}
@@ -428,8 +438,8 @@ class Post
 
 		if ($conv->isWritable()) {
 			if ($likeable) {
-				$buttons['like']    = [DI::l10n()->t("I like this \x28toggle\x29"), DI::l10n()->t('Like')];
-				$buttons['dislike'] = [DI::l10n()->t("I don't like this \x28toggle\x29"), DI::l10n()->t('Dislike')];
+				$buttons['like']    = [DI::l10n()->t("I like this (toggle)"), DI::l10n()->t('Like')];
+				$buttons['dislike'] = [DI::l10n()->t("I don't like this (toggle)"), DI::l10n()->t('Dislike')];
 			}
 			if ($shareable) {
 				$buttons['share'] = [DI::l10n()->t('Quote share this'), DI::l10n()->t('Quote Share')];
@@ -454,7 +464,7 @@ class Post
 
 		$body_html = Item::prepareBody($item, true);
 
-		list($categories, $folders) = DI::contentItem()->determineCategoriesTerms($item, DI::userSession()->getLocalUserId());
+		[$categories, $folders] = DI::contentItem()->determineCategoriesTerms($item, DI::userSession()->getLocalUserId());
 
 		$hide_dislike = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'hide_dislike');
 		if ($hide_dislike) {
@@ -477,8 +487,8 @@ class Post
 
 		$tags = Tag::populateFromItem($item);
 
-		$ago          = Temporal::getRelativeDate($item['created']);
-		$ago_received = Temporal::getRelativeDate($item['received']);
+		$ago          = DI::l10n()->relativeDateTime($item['created']);
+		$ago_received = DI::l10n()->relativeDateTime($item['received']);
 		if (DI::config()->get('system', 'show_received') && (abs(strtotime($item['created']) - strtotime($item['received'])) > DI::config()->get('system', 'show_received_seconds')) && ($ago != $ago_received)) {
 			$ago = DI::l10n()->t('%s (Received %s)', $ago, $ago_received);
 		}
@@ -487,7 +497,7 @@ class Post
 		if (!DI::userSession()->getLocalUserId() && ($item['network'] != Protocol::DIASPORA) && !empty(DI::session()->get('remote_comment'))) {
 			$remote_comment = [
 				DI::l10n()->t('Comment this item on your system'), DI::l10n()->t('Remote comment'),
-				str_replace('{uri}', urlencode($item['uri']), DI::session()->get('remote_comment'))
+				str_replace('{uri}', urlencode($item['uri']), DI::session()->get('remote_comment')),
 			];
 
 			// Ensure to either display the remote comment or the local activities
@@ -505,7 +515,7 @@ class Post
 		$languages = [];
 		$language  = '';
 		if (!empty($item['language'])) {
-			$languages = DI::l10n()->t('Languages');
+			$languages = DI::l10n()->t('Detected languages');
 			$language  = array_key_first(json_decode($item['language'], true));
 		}
 
@@ -559,7 +569,7 @@ class Post
 			'sparkle'                => $sparkle,
 			'title'                  => $item['title'],
 			'summary'                => $item['content-warning'],
-			'localtime'              => DateTimeFormat::local($item['created'], 'r'),
+			'localtime'              => DI::l10n()->fullDateTime($item['created']),
 			'utc'                    => DateTimeFormat::utc($item['created']),
 			'ago'                    => $item['app'] ? DI::l10n()->t('%s from %s', $ago, $item['app']) : $ago,
 			'app'                    => $item['app'],
@@ -588,7 +598,7 @@ class Post
 			'filer'                  => $filer,
 			'language'               => $languages,
 			'lang'                   => $language,
-			'searchtext'             => DI::l10n()->t('Search Text'),
+			'searchtext'             => DI::l10n()->t('Raw content'),
 			'drop'                   => $drop,
 			'block'                  => $block,
 			'ignore_author'          => $ignore,
@@ -807,8 +817,8 @@ class Post
 			DI::logger()->warning('Post object does not belong to local user', ['post' => $item, 'local_user' => DI::userSession()->getLocalUserId()]);
 			return false;
 		} elseif (
-			DI::activity()->match($item->getDataValue('verb'), Activity::LIKE) ||
-			DI::activity()->match($item->getDataValue('verb'), Activity::DISLIKE)
+			DI::activity()->match($item->getDataValue('verb'), Activity::LIKE)
+			|| DI::activity()->match($item->getDataValue('verb'), Activity::DISLIKE)
 		) {
 			DI::logger()->warning('Post objects is a like/dislike', ['post' => $item]);
 			return false;
@@ -1092,8 +1102,8 @@ class Post
 
 			$profile = Contact::getByURL($term['url'], false, ['addr', 'contact-type']);
 			if (
-				!empty($profile['addr']) && (($profile['contact-type'] ?? Contact::TYPE_UNKNOWN) != Contact::TYPE_COMMUNITY) &&
-				($profile['addr'] != $owner['addr']) && !strstr($text, $profile['addr'])
+				!empty($profile['addr']) && (($profile['contact-type'] ?? Contact::TYPE_UNKNOWN) != Contact::TYPE_COMMUNITY)
+				&& ($profile['addr'] != $owner['addr']) && !strstr($text, (string) $profile['addr'])
 			) {
 				$text .= '@' . $profile['addr'] . ' ';
 			}
@@ -1156,7 +1166,7 @@ class Post
 				'$mytitle'     => DI::l10n()->t('This is you'),
 				'$myphoto'     => DI::baseUrl()->remove($owner['thumb'] ?? ''),
 				'$comment'     => DI::l10n()->t('Comment'),
-				'$submit'      => DI::l10n()->t('Submit'),
+				'$submit'      => DI::l10n()->t('Post comment'),
 				'$loading'     => DI::l10n()->t('Loading...'),
 				'$edbold'      => DI::l10n()->t('Bold'),
 				'$editalic'    => DI::l10n()->t('Italic'),
@@ -1171,7 +1181,7 @@ class Post
 				'$prompttext'  => DI::l10n()->t('Please enter a image/video/audio/webpage URL:'),
 				'$preview'     => DI::l10n()->t('Preview'),
 				'$indent'      => $indent,
-				'$rand_num'    => Crypto::randomDigits(12)
+				'$rand_num'    => Crypto::randomDigits(12),
 			]);
 		}
 

@@ -7,19 +7,18 @@
 
 namespace Friendica\Protocol;
 
-use DOMDocument;
-use DOMXPath;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
+use Friendica\Model\Conversation;
 use Friendica\Model\Item;
 use Friendica\Model\User;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
-use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\ParseUrl;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
@@ -29,18 +28,13 @@ use stdClass;
  */
 final class ATProtocol
 {
-	const STATUS_UNKNOWN    = 0;
-	const STATUS_TOKEN_OK   = 1;
-	const STATUS_SUCCESS    = 2;
-	const STATUS_API_FAIL   = 10;
-	const STATUS_DID_FAIL   = 11;
-	const STATUS_PDS_FAIL   = 12;
-	const STATUS_TOKEN_FAIL = 13;
-
-	const APPVIEW_API = 'https://public.api.bsky.app'; // Path to the public Bluesky AppView API.
-	const DIRECTORY   = 'https://plc.directory';       // Path to the directory server service to fetch the PDS of a given DID
-	const WEB         = 'https://bsky.app';            // Path to the web interface with the user profile and posts
-	const HOSTNAME    = 'bsky.social';                 // Host name to be added to the handle if incomplete
+	public const STATUS_UNKNOWN    = 0;
+	public const STATUS_TOKEN_OK   = 1;
+	public const STATUS_SUCCESS    = 2;
+	public const STATUS_API_FAIL   = 10;
+	public const STATUS_DID_FAIL   = 11;
+	public const STATUS_PDS_FAIL   = 12;
+	public const STATUS_TOKEN_FAIL = 13;
 
 	/** @var LoggerInterface */
 	private $logger;
@@ -57,6 +51,17 @@ final class ATProtocol
 	/** @var ICanSendHttpRequests */
 	private $httpClient;
 
+	private ?int $uid = null;
+
+	/**
+	 * Initialize the AT Protocol service.
+	 *
+	 * @param LoggerInterface $logger
+	 * @param Database $database
+	 * @param IManageConfigValues $config
+	 * @param IManagePersonalConfigValues $pConfig
+	 * @param ICanSendHttpRequests $httpClient
+	 */
 	public function __construct(LoggerInterface $logger, Database $database, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, ICanSendHttpRequests $httpClient)
 	{
 		$this->logger     = $logger;
@@ -67,7 +72,27 @@ final class ATProtocol
 	}
 
 	/**
-	 * Returns an array of user ids who want to import the Bluesky timeline
+	 * Get the AppView API URL
+	 *
+	 * @return string
+	 */
+	public function getApi(): string
+	{
+		$uid = $this->getUser();
+		if ($uid !== 0) {
+			$api = $this->pConfig->get($uid, 'bluesky', 'pds');
+			if ($api) {
+				return $api;
+			}
+
+			$this->logger->warning('PDS for user could not be fetched', ['uid' => $uid]);
+		}
+
+		return $this->getUserPds(0);
+	}
+
+	/**
+	 * Get user IDs that import the AT Protocol timeline
 	 *
 	 * @return array user ids
 	 */
@@ -98,27 +123,31 @@ final class ATProtocol
 	}
 
 	/**
-	 * Fetches XRPC data
+	 * Fetch XRPC data
 	 * @see https://atproto.com/specs/xrpc#lexicon-http-endpoints
 	 *
 	 * @param string  $url        for example "app.bsky.feed.getTimeline"
 	 * @param array   $parameters Array with parameters
-	 * @param integer $uid        User ID
+	 * @param integer $uid        User ID. When set to null, the value from "setApiForUser" will be used
 	 * @return stdClass|null Fetched data
 	 */
-	public function XRPCGet(string $url, array $parameters = [], int $uid = 0): ?stdClass
+	public function XRPCGet(string $url, array $parameters = [], ?int $uid = null): ?stdClass
 	{
 		if (!empty($parameters)) {
 			$url .= '?' . http_build_query($parameters);
 		}
 
-		if ($uid == 0) {
-			return $this->get(ATProtocol::APPVIEW_API . '/xrpc/' . $url);
+		if (is_null($uid)) {
+			$uid = $this->getUser();
 		}
 
 		$pds = $this->getUserPds($uid);
 		if (empty($pds)) {
 			return null;
+		}
+
+		if ($uid === 0) {
+			return $this->get($pds . '/xrpc/' . $url);
 		}
 
 		$headers = ['Authorization' => ['Bearer ' . $this->getUserToken($uid)]];
@@ -132,7 +161,7 @@ final class ATProtocol
 
 		if ($data === null) {
 			$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
-
+			$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while fetching data from Bluesky');
 			return null;
 		}
 
@@ -169,18 +198,20 @@ final class ATProtocol
 		}
 
 		$data = json_decode($curlResult->getBodyString());
+		if (!$data || !is_object($data)) {
+			$this->logger->notice('Invalid data returned', ['url' => $url, 'code' => $curlResult->getReturnCode()]);
+			return null;
+		}
+
 		if (!$curlResult->isSuccess()) {
-			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
-			if (!$data) {
-				return null;
-			}
+			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data]);
 			$data->code = $curlResult->getReturnCode();
 		} elseif (($curlResult->getReturnCode() < 200) || ($curlResult->getReturnCode() >= 400)) {
-			$this->logger->notice('Unexpected return code', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
+			$this->logger->notice('Unexpected return code', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data]);
 			$data->code = $curlResult->getReturnCode();
 		}
 
-		Item::incrementInbound(Protocol::BLUESKY);
+		Item::incrementInbound(Protocol::ATPROTO);
 		return $data;
 	}
 
@@ -229,6 +260,13 @@ final class ATProtocol
 			$this->logger->notice('API Error', ['url' => $url, 'code' => $curlResult->getReturnCode(), 'error' => $data ?: $curlResult->getBodyString()]);
 			if (!$data) {
 				$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_API_FAIL);
+				if (!empty($curlResult->getBodyString())) {
+					$this->pConfig->set($uid, 'bluesky', 'status-message', $curlResult->getBodyString());
+				} elseif (!empty($curlResult->getReturnCode())) {
+					$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $curlResult->getReturnCode());
+				} else {
+					$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while posting to Bluesky');
+				}
 
 				return null;
 			}
@@ -244,6 +282,8 @@ final class ATProtocol
 				$this->pConfig->set($uid, 'bluesky', 'status-message', $data->message);
 			} elseif (!empty($data->code)) {
 				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Error Code: ' . $data->code);
+			} else {
+				$this->pConfig->set($uid, 'bluesky', 'status-message', 'Unknown error occured while posting to Bluesky');
 			}
 		}
 		return $data;
@@ -259,7 +299,7 @@ final class ATProtocol
 	private function getUserPds(int $uid): ?string
 	{
 		if ($uid == 0) {
-			return self::APPVIEW_API;
+			return $this->config->get('atprotocol', 'appview_api');
 		}
 
 		$pds = $this->pConfig->get($uid, 'bluesky', 'pds');
@@ -321,16 +361,17 @@ final class ATProtocol
 	 */
 	public function getDid(string $handle): string
 	{
+		$handle = trim($handle, '@');
 		if ($handle == '') {
 			return '';
 		}
 
-		if (strpos($handle, '.') === false) {
-			$handle .= '.' . self::HOSTNAME;
+		if (str_contains($handle, '@') || str_contains($handle, '/') || !str_contains($handle, '.')) {
+			return '';
 		}
 
 		// At first we use the AppView API which *should* cover all cases.
-		$data = $this->get(self::APPVIEW_API . '/xrpc/com.atproto.identity.resolveHandle?handle=' . urlencode($handle));
+		$data = $this->get($this->getApi() . '/xrpc/com.atproto.identity.resolveHandle?handle=' . urlencode($handle));
 		if (!empty($data) && !empty($data->did)) {
 			$this->logger->debug('Got DID by system PDS call', ['handle' => $handle, 'did' => $data->did]);
 			return $data->did;
@@ -362,51 +403,8 @@ final class ATProtocol
 	 */
 	public function getDidByProfile(string $url): string
 	{
-		if (preg_match('#^' . self::WEB . '/profile/(.+)#', $url, $matches)) {
-			$did = $this->getDid($matches[1]);
-			if (!empty($did)) {
-				return $did;
-			}
-		}
-		try {
-			$curlResult = $this->httpClient->get($url, HttpClientAccept::HTML, [HttpClientOptions::REQUEST => HttpClientRequest::CONTACTINFO]);
-		} catch (\Throwable $th) {
-			return '';
-		}
-		if (!$curlResult->isSuccess()) {
-			return '';
-		}
-		$profile = $curlResult->getBodyString();
-		if (empty($profile)) {
-			return '';
-		}
-
-		$doc = new DOMDocument();
-		try {
-			@$doc->loadHTML($profile);
-		} catch (\Throwable $th) {
-			return '';
-		}
-		$xpath = new DOMXPath($doc);
-		$list  = $xpath->query('//p[@id]');
-		foreach ($list as $node) {
-			foreach ($node->attributes as $attribute) {
-				if ($attribute->name == 'id') {
-					$ids[$attribute->value] = $node->textContent;
-				}
-			}
-		}
-
-		if (empty($ids['bsky_handle']) || empty($ids['bsky_did'])) {
-			return '';
-		}
-
-		if (!$this->isValidDid($ids['bsky_did'], $ids['bsky_handle'])) {
-			$this->logger->notice('Invalid DID', ['handle' => $ids['bsky_handle'], 'did' => $ids['bsky_did']]);
-			return '';
-		}
-
-		return $ids['bsky_did'];
+		$data = ParseUrl::getSiteinfoCached($url);
+		return $data['atprotocol']['did'] ?? '';
 	}
 
 	/**
@@ -419,7 +417,7 @@ final class ATProtocol
 	private function getDidByWellknown(string $handle): string
 	{
 		$curlResult = $this->httpClient->get('http://' . $handle . '/.well-known/atproto-did');
-		if ($curlResult->isSuccess() && substr($curlResult->getBodyString(), 0, 4) == 'did:') {
+		if ($curlResult->isSuccess() && str_starts_with($curlResult->getBodyString(), 'did:')) {
 			$did = $curlResult->getBodyString();
 			if (!$this->isValidDid($did, $handle)) {
 				$this->logger->notice('Invalid DID', ['handle' => $handle, 'did' => $did]);
@@ -431,7 +429,7 @@ final class ATProtocol
 	}
 
 	/**
-	 * Fetches the DID of a given handle via a DND request.
+	 * Fetches the DID of a given handle via a DNS request.
 	 * This is one of the ways, custom handles can be authorized.
 	 *
 	 * @param string $handle The user handle
@@ -444,7 +442,7 @@ final class ATProtocol
 			return '';
 		}
 		foreach ($records as $record) {
-			if (!empty($record['txt']) && substr($record['txt'], 0, 4) == 'did=') {
+			if (!empty($record['txt']) && str_starts_with($record['txt'], 'did=')) {
 				$did = substr($record['txt'], 4);
 				if (!$this->isValidDid($did, $handle)) {
 					$this->logger->notice('Invalid DID', ['handle' => $handle, 'did' => $did]);
@@ -457,14 +455,14 @@ final class ATProtocol
 	}
 
 	/**
-	 * Fetch the PDS of a given DID
+	 * Fetch the PDS URL for a given DID
 	 *
 	 * @param string $did DID (did:plc:...)
 	 * @return string|null URL of the PDS, e.g. https://enoki.us-east.host.bsky.network
 	 */
 	public function getPdsOfDid(string $did): ?string
 	{
-		$data = $this->get(self::DIRECTORY . '/' . $did);
+		$data = $this->get($this->getPLCDirectory() . '/' . $did);
 		if (empty($data) || empty($data->service)) {
 			return null;
 		}
@@ -479,15 +477,96 @@ final class ATProtocol
 	}
 
 	/**
+	 * Set the AppView API for this class for a given user ID
+	 *
+	 * @param integer $uid
+	 * @return void
+	 */
+	public function setApiForUser(int $uid)
+	{
+		$this->uid = $uid;
+
+		if (!$this->getUserPds($uid)) {
+			$this->uid = 0;
+		}
+	}
+
+	/**
+	 * Get the user ID for which the API URL is set
+	 *
+	 * @return integer
+	 */
+	public function getUser(): int
+	{
+		if (is_null($this->uid)) {
+			$this->logger->notice('API user not set.');
+			$this->uid = 0;
+		}
+
+		return $this->uid;
+	}
+
+	/**
+	 * Get the user ID for the selected protocol
+	 *
+	 * @param integer $protocol
+	 * @return integer|null
+	 */
+	public function getUserForProtocol(int $protocol): ?int
+	{
+		switch ($protocol) {
+			case Conversation::PARCEL_JETSTREAM:
+				return 0;
+
+			case Conversation::PARCEL_CONNECTOR:
+				return $this->getUser();
+
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Get the DID PLC directory
+	 *
+	 * @return string
+	 */
+	public function getPLCDirectory(): string
+	{
+		return $this->config->get('atprotocol', 'plc_directory');
+	}
+
+	/**
+	 * Get the Jetstream address
+	 *
+	 * @return string
+	 */
+	public function getJetstream(): string
+	{
+		return $this->config->get('atprotocol', 'jetstream');
+	}
+
+	/**
+	 * Get the web address for a given user ID
+	 *
+	 * @param integer $uid
+	 * @return string
+	 */
+	public function getWebForUser(int $uid): string
+	{
+		return $this->pConfig->get($uid, 'bluesky', 'web') ?? $this->config->get('atprotocol', 'web');
+	}
+
+	/**
 	 * Checks if the provided DID matches the handle
 	 *
 	 * @param string $did DID (did:plc:...)
 	 * @param string $handle The user handle
 	 * @return boolean
 	 */
-	private function isValidDid(string $did, string $handle): bool
+	public function isValidDid(string $did, string $handle): bool
 	{
-		$data = $this->get(self::DIRECTORY . '/' . $did);
+		$data = $this->get($this->getPLCDirectory() . '/' . $did);
 		if (empty($data) || empty($data->alsoKnownAs)) {
 			return false;
 		}
@@ -566,5 +645,123 @@ final class ATProtocol
 		$this->pConfig->set($uid, 'bluesky', 'status', self::STATUS_TOKEN_OK);
 		$this->pConfig->set($uid, 'bluesky', 'status-message', '');
 		return $data->accessJwt;
+	}
+
+	/**
+	 * Get the profile link for a given uri and user id
+	 *
+	 * @param string  $uri The post uri
+	 * @param integer $uid User id to get the web for (0 for global)
+	 * @return string Profile link
+	 */
+	public function getPostLink(string $uri, int $uid = 0): string
+	{
+		$web       = $this->getWebForUser($uid);
+		$frontends = $this->config->get('atprotocol', 'frontends');
+		if ($web && is_array($frontends) && isset($frontends[$web])) {
+			$parts = $this->getUriObject($uri);
+			if (is_object($parts)) {
+				return str_replace(['{did}', '{collection}', '{rkey}'], [$parts->repo, $parts->collection, $parts->rkey], $frontends[$web][2]);
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Fetch a record from the AT Protocol repository
+	 *
+	 * @param string $uri AT URI in the format at://did/collection/rkey
+	 * @return stdClass|null The fetched record or null on failure
+	 */
+	public function getRecord(string $uri): ?stdClass
+	{
+		$parts = $this->getUriObject($uri);
+		if (!is_object($parts)) {
+			return null;
+		}
+
+		$url = $this->getPdsOfDid($parts->repo);
+		if (!$url) {
+			return null;
+		}
+
+		$url .= '/xrpc/com.atproto.repo.getRecord?' . http_build_query(['repo' => $parts->repo, 'collection' => $parts->collection, 'rkey' => $parts->rkey]);
+		return $this->get($url);
+	}
+
+	/**
+	 * Create a new record in the AT Protocol repository
+	 *
+	 * @param integer        $uid        User ID
+	 * @param string         $collection Collection name, e.g. "app.bsky.feed.post"
+	 * @param array|stdClass $record     The record data to create
+	 * @return stdClass|null The created record response or null on failure
+	 */
+	public function createRecord(int $uid, string $collection, $record): ?stdClass
+	{
+		$post = [
+			'collection' => $collection,
+			'repo'       => $this->getUserDid($uid),
+			'record'     => $record,
+		];
+
+		return $this->XRPCPost($uid, 'com.atproto.repo.createRecord', $post);
+	}
+
+	/**
+	 * Delete a record from the AT Protocol repository
+	 *
+	 * @param integer $uid User ID
+	 * @param string  $uri AT URI in the format at://did/collection/rkey
+	 * @return stdClass|null The deletion response or null on failure
+	 */
+	public function deleteRecord(int $uid, string $uri): ?stdClass
+	{
+		$parts = $this->getUriObject($uri);
+		if (!is_object($parts)) {
+			return null;
+		}
+
+		return $this->XRPCPost($uid, 'com.atproto.repo.deleteRecord', ['repo' => $parts->repo, 'collection' => $parts->collection, 'rkey' => $parts->rkey]);
+	}
+
+	/**
+	 * Update an existing record in the AT Protocol repository
+	 *
+	 * @param integer        $uid    User ID
+	 * @param string         $uri    AT URI in the format at://did/collection/rkey
+	 * @param array|stdClass $record The updated record data
+	 * @return stdClass|null The update response or null on failure
+	 */
+	public function putRecord(int $uid, string $uri, $record): ?stdClass
+	{
+		$parts = $this->getUriObject($uri);
+		if (!is_object($parts)) {
+			return null;
+		}
+
+		return $this->XRPCPost($uid, 'com.atproto.repo.putRecord', ['repo' => $parts->repo, 'collection' => $parts->collection, 'rkey' => $parts->rkey, 'record' => $record]);
+	}
+
+	/**
+	 * Parse an AT URI into repository, collection and record key.
+	 *
+	 * @param string $uri
+	 * @return stdClass|null
+	 */
+	public function getUriObject(string $uri): ?stdClass
+	{
+		$parts = explode('/', $uri);
+		if (!$parts || count($parts) !== 5 || $parts[0] !== 'at:' || $parts[1] !== '') {
+			return null;
+		}
+
+		$class = new stdClass();
+
+		$class->repo       = $parts[2];
+		$class->collection = $parts[3];
+		$class->rkey       = explode(':', $parts[4])[0];
+
+		return $class;
 	}
 }

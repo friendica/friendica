@@ -25,10 +25,10 @@ class Crop extends BaseSettings
 		}
 
 		$photo_prefix = $this->parameters['guid'];
-		$resource_id = $photo_prefix;
-		$scale = 0;
+		$resource_id  = $photo_prefix;
+		$scale        = 0;
 		if (substr($photo_prefix, -2, 1) == '-') {
-			list($resource_id, $scale) = explode('-', $photo_prefix);
+			[$resource_id, $scale] = explode('-', $photo_prefix);
 		}
 
 		self::checkFormSecurityTokenRedirectOnError('settings/profile/photo/crop/' . $photo_prefix, 'settings_profile_photo_crop');
@@ -38,7 +38,7 @@ class Crop extends BaseSettings
 		// Image selection origin is top left
 		$selectionX = intval($_POST['xstart'] ?? 0);
 		$selectionY = intval($_POST['ystart'] ?? 0);
-		$selectionW = intval($_POST['width']  ?? 0);
+		$selectionW = intval($_POST['width'] ?? 0);
 		$selectionH = intval($_POST['height'] ?? 0);
 
 		$path = 'profile/' . DI::userSession()->getLocalUserNickname();
@@ -54,14 +54,14 @@ class Crop extends BaseSettings
 				// Normalizing expected square crop parameters
 				$selectionW = $selectionH = min($selectionW, $selectionH);
 
-				$imageIsSquare = $Image->getWidth() === $Image->getHeight();
+				$imageIsSquare        = $Image->getWidth() === $Image->getHeight();
 				$selectionIsFullImage = $selectionX === 0 && $selectionY === 0 && $selectionW === $Image->getWidth() && $selectionH === $Image->getHeight();
 
 				// Bypassed UI with a rectangle image, we force a square cropped image
 				if (!$imageIsSquare && $action == 'skip') {
 					$selectionX = $selectionY = 0;
 					$selectionW = $selectionH = min($Image->getWidth(), $Image->getHeight());
-					$action = 'crop';
+					$action     = 'crop';
 				}
 
 				// Selective crop if it was asked and the selection isn't the full image
@@ -158,9 +158,9 @@ class Crop extends BaseSettings
 		}
 
 		$havescale = false;
-		$smallest = 0;
+		$smallest  = 0;
 		foreach ($photos as $photo) {
-			$smallest = $photo['scale'] == 1 ? 1 : $smallest;
+			$smallest  = $photo['scale'] == 1 ? 1 : $smallest;
 			$havescale = $havescale || $photo['scale'] == 5;
 		}
 
@@ -197,16 +197,16 @@ class Crop extends BaseSettings
 		DI::page()['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('settings/profile/photo/crop_head.tpl'), []);
 
 		$filename = $imagecrop['resource-id'] . '-' . $imagecrop['scale'] . $imagecrop['ext'];
-		$tpl = Renderer::getMarkupTemplate('settings/profile/photo/crop.tpl');
-		$o = Renderer::replaceMacros($tpl, [
-			'$filename'  => $filename,
-			'$resource'  => $imagecrop['resource-id'] . '-' . $imagecrop['scale'],
-			'$image_url' => DI::baseUrl() . '/photo/' . $filename,
-			'$title'     => DI::l10n()->t('Crop Image'),
-			'$desc'      => DI::l10n()->t('Please adjust the image cropping for optimum viewing.'),
+		$tpl      = Renderer::getMarkupTemplate('settings/profile/photo/crop.tpl');
+		$o        = Renderer::replaceMacros($tpl, [
+			'$filename'            => $filename,
+			'$resource'            => $imagecrop['resource-id'] . '-' . $imagecrop['scale'],
+			'$image_url'           => DI::baseUrl() . '/photo/' . $filename,
+			'$title'               => DI::l10n()->t('Crop Image'),
+			'$desc'                => DI::l10n()->t('Please adjust the image cropping for optimum viewing.'),
 			'$form_security_token' => self::getFormSecurityToken('settings_profile_photo_crop'),
-			'$skip'      => $isSquare ? DI::l10n()->t('Use Image As Is') : '',
-			'$crop'      => DI::l10n()->t('Crop Image'),
+			'$skip'                => $isSquare ? DI::l10n()->t('Use Image As Is') : '',
+			'$crop'                => DI::l10n()->t('Crop Image'),
 		]);
 
 		return $o;

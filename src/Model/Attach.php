@@ -23,7 +23,6 @@ use Friendica\Security\Security;
  */
 class Attach
 {
-
 	/**
 	 * Return a list of fields that are associated with the attach table
 	 *
@@ -33,7 +32,7 @@ class Attach
 	private static function getFields(): array
 	{
 		$allfields = DI::dbaDefinition()->getAll();
-		$fields = array_keys($allfields['attach']['fields']);
+		$fields    = array_keys($allfields['attach']['fields']);
 		array_splice($fields, array_search('data', $fields), 1);
 		return $fields;
 	}
@@ -130,7 +129,7 @@ class Attach
 
 		$conditions = [
 			'`id` = ?' . $sql_acl,
-			$id
+			$id,
 		];
 
 		$item = self::selectFirst([], $conditions);
@@ -156,7 +155,7 @@ class Attach
 			$backendClass = DI::storageManager()->getByName($item['backend-class'] ?? '');
 			$backendRef   = $item['backend-ref'];
 			return $backendClass->get($backendRef);
-		} catch (InvalidClassStorageException $storageException) {
+		} catch (InvalidClassStorageException) {
 			// legacy data storage in 'data' column
 			$i = self::selectFirst(['data'], ['id' => $item['id']]);
 			if ($i === false) {
@@ -196,26 +195,26 @@ class Attach
 		}
 
 		$backend_ref = DI::storage()->put($data);
-		$data = '';
+		$data        = '';
 
-		$hash = System::createGUID(64);
+		$hash    = System::createGUID(64);
 		$created = DateTimeFormat::utcNow();
 
 		$fields = [
-			'uid' => $uid,
-			'hash' => $hash,
-			'filename' => $filename,
-			'filetype' => $filetype,
-			'filesize' => $filesize,
-			'data' => $data,
-			'created' => $created,
-			'edited' => $created,
-			'allow_cid' => $allow_cid,
-			'allow_gid' => $allow_gid,
-			'deny_cid' => $deny_cid,
-			'deny_gid' => $deny_gid,
-			'backend-class' => (string)DI::storage(),
-			'backend-ref' => $backend_ref
+			'uid'           => $uid,
+			'hash'          => $hash,
+			'filename'      => $filename,
+			'filetype'      => $filetype,
+			'filesize'      => $filesize,
+			'data'          => $data,
+			'created'       => $created,
+			'edited'        => $created,
+			'allow_cid'     => $allow_cid,
+			'allow_gid'     => $allow_gid,
+			'deny_cid'      => $deny_cid,
+			'deny_gid'      => $deny_gid,
+			'backend-class' => (string) DI::storage(),
+			'backend-ref'   => $backend_ref,
 		];
 
 		$r = DBA::insert('attach', $fields);
@@ -247,7 +246,7 @@ class Attach
 
 		$data = @file_get_contents($src);
 
-		return self::store($data, $uid, $filename, $filetype, null, $allow_cid, $allow_gid,  $deny_cid, $deny_gid);
+		return self::store($data, $uid, $filename, $filetype, null, $allow_cid, $allow_gid, $deny_cid, $deny_gid);
 	}
 
 
@@ -323,7 +322,7 @@ class Attach
 			if (DI::baseUrl()->isLocalUrl($attachment[1]) && preg_match('|.*?/attach/(\d+)|', $attachment[1], $match)) {
 				$fields = [
 					'allow_cid' => $post['allow_cid'], 'allow_gid' => $post['allow_gid'],
-					'deny_cid' => $post['deny_cid'], 'deny_gid' => $post['deny_gid']
+					'deny_cid'  => $post['deny_cid'], 'deny_gid' => $post['deny_gid'],
 				];
 				self::update($fields, ['id' => $match[1], 'uid' => $post['uid']]);
 			}
@@ -334,7 +333,7 @@ class Attach
 	{
 		$fields = [
 			'allow_cid' => $str_contact_allow, 'allow_gid' => $str_circle_allow,
-			'deny_cid' => $str_contact_deny, 'deny_gid' => $str_circle_deny,
+			'deny_cid'  => $str_contact_deny, 'deny_gid' => $str_circle_deny,
 		];
 
 		self::update($fields, ['id' => $id, 'uid' => $uid]);
@@ -354,10 +353,10 @@ class Attach
 					'url'         => $attachment[1],
 					'size'        => $attach['filesize'],
 					'mimetype'    => $attach['filetype'],
-					'description' => $attach['filename']
+					'description' => $attach['filename'],
 				];
 				$media = Post\Media::addType($media);
-				$body = str_replace($attachment[0], Post\Media::addAttachmentToBody($media, ''), $body);
+				$body  = str_replace($attachment[0], Post\Media::addAttachmentToBody($media, ''), $body);
 			}
 		}
 		return $body;

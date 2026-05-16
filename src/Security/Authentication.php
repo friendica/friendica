@@ -97,7 +97,7 @@ class Authentication
 		IHandleUserSessions $session,
 		IManagePersonalConfigValues $pConfig,
 		AppHelper $appHelper,
-		Request $request
+		Request $request,
 	) {
 		$this->config        = $config;
 		$this->mode          = $mode;
@@ -131,12 +131,14 @@ class Authentication
 					'account_expired' => false,
 					'account_removed' => false,
 					'verified'        => true,
-				]
+				],
 			);
 			if ($this->dba->isResult($user)) {
-				if (!$this->cookie->comparePrivateDataHash($this->cookie->get('hash'),
+				if (!$this->cookie->comparePrivateDataHash(
+					$this->cookie->get('hash'),
 					$user['password'] ?? '',
-					$user['prvkey'] ?? '')
+					$user['prvkey']   ?? '',
+				)
 				) {
 					$this->logger->notice("Hash doesn't fit.", ['user' => $this->cookie->get('uid')]);
 					$this->session->clear();
@@ -170,10 +172,12 @@ class Authentication
 			$check = $this->config->get('system', 'paranoia');
 			// extra paranoia - if the IP changed, log them out
 			if ($check && ($this->session->get('addr') != $this->remoteAddress)) {
-				$this->logger->notice('Session address changed. Paranoid setting in effect, blocking session. ', [
-					'addr'        => $this->session->get('addr'),
-					'remote_addr' => $this->remoteAddress
-				]
+				$this->logger->notice(
+					'Session address changed. Paranoid setting in effect, blocking session. ',
+					[
+						'addr'        => $this->session->get('addr'),
+						'remote_addr' => $this->remoteAddress,
+					],
 				);
 				$this->session->clear();
 				$this->baseUrl->redirect();
@@ -188,7 +192,7 @@ class Authentication
 					'account_expired' => false,
 					'account_removed' => false,
 					'verified'        => true,
-				]
+				],
 			);
 			if (!$this->dba->isResult($user)) {
 				$this->session->clear();
@@ -219,7 +223,7 @@ class Authentication
 
 		// Otherwise it's probably an openid.
 		try {
-			$openid           = new LightOpenID($this->baseUrl->getHost());
+			$openid = new LightOpenID($this->baseUrl->getHost());
 			/** @phpstan-ignore-next-line $openid->identity is private, but will be set via magic setter */
 			$openid->identity = $openid_url;
 			$this->session->set('openid', $openid_url);
@@ -254,9 +258,9 @@ class Authentication
 			$record = $this->dba->selectFirst(
 				'user',
 				[],
-				['uid' => User::getIdFromPasswordAuthentication($username, $password, false, true)]
+				['uid' => User::getIdFromPasswordAuthentication($username, $password, false, true)],
 			);
-		} catch (Exception $e) {
+		} catch (Exception) {
 			$this->logger->warning('authenticate: failed login attempt', ['action' => 'login', 'username' => $username, 'ip' => $this->remoteAddress]);
 			DI::sysmsg()->addNotice($this->l10n->t('Login failed. Please check your credentials.'));
 			$this->baseUrl->redirect();
@@ -310,7 +314,7 @@ class Authentication
 	 * @throws HTTPException\MovedPermanentlyException
 	 * @throws HTTPException\TemporaryRedirectException
 	 * @throws HTTPException\ForbiddenException
-
+	 *
 	 * @throws HTTPException\InternalServerErrorException In case of Friendica specific exceptions
 	 *
 	 */
@@ -337,6 +341,7 @@ class Authentication
 
 		if (strlen($user_record['timezone'])) {
 			$this->appHelper->setTimeZone($user_record['timezone']);
+			$this->session->set('timezone', $user_record['timezone']);
 		}
 
 		$contact = $this->dba->selectFirst('contact', ['id'], ['uid' => $user_record['uid'], 'self' => true]);
@@ -439,7 +444,7 @@ class Authentication
 					// Invalid trusted cookie value, removing it
 					$this->cookie->unset('trusted');
 				}
-			} catch (\Throwable $e) {
+			} catch (\Throwable) {
 				// Local trusted browser record was probably removed by the user, we carry on with 2FA
 			}
 		}

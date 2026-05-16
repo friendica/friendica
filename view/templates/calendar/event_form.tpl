@@ -33,6 +33,7 @@
 
 <div id="event-location-text">{{$l_text}}</div>
 <textarea id="event-location-textarea" name="location">{{$l_orig}}</textarea>
+<p>{{$no_bb}}</p>
 
 <div id="event-location-break"></div>
 

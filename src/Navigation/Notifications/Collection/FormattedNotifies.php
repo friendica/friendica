@@ -11,7 +11,7 @@ use Friendica\BaseCollection;
 use Friendica\Navigation\Notifications\ValueObject;
 
 /**
- * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\Collection\FormattedNotifications instead
+ * @deprecated 2022.05 Use \Friendica\Navigation\Notifications\Collection\FormattedNotifications instead
  */
 class FormattedNotifies extends BaseCollection
 {

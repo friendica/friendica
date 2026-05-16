@@ -70,7 +70,7 @@ class DbaDefinition
 
 		// Assign all field that are present in the table
 		foreach ($fieldNames as $field) {
-			if (isset($data[$field])) {
+			if (isset($data[$field]) || (!isset($definition[$table]['fields'][$field]['not null']) && array_key_exists($field, $data))) {
 				// Limit the length of varchar, varbinary, char and binary fields
 				if (is_string($data[$field]) && preg_match("/char\((\d*)\)/", $definition[$table]['fields'][$field]['type'], $result)) {
 					if ($charset == 'latin1') {

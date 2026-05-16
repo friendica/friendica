@@ -14,6 +14,7 @@ use Friendica\App\Page;
 use Friendica\AppHelper;
 use Friendica\Content\Conversation;
 use Friendica\Content\Conversation\Factory\Timeline as TimelineFactory;
+use Friendica\Content\Conversation\Factory\Activity as ActivityFactory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Content\Conversation\Factory\Channel as ChannelFactory;
 use Friendica\Content\Conversation\Factory\UserDefinedChannel as UserDefinedChannelFactory;
@@ -60,6 +61,7 @@ class Network extends NetworkModule
 		IManagePersonalConfigValues $pConfig,
 		IManageConfigValues $config,
 		ICanCache $cache,
+		ActivityFactory $ActivityFactory,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -87,6 +89,7 @@ class Network extends NetworkModule
 			$pConfig,
 			$config,
 			$cache,
+			$ActivityFactory,
 			$l10n,
 			$baseUrl,
 			$args,
@@ -94,7 +97,7 @@ class Network extends NetworkModule
 			$profiler,
 			$response,
 			$server,
-			$parameters
+			$parameters,
 		);
 
 		$this->lock = $lock;

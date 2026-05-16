@@ -7,12 +7,10 @@
 
 <form action="photos/{{$nickname}}/image/{{$resource_id}}/edit" method="post" id="photo_edit_form">
 
-	<input type="hidden" name="item_id" value="{{$item_id}}" />
 	<input type="hidden" name="origaname" value="{{$album.2}}" />
 
 	{{include file="field_input.tpl" field=$album}}
 	{{include file="field_input.tpl" field=$caption}}
-	{{include file="field_input.tpl" field=$tags}}
 
 	{{include file="field_radio.tpl" field=$rotate_none}}
 	{{include file="field_radio.tpl" field=$rotate_cw}}

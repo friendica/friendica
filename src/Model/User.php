@@ -54,13 +54,13 @@ class User
 	 *
 	 * @{
 	 */
-	const PAGE_FLAGS_NORMAL    = 0;
-	const PAGE_FLAGS_SOAPBOX   = 1;
-	const PAGE_FLAGS_COMMUNITY = 2;
-	const PAGE_FLAGS_FREELOVE  = 3;
-	const PAGE_FLAGS_BLOG      = 4;
-	const PAGE_FLAGS_PRVGROUP  = 5;
-	const PAGE_FLAGS_COMM_MAN  = 6;
+	public const PAGE_FLAGS_NORMAL    = 0;
+	public const PAGE_FLAGS_SOAPBOX   = 1;
+	public const PAGE_FLAGS_COMMUNITY = 2;
+	public const PAGE_FLAGS_FREELOVE  = 3;
+	public const PAGE_FLAGS_BLOG      = 4;
+	public const PAGE_FLAGS_PRVGROUP  = 5;
+	public const PAGE_FLAGS_COMM_MAN  = 6;
 	/**
 	 * @}
 	 */
@@ -84,12 +84,31 @@ class User
 	 *      This will only be assigned to contacts, not to user accounts
 	 * @{
 	 */
-	const ACCOUNT_TYPE_PERSON       = 0;
-	const ACCOUNT_TYPE_ORGANISATION = 1;
-	const ACCOUNT_TYPE_NEWS         = 2;
-	const ACCOUNT_TYPE_COMMUNITY    = 3;
-	const ACCOUNT_TYPE_RELAY        = 4;
-	const ACCOUNT_TYPE_DELETED      = 127;
+	public const ACCOUNT_TYPE_PERSON       = 0;
+	public const ACCOUNT_TYPE_ORGANISATION = 1;
+	public const ACCOUNT_TYPE_NEWS         = 2;
+	public const ACCOUNT_TYPE_COMMUNITY    = 3;
+	public const ACCOUNT_TYPE_RELAY        = 4;
+	public const ACCOUNT_TYPE_DELETED      = 127;
+	/**
+	 * @}
+	 */
+
+	/**
+	 * Account type value strings
+	 *
+	 * Used for drop-down select option values
+	 * so as to not expose the database values
+	 * @{
+	 */
+	public const PERSONAL = "personal";
+	public const SOAPBOX  = "soapbox";
+	public const LOVEALL  = "loveall";
+	public const ORGPAGE  = "page";
+	public const NEWSPAGE = "newspage";
+	public const PUBGROUP = "group";
+	public const RESGROUP = "group-restricted";
+	public const PRIGROUP = "group-private";
 	/**
 	 * @}
 	 */
@@ -143,9 +162,10 @@ class User
 	{
 		$system = Contact::selectFirst([], ['self' => true, 'uid' => 0]);
 		if (!DBA::isResult($system)) {
-			self::createSystemAccount();
+			$id     = self::createSystemAccount();
 			$system = Contact::selectFirst([], ['self' => true, 'uid' => 0]);
 			if (!DBA::isResult($system)) {
+				DI::logger()->warning('System account not found.', ['id' => $id]);
 				return [];
 			}
 		}
@@ -170,7 +190,7 @@ class User
 		$system['region']       = '';
 		$system['postal-code']  = '';
 		$system['country-name'] = '';
-		$system['homepage']     = (string)DI::baseUrl();
+		$system['homepage']     = (string) DI::baseUrl();
 		$system['dob']          = '0000-00-00';
 
 		// Ensure that the user contains data
@@ -202,17 +222,19 @@ class User
 	/**
 	 * Create the system account
 	 *
-	 * @return void
+	 * @return int
 	 */
-	private static function createSystemAccount()
+	private static function createSystemAccount(): int
 	{
 		$system_actor_name = self::getActorName();
 		if (empty($system_actor_name)) {
-			return;
+			DI::logger()->warning('No actor name was found.');
+			return 0;
 		}
 
 		$keys = Crypto::newKeypair(4096);
 		if ($keys === false) {
+			DI::logger()->warning('Generation of security keys failed.');
 			throw new Exception(DI::l10n()->t('SERIOUS ERROR: Generation of security keys failed.'));
 		}
 
@@ -243,7 +265,8 @@ class User
 		$system['nurl']   = Strings::normaliseLink($system['url']);
 		$system['gsid']   = GServer::getRealID($system['baseurl']);
 
-		Contact::insert($system);
+		DI::logger()->info('System account to be created', ['account' => $system]);
+		return Contact::insert($system);
 	}
 
 	/**
@@ -253,16 +276,32 @@ class User
 	 */
 	public static function getActorName(): string
 	{
+		$self              = Contact::selectFirst(['nick'], ['uid' => 0, 'self' => true]);
+		$systemuser        = DBA::selectFirst('user', ['nickname'], ['uid' => 0]);
 		$system_actor_name = DI::config()->get('system', 'actor_name');
-		if (!empty($system_actor_name)) {
-			$self = Contact::selectFirst(['nick'], ['uid' => 0, 'self' => true]);
-			if (!empty($self['nick'])) {
-				if ($self['nick'] != $system_actor_name) {
-					// Reset the actor name to the already used name
-					DI::config()->set('system', 'actor_name', $self['nick']);
-					$system_actor_name = $self['nick'];
-				}
+
+		if (isset($systemuser['nickname'])) {
+			if ($system_actor_name != $systemuser['nickname']) {
+				DI::logger()->notice('Set the actor name to the system user name', ['name' => $systemuser['nickname'], 'systemactor' => $system_actor_name]);
+				DI::config()->set('system', 'actor_name', $systemuser['nickname']);
+			} else {
+				DI::logger()->debug('Use system user name as system actor', ['name' => $systemuser['nickname']]);
 			}
+			return $systemuser['nickname'];
+		}
+
+		if (isset($self['nick'])) {
+			if ($system_actor_name != $self['nick']) {
+				DI::logger()->notice('Set the actor name to the system contact name', ['name' => $self['nick'], 'systemactor' => $system_actor_name]);
+				DI::config()->set('system', 'actor_name', $self['nick']);
+			} else {
+				DI::logger()->debug('Use system contact name as system actor', ['name' => $self['nick']]);
+			}
+			return $self['nick'];
+		}
+
+		if (isset($system_actor_name)) {
+			DI::logger()->notice('Use the stored system actor name', ['systemactor' => $system_actor_name]);
 			return $system_actor_name;
 		}
 
@@ -272,10 +311,13 @@ class User
 		$possible_accounts = ['friendica', 'actor', 'system', 'internal'];
 		foreach ($possible_accounts as $name) {
 			if (!DBA::exists('user', ['nickname' => $name]) && !$userDeletedRepository->existsByUsername($name)) {
+				DI::logger()->notice('Selected system actor', ['systemactor' => $name]);
 				DI::config()->set('system', 'actor_name', $name);
 				return $name;
 			}
 		}
+
+		DI::logger()->warning('No system actor found');
 		return '';
 	}
 
@@ -505,7 +547,7 @@ class User
 			// Check if the avatar field is filled and the photo directs to the correct path
 			$avatar = Photo::selectFirst(['resource-id'], ['uid' => $uid, 'profile' => true]);
 			if (DBA::isResult($avatar)) {
-				$repair = empty($owner['avatar']) || !strpos($owner['photo'], $avatar['resource-id']);
+				$repair = empty($owner['avatar']) || !strpos($owner['photo'], (string) $avatar['resource-id']);
 			}
 		}
 
@@ -712,7 +754,7 @@ class User
 			if (AppSpecificPassword::authenticateUser($user['uid'], $password)) {
 				return $user['uid'];
 			}
-		} elseif (strpos($user['password'], '$') === false) {
+		} elseif (!str_contains($user['password'], '$')) {
 			//Legacy hash that has not been replaced by a new hash yet
 			if (self::hashPasswordLegacy($password) === $user['password']) {
 				self::updatePasswordHashed($user['uid'], self::hashPassword($password));
@@ -757,7 +799,7 @@ class User
 			'username'      => $username,
 			'password'      => $password,
 			'authenticated' => 0,
-			'user_record'   => null
+			'user_record'   => null,
 		];
 
 		$eventDispatcher = DI::eventDispatcher();
@@ -817,7 +859,7 @@ class User
 					'uid'             => $user_info,
 					'account_expired' => false,
 					'account_removed' => false,
-					'verified'        => true
+					'verified'        => true,
 				];
 				if (!$with_blocked) {
 					$condition = DBA::mergeConditions($condition, ['blocked' => false]);
@@ -827,7 +869,7 @@ class User
 				$condition = [
 					"(`email` = ? OR `username` = ? OR `nickname` = ?)
 					AND `verified` AND NOT `account_removed` AND NOT `account_expired`",
-					$user_info, $user_info, $user_info
+					$user_info, $user_info, $user_info,
 				];
 				if (!$with_blocked) {
 					$condition = DBA::mergeConditions($condition, ['blocked' => false]);
@@ -907,7 +949,7 @@ class User
 				'code'  => $e->getCode(),
 				'file'  => $e->getFile(),
 				'line'  => $e->getLine(),
-				'trace' => $e->getTraceAsString()
+				'trace' => $e->getTraceAsString(),
 			]);
 
 			return false;
@@ -1010,7 +1052,7 @@ class User
 			'password'        => $password_hashed,
 			'pwdreset'        => null,
 			'pwdreset_time'   => null,
-			'legacy_password' => false
+			'legacy_password' => false,
 		];
 		return DBA::update('user', $fields, ['uid' => $uid]);
 	}
@@ -1027,7 +1069,7 @@ class User
 	{
 		return DBA::exists('user', [
 			'uid'   => $uid,
-			'email' => self::getAdminEmailList()
+			'email' => self::getAdminEmailList(),
 		]);
 	}
 
@@ -1180,9 +1222,10 @@ class User
 	{
 		$return = ['user' => null, 'password' => ''];
 
-		$using_invites = DI::config()->get('system', 'invitation_only');
+		$using_invites  = DI::config()->get('system', 'invitation_only', false);
+		$ignore_invites = (array_key_exists('ignore_invites', $data) && is_bool($data['ignore_invites'])) ? $data['ignore_invites'] : false;
+		$invite_id      = (array_key_exists('invite_id', $data) && is_string($data['invite_id'])) ? trim($data['invite_id']) : '';
 
-		$invite_id  = !empty($data['invite_id'])  ? trim($data['invite_id'])  : '';
 		$username   = !empty($data['username'])   ? trim($data['username'])   : '';
 		$nickname   = !empty($data['nickname'])   ? trim($data['nickname'])   : '';
 		$email      = !empty($data['email'])      ? trim($data['email'])      : '';
@@ -1203,7 +1246,9 @@ class User
 			$password = $password1;
 		}
 
-		if ($using_invites) {
+
+		// Users created by the console or from the moderation page ignore invites
+		if ($using_invites && !$ignore_invites) {
 			if (!$invite_id) {
 				throw new Exception(DI::l10n()->t('An invitation is required.'));
 			}
@@ -1269,7 +1314,7 @@ class User
 		$loose_reg = DI::config()->get('system', 'no_regfullname');
 		if (!$loose_reg) {
 			$username = mb_convert_case($username, MB_CASE_TITLE, 'UTF-8');
-			if (strpos($username, ' ') === false) {
+			if (!str_contains($username, ' ')) {
 				throw new Exception(DI::l10n()->t("That doesn't appear to be your full (First Last) name."));
 			}
 		}
@@ -1338,7 +1383,7 @@ class User
 			'language'         => $language,
 			'timezone'         => 'UTC',
 			'register_date'    => DateTimeFormat::utcNow(),
-			'default-location' => ''
+			'default-location' => '',
 		]);
 
 		if ($insert_result) {
@@ -1567,7 +1612,7 @@ class User
 			$user,
 			DI::config()->get('config', 'sitename'),
 			DI::baseUrl(),
-			($register['password'] ?? '') ?: 'Sent in a previous email'
+			($register['password'] ?? '') ?: 'Sent in a previous email',
 		);
 	}
 
@@ -1598,8 +1643,8 @@ class User
 		// Delete the avatar
 		Photo::delete(['uid' => $register['uid']]);
 
-		return DBA::delete('user', ['uid' => $register['uid']]) &&
-			Register::deleteByHash($register['hash']);
+		return DBA::delete('user', ['uid' => $register['uid']])
+			&& Register::deleteByHash($register['hash']);
 	}
 
 	/**
@@ -1617,19 +1662,20 @@ class User
 	 */
 	public static function createMinimal(string $name, string $email, string $nick, string $lang = L10n::DEFAULT, string $avatar = ''): bool
 	{
-		if (empty($name) ||
-			empty($email) ||
-			empty($nick)) {
+		if (empty($name)
+			|| empty($email)
+			|| empty($nick)) {
 			throw new HTTPException\InternalServerErrorException('Invalid arguments.');
 		}
 
 		$result = self::create([
-			'username' => $name,
-			'email'    => $email,
-			'nickname' => $nick,
-			'verified' => 1,
-			'language' => $lang,
-			'photo'    => $avatar
+			'ignore_invites' => true,
+			'username'       => $name,
+			'email'          => $email,
+			'nickname'       => $nick,
+			'verified'       => 1,
+			'language'       => $lang,
+			'photo'          => $avatar,
 		]);
 
 		$user     = $result['user'];
@@ -1702,7 +1748,7 @@ class User
 			$sitename,
 			$siteurl,
 			$user['nickname'],
-			$password
+			$password,
 		));
 
 		$email = DI::emailer()
@@ -1736,7 +1782,7 @@ class User
 				Thank you for registering at %2$s. Your account has been created.
 			',
 			$user['username'],
-			$sitename
+			$sitename,
 		));
 		$body = Strings::deindent($l10n->t(
 			'
@@ -1769,7 +1815,7 @@ class User
 			$sitename,
 			$siteurl,
 			$user['username'],
-			$password
+			$password,
 		));
 
 		$email = DI::emailer()
@@ -1883,14 +1929,14 @@ class User
 			$identities = [[
 				'uid'      => $user['uid'],
 				'username' => $user['username'],
-				'nickname' => $user['nickname']
+				'nickname' => $user['nickname'],
 			]];
 
 			// Then add all the children
 			$r = DBA::select(
 				'user',
 				['uid', 'username', 'nickname'],
-				['parent-uid' => $user['uid'], 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false]
+				['parent-uid' => $user['uid'], 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false],
 			);
 			if (DBA::isResult($r)) {
 				$identities = array_merge($identities, DBA::toArray($r));
@@ -1900,7 +1946,7 @@ class User
 			$r = DBA::select(
 				'user',
 				['uid', 'username', 'nickname'],
-				['uid' => $user['parent-uid'], 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false]
+				['uid' => $user['parent-uid'], 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false],
 			);
 			if (DBA::isResult($r)) {
 				$identities = DBA::toArray($r);
@@ -1910,7 +1956,7 @@ class User
 			$r = DBA::select(
 				'user',
 				['uid', 'username', 'nickname'],
-				['parent-uid' => $user['parent-uid'], 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false]
+				['parent-uid' => $user['parent-uid'], 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false],
 			);
 			if (DBA::isResult($r)) {
 				$identities = array_merge($identities, DBA::toArray($r));
@@ -1922,7 +1968,7 @@ class User
 			FROM `manage`
 			INNER JOIN `user` ON `manage`.`mid` = `user`.`uid`
 			WHERE NOT `user`.`account_removed` AND `manage`.`uid` = ?",
-			$user['uid']
+			$user['uid'],
 		);
 		if (DBA::isResult($r)) {
 			$identities = array_merge($identities, DBA::toArray($r));
@@ -1984,7 +2030,7 @@ class User
 			['uid', 'last-activity', 'last-item'],
 			["`verified` AND `last-activity` > ? AND NOT `blocked`
 			AND NOT `account_removed` AND NOT `account_expired`",
-				DBA::NULL_DATETIME]
+				DBA::NULL_DATETIME],
 		);
 		if (!DBA::isResult($userStmt)) {
 			return $statistics;

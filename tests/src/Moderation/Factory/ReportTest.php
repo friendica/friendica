@@ -26,13 +26,13 @@ class ReportTest extends MockedTestCase
 		$nowSeconds = $clock->now()->setTime(
 			$clock->now()->format('H'),
 			$clock->now()->format('i'),
-			$clock->now()->format('s')
+			$clock->now()->format('s'),
 		);
 
 		return [
 			'default' => [
 				'clock' => $clock,
-				'row' => [
+				'row'   => [
 					'id'              => 11,
 					'reporter-id'     => 12,
 					'uid'             => null,
@@ -50,9 +50,9 @@ class ReportTest extends MockedTestCase
 					'created'         => $nowSeconds->format(DateTimeFormat::MYSQL),
 					'edited'          => null,
 				],
-				'posts' => new Collection\Report\Posts(),
-				'rules' => new Collection\Report\Rules(),
-				'assertion'  => new Entity\Report(
+				'posts'     => new Collection\Report\Posts(),
+				'rules'     => new Collection\Report\Rules(),
+				'assertion' => new Entity\Report(
 					12,
 					13,
 					14,
@@ -70,12 +70,12 @@ class ReportTest extends MockedTestCase
 					null,
 					null,
 					null,
-					11
+					11,
 				),
 			],
 			'full' => [
 				'clock' => $clock,
-				'row' => [
+				'row'   => [
 					'id'              => 11,
 					'reporter-id'     => 42,
 					'uid'             => 12,
@@ -101,7 +101,7 @@ class ReportTest extends MockedTestCase
 					new Entity\Report\Rule(1, 'No hate speech'),
 					new Entity\Report\Rule(3, 'No commercial promotion'),
 				]),
-				'assertion'  => new Entity\Report(
+				'assertion' => new Entity\Report(
 					42,
 					13,
 					14,
@@ -125,7 +125,7 @@ class ReportTest extends MockedTestCase
 					Entity\Report::RESOLUTION_ACCEPTED,
 					16,
 					15,
-					11
+					11,
 				),
 			],
 		];
@@ -189,7 +189,7 @@ class ReportTest extends MockedTestCase
 					true,
 					new Collection\Report\Posts([
 						new Entity\Report\Post(89),
-						new Entity\Report\Post(90)
+						new Entity\Report\Post(90),
 					]),
 					new Collection\Report\Rules([
 						new Entity\Report\Rule(1, 'Rule 1'),
@@ -251,7 +251,7 @@ class ReportTest extends MockedTestCase
 	/**
 	 * @dataProvider dataCreateFromReportsRequest
 	 */
-	public function testCreateFromReportsRequest(ClockInterface $clock, array $rules, int $reporterId, int $cid, int $gsid, string $comment, string $category, bool $forward, array $postUriIds, array $ruleIds, int $uid = null, Entity\Report $assertion)
+	public function testCreateFromReportsRequest(ClockInterface $clock, array $rules, int $reporterId, int $cid, int $gsid, string $comment, string $category, bool $forward, array $postUriIds, array $ruleIds, ?int $uid, Entity\Report $assertion)
 	{
 		$factory = new Factory\Report(new NullLogger(), $clock);
 

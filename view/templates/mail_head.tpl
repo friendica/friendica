@@ -5,4 +5,4 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 
-<h3>{{$messages}}</h3>
+<h2>{{$messages}}</h2>

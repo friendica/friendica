@@ -42,8 +42,10 @@ class Directory extends BaseApi
 			$condition = ['uid' => 0, 'hidden' => false, 'network' => Protocol::FEDERATED];
 		}
 
-		$params = ['limit' => [$request['offset'], $request['limit']],
-			'order'           => [($request['order'] == 'active') ? 'last-item' : 'created' => true]];
+		$params = [
+			'limit' => [$request['offset'], $request['limit']],
+			'order' => [($request['order'] == 'active') ? 'last-item' : 'created' => true]
+		];
 
 		$accounts = [];
 		$contacts = DBA::select($table, ['id', 'uid'], $condition, $params);

@@ -18,6 +18,9 @@
 		<button type="button" id="circle-rename" class="btn btn-clear" onclick="showHide('circle-edit-wrapper'); showHide('circle-edit-header'); return false;" title="{{$edit_name}}" data-toggle="tooltip">
 			<i class="fa fa-pencil" aria-hidden="true"></i>
 		</button>
+		<a href="circle/markread/{{$gid}}?t={{$form_security_token_markread}}" class="btn btn-clear" title="{{$markread_label}}" data-toggle="tooltip">
+			<i class="fa fa-eye" aria-hidden="true"></i>
+		</a>
 		{{if $drop}}{{$drop nofilter}}{{/if}}
 	</div>
 	{{/if}}

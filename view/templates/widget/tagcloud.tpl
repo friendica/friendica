@@ -7,12 +7,18 @@
 <nav>
 	<span id="tagblock-inflated" class="widget inflated fakelink">
 		<button class="fakelink" onclick="openCloseWidget('tagblock', 'tagblock-inflated');" aria-expanded="false">
-			<h3>{{$title}}</h3>
+			<h3>
+					<i class="fa fa-tag" aria-hidden="true"></i>
+					{{$title}}
+			</h3>
 		</button>
 	</span>
 	<div id="tagblock" class="tagblock widget">
 		<button class="fakelink" onclick="openCloseWidget('tagblock', 'tagblock-inflated');" aria-expanded="true">
-			<h3>{{$title}}</h3>
+			<h3>
+					<i class="fa fa-tag" aria-hidden="true"></i>
+					{{$title}}
+			</h3>
 		</button>
 
 		<div class="tag-cloud">

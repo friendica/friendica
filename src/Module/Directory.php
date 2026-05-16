@@ -29,8 +29,8 @@ class Directory extends BaseModule
 	{
 		$config = DI::config();
 
-		if (($config->get('system', 'block_public') && !DI::userSession()->isAuthenticated()) ||
-			($config->get('system', 'block_local_dir') && !DI::userSession()->isAuthenticated())) {
+		if (($config->get('system', 'block_public') && !DI::userSession()->isAuthenticated())
+			|| ($config->get('system', 'block_local_dir') && !DI::userSession()->isAuthenticated())) {
 			throw new HTTPException\ForbiddenException(DI::l10n()->t('Public access denied.'));
 		}
 
@@ -56,9 +56,7 @@ class Directory extends BaseModule
 
 		$profiles = Profile::searchProfiles($pager->getStart(), $pager->getItemsPerPage(), $search);
 
-		if ($profiles['total'] === 0) {
-			DI::sysmsg()->addNotice(DI::l10n()->t('No entries (some entries may be hidden).'));
-		} else {
+		if ($profiles['total'] !== 0) {
 			foreach ($profiles['entries'] as $entry) {
 				$contact = Model\Contact::getByURLForUser($entry['url'], DI::userSession()->getLocalUserId());
 				if (!empty($contact)) {
@@ -70,17 +68,19 @@ class Directory extends BaseModule
 		$tpl = Renderer::getMarkupTemplate('directory_header.tpl');
 
 		$output .= Renderer::replaceMacros($tpl, [
-			'$search'     => $search,
-			'$globaldir'  => DI::l10n()->t('Global Directory'),
-			'$gDirPath'   => $gDirPath,
-			'$desc'       => DI::l10n()->t('Find on this site'),
-			'$contacts'   => $entries,
-			'$finding'    => DI::l10n()->t('Results for:'),
-			'$findterm'   => (strlen($search) ? $search : ""),
-			'$title'      => DI::l10n()->t('Site Directory'),
-			'$search_mod' => 'directory',
-			'$submit'     => DI::l10n()->t('Find'),
-			'$paginate'   => $pager->renderFull($profiles['total']),
+			'$search'           => $search,
+			'$globaldir'        => DI::l10n()->t('Global Directory'),
+			'$gDirPath'         => $gDirPath,
+			'$desc'             => DI::l10n()->t('Find on this site'),
+			'$contacts'         => $entries,
+			'$no_results'       => DI::l10n()->t('No accounts found (some may be hidden).'),
+			'$finding'          => DI::l10n()->t('Results for:'),
+			'$findterm'         => (strlen($search) ? $search : ""),
+			'$title'            => DI::l10n()->t('Site Directory'),
+			'$search_mod'       => 'directory',
+			'$submit'           => DI::l10n()->t('Find'),
+			'$paginate'         => $pager->renderFull($profiles['total']),
+			'$num_results_text' => DI::l10n()->t("Accounts listed: %s", $profiles['total']),
 		]);
 
 		return $output;
@@ -140,7 +140,7 @@ class Directory extends BaseModule
 		$location_e = $location;
 
 		$photo_menu = [
-			'profile' => [DI::l10n()->t("View Profile"), Model\Contact::magicLink($profile_link)]
+			'profile' => [DI::l10n()->t("View Profile"), Model\Contact::magicLink($profile_link)],
 		];
 
 		$entry = [

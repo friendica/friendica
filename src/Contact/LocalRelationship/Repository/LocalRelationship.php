@@ -48,7 +48,7 @@ class LocalRelationship extends BaseRepository
 	{
 		try {
 			return $this->selectForUserContact($uid, $cid);
-		} catch (NotFoundException $e) {
+		} catch (NotFoundException) {
 			return $this->factory->createFromTableRow(['uid' => $uid, 'cid' => $cid]);
 		}
 	}

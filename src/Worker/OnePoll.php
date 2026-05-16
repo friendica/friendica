@@ -181,7 +181,7 @@ class OnePoll
 			return false;
 		}
 
-		if (strpos($curlResult->getContentType(), 'xml') === false) {
+		if (!str_contains($curlResult->getContentType(), 'xml')) {
 			DI::logger()->notice('Unexpected content type.', ['id' => $contact['id'], 'url' => $contact['poll'], 'content-type' => $curlResult->getContentType()]);
 			return false;
 		}
@@ -253,7 +253,7 @@ class OnePoll
 			$metas = Email::messageMeta($mbox, implode(',', $msgs));
 
 			if (count($metas) != count($msgs)) {
-				DI::logger()->info("for " . $mailconf['user'] . " there are ". count($msgs) . " messages but received " . count($metas) . " metas");
+				DI::logger()->info("for " . $mailconf['user'] . " there are " . count($msgs) . " messages but received " . count($metas) . " metas");
 			} else {
 				$msgs = array_combine($msgs, $metas);
 
@@ -355,9 +355,9 @@ class OnePoll
 					$datarray['created'] = DateTimeFormat::utc($meta->date);
 
 					// Is it a reply?
-					$reply = ((substr(strtolower($datarray['title']), 0, 3) == 're:') ||
-						(substr(strtolower($datarray['title']), 0, 3) == 're-') ||
-						($raw_refs != ''));
+					$reply = ((str_starts_with(strtolower($datarray['title']), 're:'))
+						|| (str_starts_with(strtolower($datarray['title']), 're-'))
+						|| ($raw_refs != ''));
 
 					// Remove Reply-signs in the subject
 					$datarray['title'] = self::removeReply($datarray['title']);

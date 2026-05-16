@@ -201,6 +201,28 @@ class Post
 	}
 
 	/**
+	 * Retrieve a single record from the post-origin-view view and returns it in an associative array
+	 *
+	 * @return bool|array
+	 * @throws \Exception
+	 * @see   DBA::select
+	 */
+	public static function selectOriginFirst(array $fields = [], array $condition = [], array $params = [])
+	{
+		$params['limit'] = 1;
+
+		$result = self::selectOrigin($fields, $condition, $params);
+
+		if (is_bool($result)) {
+			return $result;
+		} else {
+			$row = self::fetch($result);
+			DBA::close($result);
+			return $row;
+		}
+	}
+
+	/**
 	 * Retrieve a single record from the post-user-view view and returns it in an associative array
 	 * When the requested record is a reshare activity, the system fetches the reshared original post.
 	 * Otherwise the function reacts similar to selectFirst
@@ -452,12 +474,10 @@ class Post
 			["`visible` AND NOT `deleted`
 			AND NOT `author-blocked` AND NOT `owner-blocked`
 			AND (NOT `causer-blocked` OR `causer-id` = ? OR `causer-id` IS NULL) AND NOT `contact-blocked`
-			AND ((NOT `contact-readonly` AND NOT `contact-pending` AND (`contact-rel` IN (?, ?)))
-				OR `self` OR `contact-uid` = ?)
 			AND NOT EXISTS(SELECT `uri-id` FROM `post-user`    WHERE `uid` = ? AND `uri-id` = " . DBA::quoteIdentifier($view) . ".`uri-id` AND `hidden`)
 			AND NOT EXISTS(SELECT `cid`    FROM `user-contact` WHERE `uid` = ? AND `cid` IN (`author-id`, `owner-id`) AND (`blocked` OR `ignored` OR `is-blocked`))
 			AND NOT EXISTS(SELECT `gsid`   FROM `user-gserver` WHERE `uid` = ? AND `gsid` IN (`author-gsid`, `owner-gsid`, `causer-gsid`) AND `ignored`)",
-				0, Contact::SHARING, Contact::FRIEND, 0, $uid, $uid, $uid]
+				0, $uid, $uid, $uid],
 		);
 
 		$select_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], $selected));
@@ -518,6 +538,22 @@ class Post
 	public static function selectTimelineForUser(int $uid, array $selected = [], array $condition = [], array $params = [])
 	{
 		return self::selectViewForUser('post-timeline-view', $uid, $selected, $condition, $params);
+	}
+
+	/**
+	 * Select rows from the post-timeline-thread-view view for a given user
+	 * This function is used for API calls.
+	 *
+	 * @param integer $uid
+	 * @param array $selected
+	 * @param array $condition
+	 * @param array $params
+	 *
+	 * @return boolean|object
+	 */
+	public static function selectTimelineThreadForUser(int $uid, array $selected = [], array $condition = [], array $params = [])
+	{
+		return self::selectViewForUser('post-timeline-thread-view', $uid, $selected, $condition, $params);
 	}
 
 	public static function selectLocalTimelineForUser(int $uid, array $selected = [], array $condition = [], array $params = [])
@@ -608,6 +644,17 @@ class Post
 	}
 
 	/**
+	 * Retrieves a list of up to 100 unseen posts for a user
+	 * @param int $uid User ID
+	 * @return array Array containing the URI IDs of unseen posts
+	 */
+	public static function getUnseenPosts(int $uid): array
+	{
+		$posts = DBA::selectToArray('post-user', ['uri-id'], ['unseen' => true, 'uid' => $uid], ['limit' => 100]);
+		return array_column($posts, 'uri-id');
+	}
+
+	/**
 	 * Update existing post entries
 	 *
 	 * @param array $fields    The fields that are to be changed
@@ -658,6 +705,7 @@ class Post
 		}
 
 		$update_fields = DI::dbaDefinition()->truncateFieldsForTable('post-content', $fields);
+		unset($update_fields['quote-uri-id']);
 		if (!empty($update_fields)) {
 			$affected_count = 0;
 			$posts          = DBA::select('post-user-view', ['uri-id'], $condition, ['group_by' => ['uri-id']]);

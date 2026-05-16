@@ -6,7 +6,10 @@
   *}}
 
 <nav id="sidebar-calendar" class="widget">
-  <h3>{{$etitle}}</h3>
+  <h3>
+    <i class="fa fa-upload" aria-hidden="true"></i>
+    {{$etitle}}
+  </h3>
 
   <ul class="sidebar-calendar-export-ul">
     <li class="sidebar-calendar-export-li"><a href="calendar/export/{{$user}}/ical">{{$export_ical}}</a></li>

@@ -1,26 +1,29 @@
-ARG VARIANT="8.2-apache-bullseye"
-FROM mcr.microsoft.com/vscode/devcontainers/php:${VARIANT}
+FROM php:8.4-apache
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG apcu_version=5.1.23
-ARG memcached_version=3.2.0
-ARG redis_version=6.0.2
-ARG imagick_version=3.7.0
-
-RUN apt-get update -y;
 
 # Install MariaDB client
-RUN apt-get install -y mariadb-client
+RUN apt-get update \
+        && apt-get install -y --no-install-recommends mariadb-client \
+;
 
 # Base packages
-RUN apt install -y vim software-properties-common sudo nano gnupg2
+RUN apt-get install -y \
+        vim \
+        sudo \
+        nano \
+        git \
+        gnupg2 \
+        pinentry-curses \
+;
 
 # entrypoint.sh and cron.sh dependencies
 RUN apt-get install -y --no-install-recommends \
         rsync \
         bzip2 \
         msmtp \
-        tini
+        tini \
+;
 
 RUN apt-get install -y --no-install-recommends \
         bash \
@@ -38,36 +41,40 @@ RUN apt-get install -y --no-install-recommends \
         libzip-dev \
         libldap2-dev \
         libgmp-dev \
-        libmagickcore-6.q16-6-extra \
-        ; \
-        \
-	docker-php-ext-configure gd \
-            --with-freetype \
-            --with-jpeg \
-            --with-webp \
-        ; \
- 	docker-php-ext-install -j "$(nproc)" \
-            pdo_mysql \
-            gd \
-            exif \
-            zip \
-            opcache \
-            ctype \
-            pcntl \
-            ldap \
-            gmp \
-            intl
+        # libmagickcore-6.q16-6-extra \
+;
+
+RUN docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg \
+        --with-webp \
+;
+
+RUN docker-php-ext-install -j "$(nproc)" \
+        pdo_mysql \
+        gd \
+        exif \
+        zip \
+        opcache \
+        ctype \
+        pcntl \
+        ldap \
+        gmp \
+        intl \
+ ;
 
 # pecl will claim success even if one install fails, so we need to perform each install separately
-RUN pecl install apcu-${apcu_version}; \
-        pecl install memcached-${memcached_version}; \
-        pecl install redis-${redis_version}; \
-        pecl install imagick-${imagick_version}; \
-        docker-php-ext-enable \
-            apcu \
-            memcached \
-            redis \
-            imagick
+RUN pecl install apcu-5.1.27;
+RUN pecl install memcached-3.4.0;
+RUN pecl install redis-6.2.0;
+RUN pecl install imagick-3.8.0;
+
+RUN docker-php-ext-enable \
+        apcu \
+        memcached \
+        redis \
+        imagick \
+;
 
 RUN apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
@@ -89,8 +96,8 @@ RUN { \
         echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
         echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
         echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
-    } > /usr/local/etc/php/conf.d/friendica.ini; \
-    ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini; \
-    \
-    mkdir /var/www/data; \
-    chmod -R g=u /var/www
+    } > /usr/local/etc/php/conf.d/friendica.ini;
+
+RUN ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+RUN mkdir /var/www/data
+RUN chmod -R g=u /var/www

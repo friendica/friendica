@@ -37,7 +37,7 @@ class FileSystem implements FileSystemUtil
 			$dirname = realpath(dirname($file));
 		}
 
-		if (substr($file, 0, 7) === 'file://') {
+		if (str_starts_with($file, 'file://')) {
 			$dirname = realpath(dirname(substr($file, 7)));
 		}
 

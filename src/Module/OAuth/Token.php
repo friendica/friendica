@@ -44,7 +44,7 @@ class Token extends BaseApi
 			$authorization = $_SERVER['REDIRECT_REMOTE_USER'] ?? '';
 		}
 
-		if ((empty($request['client_id']) || empty($request['client_secret'])) && substr($authorization, 0, 6) == 'Basic ') {
+		if ((empty($request['client_id']) || empty($request['client_secret'])) && str_starts_with($authorization, 'Basic ')) {
 			// Per RFC2617, usernames can't contain a colon but password can,
 			// so we cut on the first colon to obtain the username and the password
 			// @see https://www.rfc-editor.org/rfc/rfc2617#section-2
@@ -83,7 +83,7 @@ class Token extends BaseApi
 				'Bearer',
 				$application['scopes'],
 				$token['created_at'],
-				null
+				null,
 			);
 
 			$this->jsonExit($object->toArray());
@@ -94,7 +94,7 @@ class Token extends BaseApi
 		$redirect_uri = strtok($request['redirect_uri'], '?');
 		$condition    = [
 			"`redirect_uri` LIKE ? AND `id` = ? AND `code` = ? AND `created_at` > ?",
-			$redirect_uri, $application['id'], $request['code'], DateTimeFormat::utc('now - 5 minutes')
+			$redirect_uri, $application['id'], $request['code'], DateTimeFormat::utc('now - 5 minutes'),
 		];
 
 		$token = DBA::selectFirst('application-view', ['access_token', 'created_at', 'uid'], $condition);
@@ -110,7 +110,7 @@ class Token extends BaseApi
 			'Bearer',
 			$application['scopes'],
 			$token['created_at'],
-			$owner['url']
+			$owner['url'],
 		);
 
 		$this->jsonExit($object->toArray());

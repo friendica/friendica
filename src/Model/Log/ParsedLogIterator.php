@@ -112,7 +112,7 @@ class ParsedLogIterator implements \Iterator
 	private function search(ParsedLogLine $parsedlogline): bool
 	{
 		if ($this->search != '') {
-			return strstr($parsedlogline->logline, $this->search) !== false;
+			return str_contains($parsedlogline->logline, $this->search);
 		}
 		return true;
 	}

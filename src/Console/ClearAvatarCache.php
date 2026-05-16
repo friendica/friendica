@@ -92,13 +92,13 @@ HELP;
 
 	private function isAvatarCache(array $contact): bool
 	{
-		if (!empty($contact['photo']) && strpos($contact['photo'], Avatar::baseUrl()) === 0) {
+		if (!empty($contact['photo']) && str_starts_with($contact['photo'], Avatar::baseUrl())) {
 			return true;
 		}
-		if (!empty($contact['thumb']) && strpos($contact['thumb'], Avatar::baseUrl()) === 0) {
+		if (!empty($contact['thumb']) && str_starts_with($contact['thumb'], Avatar::baseUrl())) {
 			return true;
 		}
-		if (!empty($contact['micro']) && strpos($contact['micro'], Avatar::baseUrl()) === 0) {
+		if (!empty($contact['micro']) && str_starts_with($contact['micro'], Avatar::baseUrl())) {
 			return true;
 		}
 		return false;

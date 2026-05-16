@@ -32,7 +32,7 @@ class UpdateGServer
 		}
 
 		$filtered = filter_var($server_url, FILTER_SANITIZE_URL);
-		if (substr(Strings::normaliseLink($filtered), 0, 7) != 'http://') {
+		if (!str_starts_with(Strings::normaliseLink($filtered), 'http://')) {
 			GServer::setFailureByUrl($server_url);
 			return;
 		}

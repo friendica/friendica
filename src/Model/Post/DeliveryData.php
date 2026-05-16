@@ -8,29 +8,29 @@
 namespace Friendica\Model\Post;
 
 use Friendica\Database\DBA;
-use \BadMethodCallException;
+use BadMethodCallException;
 
 class DeliveryData
 {
-	const LEGACY_FIELD_LIST = [
+	public const LEGACY_FIELD_LIST = [
 		// Legacy fields moved from item table
 		'postopts',
 		'inform',
 	];
 
-	const FIELD_LIST = [
+	public const FIELD_LIST = [
 		// New delivery fields with virtual field name in item fields
-		'queue_count' => 'delivery_queue_count',
-		'queue_done'  => 'delivery_queue_done',
-		'queue_failed'  => 'delivery_queue_failed',
+		'queue_count'  => 'delivery_queue_count',
+		'queue_done'   => 'delivery_queue_done',
+		'queue_failed' => 'delivery_queue_failed',
 	];
 
-	const ACTIVITYPUB = 1;
-	const DFRN = 2;
-	const LEGACY_DFRN = 3; // @deprecated since version 2021.09
-	const DIASPORA = 4;
-	const OSTATUS = 5; // @deprecated since version 2024.09
-	const MAIL = 6;
+	public const ACTIVITYPUB = 1;
+	public const DFRN        = 2;
+	public const LEGACY_DFRN = 3; // @deprecated 2021.09 since version 2021.09
+	public const DIASPORA    = 4;
+	public const OSTATUS     = 5; // @deprecated 2024.09 since version 2024.09
+	public const MAIL        = 6;
 
 	/**
 	 * Extract delivery data from the provided item fields
@@ -45,7 +45,7 @@ class DeliveryData
 			if (is_int($key) && isset($fields[$field])) {
 				// Legacy field moved from item table
 				$delivery_data[$field] = $fields[$field];
-				$fields[$field] = null;
+				$fields[$field]        = null;
 			} elseif (isset($fields[$field])) {
 				// New delivery field with virtual field name in item fields
 				$delivery_data[$key] = $fields[$field];

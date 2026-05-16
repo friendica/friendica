@@ -36,7 +36,9 @@ class StatusTest extends FixtureTestCase
 			new Url(DI::logger()),
 			new Mention(DI::logger(), DI::baseUrl()),
 			new Activities(DI::logger(), DI::twitterUser()),
-			new Attachment(DI::logger()), DI::contentItem());
+			new Attachment(DI::logger()),
+			DI::contentItem(),
+		);
 	}
 
 	/**
@@ -125,7 +127,7 @@ class StatusTest extends FixtureTestCase
 	public function testApiFormatItems()
 	{
 		// @todo: This call is needed for this test
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$posts = DI::dba()->selectToArray('post-view', ['uri-id']);
 		foreach ($posts as $item) {

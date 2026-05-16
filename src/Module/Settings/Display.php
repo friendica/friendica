@@ -13,6 +13,8 @@ use Friendica\App\Page;
 use Friendica\AppHelper;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Conversation\Collection\Timelines;
+use Friendica\Content\Conversation\Entity\Channel;
+use Friendica\Content\Conversation\Entity\UserDefinedChannel;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Conversation\Factory\Channel as ChannelFactory;
 use Friendica\Content\Conversation\Factory\Community as CommunityFactory;
@@ -26,12 +28,14 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
+use Friendica\Model\Post\Engagement;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
+use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -86,24 +90,32 @@ class Display extends BaseSettings
 
 		$theme                   = trim($request['theme']);
 		$mobile_theme            = trim($request['mobile_theme'] ?? '');
-		$enable_smile            = (bool)$request['enable_smile'];
-		$enable                  = (array)$request['enable'];
-		$bookmark                = (array)$request['bookmark'];
-		$channel_languages       = (array)$request['channel_languages'];
-		$first_day_of_week       = (int)$request['first_day_of_week'];
+		$enable_smile            = (bool) $request['enable_smile'];
+		$enable                  = (array) $request['enable'];
+		$bookmark                = (array) $request['bookmark'];
+		$channel_languages       = (array) $request['channel_languages'];
+		$timeline_channels       = isset($request['timeline_channels']) ? (array) $request['timeline_channels'] : null;
+		$filter_channels         = isset($request['filter_channels']) ? (array) $request['filter_channels'] : null;
+		$first_day_of_week       = (int) $request['first_day_of_week'];
 		$calendar_default_view   = trim($request['calendar_default_view']);
-		$infinite_scroll         = (bool)$request['infinite_scroll'];
-		$enable_smart_threading  = (bool)$request['enable_smart_threading'];
-		$enable_dislike          = (bool)$request['enable_dislike'];
-		$display_resharer        = (bool)$request['display_resharer'];
-		$stay_local              = (bool)$request['stay_local'];
-		$hide_empty_descriptions = (bool)$request['hide_empty_descriptions'];
-		$hide_custom_emojis      = (bool)$request['hide_custom_emojis'];
-		$platform_icon_style     = (int)$request['platform_icon_style'];
-		$show_page_drop          = (bool)$request['show_page_drop'];
-		$display_eventlist       = (bool)$request['display_eventlist'];
-		$preview_mode            = (int)$request['preview_mode'];
-		$update_content          = (int)$request['update_content'];
+		$infinite_scroll         = (bool) $request['infinite_scroll'];
+		$enable_smart_threading  = (bool) $request['enable_smart_threading'];
+		$enable_dislike          = (bool) $request['enable_dislike'];
+		$display_resharer        = (bool) $request['display_resharer'];
+		$stay_local              = (bool) $request['stay_local'];
+		$hide_empty_descriptions = (bool) $request['hide_empty_descriptions'];
+		$hide_custom_emojis      = (bool) $request['hide_custom_emojis'];
+		$platform_icon_style     = (int) $request['platform_icon_style'];
+		$show_page_drop          = (bool) $request['show_page_drop'];
+		$display_eventlist       = (bool) $request['display_eventlist'];
+		$preview_mode            = (int) $request['preview_mode'];
+		$update_content          = (int) $request['update_content'];
+		$embed_remote_media      = (bool) $request['embed_remote_media'];
+		$embed_media             = (bool) $request['embed_media'];
+		$widget_timelineorder    = trim($request['widget_timelineorder']);
+		$menu_timelineorder      = trim($request['menu_timelineorder']);
+		$widget_timeline_reset   = (bool) $request['widget_timeline_reset'];
+		$menu_timeline_reset     = (bool) $request['menu_timeline_reset'];
 
 		$enabled_timelines = [];
 		foreach ($enable as $code => $enabled) {
@@ -119,15 +131,15 @@ class Display extends BaseSettings
 			}
 		}
 
-		$itemspage_network = !empty($request['itemspage_network']) ?
-			intval($request['itemspage_network']) :
-			$this->config->get('system', 'itemspage_network');
+		$itemspage_network = !empty($request['itemspage_network'])
+			? intval($request['itemspage_network'])
+			: $this->config->get('system', 'itemspage_network');
 		if ($itemspage_network > 100) {
 			$itemspage_network = 100;
 		}
-		$itemspage_mobile_network = !empty($request['itemspage_mobile_network']) ?
-			intval($request['itemspage_mobile_network']) :
-			$this->config->get('system', 'itemspage_network_mobile');
+		$itemspage_mobile_network = !empty($request['itemspage_mobile_network'])
+			? intval($request['itemspage_mobile_network'])
+			: $this->config->get('system', 'itemspage_network_mobile');
 		if ($itemspage_mobile_network > 100) {
 			$itemspage_mobile_network = 100;
 		}
@@ -148,10 +160,28 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'show_page_drop', $show_page_drop);
 		$this->pConfig->set($uid, 'system', 'display_eventlist', $display_eventlist);
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
-
+		$this->pConfig->set($uid, 'system', 'embed_remote_media', $embed_remote_media);
+		$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
+		if ($widget_timeline_reset) {
+			$this->pConfig->delete($uid, 'system', 'widget_timeline_order');
+		} else {
+			$this->pConfig->set($uid, 'system', 'widget_timeline_order', $widget_timelineorder);
+		}
+		if ($menu_timeline_reset) {
+			$this->pConfig->delete($uid, 'system', 'menu_timeline_order');
+		} else {
+			$this->pConfig->set($uid, 'system', 'menu_timeline_order', $menu_timelineorder);
+		}
 		$this->pConfig->set($uid, 'system', 'network_timelines', $network_timelines);
 		$this->pConfig->set($uid, 'system', 'enabled_timelines', $enabled_timelines);
 		$this->pConfig->set($uid, 'channel', 'languages', $channel_languages);
+
+		if (!is_null($timeline_channels)) {
+			$this->pConfig->set($uid, 'channel', 'timeline_channels', $timeline_channels);
+		}
+		if (!is_null($filter_channels)) {
+			$this->pConfig->set($uid, 'channel', 'filter_channels', $filter_channels);
+		}
 
 		$this->pConfig->set($uid, 'accessibility', 'hide_empty_descriptions', $hide_empty_descriptions);
 		$this->pConfig->set($uid, 'accessibility', 'hide_custom_emojis', $hide_custom_emojis);
@@ -234,13 +264,15 @@ class Display extends BaseSettings
 
 		$update_content         = $this->pConfig->get($uid, 'system', 'update_content') ?? false;
 		$enable_smile           = !$this->pConfig->get($uid, 'system', 'no_smilies', false);
-		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', false);
+		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', true);
 		$enable_smart_threading = !$this->pConfig->get($uid, 'system', 'no_smart_threading', false);
 		$enable_dislike         = !$this->pConfig->get($uid, 'system', 'hide_dislike', false);
 		$display_resharer       = $this->pConfig->get($uid, 'system', 'display_resharer', false);
-		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', false);
+		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', true);
 		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
 		$display_eventlist      = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
+		$embed_remote_media     = $this->pConfig->get($uid, 'system', 'embed_remote_media', false);
+		$embed_media            = $this->pConfig->get($uid, 'system', 'embed_media', false);
 
 		$hide_empty_descriptions = $this->pConfig->get($uid, 'accessibility', 'hide_empty_descriptions', false);
 		$hide_custom_emojis      = $this->pConfig->get($uid, 'accessibility', 'hide_custom_emojis', false);
@@ -253,27 +285,114 @@ class Display extends BaseSettings
 			ContactSelector::SVG_WHITE       => $this->t('White'),
 		];
 
-		$preview_mode  = $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_LARGE);
+		$preview_mode  = $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_AUTO);
 		$preview_modes = [
 			BBCode::PREVIEW_NONE     => $this->t('No preview'),
 			BBCode::PREVIEW_NO_IMAGE => $this->t('No image'),
 			BBCode::PREVIEW_SMALL    => $this->t('Small Image'),
 			BBCode::PREVIEW_LARGE    => $this->t('Large Image'),
+			BBCode::PREVIEW_AUTO     => $this->t('Automatic image size'),
 		];
 
 		$bookmarked_timelines = $this->pConfig->get($uid, 'system', 'network_timelines', $this->getAvailableTimelines($uid, true)->column('code'));
 		$enabled_timelines    = $this->pConfig->get($uid, 'system', 'enabled_timelines', $this->getAvailableTimelines($uid, false)->column('code'));
 		$channel_languages    = User::getWantedLanguages($uid);
-		$languages            = $this->l10n->getLanguageCodes(true);
+		$languages            = $this->l10n->getLanguageCodes(true, true);
+		$timeline_channels    = $this->pConfig->get($uid, 'channel', 'timeline_channels') ?? [];
+		$filter_channels      = $this->pConfig->get($uid, 'channel', 'filter_channels')   ?? [];
+
+		$channels = [];
+		if ($this->config->get('system', 'system_channel_cache')) {
+			foreach ($this->channel->getTimelines($uid) as $channel) {
+				if (!in_array($channel->code, [Channel::FORYOU, Channel::QUIETSHARERS])) {
+					$channels[$channel->code] = $channel->label;
+				}
+			}
+		}
+
+		$filter = [];
+		if ($this->config->get('system', 'channel_cache')) {
+			foreach ($this->userDefinedChannel->selectByUid($uid) as $channel) {
+				$filter[$channel->code] = $channel->label;
+				if (in_array($channel->circle, [UserDefinedChannel::CIRCLE_GLOBAL, UserDefinedChannel::CIRCLE_FOLLOWERS])) {
+					$channels[$channel->code] = $channel->label;
+				}
+			}
+		}
 
 		$timelines = [];
 		foreach ($this->getAvailableTimelines($uid) as $timeline) {
 			$timelines[] = [
-				'label'       => $timeline->label,
-				'description' => $timeline->description,
-				'enable'      => ["enable[{$timeline->code}]", '', in_array($timeline->code, $enabled_timelines)],
-				'bookmark'    => ["bookmark[{$timeline->code}]", '', in_array($timeline->code, $bookmarked_timelines)],
+				'enable'   => ["enable[{$timeline->code}]", $timeline->label, in_array($timeline->code, $enabled_timelines), $timeline->description],
+				'bookmark' => ["bookmark[{$timeline->code}]", $timeline->label, in_array($timeline->code, $bookmarked_timelines), $timeline->description],
 			];
+		}
+		/*  GET CUSTOM TIMELINE ORDERS IF ANY
+			=================================
+			First we see if there is a custom order saved in user prefs, if there is we set working array to that.
+			If we have an array create a temporary array with the items in the correct order.
+			Lastly we modify the $timelines array with our new order for "enable", "bookmark", or both.
+		*/
+		$widget_timeline_order = json_decode($this->pConfig->get($uid, 'system', 'widget_timeline_order'));
+		$menu_timeline_order   = json_decode($this->pConfig->get($uid, 'system', 'menu_timeline_order'));
+		$temp_widget_order     = [];
+		$temp_menu_order       = [];
+		// do the sidebar widget order first...
+		if (!empty($widget_timeline_order)) {
+			$tmp = [];
+			$xtr = [];
+			foreach ($widget_timeline_order as $order) {
+				foreach ($timelines as $timeline) {
+					$name = str_replace(['enable[',']'], '', $timeline['enable'][0]);
+					if ($name == $order) {
+						$tmp[]['enable'] = $timeline['enable'];
+					}
+				}
+			}
+			// there could be custom or add-on channels not in our array, append those
+			foreach ($timelines as $timeline) {
+				$name = str_replace(['enable[',']'], '', $timeline['enable'][0]);
+				if (!in_array($name, $widget_timeline_order)) {
+					$xtr[]['enable'] = $timeline['enable'];
+				}
+			}
+			// combine our two temp arrays into one big temp array
+			$temp_widget_order = array_merge($tmp, $xtr);
+		}
+		// do the top menu order next...
+		if (!empty($menu_timeline_order)) {
+			$tmp = [];
+			$xtr = [];
+			foreach ($menu_timeline_order as $order) {
+				foreach ($timelines as $timeline) {
+					$name = str_replace(['bookmark[',']'], '', $timeline['bookmark'][0]);
+					if ($name == $order) {
+						$tmp[]['bookmark'] = $timeline['bookmark'];
+					}
+				}
+			}
+			// there could be custom or add-on channels unaccounted for in our array, append them
+			foreach ($timelines as $timeline) {
+				$name = str_replace(['bookmark[',']'], '', $timeline['bookmark'][0]);
+				if (!in_array($name, $menu_timeline_order)) {
+					$xtr[]['bookmark'] = $timeline['bookmark'];
+				}
+			}
+			// combine our two temp arrays into one big temp array
+			$temp_menu_order = array_merge($tmp, $xtr);
+		}
+		/*  now we need to alter the original timelines array directly...
+			in theory populated temp arrays should be same length as timelines
+		*/
+		for ($t = 0; $t < count($timelines);$t++) {
+			// only mod from populated widget array
+			if (count($temp_widget_order) > 0) {
+				$timelines[$t]['enable'] = $temp_widget_order[$t]['enable'];
+			}
+			// only mod from populated menu array
+			if (count($temp_menu_order) > 0) {
+				$timelines[$t]['bookmark'] = $temp_menu_order[$t]['bookmark'];
+			}
 		}
 
 		$first_day_of_week = $this->pConfig->get($uid, 'calendar', 'first_day_of_week', 0);
@@ -284,7 +403,7 @@ class Display extends BaseSettings
 			3 => $this->t('Wednesday'),
 			4 => $this->t('Thursday'),
 			5 => $this->t('Friday'),
-			6 => $this->t('Saturday')
+			6 => $this->t('Saturday'),
 		];
 
 		$calendar_default_view = $this->pConfig->get($uid, 'calendar', 'default_view', 'month');
@@ -292,7 +411,7 @@ class Display extends BaseSettings
 			'month'      => $this->t('month'),
 			'agendaWeek' => $this->t('week'),
 			'agendaDay'  => $this->t('day'),
-			'listMonth'  => $this->t('list')
+			'listMonth'  => $this->t('list'),
 		];
 
 		$theme_config = '';
@@ -303,27 +422,37 @@ class Display extends BaseSettings
 
 		$tpl = Renderer::getMarkupTemplate('settings/display.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$ptitle'         => $this->t('Display Settings'),
-			'$submit'         => $this->t('Save Settings'),
-			'$d_tset'         => $this->t('General Theme Settings'),
-			'$d_ctset'        => $this->t('Custom Theme Settings'),
-			'$d_cset'         => $this->t('Content Settings'),
-			'$stitle'         => $this->t('Theme settings'),
-			'$timeline_title' => $this->t('Timelines'),
-			'$channel_title'  => $this->t('Channels'),
-			'$calendar_title' => $this->t('Calendar'),
+			'$ptitle'              => $this->t('Display Settings'),
+			'$submit'              => $this->t('Save Settings'),
+			'$d_cset'              => $this->t('Content Settings'),
+			'$stitle'              => $this->t('Theme settings'),
+			'$themes_title'        => $this->t('Themes'),
+			'$themes_settings_for' => $this->t('Settings for %s', Strings::ucFirst($theme_selected)),
+			'$theme_changed_text'  => $this->t('Note: If you switch the theme, you need to save changes before you can see the settings for the new theme below.'),
+			'$timeline_title'      => $this->t('Timelines'),
+			'$channel_title'       => $this->t('Channels'),
+			'$calendar_title'      => $this->t('Calendar'),
+			'$sortable'            => $this->t('Drag to reorder, use arrow buttons on each item, or tab to item with keyboard and move up/down with arrow keys'),
+			'$reset_widget'        => [
+				'0' => 'widget_timeline_reset',
+				'1' => $this->t('Reset order'),
+			],
+			'$reset_menu' => [
+				'0' => 'menu_timeline_reset',
+				'1' => $this->t('Reset order'),
+			],
 
 			'$form_security_token' => self::getFormSecurityToken('settings_display'),
 			'$uid'                 => $uid,
 
-			'$theme'        => ['theme', $this->t('Display Theme:'), $theme_selected, '', $themes, true],
-			'$mobile_theme' => ['mobile_theme', $this->t('Mobile Theme:'), $mobile_theme_selected, '', $mobile_themes, false],
+			'$theme'        => ['theme', $this->t('Theme'), $theme_selected, '', $themes, true],
+			'$mobile_theme' => ['mobile_theme', $this->t('Mobile theme'), $mobile_theme_selected, '', $mobile_themes, false],
 			'$theme_config' => $theme_config,
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],
 			'$itemspage_mobile_network' => ['itemspage_mobile_network', $this->t('Number of items to display per page when viewed from mobile device:'), $itemspage_mobile_network, $this->t('Maximum of 100 items')],
 			'$update_content'           => ['update_content', $this->t('Regularly update the page content'), $update_content, $this->t('When enabled, new content on network, community and channels are added on top.')],
-			'$enable_smile'             => ['enable_smile', $this->t('Display emoticons'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching symbols.')],
+			'$enable_smile'             => ['enable_smile', $this->t('Display emojis'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching emojis.')],
 			'$infinite_scroll'          => ['infinite_scroll', $this->t('Infinite scroll'), $infinite_scroll, $this->t('Automatic fetch new items when reaching the page end.')],
 			'$enable_smart_threading'   => ['enable_smart_threading', $this->t('Enable Smart Threading'), $enable_smart_threading, $this->t('Enable the automatic suppression of extraneous thread indentation.')],
 			'$enable_dislike'           => ['enable_dislike', $this->t('Display the Dislike feature'), $enable_dislike, $this->t('Display the Dislike button and dislike reactions on posts and comments.')],
@@ -335,15 +464,21 @@ class Display extends BaseSettings
 			'$hide_empty_descriptions'  => ['hide_empty_descriptions', $this->t('Hide pictures with empty alternative text'), $hide_empty_descriptions, $this->t("Don't display pictures that are missing the alternative text.")],
 			'$hide_custom_emojis'       => ['hide_custom_emojis', $this->t('Hide custom emojis'), $hide_custom_emojis, $this->t("Don't display custom emojis.")],
 			'$platform_icon_style'      => ['platform_icon_style', $this->t('Platform icons style'), $platform_icon_style, $this->t('Style of the platform icons'), $platform_icon_styles, false],
+			'$embed_remote_media'       => ['embed_remote_media', $this->t('Embed remote media'), $embed_remote_media, $this->t('When enabled, remote media will be embedded in the post, like for example YouTube videos.')],
+			'$embed_media'              => ['embed_media', $this->t('Embed supported media'), $embed_media, $this->t('When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos.')],
 
 			'$timeline_label'       => $this->t('Label'),
 			'$timeline_descriptiom' => $this->t('Description'),
-			'$timeline_enable'      => $this->t('Enable'),
-			'$timeline_bookmark'    => $this->t('Bookmark'),
+			'$timeline_enable'      => $this->t('Channels Widget'),
+			'$timeline_bookmark'    => $this->t('Top Menu'),
 			'$timelines'            => $timelines,
 			'$timeline_explanation' => $this->t('Enable timelines that you want to see in the channels widget. Bookmark timelines that you want to see in the top menu.'),
 
-			'$channel_languages' => ['channel_languages[]', $this->t('Channel languages:'), $channel_languages, $this->t('Select all the languages you want to see in your channels. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
+			'$channel_languages'     => ['channel_languages[]', $this->t('Channel languages:'), $channel_languages, $this->t('Select all the languages you want to see in your channels. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
+			'$timeline_channels'     => ['timeline_channels[]', $this->t('Timeline channels:'), $timeline_channels, $this->t('Select all the channels that you want to see in your network timeline.'), $channels, 'multiple'],
+			'$has_timeline_channels' => !empty($channels),
+			'$filter_channels'       => ['filter_channels[]', $this->t('Filter channels:'), $filter_channels, $this->t('Select all the channels that you want to use as a filter for your network timeline. All posts from these channels will be hidden. For technical reasons postings that are older than %s will not be filtered.', $this->l10n->dateTime(Engagement::getCreationDateLimit(false)), 'r'), $filter, 'multiple'],
+			'$has_filter_channels'   => !empty($filter),
 
 			'$first_day_of_week'     => ['first_day_of_week', $this->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],
 			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, '', $calendarViews, false],

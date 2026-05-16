@@ -59,12 +59,11 @@ class Import extends \Friendica\Module\BaseModeration
 		if (isset($request['page_blocklist_upload'])) {
 			try {
 				$this->blocklist = $this->localBlocklist::extractFromCSVFile($_FILES['listfile']['tmp_name']);
-			} catch (\Throwable $e) {
+			} catch (\Throwable) {
 				$this->systemMessages->addNotice($this->t('Error importing pattern file'));
 				return;
 			}
-		}
-		else if (isset($request['page_blocklist_import'])) {
+		} elseif (isset($request['page_blocklist_import'])) {
 			$this->blocklist = json_decode($request['blocklist'], true);
 			if ($this->blocklist === null) {
 				$this->systemMessages->addNotice($this->t('Error importing pattern file'));
@@ -117,7 +116,7 @@ class Import extends \Friendica\Module\BaseModeration
 			'$mode_append'         => ['mode', $this->t('Append'), 'append', $this->t('Imports patterns from the file that weren\'t already existing in the current blocklist.'), 'checked="checked"'],
 			'$mode_replace'        => ['mode', $this->t('Replace'), 'replace', $this->t('Replaces the current blocklist by the imported patterns.')],
 			'$blocklist'           => $this->blocklist,
-			'$form_security_token' => self::getFormSecurityToken('moderation_blocklist_import')
+			'$form_security_token' => self::getFormSecurityToken('moderation_blocklist_import'),
 		]);
 	}
 }

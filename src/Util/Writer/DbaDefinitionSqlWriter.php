@@ -93,8 +93,8 @@ class DbaDefinitionSqlWriter
 
 		$sql = implode(",\n\t", $sql_rows);
 
-		$sql = sprintf("CREATE TABLE IF NOT EXISTS `%s` (\n\t", static::escape($tableName)) . $sql .
-			   "\n)" . $engine . " DEFAULT COLLATE utf8mb4_general_ci" . $comment;
+		$sql = sprintf("CREATE TABLE IF NOT EXISTS `%s` (\n\t", static::escape($tableName)) . $sql
+			   . "\n)" . $engine . " DEFAULT COLLATE utf8mb4_general_ci" . $comment;
 		return $sql . ";\n\n";
 	}
 
@@ -193,7 +193,7 @@ class DbaDefinitionSqlWriter
 		}
 
 		if (isset($parameters['default'])) {
-			if (strpos(strtolower($parameters['type']), 'int') !== false) {
+			if (str_contains(strtolower($parameters['type']), 'int')) {
 				$fieldstruct .= ' DEFAULT ' . $parameters['default'];
 			} else {
 				$fieldstruct .= " DEFAULT '" . $parameters['default'] . "'";

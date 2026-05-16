@@ -140,7 +140,7 @@ class InstanceV2 extends BaseApi
 
 	private function buildContactInfo(): InstanceEntity\Contact
 	{
-		$email         = implode(',', User::getAdminEmailList());
+		$email         = $this->config->get('config', 'sender_email');
 		$administrator = User::getFirstAdmin();
 		$account       = null;
 

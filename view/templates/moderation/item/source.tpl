@@ -5,7 +5,7 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <div id="source" class="generic-page-wrapper">
-	<h2>{{$l10n.title}}</h2>
+	<h1>{{$l10n.title}} - {{$l10n.page}}</h1>
 	<form action="moderation/item/source" method="get" class="panel panel-default">
 		<div class="panel-body">
 			<div class="form-group">

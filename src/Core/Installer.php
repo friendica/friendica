@@ -13,7 +13,6 @@ use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
-use Friendica\Util\Images;
 use Friendica\Util\Strings;
 
 /**
@@ -22,9 +21,9 @@ use Friendica\Util\Strings;
 class Installer
 {
 	// Default values for the install page
-	const DEFAULT_LANG = 'en';
-	const DEFAULT_TZ   = 'America/Los_Angeles';
-	const DEFAULT_HOST = 'localhost';
+	public const DEFAULT_LANG = 'en';
+	public const DEFAULT_TZ   = 'America/Los_Angeles';
+	public const DEFAULT_HOST = 'localhost';
 
 	/**
 	 * @var array the check outcomes
@@ -146,13 +145,13 @@ class Installer
 
 		$tpl = Renderer::getMarkupTemplate('install/local.config.tpl');
 		$txt = Renderer::replaceMacros($tpl, [
-			'$dbhost'     => $configCache->get('database', 'hostname'),
-			'$dbuser'     => $configCache->get('database', 'username'),
-			'$dbpass'     => $configCache->get('database', 'password'),
-			'$dbdata'     => $configCache->get('database', 'database'),
+			'$dbhost' => $configCache->get('database', 'hostname'),
+			'$dbuser' => $configCache->get('database', 'username'),
+			'$dbpass' => $configCache->get('database', 'password'),
+			'$dbdata' => $configCache->get('database', 'database'),
 
-			'$phppath'    => $configCache->get('config', 'php_path'),
-			'$adminmail'  => $configCache->get('config', 'admin_email'),
+			'$phppath'   => $configCache->get('config', 'php_path'),
+			'$adminmail' => $configCache->get('config', 'admin_email'),
 
 			'$system_url' => $configCache->get('system', 'url'),
 			'$basepath'   => $basepath,
@@ -203,10 +202,10 @@ class Installer
 	private function addCheck($title, $status, $required, $help, $error_msg = "")
 	{
 		array_push($this->checks, [
-			'title' => $title,
-			'status' => $status,
-			'required' => $required,
-			'help' => $help,
+			'title'     => $title,
+			'status'    => $status,
+			'required'  => $required,
+			'help'      => $help,
 			'error_msg' => $error_msg,
 		]);
 	}
@@ -237,7 +236,7 @@ class Installer
 		$passed = file_exists($phppath);
 		if (!$passed) {
 			$phppath = trim(shell_exec('which ' . $phppath));
-			$passed = strlen($phppath);
+			$passed  = strlen($phppath);
 		}
 
 		$help = "";
@@ -256,11 +255,11 @@ class Installer
 		$this->addCheck(DI::l10n()->t('Command line PHP') . ($passed ? " (<tt>$phppath</tt>)" : ""), $passed, false, $help);
 
 		if ($passed) {
-			$cmd = "$phppath -v";
-			$result = trim(shell_exec($cmd));
-			$passed2 = (strpos($result, "(cli)") !== false);
+			$cmd      = "$phppath -v";
+			$result   = trim(shell_exec($cmd));
+			$passed2  = (str_contains($result, "(cli)"));
 			[$result] = explode("\n", $result);
-			$help = "";
+			$help     = "";
 			if (!$passed2) {
 				$help .= DI::l10n()->t("PHP executable is not the php cli binary \x28could be cgi-fgci version\x29") . '<br />';
 				$help .= DI::l10n()->t('Found PHP version: ') . "<tt>$result</tt>";
@@ -272,11 +271,11 @@ class Installer
 		}
 
 		if ($passed2) {
-			$str = Strings::getRandomName(8);
-			$cmd = "$phppath bin/testargs.php $str";
-			$result = trim(shell_exec($cmd));
+			$str     = Strings::getRandomName(8);
+			$cmd     = "$phppath bin/testargs.php $str";
+			$result  = trim(shell_exec($cmd));
 			$passed3 = $result == $str;
-			$help = "";
+			$help    = "";
 			if (!$passed3) {
 				$help .= DI::l10n()->t('The command line version of PHP on your system does not have "register_argc_argv" enabled.') . '<br />';
 				$help .= DI::l10n()->t('This is required for message delivery to work.');
@@ -302,15 +301,15 @@ class Installer
 	 */
 	public function checkKeys()
 	{
-		$help = '';
-		$res = false;
+		$help   = '';
+		$res    = false;
 		$status = true;
 
 		if (function_exists('openssl_pkey_new')) {
 			$res = openssl_pkey_new([
-				'digest_alg' => 'sha1',
+				'digest_alg'       => 'sha1',
 				'private_key_bits' => 4096,
-				'encrypt_key' => false
+				'encrypt_key'      => false,
 			]);
 		}
 
@@ -338,10 +337,10 @@ class Installer
 	private function checkFunction($name, $title, $help, $required)
 	{
 		$currHelp = '';
-		$status = true;
+		$status   = true;
 		if (!function_exists($name)) {
 			$currHelp = $help;
-			$status = false;
+			$status   = false;
 		}
 		$this->addCheck($title, $status, $required, $currHelp);
 
@@ -368,24 +367,24 @@ class Installer
 	{
 		$returnVal = true;
 
-		$help = '';
+		$help   = '';
 		$status = true;
 		if (function_exists('apache_get_modules') && !in_array('mod_rewrite', apache_get_modules())) {
-			$help = DI::l10n()->t('Error: Apache webserver mod-rewrite module is required but not installed.');
-			$status = false;
+			$help      = DI::l10n()->t('Error: Apache webserver mod-rewrite module is required but not installed.');
+			$status    = false;
 			$returnVal = false;
 		}
 		$this->addCheck(DI::l10n()->t('Apache mod_rewrite module'), $status, true, $help);
 
-		$help = '';
+		$help   = '';
 		$status = true;
 		if (!function_exists('mysqli_connect') && !class_exists('pdo')) {
-			$status = false;
-			$help = DI::l10n()->t('Error: PDO or MySQLi PHP module required but not installed.');
+			$status    = false;
+			$help      = DI::l10n()->t('Error: PDO or MySQLi PHP module required but not installed.');
 			$returnVal = false;
 		} elseif (!function_exists('mysqli_connect') && class_exists('pdo') && !in_array('mysql', \PDO::getAvailableDrivers())) {
-			$status = false;
-			$help = DI::l10n()->t('Error: The MySQL driver for PDO is not installed.');
+			$status    = false;
+			$help      = DI::l10n()->t('Error: The MySQL driver for PDO is not installed.');
 			$returnVal = false;
 		}
 		$this->addCheck(DI::l10n()->t('PDO or MySQLi PHP module'), $status, true, $help);
@@ -400,91 +399,102 @@ class Installer
 		$this->addCheck(DI::l10n()->t('IntlChar PHP module'), $status, true, $help);
 
 		// check for XML DOM Documents being able to be generated
-		$help = '';
+		$help   = '';
 		$status = true;
 		try {
 			new DOMDocument();
-		} catch (Exception $e) {
-			$help = DI::l10n()->t('Error, XML PHP module required but not installed.');
-			$status = false;
+		} catch (Exception) {
+			$help      = DI::l10n()->t('Error, XML PHP module required but not installed.');
+			$status    = false;
 			$returnVal = false;
 		}
 		$this->addCheck(DI::l10n()->t('XML PHP module'), $status, true, $help);
 
-		$status = $this->checkFunction('curl_init',
+		$status = $this->checkFunction(
+			'curl_init',
 			DI::l10n()->t('libCurl PHP module'),
 			DI::l10n()->t('Error: libCURL PHP module required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('imagecreatefromjpeg',
+		$status = $this->checkFunction(
+			'imagecreatefromjpeg',
 			DI::l10n()->t('GD graphics PHP module'),
 			DI::l10n()->t('Error: GD graphics PHP module with JPEG support required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('openssl_public_encrypt',
+		$status = $this->checkFunction(
+			'openssl_public_encrypt',
 			DI::l10n()->t('OpenSSL PHP module'),
 			DI::l10n()->t('Error: openssl PHP module required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('mb_strlen',
+		$status = $this->checkFunction(
+			'mb_strlen',
 			DI::l10n()->t('mb_string PHP module'),
 			DI::l10n()->t('Error: mb_string PHP module required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('iconv_strlen',
+		$status = $this->checkFunction(
+			'iconv_strlen',
 			DI::l10n()->t('iconv PHP module'),
 			DI::l10n()->t('Error: iconv PHP module required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('posix_kill',
+		$status = $this->checkFunction(
+			'posix_kill',
 			DI::l10n()->t('POSIX PHP module'),
 			DI::l10n()->t('Error: POSIX PHP module required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('proc_open',
+		$status = $this->checkFunction(
+			'proc_open',
 			DI::l10n()->t('Program execution functions'),
 			DI::l10n()->t('Error: Program execution functions (proc_open) required but not enabled.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('json_encode',
+		$status = $this->checkFunction(
+			'json_encode',
 			DI::l10n()->t('JSON PHP module'),
 			DI::l10n()->t('Error: JSON PHP module required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('finfo_open',
+		$status = $this->checkFunction(
+			'finfo_open',
 			DI::l10n()->t('File Information PHP module'),
 			DI::l10n()->t('Error: File Information PHP module required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('gmp_strval',
+		$status = $this->checkFunction(
+			'gmp_strval',
 			DI::l10n()->t('GNU Multiple Precision PHP module'),
 			DI::l10n()->t('Error: GNU Multiple Precision PHP module required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
-		$status = $this->checkFunction('idn_to_ascii',
+		$status = $this->checkFunction(
+			'idn_to_ascii',
 			DI::l10n()->t('IDN Functions PHP module'),
 			DI::l10n()->t('Error: IDN Functions PHP module required but not installed.'),
-			true
+			true,
 		);
 		$returnVal = $returnVal ? $status : false;
 
@@ -501,12 +511,12 @@ class Installer
 	public function checkLocalIni()
 	{
 		$status = true;
-		$help = "";
-		if ((file_exists('config/local.config.php') && !is_writable('config/local.config.php')) ||
-			(!file_exists('config/local.config.php') && !is_writable('.'))) {
+		$help   = "";
+		if ((file_exists('config/local.config.php') && !is_writable('config/local.config.php'))
+			|| (!file_exists('config/local.config.php') && !is_writable('.'))) {
 
 			$status = false;
-			$help = DI::l10n()->t('The web installer needs to be able to create a file called "local.config.php" in the "config" folder of your web server and it is unable to do so.') . '<br />';
+			$help   = DI::l10n()->t('The web installer needs to be able to create a file called "local.config.php" in the "config" folder of your web server and it is unable to do so.') . '<br />';
 			$help .= DI::l10n()->t('This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can.') . '<br />';
 			$help .= DI::l10n()->t('At the end of this procedure, we will give you a text to save in a file named local.config.php in your Friendica "config" folder.') . '<br />';
 			$help .= DI::l10n()->t('You can alternatively skip this procedure and perform a manual installation. Please see the file "doc/INSTALL.md" for instructions.') . '<br />';
@@ -528,11 +538,11 @@ class Installer
 	public function checkSmarty3()
 	{
 		$status = true;
-		$help = "";
+		$help   = "";
 		if (!is_writable('view/smarty3')) {
 
 			$status = false;
-			$help = DI::l10n()->t('Friendica uses the Smarty3 template engine to render its web views. Smarty3 compiles templates to PHP to speed up rendering.') . '<br />';
+			$help   = DI::l10n()->t('Friendica uses the Smarty3 template engine to render its web views. Smarty3 compiles templates to PHP to speed up rendering.') . '<br />';
 			$help .= DI::l10n()->t('In order to store these compiled templates, the web server needs to have write access to the directory view/smarty3/ under the Friendica top level folder.') . '<br />';
 			$help .= DI::l10n()->t("Please ensure that the user that your web server runs as \x28e.g. www-data\x29 has write access to this folder.") . '<br />';
 			$help .= DI::l10n()->t("Note: as a security measure, you should give the web server write access to view/smarty3/ only--not the template files \x28.tpl\x29 that it contains.") . '<br />';
@@ -553,8 +563,8 @@ class Installer
 	 */
 	public function checkHtAccess($baseurl)
 	{
-		$status = true;
-		$help = "";
+		$status    = true;
+		$help      = "";
 		$error_msg = "";
 		if (function_exists('curl_init')) {
 			$fetchResult = DI::httpClient()->get($baseurl . "/install/testrewrite");
@@ -566,12 +576,12 @@ class Installer
 
 			if ($fetchResult->getReturnCode() != 204) {
 				$status = false;
-				$help = DI::l10n()->t('Url rewrite in .htaccess seems not working. Make sure you copied .htaccess-dist to .htaccess.') . '<br />';
+				$help   = DI::l10n()->t('Url rewrite in .htaccess seems not working. Make sure you copied .htaccess-dist to .htaccess.') . '<br />';
 				$help .= DI::l10n()->t('In some circumstances (like running inside containers), you can skip this error.');
-				$error_msg = [];
+				$error_msg         = [];
 				$error_msg['head'] = DI::l10n()->t('Error message from Curl when fetching');
-				$error_msg['url'] = $fetchResult->getRedirectUrl();
-				$error_msg['msg'] = $fetchResult->getError();
+				$error_msg['url']  = $fetchResult->getRedirectUrl();
+				$error_msg['msg']  = $fetchResult->getError();
 			}
 
 			/// @TODO Required false because of cURL issues in containers - see https://github.com/friendica/docker/issues/134
@@ -672,7 +682,7 @@ class Installer
 	 */
 	public function setUpCache(Cache $configCache, $basePath)
 	{
-		$configCache->set('config', 'php_path'  , $this->getPHPPath());
-		$configCache->set('system', 'basepath'  , $basePath);
+		$configCache->set('config', 'php_path', $this->getPHPPath());
+		$configCache->set('system', 'basepath', $basePath);
 	}
 }

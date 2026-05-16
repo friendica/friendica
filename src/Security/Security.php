@@ -101,12 +101,12 @@ class Security
 			$circleIds = '<<>>'; // should be impossible to match
 
 			foreach (Circle::getIdsByContactId($remote_contact) as $circleId) {
-				$circleIds .= '|<' . intval($circleId) . '>';
+				$circleIds .= '|<' . $circleId . '>';
 			}
 
 			$sql = sprintf(
-				" AND (NOT (deny_cid REGEXP '<%d>' OR deny_gid REGEXP '%s')
-				  AND (allow_cid REGEXP '<%d>' OR allow_gid REGEXP '%s'
+				" AND (NOT (CAST(deny_cid AS BINARY) REGEXP BINARY '<%d>' OR CAST(deny_gid AS BINARY) REGEXP BINARY '%s')
+				  AND (CAST(allow_cid AS BINARY) REGEXP BINARY '<%d>' OR CAST(allow_gid AS BINARY) REGEXP BINARY '%s'
 				  OR (allow_cid = '' AND allow_gid = ''))" . $acc_sql . ") ",
 				intval($remote_contact),
 				DBA::escape($circleIds),

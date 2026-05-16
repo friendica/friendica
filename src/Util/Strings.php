@@ -96,17 +96,17 @@ class Strings
 			'v',
 			'w', 'wh',
 			'x',
-			'z', 'zh'
+			'z', 'zh',
 		];
 
 		$midcons = [
 			'ck', 'ct', 'gn', 'ld', 'lf', 'lm', 'lt', 'mb', 'mm', 'mn', 'mp',
-			'nd', 'ng', 'nk', 'nt', 'rn', 'rp', 'rt'
+			'nd', 'ng', 'nk', 'nt', 'rn', 'rp', 'rt',
 		];
 
 		$noend = [
 			'bl', 'br', 'cl', 'cr', 'dr', 'fl', 'fr', 'gl', 'gr',
-			'kh', 'kl', 'kr', 'mn', 'pl', 'pr', 'rh', 'tr', 'qu', 'wh', 'q'
+			'kh', 'kl', 'kr', 'mn', 'pl', 'pr', 'rh', 'tr', 'qu', 'wh', 'q',
 		];
 
 		$start = mt_rand(0, 2);
@@ -147,15 +147,16 @@ class Strings
 	 *
 	 * @param string $network Network name of the contact (e.g. dfrn, rss and so on)
 	 * @param string $url	  The contact url
+	 * @param int    $gsid    Server id
 	 *
 	 * @return string Formatted network name
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function formatNetworkName(string $network, string $url = ''): string
+	public static function formatNetworkName(string $network, string $url = '', ?int $gsid = null): string
 	{
 		if ($network != '') {
 			if ($url != '') {
-				$gsid         = ContactSelector::getServerIdForProfile($url);
+				$gsid ??= ContactSelector::getServerIdForProfile($url);
 				$network_name = '<a href="' . $url . '">' . ContactSelector::networkToName($network, '', $gsid) . '</a>';
 			} else {
 				$network_name = ContactSelector::networkToName($network);
@@ -311,7 +312,7 @@ class Strings
 	 */
 	public static function ensureQueryParameter(string $uri): string
 	{
-		if (strpos($uri, '?') === false && ($pos = strpos($uri, '&')) !== false) {
+		if (!str_contains($uri, '?') && ($pos = strpos($uri, '&')) !== false) {
 			$uri = substr($uri, 0, $pos) . '?' . substr($uri, $pos + 1);
 		}
 
@@ -359,7 +360,7 @@ class Strings
 	 */
 	public static function endsWith(string $string, string $end): bool
 	{
-		return (substr_compare($string, $end, -strlen($end)) === 0);
+		return (str_ends_with($string, $end));
 	}
 
 	/**
@@ -444,7 +445,7 @@ class Strings
 	{
 		$string_length = mb_strlen($string);
 
-		$length = $length ?? $string_length;
+		$length ??= $string_length;
 
 		if ($start < 0) {
 			$start = max(0, $string_length + $start);
@@ -494,7 +495,7 @@ class Strings
 
 				return $return;
 			},
-			$text
+			$text,
 		);
 
 		if (is_null($return)) {
@@ -513,7 +514,7 @@ class Strings
 				}
 				return $return;
 			},
-			$text
+			$text,
 		);
 
 		return $text;
@@ -530,7 +531,7 @@ class Strings
 	{
 		$shorthand = trim($shorthand);
 
-		if (ctype_digit($shorthand)) {
+		if (ctype_digit(ltrim($shorthand, '-'))) {
 			return (int) $shorthand;
 		}
 
@@ -539,7 +540,7 @@ class Strings
 		}
 
 		$last      = strtolower($shorthand[strlen($shorthand) - 1]);
-		$shorthand = substr($shorthand, 0, -1);
+		$shorthand = (int) substr($shorthand, 0, -1);
 
 		switch ($last) {
 			case 'g':
@@ -609,5 +610,25 @@ class Strings
 	public static function getTagArrayByString(string $tag_list): array
 	{
 		return explode(',', self::cleanTags($tag_list));
+	}
+
+	/**
+	 * Convert the first character of a string to uppercase.
+	 * Handles the missing base function mb_ucfirst() gracefully.
+	 *
+	 * @param string $string
+	 * @return string String with first character in uppercase
+	 */
+	public static function ucFirst(string $string): string
+	{
+		if (function_exists('mb_ucfirst')) {
+			return mb_ucfirst($string);
+		}
+
+		if (function_exists('mb_substr') && function_exists('mb_strtoupper')) {
+			return mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
+		}
+
+		return ucfirst($string);
 	}
 }

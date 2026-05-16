@@ -43,9 +43,9 @@ class StaticDatabase extends Database
 			self::statConnect($_SERVER);
 		}
 
-		$this->driver = 'pdo';
+		$this->driver     = 'pdo';
 		$this->connection = self::$staticConnection;
-		$this->connected = true;
+		$this->connected  = true;
 
 		return $this->connected;
 	}
@@ -73,7 +73,7 @@ class StaticDatabase extends Database
 		}
 
 		$this->in_transaction = true;
-		$this->_locked = true;
+		$this->_locked        = true;
 
 		return true;
 	}
@@ -85,7 +85,7 @@ class StaticDatabase extends Database
 		$this->performCommit();
 
 		$this->in_transaction = false;
-		$this->_locked = false;
+		$this->_locked        = false;
 
 		return true;
 	}
@@ -119,10 +119,9 @@ class StaticDatabase extends Database
 
 		// Use environment variables for mysql if they are set beforehand
 		if (!empty($server['MYSQL_HOST'])
-		    && (!empty($server['MYSQL_USERNAME']) || !empty($server['MYSQL_USER']))
-		    && $server['MYSQL_PASSWORD'] !== false
-		    && !empty($server['MYSQL_DATABASE']))
-		{
+			&& (!empty($server['MYSQL_USERNAME']) || !empty($server['MYSQL_USER']))
+			&& $server['MYSQL_PASSWORD'] !== false
+			&& !empty($server['MYSQL_DATABASE'])) {
 			$db_host = $server['MYSQL_HOST'];
 			if (!empty($server['MYSQL_PORT'])) {
 				$db_host .= ':' . $server['MYSQL_PORT'];
@@ -133,7 +132,7 @@ class StaticDatabase extends Database
 			} else {
 				$db_user = $server['MYSQL_USER'];
 			}
-			$db_pw = (string) $server['MYSQL_PASSWORD'];
+			$db_pw   = (string) $server['MYSQL_PASSWORD'];
 			$db_data = $server['MYSQL_DATABASE'];
 		}
 
@@ -148,10 +147,10 @@ class StaticDatabase extends Database
 		if (count($serverdata) > 1) {
 			$port = (int) trim($serverdata[1]);
 		}
-		$server  = trim($server);
-		$user    = trim($db_user);
-		$pass    = trim($db_pw);
-		$db      = trim($db_data);
+		$server = trim($server);
+		$user   = trim($db_user);
+		$pass   = trim($db_pw);
+		$db     = trim($db_data);
 
 		if (!(strlen($server) && strlen($user) && strlen($db))) {
 			return;
@@ -165,8 +164,8 @@ class StaticDatabase extends Database
 
 		try {
 			self::$staticConnection = @new ExtendedPDO($connect, $user, $pass);
-			self::$staticConnection->setAttribute(PDO::ATTR_AUTOCOMMIT,0);
-		} catch (PDOException $e) {
+			self::$staticConnection->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
+		} catch (PDOException) {
 			/*
 			 * @TODO Try to find a way to log this exception as it contains valuable information
 			 * @nupplaphil@github.com comment:

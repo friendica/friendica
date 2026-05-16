@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Timelines;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
@@ -55,7 +54,7 @@ class Direct extends BaseApi
 		if (!empty($uid)) {
 			$condition = DBA::mergeConditions(
 				$condition,
-				["NOT `parent-author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored` OR `is-blocked`) AND `cid` = `parent-author-id`)", $uid]
+				["NOT `parent-author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored` OR `is-blocked`) AND `cid` = `parent-author-id`)", $uid],
 			);
 		}
 
@@ -68,7 +67,7 @@ class Direct extends BaseApi
 				self::setBoundaries($mail['uri-id']);
 				$statuses[] = DI::mstdnStatus()->createFromMailId($mail['id']);
 			}
-		} catch (NotFoundException $e) {
+		} catch (NotFoundException) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 

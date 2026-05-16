@@ -30,7 +30,7 @@ class ProbeTest extends MockedTestCase
 		parent::tearDown();
 	}
 
-	const TEMPLATENOBASE = '
+	public const TEMPLATENOBASE = '
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
@@ -43,7 +43,7 @@ class ProbeTest extends MockedTestCase
 </body>
 </html>';
 
-	const TEMPLATEBASE = '
+	public const TEMPLATEBASE = '
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
@@ -57,7 +57,7 @@ class ProbeTest extends MockedTestCase
 </body>
 </html>';
 
-	const EXPECTED = [
+	public const EXPECTED = [
 		'https://example.org/path/to/blog/index.php' => [
 			'index.xml'               => 'https://example.org/path/to/blog/index.xml',
 			'./index.xml'             => 'https://example.org/path/to/blog/index.xml',
@@ -203,8 +203,8 @@ xQIDAQAB
 -----END PUBLIC KEY-----',
 					'manually-approve' => 0,
 					'baseurl'          => 'https://climatejustice.global',
-				]
-			]
+				],
+			],
 		];
 	}
 
@@ -264,7 +264,12 @@ xQIDAQAB
 
 		$this->httpRequestHandler->push($history);
 
-		self::assertArraySubset($assertInfos, Probe::uri($uri, '', 0));
+		$result = Probe::uri($uri, '', 0);
+
+		foreach ($assertInfos as $key => $value) {
+			self::assertArrayHasKey($key, $result);
+			self::assertEquals($value, $result[$key]);
+		}
 
 		// Iterate over the requests and responses
 		foreach ($container as $transaction) {
@@ -272,7 +277,7 @@ xQIDAQAB
 			//> GET, HEAD
 			if ($transaction['response']) {
 				echo $transaction['response']->getStatusCode() . PHP_EOL;
-			//> 200, 200
+				//> 200, 200
 			} elseif ($transaction['error']) {
 				echo $transaction['error'];
 				//> exception

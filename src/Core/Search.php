@@ -26,11 +26,11 @@ use GuzzleHttp\Psr7\Uri;
  */
 class Search
 {
-	const DEFAULT_DIRECTORY = 'https://dir.friendica.social';
+	public const DEFAULT_DIRECTORY = 'https://dir.friendica.social';
 
-	const TYPE_PEOPLE = 0;
-	const TYPE_GROUP  = 1;
-	const TYPE_ALL    = 2;
+	public const TYPE_PEOPLE = 0;
+	public const TYPE_GROUP  = 1;
+	public const TYPE_ALL    = 2;
 
 	/**
 	 * Search a user based on his/her profile address
@@ -74,7 +74,7 @@ class Search
 			$user_data['network'],
 			$contactDetails['cid'] ?? 0,
 			$user_data['id'],
-			$user_data['keywords']
+			$user_data['keywords'],
 		);
 
 		return new ResultList(1, 1, 1, [$result]);
@@ -119,7 +119,7 @@ class Search
 		$resultList = new ResultList(
 			($results['page'] ?? 0) ?: 1,
 			$results['count'] ?? 0,
-			($results['itemsperpage'] ?? 0) ?: 30
+			($results['itemsperpage'] ?? 0) ?: 30,
 		);
 
 		$profiles = $results['profiles'] ?? [];
@@ -137,7 +137,7 @@ class Search
 				Protocol::DFRN,
 				$contactDetails['cid'] ?? 0,
 				$contactDetails['zid'] ?? 0,
-				$profile['tags']       ?? ''
+				$profile['tags']       ?? '',
 			);
 
 			$resultList->addResult($result);
@@ -175,7 +175,7 @@ class Search
 				$contact['network'],
 				0,
 				$contact['pid'],
-				$contact['keywords']
+				$contact['keywords'],
 			);
 
 			$resultList->addResult($result);
@@ -210,7 +210,7 @@ class Search
 			return [];
 		}
 
-		if (substr($search, 0, 1) === '@') {
+		if (str_starts_with($search, '@')) {
 			$search = substr($search, 1);
 		}
 
@@ -275,7 +275,7 @@ class Search
 	 */
 	public static function getSearchPath(string $search): string
 	{
-		if (substr($search, 0, 1) == '#') {
+		if (str_starts_with($search, '#')) {
 			return 'search?tag=' . urlencode(substr($search, 1));
 		} else {
 			return 'search?q=' . urlencode($search);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -189,8 +190,8 @@ function update_1330()
 	}
 
 	// Update attachments and photos
-	if (!DBA::e("UPDATE `photo` SET `photo`.`backend-class` = SUBSTR(`photo`.`backend-class`, 25) WHERE `photo`.`backend-class` LIKE 'Friendica\\\Model\\\Storage\\\%' ESCAPE '|'") ||
-		!DBA::e("UPDATE `attach` SET `attach`.`backend-class` = SUBSTR(`attach`.`backend-class`, 25) WHERE `attach`.`backend-class` LIKE 'Friendica\\\Model\\\Storage\\\%' ESCAPE '|'")) {
+	if (!DBA::e("UPDATE `photo` SET `photo`.`backend-class` = SUBSTR(`photo`.`backend-class`, 25) WHERE `photo`.`backend-class` LIKE 'Friendica\\\Model\\\Storage\\\%' ESCAPE '|'")
+		|| !DBA::e("UPDATE `attach` SET `attach`.`backend-class` = SUBSTR(`attach`.`backend-class`, 25) WHERE `attach`.`backend-class` LIKE 'Friendica\\\Model\\\Storage\\\%' ESCAPE '|'")) {
 		return Update::FAILED;
 	};
 
@@ -653,7 +654,7 @@ function update_1380()
 	if (!DBA::e(
 		"UPDATE `notify` INNER JOIN `item` ON `item`.`id` = `notify`.`iid` SET `notify`.`uri-id` = `item`.`uri-id` WHERE `notify`.`uri-id` IS NULL AND `notify`.`otype` IN (?, ?)",
 		Notification\ObjectType::ITEM,
-		Notification\ObjectType::PERSON
+		Notification\ObjectType::PERSON,
 	)) {
 		return Update::FAILED;
 	}
@@ -661,7 +662,7 @@ function update_1380()
 	if (!DBA::e(
 		"UPDATE `notify` INNER JOIN `item` ON `item`.`id` = `notify`.`parent` SET `notify`.`parent-uri-id` = `item`.`uri-id` WHERE `notify`.`parent-uri-id` IS NULL AND `notify`.`otype` IN (?, ?)",
 		Notification\ObjectType::ITEM,
-		Notification\ObjectType::PERSON
+		Notification\ObjectType::PERSON,
 	)) {
 		return Update::FAILED;
 	}
@@ -1151,9 +1152,9 @@ function update_1505()
 	}
 
 	$conditions = [
-		"((`cat`  = ?) AND ((`k` LIKE ?) OR (`k` = ?) OR (`k` LIKE ?) OR (`k` = ?))) OR " .
-		"((`cat` != ?) AND  (`k` LIKE ?)) OR " .
-		"((`cat`  = ?) AND  (`k` LIKE ?))",
+		"((`cat`  = ?) AND ((`k` LIKE ?) OR (`k` = ?) OR (`k` LIKE ?) OR (`k` = ?))) OR "
+		. "((`cat` != ?) AND  (`k` LIKE ?)) OR "
+		. "((`cat`  = ?) AND  (`k` LIKE ?))",
 		"system",
 		"post_update_%",
 		"worker_last_cleaned",
@@ -1202,7 +1203,7 @@ function update_1509()
 	foreach ($addons as $addon) {
 		$newConfig->set('addons', $addon['name'], [
 			'last_update' => $addon['timestamp'],
-			'admin'       => (bool)$addon['plugin_admin'],
+			'admin'       => (bool) $addon['plugin_admin'],
 		]);
 	}
 
@@ -1530,5 +1531,17 @@ function update_1573()
 		}
 	}
 	DBA::close($media);
+	return Update::SUCCESS;
+}
+
+function update_1595()
+{
+	if (!DBA::e("INSERT IGNORE INTO `post-quote` (`uri-id`, `quote-uri-id`)
+		SELECT `uri-id`, `quote-uri-id`
+		FROM `post-content`
+		WHERE NOT `quote-uri-id` IS NULL")) {
+		return Update::FAILED;
+	}
+
 	return Update::SUCCESS;
 }

@@ -42,11 +42,11 @@ class BaseURL extends Uri implements UriInterface
 		/* Relative script path to the web server root
 		 * Not all of those $_SERVER properties can be present, so we do by inverse priority order
 		 */
-		$relativeScriptPath = ($server['REDIRECT_URL'] ?? '') ?:
-				($server['REDIRECT_URI'] ?? '') ?:
-					($server['REDIRECT_SCRIPT_URL'] ?? '') ?:
-						($server['SCRIPT_URL'] ?? '') ?:
-							$server['REQUEST_URI'] ?? '';
+		$relativeScriptPath = ($server['REDIRECT_URL'] ?? '')
+				?: ($server['REDIRECT_URI'] ?? '')
+					?: ($server['REDIRECT_SCRIPT_URL'] ?? '')
+						?: ($server['SCRIPT_URL'] ?? '')
+							?: $server['REQUEST_URI'] ?? '';
 
 		/* $relativeScriptPath gives /relative/path/to/friendica/module/parameter
 		 * QUERY_STRING gives pagename=module/parameter
@@ -116,11 +116,11 @@ class BaseURL extends Uri implements UriInterface
 
 	public function isLocalUrl(string $url): bool
 	{
-		return strpos(Strings::normaliseLink($url), Strings::normaliseLink((string)$this)) === 0;
+		return str_starts_with(Strings::normaliseLink($url), Strings::normaliseLink((string) $this));
 	}
 
 	public function isLocalUri(UriInterface $uri): bool
 	{
-		return $this->isLocalUrl((string)$uri);
+		return $this->isLocalUrl((string) $uri);
 	}
 }

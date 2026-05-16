@@ -16,6 +16,9 @@ use Friendica\Network\HTTPException\ServiceUnavailableException;
  */
 class DocWriter
 {
+	/** @var string the relativ path to the database specification */
+	const DOC_PATH_PREFIX = '/doc/en/spec/database/';
+
 	/**
 	 * Creates all database definitions as Markdown fields and create the mkdoc config file.
 	 *
@@ -28,7 +31,7 @@ class DocWriter
 	public static function writeDbDefinition(DbaDefinition $definition, string $basePath)
 	{
 		$tables = [];
-		foreach ($definition->getAll() as $name => $definition) {
+		foreach ($definition->load(false)->getAll() as $name => $definition) {
 			$indexes = [
 				[
 					'name'   => 'Name',
@@ -83,14 +86,15 @@ class DocWriter
 				'extra'   => 5,
 			];
 			foreach ($definition['fields'] as $key => $value) {
-				$field            = [];
-				$field['name']    = $key;
-				$field['comment'] = $value['comment'] ?? '';
-				$field['type']    = $value['type'];
-				$field['null']    = ($value['not null'] ?? false) ? 'NO' : 'YES';
-				$field['primary'] = ($value['primary'] ?? false) ? 'PRI' : '';
-				$field['default'] = $value['default'] ?? 'NULL';
-				$field['extra']   = $value['extra']   ?? '';
+				$field = [
+					'name'    => $key,
+					'comment' => $value['comment'] ?? '',
+					'type'    => $value['type'],
+					'null'    => ($value['not null'] ?? false) ? 'NO' : 'YES',
+					'primary' => ($value['primary'] ?? false) ? 'PRI' : '',
+					'default' => $value['default'] ?? 'NULL',
+					'extra'   => $value['extra']   ?? '',
+				];
 
 				foreach ($field as $fieldName => $fieldvalue) {
 					$lengths[$fieldName] = max($lengths[$fieldName] ?? 0, strlen($fieldvalue));
@@ -118,14 +122,14 @@ class DocWriter
 				'$indexes' => $indexes,
 				'$foreign' => $foreign,
 			]);
-			$filename = $basePath . '/doc/database/db_' . $name . '.md';
+			$filename = $basePath . static::DOC_PATH_PREFIX . 'db-' . $name . '.md';
 			file_put_contents($filename, $content);
 		}
 		asort($tables);
 		$content = Renderer::replaceMacros(Renderer::getMarkupTemplate('tables.tpl'), [
 			'$tables' => $tables,
 		]);
-		$filename = $basePath . '/doc/database.md';
+		$filename = $basePath . static::DOC_PATH_PREFIX . 'index.md';
 		file_put_contents($filename, $content);
 	}
 }

@@ -26,7 +26,7 @@ class ProfileFields extends BaseCollection
 			throw new \Exception(sprintf(
 				'BaseCollection::map() should return instance of %s, but returns %s instead.',
 				ProfileFields::class,
-				get_class($profileFields),
+				$profileFields::class,
 			));
 		}
 

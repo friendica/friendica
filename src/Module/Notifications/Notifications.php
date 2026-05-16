@@ -44,32 +44,32 @@ class Notifications extends BaseNotifications
 	public function getNotifications()
 	{
 		$notificationHeader = '';
-		$notifications = [];
+		$notifications      = [];
 
 		$factory = $this->formattedNotifyFactory;
 
 		if (($this->args->get(1) == 'network')) {
 			$notificationHeader = $this->t('Network Notifications');
 			$notifications      = [
-				'ident'        => FormattedNotify::NETWORK,
+				'ident'         => FormattedNotify::NETWORK,
 				'notifications' => $factory->getNetworkList($this->showAll, $this->firstItemNum, self::ITEMS_PER_PAGE),
 			];
 		} elseif (($this->args->get(1) == 'system')) {
 			$notificationHeader = $this->t('System Notifications');
 			$notifications      = [
-				'ident'        => FormattedNotify::SYSTEM,
+				'ident'         => FormattedNotify::SYSTEM,
 				'notifications' => $factory->getSystemList($this->showAll, $this->firstItemNum, self::ITEMS_PER_PAGE),
 			];
 		} elseif (($this->args->get(1) == 'personal')) {
 			$notificationHeader = $this->t('Personal Notifications');
 			$notifications      = [
-				'ident'        => FormattedNotify::PERSONAL,
+				'ident'         => FormattedNotify::PERSONAL,
 				'notifications' => $factory->getPersonalList($this->showAll, $this->firstItemNum, self::ITEMS_PER_PAGE),
 			];
 		} elseif (($this->args->get(1) == 'home')) {
 			$notificationHeader = $this->t('Home Notifications');
 			$notifications      = [
-				'ident'        => FormattedNotify::HOME,
+				'ident'         => FormattedNotify::HOME,
 				'notifications' => $factory->getHomeList($this->showAll, $this->firstItemNum, self::ITEMS_PER_PAGE),
 			];
 		} else {
@@ -97,7 +97,7 @@ class Notifications extends BaseNotifications
 
 		$notificationResult = $this->getNotifications();
 		$notifications      = $notificationResult['notifications'] ?? [];
-		$notificationHeader = $notificationResult['header'] ?? '';
+		$notificationHeader = $notificationResult['header']        ?? '';
 
 		if (!empty($notifications['notifications'])) {
 			$notificationTemplates = [
@@ -127,10 +127,13 @@ class Notifications extends BaseNotifications
 			$notificationNoContent = $this->t('No more %s notifications.', $notificationResult['ident']);
 		}
 
-		$notificationShowLink = [
-			'href' => ($this->showAll ? 'notifications/' . $notifications['ident'] : 'notifications/' . $notifications['ident'] . '?show=all'),
-			'text' => ($this->showAll ? $this->t('Show unread') : $this->t('Show all')),
-		];
+		$notificationShowLink = [];
+		if ($notifications['ident'] != "personal") {
+			$notificationShowLink = [
+				'href' => ($this->showAll ? 'notifications/' . $notifications['ident'] : 'notifications/' . $notifications['ident'] . '?show=all'),
+				'text' => ($this->showAll ? $this->t('Show unread') : $this->t('Show all')),
+			];
+		}
 
 		return $this->printContent($notificationHeader, $notificationContent, $notificationNoContent, $notificationShowLink);
 	}

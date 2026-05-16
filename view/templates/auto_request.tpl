@@ -35,7 +35,7 @@
 		{{$myaddr}}
 		<input type="hidden" name="dfrn_url" id="dfrn-url" value="{{$myaddr}}">
 {{else}}
-		<input type="text" name="dfrn_url" id="dfrn-url" size="32" value="{{$myaddr}}">
+		<input type="text" name="dfrn_url" id="dfrn-url" value="{{$myaddr}}">
 {{/if}}
 		<input type="hidden" name="url" id="url" value="{{$url}}">
 		<div id="dfrn-request-url-end"></div>

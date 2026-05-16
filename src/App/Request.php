@@ -24,13 +24,13 @@ class Request
 	 *
 	 * @var string
 	 */
-	const DEFAULT_FORWARD_FOR_HEADER = 'HTTP_X_FORWARDED_FOR';
+	public const DEFAULT_FORWARD_FOR_HEADER = 'HTTP_X_FORWARDED_FOR';
 	/**
 	 * The default Request-ID header to retrieve the current transaction ID from the HTTP header (if set)
 	 *
 	 * @var string
 	 */
-	const DEFAULT_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID';
+	public const DEFAULT_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID';
 
 	/** @var string The remote IP address of the current request */
 	protected $remoteAddress;
@@ -60,7 +60,7 @@ class Request
 	public function __construct(IManageConfigValues $config, array $server = [])
 	{
 		$this->remoteAddress = $this->determineRemoteAddress($config, $server);
-		$this->requestId = $server[static::DEFAULT_REQUEST_ID_HEADER] ?? System::createGUID(8, false);
+		$this->requestId     = $server[static::DEFAULT_REQUEST_ID_HEADER] ?? System::createGUID(8, false);
 	}
 
 	/**
@@ -136,7 +136,7 @@ class Request
 						$IP = trim($IP);
 
 						// remove brackets from IPv6 addresses
-						if (strpos($IP, '[') === 0 && substr($IP, -1) === ']') {
+						if (str_starts_with($IP, '[') && str_ends_with($IP, ']')) {
 							$IP = substr($IP, 1, -1);
 						}
 

@@ -37,7 +37,7 @@ class Attachment extends BaseFactory
 	public function createFromUriId(int $uriId): array
 	{
 		$attachments = [];
-		foreach (Post\Media::getByURIId($uriId, [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE]) as $attachment) {
+		foreach (Post\Media::getByURIId($uriId, [Post\Media::AUDIO, Post\Media::VIDEO, Post\Media::IMAGE, Post\Media::HLS]) as $attachment) {
 			$attachments[] = $this->createFromMediaArray($attachment);
 		}
 
@@ -164,6 +164,6 @@ class Attachment extends BaseFactory
 
 	public function isAttach(string $id): bool
 	{
-		return substr($id, 0, 7) == 'attach:';
+		return str_starts_with($id, 'attach:');
 	}
 }

@@ -41,8 +41,10 @@ class ExtendedPDO extends PDO
 	 */
 	protected function hasSavepoint()
 	{
-		return in_array($this->getAttribute(PDO::ATTR_DRIVER_NAME),
-			self::$_supportedDrivers);
+		return in_array(
+			$this->getAttribute(PDO::ATTR_DRIVER_NAME),
+			self::$_supportedDrivers,
+		);
 	}
 
 
@@ -53,7 +55,7 @@ class ExtendedPDO extends PDO
 	 */
 	public function beginTransaction()
 	{
-		if($this->_transactionDepth <= 0 || !$this->hasSavepoint()) {
+		if ($this->_transactionDepth <= 0 || !$this->hasSavepoint()) {
 			parent::beginTransaction();
 			$this->_transactionDepth = 0;
 		} else {
@@ -95,7 +97,7 @@ class ExtendedPDO extends PDO
 			$this->_transactionDepth = 0;
 			try {
 				return parent::rollBack();
-			} catch (PDOException $e) {
+			} catch (PDOException) {
 				// this shouldn't happen, but it does ...
 			}
 		} else {

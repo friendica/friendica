@@ -7,7 +7,7 @@
 
 namespace Friendica\Model\Post;
 
-use \BadMethodCallException;
+use BadMethodCallException;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -28,6 +28,7 @@ class Content
 		}
 
 		$fields = DI::dbaDefinition()->truncateFieldsForTable('post-content', $data);
+		unset($fields['quote-uri-id']);
 
 		// Additionally assign the key fields
 		$fields['uri-id'] = $uri_id;
@@ -51,6 +52,7 @@ class Content
 		}
 
 		$fields = DI::dbaDefinition()->truncateFieldsForTable('post-content', $data);
+		unset($fields['quote-uri-id']);
 
 		// Remove the key fields
 		unset($fields['uri-id']);
@@ -75,6 +77,16 @@ class Content
 		return DBA::delete('post-content', $conditions);
 	}
 
+	/**
+	 * Check if a post-content entry exists for the given URI ID
+	 *
+	 * @param integer $uri_id
+	 * @return boolean exists?
+	 */
+	public static function exists(int $uri_id): bool
+	{
+		return DBA::exists('post-content', ['uri-id' => $uri_id]);
+	}
 
 	/**
 	 * Search posts for given content
@@ -101,7 +113,7 @@ class Content
 
 		$params = [
 			'order' => ['uri-id' => true],
-			'limit' => [$start, $limit]
+			'limit' => [$start, $limit],
 		];
 
 		$tags = DBA::select(SearchIndex::getSearchTable(), ['uri-id'], $condition, $params);

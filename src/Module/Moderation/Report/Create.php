@@ -23,19 +23,19 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Moderation\Entity\Report;
+use Friendica\Module\Moderation\Utils\ReportUtil;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ForbiddenException;
-use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
 class Create extends BaseModule
 {
-	const CONTACT_ACTION_NONE     = 0;
-	const CONTACT_ACTION_COLLAPSE = 1;
-	const CONTACT_ACTION_IGNORE   = 2;
-	const CONTACT_ACTION_BLOCK    = 3;
+	public const CONTACT_ACTION_NONE     = 0;
+	public const CONTACT_ACTION_COLLAPSE = 1;
+	public const CONTACT_ACTION_IGNORE   = 2;
+	public const CONTACT_ACTION_BLOCK    = 3;
 
 	/** @var SystemMessages */
 	private $systemMessages;
@@ -47,13 +47,16 @@ class Create extends BaseModule
 	private $factory;
 	/** @var \Friendica\Moderation\Repository\Report */
 	private $repository;
+	/** @var ReportUtil */
+	protected $reportUtil;
 
-	public function __construct(\Friendica\Moderation\Repository\Report $repository, \Friendica\Moderation\Factory\Report $factory, UserSession $session, App\Page $page, SystemMessages $systemMessages, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(\Friendica\Moderation\Repository\Report $repository, ReportUtil $reportUtil, \Friendica\Moderation\Factory\Report $factory, UserSession $session, App\Page $page, SystemMessages $systemMessages, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->systemMessages = $systemMessages;
 		$this->page           = $page;
+		$this->reportUtil     = $reportUtil;
 		$this->session        = $session;
 		$this->factory        = $factory;
 		$this->repository     = $repository;
@@ -96,7 +99,7 @@ class Create extends BaseModule
 				!empty($request['rule-ids']) ? explode(',', $request['rule-ids']) : [],
 				$this->session->get('report_comment') ?? '',
 				!empty($request['uri-ids']) ? explode(',', $request['uri-ids']) : [],
-				(bool)($request['forward'] ?? false),
+				(bool) ($request['forward'] ?? false),
 			);
 			$this->repository->save($report);
 
@@ -221,11 +224,19 @@ class Create extends BaseModule
 			}
 
 			if (DI::mode()->isMobile()) {
-				$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_mobile_network',
-					DI::config()->get('system', 'itemspage_network_mobile'));
+				$itemsPerPage = DI::pConfig()->get(
+					DI::userSession()->getLocalUserId(),
+					'system',
+					'itemspage_mobile_network',
+					DI::config()->get('system', 'itemspage_network_mobile'),
+				);
 			} else {
-				$itemsPerPage = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'itemspage_network',
-					DI::config()->get('system', 'itemspage_network'));
+				$itemsPerPage = DI::pConfig()->get(
+					DI::userSession()->getLocalUserId(),
+					'system',
+					'itemspage_network',
+					DI::config()->get('system', 'itemspage_network'),
+				);
 			}
 
 			$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
@@ -260,6 +271,11 @@ class Create extends BaseModule
 		$contact = Contact::getById($request['cid'], ['url']);
 
 		$tpl = Renderer::getMarkupTemplate('moderation/report/create/summary.tpl');
+
+		$forward_translation = $this->t('Would you like to forward this report to the remote server?');
+		// @deprecated 2026.01 this translation is scheduled for removal as a new translation has been added without the typo
+		$forward_translation = $this->t('Would you ike to forward this report to the remote server?');
+
 		return Renderer::replaceMacros($tpl, [
 			'$l10n' => [
 				'title'                => $this->t('Create Moderation Report'),
@@ -280,7 +296,7 @@ class Create extends BaseModule
 			'$block'    => ['contact_action', $this->t('Block contact'), self::CONTACT_ACTION_BLOCK, $this->t("Their posts won't appear in your Network page anymore, but their replies can appear in forum threads, with their content collapsed by default. They cannot follow you but still can have access to your public posts by other means.")],
 
 			'$display_forward' => !$this->baseUrl->isLocalUrl($contact['url']),
-			'$forward'         => ['report_forward', $this->t('Forward report'), self::CONTACT_ACTION_BLOCK, $this->t('Would you ike to forward this report to the remote server?')],
+			'$forward'         => ['report_forward', $this->t('Forward report'), self::CONTACT_ACTION_BLOCK, $forward_translation],
 
 			'$summary' => $this->getAside($request),
 		]);
@@ -291,17 +307,6 @@ class Create extends BaseModule
 		$contact = null;
 		if (!empty($request['cid'])) {
 			$contact = Contact::getById($request['cid']);
-		}
-
-		switch ($request['category'] ?? 0) {
-			case Report::CATEGORY_SPAM:      $category = $this->t('Spam'); break;
-			case Report::CATEGORY_ILLEGAL:   $category = $this->t('Illegal Content'); break;
-			case Report::CATEGORY_SAFETY:    $category = $this->t('Community Safety'); break;
-			case Report::CATEGORY_UNWANTED:  $category = $this->t('Unwanted Content/Behavior'); break;
-			case Report::CATEGORY_VIOLATION: $category = $this->t('Rules Violation'); break;
-			case Report::CATEGORY_OTHER:     $category = $this->t('Other'); break;
-
-			default: $category = '';
 		}
 
 		if (!empty($request['rule-ids'])) {
@@ -321,7 +326,7 @@ class Create extends BaseModule
 			],
 
 			'$contact'  => $contact,
-			'$category' => $category,
+			'$category' => $this->reportUtil->getReportCategoryName($request['category'] ?? 0),
 			'$rules'    => $rules ?? [],
 			'$comment'  => BBCode::convertForUriId($contact['uri-id'] ?? 0, $this->session->get('report_comment') ?? '', BBCode::EXTERNAL),
 			'$posts'    => count($request['uri-ids'] ?? []),

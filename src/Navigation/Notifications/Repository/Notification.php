@@ -45,7 +45,7 @@ class Notification extends BaseRepository
 	 */
 	private function selectOne(array $condition, array $params = []): NotificationEntity
 	{
-		$fields = $this->_selectFirstRowAsArray( $condition, $params);
+		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
 		return $this->factory->createFromTableRow($fields);
 	}
@@ -106,6 +106,8 @@ class Notification extends BaseRepository
 			$condition = [];
 		}
 
+		$condition = DBA::mergeConditions($condition, ["NOT EXISTS(SELECT `cid` FROM `user-contact` WHERE `user-contact`.`cid` = `notification`.`actor-id` AND `user-contact`.`uid` = `notification`.`uid` AND (`is-blocked` OR `blocked`))"]);
+
 		if (!$this->pconfig->get($uid, 'system', 'notify_like')) {
 			$condition = DBA::mergeConditions($condition, ['NOT `vid` IN (?, ?)', Verb::getID(Activity::LIKE), Verb::getID(Activity::DISLIKE)]);
 		}
@@ -149,6 +151,7 @@ class Notification extends BaseRepository
 		$rows = $this->db->p("
 		SELECT notification.*
 		FROM notification
+		LEFT JOIN `user-contact` ON `user-contact`.`cid` = `notification`.`actor-id` AND `user-contact`.`uid` = `notification`.`uid` AND (`blocked` OR `is-blocked`)
 		WHERE `id` IN (
 		    SELECT MAX(`id`)
 		    FROM `notification`
@@ -158,6 +161,7 @@ class Notification extends BaseRepository
 		    $announce_condition
 		    GROUP BY IFNULL(`parent-uri-id`, `actor-id`)
 		)
+		AND `user-contact`.`cid` IS NULL
 		ORDER BY `seen`, `id` DESC
 		LIMIT 50
 		", ...$values);

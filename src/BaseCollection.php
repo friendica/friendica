@@ -32,9 +32,9 @@ class BaseCollection extends \ArrayIterator
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param mixed $key
+	 * @param mixed $value
 	 */
-	#[\ReturnTypeWillChange]
 	public function offsetSet($key, $value): void
 	{
 		if (is_null($key)) {
@@ -45,9 +45,8 @@ class BaseCollection extends \ArrayIterator
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param mixed $key
 	 */
-	#[\ReturnTypeWillChange]
 	public function offsetUnset($key): void
 	{
 		if ($this->offsetExists($key)) {
@@ -89,7 +88,7 @@ class BaseCollection extends \ArrayIterator
 	 */
 	public function map(callable $callback): BaseCollection
 	{
-		$class = get_class($this);
+		$class = $this::class;
 
 		return new $class(array_map($callback, $this->getArrayCopy()), $this->getTotalCount());
 	}
@@ -104,7 +103,7 @@ class BaseCollection extends \ArrayIterator
 	 */
 	public function filter(?callable $callback = null, int $flag = 0): BaseCollection
 	{
-		$class = get_class($this);
+		$class = $this::class;
 
 		return new $class(array_filter($this->getArrayCopy(), $callback, $flag));
 	}
@@ -114,7 +113,7 @@ class BaseCollection extends \ArrayIterator
 	 */
 	public function reverse(): BaseCollection
 	{
-		$class = get_class($this);
+		$class = $this::class;
 
 		return new $class(array_reverse($this->getArrayCopy()), $this->getTotalCount());
 	}
@@ -132,11 +131,11 @@ class BaseCollection extends \ArrayIterator
 
 		return array_map(
 			function ($array) {
-				$class = get_class($this);
+				$class = $this::class;
 
 				return new $class($array);
 			},
-			array_chunk($this->getArrayCopy(), $length)
+			array_chunk($this->getArrayCopy(), $length),
 		);
 	}
 

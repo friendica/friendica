@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
@@ -75,7 +74,7 @@ class Conversations extends BaseApi
 				self::setBoundaries($conv['id']);
 				$conversations[] = DI::mstdnConversation()->createFromConvId($conv['id']);
 			}
-		} catch (NotFoundException $e) {
+		} catch (NotFoundException) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
