@@ -22,7 +22,7 @@ class Index extends BaseApi
 		$this->checkAllowedScope(self::SCOPE_READ);
 		$uid = self::getCurrentUserID();
 
-		$albums = Photo::getAlbums($uid);
+		$albums = Photo::getAlbumsForAPI($uid);
 
 		$items = [];
 		foreach ($albums as $album) {

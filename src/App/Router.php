@@ -44,20 +44,20 @@ use Psr\Log\LoggerInterface;
  */
 class Router
 {
-	const DELETE  = 'DELETE';
-	const GET     = 'GET';
-	const PATCH   = 'PATCH';
-	const POST    = 'POST';
-	const PUT     = 'PUT';
-	const OPTIONS = 'OPTIONS';
+	public const DELETE  = 'DELETE';
+	public const GET     = 'GET';
+	public const PATCH   = 'PATCH';
+	public const POST    = 'POST';
+	public const PUT     = 'PUT';
+	public const OPTIONS = 'OPTIONS';
 
-	const ALLOWED_METHODS = [
+	public const ALLOWED_METHODS = [
 		self::DELETE,
 		self::GET,
 		self::PATCH,
 		self::POST,
 		self::PUT,
-		self::OPTIONS
+		self::OPTIONS,
 	];
 
 	/** @var RouteCollector */
@@ -210,12 +210,12 @@ class Router
 	private function isGroup(array $config): bool
 	{
 		return
-			is_array($config) &&
-			is_string(array_keys($config)[0]) &&
+			is_array($config)
+			&& is_string(array_keys($config)[0])
 			// This entry should NOT be a BaseModule
-			(substr(array_keys($config)[0], 0, strlen('Friendica\Module')) !== 'Friendica\Module') &&
+			&& (!str_starts_with(array_keys($config)[0], 'Friendica\Module'))
 			// The second argument is an array (another routes)
-			is_array(array_values($config)[0]);
+			&& is_array(array_values($config)[0]);
 	}
 
 	/**
@@ -229,13 +229,13 @@ class Router
 	{
 		return
 			// The config array should at least have one entry
-			!empty($config[0]) &&
+			!empty($config[0])
 			// This entry should be a BaseModule
-			(substr($config[0], 0, strlen('Friendica\Module')) === 'Friendica\Module') &&
+			&& (str_starts_with($config[0], 'Friendica\Module'))
 			// Either there is no other argument
-			(empty($config[1]) ||
+			&& (empty($config[1])
 			 // Or the second argument is an array (HTTP-Methods)
-			 is_array($config[1]));
+			 || is_array($config[1]));
 	}
 
 	/**
@@ -296,7 +296,7 @@ class Router
 					throw new HTTPException\NotFoundException($this->l10n->t('Page not found.'));
 				}
 			}
-		} catch (MethodNotAllowedException $e) {
+		} catch (MethodNotAllowedException) {
 			$this->moduleClass = MethodNotAllowed::class;
 		} catch (NotFoundException $e) {
 			$moduleName = $this->args->getModuleName();

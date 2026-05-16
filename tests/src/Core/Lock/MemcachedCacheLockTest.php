@@ -42,7 +42,7 @@ class MemcachedCacheLockTest extends CacheLockTestCase
 		try {
 			$this->cache = new MemcachedCache($host, $configMock, $logger);
 			$this->lock  = new CacheLock($this->cache);
-		} catch (Exception $e) {
+		} catch (Exception) {
 			static::markTestSkipped('Memcached is not available');
 		}
 

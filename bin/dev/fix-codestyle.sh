@@ -21,4 +21,4 @@ fi
 
 EXTRA_ARGS=$(printf -- '--path-mode=intersection\n--\n%s' "${CHANGED_FILES}");
 
-./bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer ${COMMAND} --config=.php-cs-fixer.dist.php -v --using-cache=no ${EXTRA_ARGS}
+./vendor/bin/php-cs-fixer ${COMMAND} --config=.php-cs-fixer.dist.php -v --using-cache=no ${EXTRA_ARGS}

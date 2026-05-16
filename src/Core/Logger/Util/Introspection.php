@@ -73,7 +73,7 @@ class Introspection implements IHaveCallIntrospections
 			'line'       => $trace[$i - 1]['line'] ?? null,
 			'function'   => $trace[$i]['function'] ?? null,
 			'request-id' => $this->requestId,
-			'stack'      => System::callstack(15, 0, true, ['Friendica\Core\Logger\Type\StreamLogger', 'Friendica\Core\Logger\Type\AbstractLogger', 'Friendica\Core\Logger\Type\WorkerLogger', 'Friendica\Core\Logger']),
+			'stack'      => System::callstack(15, 1, [\Friendica\Core\Logger\Type\StreamLogger::class, \Friendica\Core\Logger\Type\AbstractLogger::class, \Friendica\Core\Logger\Type\WorkerLogger::class, \Friendica\Core\Logger::class]),
 		];
 	}
 
@@ -92,7 +92,7 @@ class Introspection implements IHaveCallIntrospections
 
 		if (isset($traceItem['class'])) {
 			foreach ($this->skipClassesPartials as $part) {
-				if (strpos($traceItem['class'], $part) === 0) {
+				if (str_starts_with($traceItem['class'], $part)) {
 					return true;
 				}
 			}

@@ -117,17 +117,57 @@ class DateTimeFormatTest extends MockedTestCase
 				'expectedDate' => '2022-12-30T14:29:10+00:00',
 				'dateString'   => 'Fri Dec 30 2022 14:29:10 GMT+0000 (Coordinated Universal Time)',
 			],
+			'(India Standard Time)' => [
+				'expectedDate' => '2026-04-07T11:40:30+05:30',
+				'dateString'   => 'Tue Apr 07 2026 11:40:30 GMT+0530 (India Standard Time)',
+			],
+			'(India Standard Time) fallback without GMT prefix' => [
+				'expectedDate' => '2026-04-07T11:40:30+05:30',
+				'dateString'   => 'Tue Apr 07 2026 11:40:30 +0530 (India Standard Time)',
+			],
+			'Unambiguous day/month date string' => [
+				'expectedDate' => '2026-03-19T07:26:00+00:00',
+				'dateString'   => 'Thu, 19/03/2026, 07:26',
+			],
 			'Double HTML encode' => [
 				'expectedDate' => '2015-05-22T08:48:00+12:00',
-				'dateString'   => '2015-05-22T08:48:00&amp;#43;12:00'
+				'dateString'   => '2015-05-22T08:48:00&amp;#43;12:00',
 			],
 			'2023-04-02\T17:22:42+05:30' => [
 				'expectedDate' => '2023-04-02T17:22:42+05:30',
-				'dateString'   => '2023-04-02\T17:22:42+05:30'
+				'dateString'   => '2023-04-02\T17:22:42+05:30',
 			],
 			'2025-03-07T08:54:14.341+01:00[Europe/Berlin]' => [
 				'expectedDate' => '2025-03-07T08:54:14+01:00',
-				'dateString'   => '2025-03-07T08:54:14.341+01:00[Europe/Berlin]'
+				'dateString'   => '2025-03-07T08:54:14.341+01:00[Europe/Berlin]',
+			],
+			'April 9, 2026 at 10:00am' => [
+				'expectedDate' => '2026-04-09T10:00:00+00:00',
+				'dateString'   => 'April 9, 2026 at 10:00am',
+			],
+			'Apr 09, 2026 @ 4:52 PM PDT' => [
+				'expectedDate' => '2026-04-09T16:52:00+00:00',
+				'dateString'   => 'Apr 09, 2026 @ 4:52 PM PDT',
+			],
+			'Fr., 10 Apr. 2026 14:46:27 +0200' => [
+				'expectedDate' => '2026-04-10T14:46:27+02:00',
+				'dateString'   => 'Fr., 10 Apr. 2026 14:46:27 +0200',
+			],
+			'April, 10 2026 11:52:50 +0000' => [
+				'expectedDate' => '2026-04-10T11:52:50+00:00',
+				'dateString'   => 'April, 10 2026 11:52:50 +0000',
+			],
+			'2026:04:08 17:36:01 :' => [
+				'expectedDate' => '2026-04-08T17:36:01+00:00',
+				'dateString'   => '2026:04:08 17:36:01 :',
+			],
+			'Mo, 02/09/2026, 13:03' => [
+				'expectedDate' => '2026-02-09T13:03:00+00:00',
+				'dateString'   => 'Mo, 02/09/2026, 13:03',
+			],
+			'Publicado: 25 Mar 2024, 08:42-03:00' => [
+				'expectedDate' => '2024-03-25T08:42:00-03:00',
+				'dateString'   => 'Publicado: 25 Mar 2024, 08:42-03:00',
 			],
 		];
 	}
@@ -203,6 +243,10 @@ class DateTimeFormatTest extends MockedTestCase
 			'RFC 7231' => [
 				'expected' => '2022-06-02 07:58:35',
 				's'        => 'Thu, 02 Jun 2022 16:58:35 Asia/Tokyo',
+			],
+			'microsecond timestamp' => [
+				'expected' => '2025-11-05 22:11:28',
+				's'        => '1762380688000',
 			],
 		];
 	}

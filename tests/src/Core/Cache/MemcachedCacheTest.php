@@ -36,7 +36,7 @@ class MemcachedCacheTest extends MemoryCacheTestCase
 
 		try {
 			$this->cache = new MemcachedCache($host, $configMock, $logger);
-		} catch (Exception $exception) {
+		} catch (Exception) {
 			static::markTestSkipped('Memcached is not available');
 		}
 		return $this->cache;

@@ -213,24 +213,53 @@ class System
 	}
 
 	/**
+	 * Get the callstack without the database operations
+	 *
+	 * @return array the callstack
+	 */
+	public static function getCallstack(): array
+	{
+		$backtrace = [];
+		$file      = '';
+		$line      = 0;
+		foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) as $trace) {
+			if (!isset($trace['file']) || !isset($trace['function']) || !isset($trace['line'])) {
+				continue;
+			}
+			if (in_array(basename($trace['file']), ['DBA.php', 'Database.php'])) {
+				continue;
+			}
+			if (in_array(basename($trace['function']), ['selectView', 'selectPosts', 'selectFirstPost', 'fetch', 'toArray', 'exists', 'count', 'selectFirst', 'selectToArray', 'select', 'selectFirstForUser', 'selectForUser'])) {
+				continue;
+			}
+			if ($line != 0) {
+				$new         = $trace;
+				$new['file'] = $file;
+				$new['line'] = $line;
+				$backtrace[] = $new;
+			}
+			$file = $trace['file'];
+			$line = $trace['line'];
+		}
+
+		return $backtrace;
+	}
+
+	/**
 	 * Returns a string with a callstack. Can be used for logging.
 	 *
 	 * @param integer $depth   How many calls to include in the stacks after filtering
 	 * @param int     $offset  How many calls to shave off the top of the stack, for example if
 	 *                         this is called from a centralized method that isn't relevant to the callstack
-	 * @param bool    $full    If enabled, the callstack is not compacted
 	 * @param array   $exclude
 	 * @return string
 	 */
-	public static function callstack(int $depth = 4, int $offset = 0, bool $full = false, array $exclude = []): string
+	public static function callstack(int $depth = 4, int $offset = 0, array $exclude = []): string
 	{
-		$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-
-		// We remove at least the first two items from the list since they contain data that we don't need.
-		$trace = array_slice($trace, 2 + $offset);
+		// We remove at least the first item from the list since they contain data that we don't need.
+		$trace = array_slice(self::getCallstack(), 1 + $offset);
 
 		$callstack = [];
-		$previous  = ['class' => '', 'function' => '', 'database' => false];
 
 		// The ignore list contains all functions that are only wrapper functions
 		$ignore = ['call_user_func_array'];
@@ -240,25 +269,12 @@ class System
 				if (in_array($func['class'], $exclude)) {
 					continue;
 				}
-
-				if (!$full && in_array($previous['function'], ['insert', 'fetch', 'toArray', 'exists', 'count', 'selectFirst', 'selectToArray',
-					'select', 'update', 'delete', 'selectFirstForUser', 'selectForUser'])
-					&& (substr($previous['class'], 0, 15) === 'Friendica\Model')) {
-					continue;
-				}
-
-				// Don't show multiple calls from the Database classes to show the essential parts of the callstack
-				$func['database'] = in_array($func['class'], ['Friendica\Database\DBA', 'Friendica\Database\Database']);
-				if ($full || !$previous['database'] || !$func['database']) {
-					$classparts  = explode("\\", $func['class']);
-					$callstack[] = array_pop($classparts).'::'.$func['function'] . (isset($func['line']) ? ' (' . $func['line'] . ')' : '');
-					$previous    = $func;
-				}
+				$classparts  = explode("\\", $func['class']);
+				$callstack[] = array_pop($classparts) . '::' . $func['function'] . (isset($func['line']) ? ' (' . $func['line'] . ')' : '');
 			} elseif (!in_array($func['function'], $ignore)) {
 				$func['database'] = ($func['function'] == 'q');
 				$callstack[]      = $func['function'] . (isset($func['line']) ? ' (' . $func['line'] . ')' : '');
 				$func['class']    = '';
-				$previous         = $func;
 			}
 		}
 
@@ -282,8 +298,8 @@ class System
 				"HTTP/%s %s %s",
 				$response->getProtocolVersion(),
 				$response->getStatusCode(),
-				$response->getReasonPhrase()
-			)
+				$response->getReasonPhrase(),
+			),
 		);
 
 		foreach ($response->getHeaders() as $key => $header) {
@@ -311,7 +327,7 @@ class System
 	 * @param mixed  $status
 	 * @param string $message
 	 * @throws \Exception
-	 * @deprecated since 2023.09 Use BaseModule->httpExit() instead
+	 * @deprecated 2023.09 Use BaseModule->httpExit() instead
 	 */
 	public static function xmlExit($status, string $message = '')
 	{
@@ -335,7 +351,7 @@ class System
 	 * @param string  $message  Error message. Optional.
 	 * @param string  $content  Response body. Optional.
 	 * @throws \Exception
-	 * @deprecated since 2023.09 Use BaseModule->httpError instead
+	 * @deprecated 2023.09 Use BaseModule->httpError instead
 	 */
 	public static function httpError($httpCode, $message = '', $content = '')
 	{
@@ -452,19 +468,17 @@ class System
 
 	/**
 	 * Returns the current Load of the System
-	 *
-	 * @return integer
 	 */
-	public static function currentLoad()
+	public static function currentLoad(): float
 	{
 		if (!function_exists('sys_getloadavg')) {
-			return false;
+			return (float) 0;
 		}
 
 		$load_arr = sys_getloadavg();
 
 		if (!is_array($load_arr)) {
-			return false;
+			return (float) 0;
 		}
 
 		return round(max($load_arr[0], $load_arr[1]), 2);
@@ -488,14 +502,14 @@ class System
 			'average5'  => $load_arr[1],
 			'average15' => $load_arr[2],
 			'runnable'  => 0,
-			'scheduled' => 0
+			'scheduled' => 0,
 		];
 
 		if ($get_processes && @is_readable('/proc/loadavg')) {
 			$content = @file_get_contents('/proc/loadavg');
 			if (!empty($content) && preg_match("#([.\d]+)\s([.\d]+)\s([.\d]+)\s(\d+)/(\d+)#", $content, $matches)) {
-				$load['runnable']  = (float)$matches[4];
-				$load['scheduled'] = (float)$matches[5];
+				$load['runnable']  = (float) $matches[4];
+				$load['scheduled'] = (float) $matches[5];
 			}
 		}
 
@@ -711,7 +725,7 @@ class System
 					if ($numeric_id) {
 						$rules[++$id] = $line;
 					} else {
-						$rules[] = ['id' => (string)++$id, 'text' => $line];
+						$rules[] = ['id' => (string) ++$id, 'text' => $line];
 					}
 				}
 			}

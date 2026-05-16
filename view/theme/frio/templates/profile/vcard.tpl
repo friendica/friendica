@@ -7,16 +7,12 @@
 <div class="vcard h-card widget">
 
 	<div id="profile-photo-wrapper">
-		<a href="{{$profile.url}}"><img class="photo u-photo" src="{{$profile.photo}}" alt="{{$profile.name}}" /></a>
-		<div class="tool visible-lg visible-md">
-			{{if $profile.edit}}
-				<div class="action">
-					<a class="" href="{{$profile.edit.0}}" title="{{$profile.edit.3}}"><i
-							class="fa fa-pencil-square-o"></i></a>
-				</div>
+		<a class="vcard-anchor" href="{{$picture_dest_url}}" style="position: relative;">
+			<img class="photo u-photo" src="{{$profile.photo}}" alt="{{$profile.name}}" />
+			{{if $is_owner }}
+				<div id="change-profile-picture">{{$change_profile_picture_text}}</div>
 			{{/if}}
-		</div>
-
+		</a>
 	</div>
 
 	{{* The short information which will appended to the second navbar by scrollspy *}}
@@ -37,7 +33,14 @@
 		<div class="profile-header">
 			<h3 class="fn p-name" dir="auto">{{$profile.name}}</h3>
 
-			{{if $profile.addr}}<div class="p-addr">{{include file="sub/punct_wrap.tpl" text=$profile.addr}}</div>
+			{{if $profile.addr}}<div class="p-addr">{{include file="sub/punct_wrap.tpl" text=$profile.addr}}</div>{{/if}}
+			{{if $is_owner }}
+				<div class="edit-profile-link-wrapper">
+					<a class="btn btn-primary" href="{{$edit_profile_link.url}}">
+						<i class="fa fa-pencil" aria-hidden="true"></i>
+						{{$edit_profile_link.text}}
+					</a>
+				</div>
 			{{/if}}
 
 			{{if $profile.about}}<div class="title" dir="auto">{{$profile.about nofilter}}</div>{{/if}}
@@ -51,13 +54,13 @@
 					<div id="dfrn-request-link-button">
 						{{if $unfollow_link}}
 							<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$unfollow_link}}">
-								<span class=""><i class="fa fa-user-times"></i></span>
-								<span class="">{{$unfollow}}</span>
+								<span><i class="fa fa-user-times"></i></span>
+								<span>{{$unfollow}}</span>
 							</a>
 						{{else}}
 							<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$follow_link}}">
-								<span class=""><i class="fa fa-user-plus"></i></span>
-								<span class="">{{$follow}}</span>
+								<span><i class="fa fa-user-plus"></i></span>
+								<span>{{$follow}}</span>
 							</a>
 						{{/if}}
 					</div>
@@ -65,32 +68,32 @@
 				{{if $subscribe_feed_link}}
 					<div id="subscribe-feed-link-button">
 						<a id="subscribe-feed-link" class="btn btn-labeled btn-primary" href="{{$subscribe_feed_link}}">
-							<span class=""><i class="fa fa-rss"></i></span>
-							<span class="">{{$subscribe_feed}}</span>
+							<span><i class="fa fa-rss"></i></span>
+							<span>{{$subscribe_feed}}</span>
 						</a>
 					</div>
 				{{/if}}
 				{{if $wallmessage_link}}
 					<div id="wallmessage-link-button">
 						<button type="button" id="wallmessage-link" class="btn btn-labeled btn-primary" onclick="openWallMessage('{{$wallmessage_link}}')">
-							<span class=""><i class="fa fa-envelope"></i></span>
-							<span class="">{{$wallmessage}}</span>
+							<span><i class="fa fa-envelope"></i></span>
+							<span>{{$wallmessage}}</span>
 						</button>
 					</div>
 				{{/if}}
 				{{if $profile.addr}}
-					<div id="mention-link-button">
-						<button type="button" id="mention-link" class="btn btn-labeled btn-primary" onclick="openWallMessage('{{$mention_url}}')">
-							<span class=""><i class="fa fa-pencil-square-o"></i></span>
-							<span class="">{{$mention_label}}</span>
+					<div id="jotOpen" class="pull-right">
+						<button type="button" id="mention-link" class="action-button btn btn-labeled btn-primary" onclick="openWallMessage('{{$mention_url}}')">
+							<i class="fa fa-lg fa-pencil"></i>
+							<span>{{$mention_label}}</span>
 						</button>
 					</div>
 				{{/if}}
 				{{if $network_label}}
 					<div id="showgroup-button">
 						<a id="showgroup" class="btn btn-labeled btn-primary" href="{{$network_url}}">
-							<span class=""><i class="fa fa-group"></i></span>
-							<span class="">{{$network_label}}</span>
+							<span><i class="fa fa-group"></i></span>
+							<span>{{$network_label}}</span>
 						</a>
 					</div>
 				{{/if}}
@@ -136,6 +139,13 @@
 				<span class="homepage-url u-url"><a href="{{$profile.homepage}}" rel="me" target="_blank" rel="noopener noreferrer">{{include file="sub/punct_wrap.tpl" text=$profile.homepage}}</a>{{if $profile.homepage_verified}}
 					<span title="{{$homepage_verified}}">✔</span>{{/if}}</span>
 			</div>
+		{{/if}}
+
+		{{if $member_since}}
+				<p class="member-since">
+					<strong>{{$member_since.0}}</strong>
+					<span>{{$member_since.1}}</span>
+				</p>
 		{{/if}}
 
 		{{if $about}}<dl class="about" style="display:none;">

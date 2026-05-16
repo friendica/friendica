@@ -47,7 +47,7 @@ class Media extends BaseProfile
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->appHelper = $appHelper;
+		$this->appHelper   = $appHelper;
 		$this->userSession = $userSession;
 	}
 
@@ -66,7 +66,7 @@ class Media extends BaseProfile
 
 		$o = self::getTabsHTML('media', $is_owner, $profile['nickname'], $profile['hide-friends']);
 
-		$o .= Contact::getPostsFromUrl($profile['url'], $this->userSession->getLocalUserId(), true, $request['last_created'] ?? '');
+		$o .= Contact::getPostsFromUrl($profile['url'], $this->userSession->getLocalUserId(), true, $request);
 
 		return $o;
 	}

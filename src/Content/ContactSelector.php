@@ -18,11 +18,11 @@ use Friendica\Util\Strings;
  */
 class ContactSelector
 {
-	const SVG_DISABLED    = -1;
-	const SVG_COLOR_BLACK = 0;
-	const SVG_BLACK       = 1;
-	const SVG_COLOR_WHITE = 2;
-	const SVG_WHITE       = 3;
+	public const SVG_DISABLED    = -1;
+	public const SVG_COLOR_BLACK = 0;
+	public const SVG_BLACK       = 1;
+	public const SVG_COLOR_WHITE = 2;
+	public const SVG_WHITE       = 3;
 
 	public static $serverdata = [];
 	public static $server_id  = [];
@@ -44,7 +44,7 @@ class ContactSelector
 			2 => DI::l10n()->t('Twice daily'),
 			3 => DI::l10n()->t('Daily'),
 			4 => DI::l10n()->t('Weekly'),
-			5 => DI::l10n()->t('Monthly')
+			5 => DI::l10n()->t('Monthly'),
 		];
 
 		foreach ($rep as $k => $v) {
@@ -111,7 +111,7 @@ class ContactSelector
 	 *
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function networkToName(string $network, string $protocol = '', int $gsid = null): string
+	public static function networkToName(string $network, string $protocol = '', ?int $gsid = null): string
 	{
 		$eventDispatcher = DI::eventDispatcher();
 
@@ -134,7 +134,7 @@ class ContactSelector
 			Protocol::ACTIVITYPUB => DI::l10n()->t('ActivityPub'),
 			Protocol::PNUT        => DI::l10n()->t('pnut'),
 			Protocol::TUMBLR      => DI::l10n()->t('Tumblr'),
-			Protocol::BLUESKY     => DI::l10n()->t('Bluesky'),
+			Protocol::ATPROTO     => DI::l10n()->t('AT Protocol'),
 		];
 
 		$nets = $eventDispatcher->dispatch(
@@ -147,7 +147,7 @@ class ContactSelector
 		$networkname = str_replace($search, $replace, $network);
 		$platform    = '';
 
-		if (in_array($network, Protocol::FEDERATED) && !empty($gsid)) {
+		if (in_array($network, array_merge(Protocol::FEDERATED, [Protocol::ATPROTO])) && !empty($gsid)) {
 			$gserver = self::getServerForId($gsid);
 
 			if (!empty($gserver['platform'])) {
@@ -167,6 +167,8 @@ class ContactSelector
 			$networkname .= ' (DFRN)';
 		} elseif (in_array($network, ['', $protocol]) && ($network == Protocol::DIASPORA) && ($platform !== 'diaspora')) {
 			$networkname .= ' (Diaspora)';
+		} elseif ($network === Protocol::ATPROTO && isset($gserver['url'])) {
+			$networkname = DI::l10n()->t('%s (via %s)', $networkname, parse_url($gserver['url'], PHP_URL_HOST));
 		}
 
 		return $networkname;
@@ -184,7 +186,7 @@ class ContactSelector
 	 * @param integer $uid
 	 * @return string
 	 */
-	public static function networkToSVG(string $network, int $gsid = null, string $platform = '', int $uid = 0): string
+	public static function networkToSVG(string $network, ?int $gsid = null, string $platform = '', int $uid = 0): string
 	{
 		$platform_icon_style = $uid ? (DI::pConfig()->get($uid, 'accessibility', 'platform_icon_style') ?? self::SVG_COLOR_BLACK) : self::SVG_COLOR_BLACK;
 
@@ -194,7 +196,7 @@ class ContactSelector
 
 		$nets = [
 			Protocol::ACTIVITYPUB => 'activitypub', // https://commons.wikimedia.org/wiki/File:ActivityPub-logo-symbol.svg
-			Protocol::BLUESKY     => 'bluesky', // https://commons.wikimedia.org/wiki/File:Bluesky_Logo.svg
+			Protocol::ATPROTO     => 'atprotocol', // https://freesvg.org/at-sign-symbol
 			Protocol::DFRN        => 'friendica',
 			Protocol::DIASPORA    => 'diaspora', // https://www.svgrepo.com/svg/362315/diaspora
 			Protocol::DIASPORA2   => 'diaspora', // https://www.svgrepo.com/svg/362315/diaspora
@@ -215,22 +217,22 @@ class ContactSelector
 
 		$network_svg = str_replace($search, $replace, $network);
 
-		if (in_array($network, Protocol::FEDERATED) && !empty($gsid)) {
+		if (in_array($network, array_merge(Protocol::FEDERATED, [Protocol::ATPROTO])) && !empty($gsid)) {
 			$gserver  = self::getServerForId($gsid);
 			$platform = $gserver['platform'];
 		}
 
-		$svg = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'anfora', 'awakari', 'azorius',
-			'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed', 'brighteon_social', 'brutalinks', 'calckey',
+		$svg = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'anfora', 'atprotocol', 'awakari', 'azorius',
+			'blacksky', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed', 'brighteon_social', 'brutalinks', 'calckey',
 			'castopod', 'catodon', 'chatter_net', 'chuckya', 'clubsall', 'communecter', 'decodon',
-			'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'emissary', 'epicyon', 'f2ap',
+			'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'emissary', 'epicyon', 'eurosky', 'f2ap',
 			'fedibird', 'fedify', 'firefish', 'flipboard', 'flohmarkt', 'forgefriends', 'forgejo',
 			'forte', 'foundkey', 'friendica', 'funkwhale', 'gancio', 'gath.io', 'ghost', 'gitlab',
 			'glitch-soc', 'glitchsoc', 'gnu_social', 'gnusocial', 'goblin', 'go-fed', 'gotosocial',
 			'greatape', 'guppe', 'hollo', 'hometown', 'honk', 'hubzilla', 'iceshrimp', 'juick', 'kazarma',
 			'kbin', 'kepi', 'kitsune', 'kmyblue', 'kookie', 'ktistec', 'lemmy', 'loops', 'mastodon',
 			'mbin', 'micro.blog', 'minds', 'misskey', 'mistpark', 'mitra', 'mobilizon', 'neodb',
-			'newsmast', 'nextcloud_social', 'nodebb', 'osada', 'owncast', 'peertube', 'piefed', 'pinetta',
+			'newsmast', 'nextcloud_social', 'nodebb', 'northsky', 'osada', 'owncast', 'peertube', 'piefed', 'pinetta',
 			'pixelfed', 'pleroma', 'plume', 'postmarks', 'prismo', 'pump-io', 'rebased', 'redmatrix',
 			'reel2bits', 'rss', 'ruffy', 'sakura', 'seppo', 'shadowfacts', 'sharky', 'shuttlecraft',
 			'smilodon', 'smithereen', 'snac', 'soapbox', 'socialhome', 'streams', 'sublinks', 'sutty',
@@ -238,12 +240,12 @@ class ContactSelector
 			'wildebeest', 'wordpress', 'write.as', 'writefreely', 'wxwclub', 'xwiki', 'zap'];
 
 		if (in_array($platform_icon_style, [self::SVG_WHITE, self::SVG_COLOR_WHITE])) {
-			$svg = ['activitypub', 'akkoma', 'andstatus', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed',
-				'calckey', 'castopod', 'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'firefish',
+			$svg = ['activitypub', 'akkoma', 'andstatus', 'atprotocol', 'blacksky', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed',
+				'calckey', 'castopod', 'diaspora', 'discourse', 'dolphin', 'drupal', 'email', 'eurosky', 'firefish',
 				'flipboard', 'flohmarkt', 'forgejo', 'friendica', 'funkwhale', 'ghost', 'gitlab',
 				'glitch-soc', 'gnusocial', 'gotosocial', 'guppe', 'hollo', 'hubzilla', 'iceshrimp', 'kbin',
 				'lemmy', 'loforo', 'loops', 'mastodon', 'mbin', 'microblog', 'minds', 'misskey', 'mobilizon',
-				'nextcloud', 'owncast', 'peertube', 'phanpy', 'pixelfed', 'pleroma', 'plume', 'rss', 'shark',
+				'nextcloud', 'northsky', 'owncast', 'peertube', 'phanpy', 'pixelfed', 'pleroma', 'plume', 'rss', 'shark',
 				'soapbox', 'socialhome', 'streams', 'takahē', 'threads', 'tumblr', 'wordpress', 'write.as',
 				'writefreely', 'xwiki', 'zap'];
 		}
@@ -273,9 +275,9 @@ class ContactSelector
 			return '';
 		}
 
-		$color = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'bluesky', 'chuckya', 'decodon',
-			'discourse', 'fedify', 'firefish', 'flipboard', 'friendica', 'gitlab', 'gnusocial', 'kookie',
-			'loops', 'mastodon', 'mbin', 'misskey', 'neodb', 'newsmast', 'nodebb', 'peertube', 'pixelfed',
+		$color = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'atprotocol', 'bluesky', 'chuckya', 'decodon',
+			'discourse', 'eurosky', 'fedify', 'firefish', 'flipboard', 'friendica', 'gitlab', 'gnusocial', 'iceshrimp', 'kookie',
+			'loops', 'mastodon', 'mbin', 'misskey', 'neodb', 'newsmast', 'nodebb', 'northsky', 'peertube', 'pixelfed',
 			'pleroma', 'rss', 'sharky', 'tumblr', 'vervis', 'vocata', 'wordpress'];
 
 		if (in_array($platform_icon_style, [self::SVG_COLOR_BLACK, self::SVG_COLOR_WHITE]) && in_array($network_svg, $color)) {

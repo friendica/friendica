@@ -51,7 +51,7 @@ class Hovercard extends BaseModule
 		 * - contact/redir/123456
 		 * - contact/123456/conversations
 		 */
-		if (strpos($contact_url, 'contact/') === 0 && preg_match('/(\d+)/', $contact_url, $matches)) {
+		if (str_starts_with($contact_url, 'contact/') && preg_match('/(\d+)/', $contact_url, $matches)) {
 			$remote_contact = Contact::selectFirst(['nurl'], ['id' => $matches[1]]);
 			$contact_url    = $remote_contact['nurl'] ?? '';
 		}

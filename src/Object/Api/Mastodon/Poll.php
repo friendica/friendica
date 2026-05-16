@@ -32,7 +32,7 @@ class Poll extends BaseDataTransferObject
 	/** @var bool|null */
 	protected $voted = false;
 	/** @var array|null */
-	protected $own_votes = false;
+	protected $own_votes = null;
 	/** @var array */
 	protected $options = [];
 	/** @var Emoji[] */

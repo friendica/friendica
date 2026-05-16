@@ -13,7 +13,6 @@ use Friendica\BaseDataTransferObject;
 use Friendica\Contact\Header;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Database\Database;
-use Friendica\Model\User;
 use Friendica\Module\Register;
 use Friendica\Object\Api\Mastodon\InstanceV2\Configuration;
 
@@ -50,7 +49,7 @@ class Instance extends BaseDataTransferObject
 		$this->uri               = $baseUrl->getHost();
 		$this->title             = $config->get('config', 'sitename');
 		$this->short_description = $this->description = $config->get('config', 'info');
-		$this->email             = implode(',', User::getAdminEmailList());
+		$this->email             = $config->get('config', 'sender_email');
 		$this->version           = '2.8.0 (compatible; Friendica ' . App::VERSION . ')';
 		$this->urls              = ['streaming_api' => '']; // Not supported
 		$this->stats             = new Stats($config, $database);

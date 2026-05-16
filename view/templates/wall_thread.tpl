@@ -151,8 +151,8 @@
 									<a role="button" id="unpin-{{$item.id}}" onclick="doPin({{$item.id}}); return false;" class="{{$item.pin.classundo}}" title="{{$item.pin.undo}}"><i class="icon-remove-circle icon-large"><span class="sr-only">{{$item.pin.undo}}</span></i></a>
                                 {{/if}}
                                 {{if $item.star}}
-									<a role="button" id="star-{{$item.id}}" onclick="doStar({{$item.id}}); return false;" class="{{$item.star.classdo}}" title="{{$item.star.do}}"><i class="icon-star icon-large"><span class="sr-only">{{$item.star.do}}</span></i></a>
-									<a role="button" id="unstar-{{$item.id}}" onclick="doStar({{$item.id}}); return false;" class="{{$item.star.classundo}}" title="{{$item.star.undo}}"><i class="icon-star-empty icon-large"><span class="sr-only">{{$item.star.undo}}</span></i></a>
+									<a role="button" id="star-{{$item.id}}" onclick="doStar({{$item.id}}); return false;" class="{{$item.star.classdo}}" title="{{$item.star.do}}"><i class="icon-bookmark icon-large"><span class="sr-only">{{$item.star.do}}</span></i></a>
+									<a role="button" id="unstar-{{$item.id}}" onclick="doStar({{$item.id}}); return false;" class="{{$item.star.classundo}}" title="{{$item.star.undo}}"><i class="icon-bookmark-empty icon-large"><span class="sr-only">{{$item.star.undo}}</span></i></a>
                                 {{/if}}
                                 {{if $item.ignore}}
 									<a role="button" id="ignore-{{$item.id}}" onclick="doIgnoreThread({{$item.id}}); return false;"  class="{{$item.ignore.classdo}}"  title="{{$item.ignore.do}}"><i class="icon-bell-slash icon-large"><span class="sr-only">{{$item.ignore.do}}</span></i></a>

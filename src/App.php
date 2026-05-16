@@ -18,7 +18,6 @@ use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Content\Nav;
 use Friendica\Core\Addon\AddonHelper;
-use Friendica\Core\Addon\Capability\ICanLoadAddons;
 use Friendica\Core\Config\Factory\Config;
 use Friendica\Core\Container;
 use Friendica\Core\Hooks\HookEventBridge;
@@ -68,9 +67,9 @@ use Psr\Log\LoggerInterface;
  */
 class App
 {
-	const PLATFORM = 'Friendica';
-	const CODENAME = 'Interrupted Fern';
-	const VERSION  = '2025.02-dev';
+	public const PLATFORM = 'Friendica';
+	public const CODENAME = 'Blutwurz';
+	public const VERSION  = '2026.08-dev';
 
 	/**
 	 * @internal
@@ -200,7 +199,7 @@ class App
 			$addonHelper,
 			$this->container->create(ModuleHTTPException::class),
 			$start_time,
-			$request
+			$request,
 		);
 	}
 
@@ -282,11 +281,15 @@ class App
 
 	private function setupAddons(): void
 	{
-		/** @var ICanLoadAddons $addonLoader */
-		$addonLoader = $this->container->create(ICanLoadAddons::class);
+		/** @var AddonHelper $addonHelper */
+		$addonHelper = $this->container->create(AddonHelper::class);
 
-		foreach ($addonLoader->getActiveAddonConfig('dependencies') as $name => $rule) {
-			$this->container->addRule($name, $rule);
+		$addonHelper->loadAddons();
+
+		foreach ($addonHelper->getEnabledAddons() as $addonId) {
+			foreach ($addonHelper->getAddonDependencyConfig($addonId) as $name => $rule) {
+				$this->container->addRule($name, $rule);
+			}
 		}
 
 		$config = $this->container->create(IManageConfigValues::class);
@@ -315,7 +318,7 @@ class App
 	{
 		$command = strtolower($argv[1] ?? '');
 
-		if ($command === 'daemon' || $command === 'jetstream') {
+		if ($command === 'daemon') {
 			return LogChannel::DAEMON;
 		}
 
@@ -323,7 +326,9 @@ class App
 			return LogChannel::WORKER;
 		}
 
-		// @TODO Add support for jetstream
+		if ($command === 'jetstream') {
+			return LogChannel::JETSTREAM;
+		}
 
 		return LogChannel::CONSOLE;
 	}
@@ -363,7 +368,7 @@ class App
 
 	private function registerTemplateEngine(): void
 	{
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 	}
 
 	/**
@@ -378,7 +383,7 @@ class App
 		Profiler $profiler,
 		EventDispatcherInterface $eventDispatcher,
 		AppHelper $appHelper,
-		AddonHelper $addonHelper
+		AddonHelper $addonHelper,
 	): void {
 		if ($config->get('system', 'ini_max_execution_time') !== false) {
 			set_time_limit((int) $config->get('system', 'ini_max_execution_time'));
@@ -455,7 +460,7 @@ class App
 		AddonHelper $addonHelper,
 		ModuleHTTPException $httpException,
 		float $start_time,
-		ServerRequestInterface $request
+		ServerRequestInterface $request,
 	) {
 		$this->mode->setExecutor(Mode::INDEX);
 
@@ -463,8 +468,17 @@ class App
 		$serverVars = $request->getServerParams();
 		$queryVars  = $request->getQueryParams();
 
+		if ($this->mode->isNormal() && !$this->mode->isBackend()) {
+			$requester = HTTPSignature::getSigner('', $serverVars);
+			if (!empty($requester)) {
+				OpenWebAuth::addVisitorCookieForHandle($requester);
+			}
+		} else {
+			$requester = '';
+		}
+
 		$requeststring = ($serverVars['REQUEST_METHOD'] ?? '') . ' ' . ($serverVars['REQUEST_URI'] ?? '') . ' ' . ($serverVars['SERVER_PROTOCOL'] ?? '');
-		$this->logger->debug('Request received', ['address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '']);
+		$this->logger->debug('Request received', ['address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '', 'requester' => $requester]);
 		$request_start = microtime(true);
 		$request       = $_REQUEST;
 
@@ -482,11 +496,11 @@ class App
 
 			if (!$this->mode->isInstall()) {
 				// Force SSL redirection
-				if ($this->config->get('system', 'force_ssl') &&
-					(empty($serverVars['HTTPS']) || $serverVars['HTTPS'] === 'off') &&
-					(empty($serverVars['HTTP_X_FORWARDED_PROTO']) || $serverVars['HTTP_X_FORWARDED_PROTO'] === 'http') &&
-					!empty($serverVars['REQUEST_METHOD']) &&
-					$serverVars['REQUEST_METHOD'] === 'GET') {
+				if ($this->config->get('system', 'force_ssl')
+					&& (empty($serverVars['HTTPS']) || $serverVars['HTTPS'] === 'off')
+					&& (empty($serverVars['HTTP_X_FORWARDED_PROTO']) || $serverVars['HTTP_X_FORWARDED_PROTO'] === 'http')
+					&& !empty($serverVars['REQUEST_METHOD'])
+					&& $serverVars['REQUEST_METHOD'] === 'GET') {
 					System::externalRedirect($this->baseURL . '/' . $this->args->getQueryString());
 				}
 
@@ -495,19 +509,12 @@ class App
 
 			DID::routeRequest($this->args->getCommand(), $serverVars);
 
-			if ($this->mode->isNormal() && !$this->mode->isBackend()) {
-				$requester = HTTPSignature::getSigner('', $serverVars);
-				if (!empty($requester)) {
-					OpenWebAuth::addVisitorCookieForHandle($requester);
-				}
-			}
-
 			// ZRL
 			if (!empty($queryVars['zrl']) && $this->mode->isNormal() && !$this->mode->isBackend() && !$this->session->getLocalUserId()) {
 				// Only continue when the given profile link seems valid.
 				// Valid profile links contain a path with "/profile/" and no query parameters
-				if ((parse_url($queryVars['zrl'], PHP_URL_QUERY) == '') &&
-					strpos(parse_url($queryVars['zrl'], PHP_URL_PATH) ?? '', '/profile/') !== false) {
+				if ((parse_url($queryVars['zrl'], PHP_URL_QUERY) == '')
+					&& str_contains(parse_url($queryVars['zrl'], PHP_URL_PATH) ?? '', '/profile/')) {
 					$this->auth->setUnauthenticatedVisitor($queryVars['zrl']);
 					OpenWebAuth::zrlInit();
 				} else {
@@ -638,8 +645,8 @@ class App
 		/** @var Router $router */
 		$router = $this->container->create(Router::class);
 
-		$moduleClass = $moduleClass ?? $router->getModuleClass();
-		$parameters  = $router->getParameters();
+		$moduleClass ??= $router->getModuleClass();
+		$parameters = $router->getParameters();
 
 		$dice_profiler_threshold = $this->config->get('system', 'dice_profiler_threshold', 0);
 
@@ -677,10 +684,10 @@ class App
 
 		@file_put_contents(
 			$logfile,
-			DateTimeFormat::utcNow() . "\t" . round($duration, 3) . "\t" .
-			$this->requestId . "\t" . $code . "\t" .
-			$request . "\t" . $agent . "\n",
-			FILE_APPEND
+			DateTimeFormat::utcNow() . "\t" . round($duration, 3) . "\t"
+			. $this->requestId . "\t" . $code . "\t"
+			. $request . "\t" . $agent . "\n",
+			FILE_APPEND,
 		);
 	}
 }

@@ -34,7 +34,7 @@ HELP;
 	protected function doExecute(): int
 	{
 		if ($this->getOption('v')) {
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -68,31 +68,31 @@ HELP;
 
 				$found = false;
 
-				if (substr($detect, 0, 9) == "function ") {
+				if (str_starts_with($detect, "function ")) {
 					$found = true;
 				}
 
-				if (substr($detect, 0, 19) == "protected function ") {
+				if (str_starts_with($detect, "protected function ")) {
 					$found = true;
 				}
 
-				if (substr($detect, 0, 17) == "private function ") {
+				if (str_starts_with($detect, "private function ")) {
 					$found = true;
 				}
 
-				if (substr($detect, 0, 23) == "public static function ") {
+				if (str_starts_with($detect, "public static function ")) {
 					$found = true;
 				}
 
-				if (substr($detect, 0, 24) == "private static function ") {
+				if (str_starts_with($detect, "private static function ")) {
 					$found = true;
 				}
 
-				if (substr($detect, 0, 10) == "function (") {
+				if (str_starts_with($detect, "function (")) {
 					$found = false;
 				}
 
-				if ($found && ( trim($previous) == "*/")) {
+				if ($found && (trim($previous) == "*/")) {
 					$found = false;
 				}
 
@@ -117,33 +117,35 @@ HELP;
 	private function addDocumentation($line)
 	{
 		$trimmed = ltrim($line);
-		$length = strlen($line) - strlen($trimmed);
-		$space = substr($line, 0, $length);
+		$length  = strlen($line) - strlen($trimmed);
+		$space   = substr($line, 0, $length);
 
-		$block = $space . "/**\n" .
-			$space . " * \n" .
-			$space . " *\n"; /**/
+		$block = $space . "/**\n"
+			. $space . " * \n"
+			. $space . " *\n"; /**/
 
 
 		$left = strpos($line, "(");
 		$line = substr($line, $left + 1);
 
 		$right = strpos($line, ")");
-		$line = trim(substr($line, 0, $right));
+		$line  = trim(substr($line, 0, $right));
 
 		if ($line != "") {
 			$parameters = explode(",", $line);
 			foreach ($parameters as $parameter) {
 				$parameter = trim($parameter);
-				$splitted = explode("=", $parameter);
+				$splitted  = explode("=", $parameter);
 
 				$block .= $space . " * @param " . trim($splitted[0], "& ") . "\n";
 			}
-			if (count($parameters) > 0) $block .= $space . " *\n";
+			if (count($parameters) > 0) {
+				$block .= $space . " *\n";
+			}
 		}
 
-		$block .= $space . " * @return \n" .
-			$space . " */\n";
+		$block .= $space . " * @return \n"
+			. $space . " */\n";
 
 		return $block;
 	}

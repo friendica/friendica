@@ -29,10 +29,11 @@ class Circle
 		$return = [];
 
 		if (intval($gid)) {
-			$networks = Widget::unavailableNetworks();
+			$networks   = Widget::unavailableNetworks();
 			$sql_values = array_merge([$gid, DI::userSession()->getLocalUserId()], $networks);
 
-			$stmt = DBA::p('SELECT `circle_member`.`contact-id`, `contact`.*
+			$stmt = DBA::p(
+				'SELECT `circle_member`.`contact-id`, `contact`.*
 				FROM `contact`
 				INNER JOIN `group_member` AS `circle_member`
 					ON `contact`.`id` = `circle_member`.`contact-id`
@@ -44,7 +45,7 @@ class Circle
 				AND NOT `contact`.`pending`
 				AND NOT `contact`.`network` IN (' . substr(str_repeat('?, ', count($networks)), 0, -2) . ')
 				ORDER BY `contact`.`name` ASC',
-				$sql_values
+				$sql_values,
 			);
 
 			if (DBA::isResult($stmt)) {
@@ -68,7 +69,7 @@ class Circle
 	public static function listUncircled(int $uid)
 	{
 		$networks = Widget::unavailableNetworks();
-		$query = "`uid` = ? AND NOT `self` AND NOT `deleted` AND NOT `blocked` AND NOT `pending` AND NOT `failed`
+		$query    = "`uid` = ? AND NOT `self` AND NOT `deleted` AND NOT `blocked` AND NOT `pending` AND (`failed` IS NULL OR NOT `failed`)
 			AND NOT `network` IN (" . substr(str_repeat('?, ', count($networks)), 0, -2) . ")
 			AND `id` NOT IN (SELECT DISTINCT(`contact-id`) FROM `group_member` AS `circle_member` INNER JOIN `group` AS `circle` ON `circle`.`id` = `circle_member`.`gid`
 			WHERE `circle`.`uid` = ? AND `contact-id` = `contact`.`id`)";

@@ -17,11 +17,11 @@ use Friendica\DI;
  */
 class DateTimeFormat
 {
-	const ATOM  = 'Y-m-d\TH:i:s\Z';
-	const MYSQL = 'Y-m-d H:i:s';
-	const HTTP  = 'D, d M Y H:i:s \G\M\T';
-	const JSON  = 'Y-m-d\TH:i:s.v\Z';
-	const API   = 'D M d H:i:s +0000 Y';
+	public const ATOM  = 'Y-m-d\TH:i:s\Z';
+	public const MYSQL = 'Y-m-d H:i:s';
+	public const HTTP  = 'D, d M Y H:i:s \G\M\T';
+	public const JSON  = 'Y-m-d\TH:i:s.v\Z';
+	public const API   = 'D M d H:i:s +0000 Y';
 
 	public static $localTimezone = 'UTC';
 
@@ -121,6 +121,10 @@ class DateTimeFormat
 			$s = 'now';
 		}
 
+		if (is_numeric($s) && ($s > time() * 100)) {
+			$s = number_format($s / 1000, 0, '.', '');
+		}
+
 		// Lowest possible datetime value
 		if (substr($s, 0, 10) <= '0001-01-01') {
 			$d = new DateTime('now', new DateTimeZone('UTC'));
@@ -148,7 +152,7 @@ class DateTimeFormat
 
 		try {
 			$to_obj = new DateTimeZone($tz_to);
-		} catch (Exception $e) {
+		} catch (Exception) {
 			$to_obj = new DateTimeZone('UTC');
 		}
 
@@ -175,8 +179,18 @@ class DateTimeFormat
 		$dateString = str_replace($search, $replace, $dateString);
 
 		$pregPatterns = [
+			['#^(\w+), ((?:1[3-9]|2\d|3[0-1]))/(0?[1-9]|1[0-2])/(\d{4}), (\d{1,2}:\d{2}(?::\d{2})?)$#', '$4-$3-$2 $5'], // Thu, 19/03/2026, 07:26 (more specific, must be first)
+			['#(\w+)\s+(\d+),\s+(\d{4})\s+at\s+(\d+:\d+)(am|pm)#i', '$2 $1 $3 $4 $5'], // April 9, 2026 at 10:00am
+			['#(\w+)\s+(\d+),\s+(\d{4})\s+@\s+(\d+:\d+)\s+(AM|PM)\s+([A-Z]+)#i', '$2 $1 $3 $4 $5'], // Apr 09, 2026 @ 4:52 PM PDT
+			['#(\w+)\.,\s+(\d+)\s+(\w+)\.\s+(\d{4})\s+(\d+:\d+:\d+)\s+([\+\-]\d{4})#', '$2 $3 $4 $5 $6'], // Fr., 10 Apr. 2026 14:46:27 +0200
+			['#(\w+),\s+(\d+)\s+(\d{4})\s+(\d+:\d+:\d+)\s+([\+\-]\d{4})#', '$2 $1 $3 $4 $5'], // April, 10 2026 11:52:50 +0000
+			['#^(\d{4}):(\d{2}):(\d{2})\s+(\d{2}:\d{2}:\d{2})\s+:?$#', '$1-$2-$3 $4'], // 2026:04:08 17:36:01 :
+			['#\w+,\s+(\d{1,2})/(\d{1,2})/(\d{4}),\s+(\d{1,2}:\d{2})#', '$3-$1-$2 $4'], // Mo, 02/09/2026, 13:03
+			['#^[^:]*:\s+(\d{1,2})\s+(\w+)\s+(\d{4}),\s+(\d{2}:\d{2})([-+]\d{2}:\d{2})#', '$1 $2 $3 $4 $5$6'], // Publicado: 25 Mar 2024, 08:42-03:00
 			['#(\w+), (\d+ \w+ \d+) (\d+:\d+:\d+) (.+)#', '$2 $3 $4'],
 			['#(\d+:\d+) (\w+), (\w+) (\d+), (\d+)#', '$1 $2 $3 $4 $5'],
+			['#(GMT[+-]\d{4}) \([^)]*\)#', '$1'], // Tue Apr 07 2026 11:40:30 GMT+0530 (India Standard Time)
+			['#\s+\((?:[A-Za-z]+(?: [A-Za-z]+){0,5})\)$#', ''], // Tue Apr 07 2026 11:40:30 (India Standard Time)
 			['#\[[^\]]*\]#', ''], // 2025-03-07T08:54:14.341+01:00[Europe/Berlin]
 		];
 
@@ -209,7 +223,7 @@ class DateTimeFormat
 
 		try {
 			$now = new DateTime();
-		} catch (\Throwable $t) {
+		} catch (\Throwable) {
 			return false;
 		}
 

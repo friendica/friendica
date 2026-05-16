@@ -23,8 +23,8 @@
 	<dl>
 		<dt>{{$addons.0}}</dt>
 
-		{{foreach $addons.1 as $p}}
-			<dd><a href="{{$baseurl}}/admin/addons/{{$p}}/">{{$p}}</a></dd>
+		{{foreach $addons.1 as $a}}
+			<dd><a href="{{$baseurl}}/admin/addons/{{$a.0}}/">{{$a.1.name}}</a></dd>
 		{{/foreach}}
 
 	</dl>

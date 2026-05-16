@@ -26,13 +26,13 @@ class ReversedFileReader implements \Iterator
 	/** @var int */
 	private $pos = -1;
 
-	/** @var array */
+	/** @var array|null */
 	private $buffer = null;
 
 	/** @var int */
 	private $key = -1;
 
-	/** @var string */
+	/** @var string|null */
 	private $value = null;
 
 	/**
@@ -53,6 +53,7 @@ class ReversedFileReader implements \Iterator
 		$this->buffer   = null;
 		$this->key      = -1;
 		$this->value    = null;
+
 		return $this;
 	}
 

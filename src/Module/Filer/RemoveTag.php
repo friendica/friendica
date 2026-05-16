@@ -11,7 +11,6 @@ use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Model\Post;
 use Friendica\Module\Response;
@@ -59,20 +58,20 @@ class RemoveTag extends BaseModule
 	}
 
 	/**
-	 * @param array       $request The $_REQUEST array
-	 * @param string|null $type    Output parameter with the computed type
-	 * @param string|null $term    Output parameter with the computed term
+	 * @param array           $request The $_REQUEST array
+	 * @param string|int|null $type    Output parameter with the computed type
+	 * @param string|null     $term    Output parameter with the computed term
 	 *
 	 * @return int The relevant HTTP code
 	 *
 	 * @throws \Exception
 	 */
-	private function removeTag(array $request, string &$type = null, string &$term = null): int
+	private function removeTag(array $request, &$type = null, string &$term = null): int
 	{
 		$item_id = $this->parameters['id'] ?? 0;
 
 		$term = trim($request['term'] ?? '');
-		$cat = trim($request['cat'] ?? '');
+		$cat  = trim($request['cat'] ?? '');
 
 		if (!empty($cat)) {
 			$type = Post\Category::CATEGORY;

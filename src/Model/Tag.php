@@ -26,35 +26,36 @@ use Friendica\Util\Strings;
  */
 class Tag
 {
-	const UNKNOWN = 0;
-	const HASHTAG = 1;
-	const MENTION = 2;
+	public const UNKNOWN = 0;
+	public const HASHTAG = 1;
+	public const MENTION = 2;
 	/**
 	 * An implicit mention is a mention in a comment body that is redundant with the threading information.
 	 */
-	const IMPLICIT_MENTION = 8;
+	public const IMPLICIT_MENTION = 8;
 	/**
 	 * An exclusive mention transmits the post only to the target account without transmitting it to the followers, usually a group.
 	 */
-	const EXCLUSIVE_MENTION = 9;
+	public const EXCLUSIVE_MENTION = 9;
 
-	const TO         = 10;
-	const CC         = 11;
-	const BTO        = 12;
-	const BCC        = 13;
-	const AUDIENCE   = 14;
-	const ATTRIBUTED = 15;
+	public const TO         = 10;
+	public const CC         = 11;
+	public const BTO        = 12;
+	public const BCC        = 13;
+	public const AUDIENCE   = 14;
+	public const ATTRIBUTED = 15;
 
-	const CAN_ANNOUNCE = 20;
-	const CAN_LIKE     = 21;
-	const CAN_REPLY    = 22;
+	public const CAN_ANNOUNCE = 20;
+	public const CAN_LIKE     = 21;
+	public const CAN_REPLY    = 22;
+	public const CAN_QUOTE    = 23;
 
-	const ACCOUNT             = 1;
-	const GENERAL_COLLECTION  = 2;
-	const FOLLOWER_COLLECTION = 3;
-	const PUBLIC_COLLECTION   = 4;
+	public const ACCOUNT             = 1;
+	public const GENERAL_COLLECTION  = 2;
+	public const FOLLOWER_COLLECTION = 3;
+	public const PUBLIC_COLLECTION   = 4;
 
-	const TAG_CHARACTER = [
+	public const TAG_CHARACTER = [
 		self::HASHTAG           => '#',
 		self::MENTION           => '@',
 		self::EXCLUSIVE_MENTION => '!',
@@ -71,7 +72,7 @@ class Tag
 	 * @param integer $target Target (default: null)
 	 * @return void
 	 */
-	public static function store(int $uriId, int $type, string $name, string $url = '', int $target = null)
+	public static function store(int $uriId, int $type, string $name, string $url = '', ?int $target = null)
 	{
 		if ($type == self::HASHTAG) {
 			// Trim Unicode non-word characters
@@ -99,7 +100,7 @@ class Tag
 				return;
 			}
 
-			if ((substr($url, 0, 7) == 'https//') || (substr($url, 0, 6) == 'http//')) {
+			if ((str_starts_with($url, 'https//')) || (str_starts_with($url, 'http//'))) {
 				DI::logger()->notice('Wrong scheme in url', ['url' => $url]);
 			}
 
@@ -120,7 +121,7 @@ class Tag
 		}
 
 		if (empty($cid)) {
-			if (!in_array($type, [self::TO, self::CC, self::BTO, self::BCC, self::AUDIENCE, self::ATTRIBUTED])) {
+			if (!in_array($type, [self::TO, self::CC, self::BTO, self::BCC, self::AUDIENCE, self::ATTRIBUTED, self::CAN_ANNOUNCE, self::CAN_LIKE, self::CAN_REPLY, self::CAN_QUOTE])) {
 				if (($type != self::HASHTAG) && !empty($url) && ($url != $name)) {
 					$url = strtolower($url);
 				} else {
@@ -212,7 +213,7 @@ class Tag
 	 * @param int    $type Type of tag
 	 * @return int Tag id
 	 */
-	public static function getID(string $name, string $url = '', int $type = null): int
+	public static function getID(string $name, string $url = '', ?int $type = null): int
 	{
 		$fields = ['name' => substr($name, 0, 96), 'url' => $url];
 
@@ -268,7 +269,7 @@ class Tag
 	 *
 	 * @return array Tag list
 	 */
-	public static function getFromBody(string $body, string $tags = null): array
+	public static function getFromBody(string $body, ?string $tags = null): array
 	{
 		if (is_null($tags)) {
 			$tags = self::TAG_CHARACTER[self::HASHTAG] . self::TAG_CHARACTER[self::MENTION] . self::TAG_CHARACTER[self::EXCLUSIVE_MENTION];
@@ -289,7 +290,7 @@ class Tag
 	 * @param string  $tags    Accepted tags
 	 * @return void
 	 */
-	public static function storeFromBody(int $uriId, string $body, string $tags = null)
+	public static function storeFromBody(int $uriId, string $body, ?string $tags = null)
 	{
 		$item = ['uri-id' => $uriId, 'body' => $body, 'quote-uri-id' => null];
 		self::storeFromArray($item, $tags);
@@ -302,7 +303,7 @@ class Tag
 	 * @param string  $tags    Accepted tags
 	 * @return void
 	 */
-	public static function storeFromArray(array $item, string $tags = null)
+	public static function storeFromArray(array $item, ?string $tags = null)
 	{
 		DI::logger()->info('Check for tags', ['uri-id' => $item['uri-id'], 'hash' => $tags]);
 
@@ -317,7 +318,7 @@ class Tag
 		$shared = DI::contentItem()->getSharedPost($item, ['uri-id']);
 
 		// Search for hashtags in the shared body (but only if hashtags are wanted)
-		if (!empty($shared) && (strpos($tags, self::TAG_CHARACTER[self::HASHTAG]) !== false)) {
+		if (!empty($shared) && (str_contains($tags, self::TAG_CHARACTER[self::HASHTAG]))) {
 			foreach (self::getByURIId($shared['post']['uri-id'], [self::HASHTAG]) as $tag) {
 				self::store($item['uri-id'], $tag['type'], $tag['name'], $tag['url']);
 			}
@@ -539,7 +540,7 @@ class Tag
 		$taglist = DBA::select(
 			'tag-view',
 			['type', 'name', 'url', 'cid'],
-			['uri-id' => $item['uri-id'], 'type' => [self::HASHTAG, self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION]]
+			['uri-id' => $item['uri-id'], 'type' => [self::HASHTAG, self::MENTION, self::EXCLUSIVE_MENTION, self::IMPLICIT_MENTION]],
 		);
 		while ($tag = DBA::fetch($taglist)) {
 			if ($tag['url'] == '') {
@@ -625,7 +626,7 @@ class Tag
 
 		$params = [
 			'order' => ['uri-id' => true],
-			'limit' => [$start, $limit]
+			'limit' => [$start, $limit],
 		];
 
 		$tags = DBA::select('tag-search-view', ['uri-id'], $condition, $params);
@@ -692,7 +693,7 @@ class Tag
 		$post = Post::selectFirstThread(
 			['uri-id'],
 			["`uid` = ? AND `received` < ?", 0, DateTimeFormat::utc('now - ' . $period . ' hour')],
-			['order' => ['received' => true]]
+			['order' => ['received' => true]],
 		);
 
 		if (empty($post['uri-id'])) {
@@ -709,7 +710,7 @@ class Tag
 			Item::PUBLIC,
 			0,
 			$post['uri-id'],
-			$limit
+			$limit,
 		);
 
 		if (DBA::isResult($tagsStmt)) {
@@ -754,7 +755,7 @@ class Tag
 		$post = Post::selectFirstThread(
 			['uri-id'],
 			["`uid` = ? AND `received` < ?", 0, DateTimeFormat::utc('now - ' . $period . ' hour')],
-			['order' => ['received' => true]]
+			['order' => ['received' => true]],
 		);
 		if (empty($post['uri-id'])) {
 			return [];
@@ -769,7 +770,7 @@ class Tag
 			GROUP BY `term` ORDER BY `authors` DESC, `score` DESC LIMIT ?",
 			Item::PUBLIC,
 			$post['uri-id'],
-			$limit
+			$limit,
 		);
 
 		if (DBA::isResult($tagsStmt)) {

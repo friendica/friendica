@@ -152,13 +152,13 @@ class UserSessionTest extends MockedTestCase
 				'data' => [
 					'remote' => ['3' => '21'],
 				],
-				'expected' => false,
+				'expected' => 0,
 			],
 			'empty' => [
 				'cid'  => 21,
 				'data' => [
 				],
-				'expected' => false,
+				'expected' => 0,
 			],
 		];
 	}
@@ -167,7 +167,7 @@ class UserSessionTest extends MockedTestCase
 	public function testGetUserIdForVisitorContactID(int $cid, array $data, $expected)
 	{
 		$userSession = new UserSession(new ArraySession($data));
-		$this->assertEquals($expected, $userSession->getUserIDForVisitorContactID($cid));
+		$this->assertSame($expected, $userSession->getUserIDForVisitorContactID($cid));
 	}
 
 	public function dataAuthenticated()

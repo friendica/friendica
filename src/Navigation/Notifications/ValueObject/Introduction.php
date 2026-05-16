@@ -61,6 +61,34 @@ class Introduction implements \JsonSerializable
 	/** @var string */
 	private $about;
 
+	public function __construct(array $data = [])
+	{
+		$this->label         = $data['label']         ?? '';
+		$this->type          = $data['str_type']      ?? '';
+		$this->intro_id      = $data['intro_id']      ?? -1;
+		$this->madeBy        = $data['madeBy']        ?? '';
+		$this->madeByUrl     = $data['madeByUrl']     ?? '';
+		$this->madeByZrl     = $data['madeByZrl']     ?? '';
+		$this->madeByAddr    = $data['madeByAddr']    ?? '';
+		$this->contactId     = $data['contactId']     ?? -1;
+		$this->photo         = $data['photo']         ?? '';
+		$this->name          = $data['name']          ?? '';
+		$this->url           = $data['url']           ?? '';
+		$this->zrl           = $data['zrl']           ?? '';
+		$this->hidden        = $data['hidden']        ?? false;
+		$this->postNewFriend = $data['postNewFriend'] ?? '';
+		$this->knowYou       = $data['knowYou']       ?? false;
+		$this->note          = $data['note']          ?? '';
+		$this->request       = $data['request']       ?? '';
+		$this->dfrnId        = -1;
+		$this->addr          = $data['addr']     ?? '';
+		$this->network       = $data['network']  ?? '';
+		$this->uid           = $data['uid']      ?? -1;
+		$this->keywords      = $data['keywords'] ?? '';
+		$this->location      = $data['location'] ?? '';
+		$this->about         = $data['about']    ?? '';
+	}
+
 	public function getLabel(): string
 	{
 		return $this->label;
@@ -131,7 +159,7 @@ class Introduction implements \JsonSerializable
 		return $this->postNewFriend;
 	}
 
-	public function getKnowYou(): string
+	public function getKnowYou(): bool
 	{
 		return $this->knowYou;
 	}
@@ -179,34 +207,6 @@ class Introduction implements \JsonSerializable
 	public function getAbout(): string
 	{
 		return $this->about;
-	}
-
-	public function __construct(array $data = [])
-	{
-		$this->label         = $data['label'] ?? '';
-		$this->type          = $data['str_type'] ?? '';
-		$this->intro_id      = $data['intro_id'] ?? -1;
-		$this->madeBy        = $data['madeBy'] ?? '';
-		$this->madeByUrl     = $data['madeByUrl'] ?? '';
-		$this->madeByZrl     = $data['madeByZrl'] ?? '';
-		$this->madeByAddr    = $data['madeByAddr'] ?? '';
-		$this->contactId     = $data['contactId'] ?? -1;
-		$this->photo         = $data['photo'] ?? '';
-		$this->name          = $data['name'] ?? '';
-		$this->url           = $data['url'] ?? '';
-		$this->zrl           = $data['zrl'] ?? '';
-		$this->hidden        = $data['hidden'] ?? false;
-		$this->postNewFriend = $data['postNewFriend'] ?? '';
-		$this->knowYou       = $data['knowYou'] ?? false;
-		$this->note          = $data['note'] ?? '';
-		$this->request       = $data['request'] ?? '';
-		$this->dfrnId        = -1;
-		$this->addr          = $data['addr'] ?? '';
-		$this->network       = $data['network'] ?? '';
-		$this->uid           = $data['uid'] ?? -1;
-		$this->keywords      = $data['keywords'] ?? '';
-		$this->location      = $data['location'] ?? '';
-		$this->about         = $data['about'] ?? '';
 	}
 
 	/**

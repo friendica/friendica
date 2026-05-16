@@ -7,10 +7,13 @@
 
 namespace Friendica\Core;
 
+use DateTime;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Session\Capability\IHandleSessions;
 use Friendica\Database\Database;
 use Friendica\Util\Strings;
+use IntlDateFormatter;
+use Locale;
 
 /**
  * Provide Language, Translation, and Localization functions to the application
@@ -19,9 +22,9 @@ use Friendica\Util\Strings;
 class L10n
 {
 	/** @var string The default language */
-	const DEFAULT = 'en';
+	public const DEFAULT = 'en';
 	/** @var string[] The language names in their language */
-	const LANG_NAMES = [
+	public const LANG_NAMES = [
 		'ar'    => 'العربية',
 		'bg'    => 'Български',
 		'ca'    => 'Català',
@@ -49,15 +52,16 @@ class L10n
 		'ru'    => 'Русский',
 		'sv'    => 'Svenska',
 		'zh-cn' => '简体中文',
+		'zh-tw' => '繁體中文（臺灣）',
 	];
 
-	const LANG_PARENTS = [
+	public const LANG_PARENTS = [
 		'en-gb' => 'en', 'da-dk' => 'da', 'fi-fi' => 'fi',
-		'nb-no' => 'nb', 'pt-br' => 'pt', 'zh-cn' => 'zh'
+		'nb-no' => 'nb', 'pt-br' => 'pt', 'zh-cn' => 'zh', 'zh-tw' => 'zh',
 	];
 
 	/** @var string Undetermined language */
-	const UNDETERMINED_LANGUAGE = 'un';
+	public const UNDETERMINED_LANGUAGE = 'un';
 
 	/**
 	 * A string indicating the current language used for translation:
@@ -67,6 +71,8 @@ class L10n
 	 * @var string
 	 */
 	private $lang = '';
+
+	private string $locale = '';
 
 	/**
 	 * An array of translation strings whose key is the neutral english message.
@@ -83,13 +89,16 @@ class L10n
 	 * @var IManageConfigValues
 	 */
 	private $config;
+	private IHandleSessions $session;
 
 	public function __construct(IManageConfigValues $config, Database $dba, IHandleSessions $session, array $server, array $get)
 	{
-		$this->dba    = $dba;
-		$this->config = $config;
+		$this->dba     = $dba;
+		$this->config  = $config;
+		$this->session = $session;
 
 		$this->loadTranslationTable(L10n::detectLanguage($server, $get, $config->get('system', 'language', self::DEFAULT)));
+		$this->setLocale($server);
 		$this->setSessionVariable($session);
 		$this->setLangFromSession($session);
 	}
@@ -105,12 +114,31 @@ class L10n
 	}
 
 	/**
+	 * Set the instance locale based on the HTTP Accept-Language header.
+	 *
+	 * Reads the `HTTP_ACCEPT_LANGUAGE` value from the provided server array
+	 * and stores the accepted locale string in `$this->locale` using
+	 * `Locale::acceptFromHttp()`.
+	 *
+	 * @param array $server The $_SERVER-like array containing HTTP headers
+	 * @return void
+	 */
+	private function setLocale(array $server)
+	{
+		if (!isset($server['HTTP_ACCEPT_LANGUAGE'])) {
+			return;
+		}
+		$this->locale = Locale::acceptFromHttp($server['HTTP_ACCEPT_LANGUAGE']);
+	}
+
+	/**
 	 * Sets the language session variable
 	 */
 	private function setSessionVariable(IHandleSessions $session)
 	{
 		if ($session->get('authenticated') && !$session->get('language')) {
 			$session->set('language', $this->lang);
+			$session->set('locale', $this->locale);
 			// we haven't loaded user data yet, but we need user language
 			if ($session->get('uid')) {
 				$user = $this->dba->selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
@@ -219,7 +247,7 @@ class L10n
 			$res = preg_match(
 				'/^([a-z]{1,8}(?:-[a-z]{1,8})*)(?:;\s*q=(0(?:\.[0-9]{1,3})?|1(?:\.0{1,3})?))?$/i',
 				$acceptedLanguage,
-				$matches
+				$matches,
 			);
 
 			// Invalid language? -> skip
@@ -232,7 +260,7 @@ class L10n
 
 			// determine the quality of the guess
 			if (isset($matches[2])) {
-				$lang_quality = (float)$matches[2];
+				$lang_quality = (float) $matches[2];
 			} else {
 				// fallback so without a quality parameter, it's probably the best
 				$lang_quality = 1;
@@ -429,7 +457,7 @@ class L10n
 		if (in_array('cld2', get_loaded_extensions())) {
 			$additional_langs = array_merge(
 				$additional_langs,
-				['dv', 'kn', 'lo', 'ml', 'or', 'pa', 'sd', 'si', 'te', 'yi']
+				['dv', 'kn', 'lo', 'ml', 'or', 'pa', 'sd', 'si', 'te', 'yi'],
 			);
 		}
 
@@ -444,7 +472,7 @@ class L10n
 	 * @param bool $international If set to true, additionally the international language name is returned as well.
 	 * @return array
 	 */
-	public function getLanguageCodes(bool $international = false): array
+	public function getLanguageCodes(bool $international = false, bool $sentence_start_capitalization = false): array
 	{
 		$iso639 = new \Matriphe\ISO639\ISO639();
 
@@ -453,8 +481,11 @@ class L10n
 		$languages = [self::UNDETERMINED_LANGUAGE => $this->t('Undetermined')];
 
 		foreach ($this->getDetectableLanguages() as $code) {
-			$code     = $this->toISO6391($code);
-			$native   = $iso639->nativeByCode1($code);
+			$code   = $this->toISO6391($code);
+			$native = $iso639->nativeByCode1($code);
+			if ($sentence_start_capitalization) {
+				$native = Strings::ucFirst($native);
+			}
 			$language = $iso639->languageByCode1($code);
 			if ($native != $language && $international) {
 				$languages[$code] = $this->t('%s (%s)', $native, $language);
@@ -464,6 +495,17 @@ class L10n
 		}
 
 		return $languages;
+	}
+
+	/**
+	 * Converts e.g. en-gb to en_GB and da-dk to da_DK, which is the format some other systems expect
+	 *
+	 * @param string $lang
+	 * @return string
+	 * */
+	public function langToLocaleCode($lang)
+	{
+		return preg_replace_callback("/([a-z]+)-([a-z]+)/", fn ($m) => $m[1] . "_" . strtoupper($m[2]), $lang);
 	}
 
 	/**
@@ -497,52 +539,6 @@ class L10n
 	}
 
 	/**
-	 * Translate days and months names.
-	 *
-	 * @param string $s String with day or month name.
-	 * @return string Translated string.
-	 */
-	public function getDay(string $s): string
-	{
-		$ret = str_replace(
-			['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-			[$this->t('Monday'), $this->t('Tuesday'), $this->t('Wednesday'), $this->t('Thursday'), $this->t('Friday'), $this->t('Saturday'), $this->t('Sunday')],
-			$s
-		);
-
-		$ret = str_replace(
-			['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-			[$this->t('January'), $this->t('February'), $this->t('March'), $this->t('April'), $this->t('May'), $this->t('June'), $this->t('July'), $this->t('August'), $this->t('September'), $this->t('October'), $this->t('November'), $this->t('December')],
-			$ret
-		);
-
-		return $ret;
-	}
-
-	/**
-	 * Translate short days and months names.
-	 *
-	 * @param string $s String with short day or month name.
-	 * @return string Translated string.
-	 */
-	public function getDayShort(string $s): string
-	{
-		$ret = str_replace(
-			['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-			[$this->t('Mon'), $this->t('Tue'), $this->t('Wed'), $this->t('Thu'), $this->t('Fri'), $this->t('Sat'), $this->t('Sun')],
-			$s
-		);
-
-		$ret = str_replace(
-			['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-			[$this->t('Jan'), $this->t('Feb'), $this->t('Mar'), $this->t('Apr'), $this->t('May'), $this->t('Jun'), $this->t('Jul'), $this->t('Aug'), $this->t('Sep'), $this->t('Oct'), $this->t('Nov'), $this->t('Dec')],
-			$ret
-		);
-
-		return $ret;
-	}
-
-	/**
 	 * Creates a new L10n instance based on the given langauge
 	 *
 	 * @param string $lang The new language
@@ -560,5 +556,127 @@ class L10n
 		$newL10n = clone $this;
 		$newL10n->loadTranslationTable($lang);
 		return $newL10n;
+	}
+
+	/**
+	 * Format a date/time string using RELATIVE_FULL date and SHORT time.
+	 *
+	 * This will produce relative strings where supported by the ICU implementation
+	 * (for example "yesterday", "in 2 days") according to the current locale.
+	 *
+	 * @param string $datestring Date/time string (e.g. ISO 8601)
+	 * @return string Formatted relative date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function relativeDateTime(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::RELATIVE_FULL, IntlDateFormatter::SHORT);
+	}
+
+	/**
+	 * Format a date/time string using FULL date and SHORT time according to current locale.
+	 *
+	 * @param string $datestring Date/time string (e.g. ISO 8601)
+	 * @return string Formatted date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function fullDateTime(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::FULL, IntlDateFormatter::SHORT);
+	}
+
+	/**
+	 * Format a date/time string using MEDIUM date and SHORT time according to current locale.
+	 *
+	 * @param string $datestring Date/time string
+	 * @return string Formatted date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function dateTime(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::MEDIUM, IntlDateFormatter::SHORT);
+	}
+
+	/**
+	 * Format a date string (date only) using FULL date format according to current locale.
+	 *
+	 * @param string $datestring Date string
+	 * @return string Formatted date string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function fullDate(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::FULL, IntlDateFormatter::NONE);
+	}
+
+	/**
+	 * Format a date string (date only) using MEDIUM date format according to current locale.
+	 *
+	 * @param string $datestring Date string
+	 * @return string Formatted date string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function mediumDate(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE);
+	}
+
+	/**
+	 * Format a date string (date only) using LONG date format according to current locale.
+	 *
+	 * @param string $datestring Date string
+	 * @return string Formatted date string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function longDate(string $datestring): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+	}
+
+	/**
+	 * Format a date/time string using a custom ICU pattern.
+	 * @see https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax
+	 *
+	 * The provided pattern is passed directly to the underlying
+	 * `IntlDateFormatter` instance. This allows callers to specify
+	 * arbitrary formatting rules beyond the standard date/time styles.
+	 *
+	 * @param string $datestring Date/time string (e.g. ISO 8601)
+	 * @param string $pattern ICU date/time pattern
+	 * @return string Formatted date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function formatDateTimeByPattern(string $datestring, string $pattern): string
+	{
+		return $this->formatDateTime($datestring, IntlDateFormatter::NONE, IntlDateFormatter::NONE, $pattern);
+	}
+
+	/**
+	 * General date/time formatting helper.
+	 *
+	 * Creates an IntlDateFormatter using the instance locale and the timezone
+	 * stored in session (if any) and formats the provided date/time string.
+	 *
+	 * @see https://unicode-org.github.io/icu/userguide/format_parse/datetime/#datetime-format-syntax for details on the supported pattern syntax when using the $pattern parameter.
+	 *
+	 * @param string $datestring Date/time string (e.g. ISO 8601)
+	 * @param int $dateType One of IntlDateFormatter::SHORT|MEDIUM|LONG|FULL|NONE
+	 * @param int $timeType One of IntlDateFormatter::SHORT|MEDIUM|LONG|FULL|NONE
+	 * @param string $pattern Optional ICU date/time pattern to use instead of the standard styles
+	 * @return string Formatted date/time string
+	 * @throws \Exception If the date string cannot be parsed into a DateTime
+	 */
+	public function formatDateTime(string $datestring, int $dateType, int $timeType, ?string $pattern = null): string
+	{
+		$formatter = new IntlDateFormatter(
+			$this->session->get('language') ?? $this->locale ?: $this->config->get('system', 'language', 'en_US'),
+			$dateType,
+			$timeType,
+			$this->session->get('timezone') ?? null,
+			null,
+			$pattern,
+		);
+
+		return $formatter->format(new DateTime($datestring));
 	}
 }

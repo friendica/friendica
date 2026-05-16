@@ -9,6 +9,8 @@
 
 {{$tab_str nofilter}}
 
+{{$additional_text}}
+
 <div id="viewcontact_wrapper-{{$id}}">
 {{foreach $contacts as $contact}}
 	{{include file="contact/entry.tpl"}}

@@ -30,7 +30,7 @@ class Status extends BaseDataTransferObject
 	protected $edited_at;
 	/** @var string|null */
 	protected $in_reply_to_id = null;
-	/** @var Status|null - Fedilab extension, see issue https://github.com/friendica/friendica/issues/12672 */
+	/** @var Status[]|null - Fedilab extension, see issue https://github.com/friendica/friendica/issues/12672 */
 	protected $in_reply_to_status = null;
 	/** @var string|null */
 	protected $in_reply_to_account_id = null;
@@ -66,25 +66,25 @@ class Status extends BaseDataTransferObject
 	protected $content;
 	/** @var array */
 	protected $filtered = [];
-	/** @var Status|null */
+	/** @var Status[]|null */
 	protected $reblog = null;
-	/** @var Status|null - Akkoma extension, see issue https://github.com/friendica/friendica/issues/12603 */
+	/** @var Status[]|null - Akkoma extension, see issue https://github.com/friendica/friendica/issues/12603 */
 	protected $quote = null;
-	/** @var Application */
+	/** @var array */
 	protected $application = null;
-	/** @var Account */
+	/** @var array */
 	protected $account;
-	/** @var Attachment */
+	/** @var Attachment[] */
 	protected $media_attachments = [];
-	/** @var Mention */
+	/** @var Mention[] */
 	protected $mentions = [];
-	/** @var Tag */
+	/** @var Tag[] */
 	protected $tags = [];
 	/** @var Emoji[] */
 	protected $emojis = [];
-	/** @var Card|null */
+	/** @var array|null */
 	protected $card = null;
-	/** @var Poll|null */
+	/** @var array|null */
 	protected $poll = null;
 	/** @var FriendicaExtension */
 	protected $friendica;
@@ -98,14 +98,14 @@ class Status extends BaseDataTransferObject
 	public function __construct(array $item, Account $account, Counts $counts, UserAttributes $userAttributes, bool $sensitive, Application $application, array $mentions, array $tags, Card $card, array $attachments, array $in_reply, array $reblog, FriendicaExtension $friendica, array $quote = null, array $poll = null, array $emojis = null)
 	{
 		$reblogged        = !empty($reblog);
-		$this->id         = (string)$item['uri-id'];
+		$this->id         = (string) $item['uri-id'];
 		$this->created_at = DateTimeFormat::utc($item['created'], DateTimeFormat::JSON);
 		$this->edited_at  = DateTimeFormat::utc($item['edited'], DateTimeFormat::JSON);
 
 		if ($item['gravity'] == Item::GRAVITY_COMMENT) {
-			$this->in_reply_to_id         = (string)$item['thr-parent-id'];
+			$this->in_reply_to_id         = (string) $item['thr-parent-id'];
 			$this->in_reply_to_status     = $in_reply;
-			$this->in_reply_to_account_id = (string)$item['parent-author-id'];
+			$this->in_reply_to_account_id = (string) $item['parent-author-id'];
 		}
 
 		$this->sensitive    = $sensitive;
@@ -116,8 +116,7 @@ class Status extends BaseDataTransferObject
 
 		$languages = json_decode($item['language'] ?? '', true);
 		if (is_array($languages)) {
-			reset($languages);
-			$this->language = key($languages);
+			$this->language = array_key_first($languages);
 		} else {
 			$this->language = null;
 		}

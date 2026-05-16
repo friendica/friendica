@@ -30,7 +30,7 @@ class PlaintextTest extends FixtureTestCase
 					'Wenn die Person noch nichts gepostet hat, ignoriere ich die Anfragen und schaue ggf. nach einiger Zeit wieder nach, ob jetzt was gepostet wurde! (3/6)',
 					'Wenn die Posts in eine Richtung gehen, die ich nicht mag, lehne ich die Anfragen ab. (4/6)',
 					'Ich ignoriere auch Anfragen, wenn sie von Accounts kommen, die ggf. tausenden von anderen Accounts folgen, da ich davon ausgehe, (5/6)',
-					'dass da niemand ernsthaft so vielen Accounts folgen kann. (6/6)'
+					'dass da niemand ernsthaft so vielen Accounts folgen kann. (6/6)',
 				],
 			],
 			'test-2' => [
@@ -41,7 +41,7 @@ class PlaintextTest extends FixtureTestCase
 					'Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. (3/6)',
 					'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, (4/6)',
 					'sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. (5/6)',
-					'Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. (6/6)'
+					'Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. (6/6)',
 				],
 			],
 		];
@@ -66,7 +66,7 @@ class PlaintextTest extends FixtureTestCase
 			'plink'  => '',
 			'body'   => $text,
 		];
-		$output = Plaintext::getPost($item, 160, false, BBCode::BLUESKY);
+		$output = Plaintext::getPost($item, 160, false, BBCode::ATPROTOCOL);
 		self::assertEquals($expected, $output['parts']);
 	}
 }

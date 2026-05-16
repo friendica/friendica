@@ -60,6 +60,12 @@ class JsonLD
 			case 'https://purl.archive.org/socialweb/webfinger':
 				$url = DI::basePath() . '/static/socialweb-webfinger.jsonld';
 				break;
+			case 'https://www.w3.org/ns/cid/v1':
+				$url = DI::basePath() . '/static/cid-v1.jsonld';
+				break;
+			case 'https://w3id.org/security/data-integrity/v2':
+				$url = DI::basePath() . '/static/data-integrity-v2.jsonld';
+				break;
 			default:
 				switch (parse_url($url, PHP_URL_PATH)) {
 					case '/schemas/litepub-0.1.jsonld':
@@ -103,6 +109,28 @@ class JsonLD
 	}
 
 	/**
+	 * Checks if the given data contains suspicious commands that could be used in a malicious way, like @graph, @included or @reverse.
+	 * If such commands are found, a warning is logged and false is returned.
+	 *
+	 * @param array $data
+	 * @return boolean
+	 */
+	private static function isValidObject(array $data): bool
+	{
+		$valid = true;
+
+		array_walk_recursive($data, function (&$value, $key) use ($data, &$valid) {
+			$suspicious = ['@graph', '@included', '@reverse'];
+			if (in_array((string) $key, $suspicious) || in_array((string) $value, $suspicious)) {
+				DI::logger()->warning('Document with suspicious commands.', ['key' => $key, 'value' => $value, 'document' => $data]);
+				$valid = false;
+			}
+		});
+
+		return $valid;
+	}
+
+	/**
 	 * Normalises a given JSON array
 	 *
 	 * @param array $json
@@ -112,6 +140,10 @@ class JsonLD
 	 */
 	public static function normalize($json)
 	{
+		if (!self::isValidObject($json)) {
+			return [];
+		}
+
 		jsonld_set_document_loader('Friendica\Util\JsonLD::documentLoader');
 
 		$jsonobj = json_decode(json_encode($json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
@@ -147,24 +179,26 @@ class JsonLD
 	{
 		jsonld_set_document_loader('Friendica\Util\JsonLD::documentLoader');
 
-		$context = (object)[
+		$context = (object) [
 			'as'        => 'https://www.w3.org/ns/activitystreams#',
 			'w3id'      => 'https://w3id.org/security#',
-			'ldp'       => (object)['@id' => 'http://www.w3.org/ns/ldp#', '@type' => '@id'],
-			'vcard'     => (object)['@id' => 'http://www.w3.org/2006/vcard/ns#', '@type' => '@id'],
-			'dfrn'      => (object)['@id' => 'http://purl.org/macgirvin/dfrn/1.0/', '@type' => '@id'],
-			'diaspora'  => (object)['@id' => 'https://diasporafoundation.org/ns/', '@type' => '@id'],
-			'ostatus'   => (object)['@id' => 'http://ostatus.org#', '@type' => '@id'],
-			'dc'        => (object)['@id' => 'http://purl.org/dc/terms/', '@type' => '@id'],
-			'toot'      => (object)['@id' => 'http://joinmastodon.org/ns#', '@type' => '@id'],
-			'litepub'   => (object)['@id' => 'http://litepub.social/ns#', '@type' => '@id'],
-			'sc'        => (object)['@id' => 'http://schema.org#', '@type' => '@id'],
-			'pt'        => (object)['@id' => 'https://joinpeertube.org/ns#', '@type' => '@id'],
-			'mobilizon' => (object)['@id' => 'https://joinmobilizon.org/ns#', '@type' => '@id'],
-			'fedibird'  => (object)['@id' => 'http://fedibird.com/ns#', '@type' => '@id'],
-			'misskey'   => (object)['@id' => 'https://misskey-hub.net/ns#', '@type' => '@id'],
-			'pixelfed'  => (object)['@id' => 'http://pixelfed.org/ns#', '@type' => '@id'],
-			'lemmy'     => (object)['@id' => 'https://join-lemmy.org/ns#', '@type' => '@id'],
+			'ldp'       => (object) ['@id' => 'http://www.w3.org/ns/ldp#', '@type' => '@id'],
+			'vcard'     => (object) ['@id' => 'http://www.w3.org/2006/vcard/ns#', '@type' => '@id'],
+			'dfrn'      => (object) ['@id' => 'http://purl.org/macgirvin/dfrn/1.0/', '@type' => '@id'],
+			'diaspora'  => (object) ['@id' => 'https://diasporafoundation.org/ns/', '@type' => '@id'],
+			'ostatus'   => (object) ['@id' => 'http://ostatus.org#', '@type' => '@id'],
+			'dc'        => (object) ['@id' => 'http://purl.org/dc/terms/', '@type' => '@id'],
+			'toot'      => (object) ['@id' => 'http://joinmastodon.org/ns#', '@type' => '@id'],
+			'litepub'   => (object) ['@id' => 'http://litepub.social/ns#', '@type' => '@id'],
+			'sc'        => (object) ['@id' => 'http://schema.org#', '@type' => '@id'],
+			'pt'        => (object) ['@id' => 'https://joinpeertube.org/ns#', '@type' => '@id'],
+			'mobilizon' => (object) ['@id' => 'https://joinmobilizon.org/ns#', '@type' => '@id'],
+			'fedibird'  => (object) ['@id' => 'http://fedibird.com/ns#', '@type' => '@id'],
+			'misskey'   => (object) ['@id' => 'https://misskey-hub.net/ns#', '@type' => '@id'],
+			'pixelfed'  => (object) ['@id' => 'http://pixelfed.org/ns#', '@type' => '@id'],
+			'lemmy'     => (object) ['@id' => 'https://join-lemmy.org/ns#', '@type' => '@id'],
+			'quote'     => (object) ['@id' => 'https://w3id.org/fep/044f#', '@type' => '@id'],
+			'gts'       => (object) ['@id' => 'https://gotosocial.org/ns#', '@type' => '@id'],
 		];
 
 		$orig_json = $json;
@@ -184,6 +218,9 @@ class JsonLD
 		}
 
 		$json = json_decode(json_encode($compacted, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);
+		if (!self::isValidObject($json)) {
+			return [];
+		}
 
 		if ($json === false) {
 			DI::logger()->notice('JSON encode->decode failed', ['orig_json' => $orig_json, 'compacted' => $compacted]);
@@ -243,14 +280,11 @@ class JsonLD
 
 		return json_decode(json_encode($json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 	}
+
 	/**
 	 * Fetches an element array from a JSON array
 	 *
-	 * @param $array
-	 * @param $element
-	 * @param $key
-	 *
-	 * @return array fetched element
+	 * @return array|null fetched element or null
 	 */
 	public static function fetchElementArray($array, $element, $key = null, $type = null, $type_value = null)
 	{
@@ -289,7 +323,7 @@ class JsonLD
 	 * @param $type
 	 * @param $type_value
 	 *
-	 * @return string|null fetched element
+	 * @return mixed|null fetched element. If the element is not found, null is returned.
 	 */
 	public static function fetchElement($array, $element, $key = '@id', $type = null, $type_value = null)
 	{

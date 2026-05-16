@@ -61,12 +61,13 @@ class Summary extends BaseModeration
 
 		$t = Renderer::getMarkupTemplate('moderation/summary.tpl');
 		return Renderer::replaceMacros($t, [
-			'$title'       => $this->t('Moderation'),
-			'$page'        => $this->t('Summary'),
-			'$users'       => [$this->t('Registered users'), $users],
-			'$accounts'    => $accounts,
-			'$pending'     => [$this->t('Pending registrations'), $pending],
-			'$warningtext' => [],
+			'$title'               => $this->t('Moderation'),
+			'$page'                => $this->t('Summary'),
+			'$users'               => [$this->t('Registered users'), $users],
+			'$accounts'            => $accounts,
+			'$pending'             => [$this->t('Pending registrations'), $pending],
+			'$warningtext'         => [],
+			'$account_type_header' => $this->t('Registered accounts by type'),
 		]);
 	}
 }

@@ -9,7 +9,7 @@ namespace Friendica\Protocol;
 
 use GuzzleHttp\Psr7\Uri;
 
-class WebFingerUri
+class WebFingerUri implements \Stringable
 {
 	/**
 	 * @var string
@@ -73,8 +73,8 @@ class WebFingerUri
 	public function getFullHost(): string
 	{
 		return $this->host
-			. ($this->port ? ':' . $this->port : '') .
-			($this->path ?: '');
+			. ($this->port ? ':' . $this->port : '')
+			. ($this->path ?: '');
 	}
 
 	public function getLongForm(): string

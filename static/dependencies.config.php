@@ -39,11 +39,10 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'instanceOf' => \Friendica\Core\Addon\Model\AddonLoader::class,
 			'constructParams' => [
 				$basepath,
-				[Dice::INSTANCE => Dice::SELF],
 			],
 		],
 		\Friendica\Core\Addon\AddonHelper::class => [
-			'instanceOf' => \Friendica\Core\Addon\AddonProxy::class,
+			'instanceOf' => \Friendica\Core\Addon\AddonManagerHelper::class,
 			'constructParams' => [
 				$basepath . '/addon',
 			],
@@ -170,6 +169,7 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			],
 		],
 		\Psr\Log\LoggerInterface::class => [
+			'shared' => false, // LoggerManager::getLogger() will return a shared instance
 			'instanceOf' => \Friendica\Core\Logger\LoggerManager::class,
 			'call' => [
 				['getLogger', [], Dice::CHAIN_CALL],

@@ -22,8 +22,8 @@ use Friendica\Protocol\ActivityPub;
  */
 class Circle
 {
-	const FOLLOWERS = '~';
-	const MUTUALS   = '&';
+	public const FOLLOWERS = '~';
+	public const MUTUALS   = '&';
 
 	/**
 	 * Fetches circle record by user id and maybe includes deleted circles as well
@@ -57,7 +57,7 @@ class Circle
 
 		if (!is_null($uid)) {
 			$condition = [
-				'uid' => $uid
+				'uid' => $uid,
 			];
 		}
 
@@ -176,7 +176,7 @@ class Circle
 				FROM `group` AS `circle`
 				WHERE `circle`.`uid` = ?;",
 			$uid,
-			$uid
+			$uid,
 		);
 
 		return DBA::toArray($stmt);
@@ -233,11 +233,11 @@ class Circle
 				$user['def_gid'] = 0;
 				$change          = true;
 			}
-			if (strpos($user['allow_gid'], '<' . $gid . '>') !== false) {
+			if (str_contains($user['allow_gid'], '<' . $gid . '>')) {
 				$user['allow_gid'] = str_replace('<' . $gid . '>', '', $user['allow_gid']);
 				$change            = true;
 			}
-			if (strpos($user['deny_gid'], '<' . $gid . '>') !== false) {
+			if (str_contains($user['deny_gid'], '<' . $gid . '>')) {
 				$user['deny_gid'] = str_replace('<' . $gid . '>', '', $user['deny_gid']);
 				$change           = true;
 			}
@@ -481,8 +481,8 @@ class Circle
 			[
 				'name'     => '',
 				'id'       => '0',
-				'selected' => ''
-			]
+				'selected' => '',
+			],
 		];
 
 		$stmt = DBA::select('group', [], ['deleted' => false, 'uid' => $uid, 'cid' => null], ['order' => ['name']]);
@@ -490,7 +490,7 @@ class Circle
 			$display_circles[] = [
 				'name'     => $circle['name'],
 				'id'       => $circle['id'],
-				'selected' => $gid == $circle['id'] ? 'true' : ''
+				'selected' => $gid == $circle['id'] ? 'true' : '',
 			];
 		}
 		DBA::close($stmt);
@@ -500,7 +500,7 @@ class Circle
 		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('circle_selection.tpl'), [
 			'$id'      => $id,
 			'$label'   => $label,
-			'$circles' => $display_circles
+			'$circles' => $display_circles,
 		]);
 		return $o;
 	}
@@ -531,7 +531,7 @@ class Circle
 				'id'       => 0,
 				'selected' => (($circle_id === 'everyone') ? 'circle-selected' : ''),
 				'href'     => $every,
-			]
+			],
 		];
 
 		$member_of = [];

@@ -168,7 +168,7 @@ class InstanceManagerTest extends MockedTestCase
 	 */
 	public function testWrongInstanceName()
 	{
-		self::expectException(HookInstanceException::class	);
+		self::expectException(HookInstanceException::class);
 		self::expectExceptionMessage(sprintf('The class with the name %s isn\'t registered for the class or interface %s', 'fake', IAmADecoratedInterface::class));
 
 		$instance = new DiceInstanceManager(new Dice(), $this->hookFileManager);

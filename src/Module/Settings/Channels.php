@@ -8,6 +8,7 @@
 namespace Friendica\Module\Settings;
 
 use Friendica\App;
+use Friendica\Content\Conversation\Entity\UserDefinedChannel as EntityUserDefinedChannel;
 use Friendica\Content\Conversation\Factory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -15,6 +16,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\Worker;
 use Friendica\Model\Circle;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
@@ -61,7 +63,7 @@ class Channels extends BaseSettings
 		$channel_languages = User::getWantedLanguages($uid);
 
 		if (!empty($request['add_channel'])) {
-			if (!array_diff((array)$request['new_languages'], $channel_languages)) {
+			if (!array_diff((array) $request['new_languages'], $channel_languages)) {
 				$request['new_languages'] = null;
 			}
 
@@ -70,11 +72,11 @@ class Channels extends BaseSettings
 				'description'      => $request['new_description'],
 				'access-key'       => substr(mb_strtolower($request['new_access_key']), 0, 1),
 				'uid'              => $uid,
-				'circle'           => (int)$request['new_circle'],
+				'circle'           => (int) $request['new_circle'],
 				'include-tags'     => Strings::cleanTags($request['new_include_tags']),
 				'exclude-tags'     => Strings::cleanTags($request['new_exclude_tags']),
-				'min-size'         => $request['new_min_size'] != '' ? (int)$request['new_min_size'] : null,
-				'max-size'         => $request['new_max_size'] != '' ? (int)$request['new_max_size'] : null,
+				'min-size'         => $request['new_min_size'] != '' ? (int) $request['new_min_size'] : null,
+				'max-size'         => $request['new_max_size'] != '' ? (int) $request['new_max_size'] : null,
 				'full-text-search' => $request['new_text_search'],
 				'media-type'       => ($request['new_image'] ? 1 : 0) | ($request['new_video'] ? 2 : 0) | ($request['new_audio'] ? 4 : 0),
 				'languages'        => $request['new_languages'],
@@ -82,17 +84,20 @@ class Channels extends BaseSettings
 			$saved = $this->channel->save($channel);
 			$this->logger->debug('New channel added', ['saved' => $saved]);
 			$this->enableTimeline($uid, $saved->code);
+			if ($this->config->get('system', 'channel_cache')) {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'UpdateChannelPosts', $saved->code, $uid);
+			}
 			return;
 		}
 
-		foreach (array_keys((array)$request['label']) as $id) {
+		foreach (array_keys((array) $request['label']) as $id) {
 			if ($request['delete'][$id]) {
 				$success = $this->channel->deleteById($id, $uid);
 				$this->logger->debug('Channel deleted', ['id' => $id, 'success' => $success]);
 				continue;
 			}
 
-			if (!array_diff((array)$request['languages'][$id], $channel_languages) && (count((array)$request['languages'][$id]) == count($channel_languages))) {
+			if (!array_diff((array) $request['languages'][$id], $channel_languages) && (count((array) $request['languages'][$id]) == count($channel_languages))) {
 				$request['languages'][$id] = null;
 			}
 
@@ -102,11 +107,11 @@ class Channels extends BaseSettings
 				'description'      => $request['description'][$id],
 				'access-key'       => substr(mb_strtolower($request['access_key'][$id]), 0, 1),
 				'uid'              => $uid,
-				'circle'           => (int)$request['circle'][$id],
+				'circle'           => (int) $request['circle'][$id],
 				'include-tags'     => Strings::cleanTags($request['include_tags'][$id]),
 				'exclude-tags'     => Strings::cleanTags($request['exclude_tags'][$id]),
-				'min-size'         => $request['min_size'][$id] != '' ? (int)$request['min_size'][$id] : null,
-				'max-size'         => $request['max_size'][$id] != '' ? (int)$request['max_size'][$id] : null,
+				'min-size'         => $request['min_size'][$id] != '' ? (int) $request['min_size'][$id] : null,
+				'max-size'         => $request['max_size'][$id] != '' ? (int) $request['max_size'][$id] : null,
 				'full-text-search' => $request['text_search'][$id],
 				'media-type'       => ($request['image'][$id] ? 1 : 0) | ($request['video'][$id] ? 2 : 0) | ($request['audio'][$id] ? 4 : 0),
 				'languages'        => $request['languages'][$id],
@@ -115,6 +120,9 @@ class Channels extends BaseSettings
 			$saved = $this->channel->save($channel);
 			$this->logger->debug('Save channel', ['id' => $id, 'saved' => $saved]);
 			$this->enableTimeline($uid, $id);
+			if ($this->config->get('system', 'channel_cache')) {
+				Worker::add(Worker::PRIORITY_MEDIUM, 'UpdateChannelPosts', $id, $uid);
+			}
 		}
 	}
 
@@ -133,17 +141,17 @@ class Channels extends BaseSettings
 		if (in_array($account_type, [User::ACCOUNT_TYPE_COMMUNITY, User::ACCOUNT_TYPE_RELAY])) {
 			$intro   = $this->t('This page can be used to define the channels that will automatically be reshared by your account.');
 			$circles = [
-				0 => $this->l10n->t('Global Community')
+				EntityUserDefinedChannel::CIRCLE_GLOBAL => $this->l10n->t('Global Community'),
 			];
 		} else {
 			$intro   = $this->t('This page can be used to define your own channels.');
 			$circles = [
-				0  => $this->l10n->t('Global Community'),
-				-5 => $this->l10n->t('Latest Activity'),
-				-4 => $this->l10n->t('Latest Posts'),
-				-3 => $this->l10n->t('Latest Creation'),
-				-1 => $this->l10n->t('Following'),
-				-2 => $this->l10n->t('Followers'),
+				EntityUserDefinedChannel::CIRCLE_GLOBAL    => $this->l10n->t('Global Community'),
+				EntityUserDefinedChannel::CIRCLE_ACTIVITY  => $this->l10n->t('Latest Activity'),
+				EntityUserDefinedChannel::CIRCLE_POSTS     => $this->l10n->t('Latest Posts'),
+				EntityUserDefinedChannel::CIRCLE_CREATION  => $this->l10n->t('Latest Creation'),
+				EntityUserDefinedChannel::CIRCLE_FOLLOWING => $this->l10n->t('Following'),
+				EntityUserDefinedChannel::CIRCLE_FOLLOWERS => $this->l10n->t('Followers'),
 			];
 		}
 
@@ -151,7 +159,7 @@ class Channels extends BaseSettings
 			$circles[$circle['id']] = $circle['name'];
 		}
 
-		$languages         = $this->l10n->getLanguageCodes(true);
+		$languages         = $this->l10n->getLanguageCodes(true, true);
 		$channel_languages = User::getWantedLanguages($uid);
 
 		$channels = [];
@@ -187,11 +195,16 @@ class Channels extends BaseSettings
 				'audio'        => ["audio[$channel->code]", $this->t("Audio"), $channel->mediaType & 4],
 				'languages'    => ["languages[$channel->code][]", $this->t('Languages'), $channel->languages ?? $channel_languages, $this->t('Select all languages that you want to see in this channel. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
 				'publish'      => $publish,
-				'delete'       => ["delete[$channel->code]", $this->t("Delete channel") . ' (' . $channel->label . ')', false, $this->t("Check to delete this entry from the channel list")]
+				'delete'       => ["delete[$channel->code]", $this->t("Delete channel") . ' (' . $channel->label . ')', false, $this->t("Check to delete this entry from the channel list")],
 			];
 		}
 
 		$t = Renderer::getMarkupTemplate('settings/channels.tpl');
+
+		$exclude_tags_translation = $this->t('Comma separated list of tags. If a post contain any of these tags, then it will not be part of this channel.');
+		// @deprecated 2026.01 this translation is scheduled for removal as a new translation has been added without the typo
+		$exclude_tags_translation = $this->t('Comma separated list of tags. If a post contain any of these tags, then it will not be part of nthis channel.');
+
 		return Renderer::replaceMacros($t, [
 			'open'         => count($channels) == 0,
 			'label'        => ["new_label", $this->t('Label'), '', $this->t('Short name for the channel. It is displayed on the channels widget.'), $this->t('Required')],
@@ -199,10 +212,10 @@ class Channels extends BaseSettings
 			'access_key'   => ["new_access_key", $this->t("Access Key"), '', $this->t('When you want to access this channel via an access key, you can define it here. Pay attention to not use an already used one.')],
 			'circle'       => ['new_circle', $this->t('Circle/Channel'), 0, $this->t('Select a circle or channel, that your channel should be based on.'), $circles],
 			'include_tags' => ["new_include_tags", $this->t("Include Tags"), '', $this->t('Comma separated list of tags. A post will be used when it contains any of the listed tags.')],
-			'exclude_tags' => ["new_exclude_tags", $this->t("Exclude Tags"), '', $this->t('Comma separated list of tags. If a post contain any of these tags, then it will not be part of nthis channel.')],
+			'exclude_tags' => ["new_exclude_tags", $this->t("Exclude Tags"), '', $exclude_tags_translation],
 			'min_size'     => ["new_min_size", $this->t("Minimum Size"), '', $this->t('Minimum post size. Leave empty for no minimum size. The size is calculated without links, attached posts, mentions or hashtags.')],
 			'max_size'     => ["new_max_size", $this->t("Maximum Size"), '', $this->t('Maximum post size. Leave empty for no maximum size. The size is calculated without links, attached posts, mentions or hashtags.')],
-			'text_search'  => ["new_text_search", $this->t("Full Text Search"), '', $this->t('Search terms for the body, supports the "boolean mode" operators from MariaDB. See the help for a complete list of operators and additional keywords: %s', '<a href="help/Channels">help/Channels</a>')],
+			'text_search'  => ["new_text_search", $this->t("Full Text Search"), '', $this->t('Search terms for the body, supports the "boolean mode" operators from MariaDB. See the help for a complete list of operators and additional keywords: %s', '<a href="help/channels">help/channels</a>')],
 			'image'        => ['new_image', $this->t("Images"), false, $this->t("Check to display images in the channel.")],
 			'video'        => ["new_video", $this->t("Videos"), false, $this->t("Check to display videos in the channel.")],
 			'audio'        => ["new_audio", $this->t("Audio"), false, $this->t("Check to display audio in the channel.")],

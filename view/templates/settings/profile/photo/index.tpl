@@ -15,7 +15,7 @@
 
 		<div id="profile-photo-upload-wrapper" class="form-group field input">
 			<label id="profile-photo-upload-label" for="profile-photo-upload">{{$lbl_upfile}} </label>
-			<input class="form-control" name="userfile" type="file" id="profile-photo-upload" size="48">
+			<input class="form-control" name="userfile" type="file" id="profile-photo-upload">
 			<div class="clear"></div>
 		</div>
 

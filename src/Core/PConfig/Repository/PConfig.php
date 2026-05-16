@@ -37,7 +37,7 @@ class PConfig
 	 */
 	public function isConnected(): bool
 	{
-		return $this->db->isConnected() & !$this->mode->isInstall();
+		return $this->db->isConnected() && !$this->mode->isInstall();
 	}
 
 	/**

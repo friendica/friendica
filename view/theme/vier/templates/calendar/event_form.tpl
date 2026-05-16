@@ -33,7 +33,6 @@
 <div id="event-desc-text-edit-bb" class="comment-edit-bb">
 	<a title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="desc"><i class="icon-picture"></i></a>
 	<a title="{{$edurl}}" data-role="insert-formatting" data-bbcode="url" data-id="desc"><i class="icon-link"></i></a>
-	<a title="{{$edvideo}}" data-role="insert-formatting" data-bbcode="video" data-id="desc"><i class="icon-film"></i></a>
 
 	<a title="{{$eduline}}" data-role="insert-formatting" data-bbcode="u" data-id="desc"><i class="icon-underline"></i></a>
 	<a title="{{$editalic}}" data-role="insert-formatting" data-bbcode="i" data-id="desc"><i class="icon-italic"></i></a>
@@ -43,16 +42,7 @@
 
 <div id="event-location-text">{{$l_text}}</div>
 <textarea id="comment-edit-text-location" rows="4" cols="64" name="location" dir="auto">{{$l_orig}}</textarea>
-<div id="event-location-text-edit-bb" class="comment-edit-bb">
-	<a title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="location"><i class="icon-picture"></i></a>
-	<a title="{{$edurl}}" data-role="insert-formatting" data-bbcode="url" data-id="location"><i class="icon-link"></i></a>
-	<a title="{{$edvideo}}" data-role="insert-formatting" data-bbcode="video" data-id="location"><i class="icon-film"></i></a>
-
-	<a title="{{$eduline}}" data-role="insert-formatting" data-bbcode="u" data-id="location"><i class="icon-underline"></i></a>
-	<a title="{{$editalic}}" data-role="insert-formatting" data-bbcode="i" data-id="location"><i class="icon-italic"></i></a>
-	<a title="{{$edbold}}" data-role="insert-formatting" data-bbcode="b" data-id="location"><i class="icon-bold"></i></a>
-	<a title="{{$edquote}}" data-role="insert-formatting" data-bbcode="quote" data-id="location"><i class="icon-quote-left"></i></a>
-</div>
+<p>{{$no_bb}}</p>
 
 <div id="event-location-break"></div>
 

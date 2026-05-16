@@ -22,13 +22,13 @@ use Friendica\Util\Network;
 
 class Delivery
 {
-	const MAIL          = 'mail';
-	const SUGGESTION    = 'suggest';
-	const RELOCATION    = 'relocate';
-	const DELETION      = 'drop';
-	const POST          = 'wall-new';
-	const REMOVAL       = 'removeme';
-	const PROFILEUPDATE = 'profileupdate';
+	public const MAIL          = 'mail';
+	public const SUGGESTION    = 'suggest';
+	public const RELOCATION    = 'relocate';
+	public const DELETION      = 'drop';
+	public const POST          = 'wall-new';
+	public const REMOVAL       = 'removeme';
+	public const PROFILEUPDATE = 'profileupdate';
 
 	/**
 	 * Deliver posts to other systems
@@ -59,7 +59,7 @@ class Delivery
 		} elseif ($cmd == self::SUGGESTION) {
 			try {
 				$target_item = DI::fsuggest()->selectOneById($post_uriid)->toArray();
-			} catch (FriendSuggestNotFoundException $e) {
+			} catch (FriendSuggestNotFoundException) {
 				DI::logger()->info('Cannot find FriendSuggestion', ['id' => $post_uriid]);
 				return true;
 			}
@@ -188,7 +188,7 @@ class Delivery
 		$contact = DBA::selectFirst(
 			'contact',
 			[],
-			['id' => $contact_id, 'archive' => false, 'blocked' => false, 'pending' => false, 'self' => false]
+			['id' => $contact_id, 'archive' => false, 'blocked' => false, 'pending' => false, 'self' => false],
 		);
 		if (!DBA::isResult($contact)) {
 			self::setFailedQueue($cmd, $target_item);
@@ -542,7 +542,7 @@ class Delivery
 			}
 		} else {
 			$sender  = DI::config()->get('config', 'sender_email', 'noreply@' . DI::baseUrl()->getHost());
-			$headers = 'From: '. Email::encodeHeader($local_user['username'], 'UTF-8') . ' <' . $sender . '>' . "\n";
+			$headers = 'From: ' . Email::encodeHeader($local_user['username'], 'UTF-8') . ' <' . $sender . '>' . "\n";
 		}
 
 		$headers .= 'Message-Id: <' . Email::iri2msgid($target_item['uri']) . '>' . "\n";

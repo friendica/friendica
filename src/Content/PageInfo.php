@@ -92,6 +92,7 @@ class PageInfo
 	{
 		$eventDispatcher = DI::eventDispatcher();
 
+		/** @var array<string,mixed> */
 		$data = $eventDispatcher->dispatch(
 			new ArrayFilterEvent(ArrayFilterEvent::PAGE_INFO, $data),
 		)->getArray();
@@ -102,12 +103,12 @@ class PageInfo
 
 		// It maybe is a rich content, but if it does have everything that a link has,
 		// then treat it that way
-		if (($data['type'] == 'rich') && is_string($data['title']) &&
-			is_string($data['text']) && !empty($data['images'])) {
+		if (($data['type'] == 'rich') && is_string($data['title'])
+			&& is_string($data['text']) && !empty($data['images'])) {
 			$data['type'] = 'link';
 		}
 
-		$data['title'] = $data['title'] ?? '';
+		$data['title'] ??= '';
 
 		if ((($data['type'] != 'link') && ($data['type'] != 'video') && ($data['type'] != 'photo')) || ($data['title'] == $data['url'])) {
 			return '';
@@ -222,7 +223,7 @@ class PageInfo
 			$hashtag = str_replace(
 				[' ', '+', '/', '.', '#', "'"],
 				['', '', '', '', '', ''],
-				$keyword
+				$keyword,
 			);
 
 			$taglist[] = $hashtag;
@@ -290,7 +291,7 @@ class PageInfo
 
 			// Stripping link labels that include a shortened version of the URL
 			$trimMatch = trim($match[1], '.…');
-			if (!empty($trimMatch) && strpos($url, $trimMatch) !== false) {
+			if (!empty($trimMatch) && str_contains($url, $trimMatch)) {
 				return '';
 			}
 

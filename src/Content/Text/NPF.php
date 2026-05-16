@@ -47,7 +47,7 @@ class NPF
 
 		$element = $doc->getElementsByTagName('body')->item(0);
 
-		list($npf, $text, $formatting) = self::routeChildren($element, $uri_id, true, []);
+		[$npf, $text, $formatting] = self::routeChildren($element, $uri_id, true, []);
 
 		return self::addLinkBlockForUriId($uri_id, 0, $npf);
 	}
@@ -130,7 +130,7 @@ class NPF
 	private static function routeChildren(DOMElement $element, int $uri_id, bool $parse_structure, array $callstack, array $npf = [], string $text = '', array $formatting = []): array
 	{
 		if ($parse_structure && $text) {
-			list($npf, $text, $formatting) = self::addBlock($text, $formatting, $npf, $callstack);
+			[$npf, $text, $formatting] = self::addBlock($text, $formatting, $npf, $callstack);
 		}
 
 		$callstack[] = $element->nodeName;
@@ -140,21 +140,21 @@ class NPF
 			switch ($child->nodeName) {
 				case 'b':
 				case 'strong':
-					list($npf, $text, $formatting) = self::addFormatting($child, $uri_id, 'bold', $callstack, $npf, $text, $formatting);
+					[$npf, $text, $formatting] = self::addFormatting($child, $uri_id, 'bold', $callstack, $npf, $text, $formatting);
 					break;
 
 				case 'i':
 				case 'em':
-					list($npf, $text, $formatting) = self::addFormatting($child, $uri_id, 'italic', $callstack, $npf, $text, $formatting);
+					[$npf, $text, $formatting] = self::addFormatting($child, $uri_id, 'italic', $callstack, $npf, $text, $formatting);
 					break;
 
 				case 's':
-					list($npf, $text, $formatting) = self::addFormatting($child, $uri_id, 'strikethrough', $callstack, $npf, $text, $formatting);
+					[$npf, $text, $formatting] = self::addFormatting($child, $uri_id, 'strikethrough', $callstack, $npf, $text, $formatting);
 					break;
 
 				case 'u':
 				case 'span':
-					list($npf, $text, $formatting) = self::addFormatting($child, $uri_id, '', $callstack, $npf, $text, $formatting);
+					[$npf, $text, $formatting] = self::addFormatting($child, $uri_id, '', $callstack, $npf, $text, $formatting);
 					break;
 
 				case 'hr':
@@ -174,7 +174,7 @@ class NPF
 					break;
 
 				case 'a':
-					list($npf, $text, $formatting) = self::addInlineLink($child, $uri_id, $callstack, $npf, $text, $formatting);
+					[$npf, $text, $formatting] = self::addInlineLink($child, $uri_id, $callstack, $npf, $text, $formatting);
 					break;
 
 				case 'img':
@@ -187,13 +187,13 @@ class NPF
 					break;
 
 				default:
-					list($npf, $text, $formatting) = self::routeChildren($child, $uri_id, true, $callstack, $npf, $text, $formatting);
+					[$npf, $text, $formatting] = self::routeChildren($child, $uri_id, true, $callstack, $npf, $text, $formatting);
 					break;
 			}
 		}
 
 		if ($parse_structure && $text) {
-			list($npf, $text, $formatting) = self::addBlock($text, $formatting, $npf, $callstack);
+			[$npf, $text, $formatting] = self::addBlock($text, $formatting, $npf, $callstack);
 		}
 		return [$npf, $text, $formatting];
 	}
@@ -291,7 +291,7 @@ class NPF
 	{
 		$start = mb_strlen($text);
 
-		list($npf, $text, $formatting) = self::routeChildren($element, $uri_id, false, $callstack, $npf, $text, $formatting);
+		[$npf, $text, $formatting] = self::routeChildren($element, $uri_id, false, $callstack, $npf, $text, $formatting);
 
 		if (!empty($type)) {
 			$formatting[] = [
@@ -318,11 +318,11 @@ class NPF
 	{
 		$start = mb_strlen($text);
 
-		list($npf, $text, $formatting) = self::routeChildren($element, $uri_id, false, $callstack, $npf, $text, $formatting);
+		[$npf, $text, $formatting] = self::routeChildren($element, $uri_id, false, $callstack, $npf, $text, $formatting);
 
 		$attributes = [];
-		foreach ($element->attributes as $key => $attribute) {
-			$attributes[$key] = trim($attribute->value);
+		foreach ($element->attributes as $attribute) {
+			$attributes[$attribute->name] = trim($attribute->value);
 		}
 		if (!empty($attributes['href'])) {
 			$formatting[] = [

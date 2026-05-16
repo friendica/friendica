@@ -364,8 +364,8 @@ function toggleEventNav(elm) {
 
 // Disable the input for the finish date if it is not available.
 function enableDisableFinishDate() {
-	if ($("#id_nofinish").is(":checked")) $("#id_finish_text").prop("disabled", true);
-	else $("#id_finish_text").prop("disabled", false);
+	if ($("#id_nofinish").is(":checked")) $("#id_finish_text_wrapper").prop("disabled", true).css("visibility", "hidden");
+	else $("#id_finish_text_wrapper").prop("disabled", false).css("visibility", "visible");
 }
 
 // @license-end

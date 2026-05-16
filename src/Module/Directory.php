@@ -11,10 +11,10 @@ use Friendica\BaseModule;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Widget;
-use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model;
 use Friendica\Model\Profile;
 use Friendica\Network\HTTPException;
@@ -29,8 +29,8 @@ class Directory extends BaseModule
 	{
 		$config = DI::config();
 
-		if (($config->get('system', 'block_public') && !DI::userSession()->isAuthenticated()) ||
-			($config->get('system', 'block_local_dir') && !DI::userSession()->isAuthenticated())) {
+		if (($config->get('system', 'block_public') && !DI::userSession()->isAuthenticated())
+			|| ($config->get('system', 'block_local_dir') && !DI::userSession()->isAuthenticated())) {
 			throw new HTTPException\ForbiddenException(DI::l10n()->t('Public access denied.'));
 		}
 
@@ -39,7 +39,7 @@ class Directory extends BaseModule
 			DI::page()['aside'] .= Widget::follow();
 		}
 
-		$output = '';
+		$output  = '';
 		$entries = [];
 
 		Nav::setSelected('directory');
@@ -47,7 +47,7 @@ class Directory extends BaseModule
 		$search = trim(rawurldecode($_REQUEST['search'] ?? ''));
 
 		$gDirPath = '';
-		$dirURL = Search::getGlobalDirectory();
+		$dirURL   = Search::getGlobalDirectory();
 		if (strlen($dirURL)) {
 			$gDirPath = OpenWebAuth::getZrlUrl($dirURL, true);
 		}
@@ -56,9 +56,7 @@ class Directory extends BaseModule
 
 		$profiles = Profile::searchProfiles($pager->getStart(), $pager->getItemsPerPage(), $search);
 
-		if ($profiles['total'] === 0) {
-			DI::sysmsg()->addNotice(DI::l10n()->t('No entries (some entries may be hidden).'));
-		} else {
+		if ($profiles['total'] !== 0) {
 			foreach ($profiles['entries'] as $entry) {
 				$contact = Model\Contact::getByURLForUser($entry['url'], DI::userSession()->getLocalUserId());
 				if (!empty($contact)) {
@@ -70,17 +68,19 @@ class Directory extends BaseModule
 		$tpl = Renderer::getMarkupTemplate('directory_header.tpl');
 
 		$output .= Renderer::replaceMacros($tpl, [
-			'$search'     => $search,
-			'$globaldir'  => DI::l10n()->t('Global Directory'),
-			'$gDirPath'   => $gDirPath,
-			'$desc'       => DI::l10n()->t('Find on this site'),
-			'$contacts'   => $entries,
-			'$finding'    => DI::l10n()->t('Results for:'),
-			'$findterm'   => (strlen($search) ? $search : ""),
-			'$title'      => DI::l10n()->t('Site Directory'),
-			'$search_mod' => 'directory',
-			'$submit'     => DI::l10n()->t('Find'),
-			'$paginate'   => $pager->renderFull($profiles['total']),
+			'$search'           => $search,
+			'$globaldir'        => DI::l10n()->t('Global Directory'),
+			'$gDirPath'         => $gDirPath,
+			'$desc'             => DI::l10n()->t('Find on this site'),
+			'$contacts'         => $entries,
+			'$no_results'       => DI::l10n()->t('No accounts found (some may be hidden).'),
+			'$finding'          => DI::l10n()->t('Results for:'),
+			'$findterm'         => (strlen($search) ? $search : ""),
+			'$title'            => DI::l10n()->t('Site Directory'),
+			'$search_mod'       => 'directory',
+			'$submit'           => DI::l10n()->t('Find'),
+			'$paginate'         => $pager->renderFull($profiles['total']),
+			'$num_results_text' => DI::l10n()->t("Accounts listed: %s", $profiles['total']),
 		]);
 
 		return $output;
@@ -140,7 +140,7 @@ class Directory extends BaseModule
 		$location_e = $location;
 
 		$photo_menu = [
-			'profile' => [DI::l10n()->t("View Profile"), Model\Contact::magicLink($profile_link)]
+			'profile' => [DI::l10n()->t("View Profile"), Model\Contact::magicLink($profile_link)],
 		];
 
 		$entry = [
@@ -161,13 +161,22 @@ class Directory extends BaseModule
 
 		];
 
-		$hook = ['contact' => $contact, 'entry' => $entry];
+		$eventDispatcher = DI::eventDispatcher();
 
-		Hook::callAll('directory_item', $hook);
+		$hook_data = [
+			'contact' => $contact,
+			'entry'   => $entry,
+		];
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::DIRECTORY_ITEM, $hook_data),
+		)->getArray();
+
+		$entry = $hook_data['entry'] ?? $entry;
 
 		unset($profile);
 		unset($location);
 
-		return $hook['entry'];
+		return $entry;
 	}
 }

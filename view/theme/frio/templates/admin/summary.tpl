@@ -5,7 +5,7 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 
-<div id='adminpage-summery' class="adminpage generic-page-wrapper">
+<div id='adminpage-summary' class="adminpage generic-page-wrapper">
 	<h1>{{$title}} - {{$page}}</h1>
 
 	{{if $warningtext|count}}
@@ -17,35 +17,36 @@
 	{{/if}}
 
 	<div id="admin-summary-wrapper">
-		{{* The work queues short statistic. *}}
-		<div id="admin-summary-queues" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 admin-summary">
-			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 admin-summary-label-name text-muted">{{$queues.label}}</div>
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry"><a href="{{$baseurl}}/admin/queue/deferred">{{$queues.deferred}}</a> - <a href="{{$baseurl}}/admin/queue">{{$queues.workerq}}</a></div>
-		</div>
+		{{* The work queues short statistic and the friendica version. *}}
+		<table id="admin-summary-queues" class="table">
+			<tr>
+				<td>{{$queues.label}}</td>
+				<td class="admin-summary-entry"><a href="{{$baseurl}}/admin/queue/deferred">{{$queues.deferred}}</a> - <a href="{{$baseurl}}/admin/queue">{{$queues.workerq}}</a></td>
+			</tr>
+			<tr>
+				<td>{{$version_label}}</td>
+				<td class="admin-summary-entry">{{$platform}} '{{$codename}}' {{$VERSION}} - {{$build}}</td>
+			</tr>
+		</table>
 
 		{{* List enabled addons. *}}
-		<div id="admin-summary-addons" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 admin-summary">
-			<hr class="admin-summary-separator">
-			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 admin-summary-label-name text-muted">{{$addons.0}}</div>
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry">
-				{{foreach $addons.1 as $p}}
-				<a href="{{$baseurl}}/admin/addons/{{$p}}/">{{$p}}</a><br>
+		<div id="admin-summary-addons">
+			<h2>{{$addons.0}}</h2>
+			<table class="table">
+				{{foreach $addons.1 as $a}}
+				<tr>
+					<td><a href="{{$baseurl}}/admin/addons/{{$a.0}}/">{{$a.1.name}}</a></td>
+					<td>{{$a.1.description}}</td>
+				</tr>
 				{{/foreach}}
-			</div>
+			</table>
 		</div>
-
-		{{* The Friendica version. *}}
-		<div id="admin-summary-version" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 admin-summary">
-			<hr class="admin-summary-separator">
-			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 admin-summary-label-name text-muted">{{$version_label}}</div>
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry">{{$platform}} '{{$codename}}' {{$VERSION}} - {{$build}}</div>
-		</div>
+		<p><a class="btn btn-primary" href="/admin/addons">{{$link_enable_addons}}</a></p>
 
 		{{* Server Settings. *}}
-		<div id="admin-summary-php" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 admin-summary">
-			<hr class="admin-summary-separator">
-			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 admin-summary-label-name text-muted">{{$serversettings.label}}</div>
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry">
+		<div id="admin-summary-php">
+			<h2>{{$serversettings.label}}</h2>
+			<div class="admin-summary-entry">
 				<table class="table">
 				<tbody>
 					<tr class="info"><td colspan="2">PHP</td></tr>
@@ -62,7 +63,5 @@
 		</div>
 
 	</div>
-
-	<div class="clear"></div>
 
 </div>

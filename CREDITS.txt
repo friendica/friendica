@@ -35,12 +35,16 @@ Antron Samurai
 Anubis2814
 arcanicanis
 Arian - Cazare Muncitori
+Art4
+Artur Weigandt
 Asher Pen
 atjn
 aweiher
 axelt
 balderino
+Balázs Meskó
 Balázs Úr
+Bartosz Kozień
 Bartosz Małkowski
 Beanow
 beardyunixer
@@ -50,6 +54,7 @@ Ben
 Ben Millwood
 Ben Roberts
 ben-utzer
+Benjamin Lorteau
 Beringer Zsolt
 BinkaDroid
 Bjoessi
@@ -62,6 +67,7 @@ ButterflyOfFire
 Calango Jr
 Carlos Solís
 Carsten Pfeiffer
+Casey Kreer
 Casper
 Cat Gray
 chinnux
@@ -71,6 +77,7 @@ Christian Kalkhoff
 Christian M. Grube
 Christian Vogeley
 Christian Wiwie
+cluster15
 Cohan Robinson
 Colby Sollars
 Copiis
@@ -94,7 +101,6 @@ Dean Townsley
 Denis Chenu
 dependabot[bot]
 Devlon Duthie
-dew-git
 Diego Souza
 Domovoy
 Doru  DEACONU
@@ -111,6 +117,7 @@ Eric Côté
 Erich
 erik
 Erkan Yilmaz
+Esko Arajärvi
 Eugene Veresk
 Extarys
 F1per 3y
@@ -122,6 +129,7 @@ felixgilles
 Filip Bugaj
 Filip H.F. "FiXato" Slagter
 Finn Dean
+Fitik Old Account
 Florent C.
 FlxAlbroscheit
 foss-
@@ -146,24 +154,27 @@ haheute
 Hank Grabowski
 Hannes Heute
 Hans Meine
+hauke
 Hauke
 Hauke Altmann
 Henrik Härkönen
+Henrik Kbh
 Herbert Thielen
 hlad
 hoergen
 Hubert Kościański
 Hypolite Petovan
-ike
 Ilmari
 ImgBotApp
 irhen
 Jakob
 Jakob Schürz
+Jakobus Schürz
 Jens Tautenhahn
 jensp
 Jeroen De Meerleer
 joenepraat
+Jesper Stocholm
 Joan Bar
 JOduMonT
 Joe Doe
@@ -178,6 +189,7 @@ Josef Moravek
 Josh Soref
 juanman
 julia.domagalska
+Julien Desrosiers
 Julio Cova
 k-alin
 Karel
@@ -196,7 +208,6 @@ KulikAlex
 Laura Hausmann
 Lea1995polish
 Leberwurscht
-Leonard
 Leonard Lausen
 Lionel Triay
 loma-one
@@ -204,13 +215,16 @@ loma1
 Lorem Ipsum
 Ludovic Grossard
 Lynn Stephenson
+M33
 maase2
 Mai Anh Nguyen
 Makary
 Manuel Pérez Monís
 Marcin Klessa
-Marcin Mikołajczak
+marcin mikołajczak
+Marcus Funch
 Marcus Müller
+Marcus Vinicius Santos
 Marek Bachmann
 MarekBenjamin
 Marie Olive
@@ -233,12 +247,13 @@ Michalina
 Mike Macgirvin
 miqrogroove
 Morgan McMillian
+Morten Juhl-Johansen
 mpanhans
 MrPetovan
 mytbk
 nathilia-peirce
-Nicola Spanti
 ne20002
+Nicola Spanti
 Nicolas Derive
 nnsrymni
 nobody
@@ -249,6 +264,7 @@ Olivier
 Olivier Mehani
 Olivier Migeot
 ominds
+Oskar Kildevang Knudsen
 ozero dien
 pankraz
 Paolo Wave
@@ -271,8 +287,8 @@ Piotr Strębski
 pixelroot
 pokerazor
 R C
-r1pu5u
 Rabuzarus
+Rachel Evans
 Radek
 Rafael Garau
 Rafael Kalachev
@@ -280,6 +296,8 @@ Rain Hawk
 Rainulf Pineda
 Ralf Thees
 ralph van der honing
+Ramon van Belzen
+Random Penguin
 Raroun
 Ratten
 rcmaniac
@@ -308,12 +326,12 @@ sella
 Senex Petrovic
 Seth
 SickShark X
+Silja Ijas
 Silke Meyer
-Simon
 Simon L'nu
 Simon Rupf
 Simó Albert i Beltran
-snajafov
+Snue Snue
 softmetz
 soko1
 Spencer Dub
@@ -332,6 +350,7 @@ Taekus
 Tazman DeVille
 Tealk
 teho
+Terri L
 Thecross
 Thomas
 Thomas Willingham
@@ -349,6 +368,7 @@ Tom Aurlund
 Tom Hu
 tomamplius
 tommy tomson
+Tommi Nieminen
 tomtom84
 Tony Baldwin
 Torbjörn Andersson
@@ -366,6 +386,7 @@ utzer
 Valvin
 Vasudev Kamath
 Vasya Novikov
+veroandi
 very-ape
 Viktor Nilsson
 Vinzenz Vietzke
@@ -374,12 +395,12 @@ Vladimir Núñez
 VVelox
 Vít Šesták 'v6ak'
 Waldemar Stoczkowski
+Waldir Pimenta
 Walter Bulbazor
 Wanting Chen
 Wil Tur
 Wladimir Palant
 Wouter Broers
-www-data
 Xiaofei Xu
 XMPPはいいぞ
 xundeenergie

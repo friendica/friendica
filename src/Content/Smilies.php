@@ -89,7 +89,7 @@ class Smilies
 			':dislike',
 			'~friendica',
 			'red#',
-			'red#matrix'
+			'red#matrix',
 
 		];
 
@@ -130,7 +130,7 @@ class Smilies
 			'<img class="smiley" src="' . $baseUrl . '/images/dislike.gif" alt=":dislike" title=":dislike" />',
 			'<a href="https://friendi.ca">~friendica <img class="smiley" width="16" height="16" src="' . $baseUrl . '/images/friendica.svg" alt="~friendica" title="~friendica" /></a>',
 			'<a href="http://redmatrix.me/">red<img class="smiley" src="' . $baseUrl . '/images/rm-16.png" alt="red#" title="red#" />matrix</a>',
-			'<a href="http://redmatrix.me/">red<img class="smiley" src="' . $baseUrl . '/images/rm-16.png" alt="red#matrix" title="red#matrix" />matrix</a>'
+			'<a href="http://redmatrix.me/">red<img class="smiley" src="' . $baseUrl . '/images/rm-16.png" alt="red#matrix" title="red#matrix" />matrix</a>',
 		];
 
 		$eventDispatcher = DI::eventDispatcher();
@@ -157,7 +157,7 @@ class Smilies
 
 		$normalized = BBCode::performWithEscapedTags($text, ['code'], function ($text) use (&$emojis) {
 			return BBCode::performWithEscapedTags($text, ['noparse', 'nobb', 'pre'], function ($text) use (&$emojis) {
-				if (strpos($text, '[nosmile]') !== false || self::noSmilies()) {
+				if (str_contains($text, '[nosmile]') || self::noSmilies()) {
 					return $text;
 				}
 				$smilies    = self::getList();
@@ -286,7 +286,7 @@ class Smilies
 			$subject,
 			function (string $_, string $value) {
 				return $value;
-			}
+			},
 		);
 	}
 
@@ -318,9 +318,9 @@ class Smilies
 
 	private static function noSmilies(): bool
 	{
-		return (intval(DI::config()->get('system', 'no_smilies')) ||
-				(DI::userSession()->getLocalUserId() &&
-				 intval(DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'no_smilies'))));
+		return (intval(DI::config()->get('system', 'no_smilies'))
+				|| (DI::userSession()->getLocalUserId()
+				 && intval(DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'no_smilies'))));
 	}
 
 	/**

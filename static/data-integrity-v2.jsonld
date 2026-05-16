@@ -1,0 +1,65 @@
+{
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+    "proof": {
+      "@id": "https://w3id.org/security#proof",
+      "@type": "@id"
+    },
+    "DataIntegrityProof": {
+      "@id": "https://w3id.org/security#DataIntegrityProof"
+    },
+    "challenge": "https://w3id.org/security#challenge",
+    "created": {
+      "@id": "http://purl.org/dc/terms/created",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "domain": "https://w3id.org/security#domain",
+    "expires": {
+      "@id": "https://w3id.org/security#expiration",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "nonce": "https://w3id.org/security#nonce",
+    "previousProof": {
+      "@id": "https://w3id.org/security#previousProof",
+      "@type": "@id"
+    },
+    "proofPurpose": {
+      "@id": "https://w3id.org/security#proofPurpose",
+      "@type": "@vocab"
+    },
+    "assertionMethod": {
+      "@id": "https://w3id.org/security#assertionMethod",
+      "@type": "@id"
+    },
+    "authentication": {
+      "@id": "https://w3id.org/security#authenticationMethod",
+      "@type": "@id"
+    },
+    "capabilityInvocation": {
+      "@id": "https://w3id.org/security#capabilityInvocationMethod",
+      "@type": "@id"
+    },
+    "capabilityDelegation": {
+      "@id": "https://w3id.org/security#capabilityDelegationMethod",
+      "@type": "@id"
+    },
+    "keyAgreement": {
+      "@id": "https://w3id.org/security#keyAgreementMethod",
+      "@type": "@id",
+      "@container": "@set"
+    },
+    "cryptosuite": {
+      "@id": "https://w3id.org/security#cryptosuite",
+      "@type": "https://w3id.org/security#cryptosuiteString"
+    },
+    "proofValue": {
+      "@id": "https://w3id.org/security#proofValue",
+      "@type": "https://w3id.org/security#multibase"
+    },
+    "verificationMethod": {
+      "@id": "https://w3id.org/security#verificationMethod",
+      "@type": "@id"
+    }
+  }
+}

@@ -7,7 +7,6 @@
 
 namespace Friendica\Test;
 
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Friendica\Core\PConfig\Type\AbstractPConfigValues;
 use Friendica\Core\PConfig\Repository\PConfig as PConfigModel;
 use Friendica\Core\PConfig\ValueObject\Cache;
@@ -16,8 +15,6 @@ use Mockery\MockInterface;
 
 abstract class PConfigTestCase extends MockedTestCase
 {
-	use ArraySubsetAsserts;
-
 	/** @var PConfigModel|MockInterface */
 	protected $configModel;
 
@@ -41,7 +38,10 @@ abstract class PConfigTestCase extends MockedTestCase
 		self::assertNotEmpty($result);
 		self::assertArrayHasKey($uid, $result);
 		self::assertArrayHasKey($cat, $result[$uid]);
-		self::assertArraySubset($data, $result[$uid][$cat]);
+
+		foreach ($data as $key => $value) {
+			self::assertSame($value, $result[$uid][$cat][$key], sprintf('Pointer: `%s.%s.%s`', $uid, $cat, $key));
+		}
 	}
 
 
@@ -85,7 +85,7 @@ abstract class PConfigTestCase extends MockedTestCase
 				'key1' => 'value1a',
 				'key4' => 'value4',
 			],
-			'other'  => [
+			'other' => [
 				'key5' => 'value5',
 				'key6' => 'value6',
 			],
@@ -93,53 +93,53 @@ abstract class PConfigTestCase extends MockedTestCase
 
 		return [
 			'system' => [
-				'uid' => 1,
+				'uid'          => 1,
 				'data'         => $data,
 				'possibleCats' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
-				'load'         => [
+				'load' => [
 					'system',
 				],
 			],
-			'other'  => [
-				'uid' => 2,
+			'other' => [
+				'uid'          => 2,
 				'data'         => $data,
 				'possibleCats' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
-				'load'         => [
+				'load' => [
 					'other',
 				],
 			],
 			'config' => [
-				'uid' => 3,
+				'uid'          => 3,
 				'data'         => $data,
 				'possibleCats' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
-				'load'         => [
+				'load' => [
 					'config',
 				],
 			],
-			'all'    => [
-				'uid' => 4,
+			'all' => [
+				'uid'          => 4,
 				'data'         => $data,
 				'possibleCats' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
-				'load'         => [
+				'load' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
 			],
 		];
@@ -178,14 +178,14 @@ abstract class PConfigTestCase extends MockedTestCase
 	{
 		return [
 			'config' => [
-				'uid' => 1,
-				'data1'  => [
+				'uid'   => 1,
+				'data1' => [
 					'config' => [
 						'key1' => 'value1',
 						'key2' => 'value2',
 					],
 				],
-				'data2'  => [
+				'data2' => [
 					'config' => [
 						'key1' => 'overwritten!',
 						'key3' => 'value3',
@@ -200,30 +200,30 @@ abstract class PConfigTestCase extends MockedTestCase
 					],
 				],
 			],
-			'other'  => [
-				'uid' => 1,
-				'data1'  => [
+			'other' => [
+				'uid'   => 1,
+				'data1' => [
 					'config' => [
 						'key12' => 'data4',
 						'key45' => 7,
 					],
-					'other'  => [
+					'other' => [
 						'key1' => 'value1',
 						'key2' => 'value2',
 					],
 				],
-				'data2'  => [
-					'other'  => [
+				'data2' => [
+					'other' => [
 						'key1' => 'overwritten!',
 						'key3' => 'value3',
 					],
 					'config' => [
 						'key45' => 45,
 						'key52' => true,
-					]
+					],
 				],
 				'expect' => [
-					'other'  => [
+					'other' => [
 						// load should overwrite values everytime!
 						'key1' => 'overwritten!',
 						'key2' => 'value2',
@@ -285,9 +285,9 @@ abstract class PConfigTestCase extends MockedTestCase
 	public function testSetGetWithDB(int $uid, $data)
 	{
 		$this->configModel->shouldReceive('set')
-		                  ->with($uid, 'test', 'it', $data)
-		                  ->andReturn(true)
-		                  ->once();
+						  ->with($uid, 'test', 'it', $data)
+						  ->andReturn(true)
+						  ->once();
 
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
@@ -376,21 +376,21 @@ abstract class PConfigTestCase extends MockedTestCase
 		$this->configCache->load($uid, ['test' => ['it' => 'now', 'quarter' => 'true']]);
 
 		$this->configModel->shouldReceive('delete')
-		                  ->with($uid, 'test', 'it')
-		                  ->andReturn(false)
-		                  ->once();
+						  ->with($uid, 'test', 'it')
+						  ->andReturn(false)
+						  ->once();
 		$this->configModel->shouldReceive('delete')
-		                  ->with($uid, 'test', 'second')
-		                  ->andReturn(true)
-		                  ->once();
+						  ->with($uid, 'test', 'second')
+						  ->andReturn(true)
+						  ->once();
 		$this->configModel->shouldReceive('delete')
-		                  ->with($uid, 'test', 'third')
-		                  ->andReturn(false)
-		                  ->once();
+						  ->with($uid, 'test', 'third')
+						  ->andReturn(false)
+						  ->once();
 		$this->configModel->shouldReceive('delete')
-		                  ->with($uid, 'test', 'quarter')
-		                  ->andReturn(true)
-		                  ->once();
+						  ->with($uid, 'test', 'quarter')
+						  ->andReturn(true)
+						  ->once();
 
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
@@ -425,11 +425,11 @@ abstract class PConfigTestCase extends MockedTestCase
 						],
 						'cat2' => [
 							'key2' => 'value2',
-						]
+						],
 					],
 				],
 				'data2' => [
-					'uid' => 2,
+					'uid'  => 2,
 					'data' => [
 						'cat1' => [
 							'key1' => 'value1a',

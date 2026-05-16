@@ -10,26 +10,24 @@
 <div id="photos-usage-message">{{$usage}}</div>
 
 <form action="profile/{{$nickname}}/photos" enctype="multipart/form-data" method="post" name="photos-upload-form" id="photos-upload-form">
+{{if $is_album_context}}
+	<input type="hidden" id="photos-upload-album-select" name="album" value="{{$preselected_album}}" />
+{{else}}
 	<div id="photos-upload-new-wrapper">
 		<div id="photos-upload-newalbum-div">
-			<label id="photos-upload-newalbum-text" for="photos-upload-newalbum">{{$newalbum}}</label>
+			<label id="photos-upload-newalbum-text" for="photos-upload-newalbum">{{$albumtext_label}}</label>
 		</div>
 		<input id="photos-upload-newalbum" type="text" name="newalbum" />
 	</div>
 	<div id="photos-upload-new-end"></div>
 	<div id="photos-upload-exist-wrapper">
-		<div id="photos-upload-existing-album-text">{{$existalbumtext}}</div>
+		<div id="photos-upload-existing-album-text">{{$albumtext_description}}</div>
 		<select id="photos-upload-album-select" name="album" size="4">
-		{{$albumselect  nofilter}}
+		{{$albumselect nofilter}}
 		</select>
 	</div>
 	<div id="photos-upload-exist-end"></div>
-
-	<div id="photos-upload-noshare-div" class="photos-upload-noshare-div">
-		<input id="photos-upload-noshare" type="checkbox" name="not_visible" value="1" checked/>
-		<label id="photos-upload-noshare-text" for="photos-upload-noshare">{{$nosharetext}}</label>
-	</div>
-
+{{/if}}
 
 	<div id="photos-upload-perms" class="photos-upload-perms">
 		<a href="#photos-upload-permissions-wrapper" id="photos-upload-perms-menu" class="button popupbox" />

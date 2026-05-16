@@ -88,8 +88,8 @@ class HTTPException
 			try {
 				$tpl     = Renderer::getMarkupTemplate('http_status.tpl');
 				$content = Renderer::replaceMacros($tpl, $vars);
-			} catch (Throwable $th) {
-				$vars = array_map('htmlentities', $vars);
+			} catch (Throwable) {
+				$vars    = array_map('htmlentities', $vars);
 				$content = "<h1>{$vars['$title']}</h1><p>{$vars['$message']}</p>";
 				if ($this->isSiteAdmin) {
 					$content .= "<p>{$vars['$thrown']}</p>";
@@ -116,14 +116,16 @@ class HTTPException
 	public function content(NetworkHTTPException $e): string
 	{
 		if ($e->getCode() >= 400) {
-			$this->logger->debug('Exit with error',
+			$this->logger->debug(
+				'Exit with error',
 				[
 					'code'        => $e->getCode(),
 					'description' => $e->getDescription(),
 					'query'       => $this->args->getQueryString(),
 					'method'      => $this->args->getMethod(),
-					'agent'       => $this->server['HTTP_USER_AGENT'] ?? ''
-				]);
+					'agent'       => $this->server['HTTP_USER_AGENT'] ?? '',
+				],
+			);
 		}
 
 		$tpl = Renderer::getMarkupTemplate('exception.tpl');

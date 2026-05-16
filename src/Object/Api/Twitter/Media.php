@@ -31,7 +31,7 @@ class Media extends BaseDataTransferObject
 	protected $media_url;
 	/** @var string */
 	protected $media_url_https;
-	/** @var string */
+	/** @var array<string, array<string, mixed>> */
 	protected $sizes;
 	/** @var string */
 	protected $type;

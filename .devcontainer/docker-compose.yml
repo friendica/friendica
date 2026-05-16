@@ -1,6 +1,4 @@
-version: '3.8'
-
-services: 
+services:
   app:
     build:
       context: .
@@ -14,16 +12,14 @@ services:
     command: sleep infinity
 
     ports:
-      - 80:80
-      - 443:443
-      - 8080:8080
-      - 3306:3306
-       
-    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+      - ${ServerPort:-8080}:80
+      - 8443:443
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
     extra_hosts:
-      - "${ServerAlias}:127.0.0.1"  
+      - "${ServerAlias}:127.0.0.1"
 
   db:
     image: mariadb:10.4
@@ -49,4 +45,3 @@ volumes:
 
 networks:
   default:
-  

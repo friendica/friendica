@@ -20,12 +20,18 @@
 <nav>
 	<span id="datebrowse-sidebar-inflated" class="widget inflated fakelink">
 		<button class="fakelink" onclick="openCloseWidget('datebrowse-sidebar', 'datebrowse-sidebar-inflated');" aria-expanded="false">
-			<h3>{{$title}}</h3>
+			<h3>
+				<i class="fa fa-archive" aria-hidden="true"></i>
+				{{$title}}
+			</h3>
 		</button>
 	</span>
 	<div id="datebrowse-sidebar" class="widget">
 		<button class="fakelink" onclick="openCloseWidget('datebrowse-sidebar', 'datebrowse-sidebar-inflated');" aria-expanded="false">
-			<h3>{{$title}}</h3>
+			<h3>
+				<i class="fa fa-archive" aria-hidden="true"></i>
+				{{$title}}
+			</h3>
 		</button>
 		<ul id="posted-date-selector" class="datebrowse-ul">
 			{{foreach $dates as $y => $arr}}

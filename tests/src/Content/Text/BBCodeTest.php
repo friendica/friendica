@@ -8,6 +8,7 @@
 namespace Friendica\Test\src\Content\Text;
 
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Test\FixtureTestCase;
@@ -26,7 +27,6 @@ class BBCodeTest extends FixtureTestCase
 		DI::config()->set('system', 'url', 'https://friendica.local');
 		DI::config()->set('system', 'no_smilies', false);
 		DI::config()->set('system', 'big_emojis', false);
-		DI::config()->set('system', 'allowed_oembed', '');
 
 		$config = \HTMLPurifier_HTML5Config::createDefault();
 		$config->set('HTML.Doctype', 'HTML5');
@@ -73,51 +73,51 @@ class BBCodeTest extends FixtureTestCase
 			],
 			'no-protocol' => [
 				'data'       => 'example.com/path',
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'wrong-protocol' => [
 				'data'       => 'ftp://example.com',
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'wrong-domain-without-path' => [
 				'data'       => 'http://example',
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'wrong-domain-with-path' => [
 				'data'       => 'http://example/path',
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6857-domain-start' => [
 				'data'       => "http://\nexample.com",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6857-domain-end' => [
 				'data'       => "http://example\n.com",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6857-tld' => [
 				'data'       => "http://example.\ncom",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6857-end' => [
 				'data'       => "http://example.com\ntest",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-6901' => [
 				'data'       => "http://example.com<ul>",
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-7150' => [
 				'data'       => html_entity_decode('http://example.com&nbsp;', ENT_QUOTES, 'UTF-8'),
-				'assertHTML' => false
+				'assertHTML' => false,
 			],
 			'bug-7271-query-string-brackets' => [
 				'data'       => 'https://example.com/search?q=square+brackets+[url]',
-				'assertHTML' => true
+				'assertHTML' => true,
 			],
 			'bug-7271-path-brackets' => [
 				'data'       => 'http://example.com/path/to/file[3].html',
-				'assertHTML' => true
+				'assertHTML' => true,
 			],
 		];
 	}
@@ -177,21 +177,21 @@ class BBCodeTest extends FixtureTestCase
 			'bug-2199-diaspora-no-named-size' => [
 				'expectedHtml' => 'Test text',
 				'text'         => '[size=xx-large]Test text[/size]',
-				'try_oembed'   => false,
+				'embed'        => false,
 				// Triggers the diaspora compatible output
 				'simpleHtml' => BBCode::DIASPORA,
 			],
 			'bug-2199-diaspora-no-numeric-size' => [
 				'expectedHtml' => 'Test text',
 				'text'         => '[size=24]Test text[/size]',
-				'try_oembed'   => false,
+				'embed'        => false,
 				// Triggers the diaspora compatible output
 				'simpleHtml' => BBCode::DIASPORA,
 			],
 			'bug-7665-audio-tag' => [
-				'expectedHtml' => '<audio src="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3" controls><a href="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3">http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3</a></audio>',
+				'expectedHtml' => '<a class="embed" href="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3">cendrones.fr/colloque2017/jona…</a>',
 				'text'         => '[audio]http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3[/audio]',
-				'try_oembed'   => true,
+				'embed'        => true,
 			],
 			'bug-7808-code-lt' => [
 				'expectedHtml' => '<code>&lt;</code>',
@@ -215,19 +215,19 @@ class BBCodeTest extends FixtureTestCase
 			],
 			'bug-9611-purify-xss-nobb' => [
 				'expectedHTML' => '<span>dare to move your mouse here</span>',
-				'text'         => '[nobb]<span onmouseover="alert(0)">dare to move your mouse here</span>[/nobb]'
+				'text'         => '[nobb]<span onmouseover="alert(0)">dare to move your mouse here</span>[/nobb]',
 			],
 			'bug-9611-purify-xss-noparse' => [
 				'expectedHTML' => '<span>dare to move your mouse here</span>',
-				'text'         => '[noparse]<span onmouseover="alert(0)">dare to move your mouse here</span>[/noparse]'
+				'text'         => '[noparse]<span onmouseover="alert(0)">dare to move your mouse here</span>[/noparse]',
 			],
 			'bug-9611-purify-xss-attributes' => [
 				'expectedHTML' => '<span>dare to move your mouse here</span>',
-				'text'         => '[color="onmouseover=alert(0) style="]dare to move your mouse here[/color]'
+				'text'         => '[color="onmouseover=alert(0) style="]dare to move your mouse here[/color]',
 			],
 			'bug-9611-purify-attributes-correct' => [
 				'expectedHTML' => '<span style="color:#FFFFFF;">dare to move your mouse here</span>',
-				'text'         => '[color=FFFFFF]dare to move your mouse here[/color]'
+				'text'         => '[color=FFFFFF]dare to move your mouse here[/color]',
 			],
 			'bug-9639-span-classes' => [
 				'expectedHTML' => '<span class="arbitrary classes">Test</span>',
@@ -240,7 +240,7 @@ Karl Marx - Die ursprüngliche Akkumulation
 [url=https://wohlstandfueralle.podigee.io/107-urspruengliche-akkumulation]https://wohlstandfueralle.podigee.io/107-urspruengliche-akkumulation[/url]
 #[url=https://horche.demkontinuum.de/search?tag=Podcast]Podcast[/url] #[url=https://horche.demkontinuum.de/search?tag=Kapitalismus]Kapitalismus[/url]
 [attachment type='link' url='https://wohlstandfueralle.podigee.io/107-urspruengliche-akkumulation' title='Ep. 107: Karl Marx #8 - Die urspr&uuml;ngliche Akkumulation' publisher_name='Wohlstand f&uuml;r Alle' preview='https://images.podigee-cdn.net/0x,s6LXshYO7uhG23H431B30t4hxj1bQuzlTsUlze0F_-H8=/https://cdn.podigee.com/uploads/u8126/bd5fe4f4-38b7-4f3f-b269-6a0080144635.jpg']Wie der Kapitalismus funktioniert und inwieweit Menschen darin ausgebeutet werden, haben wir bereits besprochen. Immer wieder verweisen wir auch darauf, dass der Kapitalismus nicht immer schon existierte, sondern historisiert werden muss.[/attachment]",
-				'try_oembed' => false,
+				'embed'      => false,
 				'simpleHtml' => BBCode::TWITTER,
 			],
 			'task-10886-deprecate-class' => [
@@ -277,16 +277,16 @@ Karl Marx - Die ursprüngliche Akkumulation
 	 *
 	 * @param string $expectedHtml Expected HTML output
 	 * @param string $text         BBCode text
-	 * @param bool   $try_oembed   Whether to convert multimedia BBCode tag
+	 * @param bool   $embed   Whether to convert multimedia BBCode tag
 	 * @param int    $simpleHtml   BBCode::convert method $simple_html parameter value, optional.
 	 * @param bool   $forPlaintext BBCode::convert method $for_plaintext parameter value, optional.
 	 *
 	 * @throws InternalServerErrorException
 	 */
-	public function testConvert(string $expectedHtml, string $text, bool $try_oembed = true, int $simpleHtml = BBCode::INTERNAL, bool $forPlaintext = false)
+	public function testConvert(string $expectedHtml, string $text, bool $embed = true, int $simpleHtml = BBCode::INTERNAL, bool $forPlaintext = false)
 	{
 		// This assumes system.remove_multiplicated_lines = false
-		$actual = BBCode::convert($text, $try_oembed, $simpleHtml, $forPlaintext);
+		$actual = BBCode::convert($text, $embed, $simpleHtml, $forPlaintext);
 
 		self::assertEquals($expectedHtml, $actual);
 	}
@@ -308,11 +308,16 @@ Karl Marx - Die ursprüngliche Akkumulation
 			],
 			'bug-12701-quotes' => [
 				'expected' => '[![abc"fgh](https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png)](https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581)',
-				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abc"fgh[/img][/url]'
+				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abc"fgh[/img][/url]',
 			],
 			'bug-12701-no-quotes' => [
 				'expected' => '[![abcfgh](https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png "abcfgh")](https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581)',
-				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abcfgh[/img][/url]'
+				'text'     => '[url=https://domain.tld/photos/user/image/86912721086415cdc8e0a03226831581][img=https://domain.tld/photo/86912721086415cdc8e0a03226831581-1.png]abcfgh[/img][/url]',
+			],
+			/** @see https://github.com/friendica/friendica/pull/14908 */
+			'task-14908-strip-tags' => [
+				'expected' => 'Norddeutscher Bürger !\[Noddeutscher Bürger - Bismark Brötchen (Roger Cziwerny - pixapay)\](/rscamo/……)',
+				'text'     => '[class=postbox-ocean]Norddeutscher Bürger ![Noddeutscher Bürger - Bismark Brötchen (Roger Cziwerny - pixapay)](/rscamo/……)[/class]',
 			],
 		];
 	}
@@ -335,6 +340,29 @@ Karl Marx - Die ursprüngliche Akkumulation
 		self::assertEquals($expected, $actual);
 	}
 
+	public function dataGetTags()
+	{
+		return [
+			'bug-15076-uri-fragments-require-space-before-tags' => [
+				[],
+				'https://github.com/uBlockOrigin/uBOL-home/wiki/Frequently-asked-questions-(FAQ)#if-i-install-ubol-will-i-see-a-difference-with-ubo',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataGetTags
+	 *
+	 * @param array $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testGetTags(array $expected, string $text)
+	{
+		$actual = BBCode::getTags($text);
+
+		self::assertEquals($expected, $actual);
+	}
+
 	public function dataExpandTags()
 	{
 		return [
@@ -345,7 +373,7 @@ Karl Marx - Die ursprüngliche Akkumulation
 			'bug-10692-start-line' => [
 				'#[url=https://friendica.local/search?tag=L160]L160[/url]',
 				'#L160',
-			]
+			],
 		];
 	}
 
@@ -358,6 +386,62 @@ Karl Marx - Die ursprüngliche Akkumulation
 	public function testExpandTags(string $expected, string $text)
 	{
 		$actual = BBCode::expandTags($text);
+
+		self::assertEquals($expected, $actual);
+	}
+
+	public function dataExpandVideoLinks(): array
+	{
+		return [
+			/** @see https://github.com/friendica/friendica/pull/14940 */
+			'task-14940-youtube-watch-with-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://www.youtube.com/watch?v=hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-watch-without-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://youtube.com/watch?v=hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-shorts-with-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://www.youtube.com/shorts/hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-shorts-without-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://youtube.com/shorts/hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-embed-with-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://www.youtube.com/embed/hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-embed-without-www' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://youtube.com/embed/hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-youtube-mobile' => [
+				'expectedBBCode' => '[url=https://www.youtube.com/watch?v=hfwbmTzBFT0]https://www.youtube.com/watch?v=hfwbmTzBFT0[/url]',
+				'text'           => '[youtube]https://m.youtube.com/watch?v=hfwbmTzBFT0[/youtube]',
+			],
+			'task-14940-vimeo' => [
+				'expectedBBCode' => '[url=https://vimeo.com/2345345]https://vimeo.com/2345345[/url]',
+				'text'           => '[vimeo]https://vimeo.com/2345345[/vimeo]',
+			],
+			'task-14940-player-vimeo' => [
+				'expectedBBCode' => '[url=https://vimeo.com/2345345]https://vimeo.com/2345345[/url]',
+				'text'           => '[vimeo]https://player.vimeo.com/video/2345345[/vimeo]',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataExpandVideoLinks
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testExpandVideoLinks(string $expected, string $text)
+	{
+		$actual = BBCode::expandVideoLinks($text);
 
 		self::assertEquals($expected, $actual);
 	}
@@ -612,6 +696,157 @@ Lucas: For the right price, yes.[/share]',
 	public function testFetchShareAttributes(array $expected, string $text)
 	{
 		$actual = BBCode::fetchShareAttributes($text);
+
+		self::assertEquals($expected, $actual);
+	}
+
+	public function dataProfileLink(): array
+	{
+		return [
+			'mention' => [
+				'expected' => 'Test 1: <bdi>@<a href="https://domain.tld/~remotecontact" class="userinfo mention" title="Remote contact">Remote contact</a></bdi>',
+				'text'     => 'Test 1: @[url=https://domain.tld/profile/remotecontact]Remote contact[/url]',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataProfileLink
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testProfileLink(string $expected, string $text)
+	{
+		$actual = BBCode::convertForUriId(0, $text);
+
+		self::assertEquals($expected, $actual);
+	}
+
+	public function dataConvertAttachment(): array
+	{
+		return [
+			'player-rich' => [
+				'expected' => 'text <div class="type-link"><iframe class="embed" src="http://domain.tld/player" style="" height="480px" width="620px" scrolling="no" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups"></iframe>' . "\n</div>",
+				'data'     => [
+					'author_name'   => 'author_name',
+					'author_url'    => 'http://domain.tld/author_url',
+					'description'   => 'description',
+					'image'         => 'http://domain.tld/image',
+					'preview'       => 'http://domain.tld/preview',
+					'provider_name' => 'provider_name',
+					'provider_url'  => 'http://domain.tld/provider_url',
+					'text'          => 'text',
+					'title'         => 'title',
+					'type'          => 'link',
+					'url'           => 'http://domain.tld/page',
+					'player_url'    => 'http://domain.tld/player',
+					'player_width'  => 620,
+					'player_height' => 480,
+					'embed_type'    => 'rich',
+				],
+			],
+			'embed-rich' => [
+				'expected' => 'text <div class="type-link"><iframe class="embed" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{margin:0;padding:0;height:100%;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;iframe src=&quot;http://domain.tld/player&quot;&gt;&lt;/iframe&gt;&lt;/body&gt;&lt;/html&gt;" style="" height="480px" width="620px" scrolling="no" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups"></iframe>' . "\n</div>",
+				'data'     => [
+					'author_name'   => 'author_name',
+					'author_url'    => 'http://domain.tld/author_url',
+					'description'   => 'description',
+					'image'         => 'http://domain.tld/image',
+					'preview'       => 'http://domain.tld/preview',
+					'provider_name' => 'provider_name',
+					'provider_url'  => 'http://domain.tld/provider_url',
+					'text'          => 'text',
+					'title'         => 'title',
+					'type'          => 'link',
+					'url'           => 'http://domain.tld/page',
+					'player_url'    => '',
+					'embed_type'    => 'rich',
+					'embed_html'    => '<iframe src="http://domain.tld/player"></iframe>',
+					'embed_width'   => 620,
+					'embed_height'  => 480,
+				],
+			],
+			'player-video' => [
+				'expected' => 'text <div class="type-link"><iframe class="embed" src="http://domain.tld/player" style="aspect-ratio:620/480;" height="" width="100%" scrolling="no" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups"></iframe>' . "\n</div>",
+				'data'     => [
+					'author_name'   => 'author_name',
+					'author_url'    => 'http://domain.tld/author_url',
+					'description'   => 'description',
+					'image'         => 'http://domain.tld/image',
+					'preview'       => 'http://domain.tld/preview',
+					'provider_name' => 'provider_name',
+					'provider_url'  => 'http://domain.tld/provider_url',
+					'text'          => 'text',
+					'title'         => 'title',
+					'type'          => 'link',
+					'url'           => 'http://domain.tld/page',
+					'player_url'    => 'http://domain.tld/player',
+					'player_width'  => 620,
+					'player_height' => 480,
+					'embed_type'    => 'video',
+				],
+			],
+			'embed-video' => [
+				'expected' => 'text <div class="type-link"><iframe class="embed" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{margin:0;padding:0;height:100%;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;iframe src=&quot;http://domain.tld/player&quot;&gt;&lt;/iframe&gt;&lt;/body&gt;&lt;/html&gt;" style="aspect-ratio:620/480;" height="" width="100%" scrolling="no" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups"></iframe>' . "\n</div>",
+				'data'     => [
+					'author_name'   => 'author_name',
+					'author_url'    => 'http://domain.tld/author_url',
+					'description'   => 'description',
+					'image'         => 'http://domain.tld/image',
+					'preview'       => 'http://domain.tld/preview',
+					'provider_name' => 'provider_name',
+					'provider_url'  => 'http://domain.tld/provider_url',
+					'text'          => 'text',
+					'title'         => 'title',
+					'type'          => 'link',
+					'url'           => 'http://domain.tld/page',
+					'player_url'    => '',
+					'embed_type'    => 'video',
+					'embed_html'    => '<iframe src="http://domain.tld/player"></iframe>',
+					'embed_width'   => 620,
+					'embed_height'  => 480,
+				],
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataConvertAttachment
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testConvertAttachment(string $expected, array $data)
+	{
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$actual = BBCode::convertAttachment('', BBCode::INTERNAL, $data, 0, BBCode::PREVIEW_LARGE, true);
+
+		self::assertEquals($expected, $actual);
+	}
+
+	public function datasetMentionsToNicknames(): array
+	{
+		return [
+			'issue-15623' => [
+				'expected' => 'Whom to believe? @[url=https://bsky.app/profile/did:plc:eclio37ymobqex2ncko63h4s]nytimes.com[/url]',
+				'text'     => 'Whom to believe? @[url=did:plc:eclio37ymobqex2ncko63h4s]nytimes.com[/url]',
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider datasetMentionsToNicknames
+	 *
+	 * @param string $expected Expected BBCode output
+	 * @param string $text     Input text
+	 */
+	public function testsetMentionsToNicknames(string $expected, string $text)
+	{
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$actual = BBCode::setMentionsToNicknames($text);
 
 		self::assertEquals($expected, $actual);
 	}

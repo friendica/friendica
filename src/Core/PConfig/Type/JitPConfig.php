@@ -19,7 +19,7 @@ use Friendica\Core\PConfig\ValueObject;
  */
 class JitPConfig extends AbstractPConfigValues
 {
-	const NAME = 'jit';
+	public const NAME = 'jit';
 
 	/**
 	 * @var array Array of already loaded db values (even if there was no value)
@@ -71,8 +71,8 @@ class JitPConfig extends AbstractPConfigValues
 		}
 
 		// if the value isn't loaded or refresh is needed, load it to the cache
-		if ($this->configModel->isConnected() &&
-			(empty($this->db_loaded[$uid][$cat][$key]) || $refresh)) {
+		if ($this->configModel->isConnected()
+			&& (empty($this->db_loaded[$uid][$cat][$key]) || $refresh)) {
 			$dbValue = $this->configModel->get($uid, $cat, $key);
 
 			if (isset($dbValue)) {
@@ -86,7 +86,7 @@ class JitPConfig extends AbstractPConfigValues
 		// use the config cache for return
 		$result = $this->configCache->get($uid, $cat, $key);
 
-		return (isset($result)) ? $result : $default_value;
+		return $result ?? $default_value;
 	}
 
 	/**

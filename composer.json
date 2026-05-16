@@ -13,13 +13,16 @@
 		"issues": "https://github.com/friendica/friendica/issues"
 	},
 	"require": {
-		"php": ">=7.4",
+		"php": "8.2.* || 8.3.* || 8.4.* || 8.5.*",
+		"ext-apcu": "*",
 		"ext-ctype": "*",
 		"ext-curl": "*",
 		"ext-dom": "*",
 		"ext-fileinfo": "*",
 		"ext-gd": "*",
+		"ext-gmp": "*",
 		"ext-iconv": "*",
+		"ext-imagick": "*",
 		"ext-json": "*",
 		"ext-libxml": "*",
 		"ext-mbstring": "*",
@@ -36,7 +39,8 @@
 		"friendica/json-ld": "^1.0",
 		"geekwright/po": "^2.0",
 		"guzzlehttp/guzzle": "^7",
-		"guzzlehttp/oauth-subscriber": "^0.6",
+		"guzzlehttp/oauth-subscriber": "^0.8",
+		"james-heinrich/getid3": "^1.9",
 		"kornrunner/blurhash": "^1.2",
 		"league/html-to-markdown": "^4.8",
 		"level-2/dice": "^4",
@@ -46,6 +50,7 @@
 		"michelf/php-markdown": "^1.7",
 		"minishlink/web-push": "^6.0",
 		"mobiledetect/mobiledetectlib": "^3.74",
+		"mpratt/embera": "~2.0",
 		"nikic/fast-route": "^1.3",
 		"npm-asset/chart.js": "^2.8",
 		"npm-asset/cropperjs": "1.2.2",
@@ -58,15 +63,17 @@
 		"npm-asset/jquery": "^2.0",
 		"npm-asset/jquery-colorbox": "^1.6",
 		"npm-asset/jquery-datetimepicker": "^2.5",
+		"npm-asset/jquery-textcomplete": "^1.8.5",
 		"npm-asset/moment": "^2.24",
 		"npm-asset/perfect-scrollbar": "0.6.16",
-		"npm-asset/textcomplete": "^0.18.2",
 		"npm-asset/typeahead.js": "^0.11.1",
 		"oomphinc/composer-installers-extender": "^2.0",
 		"paragonie/hidden-string": "^1.0",
 		"patrickschur/language-detection": "^5.0.0",
 		"pear/console_table": "^1.3",
-		"phpseclib/phpseclib": "^3.0",
+		"php-ffmpeg/php-ffmpeg": "^0.19.0",
+		"phpseclib/phpseclib": "^3.0.47",
+		"phrity/websocket": "^1.7",
 		"pragmarx/google2fa": "^5.0",
 		"pragmarx/recovery": "^0.2",
 		"psr/clock": "^1.0",
@@ -76,7 +83,6 @@
 		"seld/cli-prompt": "^1.0",
 		"smarty/smarty": "^4",
 		"symfony/event-dispatcher": "^5.4",
-		"textalk/websocket": "^1.6",
 		"ua-parser/uap-php": "^3.9",
 		"xemlock/htmlpurifier-html5": "^0.1.11"
 	},
@@ -112,7 +118,7 @@
 	},
 	"config": {
 		"platform": {
-			"php": "7.4"
+			"php": "8.2"
 		},
 		"sort-packages": true,
 		"autoloader-suffix": "Friendica",
@@ -150,33 +156,36 @@
 		]
 	},
 	"require-dev": {
-		"dms/phpunit-arraysubset-asserts": "^0.3.1",
+		"friendsofphp/php-cs-fixer": "^3.94",
 		"mikey179/vfsstream": "^1.6",
 		"mockery/mockery": "^1.3",
 		"php-mock/php-mock-mockery": "^1.5",
-		"php-mock/php-mock-phpunit": "^2.10",
+		"php-mock/php-mock-phpunit": "^2.15",
 		"phpmd/phpmd": "^2.15",
-		"phpstan/phpstan": "^2.0",
-		"phpunit/phpunit": "^9"
+		"phpstan/phpstan": "^2.1.39",
+		"phpstan/phpstan-strict-rules": "^2.0.10",
+		"phpunit/phpunit": "^9.6",
+		"rector/rector": "^2.2"
 	},
 	"scripts": {
 		"test": "phpunit",
 		"test:unit": "phpunit -c tests/phpunit.xml --testsuite unit",
 		"phpmd": "phpmd src/ text .phpmd-ruleset.xml --color --cache",
 		"phpstan": "phpstan analyze --memory-limit 1024M --configuration .phpstan.neon",
+		"phpstan-addons": "phpstan analyze --memory-limit 1024M --configuration .phpstan-addons.neon",
 		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './view/asset/*' -print0 | xargs -0 -n1 php -l",
 		"docker:translate": "docker run --rm -v $PWD:/data -w /data friendicaci/transifex bin/run_xgettext.sh",
 		"lang:recreate": "bin/run_xgettext.sh",
-		"cs:install": "@composer install --working-dir=bin/dev/php-cs-fixer",
-		"cs:check": [
-			"@cs:install",
-			"bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer check --diff"
-		],
-		"cs:fix": [
-			"@cs:install",
-			"bin/dev/php-cs-fixer/vendor/bin/php-cs-fixer fix"
-		],
+		"cs:check": "php-cs-fixer check --diff",
+		"cs:fix": "php-cs-fixer fix",
 		"cs:fix-develop": "TARGET_BRANCH=develop COMMAND=fix bin/dev/fix-codestyle.sh",
+		"rector:check": "@rector:run --dry-run",
+		"rector:run": "rector --config=\".rector.php\"",
+		"rectify": [
+			"@rector:run",
+			"@lang:recreate",
+			"@cs:fix-develop"
+		],
 		"db:update-structure": "bin/console.php dbstructure dumpsql > database.sql",
 		"install:prod": "@composer install -o --no-dev"
 	}

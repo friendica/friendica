@@ -72,12 +72,13 @@ class GroupManager
 
 		while ($contact = DBA::fetch($contacts)) {
 			$groupList[] = [
-				'url'   => $contact['url'],
-				'alias' => $contact['alias'],
-				'name'  => $contact['name'],
-				'id'    => $contact['id'],
-				'micro' => $contact['micro'],
-				'thumb' => $contact['thumb'],
+				'url'     => $contact['url'],
+				'alias'   => $contact['alias'],
+				'name'    => $contact['name'],
+				'id'      => $contact['id'],
+				'micro'   => $contact['micro'],
+				'thumb'   => $contact['thumb'],
+				'network' => $contact['network'],
 			];
 		}
 		DBA::close($contacts);
@@ -122,18 +123,23 @@ class GroupManager
 
 		$tpl = Renderer::getMarkupTemplate('widget/group_list.tpl');
 
+
+		$addonHelper = DI::addonHelper();
+
 		return Renderer::replaceMacros(
 			$tpl,
 			[
-				'$title'            => DI::l10n()->t('Groups'),
-				'$groups'           => $entries,
-				'$link_desc'        => DI::l10n()->t('External link to group'),
-				'$new_group_page'   => 'register/',
-				'$total'            => $total,
-				'$visible_groups'   => $visibleGroups,
-				'$showless'         => DI::l10n()->t('show less'),
-				'$showmore'         => DI::l10n()->t('show more'),
-				'$create_new_group' => DI::l10n()->t('Create new group')
+				'$title'                         => DI::l10n()->t('Groups'),
+				'$groups'                        => $entries,
+				'$link_desc'                     => DI::l10n()->t('External link to group'),
+				'$new_group_page'                => 'register/?type=group',
+				'$total'                         => $total,
+				'$visible_groups'                => $visibleGroups,
+				'$showless'                      => DI::l10n()->t('show less'),
+				'$showmore'                      => DI::l10n()->t('show more'),
+				'$create_new_group'              => DI::l10n()->t('Create new group'),
+				'$addon_group_directory_enabled' => $addonHelper->isAddonEnabled("groupdirectory"),
+				'$visit_groupdirectory'          => DI::l10n()->t('Find groups to join'),
 			],
 		);
 	}
@@ -203,7 +209,7 @@ class GroupManager
 			Protocol::DFRN,
 			Protocol::ACTIVITYPUB,
 			Contact::TYPE_COMMUNITY,
-			DI::userSession()->getLocalUserId()
+			DI::userSession()->getLocalUserId(),
 		);
 
 		return DBA::toArray($stmtContacts);

@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -8,7 +9,7 @@
  *
  * Starts the background processing
  *
- * @deprecated 2025.02 use `bin/console.php worker` instead
+ * @deprecated 2026.01 use `bin/console.php worker` instead
  */
 
 if (php_sapi_name() !== 'cli') {
@@ -21,7 +22,7 @@ chdir(dirname(__DIR__));
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-fwrite(STDOUT, '`bin/worker.php` is deprecated since 2025.02 and will be removed in 5 months, please use `bin/console.php worker` instead.' . \PHP_EOL);
+fwrite(STDOUT, '`bin/worker.php` is deprecated since 2026.01 and will be removed in 5 months, please use `bin/console.php worker` instead.' . \PHP_EOL);
 
 // BC: Add console command as second argument
 $argv = $_SERVER['argv'] ?? [];

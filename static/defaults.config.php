@@ -83,6 +83,10 @@ return [
 		// Checks for missing entries in "post", "post-thread" or "post-thread-user" and creates them
 		'add_missing_posts' => false,
 
+		// add_page_media (boolean)
+		// Add page related audio and video media when adding a HTML page entry
+		'add_page_media' => false,
+
 		// admin_inactivity_limit (Integer)
 		// Days of inactivity after which an admin is considered inactive. "0" means that there will be no check for inactivity.
 		'admin_inactivity_limit' => 30,
@@ -138,6 +142,18 @@ return [
 		// block_local_dir (Boolean)
 		// Deny public access to the local user directory.
 		'block_local_dir' => false,
+
+		// channel_cache (Boolean)
+		// Pregenerate channel posts.
+		'channel_cache' => false,
+
+		// contact_add_limit (Integer)
+		// How many contacts should be added at a time?
+		'contact_add_limit' => 10,
+
+		// contact_discovery_limit (Integer)
+		// How many contacts relations should be checked at a time?
+		'contact_discovery_limit' => 10,
 
 		// contact_update_limit (Integer)
 		// How many contacts should be checked at a time?
@@ -274,6 +290,11 @@ return [
 		// Fetch featured posts from all contacts
 		'fetch_featured_posts' => false,
 
+		// ffmpeg_installed (Boolean)
+		// When FFMpeg is installed, video thumbnails will be generated.
+		// We will also be able to fetch video dimensions in a more ressource-friendly way.
+		'ffmpeg_installed' => false,
+
 		// free_crawls (Integer)
 		// Number of "free" searches when system => permit_crawling is enabled.
 		'free_crawls' => 10,
@@ -340,7 +361,7 @@ return [
 
 		// logger_config (String)
 		// Sets the logging adapter of Friendica globally (syslog, stream)
-		// @deprecated 2025.02 The value `monolog` is deprecated, please use `stream` or `syslog` instead.
+		// @deprecated 2026.01 The value `monolog` is deprecated, please use `stream` or `syslog` instead.
 		'logger_config' => 'stream',
 
 		// syslog_flags (Integer)
@@ -360,6 +381,10 @@ return [
 		// End of the window for the daily maintenance cron call
 		// The system timezone is used when no timezone is defined here.
 		'maintenance_end' => '03:00 +00:00',
+
+		// max_banner_width (Integer)
+		// Maximum width for profile banner images
+		'max_banner_width' => 960,
 
 		// max_connections (Integer)
 		// The maximum number of database connections which can be in use before the worker process is deferred to its next interval.
@@ -383,6 +408,10 @@ return [
 		// max_fetchreplies_depth (Integer)
 		// Maximum number of "fetchreplies" activities in the callstack. The higher, the more complete a thread will be.
 		'max_fetchreplies_depth' => 2,
+
+		// max_height (Integer)
+		// Maximum height for OEmbed and videos
+		'max_height' => 620,
 
 		// max_image_length (Integer)
 		// An alternate way of limiting picture upload sizes.
@@ -411,9 +440,9 @@ return [
 		// Maximum recursion depth when fetching posts until the job is delegated to a worker task or finished.
 		'max_recursion_depth' => 50,
 
-		// max_video_height (Integer)
-		// Maximum height of videos in portrait mode.
-		'max_video_height' => 640,
+		// max_width (Integer)
+		// Maximum width for OEmbed and videos
+		'max_width' => 620,
 
 		// memcache_host (String)
 		// Host name of the memcache daemon.
@@ -430,7 +459,7 @@ return [
 		],
 
 		// minimum_posting_interval (Integer)
-		// Minimum interval between two feed posts per user
+		// Minimum interval in minutes between two feed posts per user
 		'minimum_posting_interval' => 0,
 
 		// no_count (Boolean)
@@ -562,9 +591,17 @@ return [
 		// Show all themes including the unsupported ones.
 		'show_unsupported_themes' => false,
 
+		// songlink (Boolean)
+		// Use song.link (Odesli) to add multiple sources to embedded music
+		'songlink' => false,
+
 		// stats_key (String)
 		// A random string to be added to the /stats?key=... endpoint to enable the monitoring statistics
 		'stats_key' => '',
+
+		// system_channel_cache (Boolean)
+		// Pregenerate system channel posts.
+		'system_channel_cache' => false,
 
 		// throttle_limit_day (Integer)
 		// Maximum number of posts that a user can send per day with the API. 0 to disable daily throttling.
@@ -600,6 +637,10 @@ return [
 		// Minimum for this config value is 1. Maximum is 64 as the resulting profile URL mustn't be longer than 255 chars.
 		'username_max_length' => 48,
 
+		// videojs (Boolean)
+		// Experimental: Use Video.js as videoplayer. Since there are known issues, enabling is not recommended.
+		'videojs' => false,
+
 		// worker_cooldown (Float)
 		// Cooldown period in seconds before each worker function call.
 		'worker_cooldown' => 0,
@@ -634,7 +675,7 @@ return [
 			Friendica\Core\Worker::PRIORITY_HIGH       => 10,
 			Friendica\Core\Worker::PRIORITY_MEDIUM     => 60,
 			Friendica\Core\Worker::PRIORITY_LOW        => 180,
-			Friendica\Core\Worker::PRIORITY_NEGLIGIBLE => 720
+			Friendica\Core\Worker::PRIORITY_NEGLIGIBLE => 720,
 		],
 
 		// worker_max_idletime (Integer)
@@ -750,5 +791,34 @@ return [
 		// Maximum number of DIDs that are filtered in Jetstream. The maximum number is 10,000,
 		// The higher the number, the more likely the system won't be able to process the posts on time.
 		'did_limit' => 1000,
+	],
+	'atprotocol' => [
+		// appview_api (URL)
+		// Path to a public AppView server.
+		'appview_api' => 'https://public.api.bsky.app',
+		// frontends (Array)
+		// Array of various web frontends for the AT Protocol
+		'frontends' => [
+			'https://akari.blue'         => ['akari', 'https://akari.blue/profile/{did}', 'https://akari.blue/profile/{did}/post/{rkey}'],
+			'https://atsky.app'          => ['Atsky', 'https://atsky.app/profile/{did}', 'https://atsky.app/profile/{did}/post/{rkey}'],
+			'https://bsky.app'           => ['Bluesky', 'https://bsky.app/profile/{did}', 'https://bsky.app/profile/{did}/post/{rkey}'],
+			'https://blacksky.community' => ['Blacksky', 'https://blacksky.community/profile/{did}', 'https://blacksky.community/profile/{did}/post/{rkey}'],
+			'https://deer.social'        => ['Deer', 'https://deer.social/profile/{did}', 'https://deer.social/profile/{did}/post/{rkey}'],
+			'https://reddwarf.app'       => ['Red Dwarf', 'https://reddwarf.app/profile/{did}', 'https://reddwarf.app/profile/{did}/post/{rkey}'],
+			'https://klearsky.pages.dev' => ['Klearsky', 'https://klearsky.pages.dev/?ref=blueskydirectory#/profile/feeds?account={did}', 'https://klearsky.pages.dev/#/post?uri=at://{did}/{collection}/{rkey}'],
+		],
+		// jetstream (URL)
+		// Path to the jetstream service. Available servers from Bluesky are:
+		// jetstream1.us-east.bsky.network, jetstream2.us-east.bsky.network, jetstream1.us-west.bsky.network, jetstream2.us-west.bsky.network
+		// independant servers are: jetstream2.fr.hose.cam and jetstream.fire.hose.cam
+		// See also the servers at https://firehose.stream/
+		'jetstream' => 'jetstream1.us-west.bsky.network',
+		// directory (URL)
+		// Path to the directory server service to fetch the PDS of a given DID
+		'plc_directory' => 'https://plc.directory',
+		// web (URL)
+		// Path to the web interface with the user profile and posts.
+		// See 'frontends' for the available options.
+		'web' => 'https://bsky.app',
 	],
 ];

@@ -54,7 +54,7 @@ class PublicTimeline extends BaseApi
 			'remote'          => false, // Show only remote statuses? Defaults to false.
 			'only_media'      => false, // Show only statuses with media attached? Defaults to false.
 			'with_muted'      => false, // Pleroma extension: return activities by muted (not by blocked!) users.
-			'exclude_replies' => false, // Don't show comments
+			'exclude_replies' => true,  // Don't show comments
 			'friendica_order' => TimelineOrderByTypes::ID, // Sort order options (defaults to ID)
 		], $request);
 
@@ -70,7 +70,7 @@ class PublicTimeline extends BaseApi
 
 		$condition = [
 			'gravity' => [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT], 'private' => Item::PUBLIC,
-			'network' => Protocol::FEDERATED, 'author-blocked' => false, 'author-hidden' => false
+			'network' => Protocol::FEDERATED, 'author-blocked' => false, 'author-hidden' => false,
 		];
 
 		$condition = $this->addPagingConditions($request, $condition);
@@ -89,7 +89,7 @@ class PublicTimeline extends BaseApi
 		if ($request['only_media']) {
 			$condition = DBA::mergeConditions($condition, [
 				"`uri-id` IN (SELECT `uri-id` FROM `post-media` WHERE `type` IN (?, ?, ?))",
-				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO
+				Post\Media::AUDIO, Post\Media::IMAGE, Post\Media::VIDEO, Post\Media::HLS,
 			]);
 		}
 
@@ -99,16 +99,16 @@ class PublicTimeline extends BaseApi
 
 		if ($request['local']) {
 			$items = Post::selectLocalTimelineForUser($uid, ['uri-id'], $condition, $params);
+		} elseif ($request['exclude_replies']) {
+			$items = Post::selectTimelineThreadForUser($uid, ['uri-id'], $condition, $params);
 		} else {
 			$items = Post::selectTimelineForUser($uid, ['uri-id'], $condition, $params);
 		}
 
-		$display_quotes = self::appSupportsQuotes();
-
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			try {
-				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
 				$this->updateBoundaries($status, $item, $request['friendica_order']);
 				$statuses[] = $status;
 			} catch (\Throwable $th) {

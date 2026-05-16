@@ -47,6 +47,15 @@ class Processor
 	/** @var Actor */
 	private $actor;
 
+	/**
+	 * Processor constructor.
+	 *
+	 * @param Database $database
+	 * @param LoggerInterface $logger
+	 * @param BaseURL $baseURL
+	 * @param ATProtocol $atprotocol
+	 * @param Actor $actor
+	 */
 	public function __construct(Database $database, LoggerInterface $logger, BaseURL $baseURL, ATProtocol $atprotocol, Actor $actor)
 	{
 		$this->db         = $database;
@@ -56,23 +65,40 @@ class Processor
 		$this->actor      = $actor;
 	}
 
+	/**
+	 * Process account events and update contact archive state.
+	 *
+	 * @param stdClass $data
+	 * @return void
+	 */
 	public function processAccount(stdClass $data)
 	{
 		$fields = [
 			'archive' => !$data->account->active,
 			'failed'  => !$data->account->active,
-			'updated' => DateTimeFormat::utc($data->account->time, DateTimeFormat::MYSQL)
+			'updated' => DateTimeFormat::utc($data->account->time, DateTimeFormat::MYSQL),
 		];
 
 		$this->logger->notice('Process account', ['did' => $data->identity->did, 'fields' => $fields]);
 
-		Contact::update($fields, ['nurl' => $data->identity->did, 'network' => Protocol::BLUESKY]);
+		Contact::update($fields, ['nurl' => $data->identity->did, 'network' => Protocol::ATPROTO]);
 	}
 
+	/**
+	 * Process identity events and update contact aliases.
+	 *
+	 * @param stdClass $data
+	 * @return void
+	 */
 	public function processIdentity(stdClass $data)
 	{
+		if (!isset($data->identity->handle)) {
+			$this->logger->warning('No handle provided', ['data' => $data]);
+			return;
+		}
+
 		$fields = [
-			'alias'   => ATProtocol::WEB . '/profile/' . $data->identity->did,
+			'alias'   => $this->actor->getProfileLink($data->identity->did),
 			'nick'    => $data->identity->handle,
 			'addr'    => $data->identity->handle,
 			'updated' => DateTimeFormat::utc($data->identity->time, DateTimeFormat::MYSQL),
@@ -80,9 +106,16 @@ class Processor
 
 		$this->logger->notice('Process identity', ['did' => $data->identity->did, 'fields' => $fields]);
 
-		Contact::update($fields, ['nurl' => $data->identity->did, 'network' => Protocol::BLUESKY]);
+		Contact::update($fields, ['nurl' => $data->identity->did, 'network' => Protocol::ATPROTO]);
 	}
 
+	/**
+	 * Apply block or unblock events for local users.
+	 *
+	 * @param stdClass $data
+	 * @param int $uid
+	 * @return void
+	 */
 	public function performBlocks(stdClass $data, int $uid)
 	{
 		if (!$uid) {
@@ -106,6 +139,12 @@ class Processor
 		$this->logger->info('Contact blocked', ['id' => $contact['id'], 'did' => $data->commit->record->subject, 'uid' => $uid]);
 	}
 
+	/**
+	 * Delete an existing record identified by DID, collection and rkey.
+	 *
+	 * @param stdClass $data
+	 * @return void
+	 */
 	public function deleteRecord(stdClass $data)
 	{
 		$uri     = 'at://' . $data->did . '/' . $data->commit->collection . '/' . $data->commit->rkey;
@@ -115,7 +154,7 @@ class Processor
 			return;
 		}
 
-		$condition = ['uri-id' => $itemuri['id'], 'author-link' => $data->did, 'network' => Protocol::BLUESKY];
+		$condition = ['uri-id' => $itemuri['id'], 'author-link' => $data->did, 'network' => Protocol::ATPROTO];
 		if (!Post::exists($condition)) {
 			$this->logger->info('Record not found', $condition);
 			return;
@@ -124,6 +163,14 @@ class Processor
 		$this->logger->info('Record deleted', $condition);
 	}
 
+	/**
+	 * Create a post from Jetstream data
+	 *
+	 * @param stdClass $data
+	 * @param array $uids
+	 * @param boolean $dont_fetch
+	 * @return void
+	 */
 	public function createPost(stdClass $data, array $uids, bool $dont_fetch)
 	{
 		$parent = '';
@@ -151,7 +198,7 @@ class Processor
 
 			if (!empty($root)) {
 				$item['parent-uri'] = $root;
-				$item['thr-parent'] = $this->fetchMissingPost($parent, $uid, Item::PR_FETCHED, $item['contact-id'], 0, $parent, false, Conversation::PARCEL_JETSTREAM);
+				$item['thr-parent'] = $this->fetchMissingPost($parent, $uid, Item::PR_FETCHED, $item['contact-id'], 0, $parent, !$dont_fetch, Conversation::PARCEL_JETSTREAM);
 				$item['gravity']    = Item::GRAVITY_COMMENT;
 			} else {
 				$item['gravity'] = Item::GRAVITY_PARENT;
@@ -163,14 +210,14 @@ class Processor
 			if (!empty($data->commit->record->embed)) {
 				if (empty($post)) {
 					$uri  = 'at://' . $data->did . '/' . $data->commit->collection . '/' . $data->commit->rkey;
-					$post = $this->atprotocol->XRPCGet('app.bsky.feed.getPostThread', ['uri' => $uri]);
+					$post = $this->atprotocol->XRPCGet('app.bsky.feed.getPostThread', ['uri' => $uri], 0);
 					if (empty($post->thread->post->embed)) {
 						$this->logger->notice('Post was not fetched', ['uri' => $uri, 'post' => $post]);
 						return;
 					}
 				}
 				$item['source'] = json_encode($post);
-				$item           = $this->addMedia($post->thread->post->embed, $item, 0);
+				$item           = $this->addMedia($post->thread->post->embed, $item, Conversation::PARCEL_JETSTREAM, 0);
 			}
 
 			$id = Item::insert($item);
@@ -185,6 +232,14 @@ class Processor
 		}
 	}
 
+	/**
+	 * Create repost activity items from Jetstream data.
+	 *
+	 * @param stdClass $data
+	 * @param array $uids
+	 * @param bool $dont_fetch
+	 * @return void
+	 */
 	public function createRepost(stdClass $data, array $uids, bool $dont_fetch)
 	{
 		if ($dont_fetch && !$this->getPostUids($this->getUri($data->commit->record->subject), true)) {
@@ -203,11 +258,14 @@ class Processor
 			$item['thr-parent'] = $this->getUri($data->commit->record->subject);
 			$item['thr-parent'] = $this->fetchMissingPost($item['thr-parent'], 0, Item::PR_FETCHED, $item['contact-id'], 0, $item['thr-parent'], false, Conversation::PARCEL_JETSTREAM);
 
+			if (!Post::exists(['uri' => $item['thr-parent'], 'uid' => [0, $uid]])) {
+				$this->logger->warning('Thread parent does not exist', ['uid' => $uid, 'thr-parent' => $item['thr-parent']]);
+			}
 			$id = Item::insert($item);
 
 			if ($id) {
 				$this->logger->info('Repost inserted', ['id' => $id]);
-			} elseif (Post::exists(['uid' => $uid, 'uri-id' => $item['uri-id']])) {
+			} elseif (Post::exists(['uid' => $item['uid'], 'uri-id' => $item['uri-id']])) {
 				$this->logger->notice('Repost was found', ['uri' => $item['uri']]);
 			} else {
 				$this->logger->warning('Repost was not inserted', ['uri' => $item['uri']]);
@@ -215,6 +273,12 @@ class Processor
 		}
 	}
 
+	/**
+	 * Create like activity items for existing posts.
+	 *
+	 * @param stdClass $data
+	 * @return void
+	 */
 	public function createLike(stdClass $data)
 	{
 		$uids = $this->getPostUids($this->getUri($data->commit->record->subject), false);
@@ -223,6 +287,11 @@ class Processor
 			return;
 		}
 		foreach ($uids as $uid) {
+			$parent = $this->getPostUri($this->getUri($data->commit->record->subject), $uid);
+			if (!$parent) {
+				$this->logger->debug('Parent for like does not exist. Like will not be inserted.', ['uid' => $uid, 'uri' => $parent]);
+				continue;
+			}
 			$item = $this->getHeaderFromJetstream($data, $uid);
 			if (empty($item)) {
 				continue;
@@ -230,7 +299,7 @@ class Processor
 
 			$item['gravity']    = Item::GRAVITY_ACTIVITY;
 			$item['body']       = $item['verb'] = Activity::LIKE;
-			$item['thr-parent'] = $this->getPostUri($this->getUri($data->commit->record->subject), $uid);
+			$item['thr-parent'] = $parent;
 
 			$id = Item::insert($item);
 
@@ -244,11 +313,25 @@ class Processor
 		}
 	}
 
+	/**
+	 * Determine whether a follow-delete event targets a local account.
+	 *
+	 * @param stdClass $data
+	 * @param array $self
+	 * @return bool
+	 */
 	public function deleteFollow(stdClass $data, array $self): bool
 	{
 		return !empty($self[$data->did]);
 	}
 
+	/**
+	 * Create follow relationships for local users based on follow events.
+	 *
+	 * @param stdClass $data
+	 * @param array $self
+	 * @return bool
+	 */
 	public function createFollow(stdClass $data, array $self): bool
 	{
 		if (!empty($self[$data->did])) {
@@ -274,6 +357,17 @@ class Processor
 		return true;
 	}
 
+	/**
+	 * Import a post and related metadata into Friendica.
+	 *
+	 * @param stdClass $post
+	 * @param int $uid
+	 * @param int $post_reason
+	 * @param int $causer
+	 * @param int $level
+	 * @param int $protocol
+	 * @return int
+	 */
 	public function processPost(stdClass $post, int $uid, int $post_reason, int $causer, int $level, int $protocol): int
 	{
 		$uri = $this->getUri($post);
@@ -293,13 +387,26 @@ class Processor
 		if (empty($item)) {
 			return 0;
 		}
-		$item = $this->getContent($item, $post->record, $uri, $uid, $level);
+
+		if (isset($post->record->reply->root)) {
+			$root   = $this->getUri($post->record->reply->root);
+			$parent = $this->getPostUri($root, $uid);
+			if (!$parent) {
+				$parent = $this->fetchMissingPost($root, $uid, Item::PR_COMPLETION, $item['contact-id'], $level, '', false, $protocol);
+			}
+			if (!$parent) {
+				$this->logger->warning('Root post could not be fetched', ['uri' => $uri, 'root' => $root]);
+				return 0;
+			}
+		}
+
+		$item = $this->getContent($item, $post->record, $uri, $uid);
 		if (empty($item)) {
 			return 0;
 		}
 
 		if (!empty($post->embed)) {
-			$item = $this->addMedia($post->embed, $item, $level);
+			$item = $this->addMedia($post->embed, $item, $protocol, $level);
 		}
 
 		$item['restrictions'] = $this->getRestrictionsForUser($post, $item, $post_reason);
@@ -325,6 +432,14 @@ class Processor
 		return $this->fetchUriId($uri, $uid);
 	}
 
+	/**
+	 * Build the common item header from a Jetstream payload.
+	 *
+	 * @param stdClass $data
+	 * @param int $uid
+	 * @param int $protocol
+	 * @return array
+	 */
 	private function getHeaderFromJetstream(stdClass $data, int $uid, int $protocol = Conversation::PARCEL_JETSTREAM): array
 	{
 		$contact = $this->actor->getContactByDID($data->did, $uid, 0, true);
@@ -334,7 +449,7 @@ class Processor
 		}
 
 		$item = [
-			'network'       => Protocol::BLUESKY,
+			'network'       => Protocol::ATPROTO,
 			'protocol'      => $protocol,
 			'uid'           => $uid,
 			'wall'          => false,
@@ -350,9 +465,10 @@ class Processor
 			'owner-name'    => $contact['name'],
 			'owner-link'    => $contact['url'],
 			'owner-avatar'  => $contact['avatar'],
-			'plink'         => $contact['alias'] . '/post/' . $data->commit->rkey,
 			'source'        => json_encode($data),
 		];
+
+		$item['plink'] = $this->atprotocol->getPostLink($item['uri']);
 
 		if ((time() - strtotime($item['created'])) > 600) {
 			$item['received'] = $item['created'];
@@ -365,7 +481,7 @@ class Processor
 
 		$account          = Contact::selectAccountUserById($contact['id'], ['pid']);
 		$item['owner-id'] = $item['author-id'] = $account['pid'];
-		$item['uri-id']   = ItemURI::getIdByURI($item['uri']);
+		$item['uri-id']   = ItemURI::insert(['uri' => $item['uri'], 'guid' => $item['guid']]);
 
 		if (in_array($contact['rel'], [Contact::SHARING, Contact::FRIEND])) {
 			$item['post-reason'] = Item::PR_FOLLOWER;
@@ -386,6 +502,15 @@ class Processor
 		return $item;
 	}
 
+	/**
+	 * Build the common item header from a fetched ATProto post.
+	 *
+	 * @param stdClass $post
+	 * @param string $uri
+	 * @param int $uid
+	 * @param int $protocol
+	 * @return array
+	 */
 	public function getHeaderFromPost(stdClass $post, string $uri, int $uid, int $protocol): array
 	{
 		$parts = $this->getUriParts($uri);
@@ -399,7 +524,7 @@ class Processor
 		}
 
 		$item = [
-			'network'       => Protocol::BLUESKY,
+			'network'       => Protocol::ATPROTO,
 			'protocol'      => $protocol,
 			'uid'           => $uid,
 			'wall'          => false,
@@ -448,7 +573,16 @@ class Processor
 		return $item;
 	}
 
-	private function getContent(array $item, stdClass $record, string $uri, int $uid, int $level): array
+	/**
+	 * Fill an item with body, parent linkage and language metadata.
+	 *
+	 * @param array $item
+	 * @param stdClass $record
+	 * @param string $uri
+	 * @param int $uid
+	 * @return array
+	 */
+	private function getContent(array $item, stdClass $record, string $uri, int $uid): array
 	{
 		if (empty($item)) {
 			return [];
@@ -477,6 +611,13 @@ class Processor
 		return $item;
 	}
 
+	/**
+	 * Convert ATProto facets to BBCode links and store hashtags.
+	 *
+	 * @param stdClass $record
+	 * @param int $uri_id
+	 * @return string
+	 */
 	private function parseFacets(stdClass $record, int $uri_id): string
 	{
 		$text = $record->text ?? '';
@@ -506,13 +647,10 @@ class Processor
 						break;
 
 					case 'app.bsky.richtext.facet#mention':
-						$contact = Contact::getByURL($feature->did, null, ['id']);
-						if (!empty($contact['id'])) {
-							$url = $this->baseURL . '/contact/' . $contact['id'];
-							if (substr($linktext, 0, 1) == '@') {
-								$prefix .= '@';
-								$linktext = substr($linktext, 1);
-							}
+						$url = $feature->did;
+						if (str_starts_with($linktext, '@')) {
+							$prefix .= '@';
+							$linktext = substr($linktext, 1);
 						}
 						break;
 
@@ -534,7 +672,16 @@ class Processor
 		return $text;
 	}
 
-	private function addMedia(stdClass $embed, array $item, int $level): array
+	/**
+	 * Add media and quoted-post references from an embed payload.
+	 *
+	 * @param stdClass $embed
+	 * @param array $item
+	 * @param int $protocol
+	 * @param int $level
+	 * @return array
+	 */
+	private function addMedia(stdClass $embed, array $item, int $protocol, int $level): array
 	{
 		$type = '$type';
 		switch ($embed->$type) {
@@ -590,7 +737,7 @@ class Processor
 				}
 				$fetched_uri = $this->getPostUri($uri, $item['uid']);
 				if (!$fetched_uri) {
-					$uri = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri);
+					$uri = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri, false, $protocol);
 				} else {
 					$uri = $fetched_uri;
 				}
@@ -606,9 +753,9 @@ class Processor
 				break;
 
 			case 'app.bsky.embed.recordWithMedia#view':
-				$this->addMedia($embed->media, $item, $level);
+				$this->addMedia($embed->media, $item, $protocol, $level);
 				$original_uri = $uri = $this->getUri($embed->record->record);
-				$uri          = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri);
+				$uri          = $this->fetchMissingPost($uri, 0, Item::PR_FETCHED, $item['contact-id'], $level, $uri, false, $protocol);
 				if ($uri) {
 					$shared = Post::selectFirst(['uri-id'], ['uri' => $uri, 'uid' => [$item['uid'], 0]]);
 					$uri_id = $shared['uri-id'] ?? 0;
@@ -627,6 +774,13 @@ class Processor
 		return $item;
 	}
 
+	/**
+	 * Add starter pack metadata as HTML media to the post.
+	 *
+	 * @param array $item
+	 * @param stdClass $record
+	 * @return void
+	 */
 	private function addStarterpack(array $item, stdClass $record)
 	{
 		$this->logger->debug('Received starterpack', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'uri' => $record->uri]);
@@ -651,6 +805,14 @@ class Processor
 		Post\Media::update($fields, ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
 	}
 
+	/**
+	 * Determine reply restrictions for a user based on threadgate rules.
+	 *
+	 * @param stdClass $post
+	 * @param array $item
+	 * @param int $post_reason
+	 * @return int|null
+	 */
 	private function getRestrictionsForUser(stdClass $post, array $item, int $post_reason): ?int
 	{
 		if (!empty($post->viewer->replyDisabled)) {
@@ -697,14 +859,27 @@ class Processor
 		return $restrict ? Item::CANT_REPLY : null;
 	}
 
-	public function fetchMissingPost(string $uri, int $uid, int $post_reason, int $causer, int $level, string $fallback = '', bool $always_fetch = false, int $Protocol = Conversation::PARCEL_JETSTREAM): string
+	/**
+	 * Fetch, import and return the canonical URI of a missing post.
+	 *
+	 * @param string $uri
+	 * @param int $uid
+	 * @param int $post_reason
+	 * @param int $causer
+	 * @param int $level
+	 * @param string $fallback
+	 * @param bool $complete_thread
+	 * @param int $Protocol
+	 * @return string
+	 */
+	public function fetchMissingPost(string $uri, int $uid, int $post_reason, int $causer, int $level, string $fallback = '', bool $complete_thread = false, int $Protocol = Conversation::PARCEL_JETSTREAM): string
 	{
 		$timestamp = microtime(true);
 		$stamp     = Strings::getRandomHex(30);
 		$this->logger->debug('Fetch missing post', ['uri' => $uri, 'stamp' => $stamp]);
 
 		$fetched_uri = $this->getPostUri($uri, $uid);
-		if (!$always_fetch && !empty($fetched_uri)) {
+		if (!$complete_thread && !empty($fetched_uri)) {
 			return $fetched_uri;
 		}
 
@@ -723,7 +898,7 @@ class Processor
 		$fetch_uri = $class->uri;
 
 		$this->logger->debug('Fetch missing post', ['level' => $level, 'uid' => $uid, 'uri' => $uri]);
-		$data = $this->atprotocol->XRPCGet('app.bsky.feed.getPostThread', ['uri' => $fetch_uri]);
+		$data = $this->atprotocol->XRPCGet('app.bsky.feed.getPostThread', ['uri' => $fetch_uri], $this->atprotocol->getUserForProtocol($Protocol));
 		if (empty($data) || empty($data->thread)) {
 			$this->logger->info('Thread was not fetched', ['level' => $level, 'uid' => $uid, 'uri' => $uri, 'fallback' => $fallback]);
 			if (microtime(true) - $timestamp > 2) {
@@ -732,21 +907,22 @@ class Processor
 			return $fallback;
 		}
 
+		if (isset($data->thread->post->record->reply->root)) {
+			$parent = $this->getUri($data->thread->post->record->reply->root);
+			if (!$this->getPostUri($parent, $uid)) {
+				$result = $this->fetchMissingPost($parent, $uid, $post_reason, $causer, $level, $parent, $complete_thread, $Protocol);
+				$this->logger->debug('Root parent created', ['parent' => $result]);
+			}
+		}
+
 		$this->logger->debug('Reply count', ['level' => $level, 'uid' => $uid, 'uri' => $uri]);
 
 		if ($causer != 0) {
 			$causer = Contact::getPublicContactId($causer, $uid);
 		}
 
-		if (!empty($data->thread->parent)) {
+		if (!empty($data->thread->parent) && $complete_thread) {
 			$parents = $this->fetchParents($data->thread->parent, $uid);
-
-			if (!empty($parents)) {
-				if ($data->thread->post->record->reply->root->uri != $parents[0]->uri) {
-					$parent_uri = $this->getUri($data->thread->post->record->reply->root);
-					$this->fetchMissingPost($parent_uri, $uid, $post_reason, $causer, $level, $data->thread->post->record->reply->root->uri, false, $Protocol);
-				}
-			}
 
 			foreach ($parents as $parent) {
 				$uri_id = $this->processPost($parent, $uid, Item::PR_FETCHED, $causer, $level, $Protocol);
@@ -754,13 +930,21 @@ class Processor
 			}
 		}
 
-		$uri = $this->processThread($data->thread, $uid, $post_reason, $causer, $level, $Protocol);
+		$uri = $this->processThread($data->thread, $uid, $post_reason, $causer, $level, $Protocol, $complete_thread);
 		if (microtime(true) - $timestamp > 2) {
 			$this->logger->debug('Fetched and processed post', ['duration' => round(microtime(true) - $timestamp, 3), 'uri' => $uri, 'stamp' => $stamp]);
 		}
 		return $uri;
 	}
 
+	/**
+	 * Collect parent posts in top-down order that are not stored yet.
+	 *
+	 * @param stdClass $parent
+	 * @param int $uid
+	 * @param array $parents
+	 * @return array
+	 */
 	private function fetchParents(stdClass $parent, int $uid, array $parents = []): array
 	{
 		if (!empty($parent->parent)) {
@@ -774,7 +958,19 @@ class Processor
 		return $parents;
 	}
 
-	private function processThread(stdClass $thread, int $uid, int $post_reason, int $causer, int $level, int $protocol): string
+	/**
+	 * Process a thread node and optionally recurse into replies.
+	 *
+	 * @param stdClass $thread
+	 * @param int $uid
+	 * @param int $post_reason
+	 * @param int $causer
+	 * @param int $level
+	 * @param int $protocol
+	 * @param bool $complete_thread
+	 * @return string
+	 */
+	private function processThread(stdClass $thread, int $uid, int $post_reason, int $causer, int $level, int $protocol, bool $complete_thread): string
 	{
 		if (empty($thread->post)) {
 			$this->logger->info('Invalid post', ['post' => $thread]);
@@ -797,14 +993,22 @@ class Processor
 			$uri = $fetched_uri;
 		}
 
-		foreach ($thread->replies ?? [] as $reply) {
-			$reply_uri = $this->processThread($reply, $uid, Item::PR_FETCHED, $causer, $level, $protocol);
-			$this->logger->debug('Reply has been processed', ['uri' => $uri, 'reply' => $reply_uri]);
+		if ($complete_thread) {
+			foreach ($thread->replies ?? [] as $reply) {
+				$reply_uri = $this->processThread($reply, $uid, Item::PR_FETCHED, $causer, $level, $protocol, $complete_thread);
+				$this->logger->debug('Reply has been processed', ['uri' => $uri, 'reply' => $reply_uri]);
+			}
 		}
 
 		return $uri;
 	}
 
+	/**
+	 * Parse an AT URI into repository, collection and record key.
+	 *
+	 * @param string $uri
+	 * @return stdClass|null
+	 */
 	public function getUriParts(string $uri): ?stdClass
 	{
 		$class = $this->getUriClass($uri);
@@ -812,17 +1016,15 @@ class Processor
 			return null;
 		}
 
-		$parts = explode('/', substr($class->uri, 5));
-
-		$class = new stdClass();
-
-		$class->repo       = $parts[0];
-		$class->collection = $parts[1];
-		$class->rkey       = $parts[2];
-
-		return $class;
+		return $this->atprotocol->getUriObject($class->uri);
 	}
 
+	/**
+	 * Normalize a URI into its ATProto URI and CID components.
+	 *
+	 * @param string $uri
+	 * @return stdClass|null
+	 */
 	public function getUriClass(string $uri): ?stdClass
 	{
 		if (empty($uri)) {
@@ -848,21 +1050,35 @@ class Processor
 		return $class;
 	}
 
-	public function fetchUriId(string $uri, int $uid): string
+	/**
+	 * Look up the item URI identifier for a post URI or extid.
+	 *
+	 * @param string $uri
+	 * @param int $uid
+	 * @return int
+	 */
+	public function fetchUriId(string $uri, int $uid): int
 	{
 		$reply = Post::selectFirst(['uri-id'], ['uri' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
 		$reply = Post::selectFirst(['uri-id'], ['extid' => $uri, 'uid' => [$uid, 0]]);
 		if (!empty($reply['uri-id'])) {
 			$this->logger->debug('Post with extid exists', ['uri' => $uri]);
-			return $reply['uri-id'];
+			return (int) $reply['uri-id'];
 		}
 		return 0;
 	}
 
+	/**
+	 * Find user IDs that already contain a specific post URI.
+	 *
+	 * @param string $uri
+	 * @param bool $with_public_user
+	 * @return array
+	 */
 	private function getPostUids(string $uri, bool $with_public_user): array
 	{
 		$condition = $with_public_user ? [] : ["`uid` != ?", 0];
@@ -882,6 +1098,13 @@ class Processor
 		return array_unique($uids);
 	}
 
+	/**
+	 * Check whether a post already exists by URI or extid for one of the given users.
+	 *
+	 * @param string $uri
+	 * @param array $uids
+	 * @return bool
+	 */
 	private function postExists(string $uri, array $uids): bool
 	{
 		if (Post::exists(['uri' => $uri, 'uid' => $uids])) {
@@ -891,6 +1114,12 @@ class Processor
 		return Post::exists(['extid' => $uri, 'uid' => $uids]);
 	}
 
+	/**
+	 * Build the canonical URI with CID from a post object.
+	 *
+	 * @param stdClass $post
+	 * @return string
+	 */
 	public function getUri(stdClass $post): string
 	{
 		if (empty($post->cid)) {
@@ -900,6 +1129,13 @@ class Processor
 		return $post->uri . ':' . $post->cid;
 	}
 
+	/**
+	 * Resolve a post URI to a stored canonical URI for a user.
+	 *
+	 * @param string $uri
+	 * @param int $uid
+	 * @return string
+	 */
 	public function getPostUri(string $uri, int $uid): string
 	{
 		if (Post::exists(['uri' => $uri, 'uid' => [$uid, 0]])) {

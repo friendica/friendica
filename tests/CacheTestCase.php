@@ -8,7 +8,6 @@
 namespace Friendica\Test;
 
 use Friendica\Core\Cache\Capability\ICanCache;
-use Friendica\Test\MockedTestCase;
 use Friendica\Util\PidFile;
 
 abstract class CacheTestCase extends MockedTestCase
@@ -234,7 +233,7 @@ abstract class CacheTestCase extends MockedTestCase
 
 	public function testGetName()
 	{
-		if (defined(get_class($this->instance) . '::NAME')) {
+		if (defined($this->instance::class . '::NAME')) {
 			self::assertEquals($this->instance::NAME, $this->instance->getName());
 		} else {
 			self::expectNotToPerformAssertions();

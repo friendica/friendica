@@ -7,9 +7,6 @@
 var batchConfirmed = false;
 
 $(document).ready(function () {
-	// Initiale autosize for the textareas.
-	autosize($("textarea.text-autosize"));
-
 	// Replace the drop contact link of the photo menu
 	// with a confirmation modal.
 	$("body").on("click", ".contact-photo-menu a", function (e) {

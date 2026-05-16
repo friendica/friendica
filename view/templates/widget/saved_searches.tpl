@@ -7,12 +7,18 @@
 <nav>
 	<span id="saved-search-list-inflated" class="widget inflated fakelink">
 		<button class="fakelink" onclick="openCloseWidget('saved-search-list', 'saved-search-list-inflated');" aria-expanded="false">
-			<h3>{{$title}}</h3>
+			<h3>
+				<i class="fa fa-search" aria-hidden="true"></i>
+				{{$title}}
+			</h3>
 		</button>
 	</span>
 	<div class="widget" id="saved-search-list">
 		<button class="fakelink" onclick="openCloseWidget('saved-search-list', 'saved-search-list-inflated');" aria-expanded="true">
-			<h3 id="search">{{$title}}</h3>
+			<h3 id="search">
+				<i class="fa fa-search" aria-hidden="true"></i>
+				{{$title}}
+			</h3>
 		</button>
 		{{$searchbox nofilter}}
 
@@ -25,7 +31,7 @@
 			{{/foreach}}
 		</ul>
 		<div class="clear"></div>
-	</div>>
+	</div>
 </nav>
 <script>
 	initWidget('saved-search-list', 'saved-search-list-inflated');

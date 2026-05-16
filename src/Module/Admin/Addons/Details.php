@@ -8,8 +8,11 @@
 namespace Friendica\Module\Admin\Addons;
 
 use Friendica\Content\Text\Markdown;
+use Friendica\Core\Addon\AddonInfo;
+use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Model\Contact;
 use Friendica\Module\BaseAdmin;
 use Friendica\Util\Strings;
 
@@ -44,6 +47,7 @@ class Details extends BaseAdmin
 		$addonHelper = DI::addonHelper();
 
 		$addon = Strings::sanitizeFilePathItem($this->parameters['addon']);
+
 		if (!is_file("addon/$addon/$addon.php")) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Addon not found.'));
 			$addonHelper->uninstallAddon($addon);
@@ -90,7 +94,42 @@ class Details extends BaseAdmin
 			$func($admin_form);
 		}
 
-		$addonInfo = $addonHelper->getAddonInfo($addon);
+		try {
+			$addonInfo = $addonHelper->getAddonInfo($addon);
+		} catch (InvalidAddonException $th) {
+			$this->logger->error('Invalid addon found: ' . $addon, ['exception' => $th]);
+			DI::sysmsg()->addNotice(DI::l10n()->t('Invalid Addon found.'));
+
+			$addonInfo = AddonInfo::fromArray(['id' => $addon, 'name' => $addon]);
+		}
+
+		$addonAuthors = [];
+
+		foreach ($addonInfo->getAuthors() as $addonAuthor) {
+			if (array_key_exists('link', $addonAuthor) && empty(parse_url($addonAuthor['link'], PHP_URL_SCHEME))) {
+				$contact = Contact::getByURL($addonAuthor['link'], false);
+
+				if (!empty($contact['url'])) {
+					$addonAuthor['link'] = $contact['url'];
+				}
+			}
+
+			$addonAuthors[] = $addonAuthor;
+		}
+
+		$addonMaintainers = [];
+
+		foreach ($addonInfo->getMaintainers() as $addonMaintainer) {
+			if (array_key_exists('link', $addonMaintainer) && empty(parse_url($addonMaintainer['link'], PHP_URL_SCHEME))) {
+				$contact = Contact::getByURL($addonMaintainer['link'], false);
+
+				if (!empty($contact['url'])) {
+					$addonMaintainer['link'] = $contact['url'];
+				}
+			}
+
+			$addonMaintainers[] = $addonMaintainer;
+		}
 
 		$t = Renderer::getMarkupTemplate('admin/addons/details.tpl');
 
@@ -107,8 +146,8 @@ class Details extends BaseAdmin
 				'name'        => $addonInfo->getName(),
 				'version'     => $addonInfo->getVersion(),
 				'description' => $addonInfo->getDescription(),
-				'author'      => $addonInfo->getAuthors(),
-				'maintainer'  => $addonInfo->getMaintainers(),
+				'author'      => $addonAuthors,
+				'maintainer'  => $addonMaintainers,
 			],
 			'$str_author'     => DI::l10n()->t('Author: '),
 			'$str_maintainer' => DI::l10n()->t('Maintainer: '),

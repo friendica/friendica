@@ -279,8 +279,7 @@ class Feed
 			return [];
 		}
 
-		$items          = [];
-		$creation_dates = [];
+		$items = [];
 
 		// Limit the number of items that are about to be fetched
 		$total_items = ($entries->length - 1);
@@ -289,15 +288,20 @@ class Feed
 			$total_items = $max_items;
 		}
 
-		$postings = self::importOlderEntries($entries, $total_items, $header, $author, $contact, $importer, $xpath, $atomns, $basepath, $dryRun);
+		$processed = self::processEntries($entries, $total_items, $header, $author, $contact, $importer, $xpath, $atomns, $basepath, $dryRun);
+
+		$postings       = $processed['postings'];
+		$creation_dates = $processed['creation_dates'];
 
 		if (!empty($postings)) {
-			$min_posting = DI::config()->get('system', 'minimum_posting_interval', 0);
-			$total       = count($postings);
+			$system_min_posting = DI::config()->get('system', 'minimum_posting_interval');
+			$user_min_posting   = DI::pConfig()->get($importer['uid'], 'system', 'minimum_posting_interval', 0, true);
+			$min_posting        = max($system_min_posting, $user_min_posting) * 60;
+			$total              = count($postings);
 			if ($total > 1) {
 				// Posts shouldn't be delayed more than a day
 				$interval = min(1440, self::getPollInterval($contact));
-				$delay    = max(round(($interval * 60) / $total), 60 * $min_posting);
+				$delay    = max(round(($interval * 60) / $total), $min_posting);
 				DI::logger()->info('Got posting delay', ['delay' => $delay, 'interval' => $interval, 'items' => $total, 'cid' => $contact['id'], 'url' => $contact['url']]);
 			} else {
 				$delay = 0;
@@ -314,7 +318,7 @@ class Feed
 				}
 
 				$last_publish = DI::pConfig()->get($posting['item']['uid'], 'system', 'last_publish', 0, true);
-				$next_publish = max($last_publish + (60 * $min_posting), time());
+				$next_publish = max($last_publish + $min_posting, time());
 				if ($publish_time < $next_publish) {
 					$publish_time = $next_publish;
 				}
@@ -358,9 +362,10 @@ class Feed
 		return $title;
 	}
 
-	private static function importOlderEntries(DOMNodeList $entries, int $total_items, array $header, array $author, array $contact, array $importer, DOMXPath $xpath, string $atomns, string $basepath, bool $dryRun): array
+	private static function processEntries(DOMNodeList $entries, int $total_items, array $header, array $author, array $contact, array $importer, DOMXPath $xpath, string $atomns, string $basepath, bool $dryRun): array
 	{
-		$postings = [];
+		$postings       = [];
+		$creation_dates = [];
 
 		// Importing older entries first
 		for ($i = $total_items; $i >= 0; --$i) {
@@ -492,7 +497,7 @@ class Feed
 			if (!$dryRun) {
 				$condition = [
 					"`uid` = ? AND `uri` = ? AND `network` IN (?, ?)",
-					$importer['uid'], $item['uri'], Protocol::FEED, Protocol::DFRN
+					$importer['uid'], $item['uri'], Protocol::FEED, Protocol::DFRN,
 				];
 				$previous = Post::selectFirst(['id', 'created'], $condition);
 				if (DBA::isResult($previous)) {
@@ -541,7 +546,7 @@ class Feed
 						if (in_array($attribute->name, ['url', 'href'])) {
 							$href = $attribute->textContent;
 						} elseif ($attribute->name == 'length') {
-							$length = (int)$attribute->textContent;
+							$length = (int) $attribute->textContent;
 						} elseif ($attribute->name == 'type') {
 							$type = $attribute->textContent;
 						}
@@ -649,7 +654,7 @@ class Feed
 				$data = ParseUrl::getSiteinfoCached($item['plink']);
 				if (!empty($data['text']) && !empty($data['title']) && (mb_strlen($item['body']) < mb_strlen($data['text']))) {
 					// When the fetched page info text is longer than the body, we do try to enhance the body
-					if (!empty($item['body']) && (strpos($data['title'], $item['body']) === false) && (strpos($data['text'], $item['body']) === false)) {
+					if (!empty($item['body']) && (!str_contains($data['title'], $item['body'])) && (!str_contains($data['text'], $item['body']))) {
 						// The body is not part of the fetched page info title or page info text. So we add the text to the body
 						$item['body'] .= "\n\n" . $data['text'];
 					} else {
@@ -662,7 +667,7 @@ class Feed
 					$item['plink'],
 					false,
 					$fetch_further_information == LocalRelationship::FFI_BOTH,
-					$contact['ffi_keyword_denylist'] ?? ''
+					$contact['ffi_keyword_denylist'] ?? '',
 				);
 
 				if (!empty($data)) {
@@ -685,29 +690,6 @@ class Feed
 					$taglist             = $fetch_further_information == LocalRelationship::FFI_BOTH ? PageInfo::getTagsFromUrl($item['plink'], $preview, $contact['ffi_keyword_denylist'] ?? '') : [];
 					$item['object-type'] = Activity\ObjectType::BOOKMARK;
 					$attachments         = [];
-
-					foreach (['audio', 'video'] as $elementname) {
-						if (!empty($data[$elementname])) {
-							foreach ($data[$elementname] as $element) {
-								if (!empty($element['src'])) {
-									$src = $element['src'];
-								} elseif (!empty($element['content'])) {
-									$src = $element['content'];
-								} else {
-									continue;
-								}
-
-								$attachments[] = [
-									'type'        => ($elementname == 'audio') ? Post\Media::AUDIO : Post\Media::VIDEO,
-									'url'         => $src,
-									'preview'     => $element['image']       ?? null,
-									'mimetype'    => $element['contenttype'] ?? null,
-									'name'        => $element['name']        ?? null,
-									'description' => $element['description'] ?? null,
-								];
-							}
-						}
-					}
 				}
 			} else {
 				if ($fetch_further_information == LocalRelationship::FFI_KEYWORD) {
@@ -732,7 +714,7 @@ class Feed
 			DI::logger()->info('Stored feed', ['item' => $item]);
 
 			$notify       = Item::isRemoteSelf($contact, $item);
-			$item['wall'] = (bool)$notify;
+			$item['wall'] = (bool) $notify;
 
 			// Distributed items should have a well-formatted URI.
 			// Additionally, we have to avoid conflicts with identical URI between imported feeds and these items.
@@ -754,7 +736,7 @@ class Feed
 				} else {
 					$postings[] = [
 						'item'    => $item, 'notify' => $notify,
-						'taglist' => $taglist, 'attachments' => $attachments
+						'taglist' => $taglist, 'attachments' => $attachments,
 					];
 				}
 			} else {
@@ -762,7 +744,7 @@ class Feed
 			}
 		}
 
-		return $postings;
+		return ['postings' => $postings, 'creation_dates' => $creation_dates];
 	}
 
 	/**
@@ -994,7 +976,7 @@ class Feed
 			$body = substr($body, 0, strlen($title));
 		}
 
-		if (($title != $body) && (substr($title, -3) == '...')) {
+		if (($title != $body) && (str_ends_with($title, '...'))) {
 			$pos = strrpos($title, '...');
 			if ($pos > 0) {
 				$title = substr($title, 0, $pos);
@@ -1047,7 +1029,7 @@ class Feed
 			$owner['uid'], $check_date, Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT,
 			Item::GRAVITY_ACTIVITY, Activity::ANNOUNCE,
 			Item::PRIVATE, Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA,
-			$authorid
+			$authorid,
 		];
 
 		if ($filter === 'comments') {
@@ -1112,6 +1094,7 @@ class Feed
 	{
 		$root = $doc->createElementNS(ActivityNamespace::ATOM1, 'feed');
 		$doc->appendChild($root);
+		$root->setAttribute("xmlns:thr", ActivityNamespace::THREAD);
 
 		$title   = '';
 		$selfUri = '/feed/' . $owner['nick'] . '/';
@@ -1227,8 +1210,8 @@ class Feed
 			'',
 			[
 				'rel'  => 'alternate', 'type' => 'text/html',
-				'href' => DI::baseUrl() . '/display/' . $item['guid']
-			]
+				'href' => DI::baseUrl() . '/display/' . $item['guid'],
+			],
 		);
 
 		XML::addElement($doc, $entry, 'published', DateTimeFormat::utc($item['created'] . '+00:00', DateTimeFormat::ATOM));
@@ -1269,13 +1252,13 @@ class Feed
 			if (isset($parent_plink)) {
 				$attributes = [
 					'ref'  => $item['thr-parent'],
-					'href' => $parent_plink
+					'href' => $parent_plink,
 				];
 				XML::addElement($doc, $entry, 'thr:in-reply-to', '', $attributes);
 
 				$attributes = [
 					'rel'  => 'related',
-					'href' => $parent_plink
+					'href' => $parent_plink,
 				];
 				XML::addElement($doc, $entry, 'link', '', $attributes);
 			}
@@ -1429,9 +1412,9 @@ class Feed
 			if ($owner['contact-type'] == Contact::TYPE_COMMUNITY) {
 				$entry->setAttribute('xmlns:activity', ActivityNamespace::ACTIVITY);
 
-				$contact             = Contact::getByURL($item['author-link']) ?: $owner;
-				$contact['nickname'] = $contact['nickname'] ?? $contact['nick'];
-				$author              = self::addAuthor($doc, $contact);
+				$contact = Contact::getByURL($item['author-link']) ?: $owner;
+				$contact['nickname'] ??= $contact['nick'];
+				$author = self::addAuthor($doc, $contact);
 				$entry->appendChild($author);
 			}
 		} else {

@@ -99,8 +99,11 @@ class Cache extends AbstractSessionHandler
 	}
 
 	#[\ReturnTypeWillChange]
-	public function gc($max_lifetime): bool
+	/**
+	 * @return int|false
+	 */
+	public function gc($max_lifetime)
 	{
-		return true;
+		return 0; // Cache does not support garbage collection, so we return 0 to indicate no action taken
 	}
 }

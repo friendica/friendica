@@ -25,7 +25,7 @@ use Psr\Log\LoggerInterface;
 abstract class MailBuilder
 {
 	/** @var string The default email banner in case nothing else is defined */
-	const DEFAULT_EMAIL_BANNER = 'images/friendica-32.png';
+	public const DEFAULT_EMAIL_BANNER = 'images/friendica-32.png';
 
 	/** @var L10n */
 	protected $l10n;
@@ -199,7 +199,7 @@ abstract class MailBuilder
 	 *
 	 * @return static
 	 */
-	public function	setHeader(string $name, string $value)
+	public function setHeader(string $name, string $value)
 	{
 		$this->headers[$name] = [$value];
 
@@ -218,8 +218,8 @@ abstract class MailBuilder
 	 */
 	public function build(bool $raw = false)
 	{
-		if ((empty($this->recipientAddress)) &&
-		    !empty($this->recipientUid)) {
+		if ((empty($this->recipientAddress))
+			&& !empty($this->recipientUid)) {
 			$user = User::getById($this->recipientUid, ['email']);
 
 			if (!empty($user['email'])) {
@@ -235,7 +235,7 @@ abstract class MailBuilder
 			throw new UnprocessableEntityException('Sender address or name is missing.');
 		}
 
-		$this->senderNoReply = $this->senderNoReply ?? $this->senderAddress;
+		$this->senderNoReply ??= $this->senderAddress;
 
 		$msgHtml = $this->getHtmlMessage() ?? '';
 
@@ -247,8 +247,11 @@ abstract class MailBuilder
 				'$product'     => App::PLATFORM,
 				'$htmlversion' => $msgHtml,
 				'$sitename'    => $this->config->get('config', 'sitename'),
-				'$banner'      => $this->config->get('system', 'email_banner',
-					$this->baseUrl . DIRECTORY_SEPARATOR . self::DEFAULT_EMAIL_BANNER),
+				'$banner'      => $this->config->get(
+					'system',
+					'email_banner',
+					$this->baseUrl . DIRECTORY_SEPARATOR . self::DEFAULT_EMAIL_BANNER,
+				),
 			]);
 		}
 
@@ -261,6 +264,7 @@ abstract class MailBuilder
 			$msgHtml,
 			$this->getPlaintextMessage() ?? '',
 			$this->headers,
-			$this->recipientUid ?? null);
+			$this->recipientUid ?? null,
+		);
 	}
 }

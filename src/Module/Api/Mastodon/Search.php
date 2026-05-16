@@ -50,7 +50,7 @@ class Search extends BaseApi
 
 		$limit = min($request['limit'], 40);
 
-		if (Network::isValidHttpUrl($request['q']) && ($request['offset'] == 0)) {
+		if ((Network::isValidHttpUrl($request['q']) || Network::isValidAtUrl($request['q'])) && ($request['offset'] == 0)) {
 			$this->searchLinks($uid, $request['q'], $request['type']);
 		}
 
@@ -76,7 +76,7 @@ class Search extends BaseApi
 			}
 		}
 
-		if ((empty($request['type']) || ($request['type'] == 'hashtags')) && (strpos($request['q'], '@') == false)) {
+		if ((empty($request['type']) || ($request['type'] == 'hashtags')) && (!str_contains($request['q'], '@'))) {
 			$result['hashtags'] = $this->searchHashtags($request['q'], $request['exclude_unreviewed'], $limit, $request['offset'], $this->parameters['version']);
 		}
 
@@ -95,14 +95,18 @@ class Search extends BaseApi
 		$result = ['accounts' => [], 'statuses' => [], 'hashtags' => []];
 
 		$data = ['uri-id' => -1, 'type' => Post\Media::UNKNOWN, 'url' => $q];
-		$data = Post\Media::fetchAdditionalData($data);
+		if (Network::isValidHttpUrl($q)) {
+			$data = Post\Media::fetchAdditionalData($data);
+		}
 
 		if ((empty($type) || ($type == 'statuses')) && in_array($data['type'], [Post\Media::HTML, Post\Media::ACTIVITY, Post\Media::UNKNOWN])) {
-			$q = Network::convertToIdn($q);
+			if (Network::isValidHttpUrl($q)) {
+				$q = Network::convertToIdn($q);
+			}
 			// If the user-specific search failed, we search and probe a public post
 			$item_id = Item::fetchByLink($q, $uid) ?: Item::fetchByLink($q);
 			if ($item_id && $item = Post::selectFirst(['uri-id'], ['id' => $item_id])) {
-				$result['statuses'] = [DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, self::appSupportsQuotes())];
+				$result['statuses'] = [DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid)];
 				$this->jsonExit($result);
 			}
 		}
@@ -134,7 +138,8 @@ class Search extends BaseApi
 	 */
 	private function searchAccounts(int $uid, string $q, bool $resolve, int $limit, int $offset, bool $following)
 	{
-		if (($offset == 0) && (strrpos($q, '@') > 0) && $id = Contact::getIdForURL($q, 0, $resolve ? null : false)) {
+		$this->logger->debug('Search', ['q' => $q, 'resolve' => $resolve, 'offset' => $offset]);
+		if (($offset == 0) && (strrpos($q, '@') > 0) && $id = Contact::getIdForURL(ltrim($q, '@'), 0, $resolve ? null : false)) {
 			return DI::mstdnAccount()->createFromContactId($id, $uid);
 		}
 
@@ -163,7 +168,7 @@ class Search extends BaseApi
 	{
 		$params = ['order' => ['uri-id' => true], 'limit' => [$offset, $limit]];
 
-		if (substr($q, 0, 1) == '#') {
+		if (str_starts_with($q, '#')) {
 			$condition = ["`name` = ? AND (`uid` = ? OR (`uid` = ? AND NOT `global`))
 				AND (`network` IN (?, ?, ?) OR (`uid` = ? AND `uid` != ?))",
 				substr($q, 1), 0, $uid, Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, $uid, 0];
@@ -190,13 +195,11 @@ class Search extends BaseApi
 
 		$items = DBA::select($table, ['uri-id'], $condition, $params);
 
-		$display_quotes = self::appSupportsQuotes();
-
 		$statuses = [];
 		while ($item = Post::fetch($items)) {
 			self::setBoundaries($item['uri-id']);
 			try {
-				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid, $display_quotes);
+				$statuses[] = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
 			} catch (\Exception $exception) {
 				$this->logger->info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 			}
@@ -219,9 +222,10 @@ class Search extends BaseApi
 
 		$condition = ["`id` IN (SELECT `tid` FROM `post-tag` WHERE `type` = ?) AND `name` LIKE ?", Tag::HASHTAG, $q . '%'];
 
-		$tags = DBA::select('tag', ['name'], $condition, $params);
+		$tags = DBA::selectToArray('tag', ['name'], $condition, $params);
 
 		$hashtags = [];
+
 		foreach ($tags as $tag) {
 			if ($version == 1) {
 				$hashtags[] = $tag['name'];

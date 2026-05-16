@@ -22,21 +22,19 @@ class StreamLogger extends AbstractLogger
 
 	/**
 	 * The minimum loglevel at which this logger will be triggered
-	 * @var string
 	 */
-	private $logLevel;
+	private int $logLevel;
 
 	/**
 	 * The stream, where the current logger is writing into
-	 * @var resource
+	 * @var resource|null
 	 */
 	private $stream;
 
 	/**
 	 * The current process ID
-	 * @var int
 	 */
-	private $pid;
+	private int $pid;
 
 	/**
 	 * Translates LogLevel log levels to integer values

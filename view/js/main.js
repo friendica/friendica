@@ -174,7 +174,8 @@ $(function() {
 	/* insert returned bbcode at cursor position or replace selected text */
 	$('body').on('fbrowser.photo.comment', function(e, filename, bbcode, id) {
 		$.colorbox.close();
-		var textarea = document.getElementById("comment-edit-text-" +id);
+		// Support both receiving an ID postfix appended to comment-edit-id or the full ID
+		var textarea = document.getElementById('comment-edit-text-' + id) || document.getElementById(id);
 		var start = textarea.selectionStart;
 		var end = textarea.selectionEnd;
 		textarea.value = textarea.value.substring(0, start) + bbcode + textarea.value.substring(end, textarea.value.length);
@@ -233,13 +234,10 @@ $(function() {
 		close_last_popup_menu();
 	});
 
-	// fancyboxes
+	// Colorbox - related docs: https://www.jacklmoore.com/colorbox/
+	/* Not used by frio. Used in two photos templates */
 	$("a.popupbox").colorbox({
 		'inline' : true,
-		'transition' : 'elastic',
-		'maxWidth' : '100%'
-	});
-	$("a.ajax-popupbox").colorbox({
 		'transition' : 'elastic',
 		'maxWidth' : '100%'
 	});
@@ -248,6 +246,20 @@ $(function() {
 	var notifications_all = unescape($('<div>').append($("#nav-notifications-see-all").clone()).html()); //outerHtml hack
 	var notifications_mark = unescape($('<div>').append($("#nav-notifications-mark-all").clone()).html()); //outerHtml hack
 	var notifications_empty = unescape($("#nav-notifications-menu").html());
+
+	/* Ensure loading is visible when notifications menu is opened (if no notifications loaded yet)*/
+	$('#nav-notifications-linkmenu, #nav-notifications-menu-btn').on('click', function() {
+		if ($("#nav-notifications-loading").length && $("#nav-notifications-empty").length) {
+			// Only show loading if we haven't loaded notifications yet
+			var menu = $("#nav-notifications-menu");
+			var hasNotifications = menu.find('.notif-item, li').not('#nav-notifications-loading, #nav-notifications-empty').length > 0;
+			var hasContent = menu.html().indexOf('nav-notifications-see-all') > -1;
+			if (!hasNotifications && !hasContent) {
+				$("#nav-notifications-loading").show();
+				$("#nav-notifications-empty").hide();
+			}
+		}
+	});
 
 	/* enable perfect-scrollbars for different elements */
 	$('#nav-notifications-menu, aside').perfectScrollbar();
@@ -303,11 +315,27 @@ $(function() {
 			$(".group-"+fid+" .notify").addClass("show").text(fcount);
 		});
 
+		// Hide loading state when we receive notification data
+		$("#nav-notifications-loading").hide();
+
 		if (data.notifications.length == 0) {
-			$("#nav-notifications-menu").html(notifications_empty);
+			$("#nav-notifications-empty").show();
 		} else {
+			$("#nav-notifications-empty").hide();
 			var nnm = $("#nav-notifications-menu");
+			// Preserve the loading and empty state elements when rebuilding the menu
+			var loadingElement = nnm.find("#nav-notifications-loading");
+			var emptyElement = nnm.find("#nav-notifications-empty");
+
 			nnm.html(notifications_all + notifications_mark);
+
+			// Re-add the loading and empty elements if they existed
+			if (loadingElement.length > 0) {
+				nnm.append(loadingElement);
+			}
+			if (emptyElement.length > 0) {
+				nnm.append(emptyElement);
+			}
 
 			var lastItemStorageKey = "notification-lastitem:" + localUser;
 			var notification_lastitem = parseInt(localStorage.getItem(lastItemStorageKey));
@@ -444,7 +472,9 @@ $(function() {
  * @returns {boolean}
  */
 function insertFormatting(BBCode, id) {
-	let textarea = document.getElementById('comment-edit-text-' + id);
+
+	// Support both receiving an ID postfix appended to comment-edit-id or the full ID
+	let textarea = document.getElementById('comment-edit-text-' + id) || document.getElementById(id);
 
 	if (textarea.value === '') {
 		$(textarea)
@@ -512,7 +542,7 @@ function NavUpdate() {
 					var update_url = 'ping_network?ping=1';
 					$.get(update_url, function(net) {
 						updateCounter('net', net);
-					});			
+					});
 				}
 
 				if ($('#live-photos').length) {
@@ -719,6 +749,15 @@ function doFollowThread(ident) {
 	unpause();
 	$('#like-rotator-' + ident.toString()).show();
 	$.post('item/' + ident.toString() + '/follow', NavUpdate);
+	liking = 1;
+	force_update = true;
+	update_item = ident.toString();
+}
+
+function doCompleteThread(ident) {
+	unpause();
+	$('#like-rotator-' + ident.toString()).show();
+	$.post('item/' + ident.toString() + '/complete', NavUpdate);
 	liking = 1;
 	force_update = true;
 	update_item = ident.toString();
@@ -1083,9 +1122,15 @@ Array.prototype.remove = function(item) {
 function previewTheme(elm) {
 	theme = $(elm).val();
 	$.getJSON('pretheme?theme=' + theme,function(data) {
-			$('#theme-preview').html('<div id="theme-desc">' + data.desc + '</div><div id="theme-version">' + data.version + '</div><div id="theme-credits">' + data.credits + '</div><a href="' + data.img + '"><img src="' + data.img + '" width="320" height="240" alt="' + theme + '" /></a>');
+			$('#theme-preview').html(`
+		<div id="theme-desc">${data.desc}</div>
+		<div id="theme-credits">${data.credits}</div>
+		<a href="${data.img}">
+			<img src="${data.img}" width="320" height="240" alt="${theme}" />
+		</a>
+		<div id="theme-version">${data.version}</div>
+	`);
 	});
-
 }
 
 // notification permission settings in localstorage

@@ -14,7 +14,7 @@ use Friendica\Core\Cache\Capability\ICanCache;
  */
 abstract class AbstractCache implements ICanCache
 {
-	const NAME = '';
+	public const NAME = '';
 
 	/**
 	 * @var string The hostname
@@ -85,7 +85,7 @@ abstract class AbstractCache implements ICanCache
 			$result = [];
 
 			foreach ($keys as $key) {
-				if (strpos($key, $prefix) === 0) {
+				if (str_starts_with($key, $prefix)) {
 					array_push($result, $key);
 				}
 			}

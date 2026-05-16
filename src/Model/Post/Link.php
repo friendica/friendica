@@ -17,6 +17,7 @@ use Friendica\Util\Images;
 use Friendica\Util\Proxy;
 use Friendica\Object\Image;
 use Friendica\Util\Network;
+use Friendica\Util\ParseUrl;
 
 /**
  * Class Link
@@ -61,7 +62,7 @@ class Link
 			$id = $link['id'];
 			DI::logger()->info('Found', ['id' => $id, 'uri-id' => $uriId, 'url' => $url]);
 		} else {
-			$fields           = self::fetchMimeType($url);
+			$fields           = self::fetchMimeType($uriId, $url);
 			$fields['uri-id'] = $uriId;
 			$fields['url']    = Network::sanitizeUrl($url);
 
@@ -106,25 +107,30 @@ class Link
 	 * @param string $accept Comma-separated list of expected response MIME type(s)
 	 * @return array Discovered MIME type and blurhash or empty array on failure
 	 */
-	private static function fetchMimeType(string $url, string $accept = HttpClientAccept::DEFAULT): array
+	private static function fetchMimeType(int $uriId, string $url, string $accept = HttpClientAccept::DEFAULT): array
 	{
 		$timeout = DI::config()->get('system', 'xrd_timeout');
 
-		try {
-			$curlResult = HTTPSignature::fetchRaw($url, 0, [HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::ACCEPT_CONTENT => $accept]);
-		} catch (\Exception $exception) {
-			DI::logger()->notice('Error fetching url', ['url' => $url, 'exception' => $exception]);
+		$mimeType = ParseUrl::getContentType($url, $accept, $timeout);
+		if (!$mimeType) {
+			DI::logger()->notice('Mime type was not fetched', ['uri-id' => $uriId, 'url' => $url]);
 			return [];
 		}
 
-		if (!$curlResult->isSuccess()) {
-			DI::logger()->notice('Fetching unsuccessful', ['url' => $url]);
-			return [];
-		}
-
-		$fields = ['mimetype' => $curlResult->getContentType()];
+		$fields = ['mimetype' => implode('/', $mimeType)];
 
 		if (Images::isSupportedMimeType($fields['mimetype'])) {
+			try {
+				$curlResult = HTTPSignature::fetchRaw($url, 0, [HttpClientOptions::TIMEOUT => $timeout, HttpClientOptions::ACCEPT_CONTENT => $accept]);
+			} catch (\Exception $exception) {
+				DI::logger()->notice('Error fetching url', ['uri-id' => $uriId, 'url' => $url, 'exception' => $exception]);
+				return [];
+			}
+
+			if (!$curlResult->isSuccess()) {
+				DI::logger()->notice('Fetching unsuccessful', ['uri-id' => $uriId, 'url' => $url]);
+				return [];
+			}
 			$img_str = $curlResult->getBodyString();
 			$image   = new Image($img_str, $fields['mimetype'], $url, false);
 			if ($image->isValid()) {
@@ -134,6 +140,8 @@ class Link
 				$fields['blurhash'] = $image->getBlurHash($img_str);
 			}
 		}
+
+		DI::logger()->debug('Fetched mime type', ['uri-id' => $uriId, 'url' => $url, 'fields' => $fields]);
 
 		return $fields;
 	}

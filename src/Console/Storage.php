@@ -65,7 +65,7 @@ HELP;
 	{
 		if ($this->getOption('v')) {
 			$this->out('Executable: ' . $this->executable);
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -151,7 +151,7 @@ HELP;
 				$this->out($class . ' is not a valid backend storage class.');
 				return -1;
 			}
-		} catch (ReferenceStorageException $exception) {
+		} catch (ReferenceStorageException) {
 			$this->out($name . ' is not a registered backend.');
 			return -1;
 		}

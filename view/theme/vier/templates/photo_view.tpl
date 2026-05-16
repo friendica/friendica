@@ -33,25 +33,5 @@
 {{if $nextlink}}<div id="photo-next-link"><a href="{{$nextlink.0}}">{{$nextlink.1 nofilter}}</a></div>{{/if}}
 <div id="photo-photo-end"></div>
 <div id="photo-caption">{{$desc}}</div>
-{{if $tags}}
-<div id="in-this-photo-text">{{$tags.0}}</div>
-<div id="in-this-photo">{{$tags.1}}</div>
-{{/if}}
-{{if $tags.2}}<div id="tag-remove"><a href="{{$tags.2}}">{{$tags.3}}</a></div>{{/if}}
-
 {{if $edit}}{{$edit nofilter}}{{/if}}
-
-{{if $likebuttons}}
-<div id="photo-like-div">
-	{{$likebuttons nofilter}}
-	{{$like nofilter}}
-	{{$dislike nofilter}}
-</div>
-{{/if}}
-
-<div class="wall-item-comment-wrapper photo">
-	{{$comments nofilter}}
-</div>
-
-{{$paginate nofilter}}
 

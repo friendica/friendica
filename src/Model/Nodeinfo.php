@@ -103,10 +103,15 @@ class Nodeinfo
 			'outbound' => [],
 		];
 
-		if ($addonHelper->isAddonEnabled('bluesky')) {
-			$services['inbound'][]  = 'bluesky';
-			$services['outbound'][] = 'bluesky';
-		}
+		// @see discussion at https://github.com/jhass/nodeinfo/issues/96#issuecomment-3240296214
+		// Currently disabled, since this currently isn't covered by the Nodeinfo specification
+		//if ($addonHelper->isAddonEnabled('bluesky')) {
+		//	$services['inbound'][]  = 'atproto-pds';
+		//	$services['outbound'][] = 'atproto-pds';
+		//	if (!is_null(DI::config()->get('jetstream', 'pidfile'))) {
+		//		$services['inbound'][] = 'atproto-jetstream';
+		//	}
+		//}
 		if ($addonHelper->isAddonEnabled('dwpost')) {
 			$services['outbound'][] = 'dreamwidth';
 		}
@@ -131,6 +136,8 @@ class Nodeinfo
 		$services['outbound'][] = 'smtp';
 
 		if ($addonHelper->isAddonEnabled('tumblr')) {
+			// Currently disabled, since this currently isn't covered by the Nodeinfo specification
+			// $services['inbound'][]  = 'tumblr';
 			$services['outbound'][] = 'tumblr';
 		}
 		if ($addonHelper->isAddonEnabled('twitter')) {

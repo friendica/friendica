@@ -26,7 +26,7 @@ use Psr\Log\LoggerInterface;
  */
 abstract class BaseRepository
 {
-	const LIMIT = 30;
+	public const LIMIT = 30;
 
 	/**
 	 * @var string This should be set to the main database table name the depository is using
@@ -130,17 +130,33 @@ abstract class BaseRepository
 	}
 
 	/**
-	 * @param array $condition
-	 * @param array $params
-	 * @return BaseEntity
+	 * Selects the fields of the first row as array
+	 *
+	 * @throws NotFoundException
+	 *
+	 * @return array The resulted fields as array
+	 */
+	final protected function _selectFirstRowAsArray(array $condition, array $params = []): array
+	{
+		$fields = $this->db->selectFirst(static::$table_name, [], $condition, $params);
+
+		if (!$this->db->isResult($fields)) {
+			throw new NotFoundException();
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * @deprecated 2026.01 Use `\Friendica\BaseRepository::_selectFirstRowAsArray()` instead
+	 *
 	 * @throws NotFoundException
 	 */
 	protected function _selectOne(array $condition, array $params = []): BaseEntity
 	{
-		$fields = $this->db->selectFirst(static::$table_name, [], $condition, $params);
-		if (!$this->db->isResult($fields)) {
-			throw new NotFoundException();
-		}
+		@trigger_error('`' . __METHOD__ . '()` is deprecated since 2026.01 and will be removed after 5 months, use `\Friendica\BaseRepository::_selectFirstRowAsArray()` instead.', E_USER_DEPRECATED);
+
+		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
 		return $this->factory->createFromTableRow($fields);
 	}

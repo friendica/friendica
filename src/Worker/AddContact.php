@@ -55,6 +55,43 @@ class AddContact
 		}
 
 		DI::logger()->debug('Add contact', ['uid' => $uid, 'url' => $url]);
-		return Worker::add($run_parameters, 'AddContact', 0, $url);
+		return Worker::add($run_parameters, 'AddContact', $uid, $url);
+	}
+
+	/**
+	 * Checks if the maximum number of allowed workers for this task is reached
+	 *
+	 * @return boolean
+	 */
+	public static function workerLimitReached(): bool
+	{
+		$add_limit = (int) DI::config()->get('system', 'contact_add_limit');
+		$adding    = Worker::countWorkersByCommand('AddContact');
+		if ($adding >= $add_limit) {
+			DI::logger()->info('The number of currently running jobs exceed the limit', ['adding' => $adding, 'limit' => $add_limit]);
+		}
+		return ($adding >= $add_limit);
+	}
+
+	/**
+	 * Add contact data via probe for multiple contacts
+	 * @param array $urls Array of contact links
+	 * @param int   $uid  User ID
+	 */
+	public static function addByArray(array $urls, int $uid)
+	{
+		$added  = 0;
+		$failed = 0;
+		foreach ($urls as $url) {
+			$url = trim($url, '@');
+			if (str_contains($url, '@') || Network::isValidHttpUrl($url) || Network::isValidAtUrl($url)) {
+				AddContact::add(Worker::PRIORITY_MEDIUM, $uid, $url);
+				$added++;
+			} else {
+				DI::logger()->notice('Invalid account', ['url' => $url]);
+				$failed++;
+			}
+		}
+		DI::logger()->notice('Import done', ['added' => $added, 'failed' => $failed]);
 	}
 }

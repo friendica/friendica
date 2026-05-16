@@ -99,7 +99,7 @@ class Emailer
 			$this->config,
 			$this->logger,
 			$this->getSiteEmailAddress(),
-			$this->getSiteEmailName()
+			$this->getSiteEmailName(),
 		);
 	}
 
@@ -116,7 +116,7 @@ class Emailer
 			$this->config,
 			$this->logger,
 			$this->getSiteEmailAddress(),
-			$this->getSiteEmailName()
+			$this->getSiteEmailName(),
 		);
 	}
 
@@ -158,10 +158,10 @@ class Emailer
 		$messageSubject = Email::encodeHeader(html_entity_decode($email->getSubject(), ENT_QUOTES, 'UTF-8'), 'UTF-8');
 
 		// generate a mime boundary
-		$mimeBoundary = rand(0, 9) . '-'
-						. rand(100000000, 999999999) . '-'
-						. rand(100000000, 999999999) . '=:'
-						. rand(10000, 99999);
+		$mimeBoundary = random_int(0, 9) . '-'
+						. random_int(100000000, 999999999) . '-'
+						. random_int(100000000, 999999999) . '=:'
+						. random_int(10000, 99999);
 
 		$messageHeader = $email->getAdditionalMailHeaderString();
 		if ($countMessageId === 0) {
@@ -169,29 +169,29 @@ class Emailer
 		}
 
 		// generate a multipart/alternative message header
-		$messageHeader .=
-			"From: $fromName <{$fromAddress}>\r\n" .
-			"Reply-To: $fromName <{$replyTo}>\r\n" .
-			"MIME-Version: 1.0\r\n" .
-			"Content-Type: multipart/alternative; boundary=\"{$mimeBoundary}\"";
+		$messageHeader
+			.= "From: $fromName <{$fromAddress}>\r\n"
+			. "Reply-To: $fromName <{$replyTo}>\r\n"
+			. "MIME-Version: 1.0\r\n"
+			. "Content-Type: multipart/alternative; boundary=\"{$mimeBoundary}\"";
 
 		// assemble the final multipart message body with the text and html types included
 		$textBody             = chunk_split(base64_encode($email->getMessage(true)));
 		$htmlBody             = chunk_split(base64_encode($email->getMessage()));
-		$multipartMessageBody = "--" . $mimeBoundary . "\n" .                    // plain text section
-								"Content-Type: text/plain; charset=UTF-8\n" .
-								"Content-Transfer-Encoding: base64\n\n" .
-								$textBody . "\n";
+		$multipartMessageBody = "--" . $mimeBoundary . "\n"                    // plain text section
+								. "Content-Type: text/plain; charset=UTF-8\n"
+								. "Content-Transfer-Encoding: base64\n\n"
+								. $textBody . "\n";
 
 		if (!$email_textonly && !is_null($email->getMessage())) {
-			$multipartMessageBody .=
-				"--" . $mimeBoundary . "\n" .                // text/html section
-				"Content-Type: text/html; charset=UTF-8\n" .
-				"Content-Transfer-Encoding: base64\n\n" .
-				$htmlBody . "\n";
+			$multipartMessageBody
+				.= "--" . $mimeBoundary . "\n"                // text/html section
+				. "Content-Type: text/html; charset=UTF-8\n"
+				. "Content-Transfer-Encoding: base64\n\n"
+				. $htmlBody . "\n";
 		}
-		$multipartMessageBody .=
-			"--" . $mimeBoundary . "--\n";                    // message ending
+		$multipartMessageBody
+			.= "--" . $mimeBoundary . "--\n";                    // message ending
 
 		if ($this->config->get('system', 'sendmail_params', true)) {
 			$sendmail_params = '-f ' . $fromAddress;
@@ -220,7 +220,7 @@ class Emailer
 			$hookdata['subject'],
 			$hookdata['body'],
 			$hookdata['headers'],
-			$hookdata['parameters']
+			$hookdata['parameters'],
 		);
 
 		$this->logger->debug('Email message header', ['To' => $email->getToAddress(), 'messageHeader' => $messageHeader, 'return' => ($res) ? 'true' : 'false']);

@@ -40,7 +40,7 @@ class Hook
 	public static function loadHooks()
 	{
 		self::$hooks = [];
-		$stmt = DBA::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
+		$stmt        = DBA::select('hook', ['hook', 'file', 'function'], [], ['order' => ['priority' => 'desc', 'file']]);
 
 		while ($hook = DBA::fetch($stmt)) {
 			self::add($hook['hook'], $hook['file'], $hook['function']);
@@ -171,8 +171,8 @@ class Hook
 	 * Use this function when you want to be able to allow a hook to manipulate
 	 * the provided data.
 	 *
-	 * @param string        $name of the hook to call
-	 * @param string|array &$data to transmit to the callback handler
+	 * @param string                $name of the hook to call
+	 * @param int|string|array|null $data to transmit to the callback handler
 	 * @return void
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
@@ -197,7 +197,7 @@ class Hook
 	public static function callSingle(string $name, array $hook, &$data = null)
 	{
 		// Don't run a theme's hook if the user isn't using the theme
-		if (strpos($hook[0], 'view/theme/') !== false && strpos($hook[0], 'view/theme/' . DI::appHelper()->getCurrentTheme()) === false) {
+		if (str_contains($hook[0], 'view/theme/') && !str_contains($hook[0], 'view/theme/' . DI::appHelper()->getCurrentTheme())) {
 			return;
 		}
 

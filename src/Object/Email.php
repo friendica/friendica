@@ -38,10 +38,17 @@ class Email implements IEmail
 	/** @var int|null */
 	private $toUid;
 
-	public function __construct(string $fromName, string $fromAddress, string $replyTo, string $toAddress,
-	                            string $subject, string $msgHtml, string $msgText,
-	                            array $additionalMailHeader = [], int $toUid = null)
-	{
+	public function __construct(
+		string $fromName,
+		string $fromAddress,
+		string $replyTo,
+		string $toAddress,
+		string $subject,
+		string $msgHtml,
+		string $msgText,
+		array $additionalMailHeader = [],
+		int $toUid = null,
+	) {
 		$this->fromName             = $fromName;
 		$this->fromAddress          = $fromAddress;
 		$this->replyTo              = $replyTo;
@@ -178,9 +185,9 @@ class Email implements IEmail
 	/**
 	 * @inheritDoc
 	 */
-	public function __toString()
+	public function __toString(): string
 	{
-		return json_encode($this->toArray());
+		return (string) json_encode($this->toArray());
 	}
 
 	/**

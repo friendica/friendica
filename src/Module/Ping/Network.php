@@ -14,6 +14,7 @@ use Friendica\App\Page;
 use Friendica\AppHelper;
 use Friendica\Content\Conversation;
 use Friendica\Content\Conversation\Factory\Timeline as TimelineFactory;
+use Friendica\Content\Conversation\Factory\Activity as ActivityFactory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Content\Conversation\Factory\Channel as ChannelFactory;
 use Friendica\Content\Conversation\Factory\UserDefinedChannel as UserDefinedChannelFactory;
@@ -31,6 +32,7 @@ use Friendica\Module\Conversation\Network as NetworkModule;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Network extends NetworkModule
@@ -40,9 +42,63 @@ class Network extends NetworkModule
 	 */
 	private $lock;
 
-	public function __construct(ICanLock $lock, UserDefinedChannelFactory $userDefinedChannel, NetworkFactory $network, CommunityFactory $community, ChannelFactory $channelFactory, UserDefinedChannel $channel, AppHelper $appHelper, TimelineFactory $timeline, SystemMessages $systemMessages, Mode $mode, Conversation $conversation, Page $page, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
-		parent::__construct($userDefinedChannel, $network, $community, $channelFactory, $channel, $appHelper, $timeline, $systemMessages, $mode, $conversation, $page, $session, $database, $pConfig, $config, $cache, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	public function __construct(
+		ICanLock $lock,
+		UserDefinedChannelFactory $userDefinedChannel,
+		NetworkFactory $network,
+		CommunityFactory $community,
+		ChannelFactory $channelFactory,
+		UserDefinedChannel $channel,
+		AppHelper $appHelper,
+		EventDispatcherInterface $eventDispatcher,
+		TimelineFactory $timeline,
+		SystemMessages $systemMessages,
+		Mode $mode,
+		Conversation $conversation,
+		Page $page,
+		IHandleUserSessions $session,
+		Database $database,
+		IManagePersonalConfigValues $pConfig,
+		IManageConfigValues $config,
+		ICanCache $cache,
+		ActivityFactory $ActivityFactory,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = []
+	) {
+		parent::__construct(
+			$userDefinedChannel,
+			$network,
+			$community,
+			$channelFactory,
+			$channel,
+			$appHelper,
+			$eventDispatcher,
+			$timeline,
+			$systemMessages,
+			$mode,
+			$conversation,
+			$page,
+			$session,
+			$database,
+			$pConfig,
+			$config,
+			$cache,
+			$ActivityFactory,
+			$l10n,
+			$baseUrl,
+			$args,
+			$logger,
+			$profiler,
+			$response,
+			$server,
+			$parameters,
+		);
 
 		$this->lock = $lock;
 	}

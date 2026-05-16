@@ -58,12 +58,12 @@ class Statistics extends BaseModule
 
 		/// @todo mark the "service" addons and load them dynamically here
 		$services = [
-			'appnet'      => $this->addonHelper->isAddonEnabled('appnet'),
-			'bluesky'     => $this->addonHelper->isAddonEnabled('bluesky'),
+			'atprotocol'  => $this->addonHelper->isAddonEnabled('bluesky'),
 			'dreamwidth'  => $this->addonHelper->isAddonEnabled('dreamwidth'),
 			'gnusocial'   => $this->addonHelper->isAddonEnabled('gnusocial'),
 			'libertree'   => $this->addonHelper->isAddonEnabled('libertree'),
 			'livejournal' => $this->addonHelper->isAddonEnabled('livejournal'),
+			'pnut'        => $this->addonHelper->isAddonEnabled('pnut'),
 			'pumpio'      => $this->addonHelper->isAddonEnabled('pumpio'),
 			'twitter'     => $this->addonHelper->isAddonEnabled('twitter'),
 			'tumblr'      => $this->addonHelper->isAddonEnabled('tumblr'),

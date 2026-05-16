@@ -10,8 +10,10 @@
 			<a href="{{$notify.contact.url}}" class="userinfo click-card" tabIndex="-1"><img data-src="{{$notify.contact.photo}}" alt="" loading="lazy"></a>
 		</div>
 		<a href="{{$notify.href}}" class="notif-desc-wrapper media-body">
-            {{$notify.richtext nofilter}}
-			<div><time class="notif-when time" data-toggle="tooltip" title="{{$notify.localdate}}">{{$notify.ago}}</time></div>
+			<div>
+			{{$notify.richtext nofilter}}
+			<time class="notif-when time" data-toggle="tooltip" title="{{$notify.localdate}}">{{$notify.ago}}</time>
+			<div class="clear"></div>
 		</a>
 	</div>
 </li>

@@ -5,14 +5,17 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 {{* The button to open the jot - in This theme we move the button with js to the second nav bar *}}
-<a class="btn btn-sm btn-primary pull-right{{if !$always_open_compose}} modal-open{{/if}}" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}" aria-label="{{$new_post}}" title="{{$new_post}}"><i class="fa fa-pencil-square-o fa-2x"></i></a>
+<a class="action-button btn btn-primary pull-right{{if !$always_open_compose}} modal-open{{/if}}" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
+	<i class="fa fa-lg fa-pencil"></i>
+	<span>{{$new_post}}</span>
+</a>
 
 <div id="jot-content">
 	<div id="jot-sections">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close" style="float: right;">&times;</button>
 
-			<a href="/compose" class="btn compose-link" title="{{$compose_link_title}}" aria-label="{{$compose_link_title}}">
+			<a href="/compose" class="btn btn-secondary compose-link" title="{{$compose_link_title}}" aria-label="{{$compose_link_title}}">
 				<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
 			</a>
 
@@ -26,14 +29,6 @@
 						{{$message}}
 					</a>
 				</li>
-				{{if $acl}}
-				<li>
-					<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk jot-nav-lnk" id="jot-perms-lnk" role="tab" aria-controls="profile-jot-acl-wrapper">
-						<i class="fa fa-shield" aria-hidden="true"></i>
-						{{$shortpermset}}
-					</a>
-				</li>
-				{{/if}}
 				{{if $preview}}
 				<li>
 					<a href="#jot-preview-content" class="jot-preview-lnk jot-nav-lnk" id="jot-preview-lnk" role="tab" aria-controls="jot-preview-content">
@@ -48,6 +43,16 @@
 						{{$browser}}
 					</a>
 				</li>
+				{{if $acl}}
+				<li>
+					<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk jot-nav-lnk" id="jot-perms-lnk" role="tab" aria-controls="profile-jot-acl-wrapper">
+						<i class="fa fa-shield" aria-hidden="true"></i>
+						{{$shortpermset}}
+					</a>
+				</li>
+				{{/if}}
+
+
 			</ul>
 
 			{{* The Jot navigation menu for small displays (text input, permissions, preview, filebrowser) *}}
@@ -100,6 +105,9 @@
 					<input type="hidden" name="contact_allow[]" value="<{{$notes_cid}}>" />
 					{{/if}}
 					<div id="jot-title-wrap"><input name="title" id="jot-title" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdertitle}}" title="{{$placeholdertitle}}" value="{{$title}}" style="display:block;" dir="auto" /></div>
+					{{if $placeholdersummary}}
+					<div id="jot-summary-wrap"><input name="summary" id="jot-summary" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdersummary}}" title="{{$placeholdersummary}}" value="{{$summary}}" style="display:block;" dir="auto" /></div>
+					{{/if}}
 					{{if $placeholdercategory}}
 					<div id="jot-category-wrap"><input name="category" id="jot-category" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdercategory}}" title="{{$placeholdercategory}}" value="{{$category}}" dir="auto" /></div>
 					{{/if}}
@@ -110,15 +118,17 @@
 					</div>
 
 					<ul id="profile-jot-submit-wrapper" class="jothidden nav nav-pills">
+						<li><button type="button" class="btn-link" id="profile-attach"  ondragenter="return linkDropper(event);" ondragover="return linkDropper(event);" ondrop="linkDrop(event);" onclick="jotGetLink();" title="{{$edattach}}"><i class="fa fa-paperclip"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link icon emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}"><i class="fa fa-smile-o"></i></button></li>
+
+						<li><button type="button" class="btn-link icon" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormattingToPost('url');"><i class="fa fa-link"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$eduline}}" title="{{$eduline}}" onclick="insertFormattingToPost('u');"><i class="fa fa-underline"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormattingToPost('i');"><i class="fa fa-italic"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormattingToPost('b');"><i class="fa fa-bold"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormattingToPost('quote');"><i class="fa fa-quote-left"></i></button></li>
-						<li><button type="button" class="hidden-xs btn-link icon emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}"><i class="fa fa-smile-o"></i></button></li>
-						<li><button type="button" class="btn-link icon" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormattingToPost('url');"><i class="fa fa-link"></i></button></li>
-						<li><button type="button" class="btn-link" id="profile-attach"  ondragenter="return linkDropper(event);" ondragover="return linkDropper(event);" ondrop="linkDrop(event);" onclick="jotGetLink();" title="{{$edattach}}"><i class="fa fa-paperclip"></i></button></li>
 						<li><button type="button" class="btn-link" id="profile-location" onclick="jotGetLocation();" title="{{$setloc}}"><i class="fa fa-map-marker" aria-hidden="true"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormattingToPost('abstract');"><i class="fa fa-eye"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link" style="cursor: pointer;" aria-label="{{$edcode}}" title="{{$edcode}}" onclick="insertFormattingToPost('code');"><i class="fa fa-code"></i></button></li>
 						<!-- TODO: waiting for a better placement
 						<li><button type="button" class="btn-link" id="profile-nolocation" onclick="jotClearLocation();" title="{{$noloc}}">{{$shortnoloc}}</button></li>
 						-->
@@ -141,6 +151,7 @@
 
 				<div id="profile-jot-acl-wrapper" class="minimize" aria-labelledby="jot-perms-lnk" role="tabpanel" aria-hidden="true">
 					{{$acl nofilter}}
+					{{include file="field_checkbox.tpl" field=$sensitive}}
 					{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
 					{{if $created_at}}{{$created_at nofilter}}{{/if}}
 				</div>
@@ -181,12 +192,6 @@ can load different content into the jot modal (e.g. the item edit jot)
 	</div>
 </div>
 
-<script type="text/javascript">
-	$('iframe').load(function() {
-		this.style.height = this.contentWindow.document.body.offsetHeight + 'px';
-	});
-</script>
-
 <script>
-	dzFactory.setupDropzone('#jot-text-wrap', 'profile-jot-text'); 
+	dzFactory.setupDropzone('#jot-text-wrap', 'profile-jot-text');
 </script>

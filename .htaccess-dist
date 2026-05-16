@@ -5,10 +5,12 @@
 # This file is meant to be copied to ".htaccess" on Apache-powered web servers.
 # The created .htaccess file can be edited manually and will not be overwritten by Friendica updates.
 
+# /compose stops successfully pointing to the editor if this is removed, due to compose.yaml
+Options -Multiviews
+
 Options -Indexes
 AddType application/x-java-archive .jar
 AddType audio/ogg .oga
-#AddHandler php53-cgi .php
 
 # deny access to log files (friendica.log or php.out)
 <FilesMatch "\.(out|log)$">

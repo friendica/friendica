@@ -4,11 +4,19 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<div id='adminpage'>
+<div id='adminpage' class='adminpage'>
 	<h1>{{$title}} - {{$page}} ({{$count}})</h1>
 	
 	<p>{{$info}}</p>
 	<table>
+		<colgroup>
+			<col style="width: 80px;">
+			<col style="width: 120px;">
+			<col style="width: auto;">
+			<col style="width: 100px;">
+			{{if ($status == "deferred") }}<col style="width: 100px;">{{/if}}
+			<col style="width: 60px;">
+		</colgroup>
 		<tr>
 			<th>{{$id_header}}</th>
 			<th>{{$command_header}}</th>

@@ -18,17 +18,17 @@ use Friendica\Database\Database;
  */
 class Mode
 {
-	const LOCALCONFIGPRESENT  = 1;
-	const DBAVAILABLE         = 2;
-	const DBCONFIGAVAILABLE   = 4;
-	const MAINTENANCEDISABLED = 8;
+	public const LOCALCONFIGPRESENT  = 1;
+	public const DBAVAILABLE         = 2;
+	public const DBCONFIGAVAILABLE   = 4;
+	public const MAINTENANCEDISABLED = 8;
 
-	const UNDEFINED = 0;
-	const INDEX = 1;
-	const DAEMON = 2;
-	const WORKER = 3;
+	public const UNDEFINED = 0;
+	public const INDEX     = 1;
+	public const DAEMON    = 2;
+	public const WORKER    = 3;
 
-	const BACKEND_CONTENT_TYPES = ['application/jrd+json', 'text/xml',
+	public const BACKEND_CONTENT_TYPES = ['application/jrd+json', 'text/xml',
 		'application/rss+xml', 'application/atom+xml', 'application/activity+json'];
 
 	/**
@@ -36,7 +36,7 @@ class Mode
 	 *
 	 * @var array
 	 */
-	const BACKEND_MODULES = [
+	public const BACKEND_MODULES = [
 		'_well_known',
 		'api',
 		'dfrn_notify',
@@ -115,9 +115,9 @@ class Mode
 	{
 		$mode = 0;
 
-		if (!file_exists($basePath . '/config/local.config.php') &&
-			!file_exists($basePath . '/config/local.ini.php') &&
-			!file_exists($basePath . '/.htconfig.php')) {
+		if (!file_exists($basePath . '/config/local.config.php')
+			&& !file_exists($basePath . '/config/local.ini.php')
+			&& !file_exists($basePath . '/.htconfig.php')) {
 			return new Mode($mode);
 		}
 
@@ -151,7 +151,7 @@ class Mode
 	public function determineRunMode(bool $isBackend, array $server, Arguments $args, MobileDetect $mobileDetect): Mode
 	{
 		foreach (self::BACKEND_CONTENT_TYPES as $type) {
-			if (strpos(strtolower($server['HTTP_ACCEPT'] ?? ''), $type) !== false) {
+			if (str_contains(strtolower($server['HTTP_ACCEPT'] ?? ''), $type)) {
 				$isBackend = true;
 			}
 		}
@@ -209,8 +209,8 @@ class Mode
 	 */
 	public function isInstall(): bool
 	{
-		return !$this->has(Mode::LOCALCONFIGPRESENT) ||
-		       !$this->has(Mode::DBAVAILABLE);
+		return !$this->has(Mode::LOCALCONFIGPRESENT)
+			   || !$this->has(Mode::DBAVAILABLE);
 	}
 
 	/**
@@ -220,9 +220,9 @@ class Mode
 	 */
 	public function isNormal(): bool
 	{
-		return $this->has(Mode::LOCALCONFIGPRESENT) &&
-		       $this->has(Mode::DBAVAILABLE) &&
-		       $this->has(Mode::MAINTENANCEDISABLED);
+		return $this->has(Mode::LOCALCONFIGPRESENT)
+			   && $this->has(Mode::DBAVAILABLE)
+			   && $this->has(Mode::MAINTENANCEDISABLED);
 	}
 
 	/**

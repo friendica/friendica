@@ -6,9 +6,12 @@
   *}}
 
 <nav id="follow-sidebar" class="widget">
-  <h3>{{$connect}}</h3>
+  <h3>
+    <i class="fa fa-user-plus" aria-hidden="true"></i>
+    {{$connect}}
+  </h3>
   <div id="connect-desc">{{$desc nofilter}}</div>
   <form action="contact/follow" method="post">
-    <input id="side-follow-url" type="text" name="follow-url" value="{{$value}}" size="24" placeholder="{{$hint}}" title="{{$hint}}" /><input id="side-follow-submit" type="submit" name="submit" value="{{$follow}}" />
+    <input id="side-follow-url" type="text" name="follow-url" value="{{$value}}" placeholder="{{$hint}}"/><input id="side-follow-submit" type="submit" name="submit" value="{{$follow}}" />
   </form>
 </nav>

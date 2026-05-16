@@ -36,11 +36,11 @@ class LookupTest extends ApiTestCase
 	public function testApiUsersLookupWithUserId()
 	{
 		// @todo: This call is needed for this test
-		Renderer::registerTemplateEngine('Friendica\Render\FriendicaSmartyEngine');
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$response = (new Lookup(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'user_id' => static::OTHER_USER['id']
+				'user_id' => static::OTHER_USER['id'],
 			]);
 
 		$json = $this->toJson($response);

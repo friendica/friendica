@@ -12,7 +12,6 @@
 <meta name="viewport" content="initial-scale=1.0">
 
 {{* All needed css files - Note: css must be inserted before js files *}}
-<link rel="stylesheet" href="view/global.css?v={{$VERSION}}" type="text/css" media="all" />
 <link rel="stylesheet" href="view/asset/jquery-colorbox/example5/colorbox.css?v={{$VERSION}}"
 	type="text/css" media="screen" />
 <link rel="stylesheet" href="view/asset/jgrowl/jquery.jgrowl.min.css?v={{$VERSION}}"
@@ -59,6 +58,7 @@
 	type="text/css" media="screen" />
 
 {{* own css files *}}
+<link rel="stylesheet" href="view/global.css?v={{$VERSION}}" type="text/css" media="all" />
 <link rel="stylesheet" href="view/theme/frio/css/hovercard.css?v={{$VERSION}}" type="text/css"
 	media="screen" />
 <link rel="stylesheet" href="view/theme/frio/css/font-awesome.custom.css?v={{$VERSION}}"
@@ -94,7 +94,7 @@
 	</script>
 	<script type="text/javascript" src="view/js/jquery.textinputs.js?v={{$VERSION}}"></script>
 	<script type="text/javascript"
-		src="view/asset/textcomplete/dist/textcomplete.min.js?v={{$VERSION}}"></script>
+		src="view/asset/jquery-textcomplete/dist/jquery.textcomplete.min.js?v={{$VERSION}}"></script>
 	<script type="text/javascript" src="view/js/autocomplete.js?v={{$VERSION}}"></script>
 	<script type="text/javascript"
 		src="view/asset/jquery-colorbox/jquery.colorbox-min.js?v={{$VERSION}}"></script>
@@ -145,6 +145,7 @@
 	{{* own js files *}}
 	<script type="text/javascript" src="view/theme/frio/js/theme.js?v={{$VERSION}}"></script>
 	<script type="text/javascript" src="view/theme/frio/js/modal.js?v={{$VERSION}}"></script>
+	<script type="text/javascript" src="view/js/ajaxupload.js?v={{$VERSION}}"></script>
 	{{if ! $block_public}}
 		<script type="text/javascript" src="view/theme/frio/js/hovercard.js?v={{$VERSION}}"></script>
 	{{/if}}
@@ -161,7 +162,7 @@
 			trigger: [
 				{
 					selector: '.emojis',
-					insertInto: ['#comment-edit-text-0', '.profile-jot-text-full', '.comment-edit-text-full']
+					insertInto: ['#comment-edit-text-0', '.profile-jot-text-full', '.comment-edit-text-full', '.prvmail-text', '.emojis-target']
 				}
 			],
 			closeButton: true

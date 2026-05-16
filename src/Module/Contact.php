@@ -30,12 +30,12 @@ use Friendica\Worker\UpdateContact;
  */
 class Contact extends BaseModule
 {
-	const TAB_CONVERSATIONS = 1;
-	const TAB_POSTS         = 2;
-	const TAB_PROFILE       = 3;
-	const TAB_CONTACTS      = 4;
-	const TAB_ADVANCED      = 5;
-	const TAB_MEDIA         = 6;
+	public const TAB_CONVERSATIONS = 1;
+	public const TAB_POSTS         = 2;
+	public const TAB_PROFILE       = 3;
+	public const TAB_CONTACTS      = 4;
+	public const TAB_ADVANCED      = 5;
+	public const TAB_MEDIA         = 6;
 
 	private static function batchActions()
 	{
@@ -44,7 +44,7 @@ class Contact extends BaseModule
 		}
 
 		$redirectUrl = $_POST['command'] ?? '';
-		if (substr($redirectUrl, 0, 7) != 'contact') {
+		if (!str_starts_with($redirectUrl, 'contact')) {
 			$redirectUrl = 'contact';
 		}
 		if (!empty($_POST['parameter'])) {
@@ -177,6 +177,9 @@ class Contact extends BaseModule
 
 		$page = DI::page();
 
+		// Default page title when not viewing a specific contact
+		$page['title'] = DI::l10n()->t('Contacts');
+
 		$page->registerFooterScript(Theme::getPathForFile('asset/typeahead.js/dist/typeahead.bundle.js'));
 		$page->registerFooterScript(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.js'));
 		$page->registerStylesheet(Theme::getPathForFile('js/friendica-tagsinput/friendica-tagsinput.css'));
@@ -201,7 +204,7 @@ class Contact extends BaseModule
 		DI::page()['htmlhead'] .= Renderer::replaceMacros($tpl, []);
 
 		$o = '';
-		Nav::setSelected('contact');
+		Nav::setSelected('contacts');
 
 		$_SESSION['return_path'] = DI::args()->getQueryString();
 
@@ -254,7 +257,9 @@ class Contact extends BaseModule
 			$searching  = true;
 			$search_hdr = $search;
 			$search_txt = preg_quote(trim($search, ' @!'));
-			$sql_extra .= " AND (`name` REGEXP ? OR `url` REGEXP ? OR `nick` REGEXP ? OR `addr` REGEXP ? OR `alias` REGEXP ?)";
+			$sql_extra .= " AND (CAST(`name` AS BINARY) REGEXP BINARY ? OR CAST(`url` AS BINARY) REGEXP BINARY ?";
+			$sql_extra .= " OR  CAST(`nick` AS BINARY) REGEXP BINARY ? OR  CAST(`addr` AS BINARY) REGEXP BINARY ?";
+			$sql_extra .= " OR  CAST(`alias` AS BINARY) REGEXP BINARY ?)";
 			$sql_values[] = $search_txt;
 			$sql_values[] = $search_txt;
 			$sql_values[] = $search_txt;
@@ -397,7 +402,7 @@ class Contact extends BaseModule
 				$header = DI::l10n()->t('Following');
 				break;
 			case 'mutuals':
-				$header = DI::l10n()->t('Mutual friends');
+				$header = DI::l10n()->t('Friends');
 				break;
 			case 'nothing':
 				$header = DI::l10n()->t('No relationship');
@@ -518,7 +523,7 @@ class Contact extends BaseModule
 				'sel'       => (($active_tab == self::TAB_CONTACTS) ? 'active' : ''),
 				'title'     => DI::l10n()->t('View all known contacts'),
 				'id'        => 'contacts-tab',
-				'accesskey' => 't'
+				'accesskey' => 't',
 			],
 		];
 
@@ -529,7 +534,7 @@ class Contact extends BaseModule
 				'sel'       => (($active_tab == self::TAB_ADVANCED) ? 'active' : ''),
 				'title'     => DI::l10n()->t('Advanced Contact Settings'),
 				'id'        => 'advanced-tab',
-				'accesskey' => 'r'
+				'accesskey' => 'r',
 			];
 		}
 
@@ -537,6 +542,11 @@ class Contact extends BaseModule
 		$tab_str = Renderer::replaceMacros($tab_tpl, ['$tabs' => $tabs, '$more' => DI::l10n()->t('More')]);
 
 		return $tab_str;
+	}
+
+	public static function setPageTitle(array $contact)
+	{
+		DI::page()['title'] = $contact['name'];
 	}
 
 	/**
@@ -563,15 +573,15 @@ class Contact extends BaseModule
 		if (!empty($contact['uid']) && !empty($contact['rel']) && DI::userSession()->getLocalUserId() == $contact['uid']) {
 			switch ($contact['rel']) {
 				case Model\Contact::FRIEND:
-					$alt_text = DI::l10n()->t('Mutual Friendship');
+					$alt_text = DI::l10n()->t('Friend');
 					break;
 
 				case Model\Contact::FOLLOWER:
-					$alt_text = DI::l10n()->t('is a fan of yours');
+					$alt_text = DI::l10n()->t('Follows you');
 					break;
 
 				case Model\Contact::SHARING:
-					$alt_text = DI::l10n()->t('you are a fan of');
+					$alt_text = DI::l10n()->t('You follow');
 					break;
 
 				default:
@@ -581,7 +591,7 @@ class Contact extends BaseModule
 
 		$url = Model\Contact::magicLinkByContact($contact);
 
-		if (strpos($url, 'contact/redir/') === 0) {
+		if (str_starts_with($url, 'contact/redir/')) {
 			$sparkle = ' class="sparkle" ';
 		} else {
 			$sparkle = '';

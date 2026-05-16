@@ -17,7 +17,7 @@ class SyslogLoggerWrapper extends SyslogLogger
 {
 	private $content;
 
-	public function __construct(string $channel, IHaveCallIntrospections $introspection, string $logLevel, string $logOptions, string $logFacility)
+	public function __construct(string $channel, IHaveCallIntrospections $introspection, int $logLevel, int $logOptions, int $logFacility)
 	{
 		parent::__construct($channel, $introspection, $logLevel, $logOptions, $logFacility);
 

@@ -7,7 +7,6 @@
 
 namespace Friendica\Test\src\Core\Config;
 
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Config\Model\DatabaseConfig;
 use Friendica\Core\Config\Model\ReadOnlyFileConfig;
@@ -19,7 +18,6 @@ use Friendica\Test\Util\VFSTrait;
 
 class ConfigTest extends DatabaseTestCase
 {
-	use ArraySubsetAsserts;
 	use VFSTrait;
 	use CreateDatabaseTrait;
 
@@ -44,7 +42,10 @@ class ConfigTest extends DatabaseTestCase
 
 		self::assertNotEmpty($result);
 		self::assertArrayHasKey($cat, $result);
-		self::assertArraySubset($data, $result[$cat]);
+
+		foreach ($data as $key => $value) {
+			self::assertEquals($value, $result[$cat][$key], sprintf('Pointer: `%s.%s`', $cat, $key));
+		}
 	}
 
 
@@ -59,7 +60,7 @@ class ConfigTest extends DatabaseTestCase
 			$this->root->url(),
 			$this->root->url() . '/addon',
 			$this->root->url() . '/config',
-			$this->root->url() . '/static'
+			$this->root->url() . '/static',
 		);
 	}
 
@@ -110,7 +111,7 @@ class ConfigTest extends DatabaseTestCase
 				'possibleCats' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
 				'load' => [
 					'system',
@@ -121,7 +122,7 @@ class ConfigTest extends DatabaseTestCase
 				'possibleCats' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
 				'load' => [
 					'other',
@@ -132,7 +133,7 @@ class ConfigTest extends DatabaseTestCase
 				'possibleCats' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
 				'load' => [
 					'config',
@@ -143,12 +144,12 @@ class ConfigTest extends DatabaseTestCase
 				'possibleCats' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
 				'load' => [
 					'system',
 					'config',
-					'other'
+					'other',
 				],
 			],
 		];
@@ -253,7 +254,7 @@ class ConfigTest extends DatabaseTestCase
 					'config' => [
 						'key45' => 45,
 						'key52' => true,
-					]
+					],
 				],
 				'expect' => [
 					'other' => [
@@ -554,7 +555,7 @@ class ConfigTest extends DatabaseTestCase
 		$config = $this->getInstance();
 
 		$config->set('test', 'it', $value);
-		self:self::assertEquals($assertion, $config->get('test', 'it'));
+		self::assertEquals($assertion, $config->get('test', 'it'));
 	}
 
 	public function dataEnv(): array
@@ -617,7 +618,7 @@ class ConfigTest extends DatabaseTestCase
 			$this->root->url() . '/addon',
 			$this->root->url() . '/config',
 			$this->root->url() . '/static',
-			$server
+			$server,
 		);
 		$configFileManager->setupCache($this->configCache);
 		$config = new DatabaseConfig($this->getDbInstance(), $this->configCache);

@@ -18,7 +18,7 @@ use Friendica\BaseEntity;
  * @property-read string $subtype
  * @property-read array $parameters
  */
-class MimeType extends BaseEntity
+class MimeType extends BaseEntity implements \Stringable
 {
 	/** @var string */
 	protected $type;
@@ -29,8 +29,8 @@ class MimeType extends BaseEntity
 
 	public function __construct(string $type, string $subtype, array $parameters = [])
 	{
-		$this->type = $type;
-		$this->subtype = $subtype;
+		$this->type       = $type;
+		$this->subtype    = $subtype;
 		$this->parameters = $parameters;
 	}
 
@@ -38,9 +38,9 @@ class MimeType extends BaseEntity
 	{
 		$parameters = array_map(function (string $attribute, string $value) {
 			if (
-				strpos($value, '"') !== false ||
-				strpos($value, '\\') !== false ||
-				strpos($value, "\r") !== false
+				str_contains($value, '"')
+				|| str_contains($value, '\\')
+				|| str_contains($value, "\r")
 			) {
 				$value = '"' . str_replace(['\\', '"', "\r"], ['\\\\', '\\"', "\\\r"], $value) . '"';
 			}
@@ -48,8 +48,8 @@ class MimeType extends BaseEntity
 			return '; ' . $attribute . '=' . $value;
 		}, array_keys($this->parameters), array_values($this->parameters));
 
-		return $this->type . '/' .
-			$this->subtype .
-			implode('', $parameters);
+		return $this->type . '/'
+			. $this->subtype
+			. implode('', $parameters);
 	}
 }

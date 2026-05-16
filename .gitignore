@@ -102,3 +102,6 @@ tests/.phpunit.result.cache
 
 #ignore .php_cs (local copy)
 .php_cs
+
+#ignore daemon.pid file
+daemon.pid

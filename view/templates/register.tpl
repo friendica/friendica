@@ -4,6 +4,14 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
+
+{{* Display system messages *}}
+{{if $notices}}
+	{{foreach $notices as $notice}}
+		<div class="alert alert-warning" role="alert">{{$notice}}</div>
+	{{/foreach}}
+{{/if}}
+
 <h3>{{$regtitle}}</h3>
 
 <form action="register" method="post" id="register-form">
@@ -20,7 +28,7 @@
 
 {{if $oidlabel}}
 	<div id="register-openid-wrapper">
-	<label for="register-openid" id="label-register-openid">{{$oidlabel}}</label><input type="text" maxlength="60" size="32" name="openid_url" class="openid" id="register-openid" value="{{$openid}}">
+	<label for="register-openid" id="label-register-openid">{{$oidlabel}}</label><input type="text" maxlength="60" name="openid_url" class="openid" id="register-openid" value="{{$openid}}">
 	</div>
 	<div id="register-openid-end"></div>
 {{/if}}
@@ -29,14 +37,14 @@
 	<p id="register-invite-desc">{{$invite_desc nofilter}}</p>
 	<div id="register-invite-wrapper">
 		<label for="register-invite" id="label-register-invite">{{$invite_label}}</label>
-		<input type="text" maxlength="60" size="32" name="invite_id" id="register-invite" value="{{$invite_id}}">
+		<input type="text" maxlength="60" name="invite_id" id="register-invite" value="{{$invite_id}}">
 	</div>
 	<div id="register-name-end"></div>
 {{/if}}
 
 	<div id="register-name-wrapper">
 		<label for="register-name" id="label-register-name">{{$namelabel}}</label>
-		<input type="text" maxlength="60" size="32" name="username" id="register-name" value="{{$username}}" required>
+		<input type="text" maxlength="60" name="username" id="register-name" value="{{$username}}" required>
 	</div>
 	<div id="register-name-end"></div>
 
@@ -44,13 +52,13 @@
 	{{if !$additional}}
 		<div id="register-email-wrapper">
 			<label for="register-email" id="label-register-email">{{$addrlabel}}</label>
-			<input type="text" maxlength="60" size="32" name="field1" id="register-email" value="{{$email}}" required>
+			<input type="text" maxlength="60" name="field1" id="register-email" value="{{$email}}" required>
 		</div>
 		<div id="register-email-end"></div>
 
 		<div id="register-repeat-wrapper">
 			<label for="register-repeat" id="label-register-repeat">{{$addrlabel2}}</label>
-			<input type="text" maxlength="60" size="32" name="repeat" id="register-repeat" value="" required>
+			<input type="text" maxlength="60" name="repeat" id="register-repeat" value="" required>
 		</div>
 		<div id="register-repeat-end"></div>
 	{{/if}}
@@ -64,13 +72,18 @@
 
 	<div id="register-nickname-wrapper">
 		<label for="register-nickname" id="label-register-nickname">{{$nicklabel}}</label>
-		<input type="text" maxlength="60" size="32" name="nickname" id="register-nickname" value="{{$nickname}}" required><div id="register-sitename">@{{$sitename}}</div>
+		<input type="text" maxlength="60" name="nickname" id="register-nickname" value="{{$nickname}}" required><div id="register-sitename">@{{$sitename}}</div>
 	</div>
 	<div id="register-nickname-end"></div>
 
 	<input type="input" id=tarpit" name="email" style="display: none;" placeholder="Don't enter anything here"/>
 
 	{{if $additional}}
+		<div id="register-type-wrapper" class="form-group">
+			{{include file="field_select.tpl" field=$acct_type}}
+		</div>
+		<div id="register-type-end"></div>	
+		{{assign var="label" value="true"}}
 		{{include file="field_password.tpl" field=$parent_password}}
 	{{/if}}
 

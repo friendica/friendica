@@ -13,7 +13,6 @@ use Friendica\Core\Storage\Exception\InvalidClassStorageException;
 use Friendica\Core\Storage\Capability\ICanConfigureStorage;
 use Friendica\Core\Storage\Capability\ICanWriteToStorage;
 use Friendica\Module\BaseAdmin;
-use Friendica\Util\Strings;
 
 class Storage extends BaseAdmin
 {
@@ -28,7 +27,7 @@ class Storage extends BaseAdmin
 		try {
 			/** @var ICanConfigureStorage|false $newStorageConfig */
 			$newStorageConfig = DI::storageManager()->getConfigurationByName($storagebackend);
-		} catch (InvalidClassStorageException $storageException) {
+		} catch (InvalidClassStorageException) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Storage backend, %s is invalid.', $storagebackend));
 			DI::baseUrl()->redirect('admin/storage');
 		}
@@ -62,14 +61,14 @@ class Storage extends BaseAdmin
 			}
 		}
 
-		if (!empty($_POST['submit_save_set']) && DI::config()->isWritable('storage', 'name') ) {
+		if (!empty($_POST['submit_save_set']) && DI::config()->isWritable('storage', 'name')) {
 			try {
 				$newstorage = DI::storageManager()->getWritableStorageByName($storagebackend);
 
 				if (!DI::storageManager()->setBackend($newstorage)) {
 					DI::sysmsg()->addNotice(DI::l10n()->t('Invalid storage backend setting value.'));
 				}
-			} catch (InvalidClassStorageException $storageException) {
+			} catch (InvalidClassStorageException) {
 				DI::sysmsg()->addNotice(DI::l10n()->t('Invalid storage backend setting value.'));
 			}
 		}

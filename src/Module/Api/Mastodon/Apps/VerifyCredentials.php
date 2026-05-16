@@ -11,13 +11,13 @@ use Friendica\DI;
 use Friendica\Module\BaseApi;
 
 /**
- * @see https://docs.joinmastodon.org/methods/apps/
+ * @see https://docs.joinmastodon.org/methods/apps/#verify_credentials
  */
 class VerifyCredentials extends BaseApi
 {
 	protected function rawContent(array $request = [])
 	{
-		$this->checkAllowedScope(self::SCOPE_READ);
+		$this->checkAllowedScope(self::SCOPE_ANY);
 		$application = self::getCurrentApplication();
 
 		if (empty($application['id'])) {

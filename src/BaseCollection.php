@@ -24,7 +24,7 @@ class BaseCollection extends \ArrayIterator
 	 * @param BaseEntity[] $entities
 	 * @param int|null     $totalCount
 	 */
-	public function __construct(array $entities = [], int $totalCount = null)
+	public function __construct(array $entities = [], ?int $totalCount = null)
 	{
 		parent::__construct($entities);
 
@@ -32,9 +32,9 @@ class BaseCollection extends \ArrayIterator
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param mixed $key
+	 * @param mixed $value
 	 */
-	#[\ReturnTypeWillChange]
 	public function offsetSet($key, $value): void
 	{
 		if (is_null($key)) {
@@ -45,9 +45,8 @@ class BaseCollection extends \ArrayIterator
 	}
 
 	/**
-	 * @inheritDoc
+	 * @param mixed $key
 	 */
-	#[\ReturnTypeWillChange]
 	public function offsetUnset($key): void
 	{
 		if ($this->offsetExists($key)) {
@@ -89,7 +88,7 @@ class BaseCollection extends \ArrayIterator
 	 */
 	public function map(callable $callback): BaseCollection
 	{
-		$class = get_class($this);
+		$class = $this::class;
 
 		return new $class(array_map($callback, $this->getArrayCopy()), $this->getTotalCount());
 	}
@@ -102,21 +101,19 @@ class BaseCollection extends \ArrayIterator
 	 * @return BaseCollection
 	 * @see array_filter()
 	 */
-	public function filter(callable $callback = null, int $flag = 0): BaseCollection
+	public function filter(?callable $callback = null, int $flag = 0): BaseCollection
 	{
-		$class = get_class($this);
+		$class = $this::class;
 
 		return new $class(array_filter($this->getArrayCopy(), $callback, $flag));
 	}
 
 	/**
 	 * Reverse the orders of the elements in the collection
-	 *
-	 * @return $this
 	 */
 	public function reverse(): BaseCollection
 	{
-		$class = get_class($this);
+		$class = $this::class;
 
 		return new $class(array_reverse($this->getArrayCopy()), $this->getTotalCount());
 	}
@@ -125,7 +122,6 @@ class BaseCollection extends \ArrayIterator
 	 * Split the collection in smaller collections no bigger than the provided length
 	 *
 	 * @param int $length
-	 * @return static[]
 	 */
 	public function chunk(int $length): array
 	{
@@ -133,11 +129,14 @@ class BaseCollection extends \ArrayIterator
 			throw new \RangeException('BaseCollection->chunk(): Size parameter expected to be greater than 0');
 		}
 
-		return array_map(function ($array) {
-			$class = get_class($this);
+		return array_map(
+			function ($array) {
+				$class = $this::class;
 
-			return new $class($array);
-		}, array_chunk($this->getArrayCopy(), $length));
+				return new $class($array);
+			},
+			array_chunk($this->getArrayCopy(), $length),
+		);
 	}
 
 

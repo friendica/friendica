@@ -11,12 +11,15 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Event\ArrayFilterEvent;
+use Friendica\Model\Post;
+use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Util;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class ParseUrl extends BaseModule
@@ -24,11 +27,14 @@ class ParseUrl extends BaseModule
 	/** @var IHandleUserSessions */
 	protected $userSession;
 
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $userSession, $server, array $parameters = [])
+	private EventDispatcherInterface $eventDispatcher;
+
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $userSession, EventDispatcherInterface $eventDispatcher, $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->userSession = $userSession;
+		$this->userSession     = $userSession;
+		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function rawContent(array $request = [])
@@ -37,37 +43,26 @@ class ParseUrl extends BaseModule
 			throw new \Friendica\Network\HTTPException\ForbiddenException();
 		}
 
-		$format = '';
-		$title = '';
+		$format      = $request['format'] ?? '';
+		$title       = '';
 		$description = '';
-		$ret = ['success' => false, 'contentType' => ''];
+		$ret         = ['success' => false, 'contentType' => ''];
 
-		if (!empty($_GET['binurl']) && Util\Strings::isHex($_GET['binurl'])) {
-			$url = trim(hex2bin($_GET['binurl']));
-		} elseif (!empty($_GET['url'])) {
-			$url = trim($_GET['url']);
+		if (!empty($request['binurl']) && Util\Strings::isHex($request['binurl'])) {
+			$url = trim(hex2bin($request['binurl']));
+		} elseif (!empty($request['url'])) {
+			$url = trim($request['url']);
 			// fallback in case no url is valid
 		} else {
 			throw new BadRequestException('No url given');
 		}
 
-		if (!empty($_GET['title'])) {
-			$title = strip_tags(trim($_GET['title']));
+		if (!empty($request['title'])) {
+			$title = strip_tags(trim($request['title']));
 		}
 
-		if (!empty($_GET['description'])) {
-			$description = strip_tags(trim($_GET['description']));
-		}
-
-		if (!empty($_GET['tags'])) {
-			$arr_tags = Util\ParseUrl::convertTagsToArray($_GET['tags']);
-			if (count($arr_tags)) {
-				$str_tags = "\n" . implode(' ', $arr_tags) . "\n";
-			}
-		}
-
-		if (isset($_GET['format']) && $_GET['format'] == 'json') {
-			$format = 'json';
+		if (!empty($request['description'])) {
+			$description = strip_tags(trim($request['description']));
 		}
 
 		// Add url scheme if it is missing
@@ -80,48 +75,58 @@ class ParseUrl extends BaseModule
 			}
 		}
 
-		$arr = ['url' => $url, 'format' => $format, 'text' => null];
+		$hook_data = [
+			'url'    => $url,
+			'format' => $format,
+			'text'   => null,
+		];
 
-		Hook::callAll('parse_link', $arr);
+		$hook_data = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PARSE_LINK, $hook_data),
+		)->getArray();
 
-		if ($arr['text']) {
+		if ($hook_data['text']) {
 			if ($format == 'json') {
-				$this->jsonExit($arr['text']);
+				$this->jsonExit($hook_data['text']);
 			} else {
-				$this->httpExit($arr['text']);
+				$this->httpExit($hook_data['text']);
 			}
 		}
 
 		if ($format == 'json') {
-			$siteinfo = Util\ParseUrl::getSiteinfoCached($url);
+			$siteinfo = ['url' => $url];
+			$embed    = false;
 
-			if (in_array($siteinfo['type'], ['image', 'video', 'audio'])) {
-				switch ($siteinfo['type']) {
-					case 'video':
-						$content_type = 'video';
-						break;
-					case 'audio':
-						$content_type = 'audio';
-						break;
-					default:
-						$content_type = 'image';
-						break;
-				}
+			$contentType = Util\ParseUrl::getContentType($url, HttpClientAccept::DEFAULT, 5);
+			$mediatype   = Post\Media::getType(implode('/', $contentType));
 
-				$ret['contentType'] = $content_type;
-				$ret['data'] = ['url' => $url];
-				$ret['success'] = true;
-			} else {
+			if ($mediatype === Post\Media::HTML) {
+				$siteinfo = Util\ParseUrl::getSiteinfoCached($url, implode('/', $contentType));
+				$title    = $siteinfo['title'] ?? $title;
+				$embed    = isset($siteinfo['embed']);
 				unset($siteinfo['keywords']);
+			}
 
-				$ret['data'] = $siteinfo;
+			$ret['data']    = $siteinfo;
+			$ret['success'] = true;
+
+			if ($mediatype === Post\Media::AUDIO) {
+				$ret['contentType'] = 'audio';
+			} elseif (in_array($mediatype, [Post\Media::VIDEO, Post\Media::HLS])) {
+				$ret['contentType'] = 'video';
+			} elseif ($mediatype === Post\Media::IMAGE) {
+				$ret['contentType'] = 'image';
+			} elseif ($mediatype === Post\Media::HTML && $embed) {
+				$ret['contentType'] = 'embed';
+			} elseif ($mediatype === Post\Media::HTML) {
 				$ret['contentType'] = 'attachment';
-				$ret['success'] = true;
+			} else {
+				$ret['contentType'] = 'url';
 			}
 
 			$this->jsonExit($ret);
 		} else {
-			$this->httpExit(BBCode::embedURL($url, empty($_GET['noAttachment']), $title, $description, $_GET['tags'] ?? ''));
+			$this->httpExit(BBCode::embedURL($url, empty($request['noAttachment']), $title, $description, $request['tags'] ?? ''));
 		}
 	}
 }

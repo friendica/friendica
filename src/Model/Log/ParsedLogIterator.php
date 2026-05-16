@@ -21,7 +21,7 @@ class ParsedLogIterator implements \Iterator
 	/** @var ReversedFileReader */
 	private $reader;
 
-	/** @var ParsedLogLine current iterator value*/
+	/** @var ParsedLogLine|null current iterator value*/
 	private $value = null;
 
 	/** @var int max number of lines to read */
@@ -112,7 +112,7 @@ class ParsedLogIterator implements \Iterator
 	private function search(ParsedLogLine $parsedlogline): bool
 	{
 		if ($this->search != '') {
-			return strstr($parsedlogline->logline, $this->search) !== false;
+			return str_contains($parsedlogline->logline, $this->search);
 		}
 		return true;
 	}

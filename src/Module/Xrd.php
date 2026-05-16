@@ -32,27 +32,27 @@ class Xrd extends BaseModule
 				throw new BadRequestException();
 			}
 
-			$uri = urldecode(trim($_GET['uri']));
+			$uri  = urldecode(trim($_GET['uri']));
 			$mode = self::getAcceptedContentType($_SERVER['HTTP_ACCEPT'] ?? '', Response::TYPE_XML);
 		} else {
 			if (empty($_GET['resource'])) {
 				throw new BadRequestException();
 			}
 
-			$uri = urldecode(trim($_GET['resource']));
+			$uri  = urldecode(trim($_GET['resource']));
 			$mode = self::getAcceptedContentType($_SERVER['HTTP_ACCEPT'] ?? '', Response::TYPE_JSON);
 		}
 
 		if (Network::isValidHttpUrl($uri)) {
 			$name = ltrim(basename($uri), '~');
 			$host = parse_url($uri, PHP_URL_HOST);
-		} else if (preg_match('/^[[:alpha:]][[:alnum:]+-.]+:/', $uri)) {
+		} elseif (preg_match('/^[[:alpha:]][[:alnum:]+-.]+:/', $uri)) {
 			$local = str_replace('acct:', '', $uri);
-			if (substr($local, 0, 2) == '//') {
+			if (str_starts_with($local, '//')) {
 				$local = substr($local, 2);
 			}
 
-			list($name, $host) = explode('@', $local);
+			[$name, $host] = explode('@', $local);
 		} else {
 			throw new BadRequestException();
 		}
@@ -127,8 +127,8 @@ class Xrd extends BaseModule
 
 	private function printSystemJSON(array $owner)
 	{
-		$baseURL = (string)$this->baseUrl;
-		$json = [
+		$baseURL = (string) $this->baseUrl;
+		$json    = [
 			'subject' => 'acct:' . $owner['addr'],
 			'aliases' => [$owner['url']],
 			'links'   => [
@@ -165,7 +165,15 @@ class Xrd extends BaseModule
 					'rel'      => ActivityNamespace::OSTATUSSUB,
 					'template' => $baseURL . '/contact/follow?url={uri}',
 				],
-			]
+				[
+					'rel'      => ActivityNamespace::FEP3B86_FOLLOW,
+					'template' => $baseURL . '/contact/follow?url={object}',
+				],
+				[
+					'rel'      => ActivityNamespace::FEP3B86_CREATE,
+					'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}',
+				],
+			],
 		];
 		header('Access-Control-Allow-Origin: *');
 		$this->jsonExit($json, 'application/jrd+json; charset=utf-8');
@@ -173,7 +181,7 @@ class Xrd extends BaseModule
 
 	private function printJSON(string $alias, array $owner, array $avatar)
 	{
-		$baseURL = (string)$this->baseUrl;
+		$baseURL = (string) $this->baseUrl;
 
 		$json = [
 			'subject' => 'acct:' . $owner['addr'],
@@ -181,7 +189,7 @@ class Xrd extends BaseModule
 				$alias,
 				$owner['url'],
 			],
-			'links'   => [
+			'links' => [
 				[
 					'rel'  => ActivityNamespace::DFRN,
 					'href' => $owner['url'],
@@ -225,6 +233,14 @@ class Xrd extends BaseModule
 					'template' => $baseURL . '/contact/follow?url={uri}',
 				],
 				[
+					'rel'      => ActivityNamespace::FEP3B86_FOLLOW,
+					'template' => $baseURL . '/contact/follow?url={object}',
+				],
+				[
+					'rel'      => ActivityNamespace::FEP3B86_CREATE,
+					'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}',
+				],
+				[
 					'rel'  => ActivityNamespace::OPENWEBAUTH,
 					'type' => 'application/x-zot+json',
 					'href' => $baseURL . '/owa',
@@ -238,82 +254,94 @@ class Xrd extends BaseModule
 
 	private function printXML(string $alias, array $owner, array $avatar)
 	{
-		$baseURL = (string)$this->baseUrl;
+		$baseURL = (string) $this->baseUrl;
 
 		$xmlString = XML::fromArray([
 			'XRD' => [
 				'@attributes' => [
-					'xmlns'    => 'http://docs.oasis-open.org/ns/xri/xrd-1.0',
+					'xmlns' => 'http://docs.oasis-open.org/ns/xri/xrd-1.0',
 				],
 				'Subject' => 'acct:' . $owner['addr'],
 				'1:Alias' => $owner['url'],
 				'2:Alias' => $alias,
-				'1:link' => [
+				'1:link'  => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::DFRN,
-						'href' => $owner['url']
-					]
+						'href' => $owner['url'],
+					],
 				],
 				'2:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::FEED,
 						'type' => 'application/atom+xml',
-						'href' => $owner['poll']
-					]
+						'href' => $owner['poll'],
+					],
 				],
 				'3:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::WEBFINGERPROFILE,
 						'type' => 'text/html',
-						'href' => $owner['url']
-					]
+						'href' => $owner['url'],
+					],
 				],
 				'4:link' => [
 					'@attributes' => [
 						'rel'  => 'self',
 						'type' => 'application/activity+json',
-						'href' => $owner['url']
-					]
+						'href' => $owner['url'],
+					],
 				],
 				'5:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::HCARD,
 						'type' => 'text/html',
-						'href' => $baseURL . '/hcard/' . $owner['nickname']
-					]
+						'href' => $baseURL . '/hcard/' . $owner['nickname'],
+					],
 				],
 				'6:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::WEBFINGERAVATAR,
 						'type' => $avatar['type'],
-						'href' => User::getAvatarUrl($owner)
-					]
+						'href' => User::getAvatarUrl($owner),
+					],
 				],
 				'7:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::DIASPORA_SEED,
 						'type' => 'text/html',
-						'href' => $baseURL
-					]
+						'href' => $baseURL,
+					],
 				],
 				'8:link' => [
 					'@attributes' => [
 						'rel'  => 'salmon',
-						'href' => $baseURL . '/receive/users/' . $owner['guid']
-					]
+						'href' => $baseURL . '/receive/users/' . $owner['guid'],
+					],
 				],
 				'9:link' => [
 					'@attributes' => [
 						'rel'      => ActivityNamespace::OSTATUSSUB,
-						'template' => $baseURL . '/contact/follow?url={uri}'
-					]
+						'template' => $baseURL . '/contact/follow?url={uri}',
+					],
 				],
 				'10:link' => [
 					'@attributes' => [
+						'rel'      => ActivityNamespace::FEP3B86_FOLLOW,
+						'template' => $baseURL . '/contact/follow?url={object}',
+					],
+				],
+				'11:link' => [
+					'@attributes' => [
+						'rel'      => ActivityNamespace::FEP3B86_CREATE,
+						'template' => $baseURL . '/compose?body={content}&title={name}&summary={summary}&attachment={attachment}',
+					],
+				],
+				'12:link' => [
+					'@attributes' => [
 						'rel'  => ActivityNamespace::OPENWEBAUTH,
 						'type' => 'application/x-zot+json',
-						'href' => $baseURL . '/owa'
-					]
+						'href' => $baseURL . '/owa',
+					],
 				],
 			],
 		]);

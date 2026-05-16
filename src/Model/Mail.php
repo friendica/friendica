@@ -53,10 +53,10 @@ class Mail
 		$msg['uri-id']        = ItemURI::insert(['uri' => $msg['uri'], 'guid' => $msg['guid']]);
 		$msg['parent-uri-id'] = ItemURI::getIdByURI($msg['parent-uri']);
 
-		DBA::lock('mail');
+		DBA::transaction();
 
 		if (DBA::exists('mail', ['uri' => $msg['uri'], 'uid' => $msg['uid']])) {
-			DBA::unlock();
+			DBA::rollback();
 			DI::logger()->info('duplicate message already delivered.');
 			return false;
 		}
@@ -73,7 +73,7 @@ class Mail
 
 		$msg['id'] = DBA::lastInsertId();
 
-		DBA::unlock();
+		DBA::commit();
 
 		if (!empty($msg['convid'])) {
 			DBA::update('conv', ['updated' => DateTimeFormat::utcNow()], ['id' => $msg['convid']]);
@@ -223,7 +223,7 @@ class Mail
 		}
 
 		if ($post_id) {
-			Worker::add(Worker::PRIORITY_HIGH, "Notifier", Delivery::MAIL, $post_id);
+			Worker::add(Worker::PRIORITY_HIGH, "Notifier", Delivery::MAIL, $post_id, $sender_uid);
 			return intval($post_id);
 		} else {
 			return -3;

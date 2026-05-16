@@ -7,6 +7,7 @@
 
 namespace Friendica\Util;
 
+use Exception;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -52,7 +53,7 @@ class HTTPSignature
 		$result    = [
 			'signer'        => '',
 			'header_signed' => false,
-			'header_valid'  => false
+			'header_valid'  => false,
 		];
 
 		// Decide if $data arrived via controller submission or curl.
@@ -61,7 +62,7 @@ class HTTPSignature
 		$headers['(request-target)'] = strtolower(DI::args()->getMethod()) . ' ' . $_SERVER['REQUEST_URI'];
 
 		foreach ($_SERVER as $k => $v) {
-			if (strpos($k, 'HTTP_') === 0) {
+			if (str_starts_with($k, 'HTTP_')) {
 				$field = str_replace('_', '-', strtolower(substr($k, 5)));
 
 				$headers[$field] = $v;
@@ -213,7 +214,7 @@ class HTTPSignature
 
 		$headers = [];
 		foreach ($matches as $match) {
-			$headers[$match[1]] = trim($match[2] ?: $match[3], '"');
+			$headers[$match[1]] = trim((string) $match[2], '"');
 		}
 
 		// if the header is encrypted, decrypt with (default) site private key and continue
@@ -247,7 +248,7 @@ class HTTPSignature
 	private static function decryptSigheader(array $headers, string $prvkey): string
 	{
 		if (!empty($headers['iv']) && !empty($headers['key']) && !empty($headers['data'])) {
-			return Crypto::unencapsulate($headers, $prvkey);
+			return (string) Crypto::unencapsulate($headers, $prvkey);
 		}
 
 		return '';
@@ -281,7 +282,7 @@ class HTTPSignature
 			'Date'           => $date,
 			'Content-Length' => $content_length,
 			'Digest'         => $digest,
-			'Host'           => $host
+			'Host'           => $host,
 		];
 
 		$signed_data = "(request-target): post " . $path . "\ndate: " . $date . "\ncontent-length: " . $content_length . "\ndigest: " . $digest . "\nhost: " . $host;
@@ -537,14 +538,12 @@ class HTTPSignature
 
 		if (!empty($uid)) {
 			$owner = User::getOwnerDataById($uid);
-			if (!$owner) {
-				return;
-			}
 		} else {
 			$owner = User::getSystemAccount();
-			if (!$owner) {
-				return;
-			}
+		}
+
+		if (!$owner) {
+			throw new Exception('Could not find owner for uid ' . $uid);
 		}
 
 		if (!empty($owner['uprvkey'])) {
@@ -593,7 +592,7 @@ class HTTPSignature
 			return [];
 		}
 
-		$sig_block = self::parseSigHeader($http_headers['HTTP_SIGNATURE']);
+		$sig_block = self::parseSigheader($http_headers['HTTP_SIGNATURE']);
 
 		if (empty($sig_block['keyId'])) {
 			DI::logger()->debug('No keyId', ['sig_block' => $sig_block]);
@@ -646,14 +645,14 @@ class HTTPSignature
 
 		// Now add every http header
 		foreach ($http_headers as $k => $v) {
-			if (strpos($k, 'HTTP_') === 0) {
+			if (str_starts_with($k, 'HTTP_')) {
 				$field = str_replace('_', '-', strtolower(substr($k, 5)));
 
 				$headers[$field] = $v;
 			}
 		}
 
-		$sig_block = self::parseSigHeader($http_headers['HTTP_SIGNATURE']);
+		$sig_block = self::parseSigheader($http_headers['HTTP_SIGNATURE']);
 
 		// Add fields from the signature block to the header. See issue 8845
 		if (!empty($sig_block['created']) && empty($headers['(created)'])) {

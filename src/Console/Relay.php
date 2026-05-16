@@ -67,7 +67,7 @@ HELP;
 	{
 		if ($this->getOption('v')) {
 			$this->out('Executable: ' . $this->executable);
-			$this->out('Class: ' . __CLASS__);
+			$this->out('Class: ' . self::class);
 			$this->out('Arguments: ' . var_export($this->args, true));
 			$this->out('Options: ' . var_export($this->options, true));
 		}
@@ -87,7 +87,7 @@ HELP;
 		}
 
 		if (count($this->args) == 2) {
-			$mode = $this->getArgument(0);
+			$mode  = $this->getArgument(0);
 			$actor = $this->getArgument(1);
 
 			$apcontact = APContact::getByURL($actor);

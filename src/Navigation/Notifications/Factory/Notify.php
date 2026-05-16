@@ -13,7 +13,7 @@ use Friendica\Content\Text\BBCode;
 use GuzzleHttp\Psr7\Uri;
 
 /**
- * @deprecated since 2022.05 Use \Friendica\Navigation\Notifications\Factory\Notification instead
+ * @deprecated 2022.05 Use \Friendica\Navigation\Notifications\Factory\Notification instead
  */
 class Notify extends BaseFactory implements ICanCreateFromTableRow
 {
@@ -37,14 +37,14 @@ class Notify extends BaseFactory implements ICanCreateFromTableRow
 			$row['uri-id'],
 			$row['parent'],
 			$row['parent-uri-id'],
-			$row['id']
+			$row['id'],
 		);
 	}
 
 	public function createFromParams($params, $itemlink = null, $item_id = null, $uri_id = null, $parent_id = null, $parent_uri_id = null): \Friendica\Navigation\Notifications\Entity\Notify
 	{
 		return new \Friendica\Navigation\Notifications\Entity\Notify(
-			$params['type'] ?? '',
+			$params['type']        ?? '',
 			$params['source_name'] ?? '',
 			new Uri($params['source_link'] ?? ''),
 			new Uri($params['source_photo'] ?? ''),
@@ -52,7 +52,7 @@ class Notify extends BaseFactory implements ICanCreateFromTableRow
 			$params['uid'] ?? 0,
 			new Uri($itemlink ?? ''),
 			false,
-			$params['verb'] ?? '',
+			$params['verb']  ?? '',
 			$params['otype'] ?? '',
 			substr(BBCode::toPlaintext($params['source_name'], false), 0, 255),
 			null,
@@ -60,7 +60,7 @@ class Notify extends BaseFactory implements ICanCreateFromTableRow
 			$item_id,
 			$uri_id,
 			$parent_id,
-			$parent_uri_id
+			$parent_uri_id,
 		);
 	}
 }

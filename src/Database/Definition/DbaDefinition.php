@@ -8,9 +8,8 @@
 namespace Friendica\Database\Definition;
 
 use Exception;
-use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Hook;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 
 /**
  * Stores the whole database definition
@@ -71,7 +70,7 @@ class DbaDefinition
 
 		// Assign all field that are present in the table
 		foreach ($fieldNames as $field) {
-			if (isset($data[$field])) {
+			if (isset($data[$field]) || (!isset($definition[$table]['fields'][$field]['not null']) && array_key_exists($field, $data))) {
 				// Limit the length of varchar, varbinary, char and binary fields
 				if (is_string($data[$field]) && preg_match("/char\((\d*)\)/", $definition[$table]['fields'][$field]['type'], $result)) {
 					if ($charset == 'latin1') {
@@ -109,12 +108,16 @@ class DbaDefinition
 	{
 		$definition = require $this->configFile;
 
-		if (!$definition) {
+		if (!is_array($definition)) {
 			throw new Exception('Corrupted database structure config file static/dbstructure.config.php');
 		}
 
 		if ($withAddonStructure) {
-			Hook::callAll('dbstructure_definition', $definition);
+			$eventDispatcher = DI::eventDispatcher();
+
+			$definition = $eventDispatcher->dispatch(
+				new ArrayFilterEvent(ArrayFilterEvent::DB_STRUCTURE_DEFINITION, $definition),
+			)->getArray();
 		}
 
 		$this->definition = $definition;

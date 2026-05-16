@@ -170,7 +170,7 @@ function jotTextOpenUI(obj) {
 	if (obj.value === "" || obj.value === obj.dataset.default) {
 		var $el = $(".modal-body #profile-jot-text");
 		$el.addClass("profile-jot-text-full").removeClass("profile-jot-text-empty");
-		// initiale autosize for the jot
+		// initialize autosize for the jot
 		autosize($el);
 	}
 }

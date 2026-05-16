@@ -45,9 +45,9 @@ use GuzzleHttp\Psr7\Uri;
  */
 class DFRN
 {
-	const TOP_LEVEL = 0; // Top level posting
-	const REPLY     = 1; // Regular reply that is stored locally
-	const REPLY_RC  = 2; // Reply that will be relayed
+	public const TOP_LEVEL = 0; // Top level posting
+	public const REPLY     = 1; // Regular reply that is stored locally
+	public const REPLY_RC  = 2; // Reply that will be relayed
 
 	/**
 	 * Generates an array of contact and user for DFRN imports
@@ -117,7 +117,7 @@ class DFRN
 			// These values aren't sent when sending from the queue.
 			/// @todo Check if we can set these values from the queue or if they are needed at all.
 			$item['entry:comment-allow'] = ($item['entry:comment-allow'] ?? '') ?: true;
-			$item['entry:cid']           = $item['entry:cid'] ?? 0;
+			$item['entry:cid'] ??= 0;
 
 			$entry = self::entry($doc, 'text', $item, $owner, $item['entry:comment-allow'], $item['entry:cid']);
 			if (isset($entry)) {
@@ -442,8 +442,8 @@ class DFRN
 
 		$author = $doc->createElement($authorelement);
 
-		$namdate = DateTimeFormat::utc($owner['name-date'].'+00:00', DateTimeFormat::ATOM);
-		$picdate = DateTimeFormat::utc($owner['avatar-date'].'+00:00', DateTimeFormat::ATOM);
+		$namdate = DateTimeFormat::utc($owner['name-date'] . '+00:00', DateTimeFormat::ATOM);
+		$picdate = DateTimeFormat::utc($owner['avatar-date'] . '+00:00', DateTimeFormat::ATOM);
 
 		$attributes = [];
 
@@ -452,7 +452,7 @@ class DFRN
 		}
 
 		XML::addElement($doc, $author, 'name', $owner['name'], $attributes);
-		XML::addElement($doc, $author, 'uri', DI::baseUrl().'/profile/' . $owner['nickname'], $attributes);
+		XML::addElement($doc, $author, 'uri', DI::baseUrl() . '/profile/' . $owner['nickname'], $attributes);
 		XML::addElement($doc, $author, 'dfrn:handle', $owner['addr'], $attributes);
 
 		$attributes = [
@@ -491,14 +491,14 @@ class DFRN
 		$profile = DBA::selectFirst(
 			'owner-view',
 			['about', 'name', 'homepage', 'nickname', 'timezone', 'locality', 'region', 'country-name', 'pub_keywords', 'xmpp', 'dob'],
-			['uid' => $owner['uid'], 'hidewall' => false]
+			['uid' => $owner['uid'], 'hidewall' => false],
 		);
 		if (DBA::isResult($profile)) {
 			XML::addElement($doc, $author, 'poco:displayName', $profile['name']);
 			XML::addElement($doc, $author, 'poco:updated', $namdate);
 
 			if (trim($profile['dob']) > DBA::NULL_DATE) {
-				XML::addElement($doc, $author, 'poco:birthday', '0000-'.date('m-d', strtotime($profile['dob'])));
+				XML::addElement($doc, $author, 'poco:birthday', '0000-' . date('m-d', strtotime($profile['dob'])));
 			}
 
 			XML::addElement($doc, $author, 'poco:note', $profile['about']);
@@ -607,64 +607,64 @@ class DFRN
 	 * @param string      $element  Element name for the activity
 	 * @param string      $activity activity value
 	 * @param int         $uriid    Uri-Id of the post
-	 * @return DOMElement XML activity object
+	 * @return DOMElement|false XML activity object or false on error
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @todo  Find proper type-hints
 	 */
 	private static function createActivity(DOMDocument $doc, string $element, string $activity, int $uriid)
 	{
-		if ($activity) {
-			$entry = $doc->createElement($element);
-
-			$r = XML::parseString($activity);
-			if (!$r) {
-				return false;
-			}
-
-			if ($r->type) {
-				XML::addElement($doc, $entry, "activity:object-type", $r->type);
-			}
-
-			if ($r->id) {
-				XML::addElement($doc, $entry, "id", $r->id);
-			}
-
-			if ($r->title) {
-				XML::addElement($doc, $entry, "title", $r->title);
-			}
-
-			if ($r->link) {
-				if (substr($r->link, 0, 1) == '<') {
-					if (strstr($r->link, '&') && (! strstr($r->link, '&amp;'))) {
-						$r->link = str_replace('&', '&amp;', $r->link);
-					}
-
-					$r->link = preg_replace('/\<link(.*?)\"\>/', '<link$1"/>', $r->link);
-
-					// XML does need a single element as root element so we add a dummy element here
-					$data = XML::parseString("<dummy>" . $r->link . "</dummy>");
-					if (is_object($data)) {
-						foreach ($data->link as $link) {
-							$attributes = [];
-							foreach ($link->attributes() as $parameter => $value) {
-								$attributes[$parameter] = $value;
-							}
-							XML::addElement($doc, $entry, "link", "", $attributes);
-						}
-					}
-				} else {
-					$attributes = ["rel" => "alternate", "type" => "text/html", "href" => $r->link];
-					XML::addElement($doc, $entry, "link", "", $attributes);
-				}
-			}
-			if ($r->content) {
-				XML::addElement($doc, $entry, "content", BBCode::convertForUriId($uriid, $r->content, BBCode::EXTERNAL), ["type" => "html"]);
-			}
-
-			return $entry;
+		if (!$activity) {
+			return false;
 		}
 
-		return false;
+		$entry = $doc->createElement($element);
+
+		$r = XML::parseString($activity);
+		if (!$r) {
+			return false;
+		}
+
+		if ($r->type) {
+			XML::addElement($doc, $entry, "activity:object-type", $r->type);
+		}
+
+		if ($r->id) {
+			XML::addElement($doc, $entry, "id", $r->id);
+		}
+
+		if ($r->title) {
+			XML::addElement($doc, $entry, "title", $r->title);
+		}
+
+		if ($r->link) {
+			if (str_starts_with($r->link, '<')) {
+				if (strstr($r->link, '&') && (! strstr($r->link, '&amp;'))) {
+					$r->link = str_replace('&', '&amp;', $r->link);
+				}
+
+				$r->link = preg_replace('/\<link(.*?)\"\>/', '<link$1"/>', $r->link);
+
+				// XML does need a single element as root element so we add a dummy element here
+				$data = XML::parseString("<dummy>" . $r->link . "</dummy>");
+				if (is_object($data)) {
+					foreach ($data->link as $link) {
+						$attributes = [];
+						foreach ($link->attributes() as $parameter => $value) {
+							$attributes[$parameter] = $value;
+						}
+						XML::addElement($doc, $entry, "link", "", $attributes);
+					}
+				}
+			} else {
+				$attributes = ["rel" => "alternate", "type" => "text/html", "href" => $r->link];
+				XML::addElement($doc, $entry, "link", "", $attributes);
+			}
+		}
+		if ($r->content) {
+			XML::addElement($doc, $entry, "content", BBCode::convertForUriId($uriid, $r->content, BBCode::EXTERNAL), ["type" => "html"]);
+		}
+
+		return $entry;
 	}
 
 	/**
@@ -809,7 +809,7 @@ class DFRN
 			[
 				'rel'  => 'alternate',
 				'type' => 'text/html',
-				'href' => DI::baseUrl() . '/display/' . $item['guid']
+				'href' => DI::baseUrl() . '/display/' . $item['guid'],
 			],
 		);
 
@@ -952,7 +952,7 @@ class DFRN
 
 			try {
 				$pubkey = DI::dsprContact()->getByAddr(WebFingerUri::fromString($contact['addr']))->pubKey;
-			} catch (HTTPException\NotFoundException|\InvalidArgumentException $e) {
+			} catch (HTTPException\NotFoundException|\InvalidArgumentException) {
 				DI::logger()->notice('Unable to find contact details for ' . $contact['id'] . ' - ' . $contact['addr']);
 				return -22;
 			}
@@ -968,7 +968,7 @@ class DFRN
 			$path_parts = explode('/', $parts['path']);
 			array_pop($path_parts);
 			$parts['path']    = implode('/', $path_parts);
-			$contact['batch'] = (string)Uri::fromParts($parts);
+			$contact['batch'] = (string) Uri::fromParts($parts);
 		}
 
 		$dest_url = ($public_batch ? $contact['batch'] : $contact['notify']);
@@ -1003,7 +1003,7 @@ class DFRN
 			return -10;
 		}
 
-		if (strpos($xml, '<?xml') === false) {
+		if (!str_contains($xml, '<?xml')) {
 			DI::logger()->notice('No valid XML returned from ' . $contact['id'] . ' - ' . $dest_url);
 			DI::logger()->debug('Returned XML: ' . $xml);
 			return 3;
@@ -1021,7 +1021,7 @@ class DFRN
 		}
 
 		if (!empty($res->message)) {
-			DI::logger()->info('Transmit to ' . $dest_url . ' returned status '.$res->status.' - '.$res->message);
+			DI::logger()->info('Transmit to ' . $dest_url . ' returned status ' . $res->status . ' - ' . $res->message);
 		}
 
 		return intval($res->status);
@@ -1045,8 +1045,8 @@ class DFRN
 	private static function fetchauthor(\DOMXPath $xpath, \DOMNode $context, array $importer, string $element, bool $onlyfetch, string $xml = ''): array
 	{
 		$author         = [];
-		$author["name"] = XML::getFirstNodeValue($xpath, $element."/atom:name/text()", $context);
-		$author["link"] = XML::getFirstNodeValue($xpath, $element."/atom:uri/text()", $context);
+		$author["name"] = XML::getFirstNodeValue($xpath, $element . "/atom:name/text()", $context);
+		$author["link"] = XML::getFirstNodeValue($xpath, $element . "/atom:uri/text()", $context);
 
 		$fields = ['id', 'uid', 'url', 'network', 'avatar-date', 'avatar', 'name-date', 'uri-date', 'addr',
 			'name', 'nick', 'about', 'location', 'keywords', 'xmpp', 'bdyear', 'bd', 'hidden', 'contact-type'];
@@ -1204,7 +1204,7 @@ class DFRN
 				if ($birthday_date > new \DateTime()) {
 					$poco["bdyear"] = $birthday_date->format("Y");
 				}
-			} catch (\Exception $e) {
+			} catch (\Exception) {
 				// Invalid birthday
 			}
 
@@ -1271,7 +1271,7 @@ class DFRN
 		$obj_doc               = new DOMDocument("1.0", "utf-8");
 		$obj_doc->formatOutput = true;
 
-		$obj_element = $obj_doc->createElementNS( ActivityNamespace::ATOM1, $element);
+		$obj_element = $obj_doc->createElementNS(ActivityNamespace::ATOM1, $element);
 
 		$activity_type = $xpath->query("activity:object-type/text()", $activity)->item(0)->nodeValue;
 		XML::addElement($obj_doc, $obj_element, "type", $activity_type);
@@ -1303,7 +1303,7 @@ class DFRN
 		$objxml = $obj_doc->saveXML($obj_element);
 
 		/// @todo This isn't totally clean. We should find a way to transform the namespaces
-		$objxml = str_replace("<".$element.' xmlns="http://www.w3.org/2005/Atom">', "<".$element.">", $objxml);
+		$objxml = str_replace("<" . $element . ' xmlns="http://www.w3.org/2005/Atom">', "<" . $element . ">", $objxml);
 		return($objxml);
 	}
 
@@ -1393,7 +1393,7 @@ class DFRN
 			$suggest['cid'],
 			$suggest['body'],
 			null,
-			$cid
+			$cid,
 		));
 
 		DI::notify()->createFromArray([
@@ -1403,7 +1403,7 @@ class DFRN
 			'uid'   => $owner['uid'],
 			'cid'   => $from_contact['uid'],
 			'item'  => $suggest,
-			'link'  => DI::baseUrl().'/notifications/intros',
+			'link'  => DI::baseUrl() . '/notifications/intros',
 		]);
 
 		return true;
@@ -1753,7 +1753,7 @@ class DFRN
 
 		$current = Post::selectFirst(
 			['id', 'uid', 'edited', 'body'],
-			['uri' => $item['uri'], 'uid' => $importer['importer_uid']]
+			['uri' => $item['uri'], 'uid' => $importer['importer_uid']],
 		);
 		// Is there an existing item?
 		if (DBA::isResult($current) && !self::isEditedTimestampNewer($current, $item)) {
@@ -1925,7 +1925,7 @@ class DFRN
 		// Check if the message is wanted
 		if (!self::isSolicitedMessage($item, $importer)) {
 			DBA::delete('item-uri', ['uri' => $item['uri']]);
-			return 403;
+			return;
 		}
 
 		// Get the type of the item (Top level post, reply or remote reply)
@@ -2050,8 +2050,9 @@ class DFRN
 				if ($item['uid'] == 0) {
 					Item::distribute($posted_id);
 				}
+				Item::addPostToChannel($item['uri-id'], $item['uid']);
 
-				return true;
+				return;
 			}
 		} else { // $entrytype == self::TOP_LEVEL
 			if (($item['uid'] != 0) && !Contact::isSharing($item['owner-id'], $item['uid']) && !Contact::isSharing($item['author-id'], $item['uid'])) {
@@ -2062,7 +2063,7 @@ class DFRN
 			// This is my contact on another system, but it's really me.
 			// Turn this into a wall post.
 			$notify       = Item::isRemoteSelf($importer, $item);
-			$item['wall'] = (bool)$notify;
+			$item['wall'] = (bool) $notify;
 
 			$posted_id = Item::insert($item, $notify);
 
@@ -2075,6 +2076,7 @@ class DFRN
 			if ($item['uid'] == 0) {
 				Item::distribute($posted_id);
 			}
+			Item::addPostToChannel($item['uri-id'], $item['uid']);
 		}
 	}
 
@@ -2099,7 +2101,7 @@ class DFRN
 		}
 
 		if (!$uri || !$importer['id']) {
-			return false;
+			return;
 		}
 
 		$condition = ['uri' => $uri, 'uid' => $importer['importer_uid']];
@@ -2133,7 +2135,7 @@ class DFRN
 			return;
 		}
 
-		DI::logger()->info('deleting item '.$item['id'].' uri='.$uri);
+		DI::logger()->info('deleting item ' . $item['id'] . ' uri=' . $uri);
 
 		Item::markForDeletion(['id' => $item['id']]);
 	}

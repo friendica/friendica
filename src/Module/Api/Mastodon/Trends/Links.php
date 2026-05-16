@@ -8,7 +8,6 @@
 namespace Friendica\Module\Api\Mastodon\Trends;
 
 use Friendica\Core\Protocol;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Post;
@@ -26,7 +25,7 @@ class Links extends BaseApi
 	protected function rawContent(array $request = [])
 	{
 		$request = $this->getRequest([
-			'limit' => 10, // Maximum number of results to return. Defaults to 10.
+			'limit'  => 10, // Maximum number of results to return. Defaults to 10.
 			'offset' => 0, // Offset in set, Defaults to 0.
 		], $request);
 
@@ -37,8 +36,11 @@ class Links extends BaseApi
 		$trending = [];
 		$statuses = Post::selectPostThread(['uri-id', 'total-comments', 'total-actors'], $condition, ['limit' => [$request['offset'], $request['limit']], 'offset' => $request['offset'], 'order' => ['total-actors' => true]]);
 		while ($status = Post::fetch($statuses)) {
-			$history    = [['day' => (string)time(), 'uses' => (string)$status['total-comments'], 'accounts' => (string)$status['total-actors']]];
-			$trending[] = DI::mstdnCard()->createFromUriId($status['uri-id'], $history)->toArray();
+			$history = [['day' => (string)time(), 'uses' => (string)$status['total-comments'], 'accounts' => (string)$status['total-actors']]];
+			$link    = DI::mstdnCard()->createFromUriId($status['uri-id'], $history)->toArray();
+			if ($link) {
+				$trending[] = $link;
+			}
 		}
 		DBA::close($statuses);
 

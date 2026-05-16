@@ -8,6 +8,7 @@
 namespace Friendica\Module\Admin;
 
 use Friendica\App;
+use Friendica\Core\Addon\Exception\InvalidAddonException;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Renderer;
 use Friendica\Core\Update;
@@ -17,7 +18,6 @@ use Friendica\DI;
 use Friendica\Core\Config\Factory\Config;
 use Friendica\Module\BaseAdmin;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
-use Friendica\Network\Probe;
 use Friendica\Util\DateTimeFormat;
 
 class Summary extends BaseAdmin
@@ -91,21 +91,21 @@ class Summary extends BaseAdmin
 
 		// Legacy config file warning
 		if (file_exists('.htconfig.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/admin/config');
 		}
 
 		if (file_exists('config/local.ini.php')) {
-			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/Config');
+			$warningtext[] = DI::l10n()->t('Friendica\'s configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href="%s">the Config help page</a> for help with the transition.', DI::baseUrl() . '/help/admin/config');
 		}
 
 		// Check server vitality
-		if (!self::checkSelfHostMeta()) {
-			$well_known    = DI::baseUrl() . Probe::HOST_META;
+		if (!self::checkSelfNodeinfo()) {
+			$well_known    = DI::baseUrl() . '/.well-known/nodeinfo';
 			$warningtext[] = DI::l10n()->t(
 				'<a href="%s">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href="%s">the installation page</a> for help.',
 				$well_known,
 				$well_known,
-				DI::baseUrl() . '/help/Install'
+				DI::baseUrl() . '/help/admin/install',
 			);
 		}
 
@@ -132,7 +132,7 @@ class Summary extends BaseAdmin
 				$warningtext[] = DI::l10n()->t(
 					'Friendica\'s system.basepath was updated from \'%s\' to \'%s\'. Please remove the system.basepath from your db to avoid differences.',
 					$currBasepath,
-					$confBasepath
+					$confBasepath,
 				);
 			} elseif (!is_dir($currBasepath)) {
 				DI::logger()->alert('Friendica\'s system.basepath is wrong.', [
@@ -142,7 +142,7 @@ class Summary extends BaseAdmin
 				$warningtext[] = DI::l10n()->t(
 					'Friendica\'s current system.basepath \'%s\' is wrong and the config file \'%s\' isn\'t used.',
 					$currBasepath,
-					$confBasepath
+					$confBasepath,
 				);
 			} else {
 				DI::logger()->alert('Friendica\'s system.basepath is wrong.', [
@@ -152,7 +152,7 @@ class Summary extends BaseAdmin
 				$warningtext[] = DI::l10n()->t(
 					'Friendica\'s current system.basepath \'%s\' is not equal to the config file \'%s\'. Please fix your configuration.',
 					$currBasepath,
-					$confBasepath
+					$confBasepath,
 				);
 			}
 		}
@@ -171,32 +171,56 @@ class Summary extends BaseAdmin
 				'php.ini'             => php_ini_loaded_file(),
 				'upload_max_filesize' => ini_get('upload_max_filesize'),
 				'post_max_size'       => ini_get('post_max_size'),
-				'memory_limit'        => ini_get('memory_limit')
+				'memory_limit'        => ini_get('memory_limit'),
 			],
 			'mysql' => [
 				'max_allowed_packet' => DBA::getVariable('max_allowed_packet'),
-			]
+			],
 		];
+
+		$addons = [];
+
+		$addonHelper = DI::addonHelper();
+		foreach ($addonHelper->getEnabledAddons() as $addonId) {
+			try {
+				$addonInfo = $addonHelper->getAddonInfo($addonId);
+			} catch (InvalidAddonException $th) {
+				$this->logger->error('Invalid addon found: ' . $addonId, ['exception' => $th]);
+				continue;
+			}
+
+			$info = [
+				'name'        => $addonInfo->getName(),
+				'description' => $addonInfo->getDescription(),
+				'version'     => $addonInfo->getVersion(),
+			];
+
+			$addons[] = [
+				$addonId,
+				$info,
+			];
+		}
 
 		$t = Renderer::getMarkupTemplate('admin/summary.tpl');
 		return Renderer::replaceMacros($t, [
-			'$title'          => DI::l10n()->t('Administration'),
-			'$page'           => DI::l10n()->t('Summary'),
-			'$queues'         => $queues,
-			'$version_label'  => DI::l10n()->t('Version'),
-			'$platform'       => App::PLATFORM,
-			'$codename'       => App::CODENAME,
-			'$build'          => DI::config()->get('system', 'build'),
-			'$addons'         => [DI::l10n()->t('Active addons'), DI::addonHelper()->getEnabledAddons()],
-			'$serversettings' => $server_settings,
-			'$warningtext'    => $warningtext,
+			'$title'              => DI::l10n()->t('Administration'),
+			'$page'               => DI::l10n()->t('Summary'),
+			'$queues'             => $queues,
+			'$version_label'      => DI::l10n()->t('Version'),
+			'$platform'           => App::PLATFORM,
+			'$codename'           => App::CODENAME,
+			'$build'              => DI::config()->get('system', 'build'),
+			'$addons'             => [DI::l10n()->t('Active addons'), $addons],
+			'$serversettings'     => $server_settings,
+			'$warningtext'        => $warningtext,
+			'$link_enable_addons' => DI::l10n()->t('Enable new addons'),
 		]);
 	}
 
-	private static function checkSelfHostMeta()
+	private static function checkSelfNodeinfo()
 	{
-		// Fetch the host-meta to check if this really is a vital server
-		return DI::httpClient()->get(DI::baseUrl() . Probe::HOST_META, HttpClientAccept::XRD_XML)->isSuccess();
+		// Fetch the webfinger to check if this really is a vital server
+		return DI::httpClient()->get(DI::baseUrl() . '/.well-known/nodeinfo', HttpClientAccept::JSON)->isSuccess();
 	}
 
 }

@@ -57,7 +57,7 @@ class BaseSettings extends BaseModule
 	{
 		$tpl = Renderer::getMarkupTemplate('settings/head.tpl');
 		$this->page['htmlhead'] .= Renderer::replaceMacros($tpl, [
-			'$ispublic' => $this->t('everybody')
+			'$ispublic' => $this->t('everybody'),
 		]);
 
 		$tabs = [];
@@ -65,27 +65,27 @@ class BaseSettings extends BaseModule
 		$tabs[] = [
 			'label'     => $this->t('Account'),
 			'url'       => 'settings',
-			'selected'  => static::class == Settings\Account::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\Account) ? 'active' : '',
 			'accesskey' => 'o',
 		];
 
 		$tabs[] = [
-			'label'     => $this->t('Two-factor authentication'),
-			'url'       => 'settings/2fa',
-			'selected'  => in_array(static::class, [
+			'label'    => $this->t('Two-factor authentication'),
+			'url'      => 'settings/2fa',
+			'selected' => in_array(static::class, [
 				Settings\TwoFactor\AppSpecific::class,
 				Settings\TwoFactor\Index::class,
 				Settings\TwoFactor\Recovery::class,
 				Settings\TwoFactor\Trusted::class,
-				Settings\TwoFactor\Verify::class
+				Settings\TwoFactor\Verify::class,
 			]) ? 'active' : '',
 			'accesskey' => '2',
 		];
 
 		$tabs[] = [
-			'label'     => $this->t('Profile'),
-			'url'       => 'settings/profile',
-			'selected'  => in_array(static::class, [
+			'label'    => $this->t('Profile'),
+			'url'      => 'settings/profile',
+			'selected' => in_array(static::class, [
 				Settings\Profile\Index::class,
 				Settings\Profile\Photo\Crop::class,
 				Settings\Profile\Photo\Index::class,
@@ -97,7 +97,7 @@ class BaseSettings extends BaseModule
 			$tabs[] = [
 				'label'     => $this->t('Additional features'),
 				'url'       => 'settings/features',
-				'selected'  => static::class == Settings\Features::class ? 'active' : '',
+				'selected'  => ($this instanceof Settings\Features) ? 'active' : '',
 				'accesskey' => 't',
 			];
 		}
@@ -105,70 +105,70 @@ class BaseSettings extends BaseModule
 		$tabs[] = [
 			'label'     => $this->t('Display'),
 			'url'       => 'settings/display',
-			'selected'  => static::class == Settings\Display::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\Display) ? 'active' : '',
 			'accesskey' => 'i',
 		];
 
 		$tabs[] = [
 			'label'     => $this->t('Channels'),
 			'url'       => 'settings/channels',
-			'selected'  => static::class == Settings\Channels::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\Channels) ? 'active' : '',
 			'accesskey' => '',
 		];
 
 		$tabs[] = [
 			'label'     => $this->t('Social Networks'),
 			'url'       => 'settings/connectors',
-			'selected'  => static::class == Settings\Connectors::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\Connectors) ? 'active' : '',
 			'accesskey' => 'w',
 		];
 
 		$tabs[] = [
 			'label'     => $this->t('Addons'),
 			'url'       => 'settings/addons',
-			'selected'  => static::class == Settings\Addons::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\Addons) ? 'active' : '',
 			'accesskey' => 'l',
 		];
 
 		$tabs[] = [
 			'label'     => $this->t('Manage Accounts'),
 			'url'       => 'settings/delegation',
-			'selected'  => static::class == Settings\Delegation::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\Delegation) ? 'active' : '',
 			'accesskey' => 'd',
 		];
 
 		$tabs[] = [
 			'label'     => $this->t('Connected apps'),
 			'url'       => 'settings/oauth',
-			'selected'  => static::class == Settings\OAuth::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\OAuth) ? 'active' : '',
 			'accesskey' => 'b',
 		];
 
 		$tabs[] = [
 			'label'     => $this->t('Remote servers'),
 			'url'       => 'settings/server',
-			'selected'  => static::class == Settings\Server\Index::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\Server\Index) ? 'active' : '',
 			'accesskey' => 's',
 		];
 
 		$tabs[] = [
 			'label'     => $this->t('Import Contacts'),
 			'url'       => 'settings/importcontacts',
-			'selected'  => static::class == Settings\ContactImport::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\ContactImport) ? 'active' : '',
 			'accesskey' => '',
 		];
 
 		$tabs[] = [
 			'label'     => $this->t('Export personal data'),
 			'url'       => 'settings/userexport',
-			'selected'  => static::class == Settings\UserExport::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\UserExport) ? 'active' : '',
 			'accesskey' => 'e',
 		];
 
 		$tabs[] = [
 			'label'     => $this->t('Remove account'),
 			'url'       => 'settings/removeme',
-			'selected'  => static::class === Settings\RemoveMe::class ? 'active' : '',
+			'selected'  => ($this instanceof Settings\RemoveMe) ? 'active' : '',
 			'accesskey' => 'r',
 		];
 

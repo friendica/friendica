@@ -31,7 +31,7 @@ class Accounts extends BaseApi
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		return Circle::removeMembers($this->parameters['id'], $request['account_ids']);
+		Circle::removeMembers($this->parameters['id'], $request['account_ids']);
 	}
 
 	protected function post(array $request = [])
@@ -102,7 +102,7 @@ class Accounts extends BaseApi
 			self::setBoundaries($member['contact-id']);
 			try {
 				$accounts[] = DI::mstdnAccount()->createFromContactId($member['contact-id'], $uid);
-			} catch (\Exception $exception) {
+			} catch (\Exception) {
 			}
 		}
 		DBA::close($members);

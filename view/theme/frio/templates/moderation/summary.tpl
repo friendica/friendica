@@ -5,35 +5,33 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 
-<div id='adminpage-summery' class="adminpage generic-page-wrapper">
+<div id='adminpage-summary' class="adminpage generic-page-wrapper">
 	<h1>{{$title}} - {{$page}}</h1>
 
 	<div id="admin-summary-wrapper">
-		{{* Number of pending registrations. *}}
-		<div id="admin-summary-pending" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 admin-summary">
-			<hr class="admin-summary-separator">
-			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 admin-summary-label-name text-muted">{{$pending.0}}</div>
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry">{{$pending.1}}</div>
-		</div>
+		<table class="table">
+			{{* Number of pending registrations. *}}
+			<tr>
+				<td>{{$pending.0}}</td>
+				<td>{{$pending.1}}</td>
+			</tr>
 
-		{{* Number of registered users *}}
-		<div id="admin-summary-users" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 admin-summary">
-			<hr class="admin-summary-separator">
-			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 admin-summary-label-name text-muted">{{$users.0}}</div>
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry">{{$users.1}}</div>
-		</div>
+			{{* Number of registered users *}}
+			<tr>
+				<td>{{$users.0}}</td>
+				<td>{{$users.1}}</td>
+			</tr>
+		</table>
 
 		{{* Account types of registered users. *}}
-		{{foreach $accounts as $p}}
-		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 admin-summary">
-			<hr class="admin-summary-separator">
-			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 admin-summary-label-name text-muted">{{$p.0}}</div>
-			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry">{{if $p.1}}{{$p.1}}{{else}}0{{/if}}</div>
-		</div>
-		{{/foreach}}
-
+		<h2>{{$account_type_header}}</h2>
+		<table class="table">
+			{{foreach $accounts as $p}}
+			<tr>
+				<td>{{$p.0}}</td>
+				<td>{{if $p.1}}{{$p.1}}{{else}}0{{/if}}</td>
+			</tr>
+			{{/foreach}}
+		</table>
 	</div>
-
-	<div class="clear"></div>
-
 </div>

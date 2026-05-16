@@ -10,7 +10,9 @@ namespace Friendica\Factory\Api\Mastodon;
 use Friendica\App\BaseURL;
 use Friendica\BaseFactory;
 use Friendica\Collection\Api\Mastodon\Fields;
+use Friendica\Content\Text\BBCode;
 use Friendica\Content\Widget;
+use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
@@ -27,14 +29,17 @@ class Account extends BaseFactory
 	private $profileFieldRepo;
 	/** @var Field */
 	private $mstdnFieldFactory;
+	/** @var IManagePersonalConfigValues */
+	private $pConfig;
 
-	public function __construct(LoggerInterface $logger, BaseURL $baseURL, ProfileFieldRepository $profileFieldRepo, Field $mstdnFieldFactory)
+	public function __construct(IManagePersonalConfigValues $pConfig, LoggerInterface $logger, BaseURL $baseURL, ProfileFieldRepository $profileFieldRepo, Field $mstdnFieldFactory)
 	{
 		parent::__construct($logger);
 
 		$this->baseUrl           = $baseURL;
 		$this->profileFieldRepo  = $profileFieldRepo;
 		$this->mstdnFieldFactory = $mstdnFieldFactory;
+		$this->pConfig           = $pConfig;
 	}
 
 	/**
@@ -75,6 +80,7 @@ class Account extends BaseFactory
 		}
 
 		$fields = new Fields();
+		$source = null;
 
 		if (Contact::isLocal($account['url'])) {
 			$profile_uid = User::getIdForContactId($account['id']);
@@ -86,32 +92,35 @@ class Account extends BaseFactory
 					$account['ap-followers_count'] = $this->getContactRelationCountForUid($uid, [Contact::FOLLOWER, Contact::FRIEND]);
 					$account['ap-following_count'] = $this->getContactRelationCountForUid($uid, [Contact::SHARING, Contact::FRIEND]);
 				}
+				// Create a default source object if the request is done by the profile owner
+				// Friendica doesn't support roles, so we create a dummy role object
+				$role = new \Friendica\Object\Api\Mastodon\Role(1, 'User', '#000000', '0000000', false);
+				$note = BBCode::toPlaintext($account['about'] ?? '', true);
+
+				$user = User::getById($profile_uid, ['allow_gid', 'allow_cid', 'deny_gid', 'deny_cid']);
+				if ($user['allow_gid'] || $user['allow_cid'] || $user['deny_gid'] || $user['deny_cid']) {
+					$privacy = 'private';
+				} elseif ($this->pConfig->get($uid, 'system', 'unlisted')) {
+					$privacy = 'unlisted';
+				} else {
+					$privacy = 'public';
+				}
+
+				$requests = count(\Friendica\Model\Register::getPending());
+
+				$source = new \Friendica\Object\Api\Mastodon\Source([''], $note, $fields, $privacy, false, '', $requests, null, !$account['unsearchable'], !$account['unsearchable'], $role);
 			}
 		}
 
-		return new \Friendica\Object\Api\Mastodon\Account($this->baseUrl, $account, $fields);
-	}
-
-	/**
-	 * @param int $userId
-	 * @return \Friendica\Object\Api\Mastodon\Account
-	 * @throws ImagickException|HTTPException\InternalServerErrorException
-	 */
-	public function createFromUserId(int $userId): \Friendica\Object\Api\Mastodon\Account
-	{
-		$account       = DBA::selectFirst('account-user-view', [], ['uid' => $userId, 'self' => true]);
-		$profileFields = $this->profileFieldRepo->selectPublicFieldsByUserId($userId);
-		$fields        = $this->mstdnFieldFactory->createFromProfileFields($profileFields);
-
-		return new \Friendica\Object\Api\Mastodon\Account($this->baseUrl, $account, $fields);
+		return new \Friendica\Object\Api\Mastodon\Account($this->baseUrl, $account, $fields, $source);
 	}
 
 	private function getContactRelationCountForUid(int $uid, array $rel): int
 	{
 		$condition = [
-			'uid' => $uid,
-			'rel' => $rel,
-			'self' => false,
+			'uid'     => $uid,
+			'rel'     => $rel,
+			'self'    => false,
 			'deleted' => false,
 			'archive' => false,
 			'pending' => false,

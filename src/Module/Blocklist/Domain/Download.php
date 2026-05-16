@@ -8,23 +8,29 @@
 namespace Friendica\Module\Blocklist\Domain;
 
 use Friendica\App;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
+use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Moderation\DomainPatternBlocklist;
 use Friendica\Module\Response;
+use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
 class Download extends \Friendica\BaseModule
 {
-	/** @var DomainPatternBlocklist */
-	private $blocklist;
+	private DomainPatternBlocklist $blocklist;
+	private IManageConfigValues $config;
+	private IHandleUserSessions $session;
 
-	public function __construct(DomainPatternBlocklist $blocklist, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(DomainPatternBlocklist $blocklist, IHandleUserSessions $session, IManageConfigValues $config, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->blocklist = $blocklist;
+		$this->config    = $config;
+		$this->session   = $session;
 	}
 
 	/**
@@ -35,6 +41,10 @@ class Download extends \Friendica\BaseModule
 	 */
 	protected function rawContent(array $request = [])
 	{
+		if (!$this->config->get('blocklist', 'public') && !$this->session->isAuthenticated()) {
+			throw new HTTPException\UnauthorizedException();
+		}
+
 		$hash = md5(json_encode($this->blocklist->get(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
 		$etag = 'W/"' . $hash . '"';

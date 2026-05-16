@@ -60,7 +60,7 @@ class Addons extends BaseSettings
 					'$addon'  => $data['addon'],
 					'$title'  => $data['title'],
 					'$open'   => ($this->parameters['addon'] ?? '') === $data['addon'],
-					'$html'   => $data['html'] ?? '',
+					'$html'   => $data['html']   ?? '',
 					'$submit' => $data['submit'] ?? $this->t('Save Settings'),
 				]);
 			}
@@ -68,10 +68,10 @@ class Addons extends BaseSettings
 
 		$tpl = Renderer::getMarkupTemplate('settings/addons.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$form_security_token'           => BaseSettings::getFormSecurityToken('settings_addon'),
-			'$title'                         => $this->t('Addon Settings'),
-			'$no_addons_settings_configured' => $this->t('No Addon settings configured'),
-			'$addon_settings_forms'          => $addon_settings_forms,
+			'$form_security_token'          => BaseSettings::getFormSecurityToken('settings_addon'),
+			'$title'                        => $this->t('Addon Settings'),
+			'$no_addon_settings_configured' => $this->t('None of the addons installed on this server have any settings.'),
+			'$addon_settings_forms'         => $addon_settings_forms,
 		]);
 	}
 }

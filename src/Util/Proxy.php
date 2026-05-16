@@ -19,20 +19,20 @@ class Proxy
 	/**
 	 * Sizes constants
 	 */
-	const SIZE_MICRO  = 'micro'; // 48
-	const SIZE_THUMB  = 'thumb'; // 80
-	const SIZE_SMALL  = 'small'; // 320
-	const SIZE_MEDIUM = 'medium'; // 640
-	const SIZE_LARGE  = 'large'; // 1024
+	public const SIZE_MICRO  = 'micro'; // 48
+	public const SIZE_THUMB  = 'thumb'; // 80
+	public const SIZE_SMALL  = 'small'; // 320
+	public const SIZE_MEDIUM = 'medium'; // 640
+	public const SIZE_LARGE  = 'large'; // 1024
 
 	/**
 	 * Pixel Sizes
 	 */
-	const PIXEL_MICRO  = 48;
-	const PIXEL_THUMB  = 80;
-	const PIXEL_SMALL  = 320;
-	const PIXEL_MEDIUM = 640;
-	const PIXEL_LARGE  = 1024;
+	public const PIXEL_MICRO  = 48;
+	public const PIXEL_THUMB  = 80;
+	public const PIXEL_SMALL  = 320;
+	public const PIXEL_MEDIUM = 640;
+	public const PIXEL_LARGE  = 1024;
 
 	/**
 	 * Private constructor
@@ -79,7 +79,7 @@ class Proxy
 	 */
 	public static function isLocalImage(string $url): bool
 	{
-		if (substr($url, 0, 1) == '/') {
+		if (str_starts_with($url, '/')) {
 			return true;
 		}
 
@@ -105,7 +105,7 @@ class Proxy
 			parse_str($uri->getQuery(), $arr);
 
 			return $arr;
-		} catch (\Throwable $e) {
+		} catch (\Throwable) {
 			return [];
 		}
 	}
@@ -123,7 +123,7 @@ class Proxy
 		// if the picture seems to be from another picture cache then take the original source
 		$queryvar = self::parseQuery($matches[2]);
 
-		if (!empty($queryvar['url']) && substr($queryvar['url'], 0, 4) == 'http') {
+		if (!empty($queryvar['url']) && str_starts_with($queryvar['url'], 'http')) {
 			$matches[2] = urldecode($queryvar['url']);
 		}
 

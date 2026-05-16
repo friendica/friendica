@@ -47,7 +47,7 @@ class Show extends BaseModule
 
 		$owner = Event::getOwnerForNickname($nickname);
 
-		$event = Event::getByIdAndUid($owner['uid'], (int)$this->parameters['id'] ?? 0);
+		$event = Event::getByIdAndUid($owner['uid'], (int) $this->parameters['id'] ?? 0);
 		if (empty($event)) {
 			throw new HTTPException\NotFoundException($this->t('Event not found.'));
 		}
@@ -63,7 +63,11 @@ class Show extends BaseModule
 		$tpl = Renderer::getMarkupTemplate('calendar/event.tpl');
 
 		$o = Renderer::replaceMacros($tpl, [
-			'$event' => $tplEvent,
+			'$event'                 => $tplEvent,
+			'$action_edit_text'      => $this->t('Edit'),
+			'$action_duplicate_text' => $this->t('Duplicate'),
+			'$action_drop_text'      => $this->t('Delete'),
+			'$action_orig_text'      => $this->t('View related post'),
 		]);
 
 		$this->httpExit($o);

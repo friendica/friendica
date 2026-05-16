@@ -94,7 +94,7 @@ final class LoggerManager
 		}
 
 		// Decorate Logger as WorkerLogger for BC
-		if (self::$logChannel === LogChannel::WORKER) {
+		if (self::$logChannel === LogChannel::WORKER || self::$logChannel === LogChannel::JETSTREAM) {
 			$logger = new WorkerLogger($logger);
 		}
 

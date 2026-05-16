@@ -2,6 +2,11 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
+matrix:
+  include:
+    - PHP_MAJOR_VERSION: 8.5
+      PHP_VERSION: 8.5.5
+
 # The phpmd check is just triggered for PRs and pushes to non-stable branches of Friendica
 when:
   branch:
@@ -26,7 +31,7 @@ steps:
       - /tmp/drone-cache:/tmp/cache
 
   composer_install:
-    image: friendicaci/php8.3:php8.3.17
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     commands:
       - mkdir addon # create empty addon folder to appease composer
       - export COMPOSER_HOME=.composer
@@ -45,6 +50,6 @@ steps:
       - /tmp/drone-cache:/tmp/cache
 
   phpmd:
-    image: friendicaci/php8.3:php8.3.17
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     commands:
       - ./bin/composer.phar run phpmd

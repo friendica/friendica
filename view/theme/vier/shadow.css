@@ -4,26 +4,26 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-nav {
+nav#topbar-first {
   background: rgb(36, 76, 94);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
   padding: 0px;
   padding-left: 0px;
 }
 
-nav a:active,
-nav a:link,
-nav a:visited,
-nav a {
+nav#topbar-first a:active,
+nav#topbar-first a:link,
+nav#topbar-first a:visited,
+nav#topbar-first a {
   color: #ccc;
 }
 
-nav a:hover,
+nav#topbar-first a:hover,
 #nav-messages-see-all a:hover {
   color: #fff;
 }
 
-nav .nav-notification {
+nav#topbar-first .nav-notification {
   background-color: #F80;
   top: 0px;
   right: -5px;
@@ -31,21 +31,21 @@ nav .nav-notification {
   border-radius: 5px 5px 5px 5px;
 }
 
-nav .nav-menu-icon .nav-notification {
+nav#topbar-first .nav-menu-icon .nav-notification {
   top: 0px;
 }
 
-nav .nav-menu.selected a {
+nav#topbar-first .nav-menu.selected a {
   color: #000;
 /*  font-weight: bold; */
 }
 
-nav .nav-menu:hover,
-nav .nav-menu.selected {
+nav#topbar-first .nav-menu:hover,
+nav#topbar-first .nav-menu.selected {
   border-bottom: 2px solid #427FED;
 }
 
-nav .nav-menu {
+nav#topbar-first .nav-menu {
   height: 23px;
   font-size: 14px;
   font-weight: initial;
@@ -69,20 +69,20 @@ ul.tabs li .active, span.pager_current a {
   border-bottom: 2px solid #427FED;
 }
 
-span.pager_current, span.pager_n a:hover, 
-span.pager_first a:hover, span.pager_last a:hover, 
+span.pager_current, span.pager_n a:hover,
+span.pager_first a:hover, span.pager_last a:hover,
 span.pager_prev a:hover, span.pager_next a:hover,
 ul.tabs a:hover {
   border-bottom: 2px solid #427FED;
 }
 
-nav #nav-notifications-linkmenu.on .icon.s22.notify, nav #nav-notifications-linkmenu.selected .icon.s22.notify {
+nav#topbar-first #nav-notifications-linkmenu.on .icon.s22.notify, nav#topbar-first #nav-notifications-linkmenu.selected .icon.s22.notify {
   color: #737373;
 }
 
-nav #nav-messages-linkmenu.selected,
-nav #nav-user-linklabel.selected,
-nav #nav-apps-link.selected {
+nav#topbar-first #nav-messages-linkmenu.selected,
+nav#topbar-first #nav-user-linklabel.selected,
+nav#topbar-first #nav-apps-link.selected {
   background-color: #fff;
   border-bottom-style: none;
 }
@@ -106,7 +106,7 @@ div.pager, ul.tabs {
   font-weight: initial;
 }
 
-nav .nav-menu-icon.selected {
+nav#topbar-first .nav-menu-icon.selected {
   background-color: #fff;
 }
 
@@ -114,14 +114,15 @@ nav .nav-menu-icon.selected {
   background-color: #fff;
 }
 
-nav .icon {
+nav#topbar-first .icon {
   color: #737373;
 }
 
-nav a:hover .icon {
+nav#topbar-first a:hover .icon {
   color: #000;
 }
 
+nav#topbar-first ul.menu-popup,
 ul.menu-popup {
   border: 0px solid #FFF;
   margin-top: 0px;
@@ -152,7 +153,7 @@ section {
   top: 44px;
 }
 
-nav #nav-search-box #nav-search-text {
+nav#topbar-first #nav-search-box #nav-search-text {
   background-color: initial;
   border-style: solid;
   border-width: 1px;

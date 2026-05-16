@@ -41,12 +41,11 @@ class XmlTest extends TestCase
 		self::assertEquals(1, xml_parse_into_struct($xml_parser, $text, $values, $index));
 		self::assertEquals(
 			['TEXT' => [0]],
-			$index
+			$index,
 		);
 		self::assertEquals(
 			[['tag' => 'TEXT', 'type' => 'complete', 'level' => 1, 'value' => $tag]],
-			$values
+			$values,
 		);
-		xml_parser_free($xml_parser);
 	}
 }

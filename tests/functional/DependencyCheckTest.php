@@ -82,12 +82,6 @@ class DependencyCheckTest extends FixtureTestCase
 
 	public function testAppMode()
 	{
-		// PDO needs to be disabled for PHP 7.2, see https://jira.mariadb.org/browse/MDEV-24121
-		if (version_compare(PHP_VERSION, '7.3') < 0) {
-			$configCache = $this->dice->create(Cache::class);
-			$configCache->set('database', 'disable_pdo', true);
-		}
-
 		/** @var App\Mode $mode */
 		$mode = $this->dice->create(App\Mode::class);
 

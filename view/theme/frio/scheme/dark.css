@@ -9,6 +9,14 @@
     Created on : 11.08.2020
     Author     : Hypolite Petovan <hypolite@friendica.mrpetovan.com>
 */
+
+a:hover, button:focus, .btn-link:focus, .btn-primary:focus,
+a:hover, button:hover, .btn-link:hover, .btn-primary:hover,
+#topbar-first li a:hover, #topbar-first li button:hover,
+#topbar-first li a:focus, #topbar-first li button:focus {
+	color: white;
+}
+
 #topbar-first {
 	background-color: $background_color;
 }
@@ -33,6 +41,10 @@
 }
 #topbar-second ul.tabs li {
 	border_color: $link_color;
+}
+header #banner #logo-img:focus,
+header #banner #logo-img:hover {
+		background-color: $font_color;
 }
 
 .dropdown-menu,
@@ -179,6 +191,11 @@ main .nav-tabs > li.active > a:hover {
 	-webkit-box-shadow: 0 0 2px #dadada;
 	background: none;
 	color: $font_color_darker;
+}
+
+.wall-item-actions .btn {
+	box-shadow: none;
+	-webkit-box-shadow: none;
 }
 .btn.focus,
 .btn:focus,
@@ -390,4 +407,72 @@ textarea#profile-jot-text:focus + #preview_profile-jot-text, textarea.comment-ed
 
 figure.img-allocated-height {
 	background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Jot/Composer modal specific fixes for dark theme */
+#jot-modal .btn,
+#jot-modal .input-group-addon {
+	box-shadow: none;
+	-webkit-box-shadow: none;
+}
+
+#jot-modal .dropzone .dz-preview.dz-image-preview {
+	background: transparent;
+}
+
+#jot-modal .dropzone .dz-preview.dz-file-preview .dz-image {
+	background: #555;
+	background: linear-gradient(to bottom, #666, #444);
+}
+
+#jot-modal .dropzone .dz-preview .dz-details .dz-filename:hover span {
+	background-color: rgba(0, 0, 0, 0.8);
+	border-color: rgba(100, 100, 100, 0.8);
+}
+
+#jot-modal .dropzone .dz-preview .dz-details .dz-filename span,
+#jot-modal .dropzone .dz-preview .dz-details .dz-size span {
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+#jot-modal .dropzone .dz-preview .dz-progress {
+	background: rgba(0, 0, 0, 0.9);
+}
+
+/* Filebrowser fixes for dark theme - buttons and breadcrumbs */
+/* Target ALL buttons in filebrowser with maximum specificity */
+#jot-fbrowser-wrapper #filebrowser button.btn,
+#jot-fbrowser-wrapper #filebrowser .breadcrumb button.btn-link,
+#jot-fbrowser-wrapper #filebrowser .fbswitcher button.btn-default,
+#jot-fbrowser-wrapper #filebrowser .upload button.btn-primary,
+#jot-fbrowser-wrapper #filebrowser .error button.btn-link,
+/* Album folder buttons (no btn class) */
+#jot-fbrowser-wrapper #filebrowser .folders button,
+#jot-fbrowser-wrapper #filebrowser nav.folders button {
+	background-color: transparent !important;
+	background-image: none !important;
+	box-shadow: none !important;
+	-webkit-box-shadow: none !important;
+	-moz-box-shadow: none !important;
+	border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+#jot-fbrowser-wrapper #filebrowser button.btn:hover,
+#jot-fbrowser-wrapper #filebrowser .breadcrumb button.btn-link:hover,
+#jot-fbrowser-wrapper #filebrowser .fbswitcher button.btn-default:hover,
+#jot-fbrowser-wrapper #filebrowser .upload button.btn-primary:hover,
+#jot-fbrowser-wrapper #filebrowser .error button.btn-link:hover,
+/* Album folder buttons hover */
+#jot-fbrowser-wrapper #filebrowser .folders button:hover,
+#jot-fbrowser-wrapper #filebrowser nav.folders button:hover {
+	background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#jot-fbrowser-wrapper #filebrowser .fbswitcher button.btn-default.active {
+	background-color: rgba(255, 255, 255, 0.15) !important;
+	border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.dropzone:not(textarea) {
+	color: #ccc;
 }

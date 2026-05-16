@@ -16,6 +16,7 @@ They are loaded into the html <head> so that js functions can use them *}}
 		ignoreServer     : "{{$l10n.ignoreServer|escape:'javascript' nofilter}}",
 		ignoreServerDesc : "{{$l10n.ignoreServerDesc|escape:'javascript' nofilter}}",
 	};
+	window.aStr = aStr;
 	const aActErr = {
 		like       : "{{$l10n.likeError|escape:'javascript' nofilter}}",
 		dislike    : "{{$l10n.dislikeError|escape:'javascript' nofilter}}",
@@ -24,10 +25,12 @@ They are loaded into the html <head> so that js functions can use them *}}
 		attendno   : "{{$l10n.attendError|escape:'javascript' nofilter}}",
 		attendmaybe: "{{$l10n.attendError|escape:'javascript' nofilter}}",
 	};
+	window.aActErr = aActErr;
 	const aErrType = {
 		srvErr: "{{$l10n.srvError|escape:'javascript' nofilter}}",
 		netErr: "{{$l10n.netError|escape:'javascript' nofilter}}",
 	};
+	window.aErrType = aErrType;
 	const dzStrings = {
 		dictDefaultMessage          : "{{$l10n.dictDefaultMessage|escape:'javascript' nofilter}}",
 		dictFallbackMessage         : "{{$l10n.dictFallbackMessage|escape:'javascript' nofilter}}",
@@ -41,4 +44,5 @@ They are loaded into the html <head> so that js functions can use them *}}
 		dictRemoveFile              : "{{$l10n.dictRemoveFile|escape:'javascript' nofilter}}",
 		dictMaxFilesExceeded        : "{{$l10n.dictMaxFilesExceeded|escape:'javascript' nofilter}}",
 	};
+	window.dzStrings = dzStrings;
 </script>

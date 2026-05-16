@@ -9,9 +9,9 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content\Feature;
-use Friendica\Core\Hook;
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\User;
 
 class BaseProfile extends BaseModule
@@ -76,7 +76,7 @@ class BaseProfile extends BaseModule
 			];
 		} else {
 			$owner = User::getByNickname($nickname, ['uid']);
-			if(DI::userSession()->isAuthenticated() || $owner && Feature::isEnabled($owner['uid'], Feature::PUBLIC_CALENDAR)) {
+			if (DI::userSession()->isAuthenticated() || $owner && Feature::isEnabled($owner['uid'], Feature::PUBLIC_CALENDAR)) {
 				$tabs[] = [
 					'label'     => DI::l10n()->t('Calendar'),
 					'url'       => DI::baseUrl() . '/calendar/show/' . $nickname,
@@ -90,7 +90,7 @@ class BaseProfile extends BaseModule
 
 		if ($is_owner) {
 			$tabs[] = [
-				'label'     => DI::l10n()->t('Personal Notes'),
+				'label'     => DI::l10n()->t('Personal notes'),
 				'url'       => DI::baseUrl() . '/notes',
 				'sel'       => $current == 'notes' ? 'active' : '',
 				'title'     => DI::l10n()->t('Only You Can See This'),
@@ -128,12 +128,16 @@ class BaseProfile extends BaseModule
 			];
 		}
 
-		$arr = ['is_owner' => $is_owner, 'nickname' => $nickname, 'tab' => $current, 'tabs' => $tabs];
+		$hook_data = ['is_owner' => $is_owner, 'nickname' => $nickname, 'tab' => $current, 'tabs' => $tabs];
 
-		Hook::callAll('profile_tabs', $arr);
+		$eventDispatcher = DI::eventDispatcher();
+
+		$hook_data = $eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_TABS, $hook_data),
+		)->getArray();
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
 
-		return Renderer::replaceMacros($tpl, ['$tabs' => $arr['tabs'], '$more' => DI::l10n()->t('More')]);
+		return Renderer::replaceMacros($tpl, ['$tabs' => $hook_data['tabs'], '$more' => DI::l10n()->t('More')]);
 	}
 }

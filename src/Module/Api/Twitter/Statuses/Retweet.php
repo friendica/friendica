@@ -40,7 +40,7 @@ class Retweet extends BaseApi
 		$item   = Post::selectFirst($fields, ['uri-id' => $id, 'uid' => [0, $uid], 'private' => [Item::PUBLIC, Item::UNLISTED]], ['order' => ['uid' => true]]);
 
 		if (DBA::isResult($item) && !empty($item['body'])) {
-			if (in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::BLUESKY, Protocol::TUMBLR, Protocol::TWITTER])) {
+			if (in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::ATPROTO, Protocol::TUMBLR, Protocol::TWITTER])) {
 				if (!Item::performActivity($id, 'announce', $uid)) {
 					throw new InternalServerErrorException();
 				}

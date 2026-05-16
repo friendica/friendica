@@ -4,5 +4,4 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-
-<input id="photos-upload-choose" type="file" name="userfile" />
+<input id="photos-upload-choose" type="file" name="userfile" required />
