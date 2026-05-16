@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright (C) 2010-2024, the Friendica project
  *
@@ -21,9 +22,7 @@
 
 return [
 	\Psr\Log\LoggerInterface::class => [
-        'instanceOf' => \Psr\Log\NullLogger::class,
-        'call' => null,
-    ],
+		'instanceOf' => \Psr\Log\NullLogger::class,
+		'call'       => null,
+	],
 ];
-
-

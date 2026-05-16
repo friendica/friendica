@@ -37,18 +37,18 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertSame(
 			$expected,
-			HookEventBridge::getStaticSubscribedEvents()
+			HookEventBridge::getStaticSubscribedEvents(),
 		);
 
 		foreach ($expected as $methodName) {
 			$this->assertTrue(
 				method_exists(HookEventBridge::class, $methodName),
-				$methodName . '() is not defined'
+				$methodName . '() is not defined',
 			);
 
 			$this->assertTrue(
 				(new \ReflectionMethod(HookEventBridge::class, $methodName))->isStatic(),
-				$methodName . '() is not static'
+				$methodName . '() is not static',
 			);
 		}
 	}

@@ -41,7 +41,7 @@ class AddonManagerTest extends TestCase
 
 		$this->assertSame(
 			[[HtmlFilterEvent::PAGE_END, [Addon::class, 'onPageEnd']]],
-			$manager->getAllSubscribedEvents()
+			$manager->getAllSubscribedEvents(),
 		);
 	}
 
@@ -60,7 +60,7 @@ class AddonManagerTest extends TestCase
 
 		$this->assertSame(
 			['helloaddon' => ['foo', 'bar']],
-			$manager->getRequiredDependencies()
+			$manager->getRequiredDependencies(),
 		);
 	}
 }

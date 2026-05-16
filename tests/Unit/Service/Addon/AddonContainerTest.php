@@ -21,7 +21,7 @@ class AddonContainerTest extends TestCase
 	{
 		$container = AddonContainer::fromContainer(
 			$this->createStub(Container::class),
-			[]
+			[],
 		);
 
 		$this->assertInstanceOf(ContainerInterface::class, $container);
@@ -31,7 +31,7 @@ class AddonContainerTest extends TestCase
 	{
 		$container = AddonContainer::fromContainer(
 			$this->createStub(Container::class),
-			[]
+			[],
 		);
 
 		$this->assertFalse($container->has('foo'));
@@ -41,7 +41,7 @@ class AddonContainerTest extends TestCase
 	{
 		$container = AddonContainer::fromContainer(
 			$this->createStub(Container::class),
-			['foo']
+			['foo'],
 		);
 
 		$this->assertTrue($container->has('foo'));
@@ -56,7 +56,7 @@ class AddonContainerTest extends TestCase
 
 		$container = AddonContainer::fromContainer(
 			$parent,
-			['foo']
+			['foo'],
 		);
 
 		$this->assertSame($object, $container->get('foo'));
@@ -66,7 +66,7 @@ class AddonContainerTest extends TestCase
 	{
 		$container = AddonContainer::fromContainer(
 			$this->createStub(Container::class),
-			[]
+			[],
 		);
 
 		$this->expectException(NotFoundExceptionInterface::class);

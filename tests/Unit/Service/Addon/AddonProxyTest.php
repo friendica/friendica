@@ -21,16 +21,12 @@ use Psr\Container\ContainerInterface;
 /**
  * Helper interface to combine AddonBootstrap and DependencyProvider.
  */
-interface CombinedAddonBootstrapDependencyProvider extends AddonBootstrap, DependencyProvider
-{
-}
+interface CombinedAddonBootstrapDependencyProvider extends AddonBootstrap, DependencyProvider {}
 
 /**
  * Helper interface to combine AddonBootstrap and InstallableAddon.
  */
-interface CombinedAddonBootstrapInstallableAddon extends AddonBootstrap, InstallableAddon
-{
-}
+interface CombinedAddonBootstrapInstallableAddon extends AddonBootstrap, InstallableAddon {}
 
 class AddonProxyTest extends TestCase
 {
@@ -83,7 +79,7 @@ class AddonProxyTest extends TestCase
 			[
 				['foo', [$bootstrap, 'bar']],
 			],
-			$addon->getSubscribedEvents()
+			$addon->getSubscribedEvents(),
 		);
 
 	}

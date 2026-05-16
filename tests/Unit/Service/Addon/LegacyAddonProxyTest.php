@@ -43,7 +43,7 @@ class LegacyAddonProxyTest extends TestCase
 
 		$this->assertSame(
 			[],
-			$addon->getRequiredDependencies()
+			$addon->getRequiredDependencies(),
 		);
 	}
 
@@ -59,7 +59,7 @@ class LegacyAddonProxyTest extends TestCase
 
 		$this->assertSame(
 			['name' => []],
-			$addon->getProvidedDependencyRules()
+			$addon->getProvidedDependencyRules(),
 		);
 	}
 
@@ -71,7 +71,7 @@ class LegacyAddonProxyTest extends TestCase
 
 		$this->assertSame(
 			[],
-			$addon->getSubscribedEvents()
+			$addon->getSubscribedEvents(),
 		);
 	}
 
@@ -90,7 +90,7 @@ class LegacyAddonProxyTest extends TestCase
 		} catch (\Throwable $th) {
 			$this->assertSame(
 				'Addon loaded',
-				$th->getMessage()
+				$th->getMessage(),
 			);
 		}
 	}
@@ -110,7 +110,7 @@ class LegacyAddonProxyTest extends TestCase
 		} catch (\Exception $th) {
 			$this->assertSame(
 				'Addon loaded',
-				$th->getMessage()
+				$th->getMessage(),
 			);
 		}
 
@@ -134,7 +134,7 @@ class LegacyAddonProxyTest extends TestCase
 		} catch (\Exception $th) {
 			$this->assertSame(
 				'Addon installed',
-				$th->getMessage()
+				$th->getMessage(),
 			);
 		}
 	}
@@ -155,7 +155,7 @@ class LegacyAddonProxyTest extends TestCase
 		} catch (\Exception $th) {
 			$this->assertSame(
 				'Addon uninstalled',
-				$th->getMessage()
+				$th->getMessage(),
 			);
 		}
 	}

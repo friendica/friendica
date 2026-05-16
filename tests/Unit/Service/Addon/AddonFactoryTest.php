@@ -21,7 +21,7 @@ class AddonFactoryTest extends TestCase
 	{
 		$factory = new AddonFactory(
 			dirname(__DIR__, 3) . '/Util',
-			$this->createStub(LoggerInterface::class)
+			$this->createStub(LoggerInterface::class),
 		);
 
 		$this->assertInstanceOf(AddonLoader::class, $factory);
@@ -34,7 +34,7 @@ class AddonFactoryTest extends TestCase
 
 		$factory = new AddonFactory(
 			dirname(__DIR__, 3) . '/Util',
-			$logger
+			$logger,
 		);
 
 		$addons = $factory->getAddons(['helloaddon' => []]);

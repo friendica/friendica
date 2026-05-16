@@ -80,14 +80,14 @@ final class HookEventBridge
 	public static function onArrayFilterEvent(ArrayFilterEvent $event): void
 	{
 		$event->setArray(
-			static::callHook($event->getName(), $event->getArray())
+			static::callHook($event->getName(), $event->getArray()),
 		);
 	}
 
 	public static function onHtmlFilterEvent(HtmlFilterEvent $event): void
 	{
 		$event->setHtml(
-			static::callHook($event->getName(), $event->getHtml())
+			static::callHook($event->getName(), $event->getHtml()),
 		);
 	}
 

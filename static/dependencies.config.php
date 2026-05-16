@@ -28,7 +28,7 @@ use Dice\Dice;
 /**
  * @param string $basepath The base path of the Friendica installation without trailing slash
  */
-return (function(string $basepath, array $getVars, array $serverVars, array $cookieVars): array {
+return (function (string $basepath, array $getVars, array $serverVars, array $cookieVars): array {
 	return [
 		'*' => [
 			// marks all class result as shared for other creations, so there's just
@@ -36,19 +36,19 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'shared' => true,
 		],
 		\Friendica\Core\Addon\Capability\ICanLoadAddons::class => [
-			'instanceOf' => \Friendica\Core\Addon\Model\AddonLoader::class,
+			'instanceOf'      => \Friendica\Core\Addon\Model\AddonLoader::class,
 			'constructParams' => [
 				$basepath,
 			],
 		],
 		\Friendica\Core\Addon\AddonHelper::class => [
-			'instanceOf' => \Friendica\Core\Addon\AddonManagerHelper::class,
+			'instanceOf'      => \Friendica\Core\Addon\AddonManagerHelper::class,
 			'constructParams' => [
 				$basepath . '/addon',
 			],
 		],
 		\Friendica\Service\Addon\AddonLoader::class => [
-			'instanceOf' => \Friendica\Service\Addon\AddonFactory::class,
+			'instanceOf'      => \Friendica\Service\Addon\AddonFactory::class,
 			'constructParams' => [
 				$basepath . '/addon',
 			],
@@ -57,12 +57,12 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'constructParams' => [
 				$basepath,
 				$serverVars,
-			]
+			],
 		],
 		\Friendica\Core\Hooks\Model\DiceInstanceManager::class => [
 			'constructParams' => [
 				[Dice::INSTANCE => Dice::SELF],
-			]
+			],
 		],
 		\Friendica\Core\Hooks\Util\StrategiesFileManager::class => [
 			'constructParams' => [
@@ -73,7 +73,7 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			],
 		],
 		\Friendica\Core\Hooks\Capability\ICanRegisterStrategies::class => [
-			'instanceOf' => \Friendica\Core\Hooks\Model\DiceInstanceManager::class,
+			'instanceOf'      => \Friendica\Core\Hooks\Model\DiceInstanceManager::class,
 			'constructParams' => [
 				[Dice::INSTANCE => Dice::SELF],
 			],
@@ -82,14 +82,14 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'instanceOf' => \Friendica\AppLegacy::class,
 		],
 		\Friendica\Core\Hooks\Capability\ICanCreateInstances::class => [
-			'instanceOf' => \Friendica\Core\Hooks\Model\DiceInstanceManager::class,
+			'instanceOf'      => \Friendica\Core\Hooks\Model\DiceInstanceManager::class,
 			'constructParams' => [
 				[Dice::INSTANCE => Dice::SELF],
 			],
 		],
 		\Friendica\Core\Config\Util\ConfigFileManager::class => [
 			'instanceOf' => \Friendica\Core\Config\Factory\Config::class,
-			'call' => [
+			'call'       => [
 				['createConfigFileManager', [
 					$basepath,
 					$basepath . '/addon',
@@ -99,7 +99,7 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 		],
 		\Friendica\Core\Config\ValueObject\Cache::class => [
 			'instanceOf' => \Friendica\Core\Config\Factory\Config::class,
-			'call' => [
+			'call'       => [
 				['createCache', [], Dice::CHAIN_CALL],
 			],
 		],
@@ -112,16 +112,16 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			],
 		],
 		\Friendica\Core\Config\Capability\IManageConfigValues::class => [
-			'instanceOf' => \Friendica\Core\Config\Model\DatabaseConfig::class,
+			'instanceOf'      => \Friendica\Core\Config\Model\DatabaseConfig::class,
 			'constructParams' => [
 				$serverVars,
 			],
 		],
 		\Friendica\Core\PConfig\Capability\IManagePersonalConfigValues::class => [
 			'instanceOf' => \Friendica\Core\PConfig\Factory\PConfig::class,
-			'call' => [
+			'call'       => [
 				['create', [], Dice::CHAIN_CALL],
-			]
+			],
 		],
 		\Friendica\Database\Definition\DbaDefinition::class => [
 			'constructParams' => [
@@ -150,7 +150,7 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			],
 		],
 		'$hostname' => [
-			'instanceOf' => \Friendica\App\BaseURL::class,
+			'instanceOf'      => \Friendica\App\BaseURL::class,
 			'constructParams' => [
 				$serverVars,
 			],
@@ -169,9 +169,9 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			],
 		],
 		\Psr\Log\LoggerInterface::class => [
-			'shared' => false, // LoggerManager::getLogger() will return a shared instance
+			'shared'     => false, // LoggerManager::getLogger() will return a shared instance
 			'instanceOf' => \Friendica\Core\Logger\LoggerManager::class,
-			'call' => [
+			'call'       => [
 				['getLogger', [], Dice::CHAIN_CALL],
 			],
 		],
@@ -182,13 +182,13 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 		],
 		\Friendica\Core\Logger\Factory\LoggerFactory::class => [
 			'instanceOf' => \Friendica\Core\Logger\Factory\DelegatingLoggerFactory::class,
-			'call' => [
+			'call'       => [
 				['registerFactory', ['stream', [Dice::INSTANCE => '$StreamLoggerFactory']]],
 				['registerFactory', ['syslog', [Dice::INSTANCE => '$SyslogLoggerFactory']]],
 			],
 		],
 		'$StreamLoggerFactory' => [
-			'instanceOf' => \Friendica\Core\Logger\Factory\StreamLoggerFactory::class,
+			'instanceOf'    => \Friendica\Core\Logger\Factory\StreamLoggerFactory::class,
 			'substitutions' => [
 				\Friendica\Core\Logger\Util\FileSystemUtil::class => \Friendica\Core\Logger\Util\FileSystem::class,
 			],
@@ -198,13 +198,13 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 		],
 		\Friendica\Core\Logger\Type\SyslogLogger::class => [
 			'instanceOf' => \Friendica\Core\Logger\Factory\SyslogLogger::class,
-			'call' => [
+			'call'       => [
 				['create', [], Dice::CHAIN_CALL],
 			],
 		],
 		\Friendica\Core\Logger\Type\StreamLogger::class => [
 			'instanceOf' => \Friendica\Core\Logger\Factory\StreamLogger::class,
-			'call' => [
+			'call'       => [
 				['create', [], Dice::CHAIN_CALL],
 			],
 		],
@@ -212,32 +212,32 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'instanceOf' => \Friendica\Event\EventDispatcher::class,
 		],
 		\Friendica\Core\Logger\Capability\IHaveCallIntrospections::class => [
-			'instanceOf' => \Friendica\Core\Logger\Util\Introspection::class,
+			'instanceOf'      => \Friendica\Core\Logger\Util\Introspection::class,
 			'constructParams' => [
 				\Friendica\Core\Logger\Capability\IHaveCallIntrospections::IGNORE_CLASS_LIST,
 			],
 		],
 		\Friendica\Core\Cache\Capability\ICanCache::class => [
 			'instanceOf' => \Friendica\Core\Cache\Factory\Cache::class,
-			'call' => [
+			'call'       => [
 				['createLocal', [], Dice::CHAIN_CALL],
 			],
 		],
 		\Friendica\Core\Cache\Capability\ICanCacheInMemory::class => [
 			'instanceOf' => \Friendica\Core\Cache\Factory\Cache::class,
-			'call' => [
+			'call'       => [
 				['createLocal', [], Dice::CHAIN_CALL],
 			],
 		],
 		\Friendica\Core\Lock\Capability\ICanLock::class => [
 			'instanceOf' => \Friendica\Core\Lock\Factory\Lock::class,
-			'call' => [
+			'call'       => [
 				['create', [], Dice::CHAIN_CALL],
 			],
 		],
 		\Friendica\App\Arguments::class => [
 			'instanceOf' => \Friendica\App\Arguments::class,
-			'call' => [
+			'call'       => [
 				['determine', [$serverVars, $getVars], Dice::CHAIN_CALL],
 			],
 		],
@@ -250,17 +250,17 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 			'constructParams' => [
 				$serverVars,
 				__DIR__ . '/routes.config.php',
-				null
+				null,
 			],
 		],
 		\Friendica\Core\L10n::class => [
 			'constructParams' => [
-				$serverVars, $getVars
+				$serverVars, $getVars,
 			],
 		],
 		\Friendica\Core\Session\Capability\IHandleSessions::class => [
 			'instanceOf' => \Friendica\Core\Session\Factory\Session::class,
-			'call' => [
+			'call'       => [
 				['create', [$serverVars], Dice::CHAIN_CALL],
 				['start', [], Dice::CHAIN_CALL],
 			],
@@ -275,43 +275,43 @@ return (function(string $basepath, array $getVars, array $serverVars, array $coo
 		],
 		\Friendica\Core\Storage\Capability\ICanWriteToStorage::class => [
 			'instanceOf' => \Friendica\Core\Storage\Repository\StorageManager::class,
-			'call' => [
+			'call'       => [
 				['getBackend', [], Dice::CHAIN_CALL],
 			],
 		],
 		\Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs::class => [
 			'instanceOf' => \Friendica\Core\KeyValueStorage\Factory\KeyValueStorage::class,
-			'call' => [
+			'call'       => [
 				['create', [], Dice::CHAIN_CALL],
 			],
 		],
 		\Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests::class => [
 			'instanceOf' => \Friendica\Network\HTTPClient\Factory\HttpClient::class,
-			'call' => [
+			'call'       => [
 				['createClient', [], Dice::CHAIN_CALL],
 			],
 		],
 		\Friendica\Model\Log\ParsedLogIterator::class => [
 			'constructParams' => [
 				[Dice::INSTANCE => \Friendica\Util\ReversedFileReader::class],
-			]
+			],
 		],
 		\Friendica\Core\Worker\Repository\Process::class => [
 			'constructParams' => [
-				$serverVars
+				$serverVars,
 			],
 		],
 		\Friendica\App\Request::class => [
 			'constructParams' => [
-				$serverVars
+				$serverVars,
 			],
 		],
 		\Psr\Clock\ClockInterface::class => [
-			'instanceOf' => \Friendica\Util\Clock\SystemClock::class
+			'instanceOf' => \Friendica\Util\Clock\SystemClock::class,
 		],
 		\Friendica\Module\Special\HTTPException::class => [
 			'constructParams' => [
-				$serverVars
+				$serverVars,
 			],
 		],
 		\Friendica\Module\Api\ApiResponse::class => [
