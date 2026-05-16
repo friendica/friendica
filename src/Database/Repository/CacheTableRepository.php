@@ -85,7 +85,7 @@ final class CacheTableRepository implements CacheRepository
 			$cacheArray = $this->database->selectFirst(
 				'cache',
 				['v'],
-				['`k` = ? AND (`expires` >= ? OR `expires` = -1)', $key, $expires]
+				['`k` = ? AND (`expires` >= ? OR `expires` = -1)', $key, $expires],
 			);
 
 			if (!$this->database->isResult($cacheArray)) {

@@ -34,11 +34,11 @@ trait CreateDatabaseTrait
 			$this->root->url(),
 			$this->root->url() . '/addon',
 			$this->root->url() . '/config',
-			$this->root->url() . '/static'
+			$this->root->url() . '/static',
 		);
 		$config = new ReadOnlyFileConfig(new Cache([
 			'database' => [
-				'disable_pdo' => true
+				'disable_pdo' => true,
 			],
 		]));
 

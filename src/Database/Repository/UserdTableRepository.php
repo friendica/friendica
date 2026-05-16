@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Friendica\Database\Repository;
 
-use Exception;
 use Friendica\Database\Database;
 use Friendica\Database\DatabaseException;
 use Friendica\Repository\DeletedUserRepository;

@@ -19,7 +19,7 @@ class CacheTableRepositoryTest extends TestCase
 {
 	public function testGetAllKeysValidUntilReturnsArray(): void
 	{
-		$stmt = new \stdClass;
+		$stmt = new \stdClass();
 
 		$database = $this->createStub(Database::class);
 		$database->method('select')->willReturnMap([
@@ -29,7 +29,7 @@ class CacheTableRepositoryTest extends TestCase
 			['k' => 'value1'],
 			['k' => 'value2'],
 			['k' => 'value3'],
-			false
+			false,
 		);
 
 		$repo = new CacheTableRepository($database);
@@ -40,7 +40,7 @@ class CacheTableRepositoryTest extends TestCase
 				'value2',
 				'value3',
 			],
-			$repo->getAllKeysValidUntil('2025-04-16 10:12:01')
+			$repo->getAllKeysValidUntil('2025-04-16 10:12:01'),
 		);
 	}
 
@@ -58,7 +58,7 @@ class CacheTableRepositoryTest extends TestCase
 
 	public function testGetAllKeysValidUntilWithPrefixReturnsArray(): void
 	{
-		$stmt = new \stdClass;
+		$stmt = new \stdClass();
 
 		$database = $this->createStub(Database::class);
 		$database->method('select')->willReturnMap([
@@ -68,7 +68,7 @@ class CacheTableRepositoryTest extends TestCase
 			['k' => 'value1'],
 			['k' => 'value2'],
 			['k' => 'value3'],
-			false
+			false,
 		);
 
 		$repo = new CacheTableRepository($database);
@@ -79,7 +79,7 @@ class CacheTableRepositoryTest extends TestCase
 				'value2',
 				'value3',
 			],
-			$repo->getAllKeysValidUntilWithPrefix('2025-04-16 10:12:01', 'prefix')
+			$repo->getAllKeysValidUntilWithPrefix('2025-04-16 10:12:01', 'prefix'),
 		);
 	}
 

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Friendica\Repository;
 
-use Exception;
 use Friendica\Database\DatabaseException;
 
 /**

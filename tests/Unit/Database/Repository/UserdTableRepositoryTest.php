@@ -41,7 +41,7 @@ class UserdTableRepositoryTest extends TestCase
 		$database = $this->createMock(Database::class);
 		$database->expects($this->exactly(2))->method('throwExceptionsOnErrors');
 		$database->expects($this->once())->method('insert')->willThrowException(
-			new DatabaseException('An error occured.', 0, 'SQL query')
+			new DatabaseException('An error occured.', 0, 'SQL query'),
 		);
 
 		$repo = new UserdTableRepository($database);

@@ -26,19 +26,19 @@ final class CacheModel implements CacheEntity
 	public static function createFromArray(array $data): self
 	{
 		$rawValue = array_key_exists('v', $data) ? (string) $data['v'] : '';
-		$value = @unserialize($rawValue);
+		$value    = @unserialize($rawValue);
 
 		// Only return a value if the serialized value is valid.
 		// We also check if the db entry is a serialized
 		// boolean 'false' value (which we want to return).
-		if ($value === false && $rawValue !== 'b:0;' ) {
+		if ($value === false && $rawValue !== 'b:0;') {
 			throw new Exception(sprintf('Invalid value data for cache object.'));
 		}
 
-		$entity = new self();
-		array_key_exists('k', $data) ?? $entity->k = (string) $data['k'];
-		$entity->v = $rawValue;
-		$entity->value = $value;
+		$entity                                                = new self();
+		array_key_exists('k', $data) ?? $entity->k             = (string) $data['k'];
+		$entity->v                                             = $rawValue;
+		$entity->value                                         = $value;
 		array_key_exists('expired', $data) ?? $entity->expired = (string) $data['expired'];
 		array_key_exists('updated', $data) ?? $entity->updated = (string) $data['updated'];
 

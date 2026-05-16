@@ -74,17 +74,17 @@ class Import extends \Friendica\BaseModule
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = []
+		array $parameters = [],
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->config         = $config;
-		$this->pconfig        = $pconfig;
-		$this->systemMessages = $systemMessages;
-		$this->database       = $database;
+		$this->config                = $config;
+		$this->pconfig               = $pconfig;
+		$this->systemMessages        = $systemMessages;
+		$this->database              = $database;
 		$this->deletedUserRepository = $deletedUserRepository;
-		$this->permissionSet  = $permissionSet;
-		$this->session        = $session;
+		$this->permissionSet         = $permissionSet;
+		$this->session               = $session;
 	}
 
 	protected function post(array $request = [])

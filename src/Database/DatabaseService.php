@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Friendica\Database;
 
-use Friendica\Database\Database;
 use Friendica\Database\Repository\CacheTableRepository;
 use Friendica\Database\Repository\UserdTableRepository;
 use Friendica\Repository\CacheRepository;
