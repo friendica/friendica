@@ -85,9 +85,7 @@ class Database extends AbstractSessionHandler
 		}
 
 		if (!$data) {
-			// Empty data - session doesn't exist or has no content
-			// Don't try to destroy, just return true (idempotent)
-			return true;
+			return $this->destroy($id);
 		}
 
 		$expire         = time() + static::EXPIRE;
@@ -118,12 +116,13 @@ class Database extends AbstractSessionHandler
 	public function destroy($id): bool
 	{
 		try {
-			// Always return true even if no session was deleted (idempotent behavior)
-			return true;
+			$this->dba->delete('session', ['sid' => $id]);
 		} catch (\Exception $exception) {
 			$this->logger->warning('Cannot destroy session.', ['id' => $id, 'exception' => $exception]);
 			return false;
 		}
+
+		return true;
 	}
 
 	#[\ReturnTypeWillChange]
