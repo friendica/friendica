@@ -1,4 +1,5 @@
 FROM friendica:2026.05-fpm
+ARG LARPNET_VERSION=1
 
 # Custom themes
 COPY view/theme/larpnet               /usr/src/friendica/view/theme/larpnet

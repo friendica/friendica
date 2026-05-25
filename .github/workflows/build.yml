@@ -22,10 +22,12 @@ jobs:
           username: ${{ secrets.REGISTRY_USER }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Extract Friendica version from Dockerfile
+      - name: Extract versions from Dockerfile
         id: version
         run: |
-          echo "tag=$(grep '^FROM friendica:' Dockerfile | sed 's/FROM friendica:\(.*\)-fpm/\1/')" >> "$GITHUB_OUTPUT"
+          FRIENDICA=$(grep '^FROM friendica:' Dockerfile | sed 's/FROM friendica:\(.*\)-fpm/\1/')
+          LARPNET=$(grep '^ARG LARPNET_VERSION=' Dockerfile | sed 's/ARG LARPNET_VERSION=//')
+          echo "tag=${FRIENDICA}-${LARPNET}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
