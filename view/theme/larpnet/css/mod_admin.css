@@ -1,0 +1,56 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2024 the Friendica project
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+#adminpage.adminpage > h1 {
+	padding: 0 15px;
+}
+
+#users th:first-of-type {
+	width: 1em;
+}
+#users th:nth-of-type(2) {
+	width: 40px;
+}
+#users th:last-of-type {
+	width: 1em;
+}
+.admin-settings-footer-elements {
+	padding-left: 8px;
+	padding-right: 8px;
+}
+
+#deleted th:first-of-type {
+	width: 40px;
+}
+
+#users img.avatar-nano,
+#deleted img.avatar-nano {
+	height: 24px;
+	width: 24px;
+}
+.opened .caret {
+	transform: rotate(180deg);
+}
+tr.details td,
+tr.details th {
+	border-top: 0 !important;
+}
+
+.adminpage td > .checkbox,
+.adminpage th > .checkbox {
+	margin: 0;
+}
+.adminpage td {
+	word-break: break-all;
+}
+
+.adminpage input[id=id_maximagesize]:valid {
+	background-color: palegreen;
+}
+
+.adminpage input[id=id_maximagesize]:invalid {
+	background-color: lightpink;
+}

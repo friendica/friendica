@@ -1,0 +1,393 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2024 the Friendica project
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/*
+    Licence    : AGPL
+    Created on : 11.08.2020
+    Author     : Hypolite Petovan <hypolite@friendica.mrpetovan.com>
+*/
+#topbar-first {
+	background-color: $background_color;
+}
+#topbar-first .dropdown.account > a,
+#topbar-first .dropdown.account.open > a,
+#topbar-first .dropdown.account > button,
+#topbar-first .dropdown.account.open > button {
+	background: none;
+}
+
+#topbar-first #nav-notifications-menu li.notif-entry:hover {
+	background-color: $nav_bg;
+}
+
+#topbar-first #nav-notifications-menu li.notification-unseen {
+	background-color: $nav_icon_hover_color;
+}
+
+#topbar-second {
+	background-color: $nav_bg;
+	border-color: $link_color;
+}
+#topbar-second ul.tabs li {
+	border_color: $link_color;
+}
+
+.dropdown-menu,
+.account .dropdown-menu {
+	background-color: $background_color;
+}
+.dropdown-menu > li > a:focus,
+.dropdown-menu > li > a:hover {
+	color: $link_color;
+}
+.account .dropdown-menu li {
+	border-color: $background_color;
+}
+
+.dropdown-menu > li > a:focus,
+.dropdown-menu > li > a:hover {
+	background-image: none;
+	background-color: rgba(232, 232, 232, $contentbg_transp);
+}
+
+.breadcrumb,
+.panel-footer,
+.list-group-item {
+	background-color: rgba(245, 245, 245, $contentbg_transp);
+}
+.panel-group .panel-footer {
+	border-top: 1px solid $nav_bg;
+}
+
+.well {
+	background-image: none;
+	background-color: $nav_bg;
+	box-shadow: 0 0 3px #dadada;
+	-webkit-box-shadow: 0 0 3px #dadada;
+}
+
+input[type="text"],
+input[type="submit"],
+button[type="submit"]:not(.btn),
+select,
+textarea,
+.form-control {
+	border: 2px solid transparent;
+	background-color: $nav_bg;
+	color: $font_color;
+	box-shadow: 0 0 3px #dadada;
+	-webkit-box-shadow: 0 0 3px #dadada;
+}
+input[type="range"] {
+	box-shadow: none;
+}
+
+.form-control[disabled],
+.form-control[readonly],
+.fieldset[disabled] .form-control {
+	background-color: $background_color;
+	color: $font_color_darker;
+}
+
+.radio label::before,
+.checkbox label::before {
+	background-color: $background_color;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover,
+main .nav-tabs > li.active > a,
+main .nav-tabs > li.active > a:focus,
+main .nav-tabs > li.active > a:hover {
+	background-color: $nav_bg;
+	color: $font_color_darker;
+}
+
+.nav > li > a:focus,
+.nav > li > a:hover {
+	background-color: rgba(238, 238, 238, $contentbg_transp);
+}
+
+.modal-header {
+	border-color: $link_color;
+}
+.modal-content {
+	background-color: $background_color;
+}
+
+.pagination > .active > a,
+.pagination > .active > a:focus,
+.pagination > .active > a:hover,
+.pagination > .active > span,
+.pagination > .active > span:focus,
+.pagination > .active > span:hover {
+	border-color: $link_color;
+	background-color: $nav_bg;
+	color: $font_color;
+}
+
+.pagination > li > a:hover,
+.pagination > li > span:hover {
+	background-color: $nav_bg;
+}
+
+#jotOpen {
+	border: none;
+	background-color: $background_color;
+}
+
+.close {
+	color: $font_color;
+	text-shadow: 0 1px 0 $nav_bg;
+}
+.close:focus,
+.close:hover {
+	color: $link_color;
+}
+
+.input-group-addon {
+	color: $font_color;
+	background-color: $nav_bg;
+	box-shadow: 0 0 3px #dadada;
+	-webkit-box-shadow: 0 0 3px #dadada;
+	border: none;
+}
+
+#topbar-first #nav-notifications-menu li.notif-entry,
+.panel-footer,
+.panel-group .panel-heading + .panel-collapse > .list-group,
+.panel-group .panel-heading + .panel-collapse > .panel-body,
+.wall-item-container,
+.comment-fake-form {
+	border-color: $nav_bg;
+}
+
+.wall-item-comment-wrapper {
+	border: 0;
+}
+
+.badge {
+	background-color: $nav_bg;
+}
+
+.btn {
+	box-shadow: 0 0 2px #dadada;
+	-webkit-box-shadow: 0 0 2px #dadada;
+	background: none;
+	color: $font_color_darker;
+}
+.btn.focus,
+.btn:focus,
+.btn:hover {
+	color: $font_color;
+}
+.btn-default:focus,
+.btn-default:hover {
+	background: $nav_bg;
+}
+.btn-default.active,
+.btn-default:active {
+	background-color: $nav_bg;
+	color: $font_color;
+}
+
+button[type="submit"]:not(.btn),
+input[type="submit"],
+.btn.btn-primary {
+	border: 1px solid $link_color;
+}
+
+.label-primary {
+	background-color: $background_color;
+	color: $link_color;
+}
+
+.panel-default > .panel-heading {
+	background: none;
+	background-color: $nav_bg;
+	color: $font_color;
+}
+
+.btn-success,
+.label-success,
+.alert-success,
+.panel-success > .panel-heading {
+	background: rgba(60, 118, 61, 0.4);
+	color: #dff0d8;
+}
+
+.fc .fc-event,
+.btn-info,
+.label-info,
+.alert-info,
+.panel-info > .panel-heading,
+.table > tbody > tr.info > td,
+.table > tbody > tr.info > th,
+.table > tbody > tr > td.info,
+.table > tbody > tr > th.info,
+.table > tfoot > tr.info > td,
+.table > tfoot > tr.info > th,
+.table > tfoot > tr > td.info,
+.table > tfoot > tr > th.info,
+.table > thead > tr.info > td,
+.table > thead > tr.info > th,
+.table > thead > tr > td.info,
+.table > thead > tr > th.info {
+	background: rgba(49, 112, 143, 0.4);
+	color: #d9edf7;
+}
+
+.btn-warning,
+.label-warning,
+.alert-warning,
+.panel-warning > .panel-heading {
+	background: rgba(139, 109, 59, 0.4);
+	color: #fcf8e3;
+}
+
+.btn-danger,
+.label-danger,
+.alert-danger,
+.panel-danger > .panel-heading {
+	background: rgba(169, 68, 66, 0.4);
+	color: #f2dede;
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+	.mod-home.is-not-singleuser .login-form > #login-form,
+	.mod-home.is-not-singleuser .login-form > #login-extra-links,
+	.mod-login #content #login-form {
+		background-color: $background_color;
+	}
+
+	.mod-home.is-not-singleuser .login-form > #login-form label,
+	.mod-login #content #login-form label {
+		color: $font_color;
+	}
+
+	.mod-home.is-not-singleuser .login-form::before,
+	.mod-login #content #login-form::before {
+		background-color: rgba(7, 34, 48, 0.25);
+	}
+
+	.mod-home.is-not-singleuser .login-form::after,
+	.mod-login #content #login-form::after {
+		background-color: rgba(7, 34, 48, 0.35);
+	}
+}
+
+@media (min-width: 768px) {
+	.wall-item-container .wall-item-links,
+	.wall-item-container .wall-item-actions button > a {
+		opacity: 0.3;
+		-webkit-transition: all 0.25s ease-in-out;
+		-moz-transition: all 0.25s ease-in-out;
+		-o-transition: all 0.25s ease-in-out;
+		-ms-transition: all 0.25s ease-in-out;
+		transition: all 0.25s ease-in-out;
+	}
+	.wall-item-container:hover .wall-item-links,
+	.wall-item-container:hover .wall-item-actions button > a {
+		opacity: 1;
+		-webkit-transition: all 0.25s ease-in-out;
+		-moz-transition: all 0.25s ease-in-out;
+		-o-transition: all 0.25s ease-in-out;
+		-ms-transition: all 0.25s ease-in-out;
+		transition: all 0.25s ease-in-out;
+	}
+	.wall-item-container .wall-item-body .body-attach > a:hover {
+		opacity: 1;
+	}
+}
+
+.fc-unthemed td.fc-today {
+	background-color: $nav_bg;
+}
+
+.nav .open > .btn-link {
+	background-color: $nav_bg;
+}
+
+.hovercard {
+	box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+	-webkit-box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+.hovercard,
+.hover-card-footer {
+	background-color: $nav_bg;
+}
+.hovercard.top > .arrow:after {
+	border-top-color: $nav_bg;
+}
+.hovercard.right > .arrow:after {
+	border-right-color: $nav_bg;
+}
+.hovercard.bottom > .arrow:after {
+	border-bottom-color: $nav_bg;
+}
+.hovercard.left > .arrow:after {
+	border-left-color: $nav_bg;
+}
+
+.friendica-tagsinput .tag {
+	color: inherit;
+}
+
+code {
+	color: $font_color;
+	background-color: rgba(255, 255, 255, 0.2);
+}
+pre {
+	color: $font_color_darker;
+	background-color: rgba(255, 255, 255, 0.05);
+}
+
+legend {
+	color: $font_color;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd),
+.table-hover > tbody > tr:hover,
+.adminpage .table-hover > tbody > tr:hover + tr.details {
+	background-color: $nav_bg;
+}
+
+input[type="text"].tt-input {
+	box-shadow: none;
+}
+
+#back-to-top {
+	border: 1px solid $nav_icon_color;
+}
+
+.acpopup {
+	background-color: $nav_bg;
+	box-shadow: 0px 6px 12px rgba(218, 218, 218, .18);
+	-webkit-box-shadow: 0px 6px 12px rgba(218, 218, 218, .18);
+}
+
+.textcomplete-item > a {
+	color: $nav_icon_color !important;
+}
+
+.textcomplete-item.active > a {
+	background-color: $nav_icon_hover_color !important;
+}
+
+#preview_profile-jot-text, .comment-edit-form .preview {
+	background-color: $nav_bg;
+	border-width: 1px;
+}
+
+textarea#profile-jot-text:focus + #preview_profile-jot-text, textarea.comment-edit-text:focus + .comment-edit-form .preview {
+	border-color: $link_color;
+}
+
+figure.img-allocated-height {
+	background-color: rgba(255, 255, 255, 0.05);
+}

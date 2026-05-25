@@ -1,0 +1,8 @@
+{
+	"rules": {
+		"no-unused-vars": ["warn", { "args": "none", "argsIgnorePattern": "req|res|next|val" }],
+		"quotes": ["error", "double"],
+		"indent": ["error", "tab"],
+		"prettier/prettier": ["error"]
+	}
+}

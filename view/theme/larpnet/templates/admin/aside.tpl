@@ -1,0 +1,61 @@
+{{*
+  * Copyright (C) 2010-2024, the Friendica project
+  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
+  *
+  * SPDX-License-Identifier: AGPL-3.0-or-later
+  *}}
+<script type="text/javascript">
+	// update pending count //
+	$(function() {
+		$('#topbar-first').bind('nav-update', function(e, data) {
+			var elm = $('#pending-update');
+			var register = parseInt($(data).find('register').text());
+			if (register > 0) {
+				elm.html(register);
+			}
+		});
+	});
+</script>
+
+{{foreach $subpages as $page}}
+	<nav class="widget">
+		<h3>{{$page.0}}</h3>
+		<ul>
+			{{foreach $page.1 as $item}}
+				<li class="{{$item.2}}">
+					<a href="{{$item.0}}" {{if $item.accesskey}}accesskey="{{$item.accesskey}}" {{/if}}>
+						{{$item.1}}
+						{{if $name == "users"}}
+							<span id="pending-update" class="badge pull-right"></span>
+						{{/if}}
+					</a>
+				</li>
+			{{/foreach}}
+		</ul>
+
+		{{if $admin.update}}
+			<ul>
+				<li class="{{$admin.update.2}}">
+					<a href="{{$admin.update.0}}" {{if $admin.update.accesskey}}accesskey="{{$admin.update.accesskey}}" {{/if}}>
+						{{$admin.update.1}}
+					</a>
+				</li>
+			</ul>
+		{{/if}}
+	</nav>
+{{/foreach}}
+
+{{if $admin.addons_admin}}
+	<nav class="widget">
+		<h3>{{$plugadmtxt}}</h3>
+		<ul>
+			{{foreach $admin.addons_admin as $name => $item}}
+				<li class="{{$item.class}}">
+					<a href="{{$item.url}}" {{if $item.accesskey}}accesskey="{{$item.accesskey}}" {{/if}}>
+						{{$item.name}}
+					</a>
+				</li>
+			{{/foreach}}
+		</ul>
+	</nav>
+{{/if}}

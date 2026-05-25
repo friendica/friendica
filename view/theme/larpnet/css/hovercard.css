@@ -1,0 +1,348 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2024 the Friendica project
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+.hovercard {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1040;
+	display: none;
+	max-width: 400px;
+	padding: 1px;
+	text-align: left;
+	background-color: #ffffff;
+	background-clip: padding-box;
+	border: 1px solid #cccccc;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 200px;
+	-webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+	white-space: normal;
+}
+
+.hovercard.top {
+	margin-top: -10px;
+}
+
+.hovercard.right {
+	margin-left: 10px;
+}
+
+.hovercard.bottom {
+	margin-top: 10px;
+}
+
+.hovercard.left {
+	margin-left: -10px;
+}
+
+.hovercard-title {
+	margin: 0;
+	padding: 8px 14px;
+	font-size: 14px;
+	font-weight: normal;
+	line-height: 18px;
+	background-color: #f7f7f7;
+	border-bottom: 1px solid #ebebeb;
+	border-radius: 199px 199px 0 0;
+	display: none;
+}
+
+.hovercard-content {
+	padding: 0;
+}
+
+.hovercard > .arrow,
+.hovercard > .arrow:after {
+	position: absolute;
+	display: block;
+	width: 0;
+	height: 0;
+	border-color: transparent;
+	border-style: solid;
+}
+
+.hovercard > .arrow {
+	border-width: 11px;
+}
+
+.hovercard > .arrow:after {
+	border-width: 10px;
+	content: "";
+}
+
+.hovercard.top > .arrow {
+	left: 50%;
+	margin-left: -11px;
+	border-bottom-width: 0;
+	border-top-color: #999999;
+	border-top-color: rgba(0, 0, 0, 0.25);
+	bottom: -11px;
+}
+
+.hovercard.top > .arrow:after {
+	content: " ";
+	bottom: 1px;
+	margin-left: -10px;
+	border-bottom-width: 0;
+	border-top-color: #ffffff;
+}
+
+.hovercard.right > .arrow {
+	top: 50%;
+	left: -11px;
+	margin-top: -11px;
+	border-left-width: 0;
+	border-right-color: #999999;
+	border-right-color: rgba(0, 0, 0, 0.25);
+}
+
+.hovercard.right > .arrow:after {
+	content: " ";
+	left: 1px;
+	bottom: -10px;
+	border-left-width: 0;
+	border-right-color: #ffffff;
+}
+
+.hovercard.bottom > .arrow {
+	left: 50%;
+	margin-left: -11px;
+	border-top-width: 0;
+	border-bottom-color: #999999;
+	border-bottom-color: rgba(0, 0, 0, 0.25);
+	top: -11px;
+}
+
+.hovercard.bottom > .arrow:after {
+	content: " ";
+	top: 1px;
+	margin-left: -10px;
+	border-top-width: 0;
+	border-bottom-color: #ffffff;
+}
+
+.hovercard.left > .arrow {
+	top: 50%;
+	right: -11px;
+	margin-top: -11px;
+	border-right-width: 0;
+	border-left-color: #999999;
+	border-left-color: rgba(0, 0, 0, 0.25);
+}
+
+.hovercard.left > .arrow:after {
+	content: " ";
+	right: 1px;
+	border-right-width: 0;
+	border-left-color: #ffffff;
+	bottom: -10px;
+}
+
+.right-aligned {
+	float: right !important;
+}
+
+.left-align {
+	float: left !important;
+}
+
+.hidden {
+	display: none !important;
+	visibility: hidden !important;
+}
+
+.hovercard h1,
+.hovercard .h1,
+.hovercard h2,
+.hovercard .h2,
+.hovercard h3,
+.hovercard .h3 {
+	margin: 0;
+	padding: 0;
+}
+
+.hovercard h3 {
+	font-size: 24px;
+}
+
+.hovercard h4,
+.hovercard .h4,
+.hovercard h5,
+.hovercard .h5,
+.hovercard h6,
+.hovercard .h6 {
+	margin: 0;
+	padding: 0;
+}
+
+.hovercard h4.text-center {
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.hovercard sup {
+	top: 0;
+}
+
+.hovercard small,
+.hovercard .small {
+	font-size: 85%;
+}
+
+.hovercard ul,
+.hovercard ol {
+	margin: 0;
+	padding: 0;
+	margin-bottom: 0;
+}
+
+.hovercard a:hover,
+.hovercard a:active,
+.hovercard a:focus,
+.hovercard a:visited {
+	text-decoration: none !important;
+}
+
+/* Basic hovercard */
+.basic-content {
+	padding: 9px;
+}
+
+.image-wrapper {
+	display: block;
+	overflow: hidden;
+}
+
+.image-wrapper > a,
+.image-wrapper > span {
+	background-size: 100% !important;
+}
+
+.image-wrapper.medium > a,
+.image-wrapper.medium > span {
+	content: " ";
+	display: block;
+}
+
+.image-wrapper.medium > a img {
+	height: 80px;
+	width: 80px;
+	margin-bottom: 0;
+}
+
+.hovercard {
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	/*max-width: 250px;*/
+	max-width: 400px;
+	width: 350px;
+	-webkit-box-shadow: 0 10px 100px rgba(0, 0, 0, 0.25);
+	-moz-box-shadow: 0 10px 100px rgba(0, 0, 0, 0.25);
+	box-shadow: 0 10px 100px rgba(0, 0, 0, 0.25);
+	border: 1px solid rgba(0, 0, 0, 0);
+}
+
+.hovercard a:hover {
+	text-decoration: none;
+}
+
+.hovercard.right > .arrow {
+	border-right-color: rgba(0, 0, 0, 0.05);
+}
+
+.hovercard.left > .arrow {
+	border-left-color: rgba(0, 0, 0, 0.05);
+}
+
+.hovercard.bottom > .arrow {
+	border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+.hovercard.top > .arrow {
+	border-top-color: rgba(0, 0, 0, 0.05);
+}
+
+.advance-hovercard + .hovercard {
+	max-width: 445px;
+}
+
+.advance-hovercard + .hovercard .hovercard-content {
+	padding: 5px;
+}
+
+.basic-hovercard + .hovercard {
+	max-width: 445px;
+}
+
+.basic-hovercard + .hovercard .hovercard-content {
+	padding: 5px;
+}
+
+.hover-card-header {
+	width: 100%;
+}
+
+.hover-card-header h4 {
+	display: block;
+}
+
+.hover-card-header h4 a {
+	font-size: 18px;
+	font-weight: bold;
+	letter-spacing: 0.03rem;
+}
+
+.hover-card-details {
+	width: 100%;
+}
+
+.hover-card-pic {
+	margin-top: 0px;
+	display: block;
+}
+
+.hover-card-pic .image-wrapper {
+	margin-right: 0.75em;
+	float: left;
+	position: relative;
+}
+
+.hover-card-content {
+	list-style-type: none;
+	width: 100%;
+	display: block;
+	padding: 0.3em 0 1em;
+}
+
+.hover-card-content .profile-details {
+	font-size: 13px;
+}
+
+.hover-card-content .profile-addr {
+	overflow: hidden;
+	display: block;
+	text-overflow: ellipsis;
+}
+
+.hover-card-actions {
+	display: flex;
+}
+
+.hover-card-actions-connection {
+	margin-left: 10px;
+}
+
+.hovercard .hovercard-content .hover-card-actions a.btn {
+	display: inline-block;
+}
+
+.hover-card-footer {
+	background-color: #f7f7f7;
+	border-top: 1px solid #ebebeb;
+	padding: 0 10px;
+}
