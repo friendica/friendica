@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
+# Local build credentials
+/.env
+
 favicon.*
 /.htconfig.php
 /.htpreconfig.php
