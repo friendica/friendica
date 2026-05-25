@@ -125,6 +125,8 @@ class Subscription
 			DI::notify()->createFromNotification($notification, $type);
 		}
 
+		Worker::add(Worker::PRIORITY_HIGH, 'NtfyPush', $notification->uid, $notification->id);
+
 		if (empty($type)) {
 			return;
 		}

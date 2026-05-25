@@ -71,8 +71,10 @@ venv/
 #ignore config files from JetBrains
 /.idea
 
-#ignore addons directory
-/addon
+#ignore addons directory (except our own larpnet addons)
+/addon/*
+!/addon/larpnet_banner
+!/addon/larpnet_calendar
 
 #ignore base .htaccess
 /.htaccess
