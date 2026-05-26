@@ -28,8 +28,8 @@
 			<hr class="admin-summary-separator">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 admin-summary-label-name text-muted">{{$addons.0}}</div>
 			<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 admin-summary-entry">
-				{{foreach $addons.1 as $p}}
-				<a href="{{$baseurl}}/admin/addons/{{$p}}/">{{$p}}</a><br>
+				{{foreach $addons.1 as $a}}
+				<a href="{{$baseurl}}/admin/addons/{{$a.0}}/">{{$a.1.name}}</a><br>
 				{{/foreach}}
 			</div>
 		</div>
