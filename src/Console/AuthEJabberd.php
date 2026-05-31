@@ -24,7 +24,6 @@ use Exception;
 use Friendica\App\BaseURL;
 use Friendica\App\Mode;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Database\Database;
 use Friendica\Model\User;
@@ -38,6 +37,14 @@ use Throwable;
 /**
  * ejabberd supports external authentication via a small daemon (script or binary)
  * that communicates with the ejabberd server using STDIN and STDOUT and a binary protocol.
+ *
+ * The daemon is a long-lived port program: ejabberd keeps a fixed pool of these processes
+ * (see `extauth_pool_size`) and recycles a worker by closing its STDIN, upon which the
+ * read loop terminates. To honour that contract the daemon must never block indefinitely,
+ * therefore every outgoing HTTP request uses a short, bounded timeout - otherwise a slow
+ * remote host could keep a worker busy past ejabberd's own call timeout and leave it
+ * orphaned. This replaces the former PidFile based "one process per hostname" guard, which
+ * is incompatible with ejabberd's supervised worker pool.
  */
 final class AuthEJabberd extends Console
 {
@@ -48,13 +55,13 @@ final class AuthEJabberd extends Console
 	/** @var string Command to set user password */
 	private const COMMAND_SET_PASS = 'setpass';
 
-	/** @var string The name of the lock for the host lock */
-	private const LOCK_EX_AUTH_HOST = 'ex_auth_host';
-
-	/** @var string The prefix for the cache */
-	private const CACHE_PREFIX = 'ex_auth_';
+	/** @var int Default timeout in seconds for outgoing HTTP requests to remote hosts */
+	private const DEFAULT_HTTP_TIMEOUT = 5;
 
 	private int $debugMode = 0;
+
+	/** @var int Timeout in seconds for outgoing HTTP requests, bounded to keep the worker recyclable */
+	private int $httpTimeout = self::DEFAULT_HTTP_TIMEOUT;
 
 	private $input;
 	private $output;
@@ -65,9 +72,8 @@ final class AuthEJabberd extends Console
 		private readonly IManagePersonalConfigValues $pConfig,
 		private readonly Database $dba,
 		private readonly BaseURL $baseURL,
-		private readonly ICanLock $lock,
 		private readonly ICanSendHttpRequests $httpClient,
-		array $argv = null,
+		?array $argv = null,
 		$input = null,
 		$output = null,
 	) {
@@ -104,7 +110,8 @@ HELP;
 	 */
 	protected function doExecute(): int
 	{
-		$this->debugMode = (int) $this->config->get('jabber', 'debug');
+		$this->debugMode   = (int) $this->config->get('jabber', 'debug');
+		$this->httpTimeout = (int) $this->config->get('jabber', 'auth_http_timeout', self::DEFAULT_HTTP_TIMEOUT);
 
 		openlog('auth_ejabberd', LOG_PID, LOG_USER);
 
@@ -199,54 +206,34 @@ HELP;
 	}
 
 	/**
-	 * Returns a cache key, based on the credentials
-	 * The key is
-	 *
-	 * @param string $server
-	 * @param string $username
-	 * @param string $password
-	 *
-	 * @return string
-	 */
-	private function getCacheKey(string $server, string $username, string $password): string
-	{
-		return AuthEJabberd::CACHE_PREFIX . sha1("server=$server&username=$username&password=$password");
-	}
-
-	/**
 	 * Check if the given username exists
 	 *
 	 * @throws Exception
 	 */
 	private function isUser(string $username, string $server): void
 	{
-		// We only allow one process per hostname. So we set a lock file
-		// Problem: We get the firstname after the first auth - not before
-		if ($this->lock->acquire(self::LOCK_EX_AUTH_HOST . ':' . $server, 10, 20)) {
-			// Now we check if the given user is valid
-			$username = str_replace(['%20', '(a)'], [' ', '@'], $username);
+		// Now we check if the given user is valid
+		$username = str_replace(['%20', '(a)'], [' ', '@'], $username);
 
-			// Does the hostname match? So we try directly
-			if ($this->baseURL->getHost() == $server) {
-				$this->writeLog(LOG_INFO, 'internal user check for ' . $username . '@' . $server);
-				$found = $this->dba->exists('user', ['nickname' => $username]);
-			} else {
-				$found = false;
-			}
+		// Does the hostname match? So we try directly
+		if ($this->baseURL->getHost() == $server) {
+			$this->writeLog(LOG_INFO, 'internal user check for ' . $username . '@' . $server);
+			$found = $this->dba->exists('user', ['nickname' => $username]);
+		} else {
+			$found = false;
+		}
 
-			// If the hostnames don't match or there is some failure, we try to check remotely
-			if (!$found) {
-				$found = $this->checkUser($username, $server);
-			}
+		// If the hostnames don't match or there is some failure, we try to check remotely
+		if (!$found) {
+			$found = $this->checkUser($username, $server);
+		}
 
-			if ($found) {
-				// The user is okay
-				$this->writeSuccess('valid user: ' . $username);
-			} else {
-				// The user isn't okay
-				$this->writeFailed('invalid user: ' . $username);
-			}
-			$this->lock->release(self::LOCK_EX_AUTH_HOST . ':' . $server);
+		if ($found) {
+			// The user is okay
+			$this->writeSuccess('valid user: ' . $username);
+		} else {
+			// The user isn't okay
+			$this->writeFailed('invalid user: ' . $username);
 		}
 	}
 
@@ -265,7 +252,10 @@ HELP;
 		$url = 'https://' . $host . '/noscrape/' . $user;
 
 		try {
-			$curlResult = $this->httpClient->get($url, HttpClientAccept::JSON, [HttpClientOptions::REQUEST => HttpClientRequest::CONTACTVERIFIER]);
+			$curlResult = $this->httpClient->get($url, HttpClientAccept::JSON, [
+				HttpClientOptions::REQUEST => HttpClientRequest::CONTACTVERIFIER,
+				HttpClientOptions::TIMEOUT => $this->httpTimeout,
+			]);
 		} catch (Throwable) {
 			return false;
 		}
@@ -297,45 +287,39 @@ HELP;
 	 */
 	private function auth(string $username, string $server, string $password): void
 	{
-		// We only allow one process per hostname. So we set a lock file
-		// Problem: We get the firstname after the first auth - not before
-		if ($this->lock->acquire(self::LOCK_EX_AUTH_HOST . ':' . $server, 10, 20)) {
+		// We now check if the password match
+		$username = str_replace(['%20', '(a)'], [' ', '@'], $username);
 
-			// We now check if the password match
-			$username = str_replace(['%20', '(a)'], [' ', '@'], $username);
-
-			$Error = false;
-			// Does the hostname match? So we try directly
-			if ($this->baseURL->getHost() == $server) {
-				try {
-					$this->writeLog(LOG_INFO, 'internal auth for ' . $username . '@' . $server);
-					User::getIdFromPasswordAuthentication($username, $password, true);
-				} catch (ForbiddenException) {
-					// User exists, authentication failed
-					$this->writeLog(LOG_INFO, 'check against alternate password for ' . $username . '@' . $server);
-					$aUser = User::getByNickname($username, ['uid']);
-					if (!empty($aUser['uid'])) {
-						$sPassword = $this->pConfig->get($aUser['uid'], 'xmpp', 'password', null, true);
-						$Error     = ($password != $sPassword);
-					} else {
-						$Error = true;
-					}
-				} catch (Throwable $ex) {
-					// User doesn't exist and any other failure case
-					$this->writeLog(LOG_WARNING, $ex->getMessage() . ': ' . $username);
+		$Error = false;
+		// Does the hostname match? So we try directly
+		if ($this->baseURL->getHost() == $server) {
+			try {
+				$this->writeLog(LOG_INFO, 'internal auth for ' . $username . '@' . $server);
+				User::getIdFromPasswordAuthentication($username, $password, true);
+			} catch (ForbiddenException) {
+				// User exists, authentication failed
+				$this->writeLog(LOG_INFO, 'check against alternate password for ' . $username . '@' . $server);
+				$aUser = User::getByNickname($username, ['uid']);
+				if (!empty($aUser['uid'])) {
+					$sPassword = $this->pConfig->get($aUser['uid'], 'xmpp', 'password', null, true);
+					$Error     = ($password != $sPassword);
+				} else {
 					$Error = true;
 				}
-			} else {
+			} catch (Throwable $ex) {
+				// User doesn't exist and any other failure case
+				$this->writeLog(LOG_WARNING, $ex->getMessage() . ': ' . $username);
 				$Error = true;
 			}
+		} else {
+			$Error = true;
+		}
 
-			// If the hostnames don't match or there is some failure, we try to check remotely
-			if ($Error && !$this->checkCredentials($server, $username, $password)) {
-				$this->writeFailed('authentication failed for user ' . $username . '@' . $server);
-			} else {
-				$this->writeSuccess('authenticated user ' . $username . '@' . $server);
-			}
-			$this->lock->release(self::LOCK_EX_AUTH_HOST . ':' . $server);
+		// If the hostnames don't match or there is some failure, we try to check remotely
+		if ($Error && !$this->checkCredentials($server, $username, $password)) {
+			$this->writeFailed('authentication failed for user ' . $username . '@' . $server);
+		} else {
+			$this->writeSuccess('authenticated user ' . $username . '@' . $server);
 		}
 	}
 
@@ -357,7 +341,7 @@ HELP;
 		try {
 			$curlResult = $this->httpClient->head($url, [
 				HttpClientOptions::REQUEST => HttpClientRequest::CONTACTVERIFIER,
-				HttpClientOptions::TIMEOUT => 5,
+				HttpClientOptions::TIMEOUT => $this->httpTimeout,
 				HttpClientOptions::AUTH    => [
 					$user,
 					$password,
