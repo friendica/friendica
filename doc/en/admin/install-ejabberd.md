@@ -15,11 +15,25 @@ chown ejabberd:ejabberd /path/to/friendica/bin/auth_ejabberd.php
 chmod 700 /path/to/friendica/bin/auth_ejabberd.php
 ```
 
-- Edit your ejabberd.cfg file, comment out your auth_method and add:
+- Edit your `ejabberd.yml` file, comment out your `auth_method` and add:
+```yaml
+auth_method: [external]
+extauth_program: "/path/to/friendica/bin/console.php auth_ejabberd"
+# Number of persistent auth daemons ejabberd keeps per virtual host. This pool is the
+# upper bound on concurrent auth processes - ejabberd supervises and reuses these workers,
+# so there is no need (and no way) for the script to limit the process count itself. This
+# replaces the former PidFile based "one process per host" guard, which is incompatible
+# with a supervised worker pool.
+extauth_pool_size: 5
+# Friendica supports per-account application-specific (XMPP) passwords, which is
+# incompatible with ejabberd's own auth cache, so it must stay disabled.
+auth_use_cache: false
 ```
-{auth_method, external}.
-{extauth_program, "/path/to/friendica/bin/auth_ejabberd.php"}.
-```
+
+> **Note:** `bin/auth_ejabberd.php` is deprecated; use `bin/console.php auth_ejabberd`.
+> The daemon bounds every outgoing HTTP request with `jabber.auth_http_timeout` (default 5s,
+> see `static/defaults.config.php`) so a slow remote host can never keep a pooled worker busy
+> past ejabberd's own extauth call timeout.
 
 - Disable the module "mod_register" and disable the registration:
 ```
