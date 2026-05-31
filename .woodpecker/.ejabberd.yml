@@ -63,21 +63,24 @@ steps:
       - bin/wait-for-connection $MYSQL_HOST $MYSQL_PORT 300
       - mysql -h$MYSQL_HOST -P$MYSQL_PORT -p$MYSQL_PASSWORD -u$MYSQL_USER $MYSQL_DATABASE < database.sql
 
-  # --- Detached: Friendica ExtAuth Sidecar (öffnet TCP:9000 und startet Console-Daemon) ---
+  # --- Detached: Friendica ExtAuth Sidecar (opens TCP:9000 and starts the console daemon) ---
+  # Uses the DB-capable friendicaci image (instead of plain php:alpine) so the daemon can
+  # actually reach the database. socat spawns one daemon per ejabberd connection; ejabberd
+  # itself bounds the number of concurrent auth workers via extauth_pool_size.
   friendica_extauth:
-    image: php:${PHP_MAJOR_VERSION}-alpine
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     detach: true
     depends_on:
       - composer_install
       - db_bootstrap
     commands:
-      - apk add --no-cache socat
+      - apt-get update && apt-get install -y socat
+      - bin/wait-for-connection mariadb 3306 300
       - |
         set -e
-        CMD="auth_ejabberd"
-        echo "Starting ExtAuth daemon command: $CMD"
+        echo "Starting ExtAuth daemon command: auth_ejabberd"
         exec socat TCP-LISTEN:9000,reuseaddr,fork,nodelay,keepalive,so-keepalive=1 \
-             EXEC:"php ./bin/console $CMD",setsid
+             EXEC:"php ./bin/console auth_ejabberd",setsid
 
   # --- Detached: ejabberd with external auth + HTTP API ---
   ejabberd:
@@ -132,6 +135,10 @@ steps:
         EOF
       - exec /home/ejabberd/bin/ejabberdctl foreground
 
+  # End-to-end authentication correctness through the real ejabberd -> extauth daemon path.
+  # ejabberd's check_password HTTP API returns the JSON body `true` for valid credentials and
+  # `false` otherwise (status code 0/1 internally). We assert BOTH directions so the test fails
+  # if the daemon ever wrongly accepts a bad password or wrongly rejects a good one.
   e2e_check_password:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     depends_on:
@@ -143,51 +150,28 @@ steps:
       - php ./bin/console user add ciuser CI ciuser@example.test en || true
       - php ./bin/console user password CI sehrgeheim
       - |
+        set -e
         EJ="http://ejabberd:5281/api"
-        ok=0
-        code=$(curl -sS -X POST \
-                 -H "Content-Type: application/json" \
-                 -H "Host: xmpp.test" \
-                 --data-binary "{\"user\":\"CI\",\"host\":\"xmpp.test\",\"password\":\"sehrgeheim\"}" "$EJ/check_password" \
-                 -D /tmp/h.txt -o /tmp/b.txt -w '%{http_code}')
-        echo "[try] POST /api/check_password → HTTP $code ; body: $(cat /tmp/b.txt || true)"
-        [ "$code" = "200" ] && ok=1
-        if [ "$ok" -ne 1 ]; then
-          echo "--- headers ---"; cat /tmp/h.txt || true
-          echo "--- body ---";    cat /tmp/b.txt || true
-          exit 1
-        fi
-        echo "E2E OK"
 
-  lock_race_same_domain:
-    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
-    depends_on:
-#      - e2e_check_password
-      - ejabberd
-    commands:
-      - sleep 10
-      - set -e
-      - apt-get update && apt-get install -y curl coreutils
-      - php ./bin/console lock set "ex_auth_host:xmpp.test" || true
-      - |
-        locks=$(php ./bin/console lock list)
-        echo "$locks" || true
-      - |
-        EJ="http://ejabberd:5281/api"
-        ok=0
-        code=$(curl -sS -X POST \
-                 -H "Content-Type: application/json" \
-                 -H "Host: xmpp.test" \
-                 --data-binary "{\"user\":\"CI\",\"host\":\"xmpp.test\",\"password\":\"sehrgeheim\"}" "$EJ/check_password" \
-                 -D /tmp/h.txt -o /tmp/b.txt -w '%{http_code}')
-        echo "[try] POST /api/check_password → HTTP $code ; body: $(cat /tmp/b.txt || true)"
-        [ "$code" = "200" ] && ok=1
-        if [ "$ok" -ne 1 ]; then
-          echo "--- headers ---"; cat /tmp/h.txt || true
-          echo "--- body ---";    cat /tmp/b.txt || true
-          exit 1
-        fi
-        echo "E2E NOK"
+        # $1 = password to try, $2 = expected JSON body ("true"/"false"), $3 = label
+        check() {
+          body=$(curl -sS -X POST \
+                   -H "Content-Type: application/json" \
+                   -H "Host: xmpp.test" \
+                   --data-binary "{\"user\":\"CI\",\"host\":\"xmpp.test\",\"password\":\"$1\"}" \
+                   "$EJ/check_password")
+          echo "[$3] password='$1' -> body: $body (expected: $2)"
+          if [ "$body" != "$2" ]; then
+            echo "FAIL: $3 expected '$2' but got '$body'"
+            exit 1
+          fi
+        }
+
+        # Correct password must be accepted, any wrong password must be rejected
+        check "sehrgeheim" "true"  "valid-credentials"
+        check "falsch"     "false" "wrong-password"
+
+        echo "E2E auth correctness OK"
 
 services:
   mariadb:

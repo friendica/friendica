@@ -741,9 +741,12 @@ return [
 		// debug (Boolean)
 		// Enable debug level for the jabber account synchronisation.
 		'debug' => false,
-		// lockpath (Path)
-		// Must be writable by the ejabberd process. if set then it will prevent the running of multiple processes.
-		'lockpath' => '',
+		// auth_http_timeout (Integer)
+		// Timeout in seconds for the outgoing HTTP requests the ejabberd external auth daemon
+		// (bin/console auth_ejabberd) performs against remote hosts. Must stay well below
+		// ejabberd's own extauth call timeout so a slow remote host cannot keep a pooled auth
+		// worker busy long enough to be orphaned.
+		'auth_http_timeout' => 5,
 	],
 	'diaspora' => [
 		// native_photos (Boolean)
