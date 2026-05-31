@@ -12,14 +12,15 @@ use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Test\ConsoleTestCase;
 use Friendica\Test\FixtureTestTrait;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\Psr7\Response;
 use Mockery;
 use Mockery\MockInterface;
 
 class EjabberdAuthTest extends ConsoleTestCase
 {
 	use FixtureTestTrait;
+
+	/** @var int Default HTTP timeout the daemon applies to outgoing requests */
+	private const DEFAULT_HTTP_TIMEOUT = 5;
 
 	private $inputStream;
 	private $outputStream;
@@ -45,7 +46,6 @@ class EjabberdAuthTest extends ConsoleTestCase
 
 	protected function tearDown(): void
 	{
-		DI::lock()->releaseAll();
 		$this->tearDownFixtures();
 
 		parent::tearDown();
@@ -68,22 +68,26 @@ class EjabberdAuthTest extends ConsoleTestCase
 		$this->assertEquals(pack('nn', 2, 0), fread($this->outputStream, 4), 'Expected success'); // 2-byte length + 2-byte response
 	}
 
-	public function testWrongMode(): void
+	private function newConsole(): AuthEJabberd
 	{
-		$this->mode->shouldReceive('isNormal')->andReturn(false)->once();
-
-		$console = new AuthEJabberd(
+		return new AuthEJabberd(
 			$this->mode,
 			DI::config(),
 			DI::pConfig(),
 			DI::dba(),
 			DI::baseUrl(),
-			DI::lock(),
 			$this->httpClient,
 			$this->consoleArgv,
 			$this->inputStream,
 			$this->outputStream,
 		);
+	}
+
+	public function testWrongMode(): void
+	{
+		$this->mode->shouldReceive('isNormal')->andReturn(false)->once();
+
+		$console = $this->newConsole();
 
 		$txt = $this->dumpExecute($console);
 		rewind($this->outputStream);
@@ -129,9 +133,6 @@ class EjabberdAuthTest extends ConsoleTestCase
 					true,
 					false,
 					true,
-				],
-				'httpHandlers' => [
-					new Response(404),
 				],
 			],
 			'isuserTooShort' => [
@@ -205,13 +206,20 @@ class EjabberdAuthTest extends ConsoleTestCase
 		];
 	}
 
-	/**
-	 * Assert different kind of data, but shouldn't fail the daemon
-	 */
+	#[\PHPUnit\Framework\Attributes\TestDox('Various inputs are routed correctly and never crash the daemon')]
 	#[\PHPUnit\Framework\Attributes\DataProvider('dataAuth')]
-	public function testData(array $input, array $assertion, array $handlers = []): void
+	public function testData(array $input, array $assertion): void
 	{
 		$this->mode->shouldReceive('isNormal')->andReturn(true)->once();
+
+		// Any remote lookup defaults to "not found" so the daemon has to rely on the local fixtures.
+		// The dedicated remote success/failure paths are covered by testCheckUserExternal()/testCheckCredentialsExternal().
+		$notFound = Mockery::mock(ICanHandleHttpResponses::class);
+		$notFound->shouldReceive('isSuccess')->andReturn(false);
+		$notFound->shouldReceive('getReturnCode')->andReturn(404);
+		$notFound->shouldReceive('getBodyString')->andReturn('');
+		$this->httpClient->shouldReceive('get')->andReturn($notFound)->byDefault();
+		$this->httpClient->shouldReceive('head')->andReturn($notFound)->byDefault();
 
 		DI::config()->set('jabber', 'debug', 1);
 
@@ -220,28 +228,7 @@ class EjabberdAuthTest extends ConsoleTestCase
 		}
 		rewind($this->inputStream);
 
-		$mockHandler = new MockHandler();
-
-		foreach ($handlers as $handler) {
-			if (empty($handler)) {
-				continue;
-			}
-
-			$mockHandler->append($handler);
-		}
-
-		$console = new AuthEJabberd(
-			$this->mode,
-			DI::config(),
-			DI::pConfig(),
-			DI::dba(),
-			DI::baseUrl(),
-			DI::lock(),
-			$this->httpClient,
-			$this->consoleArgv,
-			$this->inputStream,
-			$this->outputStream,
-		);
+		$console = $this->newConsole();
 
 		$txt = $this->dumpExecute($console);
 		$this->assertSame(0, $this->consoleExecReturn);
@@ -286,11 +273,7 @@ class EjabberdAuthTest extends ConsoleTestCase
 		];
 	}
 
-	/**
-	 * Tests, if the check user endpoint is correctly built
-	 *
-	 * @return void
-	 */
+	#[\PHPUnit\Framework\Attributes\TestDox('The remote credential check endpoint is built correctly')]
 	#[\PHPUnit\Framework\Attributes\DataProvider('dataCheckCredentialsExternal')]
 	public function testCheckCredentialsExternal(string $payload, string $assertUrl, bool $isSuccess, int $returnCode, bool $assertion): void
 	{
@@ -300,7 +283,7 @@ class EjabberdAuthTest extends ConsoleTestCase
 		$response->shouldReceive('getReturnCode')->andReturn($returnCode);
 		$this->httpClient->shouldReceive('head')->with($assertUrl, [
 			HttpClientOptions::REQUEST => HttpClientRequest::CONTACTVERIFIER,
-			HttpClientOptions::TIMEOUT => 5,
+			HttpClientOptions::TIMEOUT => self::DEFAULT_HTTP_TIMEOUT,
 			HttpClientOptions::AUTH    => [
 				'wrong',
 				'someelse',
@@ -310,18 +293,7 @@ class EjabberdAuthTest extends ConsoleTestCase
 		$this->sendInput($payload);
 		rewind($this->inputStream);
 
-		$console = new AuthEJabberd(
-			$this->mode,
-			DI::config(),
-			DI::pConfig(),
-			DI::dba(),
-			DI::baseUrl(),
-			DI::lock(),
-			$this->httpClient,
-			$this->consoleArgv,
-			$this->inputStream,
-			$this->outputStream,
-		);
+		$console = $this->newConsole();
 
 		$txt = $this->dumpExecute($console);
 
@@ -385,11 +357,7 @@ class EjabberdAuthTest extends ConsoleTestCase
 		];
 	}
 
-	/**
-	 * Tests, if the check user endpoint is correctly built
-	 *
-	 * @return void
-	 */
+	#[\PHPUnit\Framework\Attributes\TestDox('The remote user existence check endpoint is built correctly')]
 	#[\PHPUnit\Framework\Attributes\DataProvider('dataCheckUserExternal')]
 	public function testCheckUserExternal(string $payload, string $assertUrl, bool $isSuccess, int $returnCode, string $bodyString, bool $assertion): void
 	{
@@ -399,24 +367,16 @@ class EjabberdAuthTest extends ConsoleTestCase
 		$response->shouldReceive('getReturnCode')->andReturn($returnCode);
 		$response->shouldReceive('getBodyString')->andReturn($bodyString);
 		$this->httpClient->shouldReceive('get')
-						 ->with($assertUrl, HttpClientAccept::JSON, [HttpClientOptions::REQUEST => HttpClientRequest::CONTACTVERIFIER])
+						 ->with($assertUrl, HttpClientAccept::JSON, [
+						 	HttpClientOptions::REQUEST => HttpClientRequest::CONTACTVERIFIER,
+						 	HttpClientOptions::TIMEOUT => self::DEFAULT_HTTP_TIMEOUT,
+						 ])
 						 ->andReturn($response)->once();
 
 		$this->sendInput($payload);
 		rewind($this->inputStream);
 
-		$console = new AuthEJabberd(
-			$this->mode,
-			DI::config(),
-			DI::pConfig(),
-			DI::dba(),
-			DI::baseUrl(),
-			DI::lock(),
-			$this->httpClient,
-			$this->consoleArgv,
-			$this->inputStream,
-			$this->outputStream,
-		);
+		$console = $this->newConsole();
 
 		$txt = $this->dumpExecute($console);
 
@@ -429,6 +389,56 @@ class EjabberdAuthTest extends ConsoleTestCase
 		} else {
 			$this->assertFailed();
 		}
+	}
+
+	/**
+	 * The daemon must never block a worker indefinitely: ejabberd recycles a worker by closing
+	 * its STDIN and relies on the program seeing EOF, so a slow remote host may not keep the
+	 * worker busy past ejabberd's own call timeout. Every outgoing request therefore carries a
+	 * short, configurable timeout (jabber.auth_http_timeout) - this guards against orphaned
+	 * workers piling up ("auth flood").
+	 */
+	#[\PHPUnit\Framework\Attributes\TestDox('Outgoing HTTP requests use the configured bounded timeout')]
+	public function testHttpRequestsUseConfiguredTimeout(): void
+	{
+		$this->mode->shouldReceive('isNormal')->andReturn(true)->once();
+
+		DI::config()->set('jabber', 'auth_http_timeout', 3);
+
+		// isuser -> checkUser() (GET) must carry the configured timeout
+		$response = Mockery::mock(ICanHandleHttpResponses::class);
+		$response->shouldReceive('isSuccess')->andReturn(false);
+		$response->shouldReceive('getReturnCode')->andReturn(500);
+		$response->shouldReceive('getBodyString')->andReturn('');
+		$this->httpClient->shouldReceive('get')
+						 ->with('https://friendi.ca/noscrape/someone', HttpClientAccept::JSON, [
+						 	HttpClientOptions::REQUEST => HttpClientRequest::CONTACTVERIFIER,
+						 	HttpClientOptions::TIMEOUT => 3,
+						 ])
+						 ->andReturn($response)->once();
+
+		// auth -> checkCredentials() (HEAD) must carry the same configured timeout
+		$this->httpClient->shouldReceive('head')
+						 ->with('https://friendi.ca/api/account/verify_credentials.json?skip_status=true', [
+						 	HttpClientOptions::REQUEST => HttpClientRequest::CONTACTVERIFIER,
+						 	HttpClientOptions::TIMEOUT => 3,
+						 	HttpClientOptions::AUTH    => ['someone', 'secret'],
+						 ])
+						 ->andReturn($response)->once();
+
+		$this->sendInput('isuser:someone:friendi.ca');
+		$this->sendInput('auth:someone:friendi.ca:secret');
+		rewind($this->inputStream);
+
+		$console = $this->newConsole();
+
+		$txt = $this->dumpExecute($console);
+		$this->assertSame(0, $this->consoleExecReturn);
+		$this->assertEmpty($txt);
+
+		rewind($this->outputStream);
+		$this->assertFailed();
+		$this->assertFailed();
 	}
 
 	/**
@@ -445,18 +455,7 @@ class EjabberdAuthTest extends ConsoleTestCase
 		$this->sendInput('auth:admin:friendica.local:pConfigPW');
 		rewind($this->inputStream);
 
-		$console = new AuthEJabberd(
-			$this->mode,
-			DI::config(),
-			DI::pConfig(),
-			DI::dba(),
-			DI::baseUrl(),
-			DI::lock(),
-			$this->httpClient,
-			$this->consoleArgv,
-			$this->inputStream,
-			$this->outputStream,
-		);
+		$console = $this->newConsole();
 
 		$txt = $this->dumpExecute($console);
 		$this->assertEmpty($txt);
@@ -479,18 +478,7 @@ class EjabberdAuthTest extends ConsoleTestCase
 		$this->sendInput('auth:admin:friendica.local:pConfigPW');
 		rewind($this->inputStream);
 
-		$console = new AuthEJabberd(
-			$this->mode,
-			DI::config(),
-			DI::pConfig(),
-			DI::dba(),
-			DI::baseUrl(),
-			DI::lock(),
-			$this->httpClient,
-			$this->consoleArgv,
-			$this->inputStream,
-			$this->outputStream,
-		);
+		$console = $this->newConsole();
 
 		$txt = $this->dumpExecute($console);
 		$this->assertSame(1, $this->consoleExecReturn);
@@ -526,18 +514,7 @@ Examples
 		Starts the daemon and reads per STDIN
 
 HELP;
-		$console = new AuthEJabberd(
-			$this->mode,
-			DI::config(),
-			DI::pConfig(),
-			DI::dba(),
-			DI::baseUrl(),
-			DI::lock(),
-			$this->httpClient,
-			$this->consoleArgv,
-			$this->inputStream,
-			$this->outputStream,
-		);
+		$console = $this->newConsole();
 		$console->setOption('help', true);
 
 		$txt = $this->dumpExecute($console);
