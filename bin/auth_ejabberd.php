@@ -52,7 +52,6 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 
 fwrite(STDOUT, '`bin/auth_ejabberd.php` is deprecated since 2026.08 and will be removed in 5 months, please use `bin/console.php auth_ejabberd` instead.' . \PHP_EOL);
 
-// BC: Add console command as second argument
 $argv = $_SERVER['argv'] ?? [];
 array_splice($argv, 1, 0, "auth_ejabberd");
 $_SERVER['argv'] = $argv;
