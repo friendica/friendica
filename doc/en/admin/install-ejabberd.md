@@ -20,10 +20,7 @@ chmod 700 /path/to/friendica/bin/auth_ejabberd.php
 auth_method: [external]
 extauth_program: "/path/to/friendica/bin/console.php auth_ejabberd"
 # Number of persistent auth daemons ejabberd keeps per virtual host. This pool is the
-# upper bound on concurrent auth processes - ejabberd supervises and reuses these workers,
-# so there is no need (and no way) for the script to limit the process count itself. This
-# replaces the former PidFile based "one process per host" guard, which is incompatible
-# with a supervised worker pool.
+# upper bound on concurrent auth processes
 extauth_pool_size: 5
 # Friendica supports per-account application-specific (XMPP) passwords, which is
 # incompatible with ejabberd's own auth cache, so it must stay disabled.

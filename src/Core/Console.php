@@ -86,7 +86,7 @@ HELP;
 		'addon'                             => Friendica\Console\Addon::class,
 		'archivecontact'                    => Friendica\Console\ArchiveContact::class,
 		'autoinstall'                       => Friendica\Console\AutomaticInstallation::class,
-		'auth_ejabberd'                     => Friendica\Console\AuthEJabberd::class,
+		'auth_ejabberd'                     => Friendica\Console\EJabberdAuthDaemon::class,
 		'cache'                             => Friendica\Console\Cache::class,
 		'clearavatarcache'                  => Friendica\Console\ClearAvatarCache::class,
 		'config'                            => Friendica\Console\Config::class,
