@@ -1,0 +1,59 @@
+# SPDX-FileCopyrightText: 2010 - 2024 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# ejabberd module — load on top of compose.yaml:
+#   docker compose -f .docker/compose.yaml -f .docker/compose.ejabberd.yaml up -d
+
+services:
+  # Exposes the Friendica ejabberd auth daemon over TCP so ejabberd can reach it without
+  # needing PHP installed. socat listens on :9000 and forks one `php bin/console.php
+  # auth_ejabberd` process per incoming connection, matching ejabberd's pool-per-worker model.
+  friendica-extauth:
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    working_dir: /var/www/html
+    volumes:
+      - ../:/var/www/html
+      - ./php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+    env_file:
+      - path: ./.dist.env
+        required: true
+      - path: ./.env.local
+        required: false
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST:-db}
+      - MYSQL_USER=${MYSQL_USER:-friendica}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-friendica}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-friendica}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - friendica-network
+    expose:
+      - "9000"
+    command:
+      - socat
+      - "TCP-LISTEN:9000,reuseaddr,fork"
+      - "EXEC:/usr/local/bin/php /var/www/html/bin/console.php auth_ejabberd,setsid"
+
+  # ejabberd XMPP server authenticating via the Friendica extauth bridge.
+  # vhost "localhost" matches SERVER_NAME in .dist.env.
+  ejabberd:
+    build:
+      context: ./ejabberd
+    volumes:
+      - ./ejabberd/ejabberd.yml:/opt/ejabberd/conf/ejabberd.yml:ro
+      - ejabberd_data:/opt/ejabberd
+    ports:
+      - "5222:5222"   # XMPP c2s (clients)
+      - "5281:5281"   # HTTP API  (curl check_password)
+    depends_on:
+      - friendica-extauth
+    networks:
+      - friendica-network
+
+volumes:
+  ejabberd_data:

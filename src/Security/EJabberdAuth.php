@@ -100,12 +100,13 @@ class EJabberdAuth
 	}
 
 	/**
-	 * Normalizes a nick: replaces the ejabberd %-escapes back to their original characters.
+	 * Normalizes a nick: replaces the ejabberd %-escapes back to their original characters
+	 * and lowercases the result to match Friendica's stored nickname format.
 	 * "%20" → " ", "(a)" → "@"
 	 */
 	private function normaliseNick(string $nick): string
 	{
-		return str_replace(['%20', '(a)'], [' ', '@'], $nick);
+		return strtolower(str_replace(['%20', '(a)'], [' ', '@'], $nick));
 	}
 
 	private function authenticateLocal(string $username, string $password): bool
