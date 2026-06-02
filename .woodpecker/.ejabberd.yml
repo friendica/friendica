@@ -1,0 +1,304 @@
+# SPDX-FileCopyrightText: 2010 - 2024 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# E2E pipeline for the ejabberd external-auth integration.
+#
+# It exercises the TWO production-ready deployment models documented in
+# doc/en/admin/install-ejabberd.md:
+#
+#   1. SAME HOST: ejabberd and Friendica live on one host, so ejabberd spawns
+#      `php bin/console.php auth_ejabberd` DIRECTLY via its extauth protocol (stdin/stdout).
+#      No socat, no nc, no TCP bridge.
+#
+#   2. CROSS HOST via systemd socket activation: the Friendica host runs the auth daemon
+#      under `systemd-socket-activate` (inetd style — one daemon per connection, the
+#      production pattern being a .socket + templated .service unit). ejabberd, on its own
+#      host, reaches it with a thin `socat STDIO TCP` client. socat appears ONLY here, as
+#      the minimal connector ejabberd's stdin/stdout extauth protocol fundamentally requires
+#      across a host boundary — the daemon lifecycle itself is systemd-managed, not socat.
+#
+# Each E2E step OWNS ejabberd's lifecycle (ejabberdctl start … stop) instead of leaving it
+# as a detached service. A detached ejabberd that outlives its backend during the pipeline
+# teardown would restart-storm its (permanent) extauth pool workers and flood the log; a
+# graceful `ejabberdctl stop` tears the pool down without restarts. The auth daemon is run
+# with `-d error_reporting='E_ALL & ~E_DEPRECATED'` so PHP 8.5 deprecation notices from the
+# framework do not drown the relevant output (they belong to phpstan/lint, not this test).
+#
+# Debian's packaged ejabberd (24.12) is used: its extauth wire protocol and check_password
+# return convention (0 = success, 1 = failure) are identical to the 26.x line used in the
+# docs and the local .docker stack (verified), so the pipeline stays self-contained — no
+# custom image and no in-pipeline image build required.
+
+matrix:
+  include:
+    - PHP_MAJOR_VERSION: 8.5
+      PHP_VERSION: 8.5.5
+
+labels:
+  location: opensocial
+
+when:
+  branch:
+    exclude: [ stable ]
+  event: [ pull_request, push ]
+
+steps:
+  restore_cache:
+    image: meltwater/drone-cache:dev
+    settings:
+      backend: filesystem
+      restore: true
+      cache_key: "{{ .Repo.Name }}_php${PHP_MAJOR_VERSION}_{{ arch }}_{{ os }}"
+      archive_format: gzip
+      mount:
+        - ".composer"
+    volumes:
+      - /tmp/drone-cache:/tmp/cache
+
+  composer_install:
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
+    depends_on: [restore_cache]
+    commands:
+      - git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
+      - export COMPOSER_HOME=.composer
+      - ./bin/composer.phar validate
+      - ./bin/composer.phar install --prefer-dist
+    volumes:
+      - /etc/hosts:/etc/hosts
+
+  rebuild_cache:
+    image: meltwater/drone-cache:dev
+    depends_on: [composer_install]
+    settings:
+      backend: filesystem
+      rebuild: true
+      cache_key: "{{ .Repo.Name }}_php${PHP_MAJOR_VERSION}_{{ arch }}_{{ os }}"
+      archive_format: gzip
+      mount:
+        - ".composer"
+    volumes:
+      - /tmp/drone-cache:/tmp/cache
+
+  # Seed the shared test database with the CI user both E2E models authenticate against.
+  # The vhost "friendica.local" (system.url in local-sample.config.php) matches both ejabberd
+  # configs, so EJabberdAuth resolves credentials through the local DB path.
+  db_bootstrap:
+    depends_on: [composer_install]
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
+    environment:
+      MYSQL_HOST: mariadb
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: test
+      MYSQL_PASSWORD: test
+      MYSQL_USER: test
+      FRIENDICA_URL: https://friendica.local
+      # CI-only: the password lives in HIBP and the vhost has no DNS, so bypass both checks.
+      FRIENDICA_DISABLE_PASSWORD_EXPOSED: "1"
+      FRIENDICA_DISABLE_EMAIL_VALIDATION: "1"
+    commands:
+      - cp config/local-sample.config.php config/local.config.php
+      - bin/wait-for-connection $MYSQL_HOST $MYSQL_PORT 300
+      - mysql -h$MYSQL_HOST -P$MYSQL_PORT -p$MYSQL_PASSWORD -u$MYSQL_USER $MYSQL_DATABASE < database.sql
+      - php bin/console.php user add "CI User" CI ciuser@friendica.local en || true
+      - php bin/console.php user password CI sehrgeheim
+
+  # ===================================================================================
+  # E2E #1 — SAME HOST: ejabberd spawns the Friendica auth daemon directly (no bridge).
+  # ===================================================================================
+  e2e_samehost:
+    depends_on: [db_bootstrap]
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
+    environment:
+      MYSQL_HOST: mariadb
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: test
+      MYSQL_PASSWORD: test
+      MYSQL_USER: test
+      FRIENDICA_URL: https://friendica.local
+      DEBIAN_FRONTEND: noninteractive
+    commands:
+      - bin/wait-for-connection $MYSQL_HOST $MYSQL_PORT 300
+      - apt-get update && apt-get install -y --no-install-recommends ejabberd curl
+      - |
+        set -e
+        WS="$(pwd)"
+        cat > /etc/ejabberd/ejabberd.yml <<EOF
+        hosts:
+          - friendica.local
+        loglevel: 4
+        auth_method:
+          - external
+        # ejabberd spawns this directly (no bridge). The -d flag keeps PHP 8.5 deprecation
+        # notices out of the log; /usr/bin/php is the image's CLI, the daemon is the workspace.
+        extauth_program: "/usr/bin/php -d error_reporting='E_ALL & ~E_DEPRECATED' $WS/bin/console.php auth_ejabberd"
+        extauth_pool_size: 5
+        auth_use_cache: false
+        listen:
+          - port: 5281
+            module: ejabberd_http
+            request_handlers:
+              /api: mod_http_api
+        modules:
+          mod_http_api: {}
+          mod_admin_extra: {}
+        api_permissions:
+          "ci-open-api":
+            from:
+              - mod_http_api
+            who:
+              ip: 0.0.0.0/0
+            what:
+              - "*"
+        EOF
+        chown ejabberd:ejabberd /etc/ejabberd/ejabberd.yml
+
+        # ejabberd refuses to run as root; manage it as the ejabberd user (own HOME for the
+        # Erlang cookie) and forward the DB env the spawned PHP daemon inherits.
+        EJHOME="$(getent passwd ejabberd | cut -d: -f6)"
+        EJCTL="runuser -u ejabberd -- env HOME=$EJHOME MYSQL_HOST=$MYSQL_HOST MYSQL_PORT=$MYSQL_PORT MYSQL_DATABASE=$MYSQL_DATABASE MYSQL_USER=$MYSQL_USER MYSQL_PASSWORD=$MYSQL_PASSWORD FRIENDICA_URL=$FRIENDICA_URL /usr/sbin/ejabberdctl"
+        $EJCTL start
+        $EJCTL started
+
+        EJ="http://localhost:5281/api"; HOST="friendica.local"
+        for i in $(seq 1 40); do
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -X POST \
+                   -H "Content-Type: application/json" -H "Host: $HOST" \
+                   --data "{\"user\":\"CI\",\"host\":\"$HOST\",\"password\":\"sehrgeheim\"}" \
+                   "$EJ/check_password" 2>/dev/null || true)
+          [ "$code" = "200" ] && break
+          sleep 3
+        done
+
+        # $1=user $2=password $3=expected $4=label
+        check() {
+          body=$(curl -sS -X POST -H "Content-Type: application/json" -H "Host: $HOST" \
+                   --data "{\"user\":\"$1\",\"host\":\"$HOST\",\"password\":\"$2\"}" "$EJ/check_password")
+          echo "[same-host/$4] user='$1' -> '$body' (expected $3)"
+          [ "$body" = "$3" ] || { echo "FAIL: $4 expected '$3' got '$body'"; $EJCTL stop; exit 1; }
+        }
+
+        # Health gate first: a broken extauth path fails closed (1 for everything).
+        check "CI" "sehrgeheim" "0" "health-gate"
+        check "CI" "sehrgeheim" "0" "valid-credentials"
+        check "ci" "sehrgeheim" "0" "case-insensitive-nick"
+        check "CI" "falsch"     "1" "wrong-password"
+        check "doesnotexist" "x" "1" "unknown-user"
+        echo "E2E #1 (same host, direct extauth) OK"
+
+        # Graceful shutdown: tears the extauth pool down without restart storms.
+        $EJCTL stop
+        $EJCTL stopped
+
+  # ===================================================================================
+  # E2E #2 — CROSS HOST: Friendica auth daemon under systemd socket activation.
+  # ===================================================================================
+  # Friendica "host": systemd-socket-activate listens on :9000 and launches one auth daemon
+  # per connection (inetd style), wiring the socket to the daemon's stdin/stdout — production
+  # being a friendica-extauth.socket + friendica-extauth@.service unit pair. The daemon runs
+  # through `sh -c "exec php -d …"` so PHP 8.5 deprecation notices stay out of the log.
+  extauth_systemd:
+    detach: true
+    depends_on: [db_bootstrap]
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
+    environment:
+      MYSQL_HOST: mariadb
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: test
+      MYSQL_PASSWORD: test
+      MYSQL_USER: test
+      FRIENDICA_URL: https://friendica.local
+      DEBIAN_FRONTEND: noninteractive
+    commands:
+      - bin/wait-for-connection $MYSQL_HOST $MYSQL_PORT 300
+      - apt-get update && apt-get install -y --no-install-recommends systemd
+      - |
+        exec systemd-socket-activate --inetd --accept -l 9000 \
+          -E MYSQL_HOST="$MYSQL_HOST" -E MYSQL_PORT="$MYSQL_PORT" -E MYSQL_DATABASE="$MYSQL_DATABASE" \
+          -E MYSQL_USER="$MYSQL_USER" -E MYSQL_PASSWORD="$MYSQL_PASSWORD" -E FRIENDICA_URL="$FRIENDICA_URL" \
+          /bin/sh -c "exec /usr/bin/php -d error_reporting='E_ALL & ~E_DEPRECATED' $(pwd)/bin/console.php auth_ejabberd"
+
+  # ejabberd "host": reaches the systemd socket with a thin socat STDIO->TCP client and, like
+  # the same-host step, owns ejabberd's lifecycle so teardown stays clean.
+  e2e_systemd:
+    depends_on: [extauth_systemd]
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
+    environment:
+      DEBIAN_FRONTEND: noninteractive
+    commands:
+      - apt-get update && apt-get install -y --no-install-recommends ejabberd socat curl
+      - |
+        set -e
+        # Wait for the systemd socket to accept connections before ejabberd probes it.
+        until socat -u /dev/null TCP:extauth_systemd:9000 2>/dev/null; do
+          echo "waiting for extauth_systemd:9000..."; sleep 2
+        done
+
+        cat > /etc/ejabberd/ejabberd.yml <<'EOF'
+        hosts:
+          - friendica.local
+        loglevel: 4
+        auth_method:
+          - external
+        # Thin stdin/stdout <-> TCP relay to the systemd-managed daemon on the Friendica host.
+        extauth_program: "/usr/bin/socat STDIO TCP:extauth_systemd:9000"
+        extauth_pool_size: 5
+        auth_use_cache: false
+        listen:
+          - port: 5281
+            module: ejabberd_http
+            request_handlers:
+              /api: mod_http_api
+        modules:
+          mod_http_api: {}
+          mod_admin_extra: {}
+        api_permissions:
+          "ci-open-api":
+            from:
+              - mod_http_api
+            who:
+              ip: 0.0.0.0/0
+            what:
+              - "*"
+        EOF
+        chown ejabberd:ejabberd /etc/ejabberd/ejabberd.yml
+
+        EJHOME="$(getent passwd ejabberd | cut -d: -f6)"
+        EJCTL="runuser -u ejabberd -- env HOME=$EJHOME /usr/sbin/ejabberdctl"
+        $EJCTL start
+        $EJCTL started
+
+        EJ="http://localhost:5281/api"; HOST="friendica.local"
+        for i in $(seq 1 40); do
+          code=$(curl -sS -o /dev/null -w "%{http_code}" -X POST \
+                   -H "Content-Type: application/json" -H "Host: $HOST" \
+                   --data "{\"user\":\"CI\",\"host\":\"$HOST\",\"password\":\"sehrgeheim\"}" \
+                   "$EJ/check_password" 2>/dev/null || true)
+          [ "$code" = "200" ] && break
+          sleep 3
+        done
+
+        check() {
+          body=$(curl -sS -X POST -H "Content-Type: application/json" -H "Host: $HOST" \
+                   --data "{\"user\":\"$1\",\"host\":\"$HOST\",\"password\":\"$2\"}" "$EJ/check_password")
+          echo "[systemd-socket/$4] user='$1' -> '$body' (expected $3)"
+          [ "$body" = "$3" ] || { echo "FAIL: $4 expected '$3' got '$body'"; $EJCTL stop; exit 1; }
+        }
+
+        check "CI" "sehrgeheim" "0" "health-gate"
+        check "CI" "sehrgeheim" "0" "valid-credentials"
+        check "CI" "falsch"     "1" "wrong-password"
+        check "doesnotexist" "x" "1" "unknown-user"
+        echo "E2E #2 (cross host, systemd socket activation) OK"
+
+        $EJCTL stop
+        $EJCTL stopped
+
+services:
+  mariadb:
+    image: mariadb:latest
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_DATABASE: test
+      MYSQL_PASSWORD: test
+      MYSQL_USER: test
