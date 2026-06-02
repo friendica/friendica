@@ -1,0 +1,86 @@
+# ejabberd config for local Friendica development and ExtAuth testing.
+#
+# Architecture:
+#   ejabberd → nc → TCP:9000 → socat (friendica-extauth) → php bin/console.php auth_ejabberd
+#
+# ejabberd spawns `nc` via Erlang open_port (no shell, split on whitespace).
+# `nc` connects to the socat bridge in the friendica-extauth container, which forks a fresh
+# PHP auth daemon per connection. The daemon stays alive until ejabberd recycles the worker
+# by closing stdin.
+#
+# The vhost "localhost" must match Friendica's SERVER_NAME (.docker/.dist.env).
+
+hosts:
+  - "localhost"
+
+loglevel: info
+
+listen:
+  - port: 5222
+    module: ejabberd_c2s
+    # TLS is optional; clients may connect plaintext for local testing.
+    starttls_required: false
+
+  - port: 5281
+    module: ejabberd_http
+    request_handlers:
+      /api: mod_http_api
+
+auth_method:
+  - external
+# Full path required: ejabberd spawns this without a shell and without a PATH.
+extauth_program: "/usr/bin/nc friendica-extauth 9000"
+extauth_pool_size: 3
+auth_use_cache: false
+
+modules:
+  mod_adhoc: {}
+  mod_admin_extra: {}
+  mod_caps: {}
+  mod_carboncopy: {}
+  mod_client_state: {}
+  mod_configure: {}
+  mod_disco: {}
+  mod_http_api: {}
+  mod_last: {}
+  mod_mam:
+    default: always
+  mod_ping: {}
+  mod_roster: {}
+  mod_stream_mgmt: {}
+  mod_version:
+    show_os: false
+
+acl:
+  local:
+    user_regexp: ""
+
+access_rules:
+  c2s:
+    deny: blocked
+    allow: all
+  # Account creation happens in Friendica, not via XMPP registration.
+  register:
+    deny: all
+
+# Open HTTP API for local integration testing (check_password etc.).
+api_permissions:
+  "local":
+    from:
+      - mod_http_api
+    who:
+      ip: 0.0.0.0/0
+    what:
+      - "*"
+
+shaper:
+  normal:
+    rate: 3000
+    burst_size: 20000
+  fast: 100000
+
+shaper_rules:
+  max_user_sessions: 10
+  c2s_shaper:
+    none: admin
+    normal: all

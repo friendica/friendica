@@ -166,6 +166,19 @@ class EJabberdAuthTest extends FixtureTestCase
 		$this->assertFalse($this->newService()->authenticate('nobody', 'friendica.local', 'whatever'));
 	}
 
+	public function testAuthenticateLocalIsCaseInsensitive(): void
+	{
+		// Friendica stores all nicknames as lowercase (User::create lowercases them).
+		// ejabberd (or the XMPP client) may send the JID localpart in any case.
+		// normaliseNick() must lowercase so the DB lookup matches.
+		$this->assertTrue($this->newService()->authenticate('Admin', 'friendica.local', 'admin'));
+	}
+
+	public function testIsUserLocalIsCaseInsensitive(): void
+	{
+		$this->assertTrue($this->newService()->isUser('Admin', 'friendica.local'));
+	}
+
 	public function testAuthenticateLocalXmppAppPassword(): void
 	{
 		DI::pConfig()->set(51, 'xmpp', 'password', 'xmpp-secret');

@@ -19,11 +19,13 @@ return [
 	'MYSQL_DATABASE' => ['database', 'database'],
 
 	// Core variables
-	'FRIENDICA_ADMIN_MAIL' => ['config', 'admin_email'],
-	'FRIENDICA_URL'        => ['system', 'url'],
-	'FRIENDICA_TZ'         => ['config', 'timezone'],
-	'FRIENDICA_LANG'       => ['config', 'language'],
-	'FRIENDICA_SITENAME'   => ['config', 'sitename'],
+	'FRIENDICA_ADMIN_MAIL'               => ['config', 'admin_email'],
+	'FRIENDICA_URL'                      => ['system', 'url'],
+	'FRIENDICA_TZ'                       => ['config', 'timezone'],
+	'FRIENDICA_LANG'                     => ['config', 'language'],
+	'FRIENDICA_SITENAME'                 => ['config', 'sitename'],
+	'FRIENDICA_DISABLE_PASSWORD_EXPOSED' => ['system', 'disable_password_exposed'],
+	'FRIENDICA_DISABLE_EMAIL_VALIDATION' => ['system', 'disable_email_validation'],
 
 	// Storage
 	'FRIENDICA_DATA'     => ['storage', 'name'],
