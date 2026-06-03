@@ -80,7 +80,7 @@ Addons in `addon/<name>/` register callbacks with `Hook::register()`. The main h
 
 All files below are larpnet additions or patches. When rebasing onto a new Friendica release, these need careful conflict resolution.
 
-**Important:** every patched core file must have a corresponding `COPY` line in `Dockerfile`. If you patch a new file, add it there or the base image version will be used in production.
+**Important:** every patched core file must have a corresponding `COPY` line in `Dockerfile` AND an entry in `larpnet-entrypoint.sh`. The Friendica entrypoint only rsyncs files when the Friendica version changes — `larpnet-entrypoint.sh` is a wrapper that unconditionally copies the patched files on every container start so larpnet redeployments always land.
 
 | Path | Purpose |
 |---|---|

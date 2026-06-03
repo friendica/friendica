@@ -1,5 +1,12 @@
 FROM friendica:2026.05-fpm
 
+# Wrapper entrypoint: copies larpnet-patched files on every start,
+# since the Friendica entrypoint only rsyncs on version upgrades.
+COPY larpnet-entrypoint.sh /larpnet-entrypoint.sh
+RUN chmod +x /larpnet-entrypoint.sh
+ENTRYPOINT ["/larpnet-entrypoint.sh"]
+CMD ["php-fpm"]
+
 # Custom themes
 COPY view/theme/larpnet               /usr/src/friendica/view/theme/larpnet
 COPY view/theme/larpnet_notifications /usr/src/friendica/view/theme/larpnet_notifications
