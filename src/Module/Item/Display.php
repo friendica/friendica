@@ -115,9 +115,13 @@ class Display extends BaseModule
 
 		// Is it an item with uid = 0?
 		if (empty($item)) {
+			$allowedPrivacy = $this->session->getLocalUserId()
+				? [Item::PUBLIC, Item::UNLISTED, Item::SERVER_ONLY]
+				: [Item::PUBLIC, Item::UNLISTED];
+
 			$item = Post::selectFirstForUser($this->session->getLocalUserId(), $fields, [
 				'guid'    => $guid,
-				'private' => [Item::PUBLIC, Item::UNLISTED],
+				'private' => $allowedPrivacy,
 				'uid'     => 0,
 			]);
 		}

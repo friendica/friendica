@@ -144,9 +144,10 @@ class Item
 	];
 
 	// Privacy levels
-	public const PUBLIC   = 0;
-	public const PRIVATE  = 1;
-	public const UNLISTED = 2;
+	public const PUBLIC      = 0;
+	public const PRIVATE     = 1;
+	public const UNLISTED    = 2;
+	public const SERVER_ONLY = 3; // visible to all local users, never federated
 
 	// Item weight for query ordering
 	public const GRAVITY_PARENT   = 0;

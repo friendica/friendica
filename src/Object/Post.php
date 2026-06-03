@@ -130,8 +130,12 @@ class Post
 				$output = DI::l10n()->t('Unlisted Message');
 				break;
 
+			case Item::SERVER_ONLY:
+				$output = DI::l10n()->t('Server-only Message');
+				break;
+
 			default:
-				throw new InvalidArgumentException('Item privacy ' . $item['privacy'] . ' is unsupported');
+				throw new InvalidArgumentException('Item privacy ' . $item['private'] . ' is unsupported');
 		}
 
 		return $output;

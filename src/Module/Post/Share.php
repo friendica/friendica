@@ -47,7 +47,7 @@ class Share extends \Friendica\BaseModule
 		}
 
 		$item = Post::selectFirst(['private', 'body', 'uri', 'plink', 'network'], ['id' => $post_id]);
-		if (!$item || $item['private'] == Item::PRIVATE) {
+		if (!$item || in_array($item['private'], [Item::PRIVATE, Item::SERVER_ONLY])) {
 			$this->httpError(404);
 		}
 

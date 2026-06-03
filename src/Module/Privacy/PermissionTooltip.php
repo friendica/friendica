@@ -135,6 +135,9 @@ class PermissionTooltip extends BaseModule
 			case Model\Item::PRIVATE:
 				$privacy = $this->t('Limited/Private');
 				break;
+			case Model\Item::SERVER_ONLY:
+				$privacy = $this->t('Server-only');
+				break;
 		}
 
 		if ($aclReceivers->isEmpty() && $addressedReceivers->isEmpty() && empty($privacy)) {
