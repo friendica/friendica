@@ -2783,23 +2783,28 @@ class Item
 		$local_user  = DI::userSession()->getLocalUserId();
 		$remote_user = DI::userSession()->getRemoteContactID($owner_id);
 
-		// default permissions - anonymous user
-		$condition = ["`private` != ?", self::PRIVATE];
-
 		if ($local_user && ($local_user == $owner_id)) {
 			// Profile owner - everything is visible
 			$condition = [];
 		} elseif ($remote_user) {
-			// Authenticated visitor - fetch the matching permissionsets
+			// Remote federated visitor - cannot see server-only posts
 			$permissionSets = DI::permissionSet()->selectByContactId($remote_user, $owner_id);
 			if (count($permissionSets) > 0) {
 				$condition = [
-					"(`private` != ? OR (`private` = ? AND `wall`
+					"(`private` NOT IN (?, ?) OR (`private` = ? AND `wall`
 					AND `psid` IN (" . implode(', ', array_fill(0, count($permissionSets), '?')) . ")))",
-					self::PRIVATE, self::PRIVATE,
+					self::PRIVATE, self::SERVER_ONLY, self::PRIVATE,
 				];
 				$condition = array_merge($condition, $permissionSets->column('id'));
+			} else {
+				$condition = ["`private` NOT IN (?, ?)", self::PRIVATE, self::SERVER_ONLY];
 			}
+		} elseif ($local_user) {
+			// Logged-in local user (not owner) - can see server-only posts
+			$condition = ["`private` != ?", self::PRIVATE];
+		} else {
+			// Anonymous user - cannot see server-only posts
+			$condition = ["`private` NOT IN (?, ?)", self::PRIVATE, self::SERVER_ONLY];
 		}
 
 		return $condition;
@@ -2828,11 +2833,9 @@ class Item
 
 		if ($remote_user) {
 			/*
-			 * Authenticated visitor. Unless pre-verified,
-			 * check that the contact belongs to this $owner_id
+			 * Remote federated visitor - cannot see server-only posts.
+			 * Unless pre-verified, check that the contact belongs to this $owner_id
 			 * and load the circles the visitor belongs to.
-			 * If pre-verified, the caller is expected to have already
-			 * done this and passed the circles into this function.
 			 */
 			$permissionSets = DI::permissionSet()->selectByContactId($remote_user, $owner_id);
 
@@ -2842,15 +2845,16 @@ class Item
 				$sql_set = sprintf(" OR (" . $table . "`private` = %d AND " . $table . "`wall` AND " . $table . "`psid` IN (", self::PRIVATE) . implode(',', $permissionSets->column('id')) . "))";
 			}
 
-			return sprintf(" AND (" . $table . "`private` != %d", self::PRIVATE) . $sql_set . ")";
+			return sprintf(" AND (" . $table . "`private` NOT IN (%d, %d)", self::PRIVATE, self::SERVER_ONLY) . $sql_set . ")";
 		}
 
-		/*
-		 * Construct permissions
-		 *
-		 * default permissions - anonymous user
-		 */
-		return sprintf(" AND " . $table . "`private` != %d", self::PRIVATE);
+		// Logged-in local user (not owner) - can see server-only posts
+		if ($local_user) {
+			return sprintf(" AND " . $table . "`private` != %d", self::PRIVATE);
+		}
+
+		// Anonymous user - cannot see server-only posts
+		return sprintf(" AND " . $table . "`private` NOT IN (%d, %d)", self::PRIVATE, self::SERVER_ONLY);
 	}
 
 	/**
