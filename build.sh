@@ -21,9 +21,9 @@ source "$ENV_FILE"
 # and serves it under REGISTRY_URL normally.
 PUSH_URL="${REGISTRY_PUSH_URL:-$REGISTRY_URL}"
 
-# Derive image tags from Dockerfile
+# Derive image tags
 FRIENDICA_VERSION=$(grep '^FROM friendica:' Dockerfile | sed 's/FROM friendica:\(.*\)-fpm/\1/')
-LARPNET_VERSION=$(grep '^ARG LARPNET_VERSION=' Dockerfile | sed 's/ARG LARPNET_VERSION=//')
+LARPNET_VERSION=$(git rev-parse --short HEAD)
 TAG="${FRIENDICA_VERSION}-${LARPNET_VERSION}"
 IMAGE="${REGISTRY_URL}/friendica-larpnet"
 PUSH_IMAGE="${PUSH_URL}/friendica-larpnet"
