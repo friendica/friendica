@@ -4,54 +4,43 @@
 
 # ejabberd module — load on top of compose.yaml:
 #   docker compose -f .docker/compose.yaml -f .docker/compose.ejabberd.yaml up -d
+#
+# Same-host production model, bridge-free: the ejabberd image (see ./ejabberd/Dockerfile)
+# bundles the PHP CLI, so ejabberd spawns `php bin/console.php auth_ejabberd` directly via
+# its external-auth protocol. No socat, no nc, no TCP sidecar — exactly how you would run
+# ejabberd next to Friendica on a single host.
 
 services:
-  # Exposes the Friendica ejabberd auth daemon over TCP so ejabberd can reach it without
-  # needing PHP installed. socat listens on :9000 and forks one `php bin/console.php
-  # auth_ejabberd` process per incoming connection, matching ejabberd's pool-per-worker model.
-  friendica-extauth:
+  ejabberd:
     build:
-      context: .
-      dockerfile: ./php/Dockerfile
-    working_dir: /var/www/html
+      context: ./ejabberd
+    # The Friendica code must be reachable by the ejabberd-spawned auth daemon at the same
+    # path referenced in extauth_program (/var/www/html/bin/console.php).
     volumes:
       - ../:/var/www/html
-      - ./php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+      - ./ejabberd/ejabberd.yml:/opt/ejabberd/conf/ejabberd.yml:ro
+      - ejabberd_data:/opt/ejabberd/database
+    # Run as root so the spawned PHP daemon can read the mounted code and write Friendica's
+    # log regardless of the host UID owning the bind mount (local-dev convenience).
+    user: root
     env_file:
       - path: ./.dist.env
         required: true
       - path: ./.env.local
         required: false
+    # The auth daemon inherits ejabberd's environment; it needs the DB connection + site URL
+    # to resolve credentials (vhost "localhost" in ejabberd.yml matches SERVER_NAME).
     environment:
       - MYSQL_HOST=${MYSQL_HOST:-db}
       - MYSQL_USER=${MYSQL_USER:-friendica}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-friendica}
       - MYSQL_DATABASE=${MYSQL_DATABASE:-friendica}
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - friendica-network
-    expose:
-      - "9000"
-    command:
-      - socat
-      - "TCP-LISTEN:9000,reuseaddr,fork"
-      - "EXEC:/usr/local/bin/php /var/www/html/bin/console.php auth_ejabberd,setsid"
-
-  # ejabberd XMPP server authenticating via the Friendica extauth bridge.
-  # vhost "localhost" matches SERVER_NAME in .dist.env.
-  ejabberd:
-    build:
-      context: ./ejabberd
-    volumes:
-      - ./ejabberd/ejabberd.yml:/opt/ejabberd/conf/ejabberd.yml:ro
-      - ejabberd_data:/opt/ejabberd
     ports:
       - "5222:5222"   # XMPP c2s (clients)
       - "5281:5281"   # HTTP API  (curl check_password)
     depends_on:
-      - friendica-extauth
+      db:
+        condition: service_healthy
     networks:
       - friendica-network
 

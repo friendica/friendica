@@ -1,0 +1,12 @@
+# ejabberd image for the CROSS-HOST model (systemd socket activation).
+#
+# Unlike ./Dockerfile (the same-host image), this one carries NO PHP. Here ejabberd and
+# Friendica live on different hosts, so ejabberd cannot spawn the auth daemon itself — it
+# only relays its extauth stdin/stdout to the Friendica host's systemd-managed daemon. socat
+# is that thin stdin/stdout <-> TCP client; the daemon lifecycle is owned by systemd on the
+# Friendica side, not by socat.
+FROM ghcr.io/processone/ejabberd:26.04
+
+USER root
+RUN apk add --no-cache socat
+USER ejabberd
