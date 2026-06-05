@@ -1,58 +1,130 @@
-# Install an ejabberd with synchronized credentials
+# ejabberd integration with Friendica credentials
 
-[Ejabberd](https://www.ejabberd.im/) is a chat server that uses XMPP as messaging protocol that you can use with a large amount of clients.
-In conjunction with the "xmpp" addon it can be used for a web based chat solution for your users.
+[ejabberd](https://www.ejabberd.im/) is an XMPP chat server. Combined with the *xmpp* addon
+it provides web-based chat for Friendica users. Credentials are checked via ejabberd's external
+auth protocol: ejabberd spawns the `auth_ejabberd` daemon and communicates over stdin/stdout
+using a small binary framing protocol.
 
-## Installation
+## Deployment models
 
-- Change its owner to whichever user is running the server, ie. ejabberd
-```sh
-chown ejabberd:ejabberd /path/to/friendica/bin/auth_ejabberd.php
-```
+There are two deployment models depending on whether ejabberd and Friendica run on the same
+host.
 
-- Change the access mode, so it is readable only to the user ejabberd and has exec
-```sh
-chmod 700 /path/to/friendica/bin/auth_ejabberd.php
-```
+### Same host
 
-- Edit your `ejabberd.yml` file, comment out your `auth_method` and add:
+ejabberd spawns the daemon directly. The daemon runs as the ejabberd user; either configure
+ejabberd to run as the web server user (`www-data`), or give the ejabberd user read access to
+Friendica's files and configure Friendica to log to syslog
+(`system.logger_config = syslog` in your local config).
+
+**ejabberd.yml:**
 ```yaml
 auth_method: [external]
-extauth_program: "/path/to/friendica/bin/console.php auth_ejabberd"
-# Number of persistent auth daemons ejabberd keeps per virtual host. This pool is the
-# upper bound on concurrent auth processes
+# Full path required — ejabberd spawns this via Erlang open_port without a shell.
+extauth_program: "/usr/bin/php /path/to/friendica/bin/console.php auth_ejabberd"
 extauth_pool_size: 5
-# Friendica supports per-account application-specific (XMPP) passwords, which is
-# incompatible with ejabberd's own auth cache, so it must stay disabled.
+# Friendica supports per-account XMPP application passwords; ejabberd's own auth
+# cache would silently break them, so it must stay disabled.
 auth_use_cache: false
 ```
 
-> **Note:** `bin/auth_ejabberd.php` is deprecated; use `bin/console.php auth_ejabberd`.
-> The daemon bounds every outgoing HTTP request with `jabber.auth_http_timeout` (default 5s,
-> see `static/defaults.config.php`) so a slow remote host can never keep a pooled worker busy
-> past ejabberd's own extauth call timeout.
+No bridge, no extra tools needed. ejabberd manages the daemon lifecycle (restarts on crash).
 
-- Disable the module "mod_register" and disable the registration:
-```
-{access, register, [{deny, all}]}.
+### Separate host / containerized (cross-host)
+
+When ejabberd and Friendica run on different hosts or in separate containers, the binary
+extauth protocol must be bridged over TCP. The recommended production approach is
+**systemd socket activation** on the Friendica host.
+
+#### Friendica host — systemd socket unit
+
+```ini
+# /etc/systemd/system/friendica-extauth.socket
+[Unit]
+Description=Friendica ejabberd external auth socket
+
+[Socket]
+ListenStream=9000
+# One PHP daemon per ejabberd pool worker (inetd style: stdin/stdout = socket).
+Accept=yes
+
+[Install]
+WantedBy=sockets.target
 ```
 
-- Enable BOSH:
-  - Enable the module "mod_http_bind"
-  - Edit this line:
-```
-{5280, ejabberd_http,    [captcha, http_poll, http_bind]}
+```ini
+# /etc/systemd/system/friendica-extauth@.service
+[Unit]
+Description=Friendica ejabberd external auth daemon (instance %i)
+
+[Service]
+# Run as the web server user so the daemon can write to Friendica's log file.
+User=www-data
+WorkingDirectory=/var/www/friendica
+# StandardInput=socket wires the accepted connection to stdin/stdout — this is
+# exactly what ejabberd's extauth protocol expects.
+StandardInput=socket
+StandardOutput=socket
+ExecStart=/usr/bin/php /var/www/friendica/bin/console.php auth_ejabberd
+# Pass Friendica's runtime config as environment (overrides local.config.php values).
+Environment=FRIENDICA_URL=https://your.friendica.domain
+Environment=MYSQL_HOST=localhost
+Environment=MYSQL_DATABASE=friendica
+Environment=MYSQL_USER=friendica
+Environment=MYSQL_PASSWORD=secret
 ```
 
-  - In your apache configuration for your site add this line:
+Enable and start:
+```sh
+systemctl enable --now friendica-extauth.socket
 ```
-ProxyPass /http-bind http://127.0.0.1:5280/http-bind retry=0
+
+#### ejabberd host — ejabberd.yml
+
+```yaml
+auth_method: [external]
+# socat bridges ejabberd's extauth stdin/stdout over TCP to the Friendica socket unit.
+# Full path required — ejabberd spawns this without a shell.
+extauth_program: "/usr/bin/socat STDIO TCP:friendica.host:9000"
+extauth_pool_size: 5
+auth_use_cache: false
 ```
 
-- Restart your ejabberd service, you should be able to log in with your friendica credentials
+`socat` is pre-installed in the official ejabberd Docker image. On a bare-metal ejabberd,
+install it via your package manager (`apt install socat` / `apk add socat`).
 
-## Other hints
+## Disable XMPP registration
 
-- if a user has a space or a @ in the nickname, the user has to replace these characters:
-  - " " (space) is replaced with "%20"
-  - "@" is replaced with "(a)"
+Users are managed exclusively by Friendica. Disable ejabberd's own registration to prevent
+accounts being created outside Friendica:
+
+```yaml
+access_rules:
+  register:
+    deny: all
+```
+
+## Nickname escaping
+
+ejabberd (and XMPP clients) encode special characters in JID local-parts. The daemon
+translates these back before the database lookup:
+
+| Character | XMPP encoding |
+|-----------|---------------|
+| space     | `%20`         |
+| `@`       | `(a)`         |
+
+## Application-specific XMPP passwords
+
+Users can set a dedicated XMPP password.
+This password is separate from their Friendica login and is checked automatically when the
+main password fails.
+
+Because these per-user passwords bypass ejabberd's auth cache, `auth_use_cache: false` is
+mandatory. With caching enabled, a cached "wrong password" result can silently block a valid
+XMPP application password for the cache lifetime.
+
+## Deprecated: bin/auth_ejabberd.php
+
+`bin/auth_ejabberd.php` is deprecated since 2026.08 and will be removed. Replace it with
+`bin/console.php auth_ejabberd` in your `extauth_program` setting.
