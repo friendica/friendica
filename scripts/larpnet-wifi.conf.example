@@ -1,0 +1,20 @@
+# /etc/larpnet-wifi.conf — Larpnet WIFI provisioning config
+# chmod 600 /etc/larpnet-wifi.conf
+
+# MikroTik RouterOS 7 REST API
+MIKROTIK_URL=https://192.168.1.1
+MIKROTIK_USER=api
+MIKROTIK_PASS=changeme
+# Set to "no" if the router uses a self-signed certificate
+MIKROTIK_TLS_VERIFY=yes
+# User Manager profile to assign to newly created users
+MIKROTIK_PROFILE=default
+
+# Spool directory (must match larpnet_wifi addon — default: /var/spool/portalprov)
+SPOOL_DIR=/var/spool/portalprov
+
+# Mailgun
+MAILGUN_API_KEY=key-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+MAILGUN_DOMAIN=mail.larpnet.pl
+MAILGUN_FROM=LARPnet <noreply@larpnet.pl>
+EMAIL_SUBJECT=Twoje hasło do sieci WIFI LARPnet

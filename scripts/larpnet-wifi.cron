@@ -1,0 +1,6 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Larpnet WIFI provisioning — picks up spool files every 5 minutes
+# Deploy: cp larpnet-wifi.cron /etc/cron.d/larpnet-wifi
+*/5 * * * * root /usr/local/sbin/larpnet-wifi-provision.sh >> /var/log/larpnet-wifi.log 2>&1
