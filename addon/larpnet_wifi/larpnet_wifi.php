@@ -49,8 +49,9 @@ function larpnet_wifi_write(int $uid): bool
 		'requested_at' => (new \DateTime('now', new \DateTimeZone('UTC')))->format('c'),
 	]);
 
-	$tmp   = "$dir/$uid.json.tmp";
-	$final = "$dir/$uid.json";
+	$name  = sprintf('%d-%s', $uid, bin2hex(random_bytes(6)));
+	$tmp   = "$dir/$name.json.tmp";
+	$final = "$dir/$name.json";
 
 	if (file_put_contents($tmp, $record) === false) {
 		DI::logger()->warning('larpnet_wifi: could not write spool file', ['tmp' => $tmp]);
