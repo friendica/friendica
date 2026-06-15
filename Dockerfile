@@ -14,6 +14,7 @@ COPY view/theme/larpnet_notifications /usr/src/friendica/view/theme/larpnet_noti
 # Custom addons
 COPY addon/larpnet_banner    /usr/src/friendica/addon/larpnet_banner
 COPY addon/larpnet_calendar  /usr/src/friendica/addon/larpnet_calendar
+COPY addon/larpnet_wifi      /usr/src/friendica/addon/larpnet_wifi
 
 # Core patches
 COPY src/Worker/NtfyPush.php                      /usr/src/friendica/src/Worker/NtfyPush.php

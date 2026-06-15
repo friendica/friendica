@@ -78,6 +78,7 @@ venv/
 /addon/*
 !/addon/larpnet_banner
 !/addon/larpnet_calendar
+!/addon/larpnet_wifi
 
 #ignore base .htaccess
 /.htaccess
