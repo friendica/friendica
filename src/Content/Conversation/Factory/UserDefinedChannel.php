@@ -23,6 +23,10 @@ final class UserDefinedChannel extends Timeline implements ICanCreateFromTableRo
 			$row['languages'] = unserialize($row['languages']);
 		}
 
+		if (!is_array($row['languages'])) {
+			$row['languages'] = [];
+		}
+
 		return new Entity\UserDefinedChannel(
 			$row['id'] ?? null,
 			$row['label'],
@@ -35,7 +39,7 @@ final class UserDefinedChannel extends Timeline implements ICanCreateFromTableRo
 			$row['full-text-search'] ?? null,
 			$row['media-type'] ?? null,
 			$row['circle'] ?? null,
-			$row['languages'] ?? null,
+			$row['languages'],
 			$row['publish'] ?? null,
 			$row['valid'] ?? null,
 			$row['min-size'] ?? null,
