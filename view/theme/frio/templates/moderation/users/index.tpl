@@ -75,9 +75,24 @@
 
 				{{if !in_array($order_users,[$th_users.2.1, $th_users.3.1, $th_users.4.1]) }}
 					<td>
-						<i class="ri {{$u.page_type.1}}" title="{{$u.page_type.0}}"></i>
 						{{if $u.page_flags_raw==0 && $u.account_type_raw > 0}}
-							<i class="ri {{$u.account_type.1}}" title"{{$u.account_type.0}}"></i>
+						<i class="ri
+							{{if $u.account_type_raw==1}}ri-building-4-line{{/if}}		{{* ACCOUNT_TYPE_ORGANISATION *}}
+							{{if $u.account_type_raw==2}}ri-newspaper-line{{/if}}	{{* ACCOUNT_TYPE_NEWS *}}
+							{{if $u.account_type_raw==3}}ri-chat-3-line{{/if}}		{{* ACCOUNT_TYPE_COMMUNITY *}}
+							" data-flag="0" data-acct="{{$u.account_type_raw}}" title="{{$u.account_type}}">
+						</i>
+						{{else}}
+						<i class="ri
+							{{if $u.page_flags_raw==0}}ri-user-line{{/if}}		{{* PAGE_NORMAL *}}
+							{{if $u.page_flags_raw==1}}ri-megaphone-line{{/if}}		{{* PAGE_SOAPBOX *}}
+							{{if $u.page_flags_raw==2}}ri-team-line{{/if}}		{{* PAGE_COMMUNITY *}}
+							{{if $u.page_flags_raw==3}}ri-heart-line{{/if}}		{{* PAGE_FREELOVE *}}
+							{{if $u.page_flags_raw==4}}ri-broadcast-line{{/if}}		{{* PAGE_BLOG *}}
+							{{if $u.page_flags_raw==5}}ri-spy-line{{/if}}	{{* PAGE_PRVGROUP *}}
+							{{if $u.page_flags_raw==6}}ri-group-3-line{{/if}}		{{* PAGE_COMM_MAN *}}
+							" data-flag="{{$u.page_flags_raw}}" data-acct="{{$u.account_type_raw}}" title="{{$u.page_flags}}">
+						</i>
 						{{/if}}
 						{{if $u.is_admin}}<i class="ri ri-spy-line text-primary" title="{{$siteadmin}}"></i>{{/if}}
 						{{if $u.blocked}}<i class="ri ri-forbid-2-line text-danger" title="{{$blocked}}"></i>{{/if}}
