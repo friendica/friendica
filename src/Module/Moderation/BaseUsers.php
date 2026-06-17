@@ -132,20 +132,19 @@ abstract class BaseUsers extends BaseModeration
 		$adminlist = User::getAdminEmailList();
 		return function ($user) use ($adminlist) {
 			$page_types = [
-				// NOTE: Currently no PAGE_FLAGS_BLOG here, unlike Model/User.php?
-				User::PAGE_FLAGS_NORMAL    => [$this->t('Normal Account Page'), "ri-user-line"],
-				User::PAGE_FLAGS_SOAPBOX   => [$this->t('Soapbox Page'), "ri-megaphone-line"],
-				User::PAGE_FLAGS_COMMUNITY => [$this->t('Public Group'), "ri-team-line"],
-				User::PAGE_FLAGS_COMM_MAN  => [$this->t('Public Group - Restricted', "ri-team-line")],
-				User::PAGE_FLAGS_FREELOVE  => [$this->t('Automatic Friend Page'), "ri-heart-line"],
-				User::PAGE_FLAGS_PRVGROUP  => [$this->t('Private Group'), "ri-spy-line"],
+				User::PAGE_FLAGS_NORMAL    => $this->t('Normal Account Page'),
+				User::PAGE_FLAGS_SOAPBOX   => $this->t('Soapbox Page'),
+				User::PAGE_FLAGS_COMMUNITY => $this->t('Public Group'),
+				User::PAGE_FLAGS_COMM_MAN  => $this->t('Public Group - Restricted'),
+				User::PAGE_FLAGS_FREELOVE  => $this->t('Automatic Friend Page'),
+				User::PAGE_FLAGS_PRVGROUP  => $this->t('Private Group'),
 			];
 			$account_types = [
-				User::ACCOUNT_TYPE_PERSON       => [$this->t('Personal Page'), ""],
-				User::ACCOUNT_TYPE_ORGANISATION => [$this->t('Organisation Page'), "ri-node-tree"],
-				User::ACCOUNT_TYPE_NEWS         => [$this->t('News Page'), "ri-newspaper-line"],
-				User::ACCOUNT_TYPE_COMMUNITY    => [$this->t('Community Group'), "ri-chat-3-line"],
-				User::ACCOUNT_TYPE_RELAY        => [$this->t('Relay'), ""],
+				User::ACCOUNT_TYPE_PERSON       => $this->t('Personal Page'),
+				User::ACCOUNT_TYPE_ORGANISATION => $this->t('Organisation Page'),
+				User::ACCOUNT_TYPE_NEWS         => $this->t('News Page'),
+				User::ACCOUNT_TYPE_COMMUNITY    => $this->t('Community Group'),
+				User::ACCOUNT_TYPE_RELAY        => $this->t('Relay'),
 			];
 
 			$user['page_flags_raw'] = $user['page-flags'];
