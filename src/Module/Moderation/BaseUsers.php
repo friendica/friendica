@@ -151,8 +151,8 @@ abstract class BaseUsers extends BaseModeration
 			$user['page_flags_raw'] = $user['page-flags'];
 			$user['page_type']      = $page_types[$user['page-flags']];
 
-			$user['account_type_raw'] = ($user['page_flags_raw'] == 0) ? $user['account-type'] : -1;
-			$user['account_type']     = ($user['page_flags_raw'] == 0) ? $account_types[$user['account-type']] : '';
+			$user['account_type_raw'] = $user['account-type'];
+			$user['account_type']     = $account_types[$user['account-type']];
 
 			$user['register_date'] = Temporal::getRelativeDate($user['register_date']);
 			$user['login_date']    = Temporal::getRelativeDate($user['last-activity'], false);
