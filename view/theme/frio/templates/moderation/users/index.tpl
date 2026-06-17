@@ -77,20 +77,19 @@
 					<td>
 						{{if $u.page_flags_raw==0 && $u.account_type_raw > 0}}
 						<i class="ri
-							{{if $u.account_type_raw==1}}ri-building-4-line{{/if}}		{{* ACCOUNT_TYPE_ORGANISATION *}}
-							{{if $u.account_type_raw==2}}ri-newspaper-line{{/if}}	{{* ACCOUNT_TYPE_NEWS *}}
-							{{if $u.account_type_raw==3}}ri-chat-3-line{{/if}}		{{* ACCOUNT_TYPE_COMMUNITY *}}
+							{{if $u.account_type_raw==1}}ri-building-4-line{{/if}}		{{* ORGANIZATION PAGE *}}
+							{{if $u.account_type_raw==2}}ri-newspaper-line{{/if}}	    {{* NEWS PAGE *}}
 							" data-flag="0" data-acct="{{$u.account_type_raw}}" title="{{$u.account_type}}">
 						</i>
 						{{else}}
 						<i class="ri
-							{{if $u.page_flags_raw==0}}ri-user-line{{/if}}		{{* PAGE_NORMAL *}}
-							{{if $u.page_flags_raw==1}}ri-megaphone-line{{/if}}		{{* PAGE_SOAPBOX *}}
-							{{if $u.page_flags_raw==2}}ri-team-line{{/if}}		{{* PAGE_COMMUNITY *}}
-							{{if $u.page_flags_raw==3}}ri-heart-line{{/if}}		{{* PAGE_FREELOVE *}}
-							{{if $u.page_flags_raw==4}}ri-broadcast-line{{/if}}		{{* PAGE_BLOG *}}
-							{{if $u.page_flags_raw==5}}ri-spy-line{{/if}}	{{* PAGE_PRVGROUP *}}
-							{{if $u.page_flags_raw==6}}ri-group-3-line{{/if}}		{{* PAGE_COMM_MAN *}}
+							{{if $u.page_flags_raw==0}}ri-user-line{{/if}}		    {{* PERSON NORMAL *}}
+							{{if $u.page_flags_raw==1}}ri-megaphone-line{{/if}}		{{* PERSON SOAPBOX *}}
+							{{if $u.page_flags_raw==2}}ri-team-line{{/if}}		    {{* PUBLIC GROUP *}}
+							{{if $u.page_flags_raw==3}}ri-heart-line{{/if}}		    {{* PERSON FREELOVE *}}
+							{{if $u.page_flags_raw==4}}ri-broadcast-line{{/if}}		{{* PAGE BLOG *}}
+							{{if $u.page_flags_raw==5}}ri-spy-line{{/if}}	        {{* GROUP PRIVATE *}}
+							{{if $u.page_flags_raw==6}}ri-group-3-line{{/if}}		{{* GROUP RESTRICTED *}}
 							" data-flag="{{$u.page_flags_raw}}" data-acct="{{$u.account_type_raw}}" title="{{$u.page_flags}}">
 						</i>
 						{{/if}}
