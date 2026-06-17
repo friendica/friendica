@@ -17,6 +17,10 @@ if [ -f /var/www/html/index.php ]; then
   do
     cp "/usr/src/friendica/$f" "/var/www/html/$f"
   done
+
+  for addon in larpnet_banner larpnet_calendar larpnet_wifi; do
+    cp -r "/usr/src/friendica/addon/${addon}" "/var/www/html/addon/"
+  done
 fi
 
 exec /entrypoint.sh "$@"
