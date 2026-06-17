@@ -410,11 +410,11 @@ class Register extends BaseModule
 						break;
 					case User::ORGPAGE:
 						$acct_type = User::ACCOUNT_TYPE_ORGANISATION;
-						$acct_flag = User::PAGE_FLAGS_SOAPBOX;
+						$acct_flag = User::PAGE_FLAGS_NORMAL;
 						break;
 					case User::NEWSPAGE:
 						$acct_type = User::ACCOUNT_TYPE_NEWS;
-						$acct_flag = User::PAGE_FLAGS_SOAPBOX;
+						$acct_flag = User::PAGE_FLAGS_NORMAL;
 						break;
 					case User::PUBGROUP:
 						$acct_type = User::ACCOUNT_TYPE_COMMUNITY;
