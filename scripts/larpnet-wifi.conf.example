@@ -13,6 +13,15 @@ MIKROTIK_PROFILE=default
 # Spool directory (must match larpnet_wifi addon — default: /var/spool/portalprov)
 SPOOL_DIR=/var/spool/portalprov
 
+# Optional: fetch spool files from a remote server via SCP before processing.
+# Leave SCP_HOST unset or empty to skip. After each file is successfully
+# downloaded to SPOOL_DIR it is deleted from the remote directory.
+# SCP_HOST=friendica.larpnet.pl
+# SCP_USER=www-data          # remote SSH user; defaults to the current user if unset
+# SCP_REMOTE_DIR=/var/spool/portalprov
+# SCP_KEY=/root/.ssh/id_ed25519_larpnet   # optional; omit to use SSH default key
+# SCP_PORT=22                             # optional; defaults to 22
+
 # Mailgun
 MAILGUN_API_KEY=key-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 MAILGUN_DOMAIN=mail.larpnet.pl

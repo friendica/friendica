@@ -28,7 +28,7 @@ function larpnet_wifi_uninstall()
 	Hook::unregister('addon_settings_post', __FILE__, 'larpnet_wifi_settings_post');
 }
 
-function larpnet_wifi_write(int $uid): bool
+function larpnet_wifi_write(int $uid, string $password = ''): bool
 {
 	$user = DI::dba()->selectFirst('user', ['uid', 'username', 'email', 'nickname'], ['uid' => $uid]);
 	if (!DBA::isResult($user) || empty($user['email'])) {
@@ -41,13 +41,18 @@ function larpnet_wifi_write(int $uid): bool
 		return false;
 	}
 
-	$record = json_encode([
+	$entry = [
 		'uid'          => $uid,
 		'portal_user'  => $user['nickname'],
 		'email'        => $user['email'],
 		'realname'     => $user['username'] ?: $user['nickname'],
 		'requested_at' => (new \DateTime('now', new \DateTimeZone('UTC')))->format('c'),
-	]);
+	];
+	if ($password !== '') {
+		$entry['password'] = $password;
+	}
+
+	$record = json_encode($entry);
 
 	$name  = sprintf('%d-%s', $uid, bin2hex(random_bytes(6)));
 	$tmp   = "$dir/$name.json.tmp";
@@ -77,7 +82,13 @@ function larpnet_wifi_settings(array &$data)
 	}
 
 	$html = '<p>Kliknij przycisk, aby zresetować hasło do sieci WIFI. '
-		. 'Nowe hasło zostanie wysłane na Twój adres email w ciągu kilku minut.</p>';
+		. 'Nowe hasło zostanie wysłane na Twój adres email w ciągu kilku minut.</p>'
+		. '<p><em>To jest osobne hasło od tego którym logujesz się do larpnetu. '
+		. 'Wybierz coś prostego, co ma min 5 znaków i co wpiszesz z pamięci. '
+		. 'Nie jest też zaszyfrowane, więc NIE UŻYWAJ hasła które jest tajne.</em></p>'
+		. '<p><label for="larpnet_wifi_password">Własne hasło (opcjonalnie, min. 5 znaków):</label><br>'
+		. '<input type="text" id="larpnet_wifi_password" name="larpnet_wifi_password"'
+		. ' autocomplete="off" style="width:16em"></p>';
 
 	$data = [
 		'addon'  => 'larpnet_wifi',
@@ -94,7 +105,13 @@ function larpnet_wifi_settings_post(array &$b)
 		return;
 	}
 
-	if (larpnet_wifi_write($uid)) {
+	$password = trim($_POST['larpnet_wifi_password'] ?? '');
+	if ($password !== '' && strlen($password) < 5) {
+		DI::sysmsg()->addNotice(DI::l10n()->t('Hasło musi mieć co najmniej 5 znaków.'));
+		return;
+	}
+
+	if (larpnet_wifi_write($uid, $password)) {
 		DI::sysmsg()->addInfo(DI::l10n()->t('Żądanie resetu hasła WIFI zostało przyjęte. Nowe hasło otrzymasz emailem.'));
 	} else {
 		DI::sysmsg()->addNotice(DI::l10n()->t('Nie udało się zapisać żądania. Spróbuj ponownie lub skontaktuj się z administratorem.'));

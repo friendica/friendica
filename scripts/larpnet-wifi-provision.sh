@@ -24,6 +24,11 @@ source "$CONFIG_FILE"
 : "${MIKROTIK_PROFILE:?not set in $CONFIG_FILE}"
 : "${MIKROTIK_TLS_VERIFY:=yes}"
 : "${SPOOL_DIR:=/var/spool/portalprov}"
+: "${SCP_HOST:=}"
+: "${SCP_USER:=}"
+: "${SCP_REMOTE_DIR:=/var/spool/portalprov}"
+: "${SCP_KEY:=}"
+: "${SCP_PORT:=22}"
 : "${MAILGUN_API_KEY:?not set in $CONFIG_FILE}"
 : "${MAILGUN_DOMAIN:?not set in $CONFIG_FILE}"
 : "${MAILGUN_FROM:?not set in $CONFIG_FILE}"
@@ -32,7 +37,43 @@ source "$CONFIG_FILE"
 TLS_FLAG=""
 [[ "$MIKROTIK_TLS_VERIFY" == "no" ]] && TLS_FLAG="-k"
 
+# Build common SSH/SCP option array from config
+_ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=accept-new -p "$SCP_PORT")
+[[ -n "$SCP_KEY" ]] && _ssh_opts+=(-i "$SCP_KEY")
+
 log() { echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] $*"; }
+
+fetch_remote_spool() {
+    [[ -z "$SCP_HOST" ]] && return 0
+
+    local remote_target="${SCP_HOST}"
+    [[ -n "$SCP_USER" ]] && remote_target="${SCP_USER}@${SCP_HOST}"
+
+    local remote_files
+    remote_files=$(ssh "${_ssh_opts[@]}" "$remote_target" \
+        "ls -1 '${SCP_REMOTE_DIR}'/*.json 2>/dev/null || true") || {
+        log "[ERROR] SSH listing of ${remote_target}:${SCP_REMOTE_DIR} failed"
+        return 1
+    }
+
+    [[ -z "$remote_files" ]] && return 0
+
+    local count=0
+    while IFS= read -r remote_file; do
+        [[ -z "$remote_file" ]] && continue
+        local fname
+        fname=$(basename "$remote_file")
+        if scp "${_ssh_opts[@]}" "${remote_target}:${remote_file}" "${SPOOL_DIR}/${fname}"; then
+            ssh "${_ssh_opts[@]}" "$remote_target" "rm -f '${remote_file}'"
+            (( count++ )) || true
+        else
+            log "[WARN] Failed to fetch ${remote_file} from ${remote_target}"
+        fi
+    done <<< "$remote_files"
+
+    [[ $count -gt 0 ]] && log "[INFO] Fetched ${count} spool file(s) from ${remote_target}:${SCP_REMOTE_DIR}"
+    return 0
+}
 
 mt_curl() {
     # Wrapper for authenticated MikroTik REST calls.
@@ -128,7 +169,10 @@ process_file() {
     fi
 
     local password
-    password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12)
+    password=$(jq -r '.password // empty' "$spool_file")
+    if [[ -z "$password" ]]; then
+        password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12)
+    fi
 
     log "[INFO] Processing uid=${uid} portal_user=${portal_user} file=$(basename "$spool_file")"
 
@@ -143,6 +187,8 @@ process_file() {
 }
 
 # Main loop
+fetch_remote_spool
+
 shopt -s nullglob
 files=("${SPOOL_DIR}"/*.json)
 
