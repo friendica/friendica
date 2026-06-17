@@ -93,7 +93,7 @@
 							" data-flag="{{$u.page_flags_raw}}" data-acct="{{$u.account_type_raw}}" title="{{$u.page_flags}}">
 						</i>
 						{{/if}}
-						{{if $u.is_admin}}<i class="ri ri-spy-line text-primary" title="{{$siteadmin}}"></i>{{/if}}
+						{{if $u.is_admin}}<i class="ri ri-key-line text-primary" title="{{$siteadmin}}"></i>{{/if}}
 						{{if $u.blocked}}<i class="ri ri-forbid-2-line text-danger" title="{{$blocked}}"></i>{{/if}}
 						{{if $u.deleted}}<i class="ri ri-user-unfollow-line" title="{{$h_deleted}}"></i>{{/if}}
 						{{if $u.account_expired}}<i class="ri ri-time-line text-warning" title="{{$accountexpired}}"></i>{{/if}}
