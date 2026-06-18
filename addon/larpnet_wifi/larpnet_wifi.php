@@ -81,7 +81,7 @@ function larpnet_wifi_settings(array &$data)
 		return;
 	}
 
-	$html = '<p>Kliknij przycisk, aby zresetować hasło do sieci WIFI. '
+	$html = '<p>Kliknij przycisk, aby zresetować hasło do sieci WIFI Larpnet dostępnej na larparcie. '
 		. 'Nowe hasło zostanie wysłane na Twój adres email w ciągu kilku minut.</p>'
 		. '<p><em>To jest osobne hasło od tego którym logujesz się do larpnetu. '
 		. 'Wybierz coś prostego, co ma min 5 znaków i co wpiszesz z pamięci. '
