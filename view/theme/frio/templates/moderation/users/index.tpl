@@ -76,23 +76,35 @@
 				{{if !in_array($order_users,[$th_users.2.1, $th_users.3.1, $th_users.4.1]) }}
 					<td>
 						{{if $u.page_flags_raw==0 && $u.account_type_raw > 0}}
-						<i class="ri
-							{{if $u.account_type_raw==1}}ri-building-4-line{{/if}}		{{* ORGANIZATION PAGE *}}
-							{{if $u.account_type_raw==2}}ri-newspaper-line{{/if}}	    {{* NEWS PAGE *}}
-							" data-flag="0" data-acct="{{$u.account_type_raw}}" title="{{$u.account_type}}">
-						</i>
+							{{if $u.account_type_raw==1}}
+								{{$acct_icon = "ri-building-4-line"}} {{* ACCOUNT_TYPE_ORGANISATION *}}
+							{{else if $u.account_type_raw==2}}
+								{{$acct_icon = "ri-newspaper-line"}}  {{* ACCOUNT_TYPE_NEWS *}}
+							{{else if $u.account_type_raw==4}}
+								{{$acct_icon = "ri-broadcast-line"}}
+							{{else}}
+								{{$acct_icon = ""}}
+							{{/if}}
 						{{else}}
-						<i class="ri
-							{{if $u.page_flags_raw==0}}ri-user-line{{/if}}		    {{* PERSON NORMAL *}}
-							{{if $u.page_flags_raw==1}}ri-megaphone-line{{/if}}		{{* PERSON SOAPBOX *}}
-							{{if $u.page_flags_raw==2}}ri-team-line{{/if}}		    {{* PUBLIC GROUP *}}
-							{{if $u.page_flags_raw==3}}ri-heart-line{{/if}}		    {{* PERSON FREELOVE *}}
-							{{if $u.page_flags_raw==4}}ri-broadcast-line{{/if}}		{{* PAGE BLOG *}}
-							{{if $u.page_flags_raw==5}}ri-spy-line{{/if}}	        {{* GROUP PRIVATE *}}
-							{{if $u.page_flags_raw==6}}ri-group-3-line{{/if}}		{{* GROUP RESTRICTED *}}
-							" data-flag="{{$u.page_flags_raw}}" data-acct="{{$u.account_type_raw}}" title="{{$u.page_flags}}">
-						</i>
+							{{if $u.page_flags_raw==0}}
+								{{$acct_icon = "ri-user-line"}}		  {{* PERSON NORMAL *}}
+							{{else if $u.page_flags_raw==1}}
+								{{$acct_icon = "ri-megaphone-line"}}  {{* PERSON SOAPBOX *}}
+							{{else if $u.page_flags_raw==2}}
+								{{$acct_icon = "ri-team-line"}}		  {{* PUBLIC GROUP *}}
+							{{else if $u.page_flags_raw==3}}
+								{{$acct_icon = "ri-heart-line"}}	  {{* PERSON FREELOVE *}}
+							{{else if $u.page_flags_raw==4}}
+								{{$acct_icon = "ri-broadcast-line"}}  {{* PAGE BLOG *}}
+							{{else if $u.page_flags_raw==5}}
+								{{$acct_icon = "ri-spy-line"}}	      {{* GROUP PRIVATE *}}
+							{{else if $u.page_flags_raw==6}}
+								{{$acct_icon = "ri-group-3-line"}}	  {{* GROUP RESTRICTED *}}
+							{{else}}
+								{{$acct_icon = ""}}
+							{{/if}}
 						{{/if}}
+						<i class="ri {{$acct_icon}}" aria-hidden="true" data-acct="{{$u.account_type_raw}}" data-flag="{{$u.page_flags_raw}}"></i>
 						{{if $u.is_admin}}<i class="ri ri-key-line text-primary" title="{{$siteadmin}}"></i>{{/if}}
 						{{if $u.blocked}}<i class="ri ri-forbid-2-line text-danger" title="{{$blocked}}"></i>{{/if}}
 						{{if $u.deleted}}<i class="ri ri-user-unfollow-line" title="{{$h_deleted}}"></i>{{/if}}
