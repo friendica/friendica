@@ -9,6 +9,7 @@ if [ -f /var/www/html/index.php ]; then
   for f in \
     src/Model/Item.php \
     src/Object/Post.php \
+    src/Module/Item/Compose.php \
     src/Module/Item/Display.php \
     src/Module/Post/Share.php \
     src/Module/Privacy/PermissionTooltip.php \
