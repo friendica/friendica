@@ -1,5 +1,5 @@
-Friendica - your open and free social network
-=============================================
+Friendica - your open and free social network (LARPnet)
+========================================================
 
 Welcome to the free social web. Friendica is a platform for decentralised social communication linking to other independent social and corporate services.
 
