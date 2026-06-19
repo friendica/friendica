@@ -1,10 +1,9 @@
 <?php
 /**
  * Name: Larpnet WIFI
- * Description: Zarządza dostępem do sieci WIFI. Przy rejestracji i na żądanie użytkownika
- *   zapisuje rekord do kolejki, który zewnętrzny skrypt odbiera i konfiguruje konto
- *   w MikroTik RouterOS User Manager.
- * Version: 1.0
+ * Description: Zarządza dostępem do sieci WIFI. Na żądanie użytkownika zapisuje rekord
+ *   do kolejki, który zewnętrzny skrypt odbiera i konfiguruje konto w MikroTik User Manager.
+ * Version: 1.1
  * Author: larpnet admin <https://larpnet.pl>
  */
 
@@ -16,14 +15,12 @@ const LARPNET_WIFI_SPOOL_DIR = '/var/spool/portalprov';
 
 function larpnet_wifi_install()
 {
-	Hook::register('register_account',    __FILE__, 'larpnet_wifi_register_account');
 	Hook::register('addon_settings',      __FILE__, 'larpnet_wifi_settings');
 	Hook::register('addon_settings_post', __FILE__, 'larpnet_wifi_settings_post');
 }
 
 function larpnet_wifi_uninstall()
 {
-	Hook::unregister('register_account',    __FILE__, 'larpnet_wifi_register_account');
 	Hook::unregister('addon_settings',      __FILE__, 'larpnet_wifi_settings');
 	Hook::unregister('addon_settings_post', __FILE__, 'larpnet_wifi_settings_post');
 }
@@ -70,11 +67,6 @@ function larpnet_wifi_write(int $uid, string $password = ''): bool
 	return true;
 }
 
-function larpnet_wifi_register_account(int &$uid)
-{
-	larpnet_wifi_write((int) $uid);
-}
-
 function larpnet_wifi_settings(array &$data)
 {
 	if (!DI::userSession()->getLocalUserId()) {
@@ -82,7 +74,7 @@ function larpnet_wifi_settings(array &$data)
 	}
 
 	$html = '<p>Kliknij przycisk, aby zresetować hasło do sieci WIFI Larpnet dostępnej na larparcie. '
-		. 'Nowe hasło zostanie wysłane na Twój adres email w ciągu kilku minut.</p>'
+		. 'Nowe hasło zostanie ustawione w ciągu kilku minut.</p>'
 		. '<p><em>To jest osobne hasło od tego którym logujesz się do larpnetu. '
 		. 'Wybierz coś prostego, co ma min 5 znaków i co wpiszesz z pamięci. '
 		. 'Nie jest też zaszyfrowane, więc NIE UŻYWAJ hasła które jest tajne.</em></p>'
@@ -112,7 +104,7 @@ function larpnet_wifi_settings_post(array &$b)
 	}
 
 	if (larpnet_wifi_write($uid, $password)) {
-		DI::sysmsg()->addInfo(DI::l10n()->t('Żądanie resetu hasła WIFI zostało przyjęte. Nowe hasło otrzymasz emailem.'));
+		DI::sysmsg()->addInfo(DI::l10n()->t('Żądanie resetu hasła WIFI zostało przyjęte. Nowe hasło zostanie ustawione w ciągu kilku minut.'));
 	} else {
 		DI::sysmsg()->addNotice(DI::l10n()->t('Nie udało się zapisać żądania. Spróbuj ponownie lub skontaktuj się z administratorem.'));
 	}

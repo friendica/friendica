@@ -2,7 +2,8 @@
 # larpnet-wifi-provision.sh
 # Processes spool files written by the larpnet_wifi Friendica addon.
 # For each file: provisions/resets the user in MikroTik User Manager,
-# emails the new password via Mailgun, then deletes the spool file.
+# optionally emails the new password via Mailgun (set SEND_EMAIL=yes),
+# then deletes the spool file.
 #
 # Deploy: cp larpnet-wifi-provision.sh /usr/local/sbin/ && chmod 700 /usr/local/sbin/larpnet-wifi-provision.sh
 # Config: /etc/larpnet-wifi.conf (chmod 600)
@@ -29,10 +30,17 @@ source "$CONFIG_FILE"
 : "${SCP_REMOTE_DIR:=/var/spool/portalprov}"
 : "${SCP_KEY:=}"
 : "${SCP_PORT:=22}"
-: "${MAILGUN_API_KEY:?not set in $CONFIG_FILE}"
-: "${MAILGUN_DOMAIN:?not set in $CONFIG_FILE}"
-: "${MAILGUN_FROM:?not set in $CONFIG_FILE}"
+: "${SEND_EMAIL:=no}"
+: "${MAILGUN_API_KEY:=}"
+: "${MAILGUN_DOMAIN:=}"
+: "${MAILGUN_FROM:=}"
 : "${EMAIL_SUBJECT:=Twoje hasło do sieci WIFI LARPnet}"
+
+if [[ "${SEND_EMAIL}" == "yes" ]]; then
+    : "${MAILGUN_API_KEY:?SEND_EMAIL=yes but MAILGUN_API_KEY not set in $CONFIG_FILE}"
+    : "${MAILGUN_DOMAIN:?SEND_EMAIL=yes but MAILGUN_DOMAIN not set in $CONFIG_FILE}"
+    : "${MAILGUN_FROM:?SEND_EMAIL=yes but MAILGUN_FROM not set in $CONFIG_FILE}"
+fi
 
 TLS_FLAG=""
 [[ "$MIKROTIK_TLS_VERIFY" == "no" ]] && TLS_FLAG="-k"
@@ -105,11 +113,11 @@ provision_user() {
         # User exists — reset password
         local result
         result=$(mt_curl PATCH "/user-manager/user/${user_id}" \
-            -d "{\"password\":\"${password}\"}" 2>&1) || {
+            -d "{\"password\":\"${password}\",\"profile\":\"${MIKROTIK_PROFILE}\"}" 2>&1) || {
             log "[ERROR] MikroTik password reset failed for '${portal_user}' (id=${user_id}): ${result}"
             return 1
         }
-        log "[INFO] Password reset for existing user '${portal_user}' (id=${user_id})"
+        log "[INFO] Password reset for existing user '${portal_user}' (id=${user_id}), profile=${MIKROTIK_PROFILE}"
     else
         # New user — create account
         local result
@@ -179,8 +187,10 @@ process_file() {
     # MikroTik provisioning must succeed before we delete the file
     provision_user "$portal_user" "$password" || return 1
 
-    # Email failure is non-fatal — don't block deletion or retry provisioning
-    send_email "$email" "$realname" "$portal_user" "$password" || true
+    # Email is optional; enabled by setting SEND_EMAIL=yes in config
+    if [[ "${SEND_EMAIL}" == "yes" ]]; then
+        send_email "$email" "$realname" "$portal_user" "$password" || true
+    fi
 
     rm -f "$spool_file"
     log "[INFO] Deleted ${spool_file}"
