@@ -418,7 +418,15 @@
 	{{$geotag nofilter}}
 
 	function jotShow() {
-		var modal = $('#jot-modal').modal();
+		var $jotModal = $('#jot-modal');
+		// Bootstrap modals must be direct children of <body> so their z-index
+		// is compared in the root stacking context (above the backdrop at 1040).
+		// Some pages (e.g. profile) wrap content in elements that create a new
+		// stacking context, which would trap the modal behind the backdrop.
+		if (!$jotModal.parent().is('body')) {
+			$jotModal.appendTo('body');
+		}
+		var modal = $jotModal.modal();
 		jotcache = $("#jot-sections");
 
 		// Auto focus on the first enabled field in the modal
