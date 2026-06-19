@@ -1528,8 +1528,12 @@ section #jotOpen {
 	margin-top: 20px;
 }
 #jot-text-wrap textarea {
+	flex: 1;
 	min-height: 100px;
 	overflow-y: auto !important;
+}
+#jot-text-wrap .dz-message {
+	display: none;
 }
 #jot-text-wrap .preview textarea {
 	width: 100%;
