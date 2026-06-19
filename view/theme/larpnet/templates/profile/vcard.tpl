@@ -73,7 +73,7 @@
 						</button>
 					</div>
 				{{/if}}
-				{{if $profile.addr}}
+				{{if $profile.addr && !$is_owner}}
 					<div id="jotOpen" class="pull-right">
 						<button type="button" id="mention-link" class="action-button btn btn-labeled btn-primary" onclick="openWallMessage('{{$mention_url}}')">
 							<i class="fa fa-lg fa-pencil"></i>
