@@ -214,7 +214,7 @@
 .dropzone:not(textarea) {
 	border: 1px solid rgba(0, 0, 0, 0.3);
 	padding: 0px 0px 5px 0px;
-	color: #999;
+	color: #444;
 }
 .dropzone.dz-clickable {
 	cursor: pointer;
