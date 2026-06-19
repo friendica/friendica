@@ -92,6 +92,7 @@ All files below are larpnet additions or patches. When rebasing onto a new Frien
 | `view/theme/larpnet_notifications/` | Stripped-down theme for notification emails |
 | `src/Model/Item.php` | Patched to add `SERVER_ONLY = 3` privacy constant |
 | `src/Object/Post.php` | Patched `fetchPrivacy()` to handle `SERVER_ONLY` |
+| `src/Module/Item/Compose.php` | Patched to allow the compose page with themes that extend Frio (not just Frio itself) |
 | `src/Module/Item/Display.php` | Patched to allow logged-in users to view `SERVER_ONLY` posts |
 | `src/Module/Post/Share.php` | Patched to block sharing of `SERVER_ONLY` posts |
 | `src/Module/Privacy/PermissionTooltip.php` | Patched to label `SERVER_ONLY` posts |

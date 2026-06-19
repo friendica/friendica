@@ -21,6 +21,7 @@ COPY src/Worker/NtfyPush.php                      /usr/src/friendica/src/Worker/
 COPY src/Model/Subscription.php                   /usr/src/friendica/src/Model/Subscription.php
 COPY src/Model/Item.php                           /usr/src/friendica/src/Model/Item.php
 COPY src/Object/Post.php                          /usr/src/friendica/src/Object/Post.php
+COPY src/Module/Item/Compose.php                  /usr/src/friendica/src/Module/Item/Compose.php
 COPY src/Module/Item/Display.php                  /usr/src/friendica/src/Module/Item/Display.php
 COPY src/Module/Post/Share.php                    /usr/src/friendica/src/Module/Post/Share.php
 COPY src/Module/Privacy/PermissionTooltip.php     /usr/src/friendica/src/Module/Privacy/PermissionTooltip.php
