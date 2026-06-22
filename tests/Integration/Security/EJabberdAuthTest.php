@@ -266,7 +266,7 @@ class EJabberdAuthTest extends FixtureTestCase
 			->with(
 				'https://friendi.ca/noscrape/someuser',
 				HttpClientAccept::JSON,
-				Mockery::on(fn ($opts) => $opts[HttpClientOptions::TIMEOUT] === 3),
+				Mockery::on(fn ($opts): bool => $opts[HttpClientOptions::TIMEOUT] === 3),
 			)
 			->andReturn($response)
 			->once();
