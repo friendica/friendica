@@ -277,11 +277,6 @@ return (function (string $basepath, array $getVars, array $serverVars, array $co
 				$serverVars,
 			],
 		],
-		\Friendica\App\Request::class => [
-			'constructParams' => [
-				$serverVars,
-			],
-		],
 		\Psr\Clock\ClockInterface::class => [
 			'instanceOf' => \Friendica\Util\Clock\SystemClock::class,
 		],

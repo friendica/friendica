@@ -135,9 +135,11 @@ class App
 	 */
 	public function processRequest(ServerRequestInterface $request, float $start_time): void
 	{
+		$appRequest = new Request($request, $this->container->create(IManageConfigValues::class));
+
 		$this->container->addRule(Mode::class, [
 			'call' => [
-				['determineRunMode', [false, $request->getServerParams()], Dice::CHAIN_CALL],
+				['determineRunMode', [false, $appRequest->getServerParams()], Dice::CHAIN_CALL],
 			],
 		]);
 
@@ -151,7 +153,7 @@ class App
 
 		$this->registerEventDispatcher();
 
-		$this->requestId = $this->container->create(Request::class)->getRequestId();
+		$this->requestId = $appRequest->getRequestId();
 		$this->auth      = $this->container->create(Authentication::class);
 		$this->config    = $this->container->create(IManageConfigValues::class);
 		$this->mode      = $this->container->create(Mode::class);
@@ -166,7 +168,7 @@ class App
 		$addonHelper = $this->container->create(AddonHelper::class);
 
 		$this->load(
-			$request->getServerParams(),
+			$appRequest->getServerParams(),
 			$this->container->create(DbaDefinition::class),
 			$this->container->create(ViewDefinition::class),
 			$this->mode,
@@ -187,7 +189,7 @@ class App
 			$addonHelper,
 			$this->container->create(ModuleHTTPException::class),
 			$start_time,
-			$request,
+			$appRequest,
 		);
 	}
 
@@ -423,7 +425,7 @@ class App
 		AddonHelper $addonHelper,
 		ModuleHTTPException $httpException,
 		float $start_time,
-		ServerRequestInterface $request,
+		Request $request,
 	) {
 		$this->mode->setExecutor(Mode::INDEX);
 
@@ -443,7 +445,6 @@ class App
 		$requeststring = ($serverVars['REQUEST_METHOD'] ?? '') . ' ' . ($serverVars['REQUEST_URI'] ?? '') . ' ' . ($serverVars['SERVER_PROTOCOL'] ?? '');
 		$this->logger->debug('Request received', ['address' => $serverVars['REMOTE_ADDR'] ?? '', 'request' => $requeststring, 'referer' => $serverVars['HTTP_REFERER'] ?? '', 'user-agent' => $serverVars['HTTP_USER_AGENT'] ?? '', 'requester' => $requester]);
 		$request_start = microtime(true);
-		$request       = $_REQUEST;
 
 		$this->profiler->set($start_time, 'start');
 		$this->profiler->set(microtime(true), 'classinit');
@@ -580,7 +581,9 @@ class App
 				$httpinput['files'] = [];
 			}
 
-			$input = array_merge($httpinput['variables'], $httpinput['files'], $request);
+			$request = $request->withHttpInput($httpinput['variables'] ?? []);
+
+			$input = array_merge($httpinput['files'], $request->getAllInput());
 
 			// Let the module run its internal process (init, get, post, ...)
 			$timestamp = microtime(true);

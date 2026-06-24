@@ -34,6 +34,12 @@ class CookieTest extends MockedTestCase
 		$this->baseUrl = \Mockery::mock(BaseURL::class);
 	}
 
+	private function createRequest(array $server = []): Request
+	{
+		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('GET', 'http://example.com', [], null, '1.1', $server);
+		return new Request($psr7Request, $this->config);
+	}
+
 	protected function tearDown(): void
 	{
 		StaticCookie::clearStatic();
@@ -51,7 +57,7 @@ class CookieTest extends MockedTestCase
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn('7')->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
 
-		$request = new Request($this->config, static::SERVER_ARRAY);
+		$request = $this->createRequest(static::SERVER_ARRAY);
 
 		$cookie = new Cookie($request, $this->config, $this->baseUrl);
 		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
@@ -117,7 +123,7 @@ class CookieTest extends MockedTestCase
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn('7')->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
 
-		$request = new Request($this->config, static::SERVER_ARRAY);
+		$request = $this->createRequest(static::SERVER_ARRAY);
 
 		$cookie = new Cookie($request, $this->config, $this->baseUrl, $cookieData);
 		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
@@ -177,7 +183,7 @@ class CookieTest extends MockedTestCase
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn('7')->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
 
-		$request = new Request($this->config, static::SERVER_ARRAY);
+		$request = $this->createRequest(static::SERVER_ARRAY);
 
 		$cookie = new Cookie($request, $this->config, $this->baseUrl);
 		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
@@ -239,7 +245,7 @@ class CookieTest extends MockedTestCase
 		$this->config->shouldReceive('get')->with('proxy', 'forwarded_for_headers')->andReturn(Request::DEFAULT_FORWARD_FOR_HEADER);
 
 
-		$request = new Request($this->config, $serverArray);
+		$request = $this->createRequest($serverArray);
 
 		$cookie = new StaticCookie($request, $this->config, $this->baseUrl);
 		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
@@ -264,7 +270,7 @@ class CookieTest extends MockedTestCase
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
 		$this->config->shouldReceive('get')->with('proxy', 'forwarded_for_headers')->andReturn(Request::DEFAULT_FORWARD_FOR_HEADER);
 
-		$request = new Request($this->config, $serverArray);
+		$request = $this->createRequest($serverArray);
 
 		$cookie = new StaticCookie($request, $this->config, $this->baseUrl, $serverArray);
 		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
@@ -289,7 +295,7 @@ class CookieTest extends MockedTestCase
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn(Cookie::DEFAULT_EXPIRE)->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
 
-		$request = new Request($this->config, static::SERVER_ARRAY);
+		$request = $this->createRequest(static::SERVER_ARRAY);
 
 		$cookie = new StaticCookie($request, $this->config, $this->baseUrl);
 		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
