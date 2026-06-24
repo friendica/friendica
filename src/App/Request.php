@@ -38,18 +38,13 @@ class Request implements ServerRequestInterface
 	protected $remoteAddress;
 	/** @var string The request-id of the current request */
 	protected $requestId;
-
-	private ServerRequestInterface $request;
-	private readonly IManageConfigValues $config;
 	private array $httpInput = [];
 	private array $serverParams;
 
-	public function __construct(ServerRequestInterface $request, IManageConfigValues $config)
+	public function __construct(private ServerRequestInterface $request, private readonly IManageConfigValues $config)
 	{
-		$this->request      = $request;
-		$this->config       = $config;
-		$this->serverParams = $request->getServerParams();
-		$this->remoteAddress = $this->determineRemoteAddress($config, $this->serverParams);
+		$this->serverParams  = $this->request->getServerParams();
+		$this->remoteAddress = $this->determineRemoteAddress($this->config, $this->serverParams);
 		$this->requestId     = $this->serverParams[static::DEFAULT_REQUEST_ID_HEADER] ?? System::createGUID(8, false);
 	}
 
@@ -75,7 +70,7 @@ class Request implements ServerRequestInterface
 
 	private function withRequest(ServerRequestInterface $request): static
 	{
-		$clone = clone $this;
+		$clone          = clone $this;
 		$clone->request = $request;
 		return $clone;
 	}
@@ -248,7 +243,7 @@ class Request implements ServerRequestInterface
 
 	public function withServerParams(array $serverParams): static
 	{
-		$clone = clone $this;
+		$clone                = clone $this;
 		$clone->serverParams  = $serverParams;
 		$clone->remoteAddress = $clone->determineRemoteAddress($clone->config, $serverParams);
 		$clone->requestId     = $serverParams[static::DEFAULT_REQUEST_ID_HEADER] ?? System::createGUID(8, false);
@@ -261,7 +256,7 @@ class Request implements ServerRequestInterface
 
 	public function withHttpInput(array $httpInput): static
 	{
-		$clone = $this->withRequest($this->request);
+		$clone            = $this->withRequest($this->request);
 		$clone->httpInput = $httpInput;
 		return $clone;
 	}

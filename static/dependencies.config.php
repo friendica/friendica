@@ -277,6 +277,12 @@ return (function (string $basepath, array $getVars, array $serverVars, array $co
 				$serverVars,
 			],
 		],
+		\Friendica\App\Request::class => [
+			'constructParams' => [
+				new \GuzzleHttp\Psr7\ServerRequest($serverVars['REQUEST_METHOD'] ?? 'GET', 'http://localhost', [], null, '1.1', $serverVars),
+				[Dice::INSTANCE => \Friendica\Core\Config\Capability\IManageConfigValues::class],
+			],
+		],
 		\Psr\Clock\ClockInterface::class => [
 			'instanceOf' => \Friendica\Util\Clock\SystemClock::class,
 		],

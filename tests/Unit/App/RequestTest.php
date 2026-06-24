@@ -328,7 +328,7 @@ class RequestTest extends TestCase
 	public function testGetUploadedFile(): void
 	{
 		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('POST', 'http://example.com', [], null, '1.1', ['REMOTE_ADDR' => '1.2.3.4']);
-		$upload = new \GuzzleHttp\Psr7\UploadedFile(\GuzzleHttp\Psr7\Utils::streamFor('test'), 4, UPLOAD_ERR_OK, 'file.txt');
+		$upload      = new \GuzzleHttp\Psr7\UploadedFile(\GuzzleHttp\Psr7\Utils::streamFor('test'), 4, UPLOAD_ERR_OK, 'file.txt');
 		$psr7Request = $psr7Request->withUploadedFiles(['avatar' => $upload]);
 		$configClass = self::createMock(IManageConfigValues::class);
 		$request     = new Request($psr7Request, $configClass);
