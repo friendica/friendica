@@ -9,10 +9,13 @@
 # Config: /etc/larpnet-wifi.conf (chmod 600)
 set -euo pipefail
 
-CONFIG_FILE="/etc/larpnet-wifi.conf"
-
-if [[ ! -f "$CONFIG_FILE" ]]; then
-    echo "[ERROR] Config file not found: $CONFIG_FILE" >&2
+CONFIG_FILE=""
+if [[ -f "./larpnet-wifi.conf" ]]; then
+    CONFIG_FILE="./larpnet-wifi.conf"
+elif [[ -f "/etc/larpnet-wifi.conf" ]]; then
+    CONFIG_FILE="/etc/larpnet-wifi.conf"
+else
+    echo "[ERROR] Config file not found (tried ./larpnet-wifi.conf and /etc/larpnet-wifi.conf)" >&2
     exit 1
 fi
 
@@ -28,8 +31,10 @@ source "$CONFIG_FILE"
 : "${SCP_HOST:=}"
 : "${SCP_USER:=}"
 : "${SCP_REMOTE_DIR:=/var/spool/portalprov}"
+SCP_REMOTE_DIR="${SCP_REMOTE_DIR%/}"
 : "${SCP_KEY:=}"
 : "${SCP_PORT:=22}"
+: "${DEFAULT_PASSWORD:=}"
 : "${SEND_EMAIL:=no}"
 : "${MAILGUN_API_KEY:=}"
 : "${MAILGUN_DOMAIN:=}"
@@ -46,7 +51,7 @@ TLS_FLAG=""
 [[ "$MIKROTIK_TLS_VERIFY" == "no" ]] && TLS_FLAG="-k"
 
 # Build common SSH/SCP option array from config
-_ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=accept-new -p "$SCP_PORT")
+_ssh_opts=(-o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 -o Port="$SCP_PORT")
 [[ -n "$SCP_KEY" ]] && _ssh_opts+=(-i "$SCP_KEY")
 
 log() { echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] $*"; }
@@ -88,12 +93,22 @@ mt_curl() {
     # Usage: mt_curl <method> <path> [extra curl args...]
     local method="$1" path="$2"
     shift 2
-    curl -sf $TLS_FLAG \
+    local tmpfile http_code body
+    tmpfile=$(mktemp)
+    http_code=$(curl -s --connect-timeout 10 --max-time 30 $TLS_FLAG \
         -u "${MIKROTIK_USER}:${MIKROTIK_PASS}" \
         -H "Content-Type: application/json" \
         -X "$method" \
+        -o "$tmpfile" \
+        -w '%{http_code}' \
         "${MIKROTIK_URL}/rest${path}" \
-        "$@"
+        "$@")
+    body=$(cat "$tmpfile"; rm -f "$tmpfile")
+    if [[ "$http_code" -lt 200 || "$http_code" -ge 300 ]]; then
+        echo "HTTP ${http_code}: ${body}" >&2
+        return 1
+    fi
+    echo "$body"
 }
 
 provision_user() {
@@ -110,24 +125,45 @@ provision_user() {
     user_id=$(echo "$lookup" | jq -r '.[0][".id"] // empty' 2>/dev/null)
 
     if [[ -n "$user_id" ]]; then
-        # User exists — reset password
         local result
         result=$(mt_curl PATCH "/user-manager/user/${user_id}" \
-            -d "{\"password\":\"${password}\",\"profile\":\"${MIKROTIK_PROFILE}\"}" 2>&1) || {
+            -d "{\"password\":\"${password}\"}" 2>&1) || {
             log "[ERROR] MikroTik password reset failed for '${portal_user}' (id=${user_id}): ${result}"
             return 1
         }
-        log "[INFO] Password reset for existing user '${portal_user}' (id=${user_id}), profile=${MIKROTIK_PROFILE}"
+        log "[INFO] Password reset for existing user '${portal_user}' (id=${user_id})"
     else
-        # New user — create account
         local result
         result=$(mt_curl PUT "/user-manager/user" \
-            -d "{\"name\":\"${portal_user}\",\"password\":\"${password}\",\"profile\":\"${MIKROTIK_PROFILE}\"}" 2>&1) || {
+            -d "{\"name\":\"${portal_user}\",\"password\":\"${password}\"}" 2>&1) || {
             log "[ERROR] MikroTik user creation failed for '${portal_user}': ${result}"
             return 1
         }
         log "[INFO] Created new user '${portal_user}'"
     fi
+
+    # Profile is managed via a separate user-profile table
+    local profile_lookup profile_entry_id presult
+    profile_lookup=$(mt_curl GET "/user-manager/user-profile" --get --data-urlencode "user=${portal_user}" 2>&1) || {
+        log "[ERROR] MikroTik profile lookup failed for '${portal_user}': ${profile_lookup}"
+        return 1
+    }
+    profile_entry_id=$(echo "$profile_lookup" | jq -r '.[0][".id"] // empty' 2>/dev/null)
+
+    if [[ -n "$profile_entry_id" ]]; then
+        presult=$(mt_curl PATCH "/user-manager/user-profile/${profile_entry_id}" \
+            -d "{\"profile\":\"${MIKROTIK_PROFILE}\"}" 2>&1) || {
+            log "[ERROR] MikroTik profile update failed for '${portal_user}': ${presult}"
+            return 1
+        }
+    else
+        presult=$(mt_curl PUT "/user-manager/user-profile" \
+            -d "{\"user\":\"${portal_user}\",\"profile\":\"${MIKROTIK_PROFILE}\"}" 2>&1) || {
+            log "[ERROR] MikroTik profile assignment failed for '${portal_user}': ${presult}"
+            return 1
+        }
+    fi
+    log "[INFO] Profile '${MIKROTIK_PROFILE}' assigned to '${portal_user}'"
 }
 
 send_email() {
@@ -179,7 +215,11 @@ process_file() {
     local password
     password=$(jq -r '.password // empty' "$spool_file")
     if [[ -z "$password" ]]; then
-        password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12)
+        if [[ -n "$DEFAULT_PASSWORD" ]]; then
+            password="$DEFAULT_PASSWORD"
+        else
+            password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 12)
+        fi
     fi
 
     log "[INFO] Processing uid=${uid} portal_user=${portal_user} file=$(basename "$spool_file")"
@@ -197,6 +237,7 @@ process_file() {
 }
 
 # Main loop
+mkdir -p "$SPOOL_DIR"
 fetch_remote_spool
 
 shopt -s nullglob
