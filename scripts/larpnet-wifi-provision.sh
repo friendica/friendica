@@ -151,18 +151,14 @@ provision_user() {
     profile_entry_id=$(echo "$profile_lookup" | jq -r '.[0][".id"] // empty' 2>/dev/null)
 
     if [[ -n "$profile_entry_id" ]]; then
-        presult=$(mt_curl PATCH "/user-manager/user-profile/${profile_entry_id}" \
-            -d "{\"profile\":\"${MIKROTIK_PROFILE}\"}" 2>&1) || {
-            log "[ERROR] MikroTik profile update failed for '${portal_user}': ${presult}"
-            return 1
-        }
-    else
-        presult=$(mt_curl PUT "/user-manager/user-profile" \
-            -d "{\"user\":\"${portal_user}\",\"profile\":\"${MIKROTIK_PROFILE}\"}" 2>&1) || {
-            log "[ERROR] MikroTik profile assignment failed for '${portal_user}': ${presult}"
-            return 1
-        }
+        mt_curl DELETE "/user-manager/user-profile/${profile_entry_id}" 2>/dev/null || true
     fi
+    local presult
+    presult=$(mt_curl PUT "/user-manager/user-profile" \
+        -d "{\"user\":\"${portal_user}\",\"profile\":\"${MIKROTIK_PROFILE}\"}" 2>&1) || {
+        log "[ERROR] MikroTik profile assignment failed for '${portal_user}': ${presult}"
+        return 1
+    }
     log "[INFO] Profile '${MIKROTIK_PROFILE}' assigned to '${portal_user}'"
 }
 
