@@ -25,7 +25,7 @@ class HTTPInputDataTest extends MockedTestCase
 			['Content-Type' => 'application/x-www-form-urlencoded;charset=utf8'],
 			'title=Test2',
 			'1.1',
-			['CONTENT_TYPE' => 'application/x-www-form-urlencoded;charset=utf8']
+			['CONTENT_TYPE' => 'application/x-www-form-urlencoded;charset=utf8'],
 		);
 
 		$httpInput = new HTTPInputDataDouble($psr7Request->getServerParams(), $psr7Request);

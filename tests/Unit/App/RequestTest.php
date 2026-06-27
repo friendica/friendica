@@ -166,7 +166,7 @@ class RequestTest extends TestCase
 		self::assertTrue($request->getBodyBool('active'));
 	}
 
-	public function testGetInputMerged(): void
+	public function testGetAllInputMerged(): void
 	{
 		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('POST', 'http://example.com', [], null, '1.1', ['REMOTE_ADDR' => '1.2.3.4']);
 		$psr7Request = $psr7Request->withQueryParams(['query_key' => 'qv', 'overlap' => 'query_val']);
@@ -174,20 +174,12 @@ class RequestTest extends TestCase
 		$configClass = self::createMock(IManageConfigValues::class);
 		$request     = new Request($psr7Request, $configClass);
 
-		self::assertSame('qv', $request->getInput('query_key'));
-		self::assertSame('bv', $request->getInput('body_key'));
-		self::assertSame('body_wins', $request->getInput('overlap'));
-		self::assertNull($request->getInput('nonexistent'));
-	}
+		$allInput = $request->getAllInput();
 
-	public function testGetInputWithHttpInput(): void
-	{
-		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('POST', 'http://example.com', [], null, '1.1', ['REMOTE_ADDR' => '1.2.3.4']);
-		$configClass = self::createMock(IManageConfigValues::class);
-		$request     = new Request($psr7Request, $configClass);
-		$request     = $request->withHttpInput(['http_key' => 'hv']);
-
-		self::assertSame('hv', $request->getInput('http_key'));
+		self::assertSame('qv', $allInput['query_key']);
+		self::assertSame('bv', $allInput['body_key']);
+		self::assertSame('body_wins', $allInput['overlap']);
+		self::assertArrayNotHasKey('nonexistent', $allInput);
 	}
 
 	public function testGetServerParam(): void
@@ -201,23 +193,6 @@ class RequestTest extends TestCase
 		self::assertNull($request->getServerParam('nonexistent'));
 	}
 
-	public function testIsMethod(): void
-	{
-		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('GET', 'http://example.com', [], null, '1.1', ['REMOTE_ADDR' => '1.2.3.4']);
-		$configClass = self::createMock(IManageConfigValues::class);
-		$request     = new Request($psr7Request, $configClass);
-
-		self::assertTrue($request->isGet());
-		self::assertTrue($request->isMethod('GET'));
-		self::assertFalse($request->isPost());
-		self::assertFalse($request->isPut());
-		self::assertFalse($request->isPatch());
-		self::assertFalse($request->isDelete());
-
-		$postRequest = new Request($psr7Request->withMethod('POST'), $configClass);
-		self::assertTrue($postRequest->isPost());
-	}
-
 	public function testWithMethodReturnsNewInstance(): void
 	{
 		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('GET', 'http://example.com', [], null, '1.1', ['REMOTE_ADDR' => '1.2.3.4']);
@@ -227,8 +202,8 @@ class RequestTest extends TestCase
 		$newRequest = $request->withMethod('POST');
 
 		self::assertNotSame($request, $newRequest);
-		self::assertTrue($request->isGet());
-		self::assertTrue($newRequest->isPost());
+		self::assertSame('GET', $request->getMethod());
+		self::assertSame('POST', $newRequest->getMethod());
 	}
 
 	public function testWithQueryParamsReturnsNewInstance(): void
@@ -261,19 +236,6 @@ class RequestTest extends TestCase
 		self::assertSame('5.6.7.8', $newRequest->getRemoteAddress());
 	}
 
-	public function testWithHttpInputReturnsNewInstance(): void
-	{
-		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('GET', 'http://example.com', [], null, '1.1', ['REMOTE_ADDR' => '1.2.3.4']);
-		$configClass = self::createMock(IManageConfigValues::class);
-		$request     = new Request($psr7Request, $configClass);
-
-		$newRequest = $request->withHttpInput(['key' => 'val']);
-
-		self::assertNotSame($request, $newRequest);
-		self::assertSame('val', $newRequest->getInput('key'));
-		self::assertNull($request->getInput('key'));
-	}
-
 	public function testGetCookieParam(): void
 	{
 		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('GET', 'http://example.com', [], null, '1.1', ['REMOTE_ADDR' => '1.2.3.4']);
@@ -302,12 +264,6 @@ class RequestTest extends TestCase
 		self::assertSame(0.0, $request->getBodyFloat('nonexistent'));
 		self::assertFalse($request->getBodyBool('nonexistent'));
 		self::assertSame([], $request->getBodyArray('nonexistent'));
-
-		self::assertSame('', $request->getInputString('nonexistent'));
-		self::assertSame(42, $request->getInputInt('nonexistent', 42));
-		self::assertSame(1.5, $request->getInputFloat('nonexistent', 1.5));
-		self::assertTrue($request->getInputBool('nonexistent', true));
-		self::assertSame(['default'], $request->getInputArray('nonexistent', ['default']));
 	}
 
 	public function testTypeCastingEdgeCases(): void

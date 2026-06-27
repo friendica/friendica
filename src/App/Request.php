@@ -38,7 +38,6 @@ class Request implements ServerRequestInterface
 	protected $remoteAddress;
 	/** @var string The request-id of the current request */
 	protected $requestId;
-	private array $httpInput = [];
 	private array $serverParams;
 
 	public function __construct(private ServerRequestInterface $request, private readonly IManageConfigValues $config)
@@ -251,17 +250,6 @@ class Request implements ServerRequestInterface
 	}
 
 	// ----------------------------------------------
-	// httpInput (immutable)
-	// ----------------------------------------------
-
-	public function withHttpInput(array $httpInput): static
-	{
-		$clone            = $this->withRequest($this->request);
-		$clone->httpInput = $httpInput;
-		return $clone;
-	}
-
-	// ----------------------------------------------
 	// Typed query parameter getters
 	// ----------------------------------------------
 
@@ -360,77 +348,9 @@ class Request implements ServerRequestInterface
 		return isset($files[$key]) && is_array($files[$key]) ? $files[$key] : [];
 	}
 
-	// ----------------------------------------------
-	// Convenience merged input (Query > Body > httpInput)
-	// ----------------------------------------------
-
 	public function getAllInput(): array
 	{
-		return array_merge($this->request->getQueryParams(), (array) $this->request->getParsedBody(), $this->httpInput);
-	}
-
-	public function getInput(string $key, mixed $default = null): mixed
-	{
-		return $this->getAllInput()[$key] ?? $default;
-	}
-
-	public function getInputString(string $key, string $default = ''): string
-	{
-		return $this->getString($this->getInput($key), $default);
-	}
-
-	public function getInputInt(string $key, int $default = 0): int
-	{
-		return $this->getInt($this->getInput($key), $default);
-	}
-
-	public function getInputFloat(string $key, float $default = 0.0): float
-	{
-		return $this->getFloat($this->getInput($key), $default);
-	}
-
-	public function getInputBool(string $key, bool $default = false): bool
-	{
-		return $this->getBool($this->getInput($key), $default);
-	}
-
-	public function getInputArray(string $key, array $default = []): array
-	{
-		return $this->getArray($this->getInput($key), $default);
-	}
-
-	// ----------------------------------------------
-	// HTTP helper methods
-	// ----------------------------------------------
-
-	public function isMethod(string $method): bool
-	{
-		return strtoupper($this->request->getMethod()) === strtoupper($method);
-	}
-
-	public function isGet(): bool
-	{
-		return $this->isMethod('GET');
-	}
-
-	public function isPost(): bool
-	{
-		return $this->isMethod('POST');
-	}
-
-	public function isPut(): bool
-	{
-		return $this->isMethod('PUT');
-	}
-
-	public function isPatch(): bool
-	{
-		return $this->isMethod('PATCH');
-	}
-
-	public function isDelete(): bool
-	{
-		return $this->isMethod('DELETE');
+		return array_merge($this->request->getQueryParams(), (array) $this->request->getParsedBody());
 	}
 
 	// ----------------------------------------------

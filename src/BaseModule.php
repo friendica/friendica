@@ -7,9 +7,11 @@
 
 namespace Friendica;
 
+use Friendica\App\Request;
 use Friendica\App\Router;
 use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Capabilities\ICanCreateResponses;
+use Friendica\Capabilities\RequestHandler;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Event\ModuleContentEvent;
@@ -33,10 +35,12 @@ use Psr\Log\LoggerInterface;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-abstract class BaseModule implements ICanHandleRequests
+abstract class BaseModule implements ICanHandleRequests, RequestHandler
 {
 	/** @var array */
 	protected $parameters = [];
+
+	private ?Request $appRequest = null;
 	/** @var L10n */
 	protected $l10n;
 	/** @var App\BaseURL */
@@ -73,6 +77,17 @@ abstract class BaseModule implements ICanHandleRequests
 		$this->server          = $server;
 		$this->response        = $response;
 		$this->eventDispatcher = $eventDispatcher ?? DI::eventDispatcher();
+	}
+
+	/**
+	 * @throws \RuntimeException when called outside of an HTTP request (e.g. from a CLI module context)
+	 */
+	protected function getServerRequest(): Request
+	{
+		if ($this->appRequest === null) {
+			throw new \RuntimeException('getServerRequest() cannot be called outside of an HTTP request context');
+		}
+		return $this->appRequest;
 	}
 
 	/**
@@ -182,10 +197,36 @@ abstract class BaseModule implements ICanHandleRequests
 	 */
 	protected function get(array $request = []) {}
 
+	public function handleRequest(Request $request): ResponseInterface
+	{
+		$this->appRequest = $request;
+		return $this->dispatchRequest($request->getAllInput());
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public function run(ModuleHTTPException $httpException, array $request = []): ResponseInterface
+	{
+		try {
+			return $this->dispatchRequest($request);
+		} catch (HTTPException $e) {
+			// In case of System::externalRedirects(), we don't want to prettyprint the exception
+			// just redirect to the new location
+			if (($e instanceof HTTPException\FoundException)
+				|| ($e instanceof HTTPException\MovedPermanentlyException)
+				|| ($e instanceof HTTPException\TemporaryRedirectException)) {
+				throw $e;
+			}
+
+			$this->response->setStatus($e->getCode(), $e->getMessage());
+			$this->response->addContent($httpException->content($e));
+
+			return $this->response->generate();
+		}
+	}
+
+	private function dispatchRequest(array $request): ResponseInterface
 	{
 		// @see https://github.com/tootsuite/mastodon/blob/c3aef491d66aec743a3a53e934a494f653745b61/config/initializers/cors.rb
 		if (str_starts_with($this->args->getQueryString(), '.well-known/')) {
@@ -253,24 +294,11 @@ abstract class BaseModule implements ICanHandleRequests
 		// templating and is expected to exit on its own if it is set.
 		$this->rawContent($request);
 
-		try {
-			$content = $this->eventDispatcher->dispatch(
-				new ModuleContentEvent(ModuleContentEvent::MODULE_CONTENT, $this->args->getModuleName(), static::class, ''),
-			)->getContent();
-			$this->response->addContent($content);
-			$this->response->addContent($this->content($request));
-		} catch (HTTPException $e) {
-			// In case of System::externalRedirects(), we don't want to prettyprint the exception
-			// just redirect to the new location
-			if (($e instanceof HTTPException\FoundException)
-				|| ($e instanceof HTTPException\MovedPermanentlyException)
-				|| ($e instanceof HTTPException\TemporaryRedirectException)) {
-				throw $e;
-			}
-
-			$this->response->setStatus($e->getCode(), $e->getMessage());
-			$this->response->addContent($httpException->content($e));
-		}
+		$content = $this->eventDispatcher->dispatch(
+			new ModuleContentEvent(ModuleContentEvent::MODULE_CONTENT, $this->args->getModuleName(), static::class, ''),
+		)->getContent();
+		$this->response->addContent($content);
+		$this->response->addContent($this->content($request));
 
 		$this->profiler->set(microtime(true) - $timestamp, 'content');
 

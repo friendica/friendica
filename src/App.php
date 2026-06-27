@@ -16,6 +16,7 @@ use Friendica\App\Request;
 use Friendica\App\Router;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Capabilities\ICanHandleRequests;
+use Friendica\Capabilities\RequestHandler;
 use Friendica\Content\Nav;
 use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Factory\Config;
@@ -135,6 +136,8 @@ class App
 	 */
 	public function processRequest(ServerRequestInterface $request, float $start_time): void
 	{
+		$request = $this->mergeRequestInput($request);
+
 		$appRequest = new Request($request, $this->container->create(IManageConfigValues::class));
 
 		$this->container->addRule(Mode::class, [
@@ -429,7 +432,6 @@ class App
 	) {
 		$this->mode->setExecutor(Mode::INDEX);
 
-		$httpInput  = new HTTPInputData($request->getServerParams());
 		$serverVars = $request->getServerParams();
 		$queryVars  = $request->getQueryParams();
 
@@ -571,23 +573,14 @@ class App
 			// Display can change depending on the requested language, so it shouldn't be cached whole
 			header('Vary: Accept-Language', false);
 
-			// Processes data from GET requests
-			$httpinput = $httpInput->process();
-
-			if (!is_array($httpinput['variables'])) {
-				$httpinput['variables'] = [];
-			}
-			if (!is_array($httpinput['files'])) {
-				$httpinput['files'] = [];
-			}
-
-			$request = $request->withHttpInput($httpinput['variables'] ?? []);
-
-			$input = array_merge($httpinput['files'], $request->getAllInput());
-
 			// Let the module run its internal process (init, get, post, ...)
 			$timestamp = microtime(true);
-			$response  = $module->run($httpException, $input);
+			if ($module instanceof RequestHandler) {
+				$response = $module->handleRequest($request);
+			} else {
+				trigger_error('Implement RequestHandler instead of ICanHandleRequests');
+				$response = $module->run($httpException, $request->getAllInput());
+			}
 			$this->profiler->set(microtime(true) - $timestamp, 'content');
 
 			// Wrapping HTML responses in the theme template
@@ -629,6 +622,25 @@ class App
 		}
 
 		return $module;
+	}
+
+	/**
+	 * Merges HTTP body input data into the PSR-7 request's parsed body.
+	 *
+	 * The PSR-7 request already contains UploadedFileInterface objects from Guzzle's
+	 * fromGlobals(), so uploaded files are preserved as-is.
+	 */
+	private function mergeRequestInput(ServerRequestInterface $request): ServerRequestInterface
+	{
+		$httpData  = new HTTPInputData($request->getServerParams(), $request);
+		$inputData = $httpData->process();
+
+		return $request->withParsedBody(
+			array_merge(
+				(array) $request->getParsedBody(),
+				$inputData['variables'],
+			),
+		);
 	}
 
 	/**
