@@ -7,6 +7,8 @@
 
 namespace Friendica\Util;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 /**
  * Derived from the work of Reid Johnson <https://codereview.stackexchange.com/users/4020/reid-johnson>
  * @see https://codereview.stackexchange.com/questions/69882/parsing-multipart-form-data-in-php-for-put-requests
@@ -15,10 +17,13 @@ class HTTPInputData
 {
 	/** @var array The $_SERVER variable */
 	protected $server;
+	/** @var ServerRequestInterface|null A PSR-7 request as alternative source for the body */
+	protected $request;
 
-	public function __construct(array $server)
+	public function __construct(array $server, ?ServerRequestInterface $request = null)
 	{
-		$this->server = $server;
+		$this->server  = $server;
+		$this->request = $request;
 	}
 
 	/**
@@ -267,6 +272,14 @@ class HTTPInputData
 	 */
 	protected function getPhpInputStream()
 	{
+		if ($this->request !== null) {
+			$bodyContent = (string) $this->request->getBody();
+			$stream      = fopen('php://temp', 'rb+');
+			fwrite($stream, $bodyContent);
+			rewind($stream);
+			return $stream;
+		}
+
 		return fopen('php://input', 'rb');
 	}
 
@@ -278,6 +291,10 @@ class HTTPInputData
 	 */
 	protected function getPhpInputContent()
 	{
+		if ($this->request !== null) {
+			return (string) $this->request->getBody();
+		}
+
 		return file_get_contents('php://input');
 	}
 }

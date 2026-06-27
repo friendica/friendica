@@ -8,6 +8,7 @@
 namespace Friendica\Test\Util;
 
 use Friendica\Util\HTTPInputData;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * This class is used to enable testability for HTTPInputData
@@ -21,6 +22,11 @@ class HTTPInputDataDouble extends HTTPInputData
 	protected $injectedContent = false;
 	/** @var false|string */
 	protected $injectedContentType = false;
+
+	public function __construct(array $server, ?ServerRequestInterface $request = null)
+	{
+		parent::__construct($server, $request);
+	}
 
 	/**
 	 * injects the PHP input stream for a test
@@ -55,13 +61,21 @@ class HTTPInputDataDouble extends HTTPInputData
 	/** {@inheritDoc} */
 	protected function getPhpInputStream()
 	{
-		return $this->injectedStream;
+		if ($this->injectedStream !== false) {
+			return $this->injectedStream;
+		}
+
+		return parent::getPhpInputStream();
 	}
 
 	/** {@inheritDoc} */
 	protected function getPhpInputContent()
 	{
-		return $this->injectedContent;
+		if ($this->injectedContent !== false) {
+			return $this->injectedContent;
+		}
+
+		return parent::getPhpInputContent();
 	}
 
 	protected function fetchFileData($stream, string $boundary, array $headers, string $filename)

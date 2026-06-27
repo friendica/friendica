@@ -17,6 +17,22 @@ use Friendica\Test\Util\HTTPInputDataDouble;
  */
 class HTTPInputDataTest extends MockedTestCase
 {
+	public function testProcessWithPsr7Body(): void
+	{
+		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest(
+			'POST',
+			'http://example.com',
+			['Content-Type' => 'application/x-www-form-urlencoded;charset=utf8'],
+			'title=Test2',
+			'1.1',
+			['CONTENT_TYPE' => 'application/x-www-form-urlencoded;charset=utf8']
+		);
+
+		$httpInput = new HTTPInputDataDouble($psr7Request->getServerParams(), $psr7Request);
+		$output    = $httpInput->process();
+
+		$this->assertSame(['variables' => ['title' => 'Test2'], 'files' => []], $output);
+	}
 	/**
 	 * Returns the data stream for the unit test
 	 * Each array element of the first hierarchy represents one test run
