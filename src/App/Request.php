@@ -237,19 +237,6 @@ class Request implements ServerRequestInterface
 	}
 
 	// ----------------------------------------------
-	// withServerParams (not part of PSR-7 interface)
-	// ----------------------------------------------
-
-	public function withServerParams(array $serverParams): static
-	{
-		$clone                = clone $this;
-		$clone->serverParams  = $serverParams;
-		$clone->remoteAddress = $clone->determineRemoteAddress($clone->config, $serverParams);
-		$clone->requestId     = $serverParams[static::DEFAULT_REQUEST_ID_HEADER] ?? System::createGUID(8, false);
-		return $clone;
-	}
-
-	// ----------------------------------------------
 	// Typed query parameter getters
 	// ----------------------------------------------
 

@@ -219,23 +219,6 @@ class RequestTest extends TestCase
 		self::assertSame([], $request->getQueryParams());
 	}
 
-	public function testWithServerParamsUpdatesRemoteAddress(): void
-	{
-		$configClass = self::createMock(IManageConfigValues::class);
-		$configClass->expects(self::atLeast(2))->method('get')->willReturnMap([
-			['proxy', 'trusted_proxies', '', ''],
-			['proxy', 'forwarded_for_headers', Request::DEFAULT_FORWARD_FOR_HEADER, Request::DEFAULT_FORWARD_FOR_HEADER],
-		]);
-
-		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('GET', 'http://example.com', [], null, '1.1', ['REMOTE_ADDR' => '1.2.3.4']);
-		$request     = new Request($psr7Request, $configClass);
-
-		$newRequest = $request->withServerParams(['REMOTE_ADDR' => '5.6.7.8']);
-
-		self::assertNotSame($request, $newRequest);
-		self::assertSame('5.6.7.8', $newRequest->getRemoteAddress());
-	}
-
 	public function testGetCookieParam(): void
 	{
 		$psr7Request = new \GuzzleHttp\Psr7\ServerRequest('GET', 'http://example.com', [], null, '1.1', ['REMOTE_ADDR' => '1.2.3.4']);
