@@ -27,8 +27,8 @@ class PasswordTooLong extends \Friendica\BaseModule
 
 	protected function post(array $request = [])
 	{
-		$newpass = $request['password'];
-		$confirm = $request['password_confirm'];
+		$newpass = $this->getServerRequest()->getBodyString('password');
+		$confirm = $this->getServerRequest()->getBodyString('password_confirm');
 
 		try {
 			if ($newpass != $confirm) {
@@ -36,9 +36,9 @@ class PasswordTooLong extends \Friendica\BaseModule
 			}
 
 			//  check if the old password was supplied correctly before changing it to the new value
-			User::getIdFromPasswordAuthentication($this->userSession->getLocalUserId(), $request['password_current']);
+			User::getIdFromPasswordAuthentication($this->userSession->getLocalUserId(), $this->getServerRequest()->getBodyString('password_current'));
 
-			if (strlen($request['password_current']) <= 72) {
+			if (strlen($this->getServerRequest()->getBodyString('password_current')) <= 72) {
 				throw new \Exception($this->l10n->t('Password does not need changing.'));
 			}
 
@@ -49,7 +49,7 @@ class PasswordTooLong extends \Friendica\BaseModule
 
 			$this->sysmsg->addInfo($this->l10n->t('Password changed.'));
 
-			$this->baseUrl->redirect($request['return_url'] ?? '');
+			$this->baseUrl->redirect($this->getServerRequest()->getQueryString('return_url'));
 		} catch (\Exception $e) {
 			$this->sysmsg->addNotice($e->getMessage());
 			$this->sysmsg->addNotice($this->l10n->t('Password unchanged.'));
@@ -73,7 +73,7 @@ class PasswordTooLong extends \Friendica\BaseModule
 			],
 
 			'$form_security_token' => self::getFormSecurityToken('security/password_too_long'),
-			'$return_url'          => $request['return_url'] ?? '',
+			'$return_url'          => $this->getServerRequest()->getQueryString('return_url'),
 
 			'$password_current' => ['password_current', $this->l10n->t('Current Password:'), '', $this->l10n->t('Your current password to confirm the changes'), 'required', 'autocomplete="off"'],
 			'$password'         => ['password', $this->l10n->t('New Password:'), '', $this->l10n->t('Allowed characters are a-z, A-Z, 0-9 and special characters except white spaces and accentuated letters.') . ' ' . $this->l10n->t('Password length is limited to 72 characters.'), 'required', 'autocomplete="off"', User::getPasswordRegExp()],
