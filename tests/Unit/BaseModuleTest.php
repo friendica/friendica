@@ -13,7 +13,6 @@ use Friendica\App\Arguments;
 use Friendica\App\Request;
 use Friendica\App\Router;
 use Friendica\BaseModule;
-use Friendica\Event\ModuleContentEvent;
 use Friendica\Module\Response;
 use Friendica\Util\Profiler;
 use PHPUnit\Framework\TestCase;

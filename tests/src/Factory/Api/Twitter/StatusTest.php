@@ -126,7 +126,7 @@ class StatusTest extends FixtureTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
-		$posts = DI::dba()->selectToArray('post-view', ['uri-id']);
+		$posts = DI::dba()->selectToArray('post-user-view', ['uri-id'], ['uid' => [0, ApiTestCase::SELF_USER['id']]]);
 		foreach ($posts as $item) {
 			$status = $this->statusFactory
 				->createFromUriId($item['uri-id'], ApiTestCase::SELF_USER['id'])

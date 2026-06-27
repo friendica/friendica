@@ -26,7 +26,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionClass;
 
 class PasswordTooLongTest extends TestCase
 {
@@ -37,7 +36,7 @@ class PasswordTooLongTest extends TestCase
 			$this->createStub(SystemMessages::class),
 			$this->createStub(L10n::class),
 			$this->createStub(BaseURL::class),
-			Router::GET
+			Router::GET,
 		);
 
 		$request = $this->createMock(Request::class);
@@ -50,7 +49,7 @@ class PasswordTooLongTest extends TestCase
 	public function testPostReadsPasswordFromTypedGetter(): void
 	{
 		$notices = [];
-		$sysmsg = $this->createMock(SystemMessages::class);
+		$sysmsg  = $this->createMock(SystemMessages::class);
 		$sysmsg->expects($this->atLeastOnce())
 			->method('addNotice')
 			->willReturnCallback(function (string $message) use (&$notices): void {
@@ -106,7 +105,7 @@ class PasswordTooLongTest extends TestCase
 		$eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 		$eventDispatcher->method('dispatch')->willReturnArgument(0);
 
-		$logger   = $this->createMock(LoggerInterface::class);
+		$logger      = $this->createMock(LoggerInterface::class);
 		$userSession = $this->createMock(IHandleUserSessions::class);
 
 		$this->setModuleProperty($module, 'baseUrl', $baseUrl);

@@ -25,6 +25,12 @@ class UploadTest extends ApiTestCase
 		$this->useHttpMethod(Router::POST);
 	}
 
+	protected function tearDown(): void
+	{
+		$_FILES = [];
+		parent::tearDown();
+	}
+
 	/**
 	 * Test the \Friendica\Module\Api\Twitter\Media\Upload module.
 	 */

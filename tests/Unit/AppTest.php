@@ -39,12 +39,12 @@ class AppTest extends TestCase
 			['Content-Type' => 'application/x-www-form-urlencoded;charset=utf8'],
 			'title=Test2',
 			'1.1',
-			['CONTENT_TYPE' => 'application/x-www-form-urlencoded;charset=utf8']
+			['CONTENT_TYPE' => 'application/x-www-form-urlencoded;charset=utf8'],
 		);
 
 		$app = App::fromContainer($this->createStub(Container::class));
 
-		$method = new \ReflectionMethod(App::class, 'mergeRequestInput');
+		$method          = new \ReflectionMethod(App::class, 'mergeRequestInput');
 		$modifiedRequest = $method->invoke($app, $psr7Request);
 
 		$appRequest = new Request($modifiedRequest, $configMock);
@@ -65,13 +65,13 @@ class AppTest extends TestCase
 			['Content-Type' => 'application/x-www-form-urlencoded;charset=utf8'],
 			'title=Test',
 			'1.1',
-			['CONTENT_TYPE' => 'application/x-www-form-urlencoded;charset=utf8']
+			['CONTENT_TYPE' => 'application/x-www-form-urlencoded;charset=utf8'],
 		);
 		$psr7Request = $psr7Request->withUploadedFiles(['avatar' => $uploadedFile]);
 
 		$app = App::fromContainer($this->createStub(Container::class));
 
-		$method = new \ReflectionMethod(App::class, 'mergeRequestInput');
+		$method          = new \ReflectionMethod(App::class, 'mergeRequestInput');
 		$modifiedRequest = $method->invoke($app, $psr7Request);
 
 		self::assertArrayHasKey('avatar', $modifiedRequest->getUploadedFiles());

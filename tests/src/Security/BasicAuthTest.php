@@ -12,6 +12,12 @@ use Friendica\Test\ApiTestCase;
 
 class BasicAuthTest extends ApiTestCase
 {
+	protected function tearDown(): void
+	{
+		unset($_REQUEST['source'], $_SERVER['HTTP_USER_AGENT'], $_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']);
+		parent::tearDown();
+	}
+
 	/**
 	 * Test the api_source() function.
 	 *

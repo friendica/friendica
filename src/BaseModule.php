@@ -200,7 +200,26 @@ abstract class BaseModule implements ICanHandleRequests, RequestHandler
 	public function handleRequest(Request $request): ResponseInterface
 	{
 		$this->appRequest = $request;
-		return $this->dispatchRequest($request->getAllInput());
+		try {
+			$this->dispatchRequestBase($request->getAllInput());
+			$this->dispatchRequestContent($request->getAllInput());
+			return $this->response->generate();
+		} catch (HTTPException $e) {
+			// In case of System::externalRedirects(), we don't want to prettyprint the exception
+			// just redirect to the new location
+			if (($e instanceof HTTPException\FoundException)
+				|| ($e instanceof HTTPException\MovedPermanentlyException)
+				|| ($e instanceof HTTPException\TemporaryRedirectException)) {
+				throw $e;
+			}
+
+			$httpException = DI::getDice()->create(ModuleHTTPException::class);
+
+			$this->response->setStatus($e->getCode(), $e->getMessage());
+			$this->response->addContent($httpException->content($e));
+
+			return $this->response->generate();
+		}
 	}
 
 	/**
@@ -208,8 +227,10 @@ abstract class BaseModule implements ICanHandleRequests, RequestHandler
 	 */
 	public function run(ModuleHTTPException $httpException, array $request = []): ResponseInterface
 	{
+		$this->dispatchRequestBase($request);
 		try {
-			return $this->dispatchRequest($request);
+			$this->dispatchRequestContent($request);
+			return $this->response->generate();
 		} catch (HTTPException $e) {
 			// In case of System::externalRedirects(), we don't want to prettyprint the exception
 			// just redirect to the new location
@@ -226,7 +247,7 @@ abstract class BaseModule implements ICanHandleRequests, RequestHandler
 		}
 	}
 
-	private function dispatchRequest(array $request): ResponseInterface
+	private function dispatchRequestBase(array $request): void
 	{
 		// @see https://github.com/tootsuite/mastodon/blob/c3aef491d66aec743a3a53e934a494f653745b61/config/initializers/cors.rb
 		if (str_starts_with($this->args->getQueryString(), '.well-known/')) {
@@ -288,11 +309,15 @@ abstract class BaseModule implements ICanHandleRequests, RequestHandler
 				break;
 		}
 
-		$timestamp = microtime(true);
 		// "rawContent" is especially meant for technical endpoints.
 		// This endpoint doesn't need any theme initialization or
 		// templating and is expected to exit on its own if it is set.
 		$this->rawContent($request);
+	}
+
+	private function dispatchRequestContent(array $request): void
+	{
+		$timestamp = microtime(true);
 
 		$content = $this->eventDispatcher->dispatch(
 			new ModuleContentEvent(ModuleContentEvent::MODULE_CONTENT, $this->args->getModuleName(), static::class, ''),
@@ -301,8 +326,6 @@ abstract class BaseModule implements ICanHandleRequests, RequestHandler
 		$this->response->addContent($this->content($request));
 
 		$this->profiler->set(microtime(true) - $timestamp, 'content');
-
-		return $this->response->generate();
 	}
 
 	/**
