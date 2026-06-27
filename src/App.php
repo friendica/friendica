@@ -142,7 +142,7 @@ class App
 
 		$this->container->addRule('*', [
 			'substitutions' => [
-				Request::class => $appRequest,
+				Request::class                => $appRequest,
 				ServerRequestInterface::class => $appRequest,
 			],
 			'shared' => true,
