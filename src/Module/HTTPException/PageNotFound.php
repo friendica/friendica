@@ -23,11 +23,19 @@ class PageNotFound extends BaseModule
 	/** @var string */
 	private $remoteAddress;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Request $request, array $server, array $parameters = [])
-	{
+	public function __construct(
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->remoteAddress = $request->getRemoteAddress();
+		$this->remoteAddress = $this->getServerRequest()->getRemoteAddress();
 	}
 
 	protected function content(array $request = []): string

@@ -43,8 +43,8 @@ class Request implements ServerRequestInterface
 	public function __construct(private ServerRequestInterface $request, private readonly IManageConfigValues $config)
 	{
 		$this->serverParams  = $this->request->getServerParams();
-		$this->remoteAddress = $this->determineRemoteAddress($this->config, $this->serverParams);
-		$this->requestId     = $this->serverParams[static::DEFAULT_REQUEST_ID_HEADER] ?? System::createGUID(8, false);
+		$this->remoteAddress = self::determineRemoteAddress($this->config, $this->serverParams);
+		$this->requestId     = self::determineRequestId($this->serverParams);
 	}
 
 	/**
@@ -385,7 +385,7 @@ class Request implements ServerRequestInterface
 	 *
 	 * @return boolean true if $remoteAddress matches $trustedProxy, false otherwise
 	 */
-	protected function matchesTrustedProxy(string $trustedProxy, string $remoteAddress): bool
+	private static function matchesTrustedProxy(string $trustedProxy, string $remoteAddress): bool
 	{
 		$cidrre = '/^([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})\/([0-9]{1,2})$/';
 
@@ -410,10 +410,10 @@ class Request implements ServerRequestInterface
 	 *
 	 * @return boolean true if $remoteAddress matches any entry in $trustedProxies, false otherwise
 	 */
-	protected function isTrustedProxy(array $trustedProxies, string $remoteAddress): bool
+	private static function isTrustedProxy(array $trustedProxies, string $remoteAddress): bool
 	{
 		foreach ($trustedProxies as $tp) {
-			if ($this->matchesTrustedProxy($tp, $remoteAddress)) {
+			if (self::matchesTrustedProxy($tp, $remoteAddress)) {
 				return true;
 			}
 		}
@@ -431,12 +431,17 @@ class Request implements ServerRequestInterface
 	 *
 	 * @return string
 	 */
-	protected function determineRemoteAddress(IManageConfigValues $config, array $server): string
+	public static function determineRemoteAddress(?IManageConfigValues $config, array $server): string
 	{
 		$remoteAddress  = $server['REMOTE_ADDR'] ?? '0.0.0.0';
+
+		if ($config === null) {
+			return $remoteAddress;
+		}
+
 		$trustedProxies = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', (string) $config->get('proxy', 'trusted_proxies', ''));
 
-		if (\is_array($trustedProxies) && $this->isTrustedProxy($trustedProxies, $remoteAddress)) {
+		if (\is_array($trustedProxies) && self::isTrustedProxy($trustedProxies, $remoteAddress)) {
 			$forwardedForHeaders = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', (string) $config->get('proxy', 'forwarded_for_headers', static::DEFAULT_FORWARD_FOR_HEADER));
 
 			foreach ($forwardedForHeaders as $header) {
@@ -450,7 +455,7 @@ class Request implements ServerRequestInterface
 						}
 
 						// skip trusted proxies in the list itself
-						if ($this->isTrustedProxy($trustedProxies, $IP)) {
+						if (self::isTrustedProxy($trustedProxies, $IP)) {
 							continue;
 						}
 
@@ -463,5 +468,10 @@ class Request implements ServerRequestInterface
 		}
 
 		return $remoteAddress;
+	}
+
+	public static function determineRequestId(array $serverParams): string
+	{
+		return $serverParams[self::DEFAULT_REQUEST_ID_HEADER] ?? System::createGUID(8, false);
 	}
 }

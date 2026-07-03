@@ -31,7 +31,6 @@ use Friendica\Test\Util\CreateDatabaseTrait;
 use Friendica\Test\Util\Database\StaticDatabase;
 use Friendica\Test\Util\FakeEventDispatcher;
 use org\bovigo\vfs\vfsStream;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\NullLogger;
 use Friendica\Test\Util\SampleStorageBackend;
 
@@ -274,10 +273,7 @@ class StorageManagerTest extends DatabaseTestCase
 		$dice = (new Dice())
 			->addRules(include __DIR__ . '/../../../../../static/dependencies.config.php')
 			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
-			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null])
-			->addRule('*', ['substitutions' => [
-				ServerRequestInterface::class => $this->createStub(ServerRequestInterface::class),
-			]]);
+			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
 		$storageManager = new StorageManager(
@@ -312,10 +308,7 @@ class StorageManagerTest extends DatabaseTestCase
 		$dice = (new Dice())
 			->addRules(include __DIR__ . '/../../../../../static/dependencies.config.php')
 			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
-			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null])
-			->addRule('*', ['substitutions' => [
-				ServerRequestInterface::class => $this->createStub(ServerRequestInterface::class),
-			]]);
+			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
 		/** @var \Friendica\Event\EventDispatcher */

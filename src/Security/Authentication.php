@@ -10,7 +10,6 @@ namespace Friendica\Security;
 use Exception;
 use Friendica\App\BaseURL;
 use Friendica\App\Mode;
-use Friendica\App\Request;
 use Friendica\AppHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
@@ -37,9 +36,6 @@ use Psr\Log\LoggerInterface;
  */
 class Authentication
 {
-	/** @var string */
-	private $remoteAddress;
-
 	/**
 	 * Sets the X-Account-Management-Status header
 	 *
@@ -64,7 +60,7 @@ class Authentication
 	 * @param Cookie                      $cookie
 	 * @param IHandleUserSessions         $session
 	 * @param IManagePersonalConfigValues $pConfig
-	 * @param Request                     $request
+	 * @param string                      $remoteAddress
 	 */
 	public function __construct(
 		private readonly IManageConfigValues $config,
@@ -77,10 +73,8 @@ class Authentication
 		private readonly IHandleUserSessions $session,
 		private readonly IManagePersonalConfigValues $pConfig,
 		private readonly AppHelper $appHelper,
-		Request $request,
-	) {
-		$this->remoteAddress = $request->getRemoteAddress();
-	}
+		private readonly string $remoteAddress,
+	) {}
 
 	/**
 	 * Tries to auth the user from the cookie or session

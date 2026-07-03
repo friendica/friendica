@@ -8,7 +8,6 @@
 namespace Friendica\Model\User;
 
 use Friendica\App\BaseURL;
-use Friendica\App\Request;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 
 /**
@@ -26,9 +25,6 @@ class Cookie
 	public const DOMAIN = '';
 	/** @var bool True, if the cookie should only be accessible through HTTP */
 	public const HTTPONLY = true;
-
-	/** @var string The remote address of this node */
-	private $remoteAddr;
 	/** @var bool True, if the connection is ssl enabled */
 	private $sslEnabled;
 	/** @var string The private key of this Friendica node */
@@ -39,13 +35,13 @@ class Cookie
 	private $data;
 
 	/**
-	 * @param Request             $request The current http request
+	 * @param string              $remoteAddr The client IP address
 	 * @param IManageConfigValues $config
 	 * @param BaseURL             $baseURL
 	 * @param array               $COOKIE The $_COOKIE array
 	 */
 	public function __construct(
-		Request $request,
+		private readonly string $remoteAddr,
 		IManageConfigValues $config,
 		BaseURL $baseURL,
 		array $COOKIE = [],
@@ -59,8 +55,6 @@ class Cookie
 			self::DEFAULT_EXPIRE,
 		);
 		$this->lifetime = $authCookieDays * 24 * 60 * 60;
-
-		$this->remoteAddr = $request->getRemoteAddress();
 
 		$this->data = json_decode($COOKIE[self::NAME] ?? '[]', true) ?: [];
 	}

@@ -13,7 +13,6 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Test\DatabaseTestCase;
 use Friendica\Test\Util\Database\StaticDatabase;
-use Psr\Http\Message\ServerRequestInterface;
 
 class DBATest extends DatabaseTestCase
 {
@@ -23,10 +22,7 @@ class DBATest extends DatabaseTestCase
 
 		$dice = (new Dice())
 			->addRules(include __DIR__ . '/../../../static/dependencies.config.php')
-			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
-			->addRule('*', ['substitutions' => [
-				ServerRequestInterface::class => $this->createStub(ServerRequestInterface::class),
-			]]);
+			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true]);
 		DI::init($dice);
 
 		// Default config

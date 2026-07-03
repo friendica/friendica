@@ -7,7 +7,6 @@
 
 namespace Friendica\Core\Logger\Util;
 
-use Friendica\App\Request;
 use Friendica\Core\Logger\Capability\IHaveCallIntrospections;
 use Friendica\Core\System;
 
@@ -16,9 +15,6 @@ use Friendica\Core\System;
  */
 class Introspection implements IHaveCallIntrospections
 {
-	/** @var string */
-	private $requestId;
-
 	private $skipFunctions = [
 		'call_user_func',
 		'call_user_func_array',
@@ -28,10 +24,11 @@ class Introspection implements IHaveCallIntrospections
 	 * @param string[] $skipClassesPartials  An array of classes to skip during logging
 	 * @param int      $skipStackFramesCount If the logger should use information from other hierarchy levels of the call
 	 */
-	public function __construct(Request $request, private array $skipClassesPartials = [], private readonly int $skipStackFramesCount = 0)
-	{
-		$this->requestId = $request->getRequestId();
-	}
+	public function __construct(
+		private readonly string $requestId,
+		private array $skipClassesPartials = [],
+		private readonly int $skipStackFramesCount = 0,
+	) {}
 
 	/**
 	 * Adds new classes to get skipped

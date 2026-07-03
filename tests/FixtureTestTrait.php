@@ -20,7 +20,6 @@ use Friendica\Database\DBStructure;
 use Friendica\DI;
 use Friendica\Test\Util\Database\StaticDatabase;
 use Friendica\Test\Util\VFSTrait;
-use Psr\Http\Message\ServerRequestInterface;
 
 trait FixtureTestTrait
 {
@@ -48,9 +47,6 @@ trait FixtureTestTrait
 				'call'       => [['createConfigFileManager', [$this->root->url(), $this->root->url() . '/addon', $server,], Dice::CHAIN_CALL]]])
 			->addRule(Database::class, ['instanceOf' => StaticDatabase::class, 'shared' => true])
 			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null])
-			->addRule('*', ['substitutions' => [
-				ServerRequestInterface::class => $this->createStub(ServerRequestInterface::class),
-			]])
 			->addRule(Arguments::class, [
 				'instanceOf' => Arguments::class,
 				'call'       => [

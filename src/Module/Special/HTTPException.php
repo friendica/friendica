@@ -8,7 +8,6 @@
 namespace Friendica\Module\Special;
 
 use Friendica\App\Arguments;
-use Friendica\App\Request;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Model\UserSession;
@@ -38,14 +37,20 @@ class HTTPException
 	/** @var string */
 	protected $requestId;
 
-	public function __construct(L10n $l10n, LoggerInterface $logger, Arguments $args, UserSession $session, Request $request, array $server = [])
-	{
+	public function __construct(
+		L10n $l10n,
+		LoggerInterface $logger,
+		Arguments $args,
+		UserSession $session,
+		string $requestId,
+		array $server = [],
+	) {
 		$this->logger      = $logger;
 		$this->l10n        = $l10n;
 		$this->args        = $args;
 		$this->isSiteAdmin = $session->isSiteAdmin();
 		$this->server      = $server;
-		$this->requestId   = $request->getRequestId();
+		$this->requestId   = $requestId;
 	}
 
 	/**

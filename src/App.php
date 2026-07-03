@@ -140,14 +140,6 @@ class App
 
 		$appRequest = new Request($request, $this->container->create(IManageConfigValues::class));
 
-		$this->container->addRule('*', [
-			'substitutions' => [
-				Request::class                => $appRequest,
-				ServerRequestInterface::class => $appRequest,
-			],
-			'shared' => true,
-		]);
-
 		$this->container->addRule(Mode::class, [
 			'call' => [
 				['determineRunMode', [false, $appRequest->getServerParams()], Dice::CHAIN_CALL],
