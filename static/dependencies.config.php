@@ -191,7 +191,7 @@ return (function (string $basepath, array $getVars, array $serverVars, array $co
 			'instanceOf'      => \Friendica\Core\Logger\Util\Introspection::class,
 			'constructParams' => [
 				[
-					\Dice\Dice::INSTANCE => function() use ($serverVars) {
+					\Dice\Dice::INSTANCE => function () use ($serverVars) {
 						return \Friendica\App\Request::determineRequestId($serverVars);
 					},
 				],
@@ -252,7 +252,7 @@ return (function (string $basepath, array $getVars, array $serverVars, array $co
 		\Friendica\Security\Authentication::class => [
 			'constructParams' => [
 				[
-					\Dice\Dice::INSTANCE => function(\Dice\Dice $dice) use ($serverVars) {
+					\Dice\Dice::INSTANCE => function (\Dice\Dice $dice) use ($serverVars) {
 						$config = $dice->create(\Friendica\Core\Config\Capability\IManageConfigValues::class);
 						return \Friendica\App\Request::determineRemoteAddress($config, $serverVars);
 					},
@@ -265,7 +265,7 @@ return (function (string $basepath, array $getVars, array $serverVars, array $co
 		\Friendica\Model\User\Cookie::class => [
 			'constructParams' => [
 				[
-					\Dice\Dice::INSTANCE => function(\Dice\Dice $dice) use ($serverVars) {
+					\Dice\Dice::INSTANCE => function (\Dice\Dice $dice) use ($serverVars) {
 						$config = $dice->create(\Friendica\Core\Config\Capability\IManageConfigValues::class);
 						return \Friendica\App\Request::determineRemoteAddress($config, $serverVars);
 					},
@@ -310,7 +310,7 @@ return (function (string $basepath, array $getVars, array $serverVars, array $co
 		\Friendica\Module\Special\HTTPException::class => [
 			'constructParams' => [
 				[
-					\Dice\Dice::INSTANCE => function() use ($serverVars) {
+					\Dice\Dice::INSTANCE => function () use ($serverVars) {
 						return \Friendica\App\Request::determineRequestId($serverVars);
 					},
 				],

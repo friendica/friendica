@@ -433,7 +433,7 @@ class Request implements ServerRequestInterface
 	 */
 	public static function determineRemoteAddress(?IManageConfigValues $config, array $server): string
 	{
-		$remoteAddress  = $server['REMOTE_ADDR'] ?? '0.0.0.0';
+		$remoteAddress = $server['REMOTE_ADDR'] ?? '0.0.0.0';
 
 		if ($config === null) {
 			return $remoteAddress;
