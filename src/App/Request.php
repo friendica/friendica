@@ -426,6 +426,8 @@ class Request implements ServerRequestInterface
 	 * and `forwarded_for_headers` has been configured then the IP address
 	 * specified in this header will be returned instead.
 	 *
+	 * @internal
+	 *
 	 * @param IManageConfigValues $config
 	 * @param array               $server The $_SERVER array
 	 *
@@ -470,6 +472,9 @@ class Request implements ServerRequestInterface
 		return $remoteAddress;
 	}
 
+	/**
+	 * @internal
+	 */
 	public static function determineRequestId(array $serverParams): string
 	{
 		return $serverParams[self::DEFAULT_REQUEST_ID_HEADER] ?? System::createGUID(8, false);
