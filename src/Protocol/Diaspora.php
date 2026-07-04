@@ -234,7 +234,7 @@ class Diaspora
 
 				$outer_key_bundle = '';
 				@openssl_private_decrypt($encrypted_aes_key_bundle, $outer_key_bundle, $privKey);
-				$j_outer_key_bundle = json_decode($outer_key_bundle);
+				$j_outer_key_bundle = json_decode((string) $outer_key_bundle);
 
 				if (!is_object($j_outer_key_bundle)) {
 					DI::logger()->info('Unable to decode outer key bundle', ['outer_key_bundle' => $outer_key_bundle]);
@@ -370,16 +370,16 @@ class Diaspora
 
 			$encrypted_header = json_decode(base64_decode($children->encrypted_header));
 
-			$encrypted_aes_key_bundle = base64_decode($encrypted_header->aes_key);
-			$ciphertext               = base64_decode($encrypted_header->ciphertext);
+			$encrypted_aes_key_bundle = base64_decode((string) $encrypted_header->aes_key);
+			$ciphertext               = base64_decode((string) $encrypted_header->ciphertext);
 
 			$outer_key_bundle = '';
 			openssl_private_decrypt($encrypted_aes_key_bundle, $outer_key_bundle, $privKey);
 
-			$j_outer_key_bundle = json_decode($outer_key_bundle);
+			$j_outer_key_bundle = json_decode((string) $outer_key_bundle);
 
-			$outer_iv  = base64_decode($j_outer_key_bundle->iv);
-			$outer_key = base64_decode($j_outer_key_bundle->key);
+			$outer_iv  = base64_decode((string) $j_outer_key_bundle->iv);
+			$outer_key = base64_decode((string) $j_outer_key_bundle->key);
 
 			$decrypted = self::aesDecrypt($outer_key, $outer_iv, $ciphertext);
 
@@ -515,7 +515,7 @@ class Diaspora
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function dispatch(array $importer, array $msg, SimpleXMLElement $fields = null, int $direction = self::PUSHED)
+	public static function dispatch(array $importer, array $msg, ?SimpleXMLElement $fields = null, int $direction = self::PUSHED)
 	{
 		// The sender is the handle of the contact that sent the message.
 		// This will often be different with relayed messages (for example "like" and "comment")
@@ -942,18 +942,18 @@ class Diaspora
 	{
 		preg_replace_callback(
 			"=diaspora://.*?/post/([0-9A-Za-z\-_@.:]{15,254}[0-9A-Za-z])=ism",
-			function ($match) use ($item) {
+			function ($match) use ($item): void {
 				self::fetchGuidSub($match, $item);
 			},
-			$item['body'],
+			(string) $item['body'],
 		);
 
 		preg_replace_callback(
 			"&\[url=/?posts/([^\[\]]*)\](.*)\[\/url\]&Usi",
-			function ($match) use ($item) {
+			function ($match) use ($item): void {
 				self::fetchGuidSub($match, $item);
 			},
-			$item['body'],
+			(string) $item['body'],
 		);
 	}
 
@@ -1285,7 +1285,7 @@ class Diaspora
 		$platform = '';
 		$gserver  = DBA::selectFirst('gserver', ['platform'], ['nurl' => Strings::normaliseLink($contact['baseurl'])]);
 		if (!empty($gserver['platform'])) {
-			$platform = strtolower($gserver['platform']);
+			$platform = strtolower((string) $gserver['platform']);
 			DI::logger()->info('Detected platform', ['platform' => $platform, 'url' => $contact['url']]);
 		}
 
@@ -1423,7 +1423,7 @@ class Diaspora
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function getUriFromGuid(string $guid, WebFingerUri $person_uri = null): string
+	private static function getUriFromGuid(string $guid, ?WebFingerUri $person_uri = null): string
 	{
 		$item = Post::selectFirst(['uri'], ['guid' => $guid]);
 		if ($item) {
@@ -1458,12 +1458,7 @@ class Diaspora
 		 * [2] = name (optional)
 		 * [3] = profile URL
 		 */
-
 		foreach ($matches as $match) {
-			if ($match === '') {
-				continue;
-			}
-
 			try {
 				$contact = DI::dsprContact()->getByUrl(new Uri($match[3]));
 				Tag::storeByHash($uriid, $match[1], $contact->name ?: $contact->nick, $contact->url);
@@ -1601,11 +1596,9 @@ class Diaspora
 			return false;
 		}
 
-		if ($message_id) {
-			DI::logger()->info('Stored comment ' . $datarray['guid'] . ' with message id ' . $message_id);
-			if ($datarray['uid'] == 0) {
-				Item::distribute($message_id, json_encode($data));
-			}
+		DI::logger()->info('Stored comment ' . $datarray['guid'] . ' with message id ' . $message_id);
+		if ($datarray['uid'] == 0) {
+			Item::distribute($message_id, json_encode($data));
 		}
 
 		return true;
@@ -1859,11 +1852,9 @@ class Diaspora
 			return false;
 		}
 
-		if ($message_id) {
-			DI::logger()->info('Stored like ' . $datarray['guid'] . ' with message id ' . $message_id);
-			if ($datarray['uid'] == 0) {
-				Item::distribute($message_id, json_encode($data));
-			}
+		DI::logger()->info('Stored like ' . $datarray['guid'] . ' with message id ' . $message_id);
+		if ($datarray['uid'] == 0) {
+			Item::distribute($message_id, json_encode($data));
 		}
 
 		return true;
@@ -2142,7 +2133,7 @@ class Diaspora
 		// this is to prevent multiple birthday notifications in a single year
 		// if we already have a stored birthday and the 'm-d' part hasn't changed, preserve the entry, which will preserve the notify year
 
-		if (substr($birthday, 5) === substr($contact['bd'], 5)) {
+		if (substr($birthday, 5) === substr((string) $contact['bd'], 5)) {
 			$birthday = $contact['bd'];
 		}
 
@@ -2247,15 +2238,25 @@ class Diaspora
 
 		if (!$following && $sharing && in_array($importer['page-flags'], [User::PAGE_FLAGS_SOAPBOX, User::PAGE_FLAGS_NORMAL])) {
 			DI::logger()->info("Author " . $author . " wants to share with us - but doesn't want to listen. Request is ignored.");
+
 			return false;
-		} elseif (!$following && !$sharing) {
+		}
+
+		if (!$following && !$sharing) {
 			DI::logger()->info("Author " . $author . " doesn't want anything - and we don't know the author. Request is ignored.");
+
 			return false;
-		} elseif (!$following && $sharing) {
+		}
+
+		if (!$following && $sharing) {
 			DI::logger()->info("Author " . $author . " wants to share with us.");
-		} elseif ($following && $sharing) {
+		}
+
+		if ($following && $sharing) {
 			DI::logger()->info("Author " . $author . " wants to have a bidirectional connection.");
-		} elseif ($following && !$sharing) {
+		}
+
+		if ($following && !$sharing) {
 			DI::logger()->info("Author " . $author . " wants to listen to us.");
 		}
 
@@ -2619,7 +2620,7 @@ class Diaspora
 	 * @param string           $xml       The original XML of the message
 	 * @param int              $direction Indicates if the message had been fetched or pushed (self::PUSHED, self::FETCHED, self::FORCED_FETCH)
 	 *
-	 * @return int|bool The message id of the newly created item or false on error
+	 * @return bool True if the item was created or false on error
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
@@ -2816,7 +2817,7 @@ class Diaspora
 
 		$json_object = json_encode(
 			[
-				'aes_key'                  => base64_encode($encrypted_key_bundle),
+				'aes_key'                  => base64_encode((string) $encrypted_key_bundle),
 				'encrypted_magic_envelope' => base64_encode($ciphertext),
 			],
 		);
@@ -3216,7 +3217,7 @@ class Diaspora
 		}
 
 		return [
-			'root_handle' => strtolower($reshared['post']['author-addr']),
+			'root_handle' => strtolower((string) $reshared['post']['author-addr']),
 			'root_guid'   => $reshared['post']['guid'],
 		];
 	}
@@ -3271,7 +3272,7 @@ class Diaspora
 			$eventdata['description'] = html_entity_decode(BBCode::toMarkdown($event['desc']));
 		}
 		if ($event['location']) {
-			$event['location'] = preg_replace("/\[map\](.*?)\[\/map\]/ism", '$1', $event['location']);
+			$event['location'] = preg_replace("/\[map\](.*?)\[\/map\]/ism", '$1', (string) $event['location']);
 			$coord             = Map::getCoordinates($event['location']);
 
 			$location            = [];
@@ -3362,8 +3363,8 @@ class Diaspora
 			$body = BBCode::toMarkdown($body);
 
 			// Adding the title
-			if (strlen($title)) {
-				$body = '### ' . html_entity_decode($title) . "\n\n" . $body;
+			if (strlen((string) $title)) {
+				$body = '### ' . html_entity_decode((string) $title) . "\n\n" . $body;
 			}
 
 			$location = [];
@@ -3373,7 +3374,7 @@ class Diaspora
 			}
 
 			if ($item['coord'] != '') {
-				$coord           = explode(' ', $item['coord']);
+				$coord           = explode(' ', (string) $item['coord']);
 				$location['lat'] = $coord[0];
 				$location['lng'] = $coord[1];
 			}
@@ -3394,7 +3395,7 @@ class Diaspora
 			}
 
 			// Diaspora rejects messages when they contain a location without "lat" or "lng"
-			if (!isset($location['lat']) || !isset($location['lng'])) {
+			if ($location['lat'] === '' || $location['lng'] === '') {
 				unset($message['location']);
 			}
 
@@ -3447,7 +3448,7 @@ class Diaspora
 				continue;
 			}
 
-			$name = basename($media['url']);
+			$name = basename((string) $media['url']);
 			$path = str_replace($name, '', $media['url']);
 
 			$message[++$counter . ':photo'] = [
@@ -3694,7 +3695,9 @@ class Diaspora
 	{
 		if ($item['deleted']) {
 			return self::sendRetraction($item, $owner, $contact, $public_batch, true);
-		} elseif (in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE])) {
+		}
+
+		if (in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE])) {
 			$type = 'like';
 		} else {
 			$type = 'comment';
@@ -3707,13 +3710,12 @@ class Diaspora
 		$message = [];
 		if (is_array($msg)) {
 			foreach ($msg as $field => $data) {
-				if (!$item['deleted']) {
-					if ($field == 'diaspora_handle') {
-						$field = 'author';
-					}
-					if ($field == 'target_type') {
-						$field = 'parent_type';
-					}
+				if ($field === 'diaspora_handle') {
+					$field = 'author';
+				}
+
+				if ($field === 'target_type') {
+					$field = 'parent_type';
 				}
 
 				$message[$field] = $data;
@@ -3743,7 +3745,7 @@ class Diaspora
 	 */
 	public static function sendRetraction(array $item, array $owner, array $contact, bool $public_batch = false, bool $relay = false): int
 	{
-		$itemaddr = strtolower($item['author-addr']);
+		$itemaddr = strtolower((string) $item['author-addr']);
 
 		$msg_type = 'retraction';
 

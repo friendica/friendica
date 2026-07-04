@@ -16,7 +16,7 @@ class StaticCookie extends Cookie
 {
 	/** @var array static Cookie array mock */
 	public static $_COOKIE = [];
-	/** @var int The last expire time set */
+	/** @var int|null The last expire time set */
 	public static $_EXPIRE;
 
 	/**
@@ -33,10 +33,10 @@ class StaticCookie extends Cookie
 	 *
 	 * @see          Cookie::setCookie()
 	 */
-	protected function setCookie(string $value = null, int $expire = null, bool $secure = null): bool
+	protected function setCookie(?string $value = null, ?int $expire = null, ?bool $secure = null): bool
 	{
 		self::$_COOKIE[self::NAME] = $value;
-		self::$_EXPIRE = $expire;
+		self::$_EXPIRE             = $expire;
 
 		return true;
 	}

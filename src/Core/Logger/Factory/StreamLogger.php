@@ -38,8 +38,11 @@ class StreamLogger extends AbstractLoggerTypeFactory
 	 *
 	 * @throws LoggerException in case the logger cannot get created
 	 */
-	public function create(IManageConfigValues $config, string $logfile = null, string $channel = null): LoggerInterface
-	{
+	public function create(
+		IManageConfigValues $config,
+		?string $logfile = null,
+		?string $channel = null,
+	): LoggerInterface {
 		@trigger_error('Class `' . self::class . '` is deprecated since 2026.01 and will be removed after 5 months, implement `\Friendica\Core\Logger\Factory\LoggerFactory` instead.', E_USER_DEPRECATED);
 
 		$fileSystem = new FileSystem();

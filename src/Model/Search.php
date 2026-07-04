@@ -31,29 +31,29 @@ class Search
 			$user_condition = DBA::mergeConditions($user_condition, ["`last-activity` > ?", DateTimeFormat::utc('now - ' . $abandon_days . ' days')]);
 		}
 
-		$condition = $user_condition;
+		$condition    = $user_condition;
 		$condition[0] = "SELECT DISTINCT(`term`) FROM `search` INNER JOIN `user` ON `search`.`uid` = `user`.`uid` WHERE " . $user_condition[0];
-		$sql = array_shift($condition);
-		$termsStmt = DBA::p($sql, $condition);
+		$sql          = array_shift($condition);
+		$termsStmt    = DBA::p($sql, $condition);
 
 		$tags = [];
 		while ($term = DBA::fetch($termsStmt)) {
-			$tags[] = trim(mb_strtolower($term['term']), '#');
+			$tags[] = trim(mb_strtolower((string) $term['term']), '#');
 		}
 		DBA::close($termsStmt);
 
-		$condition = $user_condition;
+		$condition    = $user_condition;
 		$condition[0] = "SELECT `include-tags` FROM `channel` INNER JOIN `user` ON `channel`.`uid` = `user`.`uid` WHERE " . $user_condition[0];
-		$sql = array_shift($condition);
-		$channels = DBA::p($sql, $condition);
+		$sql          = array_shift($condition);
+		$channels     = DBA::p($sql, $condition);
 		while ($channel = DBA::fetch($channels)) {
-			foreach (explode(',', $channel['include-tags']) as $tag) {
+			foreach (explode(',', (string) $channel['include-tags']) as $tag) {
 				$tag = trim(mb_strtolower($tag));
 				if (empty($tag)) {
 					continue;
 				}
 				if (!in_array($tag, $tags)) {
-					$tags[]	= $tag;
+					$tags[] = $tag;
 				}
 			}
 		}

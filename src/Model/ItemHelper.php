@@ -22,30 +22,18 @@ use Psr\Log\LoggerInterface;
  *
  * @see Item::insert()
  */
-final class ItemHelper
+final readonly class ItemHelper
 {
-	private ItemContent $itemContent;
-
-	private Activity $activity;
-
-	private LoggerInterface $logger;
-
-	private Database $database;
-
 	private string $baseUrl;
 
 	public function __construct(
-		ItemContent $itemContent,
-		Activity $activity,
-		LoggerInterface $logger,
-		Database $database,
-		BaseURL $baseURL
+		private ItemContent $itemContent,
+		private Activity $activity,
+		private LoggerInterface $logger,
+		private Database $database,
+		BaseURL $baseURL,
 	) {
-		$this->itemContent = $itemContent;
-		$this->activity    = $activity;
-		$this->logger      = $logger;
-		$this->database    = $database;
-		$this->baseUrl     = $baseURL->__toString();
+		$this->baseUrl = $baseURL->__toString();
 	}
 
 	public function prepareOriginPost(array $item): array
@@ -226,7 +214,7 @@ final class ItemHelper
 			$item['commented'] = $item['received'] ;
 		}
 
-		$item['plink'] = ($item['plink'] ?? '') ?: $this->baseUrl . '/display/' . urlencode($item['guid']);
+		$item['plink'] = ($item['plink'] ?? '') ?: $this->baseUrl . '/display/' . urlencode((string) $item['guid']);
 
 		$item['gravity'] = $this->getGravity($item);
 

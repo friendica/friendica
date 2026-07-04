@@ -10,7 +10,7 @@
 
 namespace Friendica\Module\Update;
 
-use Friendica\Content\Conversation;
+use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Module\Conversation\Community as CommunityModule;
@@ -22,13 +22,21 @@ use Friendica\Module\Conversation\Community as CommunityModule;
  */
 class Community extends CommunityModule
 {
+	/** @var ConversationRenderer */
+	protected $conversationRenderer;
+
+	public function __construct(ConversationRenderer $conversationRenderer)
+	{
+		$this->conversationRenderer = $conversationRenderer;
+	}
+
 	protected function rawContent(array $request = [])
 	{
 		$this->parseRequest($request);
 
 		$o = '';
 		if ($this->update || $this->force) {
-			$o = DI::conversation()->render($this->getCommunityItems(), Conversation::MODE_COMMUNITY, true, false, 'commented', DI::userSession()->getLocalUserId());
+			$o = $this->conversationRenderer->renderThreaded($this->getCommunityItems(), ConversationRenderer::MODE_COMMUNITY, true, ConversationRenderer::ORDER_COMMENTED, DI::userSession()->getLocalUserId(), $request);
 		}
 
 		System::htmlUpdateExit($o);

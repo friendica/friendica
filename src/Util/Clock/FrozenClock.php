@@ -13,15 +13,9 @@ use DateTimeImmutable;
  * Inspired by lcobucci/clock
  * @see https://github.com/lcobucci/clock
  */
-final class FrozenClock implements \Psr\Clock\ClockInterface
+final readonly class FrozenClock implements \Psr\Clock\ClockInterface
 {
-	/** @var DateTimeImmutable */
-	private $now;
-
-	public function __construct(DateTimeImmutable $now = null)
-	{
-		$this->now = $now ?? new DateTimeImmutable('now', new \DateTimeZone('UTC'));
-	}
+	public function __construct(private ?DateTimeImmutable $now = new DateTimeImmutable('now', new \DateTimeZone('UTC'))) {}
 
 	/**
 	 * @inheritDoc

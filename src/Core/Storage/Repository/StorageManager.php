@@ -51,16 +51,6 @@ class StorageManager
 	 */
 	private $backendInstances = [];
 
-	/** @var Database */
-	private $dba;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var LoggerInterface */
-	private $logger;
-	private EventDispatcherInterface $eventDispatcher;
-	/** @var L10n */
-	private $l10n;
-
 	/** @var ICanWriteToStorage */
 	private $currentBackend;
 
@@ -74,14 +64,15 @@ class StorageManager
 	 * @throws InvalidClassStorageException in case the active backend class is invalid
 	 * @throws StorageException in case of unexpected errors during the active backend class loading
 	 */
-	public function __construct(Database $dba, IManageConfigValues $config, LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, L10n $l10n, bool $includeAddon = true)
-	{
-		$this->dba             = $dba;
-		$this->config          = $config;
-		$this->logger          = $logger;
-		$this->eventDispatcher = $eventDispatcher;
-		$this->l10n            = $l10n;
-		$this->validBackends   = $config->get('storage', 'backends', self::DEFAULT_BACKENDS);
+	public function __construct(
+		private readonly Database $dba,
+		private readonly IManageConfigValues $config,
+		private readonly LoggerInterface $logger,
+		private readonly EventDispatcherInterface $eventDispatcher,
+		private readonly L10n $l10n,
+		bool $includeAddon = true,
+	) {
+		$this->validBackends = $this->config->get('storage', 'backends', self::DEFAULT_BACKENDS);
 
 		$currentName = $this->config->get('storage', 'name');
 
@@ -178,7 +169,7 @@ class StorageManager
 	 * @throws InvalidClassStorageException in case there's no backend class for the name
 	 * @throws StorageException in case of an unexpected failure during the hook call
 	 */
-	public function getByName(string $name, array $validBackends = null): ICanReadFromStorage
+	public function getByName(string $name, ?array $validBackends = null): ICanReadFromStorage
 	{
 		// If there's no cached instance create a new instance
 		if (!isset($this->backendInstances[$name])) {
@@ -238,7 +229,7 @@ class StorageManager
 	 *
 	 * @return boolean True, if the backend is a valid backend
 	 */
-	public function isValidBackend(string $name = null, array $validBackends = null): bool
+	public function isValidBackend(?string $name = null, ?array $validBackends = null): bool
 	{
 		$validBackends ??= array_merge(
 			$this->validBackends,

@@ -6,7 +6,7 @@
   *}}
 {{* The button to open the jot - in This theme we move the button with js to the second nav bar *}}
 <a class="action-button btn btn-primary pull-right{{if !$always_open_compose}} modal-open{{/if}}" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
-	<i class="fa fa-lg fa-pencil"></i>
+	<i class="ri ri-lg ri-pencil-line"></i>
 	<span>{{$new_post}}</span>
 </a>
 
@@ -16,7 +16,7 @@
 			<button type="button" class="close" data-dismiss="modal" aria-label="Close" style="float: right;">&times;</button>
 
 			<a href="/compose" class="btn btn-secondary compose-link" title="{{$compose_link_title}}" aria-label="{{$compose_link_title}}">
-				<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+				<i class="ri ri-edit-box-line" aria-hidden="true"></i>
 			</a>
 
 			{{* The Jot navigation menu for desktop user (text input, permissions, preview, filebrowser) *}}
@@ -25,28 +25,28 @@
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
 				<li class="active">
 					<a href="#profile-jot-wrapper" class="jot-text-lnk jot-nav-lnk" id="jot-text-lnk" role="tab" aria-controls="profile-jot-wrapper">
-						<i class="fa fa-file-text-o" aria-hidden="true"></i>
+						<i class="ri ri-file-text-line" aria-hidden="true"></i>
 						{{$message}}
 					</a>
 				</li>
 				{{if $preview}}
 				<li>
 					<a href="#jot-preview-content" class="jot-preview-lnk jot-nav-lnk" id="jot-preview-lnk" role="tab" aria-controls="jot-preview-content">
-						<i class="fa fa-eye" aria-hidden="true"></i>
+						<i class="ri ri-eye-line" aria-hidden="true"></i>
 						{{$preview}}
 					</a>
 				</li>
 				{{/if}}
 				<li>
 					<a href="#jot-fbrowser-wrapper" class="jot-browser-lnk jot-nav-lnk" id="jot-browser-link" role="tab" aria-controls="jot-fbrowser-wrapper">
-						<i class="fa fa-picture-o" aria-hidden="true"></i>
+						<i class="ri ri-image-line" aria-hidden="true"></i>
 						{{$browser}}
 					</a>
 				</li>
 				{{if $acl}}
 				<li>
 					<a href="#profile-jot-acl-wrapper" class="jot-perms-lnk jot-nav-lnk" id="jot-perms-lnk" role="tab" aria-controls="profile-jot-acl-wrapper">
-						<i class="fa fa-shield" aria-hidden="true"></i>
+						<i class="ri ri-shield-line" aria-hidden="true"></i>
 						{{$shortpermset}}
 					</a>
 				</li>
@@ -114,28 +114,28 @@
 
 					{{* The jot text field in which the post text is inserted *}}
 					<div id="jot-text-wrap" class="dropzone">
-						<textarea rows="8" cols="64" class="profile-jot-text form-control text-autosize" id="profile-jot-text" name="body" placeholder="{{$share}}" onFocus="jotTextOpenUI(this);" onBlur="jotTextCloseUI(this);" style="min-width:100%; max-width:100%;" dir="auto" onkeydown="sendOnCtrlEnter(event, 'profile-jot-submit')">{{if $content}}{{$content nofilter}}{{/if}}</textarea>
+						<textarea rows="8" cols="64" class="profile-jot-text form-control text-autosize emojis-target" id="profile-jot-text" name="body" placeholder="{{$share}}" onFocus="jotTextOpenUI(this);" onBlur="jotTextCloseUI(this);" style="min-width:100%; max-width:100%;" dir="auto" onkeydown="sendOnCtrlEnter(event, 'profile-jot-submit')">{{if $content}}{{$content nofilter}}{{/if}}</textarea>
 					</div>
 
 					<ul id="profile-jot-submit-wrapper" class="jothidden nav nav-pills">
-						<li><button type="button" class="btn-link" id="profile-attach"  ondragenter="return linkDropper(event);" ondragover="return linkDropper(event);" ondrop="linkDrop(event);" onclick="jotGetLink();" title="{{$edattach}}"><i class="fa fa-paperclip"></i></button></li>
-						<li><button type="button" class="hidden-xs btn-link icon emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}"><i class="fa fa-smile-o"></i></button></li>
+						<li><button type="button" class="btn-link" id="profile-attach"  ondragenter="return linkDropper(event);" ondragover="return linkDropper(event);" ondrop="linkDrop(event);" onclick="jotGetLink();" title="{{$edattach}}"><i class="ri ri-attachment-2"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link icon emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}"><i class="ri ri-emotion-line"></i></button></li>
 
-						<li><button type="button" class="btn-link icon" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormattingToPost('url');"><i class="fa fa-link"></i></button></li>
-						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$eduline}}" title="{{$eduline}}" onclick="insertFormattingToPost('u');"><i class="fa fa-underline"></i></button></li>
-						<li><button type="button" class="hidden-xs btn-link icon italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormattingToPost('i');"><i class="fa fa-italic"></i></button></li>
-						<li><button type="button" class="hidden-xs btn-link icon bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormattingToPost('b');"><i class="fa fa-bold"></i></button></li>
-						<li><button type="button" class="hidden-xs btn-link icon quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormattingToPost('quote');"><i class="fa fa-quote-left"></i></button></li>
-						<li><button type="button" class="btn-link" id="profile-location" onclick="jotGetLocation();" title="{{$setloc}}"><i class="fa fa-map-marker" aria-hidden="true"></i></button></li>
-						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormattingToPost('abstract');"><i class="fa fa-eye"></i></button></li>
-						<li><button type="button" class="hidden-xs btn-link" style="cursor: pointer;" aria-label="{{$edcode}}" title="{{$edcode}}" onclick="insertFormattingToPost('code');"><i class="fa fa-code"></i></button></li>
+						<li><button type="button" class="btn-link icon" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormattingToPost('url');"><i class="ri ri-link"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$eduline}}" title="{{$eduline}}" onclick="insertFormattingToPost('u');"><i class="ri ri-underline"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link icon italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormattingToPost('i');"><i class="ri ri-italic"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link icon bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormattingToPost('b');"><i class="ri ri-bold"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link icon quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormattingToPost('quote');"><i class="ri ri-double-quotes-l"></i></button></li>
+						<li><button type="button" class="btn-link" id="profile-location" onclick="jotGetLocation();" title="{{$setloc}}"><i class="ri ri-map-pin-line" aria-hidden="true"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormattingToPost('abstract');"><i class="ri ri-eye-line"></i></button></li>
+						<li><button type="button" class="hidden-xs btn-link" style="cursor: pointer;" aria-label="{{$edcode}}" title="{{$edcode}}" onclick="insertFormattingToPost('code');"><i class="ri ri-code-line"></i></button></li>
 						<!-- TODO: waiting for a better placement
 						<li><button type="button" class="btn-link" id="profile-nolocation" onclick="jotClearLocation();" title="{{$noloc}}">{{$shortnoloc}}</button></li>
 						-->
 
 						<li class="pull-right">
 							<button class="btn btn-primary" type="submit" id="profile-jot-submit" name="submit" data-loading-text="{{$loading}}">
-								<i class="fa fa-paper-plane fa-fw" aria-hidden="true"></i> {{$share}}
+							<i class="ri ri-send-plane-line ri-fw" aria-hidden="true"></i> {{$share}}
 							</button>
 						</li>
 						<li id="character-counter" class="grey jothidden text-info pull-right"></li>
@@ -162,7 +162,7 @@
 					<ul id="profile-jot-preview-submit-wrapper" class="jothidden nav nav-pills">
 						<li class="pull-right">
 							<button class="btn btn-primary" type="submit" id="profile-jot-preview-submit" name="submit" data-loading-text="{{$loading}}">
-								<i class="fa fa-paper-plane fa-fw" aria-hidden="true"></i> {{$share}}
+							<i class="ri ri-send-plane-line ri-fw" aria-hidden="true"></i> {{$share}}
 							</button>
 						</li>
 					</ul>

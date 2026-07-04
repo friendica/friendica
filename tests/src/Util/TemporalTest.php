@@ -21,20 +21,20 @@ class TemporalTest extends TestCase
 	/**
 	 * Checks for getRelativeDate()
 	 */
-	public function testGetRelativeDate()
+	public function testGetRelativeDate(): void
 	{
 		$clock = new FrozenClock();
 
 		// "never" should be returned
 		self::assertEquals(
 			Temporal::getRelativeDate('', true, $clock),
-			DI::l10n()->t('never')
+			DI::l10n()->t('never'),
 		);
 
 		// Format current date/time into "MySQL" format
 		self::assertEquals(
 			Temporal::getRelativeDate($clock->now()->format(DateTimeFormat::MYSQL), true, $clock),
-			DI::l10n()->t('less than a second ago')
+			DI::l10n()->t('less than a second ago'),
 		);
 
 		// Format current date/time - 1 minute into "MySQL" format
@@ -44,25 +44,25 @@ class TemporalTest extends TestCase
 		// Should be both equal
 		self::assertEquals(
 			Temporal::getRelativeDate($minuteAgo, true, $clock),
-			sprintf($format, 1, DI::l10n()->t('minute'))
+			sprintf($format, 1, DI::l10n()->t('minute')),
 		);
 
-		$almostAnHourAgoInterval = new \DateInterval('PT59M59S');
+		$almostAnHourAgoInterval         = new \DateInterval('PT59M59S');
 		$almostAnHourAgoInterval->invert = 1;
-		$almostAnHourAgo = (clone $clock->now())->add($almostAnHourAgoInterval);
+		$almostAnHourAgo                 = (clone $clock->now())->add($almostAnHourAgoInterval);
 
 		self::assertEquals(
 			Temporal::getRelativeDate($almostAnHourAgo->format(DateTimeFormat::MYSQL), true, $clock),
-			sprintf($format, 59, DI::l10n()->t('minutes'))
+			sprintf($format, 59, DI::l10n()->t('minutes')),
 		);
 
-		$anHourAgoInterval = new \DateInterval('PT1H');
+		$anHourAgoInterval         = new \DateInterval('PT1H');
 		$anHourAgoInterval->invert = 1;
-		$anHourAgo = (clone $clock->now())->add($anHourAgoInterval);
+		$anHourAgo                 = (clone $clock->now())->add($anHourAgoInterval);
 
 		self::assertEquals(
 			Temporal::getRelativeDate($anHourAgo->format(DateTimeFormat::MYSQL), true, $clock),
-			sprintf($format, 1, DI::l10n()->t('hour'))
+			sprintf($format, 1, DI::l10n()->t('hour')),
 		);
 	}
 }

@@ -354,9 +354,9 @@ class Statuses extends BaseApi
 			}
 
 			$this->jsonExit(DI::mstdnScheduledStatus()->createFromDelayedPostId($id, $uid)->toArray());
+		} elseif (!empty($request['scheduled_at'])) {
+			$item['created'] = $scheduled_at;
 		}
-
-		$item['created'] = $scheduled_at;
 
 		$id = Item::insert($item, true);
 		if (!empty($id)) {
@@ -440,17 +440,17 @@ class Statuses extends BaseApi
 		$item['attachments'] = [];
 
 		foreach ($media_ids as $id) {
-			if (DI::mstdnAttachment()->isAttach($id) && Attach::exists(['id' => substr($id, 7)])) {
-				$attach     = Attach::selectFirst([], ['id' => substr($id, 7)]);
+			if (DI::mstdnAttachment()->isAttach($id) && Attach::exists(['id' => substr((string) $id, 7)])) {
+				$attach     = Attach::selectFirst([], ['id' => substr((string) $id, 7)]);
 				$attachment = [
 					'type'     => Post\Media::getType($attach['filetype']),
 					'mimetype' => $attach['filetype'],
-					'url'      => DI::baseUrl() . '/attach/' . substr($id, 7),
+					'url'      => DI::baseUrl() . '/attach/' . substr((string) $id, 7),
 					'size'     => $attach['filetype'],
 					'name'     => $attach['filename'],
 				];
 				$item['attachments'][] = $attachment;
-				Attach::setPermissionForId(substr($id, 7), $item['uid'], $item['allow_cid'], $item['allow_gid'], $item['deny_cid'], $item['deny_gid']);
+				Attach::setPermissionForId(substr((string) $id, 7), $item['uid'], $item['allow_cid'], $item['allow_gid'], $item['deny_cid'], $item['deny_gid']);
 				continue;
 			}
 

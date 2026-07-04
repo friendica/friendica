@@ -15,11 +15,11 @@ use PHPUnit\Framework\TestCase;
  */
 class HTTPSignatureTest extends TestCase
 {
-	public function dataParseSigned()
+	public static function dataParseSigned()
 	{
 		return [
 			'signed1' => [
-				'header' => 'keyId="test-key-a", algorithm="hs2019",
+				'signature' => 'keyId="test-key-a", algorithm="hs2019",
        created=1402170695,
        headers="(request-target) (created) host date content-type digest
            content-length",
@@ -47,12 +47,12 @@ class HTTPSignatureTest extends TestCase
 					'expires'   => null,
 					'headers'   => ['accept', 'x-open-web-auth'],
 					'signature' => base64_decode('lZzgtUOtyko/ZUjTRq6kUye6VmLbF2Zrku9TMl+9LEEdt7rxXOd+jpRr8L0s0G0oYSrbMzArgnk5S2XAz1XLi6GhoEgpyKJNmpnYUc/GvD86k0Cmb12TQF7B4Zv8k6h5LLCHppMi5myNIqQ95mqzVeWewCTgUupZVaqJxUAve1Uyx12jlzfYo6HAprXHhZKbLSAVfg+qiS8ufVp4coCYguioSMtMd4QvCFtAO3rFGwZ5yizXmPiKjhLQqxoy15+1VifTeAy8KJ+nPy+XeakpiYTfbPuCvaDqAMqboFx+J5epKS7M2T581oIgpSmQpHpkfCU8AT/JJ99Kktyzfn+ctK3Q8bKSjZQOT9S66S1b04jvFMggDM7p8Zu+Nr/SaS7ro5Yr7Fc200CM7yoRvef7MKQ7o0HASP8sMQwtSB4k+NlNBLUu9Eo/6P16bzx27cg3yGyuh15qmU8dL9heHqBL+E/m96BTZKIB5D81TkO/m0MpvJIxR0NfS9qKFcCAoev8kfcGcnVxtcxuCys7M/iW4ykJoMhFJDnsfN7mygOledeTmug8ARm0WpxUhtoNqhQrDXjAGbuPnQ1B/fPNwKVrHdFa2i/va0kgwa5+yh2ACqyMfrKCSkv2Prni3iKTKs8W0o/bF6FFeSqPsCGxneSMoYx3FOaSy6ts2gyuAwEozSg='),
-				]
-			]
+				],
+			],
 		];
 	}
 
-	public function dataHeader()
+	public static function dataHeader()
 	{
 		return [
 			'signed' => [
@@ -111,26 +111,22 @@ G1vVmRgkLDqhc4+r3wDz3qy6JpV7tg==
 				'keyId'  => 'acct:admin@friendica.local',
 				'header' => [
 					'Accept'          => 'application/x-dfrn+json, application/x-zot+json',
-					'X-Open-Web-Auth' => '1dde649b855fd1aae542a91c4edd8c3a7a4c59d8eaf3136cdee05dfc16a30bac'
+					'X-Open-Web-Auth' => '1dde649b855fd1aae542a91c4edd8c3a7a4c59d8eaf3136cdee05dfc16a30bac',
 				],
 				'signature' => 'Signature keyId="acct:admin@friendica.local",algorithm="rsa-sha512",headers="accept x-open-web-auth",signature="cb09/wdmRdFhrQUczL0lR6LTkVh8qb/vYh70DFCW40QrzvuUYHzJ+GqqJW6tcCb2rXP4t+aobWKfZ4wFMBtVbejAiCgF01pzEBJfDevdyu7khlfKo+Gtw1CGk4/0so1QmqASeHdlG3ID3GnmuovqZn2v5f5D+1UAJ6Pu6mtAXrGRntoEM/oqYBAsRrMtDSDAE4tnOSDu2YfVJJLfyUX1ZWjUK0ejZXZ0YTDJwU8PqRcRX17NhBaDq82dEHlfhD7I/aOclwVbfKIi5Ud619XCxPq0sAAYso17MhUm40oBCJVze2x4pswJhv9IFYohtR5G/fKkz2eosu3xeRflvGicS4JdclhTRgCGWDy10DV76FiXiS5N2clLXreHItWEXlZKZx6m9zAZoEX92VRnc4BY4jDsRR89Pl88hELaxiNipviyHS7XYZTRnkLM+nvtOcxkHSCbEs7oGw+AX+pLHoU5otNOqy+ZbXQ1cUvFOBYZmYdX3DiWaLfBKraakPkslJuU3yJu95X1qYmQTpOZDR4Ma/yf5fmWJh5D9ywnXxxd6RaupoO6HTtIl6gmsfcsyZNi5hRbbgPI3BiQwGYVGF6qzJpEOMzEyHyAuFeanhicc8b+P+DCwXni5sjM7ntKwShbCBP80KHSdoumORin3/PYgHCmHZVv71N0HNlPZnyVzZw="',
-			]
+			],
 		];
 	}
 
-	/**
-	 * @dataProvider dataParseSigned
-	 */
-	public function testParseSigheader(string $signature, array $assertion)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataParseSigned')]
+	public function testParseSigheader(string $signature, array $assertion): void
 	{
 		$headers = HTTPSignature::parseSigheader($signature);
 		self::assertEquals($assertion, $headers);
 	}
 
-	/**
-	 * @dataProvider dataHeader
-	 */
-	public function testSignHeader(string $privKey, string $keyId, array $header, string $signature)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataHeader')]
+	public function testSignHeader(string $privKey, string $keyId, array $header, string $signature): void
 	{
 		$signed = HTTPSignature::createSig($header, $privKey, $keyId);
 		self::assertEquals($signature, $signed['Authorization'][0]);

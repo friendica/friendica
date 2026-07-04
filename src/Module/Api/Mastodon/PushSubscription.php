@@ -113,7 +113,7 @@ class PushSubscription extends BaseApi
 		if (is_bool($input)) {
 			return $input;
 		}
-		return strtolower($input) == 'true';
+		return strtolower((string) $input) == 'true';
 	}
 
 	protected function delete(array $request = []): void

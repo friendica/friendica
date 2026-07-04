@@ -7,7 +7,7 @@
 
 namespace Friendica\Module\Update;
 
-use Friendica\Content\Conversation;
+use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Core\System;
 use Friendica\Module\Conversation\Network as NetworkModule;
 
@@ -40,7 +40,7 @@ class Network extends NetworkModule
 			$items = [];
 		}
 
-		$o = $this->conversation->render($items, Conversation::MODE_NETWORK, true, false, $this->getOrder(), $this->session->getLocalUserId());
+		$o = $this->conversationRenderer->renderThreaded($items, ConversationRenderer::MODE_NETWORK, true, $this->getOrder(), $this->session->getLocalUserId(), $request);
 
 		System::htmlUpdateExit($o);
 	}

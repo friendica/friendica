@@ -83,7 +83,7 @@ class ContactSelector
 	 * @param integer $gsid
 	 * @return array
 	 */
-	private static function getServerForId(int $gsid = null): array
+	private static function getServerForId(?int $gsid = null): array
 	{
 		if (empty($gsid)) {
 			return [];

@@ -32,13 +32,9 @@ use Psr\Log\LoggerInterface;
  **/
 class UserExport extends BaseSettings
 {
-	private DbaDefinition $dbaDefinition;
-
-	public function __construct(DbaDefinition $dbaDefinition, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly DbaDefinition $dbaDefinition, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->dbaDefinition = $dbaDefinition;
 	}
 
 	/**
@@ -71,7 +67,7 @@ class UserExport extends BaseSettings
 		 * list of array( 'link url', 'link text', 'help text' )
 		 */
 
-		$t = self::getFormSecurityToken('userexport');
+		$t       = self::getFormSecurityToken('userexport');
 		$options = [
 			['settings/userexport/account?t=' . $t, $this->l10n->t('Export account'), $this->l10n->t('Export your account info and contacts. Use this to make a backup of your account and/or to move it to another server.')],
 			['settings/userexport/backup?t=' . $t, $this->l10n->t('Export all'), $this->l10n->t('Export your account info, contacts and all your items as json. Could be a very big file, and could take a lot of time. Use this to make a full backup of your account (photos are not exported)')],
@@ -81,8 +77,8 @@ class UserExport extends BaseSettings
 
 		$tpl = Renderer::getMarkupTemplate('settings/userexport.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$title' => $this->l10n->t('Export personal data'),
-			'$options' => $options
+			'$title'   => $this->l10n->t('Export personal data'),
+			'$options' => $options,
 		]);
 	}
 
@@ -136,7 +132,7 @@ class UserExport extends BaseSettings
 		$table = $match[1];
 
 		$result = [];
-		$rows = DBA::p($query);
+		$rows   = DBA::p($query);
 		while ($row = DBA::fetch($rows)) {
 			$p = [];
 			foreach ($dbStructure[$table]['fields'] as $column => $field) {
@@ -165,21 +161,17 @@ class UserExport extends BaseSettings
 		$table = $match[1];
 
 		$result = [];
-		$rows = DBA::p($query);
+		$rows   = DBA::p($query);
 		while ($row = DBA::fetch($rows)) {
 			foreach ($row as $k => $v) {
 				if (empty($dbStructure[$table]['fields'][$k])) {
 					continue;
 				}
 
-				switch ($dbStructure[$table]['fields'][$k]['type']) {
-					case 'datetime':
-						$result[$k] = $v ?? DBA::NULL_DATETIME;
-						break;
-					default:
-						$result[$k] = $v;
-						break;
-				}
+				$result[$k] = match ($dbStructure[$table]['fields'][$k]['type']) {
+					'datetime' => $v ?? DBA::NULL_DATETIME,
+					default    => $v,
+				};
 			}
 		}
 		DBA::close($rows);
@@ -220,53 +212,53 @@ class UserExport extends BaseSettings
 		}
 
 		$user = $this->exportRow(
-			sprintf("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", $user_id)
+			sprintf("SELECT * FROM `user` WHERE `uid` = %d LIMIT 1", $user_id),
 		);
 
 		$contact = $this->exportMultiRow(
-			sprintf("SELECT * FROM `contact` WHERE `uid` = %d ", $user_id)
+			sprintf("SELECT * FROM `contact` WHERE `uid` = %d ", $user_id),
 		);
 
 
 		$profile = $this->exportMultiRow(
-			sprintf("SELECT *, 'default' AS `profile_name`, 1 AS `is-default` FROM `profile` WHERE `uid` = %d ", $user_id)
+			sprintf("SELECT *, 'default' AS `profile_name`, 1 AS `is-default` FROM `profile` WHERE `uid` = %d ", $user_id),
 		);
 
 		$profile_fields = $this->exportMultiRow(
-			sprintf("SELECT * FROM `profile_field` WHERE `uid` = %d ", $user_id)
+			sprintf("SELECT * FROM `profile_field` WHERE `uid` = %d ", $user_id),
 		);
 
 		$photo = $this->exportMultiRow(
-			sprintf("SELECT * FROM `photo` WHERE uid = %d AND profile = 1", $user_id)
+			sprintf("SELECT * FROM `photo` WHERE uid = %d AND profile = 1", $user_id),
 		);
 		foreach ($photo as &$p) {
-			$p['data'] = bin2hex($p['data']);
+			$p['data'] = bin2hex((string) $p['data']);
 		}
 
 		$pconfig = $this->exportMultiRow(
-			sprintf("SELECT * FROM `pconfig` WHERE uid = %d", $user_id)
+			sprintf("SELECT * FROM `pconfig` WHERE uid = %d", $user_id),
 		);
 
 		$circle = $this->exportMultiRow(
-			sprintf("SELECT * FROM `group` WHERE uid = %d", $user_id)
+			sprintf("SELECT * FROM `group` WHERE uid = %d", $user_id),
 		);
 
 		$circle_member = $this->exportMultiRow(
-			sprintf("SELECT `circle_member`.`gid`, `circle_member`.`contact-id` FROM `group_member` AS `circle_member` INNER JOIN `group` AS `circle` ON `circle`.`id` = `circle_member`.`gid` WHERE `circle`.`uid` = %d", $user_id)
+			sprintf("SELECT `circle_member`.`gid`, `circle_member`.`contact-id` FROM `group_member` AS `circle_member` INNER JOIN `group` AS `circle` ON `circle`.`id` = `circle_member`.`gid` WHERE `circle`.`uid` = %d", $user_id),
 		);
 
 		$output = [
-			'version' => App::VERSION,
-			'schema' => DB_UPDATE_VERSION,
-			'baseurl' => $this->baseUrl,
-			'user' => $user,
-			'contact' => $contact,
-			'profile' => $profile,
+			'version'        => App::VERSION,
+			'schema'         => DB_UPDATE_VERSION,
+			'baseurl'        => $this->baseUrl,
+			'user'           => $user,
+			'contact'        => $contact,
+			'profile'        => $profile,
 			'profile_fields' => $profile_fields,
-			'photo' => $photo,
-			'pconfig' => $pconfig,
-			'circle' => $circle,
-			'circle_member' => $circle_member,
+			'photo'          => $photo,
+			'pconfig'        => $pconfig,
+			'circle'         => $circle,
+			'circle_member'  => $circle_member,
 		];
 
 		echo json_encode($output, JSON_PARTIAL_OUTPUT_ON_ERROR);
@@ -291,7 +283,7 @@ class UserExport extends BaseSettings
 		// chunk the output to avoid exhausting memory
 
 		for ($x = 0; $x < $total; $x += 500) {
-			$items = Post::selectToArray(Item::ITEM_FIELDLIST, ['uid' => $user_id], ['limit' => [$x, 500]]);
+			$items  = Post::selectToArray(Item::ITEM_FIELDLIST, ['uid' => $user_id], ['limit' => [$x, 500]]);
 			$output = ['item' => $items];
 			echo json_encode($output, JSON_PARTIAL_OUTPUT_ON_ERROR) . "\n";
 		}

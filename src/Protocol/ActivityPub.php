@@ -46,8 +46,8 @@ use Friendica\Util\JsonLD;
  */
 class ActivityPub
 {
-	const PUBLIC_COLLECTION = 'https://www.w3.org/ns/activitystreams#Public';
-	const CONTEXT           = [
+	public const PUBLIC_COLLECTION = 'https://www.w3.org/ns/activitystreams#Public';
+	public const CONTEXT           = [
 		'https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1',
 		[
 			'ostatus'            => 'http://ostatus.org#',
@@ -90,15 +90,16 @@ class ActivityPub
 			'conversation'              => 'ostatus:conversation',
 			'directMessage'             => 'litepub:directMessage',
 			'discoverable'              => 'toot:discoverable',
+			'indexable'                 => 'toot:indexable',
 			'PropertyValue'             => 'schema:PropertyValue',
 			'value'                     => 'schema:value',
-		]
+		],
 	];
-	const ACCOUNT_TYPES = ['Person', 'Organization', 'Service', 'Group', 'Application', 'Tombstone'];
+	public const ACCOUNT_TYPES = ['Person', 'Organization', 'Service', 'Group', 'Application', 'Tombstone'];
 
-	const ARTICLE_DEFAULT     = 0;
-	const ARTICLE_USE_SUMMARY = 1;
-	const ARTICLE_EMBED_TITLE = 2;
+	public const ARTICLE_DEFAULT     = 0;
+	public const ARTICLE_USE_SUMMARY = 1;
+	public const ARTICLE_EMBED_TITLE = 2;
 
 	/**
 	 * Checks if the web request is done for the AP protocol
@@ -125,26 +126,15 @@ class ActivityPub
 	{
 		$accounttype = -1;
 
-		switch ($apcontact['type']) {
-			case 'Person':
-				$accounttype = User::ACCOUNT_TYPE_PERSON;
-				break;
-			case 'Organization':
-				$accounttype = User::ACCOUNT_TYPE_ORGANISATION;
-				break;
-			case 'Service':
-				$accounttype = User::ACCOUNT_TYPE_NEWS;
-				break;
-			case 'Group':
-				$accounttype = User::ACCOUNT_TYPE_COMMUNITY;
-				break;
-			case 'Application':
-				$accounttype = User::ACCOUNT_TYPE_RELAY;
-				break;
-			case 'Tombstone':
-				$accounttype = User::ACCOUNT_TYPE_DELETED;
-				break;
-		}
+		$accounttype = match ($apcontact['type']) {
+			'Person'       => User::ACCOUNT_TYPE_PERSON,
+			'Organization' => User::ACCOUNT_TYPE_ORGANISATION,
+			'Service'      => User::ACCOUNT_TYPE_NEWS,
+			'Group'        => User::ACCOUNT_TYPE_COMMUNITY,
+			'Application'  => User::ACCOUNT_TYPE_RELAY,
+			'Tombstone'    => User::ACCOUNT_TYPE_DELETED,
+			default        => $accounttype,
+		};
 
 		return $accounttype;
 	}
@@ -197,6 +187,10 @@ class ActivityPub
 
 		if (!is_null($apcontact['discoverable'])) {
 			$profile['hide'] = !$apcontact['discoverable'];
+		}
+
+		if (!is_null($apcontact['indexable']) && !$apcontact['indexable']) {
+			$profile['hide'] = true;
 		}
 
 		// Remove all "null" fields
@@ -338,7 +332,7 @@ class ActivityPub
 		$limited = DI::config()->get('system', 'limited_servers');
 		if (!empty($limited)) {
 			$servers = explode(',', str_replace(' ', '', $limited));
-			$host    = parse_url($apcontact['baseurl'], PHP_URL_HOST);
+			$host    = parse_url((string) $apcontact['baseurl'], PHP_URL_HOST);
 			if (!empty($host) && in_array($host, $servers)) {
 				return false;
 			}

@@ -78,7 +78,7 @@ class Tag
 			// Trim Unicode non-word characters
 			$name = preg_replace('/(^\W+)|(\W+$)/us', '', $name);
 
-			$tags = explode(self::TAG_CHARACTER[self::HASHTAG], $name);
+			$tags = explode(self::TAG_CHARACTER[self::HASHTAG], (string) $name);
 			if (count($tags) > 1) {
 				foreach ($tags as $tag) {
 					self::store($uriId, $type, $tag, $url);
@@ -346,10 +346,10 @@ class Tag
 		DI::logger()->info('Found tags', ['uri-id' => $uriId, 'result' => $result]);
 
 		foreach ($result as $tag) {
-			if (substr($tag, 0, 1) != self::TAG_CHARACTER[self::HASHTAG]) {
+			if (substr((string) $tag, 0, 1) != self::TAG_CHARACTER[self::HASHTAG]) {
 				continue;
 			}
-			self::storeByHash($uriId, substr($tag, 0, 1), substr($tag, 1));
+			self::storeByHash($uriId, substr((string) $tag, 0, 1), substr((string) $tag, 1));
 		}
 	}
 
@@ -544,7 +544,7 @@ class Tag
 		);
 		while ($tag = DBA::fetch($taglist)) {
 			if ($tag['url'] == '') {
-				$tag['url'] = $searchpath . urlencode($tag['name']);
+				$tag['url'] = $searchpath . urlencode((string) $tag['name']);
 			}
 
 			$orig_tag = $tag['url'];
@@ -556,8 +556,8 @@ class Tag
 						$item['body'] = str_replace($orig_tag, $tag['url'], $item['body']);
 					}
 
-					$return['hashtags'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
-					$return['tags'][]     = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
+					$return['hashtags'][] = '<bdi>' . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . $prefix . htmlspecialchars((string) $tag['name']) . '</a></bdi>';
+					$return['tags'][]     = '<bdi>' . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . $prefix . htmlspecialchars((string) $tag['name']) . '</a></bdi>';
 					break;
 
 				case self::MENTION:
@@ -567,8 +567,8 @@ class Tag
 					} else {
 						$tag['url'] = Contact::magicLink($tag['url']);
 					}
-					$return['mentions'][] = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
-					$return['tags'][]     = '<bdi>' . $prefix . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . htmlspecialchars($tag['name']) . '</a></bdi>';
+					$return['mentions'][] = '<bdi>' . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . $prefix . htmlspecialchars((string) $tag['name']) . '</a></bdi>';
+					$return['tags'][]     = '<bdi>' . '<a href="' . $tag['url'] . '" target="_blank" rel="noopener noreferrer">' . $prefix . htmlspecialchars((string) $tag['name']) . '</a></bdi>';
 					break;
 
 				case self::IMPLICIT_MENTION:
@@ -670,7 +670,7 @@ class Tag
 			return '';
 		}
 
-		array_walk($blocked, function (&$value) {
+		array_walk($blocked, function (&$value): void {
 			$value = "'" . DBA::escape(trim($value)) . "'";
 		});
 		return ' AND NOT `name` IN (' . implode(',', $blocked) . ')';

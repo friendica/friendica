@@ -38,8 +38,15 @@ class ApiResponse extends Response
 	/** @var string */
 	protected $jsonpCallback;
 
-	public function __construct(L10n $l10n, Arguments $args, LoggerInterface $logger, BaseURL $baseUrl, TwitterUser $twitterUser, array $server = [], string $jsonpCallback = '')
-	{
+	public function __construct(
+		L10n $l10n,
+		Arguments $args,
+		LoggerInterface $logger,
+		BaseURL $baseUrl,
+		TwitterUser $twitterUser,
+		array $server = [],
+		string $jsonpCallback = '',
+	) {
 		$this->l10n          = $l10n;
 		$this->args          = $args;
 		$this->logger        = $logger;
@@ -187,7 +194,7 @@ class ApiResponse extends Response
 	 * @return void
 	 * @throws HTTPException\InternalServerErrorException
 	 */
-	public function error(int $code, string $description, string $message, string $format = null)
+	public function error(int $code, string $description, string $message, ?string $format = null)
 	{
 		$error = [
 			'error'   => $message ?: $description,
@@ -211,7 +218,7 @@ class ApiResponse extends Response
 	 * @return void
 	 * @throws HTTPException\InternalServerErrorException
 	 */
-	public function addFormattedContent(string $root_element, array $data, string $format = null, int $cid = 0)
+	public function addFormattedContent(string $root_element, array $data, ?string $format = null, int $cid = 0)
 	{
 		$format ??= 'json';
 

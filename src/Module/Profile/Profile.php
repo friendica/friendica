@@ -45,30 +45,15 @@ use Psr\Log\LoggerInterface;
 
 class Profile extends BaseProfile
 {
-	/** @var Database */
-	private $database;
-	private DeletedUserRepository $deletedUserRepository;
-	/** @var AppHelper */
-	private $appHelper;
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var Page */
-	private $page;
-	/** @var ProfileField */
-	private $profileField;
-	private EventDispatcherInterface $eventDispatcher;
-
 	public function __construct(
-		ProfileField $profileField,
-		Page $page,
-		IManageConfigValues $config,
-		IHandleUserSessions $session,
-		AppHelper $appHelper,
-		Database $database,
-		DeletedUserRepository $deletedUserRepository,
-		EventDispatcherInterface $eventDispatcher,
+		private readonly ProfileField $profileField,
+		private Page $page,
+		private readonly IManageConfigValues $config,
+		private readonly IHandleUserSessions $session,
+		private readonly AppHelper $appHelper,
+		private readonly Database $database,
+		private readonly DeletedUserRepository $deletedUserRepository,
+		private readonly EventDispatcherInterface $eventDispatcher,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -79,15 +64,6 @@ class Profile extends BaseProfile
 		array $parameters = [],
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->database              = $database;
-		$this->deletedUserRepository = $deletedUserRepository;
-		$this->appHelper             = $appHelper;
-		$this->session               = $session;
-		$this->config                = $config;
-		$this->page                  = $page;
-		$this->profileField          = $profileField;
-		$this->eventDispatcher       = $eventDispatcher;
 	}
 
 	protected function rawContent(array $request = [])
@@ -148,7 +124,7 @@ class Profile extends BaseProfile
 			if (($key = array_search($view_as_contact_id, $view_as_contact_ids)) !== false) {
 				$view_as_contact_alert = $this->t(
 					'You\'re currently viewing your profile as <b>%s</b> <a href="%s" class="btn btn-sm pull-right">Cancel</a>',
-					htmlentities($view_as_contacts[$key]['name'], ENT_COMPAT, 'UTF-8'),
+					htmlentities((string) $view_as_contacts[$key]['name'], ENT_COMPAT, 'UTF-8'),
 					'profile/' . $this->parameters['nickname'] . '/profile',
 				);
 			}
@@ -195,7 +171,7 @@ class Profile extends BaseProfile
 			$short_bd_format = $this->t('d MMMM');
 			$dob             = intval($profile['dob'])
 					? $this->l10n->longDate($profile['dob'] . ' 00:00 +00:00')
-					: $this->l10n->formatDateTimeByPattern('2001-' . substr($profile['dob'], 5) . ' 00:00 +00:00', $short_bd_format);
+					: $this->l10n->formatDateTimeByPattern('2001-' . substr((string) $profile['dob'], 5) . ' 00:00 +00:00', $short_bd_format);
 
 			$basic_fields += self::buildField('dob', $this->t('Birthday:'), $dob);
 
@@ -237,7 +213,7 @@ class Profile extends BaseProfile
 		if ($profile['pub_keywords']) {
 			$tags = [];
 			// Separator is defined in Module\Settings\Profile\Index::cleanKeywords
-			foreach (explode(', ', $profile['pub_keywords']) as $tag_label) {
+			foreach (explode(', ', (string) $profile['pub_keywords']) as $tag_label) {
 				$tags[] = [
 					'url'   => '/search?tag=' . urlencode($tag_label),
 					'label' => Tag::TAG_CHARACTER[Tag::HASHTAG] . $tag_label,
@@ -273,6 +249,27 @@ class Profile extends BaseProfile
 				'group_list',
 				$this->t('Groups:'),
 				GroupManager::profileAdvanced($profile['uid']),
+			);
+		}
+
+		$publicCircleLinks = [];
+		$publicCircles     = DBA::selectToArray('group', ['id', 'name'], ['uid' => $profile['uid'], 'deleted' => false, 'public' => true], ['order' => ['name']]);
+		foreach ($publicCircles as $publicCircle) {
+			$publicCircleLinks[] = sprintf(
+				'<a href="%s/profile/%s/circles/%d/download">%s</a>',
+				$this->baseUrl,
+				urlencode((string) $profile['nickname']),
+				(int) $publicCircle['id'],
+				htmlentities((string) $publicCircle['name'], ENT_COMPAT, 'UTF-8', true),
+			);
+		}
+
+		if (!empty($publicCircleLinks)) {
+			$custom_fields += self::buildField(
+				'public_circle_downloads',
+				$this->t('Public circles (CSV):'),
+				implode('<br>', $publicCircleLinks),
+				'aprofile custom',
 			);
 		}
 
@@ -338,7 +335,7 @@ class Profile extends BaseProfile
 		}
 
 		if (!empty($profile['openid'])) {
-			$delegate = strstr($profile['openid'], '://') ? $profile['openid'] : 'https://' . $profile['openid'];
+			$delegate = strstr((string) $profile['openid'], '://') ? $profile['openid'] : 'https://' . $profile['openid'];
 			$htmlhead .= '<link rel="openid.delegate" href="' . $delegate . '" />' . "\n";
 		}
 
@@ -358,9 +355,9 @@ class Profile extends BaseProfile
 			$htmlhead .= '<meta content="noindex, noarchive" name="robots" />' . "\n";
 		}
 
-		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/" title="' . $this->t('%s\'s posts', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
-		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/comments" title="' . $this->t('%s\'s comments', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
-		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/activity" title="' . $this->t('%s\'s timeline', htmlspecialchars($profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
+		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/" title="' . $this->t('%s\'s posts', htmlspecialchars((string) $profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
+		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/comments" title="' . $this->t('%s\'s comments', htmlspecialchars((string) $profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
+		$htmlhead .= '<link rel="alternate" type="application/atom+xml" href="' . $this->baseUrl . '/feed/' . $nickname . '/activity" title="' . $this->t('%s\'s timeline', htmlspecialchars((string) $profile['name'], ENT_COMPAT, 'UTF-8', true)) . '"/>' . "\n";
 		$uri = urlencode('acct:' . $profile['nickname'] . '@' . $this->baseUrl->getHost() . ($this->baseUrl->getPath() ? '/' . $this->baseUrl->getPath() : ''));
 		$htmlhead .= '<link rel="lrdd" type="application/xrd+xml" href="' . $this->baseUrl . '/xrd/?uri=' . $uri . '" />' . "\n";
 		header('Link: <' . $this->baseUrl . '/xrd/?uri=' . $uri . '>; rel="lrdd"; type="application/xrd+xml"', false);

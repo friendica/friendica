@@ -15,13 +15,9 @@ use Psr\Log\LoggerInterface;
 
 class Application extends BaseFactory
 {
-	/** @var Database */
-	private $dba;
-
-	public function __construct(LoggerInterface $logger, Database $dba)
+	public function __construct(LoggerInterface $logger, private readonly Database $dba)
 	{
 		parent::__construct($logger);
-		$this->dba = $dba;
 	}
 
 	/**

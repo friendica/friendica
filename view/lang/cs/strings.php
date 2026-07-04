@@ -9,92 +9,6 @@ $a->strings['Unable to locate original post.'] = 'Nelze nalézt původní přís
 $a->strings['Empty post discarded.'] = 'Prázdný příspěvek odstraněn.';
 $a->strings['Item not found.'] = 'Položka nenalezena.';
 $a->strings['Permission denied.'] = 'Přístup odmítnut.';
-$a->strings['No valid account found.'] = 'Nenalezen žádný platný účet.';
-$a->strings['Password reset request issued. Check your email.'] = 'Požadavek o obnovení hesla vyřízen. Zkontrolujte Vaši e-mailovou schránku.';
-$a->strings['
-		Dear %1$s,
-			A request was recently received at "%2$s" to reset your account
-		password. In order to confirm this request, please select the verification link
-		below or paste it into your web browser address bar.
-
-		If you did NOT request this change, please DO NOT follow the link
-		provided and ignore and/or delete this email, the request will expire shortly.
-
-		Your password will not be changed unless we can verify that you
-		issued this request.'] = '
-		Vážený/á %1$s,
-			Před nedávnem jsme obdrželi na „%2$s“ požadavek o obnovení
-		hesla k vašemu účtu. Pro potvrzení tohoto požadavku, prosím klikněte na odkaz
-		pro ověření dole, nebo ho zkopírujte do adresního řádku vašeho prohlížeče.
-
-		Pokud jste o tuto změnu NEPOŽÁDAL/A, prosím NEKLIKEJTE na tento odkaz
-		a ignorujte a/nebo smažte tento e-mail. Platnost požadavku brzy vyprší.
-
-		Vaše heslo nebude změněno, dokud nedokážeme ověřit, že jste tento
-		požadavek nevydal/a vy.';
-$a->strings['
-		Follow this link soon to verify your identity:
-
-		%1$s
-
-		You will then receive a follow-up message containing the new password.
-		You may change that password from your account settings page after logging in.
-
-		The login details are as follows:
-
-		Site Location:	%2$s
-		Login Name:	%3$s'] = '
-		Klikněte na tento odkaz brzy pro ověření vaší identity:
-
-		%1$s
-
-		Obdržíte poté následnou zprávu obsahující nové heslo.
-		Po přihlášení můžete toto heslo změnit na stránce nastavení vašeho účtu.
-
-		Zde jsou vaše přihlašovací detaily:
-
-		Adresa stránky:		%2$s
-		Přihlašovací jméno:	%3$s';
-$a->strings['Password reset requested at %s'] = 'Na %s bylo požádáno o obnovení hesla';
-$a->strings['Request could not be verified. (You may have previously submitted it.) Password reset failed.'] = 'Požadavek nemohl být ověřen. (Možná jste jej odeslal/a již dříve.) Obnovení hesla se nezdařilo.';
-$a->strings['Request has expired, please make a new one.'] = 'Platnost požadavku vypršela, prosím vytvořte nový.';
-$a->strings['Forgot your Password?'] = 'Zapomněl/a jste heslo?';
-$a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Zadejte svůj e-mailovou adresu a odešlete pro obnovení vašeho hesla. Poté zkontrolujte svůj e-mail pro další instrukce.';
-$a->strings['Password Reset'] = 'Obnovit heslo';
-$a->strings['Your password has been reset as requested.'] = 'Vaše heslo bylo na vaše přání obnoveno.';
-$a->strings['Your new password is'] = 'Někdo vám napsal na vaši profilovou stránku';
-$a->strings['Save or copy your new password - and then'] = 'Uložte si nebo zkopírujte nové heslo - a pak';
-$a->strings['click here to login'] = 'klikněte zde pro přihlášení';
-$a->strings['Your password may be changed from the <em>Settings</em> page after successful login.'] = 'Nezdá se, že by to bylo vaše celé jméno (křestní jméno a příjmení).';
-$a->strings['
-			Dear %1$s,
-				Your password has been changed as requested. Please retain this
-			information for your records (or change your password immediately to
-			something that you will remember).
-		'] = '
-			Vážený/á %1$s,
-				Vaše heslo bylo změněno, jak jste požádal/a. Prosím uchovejte
-			tyto informace pro vaše záznamy (nebo si ihned změňte heslo na něco,
-			co si zapamatujete).
-		';
-$a->strings['
-			Your login details are as follows:
-
-			Site Location:	%1$s
-			Login Name:	%2$s
-			Password:	%3$s
-
-			You may change that password from your account settings page after logging in.
-		'] = '
-			Zde jsou vaše přihlašovací detaily:
-
-			Adresa stránky:		%1$s
-			Přihlašovací jméno:	%2$s
-			Heslo:			%3$s
-
-			Toto heslo si po přihlášení můžete změnit na stránce nastavení Vašeho účtu.
-		';
-$a->strings['Your password has been changed at %s'] = 'Vaše heslo bylo změněno na %s';
 $a->strings['Messages'] = 'Zprávy';
 $a->strings['New Message'] = 'Nová zpráva';
 $a->strings['No recipient selected.'] = 'Nevybrán příjemce.';
@@ -106,8 +20,6 @@ $a->strings['Conversation not found.'] = 'Konverzace nenalezena.';
 $a->strings['Please enter a link URL:'] = 'Zadejte prosím URL odkaz:';
 $a->strings['Send Private Message'] = 'Odeslat soukromou zprávu';
 $a->strings['To:'] = 'Adresát:';
-$a->strings['Subject:'] = 'Předmět:';
-$a->strings['Your message:'] = 'Vaše zpráva:';
 $a->strings['Upload photo'] = 'Nahrát fotku';
 $a->strings['Insert web link'] = 'Vložit webový odkaz';
 $a->strings['Please wait'] = 'Čekejte prosím';
@@ -117,6 +29,8 @@ $a->strings['D, d M Y - g:i A'] = 'D d. M Y - g:i A';
 $a->strings['Delete conversation'] = 'Odstranit konverzaci';
 $a->strings['No secure communications available. You <strong>may</strong> be able to respond from the sender\'s profile page.'] = 'Není k dispozici zabezpečená komunikace. <strong>Možná</strong> budete schopen/na reagovat z odesílatelovy profilové stránky.';
 $a->strings['Send Reply'] = 'Poslat odpověď';
+$a->strings['Subject:'] = 'Předmět:';
+$a->strings['Your message:'] = 'Vaše zpráva:';
 $a->strings['Unknown sender - %s'] = 'Neznámý odesilatel - %s';
 $a->strings['You and %s'] = 'Vy a %s';
 $a->strings['%s and You'] = '%s a vy';
@@ -126,28 +40,21 @@ $a->strings['%d message'] = [
 	2 => '%d zprávy',
 	3 => '%d zpráv',
 ];
-$a->strings['Personal Notes'] = 'Osobní poznámky';
-$a->strings['Save'] = 'Uložit';
 $a->strings['User not found.'] = 'Uživatel nenalezen.';
 $a->strings['Photo Albums'] = 'Fotoalba';
 $a->strings['Recent Photos'] = 'Nedávné fotky';
-$a->strings['Upload Photos'] = 'Nahrát fotky';
 $a->strings['everybody'] = 'Žádost o připojení selhala nebo byla zrušena.';
 $a->strings['Contact information unavailable'] = 'Kontakt byl zablokován';
 $a->strings['Album not found.'] = 'Album nenalezeno.';
 $a->strings['Album successfully deleted'] = 'Album úspěšně smazáno';
 $a->strings['Album was empty.'] = 'Album bylo prázdné.';
-$a->strings['a photo'] = 'fotce';
-$a->strings['%1$s was tagged in %2$s by %3$s'] = '%1$s byl označen ve %2$s uživatelem %3$s';
 $a->strings['Public access denied.'] = 'Veřejný přístup odepřen.';
 $a->strings['No photos selected'] = 'Není vybrána žádná fotka';
-$a->strings['New album name: '] = 'Název nového alba: ';
-$a->strings['or select existing album:'] = 'nebo si vyberte existující album:';
-$a->strings['Do not show a status post for this upload'] = 'Nezobrazovat pro toto nahrání stavovou zprávu';
 $a->strings['Permissions'] = 'Oprávnění';
 $a->strings['Do you really want to delete this photo album and all its photos?'] = 'Opravdu chcete smazat toto fotoalbum a všechny jeho fotky?';
 $a->strings['Delete Album'] = 'Smazat album';
 $a->strings['Cancel'] = 'Zrušit';
+$a->strings['New album name: '] = 'Název nového alba: ';
 $a->strings['Edit Album'] = 'Upravit album';
 $a->strings['Show Newest First'] = 'Zobrazit nejprve nejnovější';
 $a->strings['Show Oldest First'] = 'Zobrazit nejprve nejstarší';
@@ -161,24 +68,13 @@ $a->strings['Edit photo'] = 'Upravit fotku';
 $a->strings['Delete photo'] = 'Smazat fotku';
 $a->strings['Private Photo'] = 'Soukromá fotka';
 $a->strings['View Full Size'] = 'Zobrazit v plné velikosti';
-$a->strings['Tags'] = 'Štítky';
-$a->strings['[Select tags to remove]'] = '[Vyberte štítky pro odstranění]';
 $a->strings['New album name'] = 'Nové jméno alba';
 $a->strings['Caption'] = 'Titulek';
-$a->strings['Add a Tag'] = 'Přidat štítek';
-$a->strings['Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping'] = 'Příklad: @jan, @Lucie_Nováková, @jakub@priklad.cz, #Morava, #taboreni';
 $a->strings['Do not rotate'] = 'Neotáčet';
 $a->strings['Rotate CW (right)'] = 'Otáčet po směru hodinových ručiček (doprava)';
 $a->strings['Rotate CCW (left)'] = 'Otáčet proti směru hodinových ručiček (doleva)';
-$a->strings['This is you'] = 'Tohle jste vy';
-$a->strings['Comment'] = 'Okomentovat';
-$a->strings['Preview'] = 'Náhled';
-$a->strings['Select'] = 'Vybrat';
-$a->strings['Delete'] = 'Odstranit';
-$a->strings['I like this (toggle)'] = 'To se mi líbí (přepínat)';
-$a->strings['I don\'t like this (toggle)'] = 'To se mi nelíbí (přepínat)';
 $a->strings['Edit'] = 'Upravit';
-$a->strings['Map'] = 'Mapa';
+$a->strings['Delete'] = 'Odstranit';
 $a->strings['Delete this item?'] = 'Odstranit tuto položku?';
 $a->strings['toggle mobile'] = 'přepínat mobilní zobrazení';
 $a->strings['Page not found.'] = 'Stránka nenalezena';
@@ -234,7 +130,6 @@ $a->strings['Tag term:'] = 'Štítek:';
 $a->strings['Where are you right now?'] = 'Kde právě jste?';
 $a->strings['Delete item(s)?'] = 'Smazat položku(y)?';
 $a->strings['New Post'] = 'Nový příspěvek';
-$a->strings['Share'] = 'Sdílet';
 $a->strings['upload photo'] = 'nahrát fotku';
 $a->strings['Attach file'] = 'Přiložit soubor';
 $a->strings['attach file'] = 'přiložit soubor';
@@ -254,10 +149,12 @@ $a->strings['Set title'] = 'Nastavit nadpis';
 $a->strings['Categories (comma-separated list)'] = 'Kategorie (seznam, oddělujte čárkou)';
 $a->strings['Permission settings'] = 'Nastavení oprávnění';
 $a->strings['Public post'] = 'Veřejný příspěvek';
+$a->strings['Preview'] = 'Náhled';
 $a->strings['Message'] = 'Zpráva';
 $a->strings['remove'] = 'odstranit';
 $a->strings['Delete Selected Items'] = 'Smazat vybrané položky';
 $a->strings['%s reshared this.'] = '%s tohle znovusdílel/a.';
+$a->strings['Select'] = 'Vybrat';
 $a->strings['View %s\'s profile @ %s'] = 'Zobrazit profil uživatele %s na %s';
 $a->strings['Categories:'] = 'Kategorie:';
 $a->strings['Filed under:'] = 'Vyplněn pod:';
@@ -269,17 +166,15 @@ $a->strings['Global Community'] = 'Globální komunita';
 $a->strings['Posts from users of the whole federated network'] = 'Příspěvky od uživatelů z celé federované sítě';
 $a->strings['Personal'] = 'Osobní';
 $a->strings['Posts that mention or involve you'] = 'Příspěvky, které vás zmiňují nebo zahrnují';
-$a->strings['Starred'] = 'S hvězdou';
 $a->strings['Favourite Posts'] = 'Oblíbené přízpěvky';
 $a->strings['General Features'] = 'Obecné vlastnosti';
-$a->strings['Photo Location'] = 'Poloha fotky';
-$a->strings['Photo metadata is normally stripped. This extracts the location (if present) prior to stripping metadata and links it to a map.'] = 'Metadata fotek jsou normálně odebrána. Tato funkce před odebrání metadat extrahuje polohu (pokud je k dispozici) a propojí ji s mapou.';
 $a->strings['Post Composition Features'] = 'Nastavení vytváření příspěvků';
 $a->strings['Explicit Mentions'] = 'Výslovné zmínky';
 $a->strings['Add explicit mentions to comment box for manual control over who gets mentioned in replies.'] = 'Přidá do pole pro komentování výslovné zmínky pro ruční kontrolu nad tím, koho zmíníte v odpovědích.';
 $a->strings['Post/Comment Tools'] = 'Nástroje příspěvků/komentářů';
 $a->strings['Post Categories'] = 'Kategorie příspěvků';
 $a->strings['Add categories to your posts'] = 'Přidat kategorie k vašim příspěvkům';
+$a->strings['Summary'] = 'Shrnutí';
 $a->strings['Archives'] = 'Archivy';
 $a->strings['Protocols'] = 'Protokoly';
 $a->strings['Account Types'] = 'Typy účtů';
@@ -296,14 +191,11 @@ $a->strings['event'] = 'událost';
 $a->strings['status'] = 'stav';
 $a->strings['photo'] = 'fotka';
 $a->strings['%1$s tagged %2$s\'s %3$s with %4$s'] = '%1$s označil/a %3$s uživatele %2$s štítkem %4$s';
-$a->strings['Follow Thread'] = 'Sledovat vlákno';
 $a->strings['View Status'] = 'Zobrazit stav';
 $a->strings['View Profile'] = 'Zobrazit profil';
 $a->strings['View Photos'] = 'Zobrazit fotky';
 $a->strings['Network Posts'] = 'Síťové příspěvky';
 $a->strings['View Contact'] = 'Zobrazit kontakt';
-$a->strings['Block'] = 'Blokovat';
-$a->strings['Ignore'] = 'Ignorovat';
 $a->strings['Connect/Follow'] = 'Spojit se/sledovat';
 $a->strings['Nothing new here'] = 'Zde není nic nového';
 $a->strings['Home'] = 'Domů';
@@ -327,6 +219,7 @@ $a->strings['Addon applications, utilities, games'] = 'Doplňkové aplikace, ná
 $a->strings['Search'] = 'Hledat';
 $a->strings['Search site content'] = 'Hledání na stránkách tohoto webu';
 $a->strings['Full Text'] = 'Celý text';
+$a->strings['Tags'] = 'Štítky';
 $a->strings['Contacts'] = 'Kontakty';
 $a->strings['Community'] = 'Komunita';
 $a->strings['Conversations on this and other servers'] = 'Konverzace na tomto a jiných serverech';
@@ -470,43 +363,6 @@ $a->strings['ImageMagick PHP extension is not installed'] = 'PHP rozšíření I
 $a->strings['ImageMagick PHP extension is installed'] = 'PHP rozšíření ImageMagick je nainstalováno';
 $a->strings['Database already in use.'] = 'Databáze se již používá.';
 $a->strings['Could not connect to database.'] = 'Nelze se připojit k databázi.';
-$a->strings['Monday'] = 'pondělí';
-$a->strings['Tuesday'] = 'úterý';
-$a->strings['Wednesday'] = 'středa';
-$a->strings['Thursday'] = 'čtvrtek';
-$a->strings['Friday'] = 'pátek';
-$a->strings['Saturday'] = 'sobota';
-$a->strings['Sunday'] = 'neděle';
-$a->strings['January'] = 'leden';
-$a->strings['February'] = 'únor';
-$a->strings['March'] = 'březen';
-$a->strings['April'] = 'duben';
-$a->strings['May'] = 'květen';
-$a->strings['June'] = 'červen';
-$a->strings['July'] = 'červenec';
-$a->strings['August'] = 'srpen';
-$a->strings['September'] = 'září';
-$a->strings['October'] = 'říjen';
-$a->strings['November'] = 'listopad';
-$a->strings['December'] = 'prosinec';
-$a->strings['Mon'] = 'pon';
-$a->strings['Tue'] = 'úte';
-$a->strings['Wed'] = 'stř';
-$a->strings['Thu'] = 'čtv';
-$a->strings['Fri'] = 'pát';
-$a->strings['Sat'] = 'sob';
-$a->strings['Sun'] = 'ned';
-$a->strings['Jan'] = 'led';
-$a->strings['Feb'] = 'úno';
-$a->strings['Mar'] = 'bře';
-$a->strings['Apr'] = 'dub';
-$a->strings['Jun'] = 'čvn';
-$a->strings['Jul'] = 'čvc';
-$a->strings['Aug'] = 'srp';
-$a->strings['Sep'] = 'zář';
-$a->strings['Oct'] = 'říj';
-$a->strings['Nov'] = 'lis';
-$a->strings['Dec'] = 'pro';
 $a->strings['Storage base path'] = 'Cesta ke kořenové složce úložiště';
 $a->strings['Folder where uploaded files are saved. For maximum security, This should be a path outside web server folder tree'] = 'Složka, do které jsou ukládány nahrané soubory. Pro maximální bezpečnost to musí být cesta mimo složku webového serveru';
 $a->strings['Enter a valid existing folder'] = 'Zadejte platnou existující složku';
@@ -553,9 +409,44 @@ $a->strings['Use mailto: in front of address to force email check.'] = 'Použite
 $a->strings['Limited profile. This person will be unable to receive direct/personal notifications from you.'] = 'Omezený profil. Tato osoba nebude schopna od vás přijímat přímá/osobní oznámení.';
 $a->strings['Unable to retrieve contact information.'] = 'Nepodařilo se získat kontaktní informace.';
 $a->strings['Starts:'] = 'Začíná:';
-$a->strings['Finishes:'] = 'Končí:';
 $a->strings['all-day'] = 'celodenní';
+$a->strings['Sun'] = 'ned';
+$a->strings['Mon'] = 'pon';
+$a->strings['Tue'] = 'úte';
+$a->strings['Wed'] = 'stř';
+$a->strings['Thu'] = 'čtv';
+$a->strings['Fri'] = 'pát';
+$a->strings['Sat'] = 'sob';
+$a->strings['Sunday'] = 'neděle';
+$a->strings['Monday'] = 'pondělí';
+$a->strings['Tuesday'] = 'úterý';
+$a->strings['Wednesday'] = 'středa';
+$a->strings['Thursday'] = 'čtvrtek';
+$a->strings['Friday'] = 'pátek';
+$a->strings['Saturday'] = 'sobota';
+$a->strings['Jan'] = 'led';
+$a->strings['Feb'] = 'úno';
+$a->strings['Mar'] = 'bře';
+$a->strings['Apr'] = 'dub';
+$a->strings['May'] = 'květen';
+$a->strings['Jun'] = 'čvn';
+$a->strings['Jul'] = 'čvc';
+$a->strings['Aug'] = 'srp';
 $a->strings['Sept'] = 'září';
+$a->strings['Oct'] = 'říj';
+$a->strings['Nov'] = 'lis';
+$a->strings['Dec'] = 'pro';
+$a->strings['January'] = 'leden';
+$a->strings['February'] = 'únor';
+$a->strings['March'] = 'březen';
+$a->strings['April'] = 'duben';
+$a->strings['June'] = 'červen';
+$a->strings['July'] = 'červenec';
+$a->strings['August'] = 'srpen';
+$a->strings['September'] = 'září';
+$a->strings['October'] = 'říjen';
+$a->strings['November'] = 'listopad';
+$a->strings['December'] = 'prosinec';
 $a->strings['today'] = 'dnes';
 $a->strings['month'] = 'měsíc';
 $a->strings['week'] = 'týden';
@@ -563,12 +454,6 @@ $a->strings['day'] = 'den';
 $a->strings['No events to display'] = 'Žádné události k zobrazení';
 $a->strings['Access to this profile has been restricted.'] = 'Přístup na tento profil byl omezen.';
 $a->strings['l, F j'] = 'l, j. F';
-$a->strings['Edit event'] = 'Upravit událost';
-$a->strings['Duplicate event'] = 'Duplikovat událost';
-$a->strings['Delete event'] = 'Smazat událost';
-$a->strings['l F d, Y \@ g:i A'] = 'l d. F, Y v g:i A';
-$a->strings['D g:i A'] = 'D g:i A';
-$a->strings['g:i A'] = 'g:i A';
 $a->strings['Show map'] = 'Zobrazit mapu';
 $a->strings['Hide map'] = 'Skrýt mapu';
 $a->strings['%s\'s birthday'] = '%s má narozeniny';
@@ -576,17 +461,15 @@ $a->strings['Happy Birthday %s'] = 'Veselé narozeniny, %s';
 $a->strings['activity'] = 'aktivita';
 $a->strings['post'] = 'příspěvek';
 $a->strings['bytes'] = 'bytů';
-$a->strings['View on separate page'] = 'Zobrazit na separátní stránce';
 $a->strings['[no subject]'] = '[bez předmětu]';
 $a->strings['Wall Photos'] = 'Fotky na zdi';
 $a->strings['Homepage:'] = 'Domovská stránka:';
 $a->strings['About:'] = 'O mně:';
+$a->strings['Edit profile'] = 'Upravit profil';
 $a->strings['Atom feed'] = 'Kanál Atom';
-$a->strings['F d'] = 'd. F';
 $a->strings['[today]'] = '[dnes]';
 $a->strings['Birthday Reminders'] = 'Připomínka narozenin';
 $a->strings['Birthdays this week:'] = 'Narozeniny tento týden:';
-$a->strings['g A l F d'] = 'g A, l d. F';
 $a->strings['[No description]'] = '[Žádný popis]';
 $a->strings['Event Reminders'] = 'Připomenutí událostí';
 $a->strings['Upcoming events the next 7 days:'] = 'Nadcházející události v příštích 7 dnech:';
@@ -597,7 +480,6 @@ $a->strings['Religious Views:'] = 'Náboženské přesvědčení:';
 $a->strings['Likes:'] = 'Líbí se:';
 $a->strings['Dislikes:'] = 'Nelibí se:';
 $a->strings['Title/Description:'] = 'Název / Popis:';
-$a->strings['Summary'] = 'Shrnutí';
 $a->strings['Musical interests'] = 'Hudební vkus';
 $a->strings['Books, literature'] = 'Knihy, literatura';
 $a->strings['Television'] = 'Televize';
@@ -701,7 +583,6 @@ $a->strings['Federation Statistics'] = 'Statistiky Federation';
 $a->strings['The logfile \'%s\' is not writable. No logging possible'] = 'Záznamový soubor „%s“ není zapisovatelný. Zaznamenávání není možno.';
 $a->strings['PHP log currently enabled.'] = 'PHP záznamy jsou aktuálně povolené.';
 $a->strings['PHP log currently disabled.'] = 'PHP záznamy jsou aktuálně zakázané.';
-$a->strings['Logs'] = 'Záznamy';
 $a->strings['Clear'] = 'Vyčistit';
 $a->strings['Enable Debugging'] = 'Povolit ladění';
 $a->strings['Log file'] = 'Soubor se záznamem';
@@ -852,6 +733,7 @@ $a->strings['Allow user tags'] = 'Povolit uživatelské štítky';
 $a->strings['If enabled, the tags from the saved searches will used for the "tags" subscription in addition to the "relay_server_tags".'] = 'Pokud je toto povoleno, budou štítky z uložených hledání vedle odběru „relay_server_tags“ použity i pro odběr „tags“.';
 $a->strings['Start Relocation'] = 'Začít přemístění';
 $a->strings['Invalid storage backend setting value.'] = 'Neplatná hodnota nastavení backendu úložiště.';
+$a->strings['Save'] = 'Uložit';
 $a->strings['Database (legacy)'] = 'Databáze (legacy)';
 $a->strings['Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />'] = 'Vaše databáze stále běží s tabulkami MyISAM. Měl/a byste změnit typ datového úložiště na InnoDB. Protože Friendica bude v budoucnu používat pouze funkce pro InnoDB, měl/a byste to změnit! <a href="%s">Zde</a> naleznete návod, který by pro vás mohl být užitečný při konverzi úložišť. Můžete také použít příkaz <tt>php bin/console.php dbstructure toinnodb</tt> na Vaší instalaci Friendica pro automatickou konverzi.<br />';
 $a->strings['There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s'] = 'Je dostupná ke stažení nová verze Friendica. Vaše aktuální verze je %1$s, upstreamová verze je %2$s';
@@ -897,12 +779,13 @@ $a->strings['Database'] = 'Databáze';
 $a->strings['DB updates'] = 'Aktualizace databáze';
 $a->strings['Inspect Deferred Workers'] = 'Prozkoumat odložené pracovníky';
 $a->strings['Inspect worker Queue'] = 'Prozkoumat frontu pro pracovníka';
+$a->strings['Logs'] = 'Záznamy';
+$a->strings['View'] = 'Zobrazit';
 $a->strings['Diagnostics'] = 'Diagnostika';
 $a->strings['PHP Info'] = 'Info o PHP';
 $a->strings['probe address'] = 'vyzkoušet adresu';
 $a->strings['check webfinger'] = 'vyzkoušet webfinger';
 $a->strings['Babel'] = 'Babel';
-$a->strings['Addon Features'] = 'Vlastnosti doplňků';
 $a->strings['User registrations waiting for confirmation'] = 'Registrace uživatelů čekající na potvrzení';
 $a->strings['Daily posting limit of %d post reached. The post was rejected.'] = [
 	0 => 'Byl dosažen denní limit %d příspěvku. Příspěvek byl odmítnut.',
@@ -939,19 +822,15 @@ $a->strings['The post was created'] = 'Příspěvek byl vytvořen';
 $a->strings['Failed to remove event'] = 'Odstranění události selhalo';
 $a->strings['Event can not end before it has started.'] = 'Událost nemůže končit dříve, než začala.';
 $a->strings['Event title and start time are required.'] = 'Název události a datum začátku jsou vyžadovány.';
+$a->strings['Edit event'] = 'Upravit událost';
 $a->strings['Starting date and Title are required.'] = 'Počáteční datum a Název jsou vyžadovány.';
-$a->strings['Event Starts:'] = 'Událost začíná:';
 $a->strings['Required'] = 'Vyžadováno';
-$a->strings['Finish date/time is not known or not relevant'] = 'Datum/čas konce není zadán nebo není relevantní';
-$a->strings['Event Finishes:'] = 'Akce končí:';
+$a->strings['Location'] = 'Poloha';
 $a->strings['Share this event'] = 'Sdílet tuto událost';
-$a->strings['Submit'] = 'Odeslat';
 $a->strings['Basic'] = 'Základní';
 $a->strings['This calendar format is not supported'] = 'Tento formát kalendáře není podporován.';
 $a->strings['No exportable data found'] = 'Nenalezena žádná data pro export';
 $a->strings['calendar'] = 'kalendář';
-$a->strings['Events'] = 'Události';
-$a->strings['View'] = 'Zobrazit';
 $a->strings['list'] = 'seznam';
 $a->strings['Contact not found.'] = 'Kontakt nenalezen.';
 $a->strings['Invalid contact.'] = 'Neplatný kontakt.';
@@ -979,16 +858,20 @@ $a->strings['Only show hidden contacts'] = 'Zobrazit pouze skryté kontakty';
 $a->strings['Search your contacts'] = 'Prohledat vaše kontakty';
 $a->strings['Results for: %s'] = 'Výsledky pro: %s';
 $a->strings['Update'] = 'Aktualizace';
+$a->strings['Block'] = 'Blokovat';
 $a->strings['Unblock'] = 'Odblokovat';
+$a->strings['Ignore'] = 'Ignorovat';
 $a->strings['Unignore'] = 'Přestat ignorovat';
 $a->strings['Batch Actions'] = 'Souhrnné akce';
 $a->strings['Conversations started by this contact'] = 'Konverzace, které tento kontakt začal';
 $a->strings['Posts and Comments'] = 'Příspěvky a komentáře';
 $a->strings['Advanced Contact Settings'] = 'Pokročilé nastavení kontaktu';
 $a->strings['Friend'] = 'Přítel';
+$a->strings['This is you'] = 'Tohle jste vy';
 $a->strings['Visit %s\'s profile [%s]'] = 'Navštivte profil uživatele %s [%s]';
 $a->strings['Contact update failed.'] = 'Aktualizace kontaktu selhala.';
 $a->strings['Return to contact editor'] = 'Zpět k editoru kontaktu';
+$a->strings['Submit'] = 'Odeslat';
 $a->strings['Name'] = 'Jméno';
 $a->strings['Account Nickname'] = 'Přezdívka účtu';
 $a->strings['Account URL'] = 'URL adresa účtu';
@@ -1089,6 +972,7 @@ $a->strings['Error'] = [
 ];
 $a->strings['You must be logged in to use this module'] = 'Pro používání tohoto modulu musíte být přihlášen/a';
 $a->strings['Source URL'] = 'Zdrojová adresa URL';
+$a->strings['l F d, Y \@ g:i A'] = 'l d. F, Y v g:i A';
 $a->strings['Time Conversion'] = 'Časový převod';
 $a->strings['Friendica provides this service for sharing events with other networks and friends in unknown timezones.'] = 'Friendica poskytuje tuto službu ke sdílení událostí s ostatními sítěmi a přáteli v neznámých časových pásmech';
 $a->strings['UTC time: %s'] = 'UTC čas: %s';
@@ -1097,7 +981,6 @@ $a->strings['Converted localtime: %s'] = 'Převedený místní čas : %s';
 $a->strings['Please select your timezone:'] = 'Prosím, vyberte své časové pásmo:';
 $a->strings['Only logged in users are permitted to perform a probing.'] = 'Pouze přihlášení uživatelé mohou zkoušet adresy.';
 $a->strings['Lookup address'] = 'Najít adresu';
-$a->strings['No entries (some entries may be hidden).'] = 'Žádné záznamy (některé položky mohou být skryty).';
 $a->strings['Find on this site'] = 'Najít na tomto webu';
 $a->strings['Results for:'] = 'Výsledky pro:';
 $a->strings['Site Directory'] = 'Adresář serveru';
@@ -1173,6 +1056,20 @@ $a->strings['For more information about the Friendica project and why we feel it
 $a->strings['Compose new personal note'] = 'Napsat novou osobní poznámku';
 $a->strings['Compose new post'] = 'Napsat nový příspěvek';
 $a->strings['The feed for this item is unavailable.'] = 'Proud pro tuto položku je nedostupný.';
+$a->strings['No valid account found.'] = 'Nenalezen žádný platný účet.';
+$a->strings['Password reset request issued. Check your email.'] = 'Požadavek o obnovení hesla vyřízen. Zkontrolujte Vaši e-mailovou schránku.';
+$a->strings['Password reset requested at %s'] = 'Na %s bylo požádáno o obnovení hesla';
+$a->strings['Request could not be verified. (You may have previously submitted it.) Password reset failed.'] = 'Požadavek nemohl být ověřen. (Možná jste jej odeslal/a již dříve.) Obnovení hesla se nezdařilo.';
+$a->strings['Request has expired, please make a new one.'] = 'Platnost požadavku vypršela, prosím vytvořte nový.';
+$a->strings['Forgot your Password?'] = 'Zapomněl/a jste heslo?';
+$a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Zadejte svůj e-mailovou adresu a odešlete pro obnovení vašeho hesla. Poté zkontrolujte svůj e-mail pro další instrukce.';
+$a->strings['Password Reset'] = 'Obnovit heslo';
+$a->strings['Your password has been reset as requested.'] = 'Vaše heslo bylo na vaše přání obnoveno.';
+$a->strings['Your new password is'] = 'Někdo vám napsal na vaši profilovou stránku';
+$a->strings['Save or copy your new password - and then'] = 'Uložte si nebo zkopírujte nové heslo - a pak';
+$a->strings['click here to login'] = 'klikněte zde pro přihlášení';
+$a->strings['Your password may be changed from the <em>Settings</em> page after successful login.'] = 'Nezdá se, že by to bylo vaše celé jméno (křestní jméno a příjmení).';
+$a->strings['Your password has been changed at %s'] = 'Vaše heslo bylo změněno na %s';
 $a->strings['System down for maintenance'] = 'Systém vypnut z důvodů údržby';
 $a->strings['Files'] = 'Soubory';
 $a->strings['Upload'] = 'Nahrát';
@@ -1225,6 +1122,7 @@ $a->strings['The GUID of the item you want to delete.'] = 'Číslo GUID položky
 $a->strings['Type'] = 'Typ';
 $a->strings['Item not found'] = 'Položka nenalezena';
 $a->strings['Item Guid'] = 'Číslo GUID položky';
+$a->strings['Comment'] = 'Okomentovat';
 $a->strings['Registered users'] = 'Registrovaní uživatelé';
 $a->strings['Pending registrations'] = 'Čekající registrace';
 $a->strings['%s user blocked'] = [
@@ -1279,14 +1177,6 @@ $a->strings['Show unread'] = 'Zobrazit nepřečtené';
 $a->strings['{0} requested registration'] = '{0} požaduje registraci';
 $a->strings['Authorize application connection'] = 'Povolit připojení aplikacím';
 $a->strings['Do you want to authorize this application to access your posts and contacts, and/or create new posts for you?'] = 'Chcete umožnit této aplikaci přístup k vašim příspěvkům a kontaktům a/nebo k vytváření Vašich nových příspěvků?';
-$a->strings['No contact provided.'] = 'Nebyl poskytnut žádný kontakt.';
-$a->strings['Couldn\'t fetch information for contact.'] = 'Nelze načíst informace pro kontakt.';
-$a->strings['Couldn\'t fetch friends for contact.'] = 'Nelze načíst přátele pro kontakt.';
-$a->strings['Done'] = 'Hotovo';
-$a->strings['success'] = 'úspěch';
-$a->strings['failed'] = 'selhalo';
-$a->strings['ignored'] = 'ignorován';
-$a->strings['Keep this window open until done.'] = 'Toto okno nechte otevřené až do konce.';
 $a->strings['Invalid photo with id %s.'] = 'Neplatná fotka s ID %s.';
 $a->strings['Edit post'] = 'Upravit příspěvek';
 $a->strings['web link'] = 'webový odkaz';
@@ -1310,13 +1200,9 @@ $a->strings['Server can\'t accept new file upload at this time, please contact y
 $a->strings['Image file is empty.'] = 'Soubor obrázku je prázdný.';
 $a->strings['View Album'] = 'Zobrazit album';
 $a->strings['Profile not found.'] = 'Profil nenalezen.';
-$a->strings['Member since:'] = 'Členem od:';
-$a->strings['j F, Y'] = 'j F, Y';
-$a->strings['j F'] = 'j F';
 $a->strings['Birthday:'] = 'Narozeniny:';
 $a->strings['Age: '] = 'Věk: ';
 $a->strings['Description:'] = 'Popis:';
-$a->strings['Edit profile'] = 'Upravit profil';
 $a->strings['Profile unavailable.'] = 'Profil není k dispozici.';
 $a->strings['Invalid locator'] = 'Neplatný odkaz';
 $a->strings['Remote subscription can\'t be done for your network. Please subscribe directly on your system.'] = 'Vzdálený odběr nemůže být na vaší síti proveden. Prosím, přihlaste se k odběru přímo na vašem systému.';
@@ -1408,11 +1294,8 @@ $a->strings['Your contacts can add additional tags to your posts.'] = 'Vaše kon
 $a->strings['Default Post Permissions'] = 'Výchozí oprávnění pro příspěvek';
 $a->strings['Automatically expire posts after this many days:'] = 'Automaticky expirovat příspěvky po zadaném počtu dní:';
 $a->strings['If empty, posts will not expire. Expired posts will be deleted'] = 'Pokud je prázdné, příspěvky nebudou nikdy expirovat. Expirované příspěvky budou vymazány';
-$a->strings['Notification Settings'] = 'Nastavení oznámení';
-$a->strings['Send a notification email when:'] = 'Poslat oznámení e-mailem, když:';
 $a->strings['You receive an introduction'] = 'obdržíte představení';
 $a->strings['Your introductions are confirmed'] = 'jsou vaše představení potvrzena';
-$a->strings['Someone writes on your profile wall'] = 'vám někdo napíše na vaši profilovou stránku';
 $a->strings['Someone writes a followup comment'] = 'Vám někdo napíše následný komentář';
 $a->strings['You receive a private message'] = 'obdržíte soukromou zprávu';
 $a->strings['You receive a friend suggestion'] = 'obdržíte návrh přátelství';
@@ -1473,7 +1356,6 @@ $a->strings['(click to open/close)'] = '(klikněte pro otevření/zavření)';
 $a->strings['Profile Actions'] = 'Akce profilu';
 $a->strings['Edit Profile Details'] = 'Upravit podrobnosti profilu ';
 $a->strings['Profile picture'] = 'Profilový obrázek';
-$a->strings['Location'] = 'Poloha';
 $a->strings['Miscellaneous'] = 'Různé';
 $a->strings['Street Address:'] = 'Ulice:';
 $a->strings['Locality/City:'] = 'Poloha/město:';
@@ -1483,9 +1365,7 @@ $a->strings['Country:'] = 'Země:';
 $a->strings['XMPP (Jabber) address:'] = 'Adresa XMPP (Jabber):';
 $a->strings['Homepage URL:'] = 'Odkaz na domovskou stránku:';
 $a->strings['Public Keywords:'] = 'Veřejná klíčová slova:';
-$a->strings['(Used for suggesting potential friends, can be seen by others)'] = '(Používá se pro doporučování potenciálních přátel, může být viděno ostatními)';
 $a->strings['Private Keywords:'] = 'Soukromá klíčová slova:';
-$a->strings['(Used for searching profiles, never shown to others)'] = '(Používá se pro vyhledávání profilů, není nikdy zobrazeno ostatním)';
 $a->strings['Image size reduction [%s] failed.'] = 'Nepodařilo se snížit velikost obrázku [%s].';
 $a->strings['Shift-reload the page or clear browser cache if the new photo does not display immediately.'] = 'Znovu načtěte stránku (Shift+F5) nebo vymažte cache prohlížeče, pokud se nová fotka nezobrazí okamžitě.';
 $a->strings['Unable to process image'] = 'Obrázek nelze zpracovat ';
@@ -1662,6 +1542,9 @@ $a->strings['Remove locally'] = 'Odstranit lokálně';
 $a->strings['I will attend'] = 'zúčastním se';
 $a->strings['I will not attend'] = 'nezúčastním se';
 $a->strings['I might attend'] = 'mohl bych se zúčastnit';
+$a->strings['Starred'] = 'S hvězdou';
+$a->strings['I like this (toggle)'] = 'To se mi líbí (přepínat)';
+$a->strings['I don\'t like this (toggle)'] = 'To se mi nelíbí (přepínat)';
 $a->strings['to'] = 'na';
 $a->strings['Wall-to-Wall'] = 'Ze zdi na zeď';
 $a->strings['via Wall-To-Wall:'] = 'ze zdi na zeď';

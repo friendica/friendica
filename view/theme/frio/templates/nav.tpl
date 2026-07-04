@@ -6,41 +6,48 @@
   *}}
 {{* we have modified the navmenu (look at function frio_remote_nav() ) to have remote links. *}}
 {{if $userinfo}}
-	<header>
-		{{* {{$langselector}} *}}
-
-		<div id="site-location" aria-hidden="true">{{$sitelocation}}</div>
-		<div id="banner" class="hidden-sm hidden-xs">
-			<a href="{{$baseurl}}" aria-hidden="true">
-				<div id="logo-img" aria-label="{{$home}}"></div>
-			</a>
-		</div>
-	</header>
 	<nav id="topbar-first" class="topbar" role="menubar">
-		<div class="container">
-			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+		<div class="container-fluid">
+			<div id="topbar-first-nav-container" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+
+				<header style="display: flex;">
+
+					{{* Buttons for the mobile view *}}
+					{{* Mobile left menu dropdown button *}}
+					<button type="button" id="mobile-left-menu" class="navbar-toggle collapsed visible-sm visible-xs"
+						data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
+						<span class="sr-only">Toggle navigation</span>
+						<i class="ri ri-arrow-right-double-line ri-fw ri-lg" aria-hidden="true"></i>
+					</button>
+
+					<div id="site-location" aria-hidden="true">{{$sitelocation}}</div>
+					<div id="banner" class="hidden-sm hidden-xs">
+						<a href="{{$baseurl}}" aria-hidden="true">
+							<div id="logo-img" aria-label="{{$home}}"></div>
+						</a>
+					</div>
+					{{* The search box *}}
+					{{if $nav.search}}
+						<form id="search-box" class="navbar-form hidden-xs form-group form-group-search" role="search" method="get" action="{{$nav.search.0}}">
+							<div class="form-group form-group-search">
+								<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
+									type="search" name="q" placeholder="{{$search_placeholder}}">
+								<button class="btn btn-primary btn-md form-button-search" type="submit">
+									<i class="ri ri-search-line" aria-hidden="true"></i>
+									<span class="sr-only">{{$nav.search.1}}</span>
+								</button>
+							</div>
+						</form>
+					{{/if}}
+					<button type="button" id="search-mobile-btn" class="navbar-toggle collapsed" data-toggle="collapse"
+						data-target="#search-mobile" aria-expanded="false" aria-controls="search-mobile">
+						<span class="sr-only">Toggle Search</span>
+						<i class="ri ri-search-line ri-fw ri-lg" aria-hidden="true"></i>
+					</button>
+				</header>
 				<!-- div for navbar width-->
 				<!-- Brand and toggle get grouped for better mobile display -->
 				<div class="topbar-nav">
-
-					{{* Buttons for the mobile view *}}
-					{{* Mobile user menu dropdown button *}}
-					<button type="button" class="navbar-toggle offcanvas-right-toggle pull-right"
-						aria-controls="offcanvasUsermenu" aria-haspopup="true">
-						<span class="sr-only">Toggle navigation</span>
-						<i class="fa fa-ellipsis-v fa-fw fa-lg" aria-hidden="true"></i>
-					</button>
-					<button type="button" class="navbar-toggle collapsed pull-right" data-toggle="collapse"
-						data-target="#search-mobile" aria-expanded="false" aria-controls="search-mobile">
-						<span class="sr-only">Toggle Search</span>
-						<i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i>
-					</button>
-					{{* Mobile left menu dropdown button *}}
-					<button type="button" id="mobile-left-menu" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
-						data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
-						<span class="sr-only">Toggle navigation</span>
-						<i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i>
-					</button>
 
 					{{* Left section of the NavBar with navigation shortcuts/icons *}}
 					<ul class="nav navbar-left">
@@ -50,29 +57,22 @@
 						<li class="sr-only">
 							<a class="sr-only" href="{{$baseurl}}">{{$home}}</a>
 						</li>
+
+						{{if $nav.back}}
+							<!-- Link back home to one's own instance, only visible to visitors -->
+							<li class="nav-segment">
+								<a accesskey="b" class="nav-menu" href="{{$nav.back.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
+										aria-label="{{$nav.back.3}}" title="{{$nav.back.3}}"><i class="ri ri-xl ri-arrow-go-back-line ri-fw"
+										aria-hidden="true"></i> <span class="d-none">{{$nav.back.1}}</span></a>
+							</li>
+						{{/if}}
+
 						{{if $nav.network}}
 							<li class="nav-segment">
 								<a accesskey="n" class="nav-menu {{$sel.network}}" href="{{$nav.network.0}}"
 									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.network.3}}" title="{{$nav.network.3}}"><i
-										class="fa fa-lg fa-th fa-fw" aria-hidden="true"></i><span id="net-update"
+									 class="ri ri-xl ri-home-5-{{if $sel.network}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="d-none">{{$nav.network.1}}</span><span id="net-update"
 										class="nav-network-badge badge nav-notification"></span></a>
-							</li>
-						{{/if}}
-
-						{{if $nav.channel}}
-							<li class="nav-segment">
-								<a accesskey="l" class="nav-menu {{$sel.channel}}" href="{{$nav.channel.0}}"
-									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.channel.3}}" title="{{$nav.channel.3}}"><i
-										class="fa fa-lg fa-newspaper-o fa-fw" aria-hidden="true"></i></a>
-							</li>
-						{{/if}}
-
-						{{if $nav.home}}
-							<li class="nav-segment">
-								<a accesskey="p" class="nav-menu {{$sel.home}}" href="{{$nav.home.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
-									aria-label="{{$nav.home.3}}" title="{{$nav.home.3}}"><i class="fa fa-lg fa-home fa-fw"
-										aria-hidden="true"></i><span id="home-update"
-										class="nav-home-badge badge nav-notification"></span></a>
 							</li>
 						{{/if}}
 
@@ -80,7 +80,40 @@
 							<li class="nav-segment">
 								<a accesskey="c" class="nav-menu {{$sel.community}}" href="{{$nav.community.0}}"
 									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.community.3}}" title="{{$nav.community.3}}"><i
-										class="fa fa-lg fa-bullseye fa-fw" aria-hidden="true"></i></a>
+									  class="ri ri-xl ri-earth-{{if $sel.community}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="d-none">{{$nav.community.1}}</span></a>
+							</li>
+						{{/if}}
+
+						{{if $nav.calendar}}
+							<li class="nav-segment">
+								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
+									aria-label="{{$nav.calendar.1}}" title="{{$nav.calendar.3}}" class="nav-menu {{$sel.calendar}}"><i
+									class="ri ri-xl ri-calendar-2-{{if $sel.calendar}}fill{{else}}line{{/if}} ri-fw"></i> <span class="d-none">{{$nav.calendar.1}}</span></a>
+							</li>
+						{{/if}}
+
+						{{if $nav.channel}}
+							<!-- Note: This is currently never displayed -->
+							<li class="nav-segment">
+								<a accesskey="l" class="nav-menu {{$sel.channel}}" href="{{$nav.channel.0}}"
+									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.channel.3}}" title="{{$nav.channel.3}}"><i
+										class="ri ri-xl ri-newspaper-{{if $sel.channel}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="d-none">{{$nav.channel.1}}</span></a>
+							</li>
+						{{/if}}
+
+					</ul>
+				</div>
+
+				{{* This is the right part of the NavBar. It includes the search and the user menu *}}
+				<div class="topbar-actions">
+					<ul class="nav">
+
+						{{if $nav.contacts}}
+							<li class="nav-segment hidden-xs">
+								<a accesskey="k" id="nav-contacts-link" href="{{$nav.contacts.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
+									aria-label="{{$nav.contacts.1}}" title="{{$nav.contacts.1}}"
+									class="nav-menu {{$sel.contacts}} {{$nav.contacts.2}}"><i
+										class="ri ri-contacts-{{if $sel.contacts}}fill{{else}}line{{/if}} ri-lg ri-fw"></i> <span class="d-none">{{$nav.contacts.1}}</span></a>
 							</li>
 						{{/if}}
 
@@ -88,26 +121,9 @@
 							<li class="nav-segment">
 								<a accesskey="m" id="nav-messages-link" href="{{$nav.messages.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.messages.1}}" title="{{$nav.messages.1}}"
-									class="nav-menu {{$sel.messages}}"><i class="fa fa-envelope fa-lg fa-fw"
-										aria-hidden="true"></i><span id="mail-update"
+									class="nav-menu {{$sel.messages}}"><i class="ri ri-mail-{{if $sel.messages}}fill{{else}}line{{/if}} ri-lg ri-fw"
+										aria-hidden="true"></i> <span class="d-none">{{$nav.messages.1}}</span><span id="mail-update"
 										class="nav-mail-badge badge nav-notification"></span></a>
-							</li>
-						{{/if}}
-
-						{{if $nav.calendar}}
-							<li class="nav-segment hidden-xs">
-								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
-									aria-label="{{$nav.calendar.1}}" title="{{$nav.calendar.1}}" class="nav-menu {{$sel.calendar}}"><i
-										class="fa fa-lg fa-calendar fa-fw"></i></a>
-							</li>
-						{{/if}}
-
-						{{if $nav.contacts}}
-							<li class="nav-segment hidden-xs">
-								<a accesskey="k" id="nav-contacts-link" href="{{$nav.contacts.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
-									aria-label="{{$nav.contacts.1}}" title="{{$nav.contacts.1}}"
-									class="nav-menu {{$sel.contacts}} {{$nav.contacts.2}}"><i
-										class="fa fa-users fa-lg fa-fw"></i></a>
 							</li>
 						{{/if}}
 
@@ -118,7 +134,7 @@
 									type="button" aria-haspopup="true" aria-expanded="false"
 									aria-controls="nav-notifications-menu">
 									<span id="notification-update" class="nav-notification-badge badge nav-notification"></span>
-									<i class="fa fa-bell fa-lg" aria-label="{{$nav.notifications.1}}"></i>
+									<i class="ri ri-notification-line ri-lg" aria-label="{{$nav.notifications.1}}"></i>  <span class="d-none">{{$nav.notifications.1}}</span>
 								</button>
 								{{* The notifications dropdown menu. There are two parts of menu. The second is at the bottom of this file. It is loaded via js. Look at nav-notifications-template *}}
 								<ul id="nav-notifications-menu" class="dropdown-menu menu-popup" role="menu"
@@ -135,11 +151,10 @@
 												</button>
 											</header>
 										</header>
-
 									</li>
 
 							<li id="nav-notifications-loading" class="loading" style="font-weight: bold; color: #555; padding-left: 10px;">
-								<i class="fa fa-spinner fa-spin" aria-hidden="true" style="vertical-align: middle;"></i> {{$loadingnotifications}}
+								<i class="ri ri-loader-4-line ri-spin" aria-hidden="true" style="vertical-align: middle;"></i> {{$loadingnotifications}}
 							</li>
 							<li id="nav-notifications-empty" class="empty" style="display: none;">
 								<p role="menuitem" class="text-muted text-center"><i>{{$emptynotifications}}</i></p>
@@ -148,28 +163,12 @@
 							</li>
 						{{/if}}
 
-					</ul>
-				</div>
-
-				{{* This is the right part of the NavBar. It includes the search and the user menu *}}
-				<div class="topbar-actions pull-right">
-					<ul class="nav">
-
-						{{* The search box *}}
-						{{if $nav.search}}
-							<li id="search-box" class="hidden-xs">
-								<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
-									<div class="form-group form-group-search">
-										<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
-											type="search" name="q" placeholder="{{$search_placeholder}}">
-										<button class="btn btn-primary btn-md form-button-search" type="submit">
-											<i class="fa fa-search" aria-hidden="true"></i>
-											<span class="sr-only">{{$nav.search.1}}</span>
-										</button>
-									</div>
-								</form>
-							</li>
-						{{/if}}
+					{{* Mobile user menu dropdown button *}}
+					<button type="button" class="navbar-toggle offcanvas-right-toggle"
+						aria-controls="offcanvasUsermenu" aria-haspopup="true">
+						<span class="sr-only">Toggle navigation</span>
+						<i class="ri ri-more-2-line ri-fw ri-lg" aria-hidden="true"></i>
+					</button>
 
 						{{* The user dropdown menu *}}
 						{{if $userinfo}}
@@ -197,9 +196,9 @@
 									{{/if}}
 									{{foreach $nav.usermenu as $usermenu}}
 										<li>
-											<a role="menuitem" class="{{$usermenu.2}}{{if $usermenu.0|str_ends_with:"calendar/"}}visible-xs{{/if}}" href="{{$usermenu.0}}"
+											<a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}"
 												title="{{$usermenu.3}}">
-												<i class="fa {{$usermenu.4}}"></i>
+												<i class="ri {{$usermenu.4}}"></i>
 												{{$usermenu.1}}
 											</a>
 										</li>
@@ -210,7 +209,7 @@
 											<a role="menuitem"
 												class="nav-commlink {{$nav.messages.2}} {{$sel.messages}}"
 												href="{{$nav.messages.0}}" title="{{$nav.messages.3}}">
-												<i class="fa fa-envelope fa-fw" aria-hidden="true"></i>
+												<i class="ri ri-mail-line ri-fw" aria-hidden="true"></i>
 												{{$nav.messages.1}} <span id="mail-update-li"
 													class="nav-mail-badge badge nav-notification"></span>
 											</a>
@@ -221,7 +220,7 @@
 											<a role="menuitem" id="nav-menu-contacts-link"
 												class="nav-link {{$nav.contacts.2}}" href="{{$nav.contacts.0}}"
 												title="{{$nav.contacts.3}}">
-												<i class="fa fa-users fa-fw" aria-hidden="true"></i>
+												<i class="ri ri-contacts-line ri-fw" aria-hidden="true"></i>
 												{{$nav.contacts.1}}
 											</a>
 										</li>
@@ -231,14 +230,15 @@
 											<a role="menuitem" id="nav-delegation-link"
 												class="nav-commlink {{$nav.delegation.2}} {{$sel.delegation}}"
 												href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}">
-												<i class="fa fa-flag fa-fw" aria-hidden="true"></i> {{$nav.delegation.1}}
+												<i class="ri ri-arrow-left-right-line ri-fw" aria-hidden="true"></i> {{$nav.delegation.1}}
 											</a>
 										</li>
 									{{/if}}
 									<li>
 										<a role="menuitem" id="nav-directory-link" class="nav-link {{$nav.directory.2}}"
 											href="{{$nav.directory.0}}" title="{{$nav.directory.3}}">
-											<i class="fa fa-sitemap fa-fw" aria-hidden="true"></i>{{$nav.directory.1}}
+											<i class="ri ri-node-tree ri-fw" aria-hidden="true"></i>
+											{{$nav.directory.1}}
 										</a>
 									</li>
 									<li class="divider"><hr></li>
@@ -246,7 +246,7 @@
 										<li>
 											<a role="menuitem" id="nav-apps-link" class="nav-link {{$nav.apps.2}}"
 												href="{{$nav.apps.0}}" title="{{$nav.apps.3}}">
-												<i class="fa fa-puzzle-piece fa-fw" aria-hidden="true"></i> {{$nav.apps.1}}
+												<i class="ri ri-puzzle-line ri-fw" aria-hidden="true"></i> {{$nav.apps.1}}
 											</a>
 										</li>
 										<li class="divider"><hr></li>
@@ -255,7 +255,7 @@
 										<li>
 											<a role="menuitem" id="nav-help-link" class="nav-link {{$nav.help.2}}"
 												href="{{$nav.help.0}}" title="{{$nav.help.3}}">
-												<i class="fa fa-question-circle fa-fw" aria-hidden="true"></i> {{$nav.help.1}}
+												<i class="ri ri-question-mark ri-fw" aria-hidden="true"></i> {{$nav.help.1}}
 											</a>
 										</li>
 									{{/if}}
@@ -263,7 +263,7 @@
 										<li>
 											<a role="menuitem" id="nav-settings-link" class="nav-link {{$nav.settings.2}}"
 												href="{{$nav.settings.0}}" title="{{$nav.settings.3}}">
-												<i class="fa fa-cog fa-fw" aria-hidden="true"></i> {{$nav.settings.1}}
+												<i class="ri ri-settings-3-line ri-fw" aria-hidden="true"></i> {{$nav.settings.1}}
 											</a>
 										</li>
 									{{/if}}
@@ -271,16 +271,15 @@
 										<li>
 											<a accesskey="a" role="menuitem" id="nav-admin-link"
 												class="nav-link {{$nav.admin.2}}" href="{{$nav.admin.0}}"
-												title="{{$nav.admin.3}}"><i class="fa fa-user-secret fa-fw" aria-hidden="true"></i>
+												title="{{$nav.admin.3}}"><i class="ri ri-medal-2-fill ri-fw" aria-hidden="true"></i>
 												{{$nav.admin.1}}
 											</a>
-										</li>
-									{{/if}}
+										</li>									{{/if}}
 									{{if $nav.moderation}}
 										<li>
 											<a accesskey="m" role="menuitem" id="nav-moderation-link"
 												class="nav-link {{$nav.moderation.2}}" href="{{$nav.moderation.0}}"
-												title="{{$nav.moderation.3}}"><i class="fa fa-gavel fa-fw" aria-hidden="true"></i>
+												title="{{$nav.moderation.3}}"><i class="ri ri-shield-user-line ri-fw" aria-hidden="true"></i>
 												{{$nav.moderation.1}}
 											</a>
 										</li>
@@ -289,13 +288,13 @@
 									<li>
 										<a role="menuitem" id="nav-about-link" class="nav-link {{$nav.about.2}}"
 											href="{{$nav.about.0}}" title="{{$nav.about.3}}">
-											<i class="fa fa-info fa-fw" aria-hidden="true"></i> {{$nav.about.1}}
+											<i class="ri ri-information-line ri-fw" aria-hidden="true"></i> {{$nav.about.1}}
 										</a>
 									</li>
 									{{if $nav.tos}}
 										<li>
 											<a role="menuitem" id="nav-tos-link" class="nav-link {{$nav.tos.2}}"
-												href="{{$nav.tos.0}}" title="{{$nav.tos.3}}"><i class="fa fa-file-text"
+												href="{{$nav.tos.0}}" title="{{$nav.tos.3}}"><i class="ri ri-file-text-line"
 													aria-hidden="true"></i> {{$nav.tos.1}}
 											</a>
 										</li>
@@ -305,7 +304,7 @@
 										<li>
 											<a role="menuitem" id="nav-logout-link"
 												class="nav-link {{$nav.logout.2}}" href="{{$nav.logout.0}}"
-												title="{{$nav.logout.3}}"><i class="fa fa fa-sign-out fa-fw" aria-hidden="true"></i>
+												title="{{$nav.logout.3}}"><i class="ri ri-logout-box-line ri-fw" aria-hidden="true"></i>
 												{{$nav.logout.1}}
 											</a>
 										</li>
@@ -313,7 +312,7 @@
 										<li>
 											<a role="menuitem" id="nav-login-link"
 												class="nav-login-link {{$nav.login.2}}" href="{{$nav.login.0}}"
-												title="{{$nav.login.3}}"><i class="fa fa-power-off fa-fw" aria-hidden="true"></i>
+												title="{{$nav.login.3}}"><i class="ri ri-shut-down-line ri-fw" aria-hidden="true"></i>
 												{{$nav.login.1}}
 											</a>
 										</li>
@@ -322,9 +321,6 @@
 							</li>{{* End of userinfo dropdown menu *}}
 						{{/if}}
 
-						<!-- Language selector, I do not find it relevant, activate if necessary.
-						<li>{{$langselector}}</li>
-						-->
 					</ul>
 				</div>{{* End of right navbar *}}
 
@@ -348,7 +344,7 @@
 								<li class="list-group-item">
 									<a role="menuitem" class="{{$usermenu.2}}"
 										href="{{$usermenu.0}}" title="{{$usermenu.3}}">
-										<i class="fa {{$usermenu.4}}"></i>&nbsp;
+										<i class="ri {{$usermenu.4}}"></i>&nbsp;
 										{{$usermenu.1}}
 									</a>
 								</li>
@@ -360,7 +356,7 @@
 								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.contacts.2}}" href="{{$nav.contacts.0}}"
-										title="{{$nav.contacts.3}}"><i class="fa fa-users fa-fw" aria-hidden="true"></i>
+										title="{{$nav.contacts.3}}"><i class="ri ri-contacts-line ri-fw" aria-hidden="true"></i>
 										{{$nav.contacts.1}}
 									</a>
 								</li>
@@ -369,7 +365,7 @@
 								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.messages.2}} {{$sel.messages}}" href="{{$nav.messages.0}}"
-										title="{{$nav.messages.3}}"><i class="fa fa-envelope fa-fw" aria-hidden="true"></i>
+										title="{{$nav.messages.3}}"><i class="ri ri-mail-line ri-fw" aria-hidden="true"></i>
 										{{$nav.messages.1}}
 									</a>
 								</li>
@@ -378,7 +374,7 @@
 								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-commlink {{$nav.delegation.2}} {{$sel.delegation}}"
-										href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}"><i class="fa fa-flag fa-fw"
+										href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}"><i class="ri ri-arrow-left-right-line ri-fw"
 											aria-hidden="true"></i> {{$nav.delegation.1}}
 									</a>
 								</li>
@@ -389,7 +385,7 @@
 							{{if $nav.settings}}
 								<li class="list-group-item">
 									<a role="menuitem" class="nav-link {{$nav.settings.2}}" href="{{$nav.settings.0}}"
-										title="{{$nav.settings.3}}"><i class="fa fa-cog fa-fw" aria-hidden="true"></i>
+										title="{{$nav.settings.3}}"><i class="ri ri-settings-3-line ri-fw" aria-hidden="true"></i>
 										{{$nav.settings.1}}
 									</a>
 								</li>
@@ -398,7 +394,7 @@
 								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.admin.2}}" href="{{$nav.admin.0}}" title="{{$nav.admin.3}}"><i
-											class="fa fa-user-secret fa-fw" aria-hidden="true"></i>
+											class="ri ri-admin-line ri-fw" aria-hidden="true"></i>
 										{{$nav.admin.1}}
 									</a>
 								</li>
@@ -407,7 +403,7 @@
 								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.moderation.2}}" href="{{$nav.moderation.0}}" title="{{$nav.moderation.3}}"><i
-											class="fa fa-gavel fa-fw" aria-hidden="true"></i>
+											class="ri ri-shield-user-line ri-fw" aria-hidden="true"></i>
 										{{$nav.moderation.1}}
 									</a>
 								</li>
@@ -416,7 +412,7 @@
 						<li class="list-group-item">
 							<a role="menuitem" class="nav-link {{$nav.about.2}}"
 								href="{{$nav.about.0}}" title="{{$nav.about.3}}">
-								<i class="fa fa-info fa-fw" aria-hidden="true"></i> {{$nav.about.1}}
+								<i class="ri ri-information-line ri-fw" aria-hidden="true"></i> {{$nav.about.1}}
 							</a>
 						</li>
 							<li class="divider"><hr></li>
@@ -424,7 +420,7 @@
 								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-link {{$nav.logout.2}}" href="{{$nav.logout.0}}" title="{{$nav.logout.3}}"><i
-											class="fa fa fa-sign-out fa-fw" aria-hidden="true"></i>
+											class="ri ri ri-logout-box-line ri-fw" aria-hidden="true"></i>
 										{{$nav.logout.1}}
 									</a>
 								</li>
@@ -432,7 +428,7 @@
 								<li class="list-group-item">
 									<a role="menuitem"
 										class="nav-login-link {{$nav.login.2}}" href="{{$nav.login.0}}"
-										title="{{$nav.login.3}}"><i class="fa fa-power-off fa-fw" aria-hidden="true"></i>
+										title="{{$nav.login.3}}"><i class="ri ri-shut-down-line ri-fw" aria-hidden="true"></i>
 										{{$nav.login.1}}
 									</a>
 								</li>
@@ -447,12 +443,12 @@
 {{else}}
 	{{* The navbar for users which are not logged in *}}
 	<nav class="navbar navbar-fixed-top">
-		<div class="container">
+		<div class="container-fluid">
 		<div class="navbar-header pull-left">
 			<button type="button" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
 					data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
 				<span class="sr-only">Toggle navigation</span>
-				<i class="fa fa-ellipsis-v fa-fw fa-lg" aria-hidden="true"></i>
+				<i class="ri ri-more-2-line ri-fw ri-lg" aria-hidden="true"></i>
 			</button>
 			<a class="navbar-brand" href="#">
 				<div id="navbrand-container">
@@ -464,15 +460,15 @@
 			<div class="pull-right">
 				<ul class="nav navbar-nav navbar-right">
 					<li>
-						<a href="login?mode=none" id="nav-login">
-							<i class="fa fa-sign-in fa-fw" aria-hidden="true"></i>
+						<a href="login?mode=none" id="nav-login" class="btn btn-primary">
+							<i class="ri ri-login-box-line ri-fw" aria-hidden="true"></i>
 							{{$nav.login.3}}
 						</a>
 					</li>
 					<li>
-						<a href="{{$nav.about.0}}" id="nav-about" data-toggle="tooltip" aria-label="{{$nav.about.3}}"
+						<a href="{{$nav.about.0}}" id="nav-about" data-toggle="tooltip" aria-label="{{$nav.about.3}}" class="btn btn-primary"
 							title="{{$nav.about.3}}">
-							<i class="fa fa-info fa-fw" aria-hidden="true"></i>
+							<i class="ri ri-information-line ri-fw" aria-hidden="true"></i> {{$nav.about.1}}
 						</a>
 					</li>
 				</ul>
@@ -489,7 +485,7 @@
 				<input id="nav-search-input-field-mobile" class="form-control form-search" type="search" name="q"
 					placeholder="{{$search_placeholder}}">
 				<button class="btn btn-primary btn-sm form-button-search" type="submit">
-					<i class="fa fa-search fa-fw fa-lg" aria-hidden="true"></i>
+					<i class="ri ri-search-line ri-fw ri-lg" aria-hidden="true"></i>
 					<span class="sr-only">{{$nav.search.1}}</span>
 				</button>
 			</div>
@@ -499,9 +495,9 @@
 
 {{* The second navbar which contains nav points of the actual page - (nav points are actual handled by this theme through js *}}
 <div id="topbar-second" class="topbar">
-	<div class="container">
-		<div class="col-lg-3 col-md-3 hidden-sm hidden-xs" id="nav-short-info"></div>
-		<div class="col-lg-7 col-md-7 col-sm-11 col-xs-10" id="tabmenu"></div>
-		<div class="col-lg-2 col-md-2 col-sm-1 col-xs-2" id="navbar-button"></div>
+	<div class="container-fluid">
+		<div class="col-lg-2 col-md-2 hidden-sm hidden-xs" id="nav-short-info"></div>
+		<div class="col-lg-9 col-md-9 col-sm-11 col-xs-7" id="tabmenu"></div>
+		<div class="col-lg-1 col-md-1 col-sm-1 col-xs-5" id="navbar-button"></div>
 	</div>
 </div>

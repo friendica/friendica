@@ -14,9 +14,8 @@ class ConversationsTest extends ApiTestCase
 	/**
 	 * Test the api_conversation_show() function.
 	 *
-	 * @return void
 	 */
-	public function testApiConversationShow()
+	public function testApiConversationShow(): void
 	{
 		self::markTestIncomplete('Needs Conversations to not set header during call (like at BaseApi::setLinkHeader');
 
@@ -27,9 +26,8 @@ class ConversationsTest extends ApiTestCase
 	/**
 	 * Test the api_conversation_show() function with an ID.
 	 *
-	 * @return void
 	 */
-	public function testApiConversationShowWithId()
+	public function testApiConversationShowWithId(): void
 	{
 		self::markTestIncomplete('Needs Conversations to not set header during call (like at BaseApi::setLinkHeader');
 
@@ -48,9 +46,8 @@ class ConversationsTest extends ApiTestCase
 	/**
 	 * Test the api_conversation_show() function with an unallowed user.
 	 *
-	 * @return void
 	 */
-	public function testApiConversationShowWithUnallowedUser()
+	public function testApiConversationShowWithUnallowedUser(): void
 	{
 		self::markTestIncomplete('Needs Conversations to not set header during call (like at BaseApi::setLinkHeader');
 

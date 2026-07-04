@@ -26,7 +26,7 @@ class StreamLoggerFactoryTest extends TestCase
 	{
 		$config = $this->createStub(IManageConfigValues::class);
 		$config->method('get')->willReturnMap([
-			['system', 'logfile', null, dirname(__DIR__, 4) . '/datasets/log/empty.friendica.log.txt'],
+			['system', 'logfile', null, dirname(__DIR__, 4) . '/Fixtures/log/empty.friendica.log.txt'],
 		]);
 
 		$factory = new StreamLoggerFactory(
@@ -35,9 +35,9 @@ class StreamLoggerFactoryTest extends TestCase
 			$this->createStub(FileSystemUtil::class),
 		);
 
-		$this->assertInstanceOf(
+		$this->assertInstanceOf( // @phpstan-ignore method.alreadyNarrowedType
 			LoggerInterface::class,
-			$factory->createLogger(LogLevel::DEBUG, LogChannel::DEFAULT)
+			$factory->createLogger(LogLevel::DEBUG, LogChannel::DEFAULT),
 		);
 	}
 
@@ -64,7 +64,7 @@ class StreamLoggerFactoryTest extends TestCase
 	{
 		$config = $this->createStub(IManageConfigValues::class);
 		$config->method('get')->willReturnMap([
-			['system', 'logfile', null, dirname(__DIR__, 4) . '/datasets/log/empty.friendica.log.txt'],
+			['system', 'logfile', null, dirname(__DIR__, 4) . '/Fixtures/log/empty.friendica.log.txt'],
 		]);
 
 		$factory = new StreamLoggerFactory(

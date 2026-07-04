@@ -210,8 +210,8 @@
 		top: 10px;
 	}
 		.sorter-mvup::before {
-			content: '\f106';
-			font-family: "ForkAwesome","FontAwesome";
+			content: '\ea78';
+			font-family: "remixicon";
 			font-size: 14px;
 			line-height: 24px;
 		}
@@ -219,8 +219,8 @@
 		bottom: 10px;
 	}
 		.sorter-mvdn::before {
-			content: '\f107';
-			font-family: "ForkAwesome","FontAwesome";
+			content: '\ea4e';
+			font-family: "remixicon";
 			font-size: 14px;
 			line-height: 24px;
 		}

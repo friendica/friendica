@@ -17,7 +17,7 @@ use Friendica\Network\HTTPException\ServiceUnavailableException;
 class DocWriter
 {
 	/** @var string the relativ path to the database specification */
-	const DOC_PATH_PREFIX = '/doc/en/spec/database/';
+	public const DOC_PATH_PREFIX = '/doc/en/spec/database/';
 
 	/**
 	 * Creates all database definitions as Markdown fields and create the mkdoc config file.
@@ -40,19 +40,19 @@ class DocWriter
 				[
 					'name'   => '-',
 					'fields' => '-',
-				]
+				],
 			];
 
 			$lengths = ['name' => 4, 'fields' => 6];
 			foreach ($definition['indexes'] as $key => $value) {
 				$fieldlist         = implode(', ', $value);
 				$indexes[]         = ['name' => $key, 'fields' => $fieldlist];
-				$lengths['name']   = max($lengths['name'], strlen($key));
+				$lengths['name']   = max($lengths['name'], strlen((string) $key));
 				$lengths['fields'] = max($lengths['fields'], strlen($fieldlist));
 			}
 
-			array_walk_recursive($indexes, function (&$value, $key) use ($lengths) {
-				$value = str_pad($value, $lengths[$key], $value === '-' ? '-' : ' ');
+			array_walk_recursive($indexes, function (&$value, $key) use ($lengths): void {
+				$value = str_pad((string) $value, $lengths[$key], $value === '-' ? '-' : ' ');
 			});
 
 			$foreign = [];
@@ -74,7 +74,7 @@ class DocWriter
 					'primary' => '-',
 					'default' => '-',
 					'extra'   => '-',
-				]
+				],
 			];
 			$lengths = [
 				'name'    => 5,
@@ -97,7 +97,7 @@ class DocWriter
 				];
 
 				foreach ($field as $fieldName => $fieldvalue) {
-					$lengths[$fieldName] = max($lengths[$fieldName] ?? 0, strlen($fieldvalue));
+					$lengths[$fieldName] = max($lengths[$fieldName], strlen((string) $fieldvalue));
 				}
 				$fields[] = $field;
 
@@ -105,13 +105,13 @@ class DocWriter
 					$foreign[] = [
 						'field'       => $key,
 						'targettable' => array_keys($value['foreign'])[0],
-						'targetfield' => array_values($value['foreign'])[0]
+						'targetfield' => array_values($value['foreign'])[0],
 					];
 				}
 			}
 
-			array_walk_recursive($fields, function (&$value, $key) use ($lengths) {
-				$value = str_pad($value, $lengths[$key], $value === '-' ? '-' : ' ');
+			array_walk_recursive($fields, function (&$value, $key) use ($lengths): void {
+				$value = str_pad((string) $value, $lengths[$key], $value === '-' ? '-' : ' ');
 			});
 
 			$tables[] = ['name' => $name, 'comment' => $definition['comment']];

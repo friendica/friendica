@@ -43,15 +43,15 @@ class Invite extends BaseModule
 		}
 
 
-		$recipients = !empty($_POST['recipients']) ? explode("\n", $_POST['recipients']) : [];
-		$message = !empty($_POST['message']) ? Strings::escapeHtml(trim($_POST['message'])) : '';
+		$recipients = !empty($_POST['recipients']) ? explode("\n", (string) $_POST['recipients']) : [];
+		$message    = !empty($_POST['message']) ? Strings::escapeHtml(trim((string) $_POST['message'])) : '';
 
-		$total = 0;
-		$invitation_only = false;
+		$total             = 0;
+		$invitation_only   = false;
 		$invites_remaining = null;
 
 		if ($config->get('system', 'invitation_only')) {
-			$invitation_only = true;
+			$invitation_only   = true;
 			$invites_remaining = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'invites_remaining');
 			if ((!$invites_remaining) && (!DI::userSession()->isSiteAdmin())) {
 				throw new HTTPException\ForbiddenException();
@@ -69,7 +69,7 @@ class Invite extends BaseModule
 			}
 
 			if ($invitation_only && ($invites_remaining || DI::userSession()->isSiteAdmin())) {
-				$code = Model\Register::createForInvitation();
+				$code     = Model\Register::createForInvitation();
 				$nmessage = str_replace('$invite_code', $code, $message);
 
 				if (!DI::userSession()->isSiteAdmin()) {
@@ -92,7 +92,8 @@ class Invite extends BaseModule
 				$recipient,
 				Email::encodeHeader(DI::l10n()->t('Please join us on Friendica'), 'UTF-8'),
 				$nmessage,
-				$additional_headers);
+				$additional_headers,
+			);
 
 			if ($res) {
 				$total++;
@@ -122,7 +123,7 @@ class Invite extends BaseModule
 
 		if ($config->get('system', 'invitation_only')) {
 			$inviteOnly = true;
-			$x = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'invites_remaining');
+			$x          = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'invites_remaining');
 			if ((!$x) && (!DI::userSession()->isSiteAdmin())) {
 				throw new HTTPException\ForbiddenException(DI::l10n()->t('You have no more invitations available'));
 			}
@@ -159,7 +160,7 @@ class Invite extends BaseModule
 				. "\r\n" . "\r\n" . DI::baseUrl() . '/profile/' . DI::userSession()->getLocalUserNickname()
 				. "\r\n" . "\r\n" . DI::l10n()->t('For more information about the Friendica project and why we feel it is important, please visit http://friendi.ca') . "\r\n" . "\r\n",
 			],
-			'$submit'              => DI::l10n()->t('Submit')
+			'$submit' => DI::l10n()->t('Submit'),
 		]);
 	}
 }

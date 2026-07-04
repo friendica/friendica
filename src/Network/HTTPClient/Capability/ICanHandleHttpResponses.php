@@ -8,6 +8,7 @@
 namespace Friendica\Network\HTTPClient\Capability;
 
 use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Temporary class to map Friendica used variables based on PSR-7 HTTPResponse
@@ -123,4 +124,11 @@ interface ICanHandleHttpResponses
 	 * @return boolean
 	 */
 	public function isTimeout(): bool;
+
+	/**
+	 * Get the response body as a stream
+	 *
+	 * @return StreamInterface
+	 */
+	public function getBodyStream(): StreamInterface;
 }

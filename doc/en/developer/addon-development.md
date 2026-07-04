@@ -4,6 +4,14 @@ Please see the sample addon 'randplace' for a working example of using some of t
 Addons work by intercepting event hooks - which must be registered.
 Modules work by intercepting specific page requests (by URL path).
 
+## Upgrade notes
+
+Addon developers should check the following upgrade notes for breaking changes and deprecations:
+
+- [Upgrade from 2026.05 to 2026.08](upgrade-2026.08.md)
+- [Upgrade from 2026.01 to 2026.05](upgrade-2026.05.md)
+- [Upgrade from 2024.12-1 to 2026.01](upgrade-2026.01.md)
+
 ## Naming
 
 Addon names are used in file paths and functions names, and as such:

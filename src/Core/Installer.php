@@ -28,12 +28,12 @@ class Installer
 	/**
 	 * @var array the check outcomes
 	 */
-	private $checks;
+	private array $checks = [];
 
 	/**
-	 * @var string The path to the PHP binary
+	 * @var string|null The path to the PHP binary
 	 */
-	private $phppath = null;
+	private ?string $phppath = null;
 
 	/**
 	 * Returns all checks made
@@ -66,15 +66,6 @@ class Installer
 	 * Resets all checks
 	 */
 	public function resetChecks()
-	{
-		$this->checks = [];
-	}
-
-	/**
-	 * Install constructor.
-	 *
-	 */
-	public function __construct()
 	{
 		$this->checks = [];
 	}
@@ -334,7 +325,7 @@ class Installer
 	 *
 	 * @return bool false, if the check failed
 	 */
-	private function checkFunction($name, $title, $help, $required)
+	private function checkFunction(string $name, string $title, string $help, bool $required)
 	{
 		$currHelp = '';
 		$status   = true;
@@ -344,7 +335,7 @@ class Installer
 		}
 		$this->addCheck($title, $status, $required, $currHelp);
 
-		return $status || (!$status && !$required);
+		return $status || !$required;
 	}
 
 	/**

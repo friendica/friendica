@@ -9,7 +9,6 @@ namespace Friendica\Console;
 
 use Asika\SimpleConsole\Console;
 use Exception;
-use Friendica\App\Mode;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Installer;
@@ -20,15 +19,6 @@ use RuntimeException;
 
 class AutomaticInstallation extends Console
 {
-	/** @var Mode */
-	private $appMode;
-	/** @var \Friendica\Core\Config\ValueObject\Cache */
-	private $configCache;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var Database */
-	private $dba;
-
 	protected function getHelp()
 	{
 		return <<<HELP
@@ -86,14 +76,14 @@ Examples
 HELP;
 	}
 
-	public function __construct(Mode $appMode, Cache $configCache, IManageConfigValues $config, Database $dba, array $argv = null)
-	{
+	public function __construct(
+		private readonly Cache $configCache,
+		private readonly IManageConfigValues $config,
+		private readonly Database $dba,
+		private readonly ?Installer $installer = null,
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->appMode     = $appMode;
-		$this->configCache = $configCache;
-		$this->config      = $config;
-		$this->dba         = $dba;
 	}
 
 	protected function doExecute(): int
@@ -101,7 +91,7 @@ HELP;
 		// Initialise the app
 		$this->out("Initializing setup...");
 
-		$installer = new Installer();
+		$installer = $this->installer ?? new Installer();
 
 		$configCache  = $this->configCache;
 		$basePathConf = $configCache->get('system', 'basepath');
@@ -143,36 +133,62 @@ HELP;
 
 			$save_db = $this->getOption(['s', 'savedb'], false);
 
-			$db_host = $this->getOption(['H', 'dbhost'], ($save_db) ? (getenv('MYSQL_HOST')) : Installer::DEFAULT_HOST);
-			$db_port = $this->getOption(['p', 'dbport'], ($save_db) ? getenv('MYSQL_PORT') : null);
+			$db_host   = $this->getOption(['H', 'dbhost'], ($save_db) ? (getenv('MYSQL_HOST')) : Installer::DEFAULT_HOST);
+			$db_port   = $this->getOption(['p', 'dbport'], ($save_db) ? getenv('MYSQL_PORT') : null);
 			$db_socket = $this->getOption(['s', 'dbsocket'], ($save_db) ? getenv('MYSQL_SOCKET') : null);
 			$configCache->set('database', 'hostname', $db_host . (!empty($db_port) ? ':' . $db_port : ''));
-			$configCache->set('database', 'database',
-				$this->getOption(['d', 'dbdata'],
-					($save_db) ? getenv('MYSQL_DATABASE') : ''));
-			$configCache->set('database', 'username',
-				$this->getOption(['u', 'dbuser'],
-					($save_db) ? getenv('MYSQL_USER') . getenv('MYSQL_USERNAME') : ''));
-			$configCache->set('database', 'password',
-				$this->getOption(['P', 'dbpass'],
-					($save_db) ? getenv('MYSQL_PASSWORD') : ''));
+			$configCache->set(
+				'database',
+				'database',
+				$this->getOption(
+					['d', 'dbdata'],
+					($save_db) ? getenv('MYSQL_DATABASE') : '',
+				),
+			);
+			$configCache->set(
+				'database',
+				'username',
+				$this->getOption(
+					['u', 'dbuser'],
+					($save_db) ? getenv('MYSQL_USER') . getenv('MYSQL_USERNAME') : '',
+				),
+			);
+			$configCache->set(
+				'database',
+				'password',
+				$this->getOption(
+					['P', 'dbpass'],
+					($save_db) ? getenv('MYSQL_PASSWORD') : '',
+				),
+			);
 
-			$php_path = $this->getOption(['b', 'phppath'], !empty('FRIENDICA_PHP_PATH') ? getenv('FRIENDICA_PHP_PATH') : null);
-			if (!empty($php_path)) {
-				$configCache->set('config', 'php_path', $php_path);
-			} else {
-				$configCache->set('config', 'php_path', $installer->getPHPPath());
-			}
+			$php_path = $this->getOption(['b', 'phppath'], !empty(getenv('FRIENDICA_PHP_PATH')) ? getenv('FRIENDICA_PHP_PATH') : null) ?? $installer->getPHPPath();
+			$configCache->set('config', 'php_path', $php_path);
 
-			$configCache->set('config', 'admin_email',
-				$this->getOption(['A', 'admin'],
-					!empty(getenv('FRIENDICA_ADMIN_MAIL')) ? getenv('FRIENDICA_ADMIN_MAIL') : ''));
-			$configCache->set('system', 'default_timezone',
-				$this->getOption(['T', 'tz'],
-					!empty(getenv('FRIENDICA_TZ')) ? getenv('FRIENDICA_TZ') : Installer::DEFAULT_TZ));
-			$configCache->set('system', 'language',
-				$this->getOption(['L', 'lang'],
-					!empty(getenv('FRIENDICA_LANG')) ? getenv('FRIENDICA_LANG') : Installer::DEFAULT_LANG));
+			$configCache->set(
+				'config',
+				'admin_email',
+				$this->getOption(
+					['A', 'admin'],
+					!empty(getenv('FRIENDICA_ADMIN_MAIL')) ? getenv('FRIENDICA_ADMIN_MAIL') : '',
+				),
+			);
+			$configCache->set(
+				'system',
+				'default_timezone',
+				$this->getOption(
+					['T', 'tz'],
+					!empty(getenv('FRIENDICA_TZ')) ? getenv('FRIENDICA_TZ') : Installer::DEFAULT_TZ,
+				),
+			);
+			$configCache->set(
+				'system',
+				'language',
+				$this->getOption(
+					['L', 'lang'],
+					!empty(getenv('FRIENDICA_LANG')) ? getenv('FRIENDICA_LANG') : Installer::DEFAULT_LANG,
+				),
+			);
 
 			$basepath = $this->getOption(['b', 'basepath'], !empty(getenv('FRIENDICA_BASE_PATH')) ? getenv('FRIENDICA_BASE_PATH') : null);
 			if (!empty($basepath)) {

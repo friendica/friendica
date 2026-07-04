@@ -357,7 +357,7 @@ class PostUpdate
 		}
 
 		while ($term = DBA::fetch($terms)) {
-			if (($term['type'] == Tag::MENTION) && !empty($term['url']) && !strstr($term['body'], (string) $term['url'])) {
+			if (($term['type'] == Tag::MENTION) && !empty($term['url']) && !strstr((string) $term['body'], (string) $term['url'])) {
 				$condition = ['nurl' => Strings::normaliseLink($term['url']), 'uid' => 0, 'deleted' => false];
 				$contact   = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
 				if (!DBA::isResult($contact)) {
@@ -366,7 +366,7 @@ class PostUpdate
 					$contact   = DBA::selectFirst('contact', ['url', 'alias'], $condition, ['order' => ['id']]);
 				}
 
-				if (DBA::isResult($contact) && (!strstr($term['body'], (string) $contact['url']) && (empty($contact['alias']) || !strstr($term['body'], (string) $contact['alias'])))) {
+				if (DBA::isResult($contact) && (!strstr((string) $term['body'], (string) $contact['url']) && (empty($contact['alias']) || !strstr((string) $term['body'], (string) $contact['alias'])))) {
 					$term['type'] = Tag::IMPLICIT_MENTION;
 				}
 			}
@@ -794,7 +794,7 @@ class PostUpdate
 
 		while ($photo = DBA::fetch($photos)) {
 			$img = Photo::getImageForPhoto($photo);
-			$md5 = md5($img->asString());
+			$md5 = md5((string) $img->asString());
 
 			DBA::update('photo', ['hash' => $md5], ['id' => $photo['id']]);
 			++$rows;
@@ -1091,7 +1091,7 @@ class PostUpdate
 			$id       = $conversation['uri-id'];
 			$received = $conversation['received'];
 
-			$raw = json_decode($conversation['source'], true);
+			$raw = json_decode((string) $conversation['source'], true);
 			if (empty($raw)) {
 				continue;
 			}
@@ -1237,7 +1237,7 @@ class PostUpdate
 		while ($contact = DBA::fetch($contacts)) {
 			$id = $contact['id'];
 
-			$parts = parse_url($contact['url']);
+			$parts = parse_url((string) $contact['url']);
 			unset($parts['path']);
 			$server = (string) Uri::fromParts($parts);
 

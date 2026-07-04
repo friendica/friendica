@@ -38,13 +38,13 @@ class TransmitterTest extends FixtureTestCase
 		$post = Post::selectFirst([], ['id' => 14]);
 		$this->assertNotNull($post);
 		$note = Transmitter::createNote($post);
-		$this->assertNotNull($note);
+		$this->assertNotNull($note); // @phpstan-ignore method.alreadyNarrowedType
 
 		$this->assertEquals(':like: :friendica: no <code>:dislike</code> :p: :embarrassed: 🤗 ❤ :smileyheart333: 🔥', $note['content']);
 		$emojis = array_fill_keys(['like', 'friendica', 'p', 'embarrassed', 'smileyheart333'], true);
 		$this->assertEquals(count($emojis), count($note['tag']));
 		foreach ($note['tag'] as $emoji) {
-			$this->assertTrue(array_key_exists($emoji['name'], $emojis));
+			$this->assertArrayHasKey($emoji['name'], $emojis);
 			$this->assertEquals('Emoji', $emoji['type']);
 		}
 	}

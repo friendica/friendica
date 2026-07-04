@@ -22,45 +22,45 @@ class UpdateTest extends ApiTestCase
 		$this->useHttpMethod(Router::POST);
 	}
 
-	public function testEmpty()
+	public function testEmpty(): void
 	{
 		$this->expectException(BadRequestException::class);
 		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
 
-	public function testTooFewArgs()
+	public function testTooFewArgs(): void
 	{
 		$this->expectException(BadRequestException::class);
 		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'album' => 'album_name'
+				'album' => 'album_name',
 			]);
 	}
 
-	public function testWrongUpdate()
+	public function testWrongUpdate(): void
 	{
 		$this->expectException(BadRequestException::class);
 		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'album'     => 'album_name',
-				'album_new' => 'album_name'
+				'album_new' => 'album_name',
 			]);
 	}
 
-	public function testWithoutAuthenticatedUser()
+	public function testWithoutAuthenticatedUser(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 	}
 
-	public function testValid()
+	public function testValid(): void
 	{
-		$this->loadFixture(__DIR__ . '/../../../../../datasets/photo/photo.fixture.php', DI::dba());
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
 
 		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'album'     => 'test_album',
-				'album_new' => 'test_album_2'
+				'album_new' => 'test_album_2',
 			]);
 
 		$json = $this->toJson($response);

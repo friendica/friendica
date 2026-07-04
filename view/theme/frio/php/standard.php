@@ -16,31 +16,31 @@ $frio = 'view/theme/frio';
 <!DOCTYPE html>
 <html lang="<?php echo DI::l10n()->getCurrentLang(); ?>">
 <head>
-	<title><?php if(!empty($page['title'])) {
+	<title><?php if (!empty($page['title'])) {
 		echo $page['title'];
 	} ?></title>
 	<meta name="viewport" content="initial-scale=1.0">
-	<meta request="<?php echo htmlspecialchars($_REQUEST['pagename']) ?>">
+	<meta request="<?php echo htmlspecialchars((string) $_REQUEST['pagename']) ?>">
 	<script type="text/javascript">var baseurl="<?php echo DI::baseUrl() ?>";</script>
 	<script type="text/javascript">var frio="<?php echo $frio; ?>";</script>
-	<?php if(!empty($page['htmlhead'])) {
+	<?php if (!empty($page['htmlhead'])) {
 		echo $page['htmlhead'];
 	} ?>
 </head>
 <body id="top">
-<?php if($_SERVER['REQUEST_URI'] == '/') {
+<?php if ($_SERVER['REQUEST_URI'] == '/') {
 	header('Location: /login');
 } ?>
 <?php
-if(!empty($page['nav'])) {
+if (!empty($page['nav'])) {
 	echo	str_replace(
 		'~config.sitename~',
 		DI::config()->get('config', 'sitename'),
 		str_replace(
 			'~system.banner~',
 			DI::config()->get('system', 'banner'),
-			$page['nav']
-		)
+			$page['nav'],
+		),
 	);
 };
 ?>
@@ -52,11 +52,11 @@ if(!empty($page['nav'])) {
 					echo '
 					<aside class="col-lg-3 col-md-3 hidden-sm hidden-xs">
 						';
-if(!empty($page['aside'])) {
+if (!empty($page['aside'])) {
 	echo $page['aside'];
 } echo'
 						';
-if(!empty($page['right_aside'])) {
+if (!empty($page['right_aside'])) {
 	echo $page['right_aside'];
 } echo'
 						';
@@ -68,7 +68,7 @@ echo'
 						<section class="sectiontop">
 								<div class="panel ' . DI::args()->get(0, 'generic') . '-content-wrapper">
 									<div class="panel-body">';
-if(!empty($page['content'])) {
+if (!empty($page['content'])) {
 	echo $page['content'];
 } echo'
 										<div id="pause"></div> <!-- The pause/resume Ajax indicator -->

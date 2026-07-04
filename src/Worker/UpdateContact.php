@@ -40,7 +40,7 @@ class UpdateContact
 	 * @param array|int $run_parameters Priority constant or array of options described in Worker::add
 	 * @param int       $contact_id
 	 * @return int
-	 * @throws InternalServerErrorException
+	 * @throws InternalServerErrorException|\InvalidArgumentException
 	 */
 	public static function add($run_parameters, int $contact_id): int
 	{
@@ -64,7 +64,7 @@ class UpdateContact
 	 */
 	public static function workerLimitReached(): bool
 	{
-		$update_limit = (int)DI::config()->get('system', 'contact_update_limit');
+		$update_limit = (int) DI::config()->get('system', 'contact_update_limit');
 		$updating     = Worker::countWorkersByCommand('UpdateContact');
 		if ($updating >= $update_limit) {
 			DI::logger()->info('The number of currently running jobs exceed the limit', ['updating' => $updating, 'limit' => $update_limit]);

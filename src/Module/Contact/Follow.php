@@ -236,7 +236,7 @@ class Follow extends BaseModule
 	private function getUrl(array $request): string
 	{
 		if (!empty($request['binurl']) && Strings::isHex($request['binurl'])) {
-			$url = hex2bin($request['binurl']);
+			$url = hex2bin((string) $request['binurl']);
 		} else {
 			$url = $request['url'] ?? '';
 		}

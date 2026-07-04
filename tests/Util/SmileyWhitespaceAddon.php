@@ -7,7 +7,7 @@
 
 use Friendica\Content\Smilies;
 
-function add_test_unicode_smilies(array &$b)
+function add_test_unicode_smilies(array &$b): void
 {
 	// String-substitution smilies
 	// - no whitespaces

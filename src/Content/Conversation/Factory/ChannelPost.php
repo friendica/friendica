@@ -29,28 +29,17 @@ use Psr\Log\LoggerInterface;
  *
  * @package Friendica\Content\Conversation\Factory
  */
-final class ChannelPost
+final readonly class ChannelPost
 {
-	private LoggerInterface $logger;
-	private UserDefinedChannel $channelRepository;
-	private Database $dba;
-	private IManageConfigValues $config;
-
 	/**
 	 * ChannelPost constructor.
 	 *
 	 * @param Database $dba Database access object.
-	 * @param UserDefinedChannel $channel Channel repository.
+	 * @param UserDefinedChannel $channelRepository Channel repository.
 	 * @param LoggerInterface $logger Logger instance.
 	 * @param IManageConfigValues $config Configuration manager.
 	 */
-	public function __construct(Database $dba, UserDefinedChannel $channel, LoggerInterface $logger, IManageConfigValues $config)
-	{
-		$this->dba               = $dba;
-		$this->logger            = $logger;
-		$this->channelRepository = $channel;
-		$this->config            = $config;
-	}
+	public function __construct(private Database $dba, private UserDefinedChannel $channelRepository, private LoggerInterface $logger, private IManageConfigValues $config) {}
 
 	/**
 	 * Add a post to matching user-defined channels.
@@ -84,7 +73,7 @@ final class ChannelPost
 
 		$language = $engagement['language'] !== L10n::UNDETERMINED_LANGUAGE ? $engagement['language'] : '';
 		$tags     = array_column(Tag::getByURIId($engagement['uri-id'], [Tag::HASHTAG]), 'name');
-		$circles  = ($gravity != Item::GRAVITY_PARENT) ? [UserDefinedChannelEntity::CIRCLE_CREATION, UserDefinedChannelEntity::CIRCLE_POSTS, UserDefinedChannelEntity::CIRCLE_ACTIVITY] : [];
+		$circles  = ($gravity !== Item::GRAVITY_PARENT) ? [UserDefinedChannelEntity::CIRCLE_CREATION, UserDefinedChannelEntity::CIRCLE_POSTS, UserDefinedChannelEntity::CIRCLE_ACTIVITY] : [];
 
 		$channels = $this->channelRepository->getMatchingChannels($engagement['searchtext'], $language, $tags, $engagement['media-type'], $engagement['owner-id'], $reshare_id, $uids, $circles);
 		if (!($channels instanceof \Friendica\Content\Conversation\Collection\UserDefinedChannels) || $channels->count() === 0) {
@@ -112,7 +101,7 @@ final class ChannelPost
 			}
 
 			$cache = [
-				'channel'     => (int)$channel->code,
+				'channel'     => (int) $channel->code,
 				'uid'         => $channel->uid,
 				'uri-id'      => $engagement['uri-id'],
 				'in-timeline' => $in_timeline,

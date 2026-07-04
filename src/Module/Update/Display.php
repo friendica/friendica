@@ -34,7 +34,7 @@ class Display extends DisplayModule
 		$item = Post::selectFirst(
 			['uid', 'parent-uri-id', 'uri-id'],
 			['uri-id' => $uriId, 'uid' => [0, $profileUid]],
-			['order'  => ['uid' => true]]
+			['order'  => ['uid' => true]],
 		);
 
 		if (empty($item)) {
@@ -66,6 +66,6 @@ class Display extends DisplayModule
 			$this->notify->setAllSeenForUser($this->session->getLocalUserId(), ['parent-uri-id' => $item['parent-uri-id']]);
 		}
 
-		return $this->getDisplayData($item, true, $profileUid, $force);
+		return $this->getDisplayData($item, true, $force);
 	}
 }

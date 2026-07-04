@@ -17,7 +17,7 @@ use Friendica\Model\Post\UserNotification;
 use Friendica\Model\Verb;
 use Friendica\Navigation\Notifications\Collection\Notifications as NotificationsCollection;
 use Friendica\Navigation\Notifications\Entity\Notification as NotificationEntity;
-use Friendica\Navigation\Notifications\Factory;
+use Friendica\Navigation\Notifications\Factory\Notification as NotificationFactory;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Protocol\Activity;
 use Friendica\Util\DateTimeFormat;
@@ -25,19 +25,20 @@ use Psr\Log\LoggerInterface;
 
 class Notification extends BaseRepository
 {
-	/** @var Factory\Notification  */
-	protected $factory;
-
 	protected static $table_name = 'notification';
 
-	/** @var IManagePersonalConfigValues */
-	private $pconfig;
+	public function __construct(
+		private readonly IManagePersonalConfigValues $pconfig,
+		Database $database,
+		LoggerInterface $logger,
+		private readonly NotificationFactory $entityFactory,
+	) {
+		parent::__construct($database, $logger, $entityFactory);
+	}
 
-	public function __construct(IManagePersonalConfigValues $pconfig, Database $database, LoggerInterface $logger, Factory\Notification $factory)
+	protected function getFactory(): NotificationFactory
 	{
-		parent::__construct($database, $logger, $factory);
-
-		$this->pconfig = $pconfig;
+		return $this->entityFactory;
 	}
 
 	/**
@@ -47,7 +48,7 @@ class Notification extends BaseRepository
 	{
 		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
-		return $this->factory->createFromTableRow($fields);
+		return $this->getFactory()->createFromTableRow($fields);
 	}
 
 	private function select(array $condition, array $params = []): NotificationsCollection
@@ -173,7 +174,7 @@ class Notification extends BaseRepository
 		}
 
 		foreach ($rows as $fields) {
-			$entities[] = $this->factory->createFromTableRow($fields);
+			$entities[] = $this->getFactory()->createFromTableRow($fields);
 		}
 
 		return $entities;
@@ -195,7 +196,7 @@ class Notification extends BaseRepository
 	 * @throws Exception
 	 * @see _selectByBoundaries
 	 */
-	public function selectByBoundaries(array $condition = [], array $params = [], int $min_id = null, int $max_id = null, int $limit = self::LIMIT)
+	public function selectByBoundaries(array $condition = [], array $params = [], ?int $min_id = null, ?int $max_id = null, int $limit = self::LIMIT)
 	{
 		$BaseCollection = parent::_selectByBoundaries($condition, $params, $min_id, $max_id, $limit);
 

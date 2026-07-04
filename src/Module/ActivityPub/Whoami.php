@@ -8,7 +8,6 @@
 namespace Friendica\Module\ActivityPub;
 
 use Friendica\Content\Text\BBCode;
-use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Module\BaseApi;
@@ -38,12 +37,13 @@ class Whoami extends BaseApi
 		$data['preferredUsername']         = $owner['nick'];
 		$data['alsoKnownAs']               = [];
 		$data['manuallyApprovesFollowers'] = in_array($owner['page-flags'], [User::PAGE_FLAGS_NORMAL, User::PAGE_FLAGS_PRVGROUP, User::PAGE_FLAGS_COMM_MAN]);
-		$data['discoverable']              = (bool)$owner['net-publish'];
+		$data['discoverable']              = (bool) $owner['net-publish'];
+		$data['indexable']                 = (bool) $owner['net-publish'];
 		$data['tag']                       = [];
 
 		$data['icon'] = [
 			'type' => 'Image',
-			'url'  => User::getAvatarUrl($owner)
+			'url'  => User::getAvatarUrl($owner),
 		];
 
 		if (!empty($owner['about'])) {
@@ -56,7 +56,7 @@ class Whoami extends BaseApi
 			$custom_fields[] = [
 				'type'  => 'PropertyValue',
 				'name'  => $profile_field->label,
-				'value' => BBCode::convertForUriId($owner['uri-id'], $profile_field->value)
+				'value' => BBCode::convertForUriId($owner['uri-id'], $profile_field->value),
 			];
 		};
 
@@ -67,7 +67,7 @@ class Whoami extends BaseApi
 		$data['publicKey'] = [
 			'id'           => $owner['url'] . '#main-key',
 			'owner'        => $owner['url'],
-			'publicKeyPem' => $owner['pubkey']
+			'publicKeyPem' => $owner['pubkey'],
 		];
 
 		$data['capabilities'] = [];
@@ -82,7 +82,7 @@ class Whoami extends BaseApi
 			'oauthRegistrationEndpoint'  => DI::baseUrl() . '/api/v1/apps',
 			'oauthTokenEndpoint'         => DI::baseUrl() . '/oauth/token',
 			'sharedInbox'                => DI::baseUrl() . '/inbox',
-//			'uploadMedia'                => DI::baseUrl() . '/api/upload_media' // @todo Endpoint does not exist at the moment
+			//'uploadMedia'                => DI::baseUrl() . '/api/upload_media' // @todo Endpoint does not exist at the moment
 		];
 
 		$data['generator'] = ActivityPub\Transmitter::getService();

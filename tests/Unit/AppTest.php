@@ -22,6 +22,6 @@ class AppTest extends TestCase
 
 		$app = App::fromContainer($container);
 
-		$this->assertInstanceOf(App::class, $app);
+		$this->assertInstanceOf(App::class, $app); // @phpstan-ignore method.alreadyNarrowedType
 	}
 }

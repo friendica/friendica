@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Module\BaseApi;
@@ -75,10 +74,10 @@ class Apps extends BaseApi
 			$this->jsonExit(DI::mstdnApplication()->createFromApplicationId($application['id'])->toArray());
 		}
 
-		$fields['read']          = (stripos($request['scopes'], self::SCOPE_READ) !== false);
-		$fields['write']         = (stripos($request['scopes'], self::SCOPE_WRITE) !== false);
-		$fields['follow']        = (stripos($request['scopes'], self::SCOPE_FOLLOW) !== false);
-		$fields['push']          = (stripos($request['scopes'], self::SCOPE_PUSH) !== false);
+		$fields['read']          = (stripos((string) $request['scopes'], self::SCOPE_READ) !== false);
+		$fields['write']         = (stripos((string) $request['scopes'], self::SCOPE_WRITE) !== false);
+		$fields['follow']        = (stripos((string) $request['scopes'], self::SCOPE_FOLLOW) !== false);
+		$fields['push']          = (stripos((string) $request['scopes'], self::SCOPE_PUSH) !== false);
 		$fields['client_id']     = bin2hex(random_bytes(32));
 		$fields['client_secret'] = bin2hex(random_bytes(32));
 

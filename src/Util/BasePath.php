@@ -10,23 +10,10 @@ namespace Friendica\Util;
 class BasePath
 {
 	/**
-	 * @var string
-	 */
-	private $baseDir;
-	/**
-	 * @var array
-	 */
-	private $server;
-
-	/**
 	 * @param string $baseDir The default base path
 	 * @param array  $server  server arguments
 	 */
-	public function __construct(string $baseDir, array $server = [])
-	{
-		$this->baseDir = $baseDir;
-		$this->server = $server;
-	}
+	public function __construct(private readonly string $baseDir, private readonly array $server = []) {}
 
 	/**
 	 * Returns the base Friendica filesystem path without trailing slash
@@ -41,7 +28,7 @@ class BasePath
 	public function getPath()
 	{
 		$baseDir = $this->baseDir;
-		$server = $this->server;
+		$server  = $this->server;
 
 		if ((!$baseDir || !is_dir($baseDir)) && !empty($server['DOCUMENT_ROOT'])) {
 			$baseDir = $server['DOCUMENT_ROOT'];

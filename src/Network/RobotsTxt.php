@@ -37,12 +37,7 @@ class RobotsTxt
 	 */
 	private bool $isLoaded = false;
 
-	protected ICanSendHttpRequests $httpClient;
-
-	public function __construct(ICanSendHttpRequests $httpClient)
-	{
-		$this->httpClient = $httpClient;
-	}
+	public function __construct(protected ICanSendHttpRequests $httpClient) {}
 
 	/**
 	 * Loads the RobotsTxt parser with a server URL
@@ -105,7 +100,7 @@ class RobotsTxt
 
 		foreach ($lines as $line) {
 			$line = preg_replace('~\s*#.*$~', '', $line);
-			$line = trim($line);
+			$line = trim((string) $line);
 
 			if (empty($line)) {
 				continue;
@@ -137,10 +132,6 @@ class RobotsTxt
 				}
 				continue;
 			}
-
-			if (stripos($line, 'User-Agent:') === 0 && !$isRelevantSection) {
-				break;
-			}
 		}
 
 		return sizeof($this->disallowRules) > 0 || sizeof($this->allowRules) > 0;
@@ -159,13 +150,13 @@ class RobotsTxt
 		$length  = 0;
 
 		foreach ($this->allowRules as $rule) {
-			if (strlen($rule) > $length && $this->pathMatches($path, $rule)) {
-				$length = strlen($rule);
+			if (strlen((string) $rule) > $length && $this->pathMatches($path, $rule)) {
+				$length = strlen((string) $rule);
 			}
 		}
 
 		foreach ($this->disallowRules as $rule) {
-			if (strlen($rule) > $length && $this->pathMatches($path, $rule)) {
+			if (strlen((string) $rule) > $length && $this->pathMatches($path, $rule)) {
 				$allowed = false;
 			}
 		}

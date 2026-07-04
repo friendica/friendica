@@ -18,7 +18,7 @@ class MarkdownParser extends MarkdownExtra
 
 		$text = preg_replace_callback(
 			Strings::autoLinkRegEx(),
-			[$this, '_doAutoLinks_url_callback'],
+			$this->_doAutoLinks_url_callback(...),
 			$text,
 		);
 

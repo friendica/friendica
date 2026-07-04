@@ -9,7 +9,6 @@ namespace Friendica\Test;
 
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Logger\Util\Introspection;
-use Friendica\Test\MockedTestCase;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -18,11 +17,11 @@ abstract class LoggerTestCase extends MockedTestCase
 {
 	use LoggerDataTrait;
 
-	const LOGLINE = '/.* \[.*]: .* {.*\"file\":\".*\".*,.*\"line\":\d*,.*\"function\":\".*\".*,.*\"uid\":\".*\".*}/';
+	public const LOGLINE = '/.* \[.*]: .* {.*\"file\":\".*\".*,.*\"line\":\d*,.*\"function\":\".*\".*,.*\"uid\":\".*\".*}/';
 
-	const FILE = 'test';
-	const LINE = 666;
-	const FUNC = 'myfunction';
+	public const FILE = 'test';
+	public const LINE = 666;
+	public const FUNC = 'myfunction';
 
 	/**
 	 * @var Introspection|MockInterface
@@ -57,7 +56,7 @@ abstract class LoggerTestCase extends MockedTestCase
 		$this->introspection->shouldReceive('getRecord')->andReturn([
 			'file'     => self::FILE,
 			'line'     => self::LINE,
-			'function' => self::FUNC
+			'function' => self::FUNC,
 		]);
 
 		$this->config = \Mockery::mock(IManageConfigValues::class);
@@ -70,13 +69,13 @@ abstract class LoggerTestCase extends MockedTestCase
 
 	public function assertLoglineNums($assertNum, $string)
 	{
-		self::assertEquals($assertNum, preg_match_all(self::LOGLINE, $string));
+		self::assertEquals($assertNum, preg_match_all(self::LOGLINE, (string) $string));
 	}
 
 	/**
 	 * Test if the logger works correctly
 	 */
-	public function testNormal()
+	public function testNormal(): void
 	{
 		$logger = $this->getInstance();
 		$logger->emergency('working!');
@@ -92,7 +91,7 @@ abstract class LoggerTestCase extends MockedTestCase
 	/**
 	 * Test if a log entry is correctly interpolated
 	 */
-	public function testPsrInterpolate()
+	public function testPsrInterpolate(): void
 	{
 		$logger = $this->getInstance();
 
@@ -106,7 +105,7 @@ abstract class LoggerTestCase extends MockedTestCase
 	/**
 	 * Test if a log entry contains all necessary information
 	 */
-	public function testContainsInformation()
+	public function testContainsInformation(): void
 	{
 		$logger = $this->getInstance();
 		$logger->emergency('A test');
@@ -120,7 +119,7 @@ abstract class LoggerTestCase extends MockedTestCase
 	/**
 	 * Test if the minimum level is working
 	 */
-	public function testMinimumLevel()
+	public function testMinimumLevel(): void
 	{
 		$logger = $this->getInstance(LogLevel::NOTICE);
 
@@ -139,9 +138,9 @@ abstract class LoggerTestCase extends MockedTestCase
 
 	/**
 	 * Test with different logging data
-	 * @dataProvider dataTests
 	 */
-	public function testDifferentTypes($function, $message, array $context)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testDifferentTypes($function, $message, array $context): void
 	{
 		$logger = $this->getInstance();
 		$logger->$function($message, $context);
@@ -156,9 +155,9 @@ abstract class LoggerTestCase extends MockedTestCase
 	/**
 	 * Test a message with an exception
 	 */
-	public function testExceptionHandling()
+	public function testExceptionHandling(): void
 	{
-		$e = new \Exception("Test String", 123);
+		$e         = new \Exception("Test String", 123);
 		$eFollowUp = new \Exception("FollowUp", 456, $e);
 
 		$assertion = $eFollowUp->__toString();
@@ -172,7 +171,7 @@ abstract class LoggerTestCase extends MockedTestCase
 		self::assertStringContainsString(@json_encode($assertion, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), $this->getContent());
 	}
 
-	public function testNoObjectHandling()
+	public function testNoObjectHandling(): void
 	{
 		$logger = $this->getInstance();
 		$logger->alert('test', ['e' => ['test' => 'test']]);

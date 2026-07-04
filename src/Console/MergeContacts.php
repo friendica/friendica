@@ -18,16 +18,6 @@ class MergeContacts extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/**
-	 * @var Database
-	 */
-	private $dba;
-
-	/**
-	 * @var L10n
-	 */
-	private $l10n;
-
 	protected function getHelp()
 	{
 		$help = <<<HELP
@@ -46,12 +36,12 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Database $dba, L10n $l10n, array $argv = null)
-	{
+	public function __construct(
+		private readonly Database $dba,
+		private readonly L10n $l10n,
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->dba  = $dba;
-		$this->l10n = $l10n;
 	}
 
 	protected function doExecute(): int
@@ -146,7 +136,7 @@ HELP;
 			} else {
 				$this->out($this->l10n->t(' - success'), false);
 			}
-			if ($in_unique_key && $this->dba->exists($table, [$field => $from])) {
+			if ($in_unique_key) {
 				$this->dba->delete($table, [$field => $from]);
 				$this->out($this->l10n->t(' - deleted'), false);
 			}

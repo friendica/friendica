@@ -19,10 +19,10 @@ use Friendica\Util\Strings;
 
 class Update
 {
-	const SUCCESS = 0;
-	const FAILED  = 1;
+	public const SUCCESS = 0;
+	public const FAILED  = 1;
 
-	const NEW_TABLE_STRUCTURE_VERSION = 1288;
+	public const NEW_TABLE_STRUCTURE_VERSION = 1288;
 
 	/**
 	 * Returns the status of the current update
@@ -31,7 +31,7 @@ class Update
 	 */
 	public static function getStatus(): int
 	{
-		return (int)DI::config()->get('system', 'update') ?? static::SUCCESS;
+		return (int) DI::config()->get('system', 'update', static::SUCCESS);
 	}
 
 	/**
@@ -206,7 +206,7 @@ class Update
 						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t(
 							'%s: executing pre update %d',
 							DateTimeFormat::utcNow() . ' ' . date('e'),
-							$version
+							$version,
 						));
 						$r = self::runUpdateFunction($version, 'pre_update', $sendMail);
 						if (!$r) {
@@ -230,7 +230,7 @@ class Update
 						if ($sendMail) {
 							self::updateFailed(
 								DB_UPDATE_VERSION,
-								$retval
+								$retval,
 							);
 						}
 						DI::logger()->error('Update ERROR.', ['from' => $stored, 'to' => $current, 'retval' => $retval]);
@@ -251,7 +251,7 @@ class Update
 						DI::config()->set('system', 'maintenance_reason', DI::l10n()->t(
 							'%s: executing post update %d',
 							DateTimeFormat::utcNow() . ' ' . date('e'),
-							$version
+							$version,
 						));
 						$r = self::runUpdateFunction($version, 'update', $sendMail);
 						if (!$r) {
@@ -325,7 +325,7 @@ class Update
 						//send the administrator an e-mail
 						self::updateFailed(
 							$version,
-							DI::l10n()->t('Update %s failed. See error logs.', $version)
+							DI::l10n()->t('Update %s failed. See error logs.', $version),
 						);
 					}
 					DI::logger()->error('Update function ERROR.', ['function' => $funcname, 'retval' => $retval]);
@@ -362,7 +362,7 @@ class Update
 			return;
 		}
 
-		foreach($adminEmails as $admin) {
+		foreach ($adminEmails as $admin) {
 			$l10n = DI::l10n()->withLang($admin['language'] ?: 'en');
 
 			$preamble = Strings::deindent($l10n->t(
@@ -371,7 +371,7 @@ class Update
 				but when I tried to install it, something went terribly wrong.
 				This needs to be fixed soon and I can't do it alone. Please contact a
 				friendica developer if you can not help me on your own. My database might be invalid.",
-				$update_id
+				$update_id,
 			));
 			$body = $l10n->t('The error message is\n[pre]%s[/pre]', $error_message);
 
@@ -396,14 +396,14 @@ class Update
 	 */
 	private static function updateSuccessful(int $from_build, int $to_build)
 	{
-		foreach(User::getAdminListForEmailing(['uid', 'language', 'email']) as $admin) {
+		foreach (User::getAdminListForEmailing(['uid', 'language', 'email']) as $admin) {
 			$l10n = DI::l10n()->withLang($admin['language'] ?: 'en');
 
 			$preamble = Strings::deindent($l10n->t(
 				'
 				The friendica database was successfully updated from %s to %s.',
 				$from_build,
-				$to_build
+				$to_build,
 			));
 
 			$email = DI::emailer()

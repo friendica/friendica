@@ -217,10 +217,6 @@ blockquote.shared_content {
   font-weight: bold;
 }
 
-.settings-heading a:after{
-  content: ' »';
-}
-
 #profile-photo-wrapper {
   clear: both;
   overflow: hidden;
@@ -447,15 +443,10 @@ td.federation-data {
   max-height: 80px;
 }
 
-/* group list widget */
-.group-list-img {
+.sidebar-widget-list img {
   height: 20px;
   width: 20px;
   vertical-align: middle;
-}
-
-#group-widget-collapse {
-  opacity: 0.3;
 }
 
 /* help widget */
@@ -473,8 +464,11 @@ aside .help-aside-wrapper h1 {
   background-color: #f9a3a3;
   color: #ffffff;
 }
+.widget-show-more {
+  opacity: 0.3;
+}
 
-#group-widget-collapse:hover {
+.widget-show-more:hover {
   opacity: 1.0;
 }
 
@@ -531,6 +525,13 @@ aside .help-aside-wrapper h1 {
     margin: 0 0 20px 30px;
 }
 
+.settings-heading a:after{
+  content: ' »';
+}
+.settings-widget {
+	line-height: 2.2;
+}
+
 /* admin pending user notes */
 td.pendingnote {
   padding-left: 20px;
@@ -557,51 +558,73 @@ td.pendingnote > p > span {
 img.invalid-src:after { vertical-align: top;}
 
 /* Tag cloud */
-.tag1, .tag1:hover {
+.tagblock .tag-cloud {
+  word-wrap: break-word;
+}
+.tagblock .tag-cloud .tag {
+	display: flex;
+	align-items: center;
+}
+
+.tagblock .tag-cloud .tag:focus {
+	color: black;
+}
+
+.tagblock .tag-cloud .tag1 {
   font-size: 0.9em ;
   color: DarkGray;
+	border-color: DarkGray;
 }
-.tag2, .tag2:hover {
+.tagblock .tag-cloud .tag2 {
   font-size: 1.0em;
   color: LawnGreen;
+	border-color: LawnGreen;
 }
-.tag3, .tag3:hover {
+.tagblock .tag-cloud .tag3 {
   font-size: 1.1em;
   color: DarkOrange;
+	border-color: DarkOrange;
 }
-.tag4, .tag4:hover {
+.tagblock .tag-cloud .tag4 {
   font-size: 1.2em;
   color: Red;
+	border-color: Red;
 }
-.tag5, .tag5:hover {
+.tagblock .tag-cloud .tag5 {
   font-size: 1.3em;
   color: Gold;
+	border-color: Gold;
 }
-.tag6, .tag6:hover {
+.tagblock .tag-cloud .tag6 {
   font-size: 1.4em;
   color: Teal;
+	border-color: Teal;
 }
-.tag7, .tag7:hover {
+.tagblock .tag-cloud .tag7 {
   font-size: 1.5em;
   color: DarkMagenta;
+	border-color: DarkMagenta;
 }
-.tag8, .tag8:hover {
+.tagblock .tag-cloud .tag8 {
   font-size: 1.6em;
   color: DarkGoldenRod;
+	border-color: DarkGoldenRod;
 }
-.tag9, .tag9:hover {
+.tagblock .tag-cloud .tag9 {
   font-size: 1.7em;
   color: DarkBlue;
+	border-color: DarkBlue;
 }
-.tag10 .tag10:hover {
+.tagblock .tag-cloud .tag10 {
   font-size: 1.8em;
   color: DeepPink;
+	border-color: DeepPink;
+}
+.tagblock .tag-cloud .tag:hover {
+	color: white;
 }
 .tags > a:hover {
   text-decoration: underline;
-}
-.tag-cloud {
-  word-wrap: break-word;
 }
 
 #register-explicit-content {

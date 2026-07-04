@@ -16,10 +16,10 @@
 	{{* The buttons for editing the contact circle (edit name / remove contact circle) *}}
 	<div class="circle-actions pull-right">
 		<button type="button" id="circle-rename" class="btn btn-clear" onclick="showHide('circle-edit-wrapper'); showHide('circle-edit-header'); return false;" title="{{$edit_name}}" data-toggle="tooltip">
-			<i class="fa fa-pencil" aria-hidden="true"></i>
+			<i class="ri ri-pencil-line" aria-hidden="true"></i>
 		</button>
 		<a href="circle/markread/{{$gid}}?t={{$form_security_token_markread}}" class="btn btn-clear" title="{{$markread_label}}" data-toggle="tooltip">
-			<i class="fa fa-eye" aria-hidden="true"></i>
+			<i class="ri ri-eye-line" aria-hidden="true"></i>
 		</a>
 		{{if $drop}}{{$drop nofilter}}{{/if}}
 	</div>
@@ -38,6 +38,7 @@
 
 				<div class="pull-left">
 				{{include file="field_input.tpl" field=$gname label=false}}
+				{{include file="field_checkbox.tpl" field=$public}}
 				</div>
 				<div id="circle-edit-submit-wrapper" class="form-group pull-right">
 					<button class="btn btn-primary btn-small" type="submit" name="submit" value="{{$submit}}">
@@ -68,10 +69,10 @@
 	{{* The buttons to switch between the different view modes *}}
 	<div id="circle-list-view-switcher" class="btn-group btn-group-sm pull-right">
 		<button type="button" id="circle-list-big" class="active circle-list-switcher btn btn-default">
-			<i class="fa fa-align-justify" aria-hidden="true"></i>
+			<i class="ri ri-align-justify" aria-hidden="true"></i>
 		</button>
 		<button type="button" id="circle-list-small" class="btn btn-default circle-list-switcher">
-			<i class="fa fa-th-large" aria-hidden="true"></i>
+			<i class="ri ri-layout-grid-line" aria-hidden="true"></i>
 		</button>
 	</div>
 	<div class="clear"></div>

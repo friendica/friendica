@@ -53,80 +53,39 @@ final class Report extends \Friendica\BaseEntity
 	public const RESOLUTION_ACCEPTED = 0;
 	public const RESOLUTION_REJECTED = 1;
 
-	/** @var int|null */
-	protected $id;
-	/** @var int ID of the contact making a moderation report */
-	protected $reporterCid;
-	/** @var int ID of the contact being reported */
-	protected $cid;
-	/** @var int ID of the gserver of the contact being reported */
-	protected $gsid;
-	/** @var string Reporter comment */
-	protected $comment;
-	/** @var int One of CATEGORY_* */
-	protected $category;
-	/** @var int ID of the user making a moderation report, null in case of an incoming forwarded report */
-	protected $reporterUid;
-	/** @var bool Whether this report should be forwarded to the remote server */
-	protected $forward;
-	/** @var \DateTimeImmutable When the report was created */
-	protected $created;
-	/** @var Collection\Report\Rules List of terms of service rule lines being possibly violated */
-	protected $rules;
-	/** @var Collection\Report\Posts List of URI IDs of posts supporting the report */
-	protected $posts;
-	/** @var string Remarks shared with the reporter */
-	protected $publicRemarks;
-	/** @var string Remarks shared with the moderation team */
-	protected $privateRemarks;
-	/** @var \DateTimeImmutable|null When the report was last edited */
-	protected $edited;
-	/** @var int One of STATUS_* */
-	protected $status;
-	/** @var int|null One of RESOLUTION_* if any */
-	protected $resolution;
-	/** @var int|null Assigned moderator user id if any */
-	protected $assignedUid;
-	/** @var int|null Last editor user ID if any */
-	protected $lastEditorUid;
-
 	public function __construct(
-		int $reporterCid,
-		int $cid,
-		int $gsid,
-		\DateTimeImmutable $created,
-		int $category,
-		int $reporterUid = null,
-		string $comment = '',
-		bool $forward = false,
-		Collection\Report\Posts $posts = null,
-		Collection\Report\Rules $rules = null,
-		string $publicRemarks = '',
-		string $privateRemarks = '',
-		\DateTimeImmutable $edited = null,
-		int $status = self::STATUS_OPEN,
-		int $resolution = null,
-		int $assignedUid = null,
-		int $lastEditorUid = null,
-		int $id = null
-	) {
-		$this->reporterCid    = $reporterCid;
-		$this->cid            = $cid;
-		$this->gsid           = $gsid;
-		$this->created        = $created;
-		$this->category       = $category;
-		$this->reporterUid    = $reporterUid;
-		$this->comment        = $comment;
-		$this->forward        = $forward;
-		$this->posts          = $posts ?? new Collection\Report\Posts();
-		$this->rules          = $rules ?? new Collection\Report\Rules();
-		$this->publicRemarks  = $publicRemarks;
-		$this->privateRemarks = $privateRemarks;
-		$this->edited         = $edited;
-		$this->status         = $status;
-		$this->resolution     = $resolution;
-		$this->assignedUid    = $assignedUid;
-		$this->lastEditorUid  = $lastEditorUid;
-		$this->id             = $id;
-	}
+		/** @var int ID of the contact making a moderation report */
+		protected int $reporterCid,
+		/** @var int ID of the contact being reported */
+		protected int $cid,
+		/** @var int ID of the gserver of the contact being reported */
+		protected int $gsid,
+		/** @var \DateTimeImmutable When the report was created */
+		protected \DateTimeImmutable $created,
+		/** @var int One of CATEGORY_* */
+		protected int $category,
+		/** @var int ID of the user making a moderation report, null in case of an incoming forwarded report */
+		protected ?int $reporterUid = null,
+		/** @var string Reporter comment */
+		protected string $comment = '',
+		/** @var bool Whether this report should be forwarded to the remote server */
+		protected bool $forward = false,
+		protected ?Collection\Report\Posts $posts = new Collection\Report\Posts(),
+		protected ?Collection\Report\Rules $rules = new Collection\Report\Rules(),
+		/** @var string Remarks shared with the reporter */
+		protected string $publicRemarks = '',
+		/** @var string Remarks shared with the moderation team */
+		protected string $privateRemarks = '',
+		/** @var \DateTimeImmutable|null When the report was last edited */
+		protected ?\DateTimeImmutable $edited = null,
+		/** @var int One of STATUS_* */
+		protected int $status = self::STATUS_OPEN,
+		/** @var int|null One of RESOLUTION_* if any */
+		protected ?int $resolution = null,
+		/** @var int|null Assigned moderator user id if any */
+		protected ?int $assignedUid = null,
+		/** @var int|null Last editor user ID if any */
+		protected ?int $lastEditorUid = null,
+		protected ?int $id = null,
+	) {}
 }

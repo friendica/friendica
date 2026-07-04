@@ -18,43 +18,6 @@ use Psr\Http\Message\UriInterface;
 class ContactResult implements IResult
 {
 	/**
-	 * @var int
-	 */
-	private $cid;
-	/**
-	 * @var int
-	 */
-	private $pCid;
-	/**
-	 * @var string
-	 */
-	private $name;
-	/**
-	 * @var string
-	 */
-	private $addr;
-	/**
-	 * @var string
-	 */
-	private $item;
-	/**
-	 * @var UriInterface
-	 */
-	private $url;
-	/**
-	 * @var string
-	 */
-	private $photo;
-	/**
-	 * @var string
-	 */
-	private $tags;
-	/**
-	 * @var string
-	 */
-	private $network;
-
-	/**
 	 * @return int
 	 */
 	public function getCid()
@@ -137,17 +100,5 @@ class ContactResult implements IResult
 	 * @param int    $pCid
 	 * @param string $tags
 	 */
-	public function __construct($name, $addr, $item, UriInterface $url, $photo, $network, $cid = 0, $pCid = 0, $tags = '')
-	{
-		$this->name    = $name;
-		$this->addr    = $addr;
-		$this->item    = $item;
-		$this->url     = $url;
-		$this->photo   = $photo;
-		$this->network = $network;
-
-		$this->cid  = $cid;
-		$this->pCid = $pCid;
-		$this->tags = $tags;
-	}
+	public function __construct(private $name, private $addr, private $item, private readonly UriInterface $url, private $photo, private $network, private $cid = 0, private $pCid = 0, private $tags = '') {}
 }

@@ -13,14 +13,5 @@ namespace Friendica\Moderation\Entity\Report;
  */
 final class Rule extends \Friendica\BaseEntity
 {
-	/** @var int */
-	protected $lineId;
-	/** @var string */
-	protected $text;
-
-	public function __construct(int $lineId, string $text)
-	{
-		$this->lineId = $lineId;
-		$this->text   = $text;
-	}
+	public function __construct(protected int $lineId, protected string $text) {}
 }

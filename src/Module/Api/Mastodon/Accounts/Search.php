@@ -7,7 +7,6 @@
 
 namespace Friendica\Module\Api\Mastodon\Accounts;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -37,7 +36,7 @@ class Search extends BaseApi
 
 		$accounts = [];
 
-		if (($request['offset'] == 0) && (Network::isValidHttpUrl($request['q']) || (strrpos($request['q'], '@') > 0))) {
+		if (($request['offset'] == 0) && (Network::isValidHttpUrl($request['q']) || (strrpos((string) $request['q'], '@') > 0))) {
 			$id = Contact::getIdForURL($request['q'], 0, $request['resolve'] ? null : false);
 
 			if (!empty($id)) {

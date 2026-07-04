@@ -19,7 +19,7 @@ class VerifyQrCodeTest extends TestCase
 	/**
 	 * Asserts that valid SVG is produced when the xmlwriter extension is available.
 	 */
-	public function testQrCodeGeneratesValidSvgWhenXmlWriterIsAvailable()
+	public function testQrCodeGeneratesValidSvgWhenXmlWriterIsAvailable(): void
 	{
 		if (!class_exists(\XMLWriter::class)) {
 			$this->markTestSkipped('XMLWriter (ext-xmlwriter) is not available on this system.');
@@ -48,7 +48,7 @@ class VerifyQrCodeTest extends TestCase
 	 * the exception is caught, the logger receives a warning, and
 	 * $qrcode_image stays an empty string so the page can still render.
 	 */
-	public function testQrCodeGenerationFailureIsCaughtAndLogged()
+	public function testQrCodeGenerationFailureIsCaughtAndLogged(): void
 	{
 		$logger = $this->createMock(LoggerInterface::class);
 		$logger->expects($this->once())
@@ -71,6 +71,6 @@ class VerifyQrCodeTest extends TestCase
 			);
 		}
 
-		self::assertSame('', $qrcode_image, '$qrcode_image must stay empty on failure so the page still renders');
+		self::assertSame('', $qrcode_image, '$qrcode_image must stay empty on failure so the page still renders'); // @phpstan-ignore staticMethod.alreadyNarrowedType
 	}
 }

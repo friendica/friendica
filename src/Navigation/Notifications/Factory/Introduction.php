@@ -30,29 +30,13 @@ use Psr\Log\LoggerInterface;
  */
 class Introduction extends BaseFactory
 {
-	/** @var Database */
-	private $dba;
-	/** @var BaseURL */
-	private $baseUrl;
-	/** @var L10n */
-	private $l10n;
-	/** @var IManagePersonalConfigValues */
-	private $pConfig;
-	/** @var IHandleUserSessions */
-	private $session;
 	/** @var string */
 	private $nick;
 
-	public function __construct(LoggerInterface $logger, Database $dba, BaseURL $baseUrl, L10n $l10n, IManagePersonalConfigValues $pConfig, IHandleUserSessions $session)
+	public function __construct(LoggerInterface $logger, private readonly Database $dba, private readonly BaseURL $baseUrl, private readonly L10n $l10n, private readonly IManagePersonalConfigValues $pConfig, private readonly IHandleUserSessions $session)
 	{
 		parent::__construct($logger);
-
-		$this->dba     = $dba;
-		$this->baseUrl = $baseUrl;
-		$this->l10n    = $l10n;
-		$this->pConfig = $pConfig;
-		$this->session = $session;
-		$this->nick    = $session->getLocalUserNickname() ?? '';
+		$this->nick = $this->session->getLocalUserNickname() ?? '';
 	}
 
 	/**
@@ -94,7 +78,7 @@ class Introduction extends BaseFactory
 			LIMIT ?, ?",
 				$this->session->getLocalUserId(),
 				$start,
-				$limit
+				$limit,
 			);
 
 			while ($intro = $this->dba->fetch($stmtNotifications)) {
@@ -102,16 +86,16 @@ class Introduction extends BaseFactory
 					continue;
 				}
 
-			// There are two kind of introduction. Contacts suggested by other contacts and normal connection requests.
+				// There are two kind of introduction. Contacts suggested by other contacts and normal connection requests.
 				// We have to distinguish between these two because they use different data.
 				// Contact suggestions
 				if ($intro['suggest-cid'] ?? '') {
 					if (empty($intro['furl'])) {
 						continue;
 					}
-					$return_addr = bin2hex($this->nick . '@' .
-					                       $this->baseUrl->getHost() .
-										   (($this->baseUrl->getPath()) ? '/' . $this->baseUrl->getPath() : ''));
+					$return_addr = bin2hex($this->nick . '@'
+										   . $this->baseUrl->getHost()
+										   . (($this->baseUrl->getPath()) ? '/' . $this->baseUrl->getPath() : ''));
 
 					$formattedIntroductions[] = new ValueObject\Introduction([
 						'label'          => 'friend_suggestion',
@@ -149,7 +133,7 @@ class Introduction extends BaseFactory
 						'photo'          => Contact::getPhoto($intro),
 						'name'           => $intro['name'],
 						'location'       => BBCode::convertForUriId($intro['uri-id'], $intro['location'], BBCode::EXTERNAL),
-						'about'          => BBCode::convertForUriId ($intro['uri-id'], $intro['about'], BBCode::EXTERNAL),
+						'about'          => BBCode::convertForUriId($intro['uri-id'], $intro['about'], BBCode::EXTERNAL),
 						'keywords'       => $intro['keywords'],
 						'hidden'         => $intro['hidden'] == 1,
 						'post_newfriend' => (intval($this->pConfig->get($this->session->getLocalUserId(), 'system', 'post_newfriend')) ? '1' : 0),

@@ -60,45 +60,30 @@ class Mode
 	];
 
 	/***
-	 * @var int The mode of this Application
-	 *
-	 */
-	private $mode;
-
-	/***
 	 * @var int Who executes this Application
 	 *
 	 */
 	private $executor = self::UNDEFINED;
 
-	/**
-	 * @var bool True, if the call is a backend call
-	 */
-	private $isBackend;
-
-	/**
-	 * @var bool True, if the call is a ajax call
-	 */
-	private $isAjax;
-
-	/**
-	 * @var bool True, if the call is from a mobile device
-	 */
-	private $isMobile;
-
-	/**
-	 * @var bool True, if the call is from a tablet device
-	 */
-	private $isTablet;
-
-	public function __construct(int $mode = 0, bool $isBackend = false, bool $isAjax = false, bool $isMobile = false, bool $isTablet = false)
-	{
-		$this->mode      = $mode;
-		$this->isBackend = $isBackend;
-		$this->isAjax    = $isAjax;
-		$this->isMobile  = $isMobile;
-		$this->isTablet  = $isTablet;
-	}
+	public function __construct(
+		private readonly int $mode = 0,
+		/**
+		 * @var bool True, if the call is a backend call
+		 */
+		private bool $isBackend = false,
+		/**
+		 * @var bool True, if the call is a ajax call
+		 */
+		private readonly bool $isAjax = false,
+		/**
+		 * @var bool True, if the call is from a mobile device
+		 */
+		private readonly bool $isMobile = false,
+		/**
+		 * @var bool True, if the call is from a tablet device
+		 */
+		private readonly bool $isTablet = false,
+	) {}
 
 	/**
 	 * Sets the App mode

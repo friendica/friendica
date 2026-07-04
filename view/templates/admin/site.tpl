@@ -170,6 +170,7 @@
 		{{include file="field_input.tpl" field=$relay_deny_tags}}
 		{{include file="field_input.tpl" field=$relay_max_tags}}
 		{{include file="field_checkbox.tpl" field=$relay_user_tags}}
+		{{include file="field_checkbox.tpl" field=$relay_auto_subscribe_tags}}
 		{{include file="field_checkbox.tpl" field=$relay_directly}}
 		{{include file="field_checkbox.tpl" field=$relay_deny_undetected_language}}
 		{{include file="field_input.tpl" field=$relay_language_quality}}

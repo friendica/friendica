@@ -7,15 +7,18 @@
 
 namespace Friendica\Test\src\Core;
 
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
+use Friendica\Core\Session\Capability\IHandleSessions;
+use Friendica\Database\Database;
 use Friendica\Test\MockedTestCase;
 
 class L10nTest extends MockedTestCase
 {
-	public function dataDetectLanguage()
+	public static function dataDetectLanguage()
 	{
 		return [
-			'empty'   => [
+			'empty' => [
 				'server'  => [],
 				'get'     => [],
 				'default' => 'en',
@@ -90,11 +93,81 @@ class L10nTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataDetectLanguage
-	 */
-	public function testDetectLanguage(array $server, array $get, string $default, string $assert)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataDetectLanguage')]
+	public function testDetectLanguage(array $server, array $get, string $default, string $assert): void
 	{
 		self::assertEquals($assert, L10n::detectLanguage($server, $get, $default));
+	}
+
+	public static function dataNormaliseLocale(): array
+	{
+		return [
+			'lookup returns supported locale' => [
+				'locale' => 'de-DE',
+				'server' => [],
+				'assert' => 'de',
+			],
+			'valid unsupported locale falls back to language only' => [
+				'locale' => 'zu-ZA',
+				'server' => [],
+				'assert' => 'zu',
+			],
+			'invalid locale falls back to default' => [
+				'locale' => '***',
+				'server' => [],
+				'assert' => 'en-US',
+			],
+			'unknown language falls back to default' => [
+				'locale' => 'zz-ZZ',
+				'server' => [],
+				'assert' => 'en-US',
+			],
+			'null locale falls back to system default' => [
+				'locale' => null,
+				'server' => [],
+				'assert' => 'en-US',
+			],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataNormaliseLocale')]
+	public function testNormaliseLocale(?string $locale, array $server, string $assert): void
+	{
+		unset($_GET['lang']);
+
+		$l10n = $this->createL10n($server);
+
+		self::assertSame($assert, $l10n->normaliseLocale($locale));
+	}
+
+	private function createL10n(array $server): L10n
+	{
+		$config = $this->createMock(IManageConfigValues::class);
+		$config->method('get')
+			->willReturnCallback(static function (string $cat, ?string $key = null) {
+				if ($cat === 'system' && $key === 'language') {
+					return 'en-US';
+				}
+
+				if ($cat === 'addons') {
+					return [];
+				}
+
+				return null;
+			});
+
+		$session = $this->createMock(IHandleSessions::class);
+		$session->method('get')
+			->willReturnCallback(static function (string $name) {
+				if ($name === 'authenticated') {
+					return false;
+				}
+
+				return null;
+			});
+
+		$dba = $this->createMock(Database::class);
+
+		return new L10n($config, $dba, $session, $server, []);
 	}
 }

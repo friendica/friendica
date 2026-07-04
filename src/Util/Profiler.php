@@ -53,8 +53,8 @@ class Profiler implements ContainerInterface
 
 	public function __construct(IManageConfigValues $config)
 	{
-		$this->enabled    = (bool)$config->get('system', 'profiler') ?? false;
-		$this->rendertime = (bool)$config->get('rendertime', 'callstack') ?? false;
+		$this->enabled    = (bool) $config->get('system', 'profiler');
+		$this->rendertime = (bool) $config->get('rendertime', 'callstack');
 		$this->reset();
 	}
 
@@ -102,15 +102,15 @@ class Profiler implements ContainerInterface
 			$this->performance[$value] = 0;
 		}
 
-		$this->performance[$value]     += (float)$duration;
-		$this->performance['marktime'] += (float)$duration;
+		$this->performance[$value] += (float) $duration;
+		$this->performance['marktime'] += (float) $duration;
 
 		if (!isset($this->callstack[$value][$callstack])) {
 			// Prevent ugly E_NOTICE
 			$this->callstack[$value][$callstack] = 0;
 		}
 
-		$this->callstack[$value][$callstack] += (float)$duration;
+		$this->callstack[$value][$callstack] += (float) $duration;
 	}
 
 	/**
@@ -138,15 +138,15 @@ class Profiler implements ContainerInterface
 			$this->performance[$value] = 0;
 		}
 
-		$this->performance[$value]     += (float)$duration;
-		$this->performance['marktime'] += (float)$duration;
+		$this->performance[$value] += (float) $duration;
+		$this->performance['marktime'] += (float) $duration;
 
 		if (!isset($this->callstack[$value][$callstack])) {
 			// Prevent ugly E_NOTICE
 			$this->callstack[$value][$callstack] = 0;
 		}
 
-		$this->callstack[$value][$callstack] += (float)$duration;
+		$this->callstack[$value][$callstack] += (float) $duration;
 	}
 
 	/**
@@ -305,8 +305,8 @@ class Profiler implements ContainerInterface
 				'other_io'       => round($duration - ($this->get('database')
 													   + $this->get('cache') + $this->get('cache_write')
 													   + $this->get('network') + $this->get('file')), 2),
-				'total'          => round($duration, 2)
-			]
+				'total' => round($duration, 2),
+			],
 		);
 
 		if ($this->isRendertime()) {

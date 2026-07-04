@@ -78,11 +78,6 @@ class App
 	}
 
 	/**
-	 * @var Container
-	 */
-	private $container;
-
-	/**
 	 * @var Mode The Mode of the Application
 	 */
 	private $mode;
@@ -133,10 +128,7 @@ class App
 	 */
 	private $appHelper;
 
-	private function __construct(Container $container)
-	{
-		$this->container = $container;
-	}
+	private function __construct(private readonly Container $container) {}
 
 	/**
 	 * @internal
@@ -484,8 +476,8 @@ class App
 			if (!empty($queryVars['zrl']) && $this->mode->isNormal() && !$this->mode->isBackend() && !$this->session->getLocalUserId()) {
 				// Only continue when the given profile link seems valid.
 				// Valid profile links contain a path with "/profile/" and no query parameters
-				if ((parse_url($queryVars['zrl'], PHP_URL_QUERY) == '')
-					&& str_contains(parse_url($queryVars['zrl'], PHP_URL_PATH) ?? '', '/profile/')) {
+				if ((parse_url((string) $queryVars['zrl'], PHP_URL_QUERY) == '')
+					&& str_contains(parse_url((string) $queryVars['zrl'], PHP_URL_PATH) ?? '', '/profile/')) {
 					$this->auth->setUnauthenticatedVisitor($queryVars['zrl']);
 					OpenWebAuth::zrlInit();
 				} else {

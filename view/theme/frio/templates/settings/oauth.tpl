@@ -30,7 +30,7 @@
 						<td>{{$app.created_at}}</td>
 						<td>
 							<button type="submit" class="btn" title="{{$delete}}" name="delete" value="{{$app.id}}">
-								<i class="fa fa-trash" aria-hidden="true"></i>
+								<i class="ri ri-delete-bin-line" aria-hidden="true"></i>
 							</button>
 						</td>
 					</tr>

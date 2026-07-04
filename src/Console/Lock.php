@@ -22,16 +22,6 @@ class Lock extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/**
-	 * @var Mode
-	 */
-	private $appMode;
-
-	/**
-	 * @var ICanLock
-	 */
-	private $lock;
-
 	protected function getHelp()
 	{
 		$help = <<<HELP
@@ -62,12 +52,9 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Mode $appMode, ICanLock $lock, array $argv = null)
+	public function __construct(private readonly Mode $appMode, private readonly ICanLock $lock, ?array $argv = null)
 	{
 		parent::__construct($argv);
-
-		$this->appMode = $appMode;
-		$this->lock    = $lock;
 	}
 
 	protected function doExecute(): int

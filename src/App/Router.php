@@ -30,7 +30,6 @@ use Friendica\Network\HTTPException\MethodNotAllowedException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\Router\FriendicaGroupCountBased;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Wrapper for FastRoute\Router
@@ -60,44 +59,13 @@ class Router
 		self::OPTIONS,
 	];
 
-	/** @var RouteCollector */
-	protected $routeCollector;
-
 	/**
 	 * @var array Module parameters
 	 */
 	protected $parameters = [];
 
-	/** @var L10n */
-	private $l10n;
-
-	/** @var ICanCache */
-	private $cache;
-
-	/** @var ICanLock */
-	private $lock;
-
-	/** @var Arguments */
-	private $args;
-
-	/** @var IManageConfigValues */
-	private $config;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	private EventDispatcherInterface $eventDispatcher;
-
-	private AddonHelper $addonHelper;
-
 	/** @var bool */
 	private $isLocalUser;
-
-	/** @var string */
-	private $baseRoutesFilepath;
-
-	/** @var array */
-	private $server;
 
 	/** @var string|null */
 	protected $moduleClass = null;
@@ -110,25 +78,23 @@ class Router
 	 * @param ICanLock            $lock
 	 * @param IManageConfigValues $config
 	 * @param Arguments           $args
-	 * @param LoggerInterface     $logger
 	 * @param IHandleUserSessions $userSession
 	 * @param RouteCollector|null $routeCollector
 	 */
-	public function __construct(array $server, string $baseRoutesFilepath, L10n $l10n, ICanCache $cache, ICanLock $lock, IManageConfigValues $config, Arguments $args, LoggerInterface $logger, EventDispatcherInterface $eventDispatcher, AddonHelper $addonHelper, IHandleUserSessions $userSession, RouteCollector $routeCollector = null)
-	{
-		$this->baseRoutesFilepath = $baseRoutesFilepath;
-		$this->l10n               = $l10n;
-		$this->cache              = $cache;
-		$this->lock               = $lock;
-		$this->args               = $args;
-		$this->config             = $config;
-		$this->server             = $server;
-		$this->logger             = $logger;
-		$this->eventDispatcher    = $eventDispatcher;
-		$this->addonHelper        = $addonHelper;
-		$this->isLocalUser        = !empty($userSession->getLocalUserId());
-
-		$this->routeCollector = $routeCollector ?? new RouteCollector(new Std(), new GroupCountBased());
+	public function __construct(
+		private readonly array $server,
+		private readonly string $baseRoutesFilepath,
+		private readonly L10n $l10n,
+		private readonly ICanCache $cache,
+		private readonly ICanLock $lock,
+		private readonly IManageConfigValues $config,
+		private readonly Arguments $args,
+		private readonly EventDispatcherInterface $eventDispatcher,
+		private readonly AddonHelper $addonHelper,
+		IHandleUserSessions $userSession,
+		protected ?RouteCollector $routeCollector = new RouteCollector(new Std(), new GroupCountBased()),
+	) {
+		$this->isLocalUser = !empty($userSession->getLocalUserId());
 
 		if ($this->baseRoutesFilepath && !file_exists($this->baseRoutesFilepath)) {
 			throw new HTTPException\InternalServerErrorException('Routes file path does\'n exist.');
@@ -195,7 +161,7 @@ class Router
 	 */
 	private function addGroup(string $groupRoute, array $routes, RouteCollector $routeCollector)
 	{
-		$routeCollector->addGroup($groupRoute, function (RouteCollector $routeCollector) use ($routes) {
+		$routeCollector->addGroup($groupRoute, function (RouteCollector $routeCollector) use ($routes): void {
 			$this->addRoutes($routeCollector, $routes);
 		});
 	}
@@ -210,8 +176,7 @@ class Router
 	private function isGroup(array $config): bool
 	{
 		return
-			is_array($config)
-			&& is_string(array_keys($config)[0])
+			is_string(array_keys($config)[0])
 			// This entry should NOT be a BaseModule
 			&& (!str_starts_with(array_keys($config)[0], 'Friendica\Module'))
 			// The second argument is an array (another routes)
@@ -231,7 +196,7 @@ class Router
 			// The config array should at least have one entry
 			!empty($config[0])
 			// This entry should be a BaseModule
-			&& (str_starts_with($config[0], 'Friendica\Module'))
+			&& (str_starts_with((string) $config[0], 'Friendica\Module'))
 			// Either there is no other argument
 			&& (empty($config[1])
 			 // Or the second argument is an array (HTTP-Methods)

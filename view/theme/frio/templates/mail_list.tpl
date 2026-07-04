@@ -38,7 +38,7 @@
 					</a>
 				</div>
 				<a href="message/dropconv/{{$id}}" onclick="return confirmDelete();"  title="{{$delete}}" class="pull-right" onmouseover="imgbright(this);" onmouseout="imgdull(this);">
-				<i class="faded-icon fa fa-trash"></i>
+				<i class="faded-icon ri ri-delete-bin-line"></i>
 				</a>
 				<p class="text-muted">{{$count}}</p>
 			</div>

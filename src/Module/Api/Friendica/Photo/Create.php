@@ -25,15 +25,9 @@ use Psr\Log\LoggerInterface;
  */
 class Create extends BaseApi
 {
-	/** @var FriendicaPhoto */
-	private $friendicaPhoto;
-
-
-	public function __construct(FriendicaPhoto $friendicaPhoto, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(private readonly FriendicaPhoto $friendicaPhoto, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->friendicaPhoto = $friendicaPhoto;
 	}
 
 	protected function post(array $request = [])
@@ -72,7 +66,7 @@ class Create extends BaseApi
 			throw new HTTPException\BadRequestException('acl data invalid');
 		}
 		// now let's upload the new media in create-mode
-		$photo = Photo::upload($uid, $_FILES['media'], $album, trim($allow_cid), trim($allow_gid), trim($deny_cid), trim($deny_gid), $desc);
+		$photo = Photo::upload($uid, $_FILES['media'], $album, trim((string) $allow_cid), trim((string) $allow_gid), trim((string) $deny_cid), trim((string) $deny_gid), $desc);
 
 		// return success of updating or error message
 		if (!empty($photo)) {

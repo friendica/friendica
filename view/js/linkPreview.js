@@ -128,9 +128,6 @@
 				isExtern = true;
 			}
 
-			// Don't add an attachment if we have already an attachment preview.
-			attach = !isActive;
-
 			if (trim(text) !== "" && block === false && urlRegex.test(text)) {
 				binurl = bin2hex(text);
 				block = true;
@@ -140,9 +137,9 @@
 
 				if (binurl in cache) {
 					isCrawling = false;
-					processContentData(cache[binurl], attach);
+					processContentData(cache[binurl]);
 				} else {
-					getContentData(binurl, processContentData, attach);
+					getContentData(binurl, processContentData);
 				}
 			}
 		};
@@ -154,14 +151,14 @@
 		 * @param {object} result
 		 * @returns {void}
 		 */
-		var processContentData = function(result, attach) {
+		var processContentData = function(result) {
 			if (result.contentType === 'image') {
 				insertImage(result.data);
 			} else if (result.contentType === 'audio') {
 				insertAudio(result.data);
 			} else if (result.contentType === 'video') {
 				insertVideo(result.data);
-			} else if ((result.contentType === 'attachment' || result.contentType === 'embed') && attach) {
+			} else if ((result.contentType === 'attachment' || result.contentType === 'embed') && !isActive) {
 				insertAttachment(result.data);
 			} else if (result.contentType === 'embed') {
 				insertEmbed(result.data);
@@ -201,7 +198,7 @@
 			if (!isExtern) {
 				return;
 			}
-			var bbcode = '\n[img=' + data.url + '][/img]\n';
+			var bbcode = '[img=' + data.url + '][/img]';
 			addeditortext(bbcode);
 		};
 
@@ -215,7 +212,7 @@
 			if (!isExtern) {
 				return;
 			}
-			var bbcode = '\n[audio]' + data.url + '[/audio]\n';
+			var bbcode = '[audio]' + data.url + '[/audio]';
 			addeditortext(bbcode);
 		};
 
@@ -229,7 +226,7 @@
 			if (!isExtern) {
 				return;
 			}
-			var bbcode = '\n[video]' + data.url + '[/video]\n';
+			var bbcode = '[video]' + data.url + '[/video]';
 			addeditortext(bbcode);
 		};
 
@@ -243,7 +240,7 @@
 			if (!isExtern) {
 				return;
 			}
-			var bbcode = '\n[embed]' + data.url + '[/embed]\n';
+			var bbcode = '[embed]' + data.url + '[/embed]';
 			addeditortext(bbcode);
 		};
 
@@ -257,7 +254,7 @@
 			if (!isExtern) {
 				return;
 			}
-			var bbcode = '\n[url=' + data.url + ']' + data.title + '[/url]\n';
+			var bbcode = '[url=' + data.url + ']' + data.title + '[/url]';
 			addeditortext(bbcode);
 		};
 

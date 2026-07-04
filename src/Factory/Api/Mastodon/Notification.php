@@ -19,16 +19,9 @@ use Friendica\Model\Post;
 
 class Notification extends BaseFactory
 {
-	/** @var Account */
-	private $mstdnAccountFactory;
-	/** @var Status */
-	private $mstdnStatusFactory;
-
-	public function __construct(LoggerInterface $logger, Account $mstdnAccountFactory, Status $mstdnStatusFactoryFactory)
+	public function __construct(LoggerInterface $logger, private readonly Account $mstdnAccountFactory, private readonly Status $mstdnStatusFactory)
 	{
 		parent::__construct($logger);
-		$this->mstdnAccountFactory = $mstdnAccountFactory;
-		$this->mstdnStatusFactory  = $mstdnStatusFactoryFactory;
 	}
 
 	/**

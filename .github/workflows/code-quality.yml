@@ -19,11 +19,11 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest']
-        php: ['8.3']
+        php: ['8.5']
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
@@ -38,7 +38,7 @@ jobs:
         run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@v4"
 
       - name: Run PHP-CS-Fixer
         continue-on-error: true
@@ -52,11 +52,11 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest']
-        php: ['8.4']
+        php: ['8.5']
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
@@ -71,7 +71,7 @@ jobs:
         run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@v4"
 
       - name: Run PHPStan
         run: composer run phpstan
@@ -84,11 +84,11 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest']
-        php: ['8.4']
+        php: ['8.5']
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
@@ -103,10 +103,41 @@ jobs:
         run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@v4"
 
       - name: Run PHPStan in addons
-        run: composer run phpstan-addons
+        run: 'composer run addons:phpstan'
+
+  rector:
+    name: Rector (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: ['ubuntu-latest']
+        php: ['8.5']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Setup PHP with composer and extensions
+        uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+        with:
+          php-version: ${{ matrix.php }}
+          tools: none
+
+      - name: Clone addon repository
+        run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
+
+      - name: Install Composer dependencies
+        uses: "ramsey/composer-install@v4"
+
+      - name: Run Rector
+        run: composer run rector:check
 
   phpmd:
     name: PHPMD (PHP ${{ matrix.php }})
@@ -116,11 +147,11 @@ jobs:
       fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest']
-        php: ['8.4']
+        php: ['8.5']
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
@@ -135,7 +166,7 @@ jobs:
         run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@v4"
 
       - name: Run PHPMD
         run: vendor/bin/phpmd src/ text .phpmd-ruleset.xml --color

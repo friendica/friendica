@@ -1,7 +1,7 @@
 <?php
 
-// Copyright (C) 2010-2024, the Friendica project
-// SPDX-FileCopyrightText: 2010-2024 the Friendica project
+// Copyright (C) 2010-2026, the Friendica project
+// SPDX-FileCopyrightText: 2010-2026 the Friendica project
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -9,7 +9,7 @@ namespace Friendica\Module\Moderation\Report;
 
 use Friendica\App;
 use Friendica\BaseModule;
-use Friendica\Content\Conversation as ConversationContent;
+use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
@@ -17,6 +17,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\System;
+use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -36,30 +37,28 @@ class Create extends BaseModule
 	public const CONTACT_ACTION_COLLAPSE = 1;
 	public const CONTACT_ACTION_IGNORE   = 2;
 	public const CONTACT_ACTION_BLOCK    = 3;
-
-	/** @var SystemMessages */
-	private $systemMessages;
-	/** @var App\Page */
-	private $page;
-	/** @var UserSession */
-	private $session;
-	/** @var \Friendica\Moderation\Factory\Report */
-	private $factory;
-	/** @var \Friendica\Moderation\Repository\Report */
-	private $repository;
 	/** @var ReportUtil */
 	protected $reportUtil;
 
-	public function __construct(\Friendica\Moderation\Repository\Report $repository, ReportUtil $reportUtil, \Friendica\Moderation\Factory\Report $factory, UserSession $session, App\Page $page, SystemMessages $systemMessages, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly \Friendica\Moderation\Repository\Report $repository,
+		ReportUtil $reportUtil,
+		private readonly \Friendica\Moderation\Factory\Report $factory,
+		private readonly UserSession $session,
+		private App\Page $page,
+		private readonly SystemMessages $systemMessages,
+		private readonly ConversationRenderer $conversationRenderer,
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->systemMessages = $systemMessages;
-		$this->page           = $page;
-		$this->reportUtil     = $reportUtil;
-		$this->session        = $session;
-		$this->factory        = $factory;
-		$this->repository     = $repository;
+		$this->reportUtil = $reportUtil;
 	}
 
 	protected function post(array $request = [])
@@ -69,7 +68,7 @@ class Create extends BaseModule
 		}
 
 		$report = [];
-		foreach (['cid', 'category', 'rule-ids', 'uri-ids'] as $key) {
+		foreach (['cid', 'category', 'rule-ids', 'uri-ids', 'return'] as $key) {
 			if (isset($request[$key])) {
 				$report[$key] = $request[$key];
 			}
@@ -99,9 +98,13 @@ class Create extends BaseModule
 				!empty($request['rule-ids']) ? explode(',', $request['rule-ids']) : [],
 				$this->session->get('report_comment') ?? '',
 				!empty($request['uri-ids']) ? explode(',', $request['uri-ids']) : [],
-				(bool) ($request['forward'] ?? false),
+				(bool) ($request['report_forward'] ?? false),
 			);
-			$this->repository->save($report);
+			$report = $this->repository->save($report);
+
+			if ($report->forward && $report->id) {
+				Worker::add(Worker::PRIORITY_LOW, 'ForwardReport', (int) $report->id);
+			}
 
 			switch ($request['contact_action'] ?? 0) {
 				case self::CONTACT_ACTION_COLLAPSE:
@@ -114,9 +117,46 @@ class Create extends BaseModule
 					Contact\User::setBlocked($request['cid'], $this->session->getLocalUserId(), true);
 					break;
 			}
+
+			$this->systemMessages->addInfo($this->t('The moderation report has been submitted.'));
+			$this->baseUrl->redirect($this->getReturnPath($request));
 		}
 
 		$this->baseUrl->redirect($this->args->getCommand() . '?' . http_build_query($report));
+	}
+
+	private function getReturnPath(array $request): string
+	{
+		$return = trim((string) ($request['return'] ?? ''));
+		if ($return === '') {
+			return 'moderation/reports';
+		}
+
+		if (!empty(parse_url($return, PHP_URL_SCHEME))) {
+			if (!$this->baseUrl->isLocalUrl($return)) {
+				return 'moderation/reports';
+			}
+
+			$path     = parse_url($return, PHP_URL_PATH);
+			$query    = parse_url($return, PHP_URL_QUERY);
+			$basePath = rtrim((string) $this->baseUrl->getPath(), '/');
+
+			$path = (string) $path;
+			if ($basePath !== '' && $basePath !== '/') {
+				if ($path === $basePath) {
+					$path = '';
+				} elseif (str_starts_with($path, $basePath . '/')) {
+					$path = substr($path, strlen($basePath) + 1);
+				}
+			}
+
+			$return = $path;
+			if (!empty($query)) {
+				$return .= '?' . $query;
+			}
+		}
+
+		return ltrim($return, '/');
 	}
 
 	protected function content(array $request = []): string
@@ -246,9 +286,7 @@ class Create extends BaseModule
 			$fields = array_merge(Item::DISPLAY_FIELDLIST, ['featured']);
 			$items  = Post::toArray(Post::selectForUser(DI::userSession()->getLocalUserId(), $fields, $condition, $params));
 
-			$formSecurityToken = BaseModule::getFormSecurityToken('contact_action');
-
-			$threads = DI::conversation()->getContextLessThreadList($items, ConversationContent::MODE_CONTACT_POSTS, false, false, $formSecurityToken);
+			$threads = $this->conversationRenderer->renderFlat($items, ConversationRenderer::MODE_CONTACT_POSTS, false, DI::userSession()->getLocalUserId());
 		}
 
 		$tpl = Renderer::getMarkupTemplate('moderation/report/create/pick_posts.tpl');
@@ -289,6 +327,7 @@ class Create extends BaseModule
 			'$category' => $request['category'],
 			'$ruleIds'  => implode(',', $request['rule-ids'] ?? []),
 			'$uriIds'   => implode(',', $request['uri-ids'] ?? []),
+			'$return'   => $request['return'] ?? '',
 
 			'$nothing'  => ['contact_action', $this->t('Nothing'), self::CONTACT_ACTION_NONE, '', true],
 			'$collapse' => ['contact_action', $this->t('Collapse contact'), self::CONTACT_ACTION_COLLAPSE, $this->t('Their posts and replies will keep appearing in your Network page but their content will be collapsed by default.')],
@@ -296,7 +335,7 @@ class Create extends BaseModule
 			'$block'    => ['contact_action', $this->t('Block contact'), self::CONTACT_ACTION_BLOCK, $this->t("Their posts won't appear in your Network page anymore, but their replies can appear in forum threads, with their content collapsed by default. They cannot follow you but still can have access to your public posts by other means.")],
 
 			'$display_forward' => !$this->baseUrl->isLocalUrl($contact['url']),
-			'$forward'         => ['report_forward', $this->t('Forward report'), self::CONTACT_ACTION_BLOCK, $forward_translation],
+			'$forward'         => ['report_forward', $this->t('Forward report'), false, $forward_translation],
 
 			'$summary' => $this->getAside($request),
 		]);

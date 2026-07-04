@@ -450,7 +450,7 @@ class Feed
 				$item['uri'] = $item['plink'];
 			}
 
-			if (!parse_url($item['uri'], PHP_URL_HOST)) {
+			if (!parse_url((string) $item['uri'], PHP_URL_HOST)) {
 				$item['uri'] = 'feed::' . $host . ':' . $item['uri'];
 			}
 
@@ -635,10 +635,10 @@ class Feed
 
 				// Remove a possible link to the item itself
 				$item['body'] = str_replace($item['plink'], '', $item['body']);
-				$item['body'] = trim(preg_replace('/\[url\=\](\w+.*?)\[\/url\]/i', '', $item['body']));
+				$item['body'] = trim((string) preg_replace('/\[url\=\](\w+.*?)\[\/url\]/i', '', $item['body']));
 
 				$summary = str_replace($item['plink'], '', $summary);
-				$summary = trim(preg_replace('/\[url\=\](\w+.*?)\[\/url\]/i', '', $summary));
+				$summary = trim((string) preg_replace('/\[url\=\](\w+.*?)\[\/url\]/i', '', $summary));
 
 				if (!empty($summary) && self::replaceBodyWithTitle($summary, $item['title'])) {
 					$summary = '';
@@ -652,9 +652,9 @@ class Feed
 				}
 
 				$data = ParseUrl::getSiteinfoCached($item['plink']);
-				if (!empty($data['text']) && !empty($data['title']) && (mb_strlen($item['body']) < mb_strlen($data['text']))) {
+				if (!empty($data['text']) && !empty($data['title']) && (mb_strlen($item['body']) < mb_strlen((string) $data['text']))) {
 					// When the fetched page info text is longer than the body, we do try to enhance the body
-					if (!empty($item['body']) && (!str_contains($data['title'], $item['body'])) && (!str_contains($data['text'], $item['body']))) {
+					if (!empty($item['body']) && (!str_contains((string) $data['title'], $item['body'])) && (!str_contains((string) $data['text'], $item['body']))) {
 						// The body is not part of the fetched page info title or page info text. So we add the text to the body
 						$item['body'] .= "\n\n" . $data['text'];
 					} else {
@@ -755,29 +755,29 @@ class Feed
 	 * @param string|null $basepath
 	 * @return string
 	 */
-	private static function getHostname(array $item, string $guid = null, string $basepath = null): string
+	private static function getHostname(array $item, ?string $guid = null, ?string $basepath = null): string
 	{
-		$host = parse_url($item['plink'], PHP_URL_HOST);
+		$host = parse_url((string) $item['plink'], PHP_URL_HOST);
 		if (!empty($host)) {
 			return $host;
 		}
 
-		$host = parse_url($item['uri'], PHP_URL_HOST);
+		$host = parse_url((string) $item['uri'], PHP_URL_HOST);
 		if (!empty($host)) {
 			return $host;
 		}
 
-		$host = parse_url($guid, PHP_URL_HOST);
+		$host = parse_url((string) $guid, PHP_URL_HOST);
 		if (!empty($host)) {
 			return $host;
 		}
 
-		$host = parse_url($item['author-link'], PHP_URL_HOST);
+		$host = parse_url((string) $item['author-link'], PHP_URL_HOST);
 		if (!empty($host)) {
 			return $host;
 		}
 
-		return parse_url($basepath, PHP_URL_HOST);
+		return parse_url((string) $basepath, PHP_URL_HOST);
 	}
 	/**
 	 * Automatically adjust the poll frequency according to the post frequency
@@ -801,7 +801,7 @@ class Feed
 			$newest_date = '';
 
 			foreach ($creation_dates as $date) {
-				$timestamp = strtotime($date);
+				$timestamp = strtotime((string) $date);
 				$day       = intdiv($timestamp, 86400);
 				$hour      = $timestamp % 86400;
 
@@ -954,7 +954,7 @@ class Feed
 				$tagstr .= ', ';
 			}
 
-			$tagstr .= '#[url=' . DI::baseUrl() . '/search?tag=' . urlencode($tag) . ']' . $tag . '[/url]';
+			$tagstr .= '#[url=' . DI::baseUrl() . '/search?tag=' . urlencode((string) $tag) . ']' . $tag . '[/url]';
 		}
 
 		return $tagstr;
@@ -1012,7 +1012,7 @@ class Feed
 		$stamp = microtime(true);
 
 		// Display events in the user's timezone
-		if (strlen($owner['timezone'])) {
+		if (strlen((string) $owner['timezone'])) {
 			DI::appHelper()->setTimeZone($owner['timezone']);
 		}
 
@@ -1299,7 +1299,7 @@ class Feed
 
 		// If no bookmark is found then take the first line
 		// Remove the share element before fetching the first line
-		$title = trim(preg_replace("/\[share.*?\](.*?)\[\/share\]/ism", "\n$1\n", $item['body']));
+		$title = trim((string) preg_replace("/\[share.*?\](.*?)\[\/share\]/ism", "\n$1\n", (string) $item['body']));
 
 		$title   = BBCode::toPlaintext($title) . "\n";
 		$pos     = strpos($title, "\n");

@@ -1,7 +1,7 @@
 <?php
 
-// Copyright (C) 2010-2024, the Friendica project
-// SPDX-FileCopyrightText: 2010-2024 the Friendica project
+// Copyright (C) 2010-2026, the Friendica project
+// SPDX-FileCopyrightText: 2010-2026 the Friendica project
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -12,6 +12,7 @@ use Friendica\App\BaseURL;
 use Friendica\AppHelper;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\Core\Worker;
 use Friendica\Model\Contact;
 use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
@@ -24,17 +25,9 @@ use Psr\Log\LoggerInterface;
  */
 class Reports extends BaseApi
 {
-	/** @var \Friendica\Moderation\Factory\Report */
-	private $reportFactory;
-	/** @var \Friendica\Moderation\Repository\Report */
-	private $reportRepo;
-
-	public function __construct(\Friendica\Moderation\Repository\Report $reportRepo, \Friendica\Moderation\Factory\Report $reportFactory, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(private readonly \Friendica\Moderation\Repository\Report $reportRepo, private readonly \Friendica\Moderation\Factory\Report $reportFactory, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->reportFactory = $reportFactory;
-		$this->reportRepo    = $reportRepo;
 	}
 
 	public function post(array $request = [])
@@ -65,10 +58,14 @@ class Reports extends BaseApi
 			$request['forward'],
 			$request['status_ids'],
 			$request['rule_ids'],
-			self::getCurrentUserID()
+			self::getCurrentUserID(),
 		);
 
-		$this->reportRepo->save($report);
+		$report = $this->reportRepo->save($report);
+
+		if ($report->forward && $report->id) {
+			Worker::add(Worker::PRIORITY_LOW, 'ForwardReport', (int) $report->id);
+		}
 
 		$this->jsonExit([]);
 	}

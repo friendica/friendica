@@ -7,10 +7,8 @@
 
 namespace Friendica\Console;
 
-use Friendica\App\BaseURL;
 use Friendica\Contact\Avatar;
 use Friendica\Core\L10n;
-use Friendica\Database\Database;
 use Friendica\Model\Contact;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 
@@ -20,26 +18,6 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 class ClearAvatarCache extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
-
-	/**
-	 * @var Database
-	 */
-	private $dba;
-
-	/**
-	 * @var BaseURL
-	 */
-	private $baseUrl;
-
-	/**
-	 * @var L10n
-	 */
-	private $l10n;
-
-	/**
-	 * @var IManageConfigValues
-	 */
-	private $config;
 
 	protected function getHelp()
 	{
@@ -58,14 +36,13 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(\Friendica\Database\Database $dba, BaseURL $baseUrl, L10n $l10n, IManageConfigValues $config, array $argv = null)
-	{
+	public function __construct(
+		private readonly \Friendica\Database\Database $dba,
+		private readonly L10n $l10n,
+		private readonly IManageConfigValues $config,
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->dba     = $dba;
-		$this->baseUrl = $baseUrl;
-		$this->l10n    = $l10n;
-		$this->config  = $config;
 	}
 
 	protected function doExecute(): int
@@ -92,13 +69,13 @@ HELP;
 
 	private function isAvatarCache(array $contact): bool
 	{
-		if (!empty($contact['photo']) && str_starts_with($contact['photo'], Avatar::baseUrl())) {
+		if (!empty($contact['photo']) && str_starts_with((string) $contact['photo'], Avatar::baseUrl())) {
 			return true;
 		}
-		if (!empty($contact['thumb']) && str_starts_with($contact['thumb'], Avatar::baseUrl())) {
+		if (!empty($contact['thumb']) && str_starts_with((string) $contact['thumb'], Avatar::baseUrl())) {
 			return true;
 		}
-		if (!empty($contact['micro']) && str_starts_with($contact['micro'], Avatar::baseUrl())) {
+		if (!empty($contact['micro']) && str_starts_with((string) $contact['micro'], Avatar::baseUrl())) {
 			return true;
 		}
 		return false;

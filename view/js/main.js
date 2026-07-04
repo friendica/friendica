@@ -37,40 +37,34 @@ function _resizeIframe(obj, desth) {
 	setTimeout(_resizeIframe, 100, obj, ch);
 }
 
-function initWidget(inflated, deflated) {
-	var elInf = document.getElementById(inflated);
-	var elDef = document.getElementById(deflated);
+function initWidget(name) {
+	const widget = document.getElementById(name)
+	const list = widget.getElementsByClassName("sidebar-widget-list")[0];
+	const btn = widget.getElementsByClassName("widget-btn")[0]
 
-	if (!elInf || !elDef) {
-		return;
-	}
-	if (localStorage.getItem(window.location.pathname.split("/")[1] + ":" + inflated) != "none") {
-		elInf.style.display = "block";
-		elDef.style.display = "none";
+	if (localStorage.getItem(window.location.pathname.split("/")[1] + ":" + name) != "block") {
+		list.style.display = "none";
+		btn.setAttribute("aria-expanded", false)
 	} else {
-		elInf.style.display = "none";
-		elDef.style.display = "block";
+		list.style.display = "block";
+		btn.setAttribute("aria-expanded", true)
 	}
 }
 
-function openCloseWidget(inflated, deflated) {
-	var elInf = document.getElementById(inflated);
-	var elDef = document.getElementById(deflated);
+/* Consider switching to Bootstrap collapses or native "details" element to handle showing/hiding */
+function openCloseWidget(name) {
+	widget = document.getElementById(name)
+	const list = widget.getElementsByClassName("sidebar-widget-list")[0];
+	const btn = event.currentTarget
 
-	if (!elInf || !elDef) {
-		return;
-	}
+	btn.ariaExpanded = btn.ariaExpanded !== 'true';
 
-	if (window.getComputedStyle(elInf).display === "none") {
-		elInf.style.display = "block";
-		elDef.style.display = "none";
-		localStorage.setItem(window.location.pathname.split("/")[1] + ":" + inflated, "block");
-		elInf.querySelector("button").focus();
+	if (window.getComputedStyle(list).display === "block") {
+		list.style.display = "none";
+		localStorage.setItem(window.location.pathname.split("/")[1] + ":" + name, "none");
 	} else {
-		elInf.style.display = "none";
-		elDef.style.display = "block";
-		localStorage.setItem(window.location.pathname.split("/")[1] + ":" + inflated, "none");
-		elDef.querySelector("button").focus();
+		list.style.display = "block";
+		localStorage.setItem(window.location.pathname.split("/")[1] + ":" + name, "block");
 	}
 }
 
@@ -135,7 +129,6 @@ var timer = null;
 var pr = 0;
 var liking = 0;
 var in_progress = false;
-var langSelect = false;
 var commentBusy = false;
 var last_popup_menu = null;
 var last_popup_button = null;
@@ -938,6 +931,65 @@ function showHideComments(id) {
 		$('#hide-comments-' + id).show();
 		$('#hide-comments-total-' + id).hide();
 	}
+}
+
+// Load more comments for a specific post
+function loadMoreComments(uriId, itemId, existing) {
+	var button = $('#load-more-comments-' + itemId);
+	var loadingText = $('#load-more-loading-' + itemId);
+	
+	if (button.hasClass('loading') || commentBusy) {
+		return;
+	}
+	
+	// Hide button, show loading text (which contains the rotator)
+	button.addClass('loading').prop('disabled', true).hide();
+	loadingText.show();
+	commentBusy = true;
+	
+	// Parse existing JSON string if it's a string, or use as-is if already an array
+	var existingArray = typeof existing === 'string' ? JSON.parse(existing) : existing;
+	
+	$.get({
+		url: 'item/' + uriId + '/comments',
+		data: {
+			'mode': 'raw',
+			'existing': existingArray.join(',')
+		}
+	})
+	.done(function(data) {
+		loadingText.hide();
+		if ($(data).length > 0) {
+			var $data = $(data);
+			// Find all elements with id starting with "item-comments-" or "item-"
+			var allItems = $data.find('[id^="item-comments-"], [id^="item-"]').addBack('[id^="item-comments-"], [id^="item-"]');
+			
+			// Filter to only keep items that don't already exist on the page
+			var newItems = allItems.filter(function() {
+				var id = $(this).attr('id');
+				return id && $('#' + id).length === 0;
+			});
+			
+			if (newItems.length > 0) {
+				// Replace the button with the new comments
+				button.replaceWith(newItems);
+			} else {
+				// No new comments to add
+				button.hide();
+			}
+		} else {
+			// No more comments to load
+			button.hide();
+		}
+	})
+	.fail(function() {
+		// Show error feedback
+		button.removeClass('loading').prop('disabled', false).show();
+		loadingText.hide();
+	})
+	.always(function() {
+		commentBusy = false;
+	});
 }
 
 function preview_post() {

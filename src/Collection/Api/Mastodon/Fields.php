@@ -16,7 +16,7 @@ class Fields extends BaseCollection
 	 * @param Field[]  $entities
 	 * @param int|null $totalCount
 	 */
-	public function __construct(array $entities = [], int $totalCount = null)
+	public function __construct(array $entities = [], ?int $totalCount = null)
 	{
 		parent::__construct($entities);
 

@@ -31,8 +31,8 @@ class Circle extends BaseDataTransferObject
 	{
 		$this->name   = $circle['name'];
 		$this->id     = $circle['id'];
-		$this->id_str = (string)$circle['id'];
+		$this->id_str = (string) $circle['id'];
 		$this->user   = $user;
-		$this->mode   = $circle['visible'] ? 'public' : 'private';
+		$this->mode   = !empty($circle['public']) ? 'public' : 'private';
 	}
 }

@@ -25,7 +25,7 @@ class Email
 	 * @param string $mailbox  The mailbox name
 	 * @param string $username The username
 	 * @param string $password The password
-	 * @return Connection|resource|false
+	 * @return Connection|false
 	 * @throws \Exception
 	 */
 	public static function connect(string $mailbox, string $username, string $password)
@@ -53,8 +53,8 @@ class Email
 	}
 
 	/**
-	 * @param Connection|resource $mbox       mailbox
-	 * @param string              $email_addr email
+	 * @param Connection $mbox       mailbox
+	 * @param string     $email_addr email
 	 * @throws \Exception
 	 */
 	public static function poll($mbox, string $email_addr): array
@@ -107,8 +107,8 @@ class Email
 	}
 
 	/**
-	 * @param Connection|resource $mbox     mailbox
-	 * @param string              $sequence
+	 * @param Connection $mbox     mailbox
+	 * @param string     $sequence
 	 * @return mixed
 	 */
 	public static function messageMeta($mbox, string $sequence)
@@ -118,10 +118,10 @@ class Email
 	}
 
 	/**
-	 * @param Connection|resource $mbox  mailbox
-	 * @param integer             $uid   user id
-	 * @param string              $reply reply
-	 * @param array               $item  Item
+	 * @param Connection $mbox  mailbox
+	 * @param integer    $uid   user id
+	 * @param string     $reply reply
+	 * @param array      $item  Item
 	 * @return array
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
@@ -207,14 +207,14 @@ class Email
 	/**
 	 * fetch the specified message part number with the specified subtype
 	 *
-	 * @param Connection|resource $mbox    mailbox
-	 * @param integer             $uid     user id
-	 * @param object              $p       parts
-	 * @param integer             $partno  part number
-	 * @param string              $subtype sub type
+	 * @param Connection $mbox    mailbox
+	 * @param integer    $uid     user id
+	 * @param object     $p       parts
+	 * @param integer    $partno  part number
+	 * @param string     $subtype sub type
 	 * @return string
 	 */
-	private static function messageGetPart($mbox, int $uid, $p, int $partno, string $subtype): string
+	private static function messageGetPart(Connection $mbox, int $uid, $p, int $partno, string $subtype): string
 	{
 		// $partno = '1', '2', '2.1', '2.1.3', etc for multipart, 0 if simple
 		global $htmlmsg,$plainmsg,$charset,$attachments;
@@ -236,13 +236,13 @@ class Email
 		$params = [];
 		if ($p->parameters) {
 			foreach ($p->parameters as $x) {
-				$params[strtolower($x->attribute)] = $x->value;
+				$params[strtolower((string) $x->attribute)] = $x->value;
 			}
 		}
 
 		if (isset($p->dparameters) && $p->dparameters) {
 			foreach ($p->dparameters as $x) {
-				$params[strtolower($x->attribute)] = $x->value;
+				$params[strtolower((string) $x->attribute)] = $x->value;
 			}
 		}
 
@@ -261,8 +261,8 @@ class Email
 		if ($p->type == 0 && $data) {
 			// Messages may be split in different parts because of inline attachments,
 			// so append parts together with blank row.
-			if (strtolower($p->subtype) == $subtype) {
-				$data = iconv($params['charset'], 'UTF-8//IGNORE', $data);
+			if (strtolower((string) $p->subtype) == $subtype) {
+				$data = iconv((string) $params['charset'], 'UTF-8//IGNORE', $data);
 				return (trim($data) . "\n\n");
 			} else {
 				$data = '';

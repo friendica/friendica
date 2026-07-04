@@ -44,8 +44,12 @@ class Cookie
 	 * @param BaseURL             $baseURL
 	 * @param array               $COOKIE The $_COOKIE array
 	 */
-	public function __construct(Request $request, IManageConfigValues $config, BaseURL $baseURL, array $COOKIE = [])
-	{
+	public function __construct(
+		Request $request,
+		IManageConfigValues $config,
+		BaseURL $baseURL,
+		array $COOKIE = [],
+	) {
 		$this->sslEnabled     = $baseURL->getScheme() === 'https';
 		$this->sitePrivateKey = $config->get('system', 'site_prvkey');
 
@@ -164,11 +168,11 @@ class Cookie
 	 *
 	 */
 	protected function setCookie(
-		string $value = null,
-		int $expire = null,
-		bool $secure = null
+		?string $value = null,
+		?int $expire = null,
+		?bool $secure = null,
 	): bool {
-		return setcookie(self::NAME, $value, ['expires' => $expire, 'path' => self::PATH, 'domain' => self::DOMAIN, 'secure' => $secure, 'httponly' => self::HTTPONLY]);
+		return setcookie(self::NAME, (string) $value, ['expires' => $expire, 'path' => self::PATH, 'domain' => self::DOMAIN, 'secure' => $secure, 'httponly' => self::HTTPONLY]);
 	}
 
 	/**

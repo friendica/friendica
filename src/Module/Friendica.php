@@ -32,21 +32,12 @@ use Psr\Log\LoggerInterface;
  */
 class Friendica extends BaseModule
 {
-	private AddonHelper $addonHelper;
-	private EventDispatcherInterface $eventDispatcher;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var IManageKeyValuePairs */
-	private $keyValue;
-	/** @var IHandleUserSessions */
-	private $session;
-
 	public function __construct(
-		AddonHelper $addonHelper,
-		EventDispatcherInterface $eventDispatcher,
-		IHandleUserSessions $session,
-		IManageKeyValuePairs $keyValue,
-		IManageConfigValues $config,
+		private readonly AddonHelper $addonHelper,
+		private readonly EventDispatcherInterface $eventDispatcher,
+		private readonly IHandleUserSessions $session,
+		private readonly IManageKeyValuePairs $keyValue,
+		private readonly IManageConfigValues $config,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -57,12 +48,6 @@ class Friendica extends BaseModule
 		array $parameters = [],
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->config          = $config;
-		$this->keyValue        = $keyValue;
-		$this->session         = $session;
-		$this->eventDispatcher = $eventDispatcher;
-		$this->addonHelper     = $addonHelper;
 	}
 
 	protected function content(array $request = []): string

@@ -11,7 +11,6 @@ use Console_Table;
 use Friendica\App\Mode;
 use Friendica\Core\L10n;
 use Friendica\Core\Addon\AddonHelper;
-use Friendica\Database\Database;
 use Friendica\Util\Strings;
 use RuntimeException;
 
@@ -21,20 +20,6 @@ use RuntimeException;
 class Addon extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
-
-	/**
-	 * @var Mode
-	 */
-	private $appMode;
-	/**
-	 * @var L10n
-	 */
-	private $l10n;
-	/**
-	 * @var Database
-	 */
-	private $dba;
-	private AddonHelper $addonHelper;
 
 	protected function getHelp()
 	{
@@ -57,14 +42,13 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Mode $appMode, L10n $l10n, Database $dba, AddonHelper $addonHelper, array $argv = null)
-	{
+	public function __construct(
+		private readonly Mode $appMode,
+		private readonly L10n $l10n,
+		private readonly AddonHelper $addonHelper,
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->appMode     = $appMode;
-		$this->l10n        = $l10n;
-		$this->dba         = $dba;
-		$this->addonHelper = $addonHelper;
 
 		$this->addonHelper->loadAddons();
 	}
@@ -88,16 +72,12 @@ HELP;
 
 		$command = $this->getArgument(0);
 
-		switch ($command) {
-			case 'list':
-				return $this->list();
-			case 'enable':
-				return $this->enable();
-			case 'disable':
-				return $this->disable();
-			default:
-				throw new \Asika\SimpleConsole\CommandArgsException('Wrong command.');
-		}
+		return match ($command) {
+			'list'    => $this->list(),
+			'enable'  => $this->enable(),
+			'disable' => $this->disable(),
+			default   => throw new \Asika\SimpleConsole\CommandArgsException('Wrong command.'),
+		};
 	}
 
 	/**

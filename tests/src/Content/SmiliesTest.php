@@ -33,17 +33,17 @@ class SmiliesTest extends FixtureTestCase
 		Hook::loadHooks();
 	}
 
-	public function dataLinks(): array
+	public static function dataLinks(): array
 	{
 		return [
 			/** @see https://github.com/friendica/friendica/pull/6933 */
 			'bug-6933-1' => [
-				'data'     => '<code>/</code>',
+				'text'     => '<code>/</code>',
 				'smilies'  => ['texts' => [], 'icons' => []],
 				'expected' => '<code>/</code>',
 			],
 			'bug-6933-2' => [
-				'data'     => '<code>code</code>',
+				'text'     => '<code>code</code>',
 				'smilies'  => ['texts' => [], 'icons' => []],
 				'expected' => '<code>code</code>',
 			],
@@ -53,21 +53,20 @@ class SmiliesTest extends FixtureTestCase
 	/**
 	 * Test replace smilies in different texts
 	 *
-	 * @dataProvider dataLinks
 	 *
 	 * @param string $text     Test string
 	 * @param array  $smilies  List of smilies to replace
 	 * @param string $expected Expected result
-	 *
 	 * @throws InternalServerErrorException
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataLinks')]
 	public function testReplaceFromArray(string $text, array $smilies, string $expected): void
 	{
 		$output = Smilies::replaceFromArray($text, $smilies);
 		self::assertEquals($expected, $output);
 	}
 
-	public function dataIsEmojiPost(): array
+	public static function dataIsEmojiPost(): array
 	{
 		return [
 			'emoji' => [
@@ -126,15 +125,13 @@ class SmiliesTest extends FixtureTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataIsEmojiPost
-	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataIsEmojiPost')]
 	public function testIsEmojiPost(bool $expected, string $body): void
 	{
 		$this->assertEquals($expected, Smilies::isEmojiPost($body));
 	}
 
-	public function dataReplace(): array
+	public static function dataReplace(): array
 	{
 		$data = [
 			'simple-1' => [
@@ -198,7 +195,7 @@ class SmiliesTest extends FixtureTestCase
 		foreach ([':-[', ':-D', 'o.O'] as $emoji) {
 			foreach (['A', '_', ':', '-'] as $prefix) {
 				foreach (['', ' ', 'A', ':', '-'] as $suffix) {
-					$no_smile = ($prefix !== '' && ctype_alnum($prefix)) || ($suffix !== '' && ctype_alnum($suffix));
+					$no_smile = ctype_alnum($prefix) || ($suffix !== '' && ctype_alnum($suffix));
 					$s        = $prefix . $emoji . $suffix;
 					$data[]   = [
 						'expected' => $no_smile ? $s : 'alt="' . $emoji . '"',
@@ -210,16 +207,14 @@ class SmiliesTest extends FixtureTestCase
 		return $data;
 	}
 
-	/**
-	 * @dataProvider dataReplace
-	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataReplace')]
 	public function testReplace(string $expected, string $body): void
 	{
 		$result = Smilies::replace($body);
 		$this->assertStringContainsString($expected, $result);
 	}
 
-	public function dataExtractUsedSmilies(): array
+	public static function dataExtractUsedSmilies(): array
 	{
 		return [
 			'symbols' => [
@@ -240,22 +235,22 @@ class SmiliesTest extends FixtureTestCase
 			'nosmile' => [
 				'expected'   => [],
 				'body'       => '[nosmile] :like :like',
-				'normalized' => '[nosmile] :like :like'
+				'normalized' => '[nosmile] :like :like',
 			],
 			'in-code' => [
 				'expected'   => [],
 				'body'       => '[code]:like :like :like[/code]',
-				'normalized' => '[code]:like :like :like[/code]'
+				'normalized' => '[code]:like :like :like[/code]',
 			],
 			'~friendica' => [
 				'expected'   => ['friendica'],
 				'body'       => '~friendica',
-				'normalized' => ':friendica:'
+				'normalized' => ':friendica:',
 			],
 			'space' => [
 				'expected'   => ['smileyheart333'],
 				'body'       => ':smiley heart 333:',
-				'normalized' => ':smileyheart333:'
+				'normalized' => ':smileyheart333:',
 			],
 			'substitution-1' => [
 				'expected'   => [],
@@ -280,9 +275,7 @@ class SmiliesTest extends FixtureTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataExtractUsedSmilies
-	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataExtractUsedSmilies')]
 	public function testExtractUsedSmilies(array $expected, string $body, string $normalized): void
 	{
 		$extracted = Smilies::extractUsedSmilies($body, $converted);

@@ -52,11 +52,11 @@ class Addon
 		if (is_array($files)) {
 			foreach ($files as $file) {
 				if (is_dir($file)) {
-					[$tmp, $addon] = array_map('trim', explode('/', $file));
+					[$tmp, $addon] = array_map(trim(...), explode('/', $file));
 					$info          = self::getInfo($addon);
 
 					if (DI::config()->get('system', 'show_unsupported_addons')
-						|| strtolower($info['status']) != 'unsupported'
+						|| strtolower((string) $info['status']) != 'unsupported'
 						|| self::isEnabled($addon)
 					) {
 						$addons[] = [$addon, (self::isEnabled($addon) ? 'on' : 'off'), $info];
@@ -208,7 +208,7 @@ class Addon
 		$addons = array_filter(DI::config()->get('addons') ?? []);
 
 		foreach ($addons as $name => $data) {
-			$addonname       = Strings::sanitizeFilePathItem(trim($name));
+			$addonname       = Strings::sanitizeFilePathItem(trim((string) $name));
 			$addon_file_path = 'addon/' . $addonname . '/' . $addonname . '.php';
 			if (file_exists($addon_file_path) && $data['last_update'] == filemtime($addon_file_path)) {
 				// Addon unmodified, skipping
@@ -272,7 +272,7 @@ class Addon
 			foreach ($ll as $l) {
 				$l = trim($l, "\t\n\r */");
 				if ($l != "") {
-					$addon_info = array_map("trim", explode(":", $l, 2));
+					$addon_info = array_map(trim(...), explode(":", $l, 2));
 					if (count($addon_info) < 2) {
 						continue;
 					}

@@ -72,10 +72,7 @@ class DbaDefinitionSqlWriter
 
 		if (!empty($tableStructure['indexes'])) {
 			foreach ($tableStructure['indexes'] as $indexName => $fieldNames) {
-				$sql_index = self::createIndex($indexName, $fieldNames, '');
-				if (!is_null($sql_index)) {
-					$sql_rows[] = $sql_index;
-				}
+				$sql_rows[] = self::createIndex($indexName, $fieldNames, '');
 			}
 		}
 
@@ -193,7 +190,7 @@ class DbaDefinitionSqlWriter
 		}
 
 		if (isset($parameters['default'])) {
-			if (str_contains(strtolower($parameters['type']), 'int')) {
+			if (str_contains(strtolower((string) $parameters['type']), 'int')) {
 				$fieldstruct .= ' DEFAULT ' . $parameters['default'];
 			} else {
 				$fieldstruct .= " DEFAULT '" . $parameters['default'] . "'";
@@ -241,7 +238,7 @@ class DbaDefinitionSqlWriter
 				$names .= ',';
 			}
 
-			if (preg_match('|(.+)\((\d+)\)|', $fieldName, $matches)) {
+			if (preg_match('|(.+)\((\d+)\)|', (string) $fieldName, $matches)) {
 				$names .= "`" . static::escape($matches[1]) . "`(" . intval($matches[2]) . ")";
 			} else {
 				$names .= "`" . static::escape($fieldName) . "`";
@@ -272,13 +269,13 @@ class DbaDefinitionSqlWriter
 		$sql = "FOREIGN KEY (`" . $foreignKeyName . "`) REFERENCES `" . $foreign_table . "` (`" . $foreign_field . "`)";
 
 		if (!empty($parameters['foreign']['on update'])) {
-			$sql .= " ON UPDATE " . strtoupper($parameters['foreign']['on update']);
+			$sql .= " ON UPDATE " . strtoupper((string) $parameters['foreign']['on update']);
 		} else {
 			$sql .= " ON UPDATE RESTRICT";
 		}
 
 		if (!empty($parameters['foreign']['on delete'])) {
-			$sql .= " ON DELETE " . strtoupper($parameters['foreign']['on delete']);
+			$sql .= " ON DELETE " . strtoupper((string) $parameters['foreign']['on delete']);
 		} else {
 			$sql .= " ON DELETE CASCADE";
 		}

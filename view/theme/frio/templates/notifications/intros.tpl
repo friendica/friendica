@@ -48,19 +48,19 @@
 			{{* On mobile touch devices we use buttons for approve, ignore && discard to have a better UX *}}
 			{{if $is_mobile}}
 			<form class="intro-form" action="notification/{{$intro_id}}" method="post">
-				<button class="btn btn-small btn-primary" type="button" onclick="addElmToModal('#intro-approve-wrapper-{{$intro_id}}');"><i class="fa fa-check" aria-hidden="true"></i> {{$approve}}</button>
+				<button class="btn btn-small btn-primary" type="button" onclick="addElmToModal('#intro-approve-wrapper-{{$intro_id}}');"><i class="ri ri-check-line" aria-hidden="true"></i> {{$approve}}</button>
 				{{if $discard}}
-					<button class="btn btn-small btn-warning intro-submit-discard" type="submit" name="submit" value="discard"><i class="fa fa-trash-o" aria-hidden="true"></i> {{$discard}}</button>
+					<button class="btn btn-small btn-warning intro-submit-discard" type="submit" name="submit" value="discard"><i class="ri ri-delete-bin-line" aria-hidden="true"></i> {{$discard}}</button>
 				{{/if}}
-				<button class="btn btn-small btn-danger intro-submit-ignore" type="submit" name="submit" value="ignore"><i class="fa fa-ban" aria-hidden="true"></i> {{$ignore}}</button>
+				<button class="btn btn-small btn-danger intro-submit-ignore" type="submit" name="submit" value="ignore"><i class="ri ri-forbid-2-line" aria-hidden="true"></i> {{$ignore}}</button>
 			</form>
 			{{else}}
 			{{* The intro actions like approve, ignore, discard intro*}}
 			<div class="intro-actions nav-pills">
-				<button class="btn-link intro-action-link" onclick="addElmToModal('#intro-approve-wrapper-{{$intro_id}}');" aria-label="{{$approve}}" title="{{$approve}}" data-toggle="tooltip"><i class="fa fa-check" aria-hidden="true"></i></button>
+				<button class="btn-link intro-action-link" onclick="addElmToModal('#intro-approve-wrapper-{{$intro_id}}');" aria-label="{{$approve}}" title="{{$approve}}" data-toggle="tooltip"><i class="ri ri-check-line" aria-hidden="true"></i></button>
 				<form class="intro-form" action="notification/{{$intro_id}}" method="post">
-					<button class="btn-link intro-submit-ignore intro-action-link" type="submit" name="submit" value="ignore" aria-label="{{$ignore}}" title="{{$ignore}}" data-toggle="tooltip"><i class="fa fa-ban" aria-hidden="true"></i></button>
-					{{if $discard}}<button class="btn-link intro-submit-discard intro-action-link" type="submit" name="submit" value="discard" aria-label="{{$discard}}" title="{{$discard}}" data-toggle="tooltip"><i class="fa fa-trash-o" aria-hidden="true"></i></button>{{/if}}
+					<button class="btn-link intro-submit-ignore intro-action-link" type="submit" name="submit" value="ignore" aria-label="{{$ignore}}" title="{{$ignore}}" data-toggle="tooltip"><i class="ri ri-forbid-2-line" aria-hidden="true"></i></button>
+					{{if $discard}}<button class="btn-link intro-submit-discard intro-action-link" type="submit" name="submit" value="discard" aria-label="{{$discard}}" title="{{$discard}}" data-toggle="tooltip"><i class="ri ri-delete-bin-line" aria-hidden="true"></i></button>{{/if}}
 				</form>
 			</div>
 			{{/if}}

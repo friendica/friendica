@@ -28,7 +28,7 @@ class UploadTest extends ApiTestCase
 	/**
 	 * Test the \Friendica\Module\Api\Twitter\Media\Upload module.
 	 */
-	public function testApiMediaUpload()
+	public function testApiMediaUpload(): void
 	{
 		$this->expectException(BadRequestException::class);
 
@@ -41,7 +41,7 @@ class UploadTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiMediaUploadWithoutAuthenticatedUser()
+	public function testApiMediaUploadWithoutAuthenticatedUser(): void
 	{
 		$this->expectException(UnauthorizedException::class);
 		AuthTestConfig::$authenticated = false;
@@ -63,7 +63,7 @@ class UploadTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiMediaUploadWithMedia()
+	public function testApiMediaUploadWithMedia(): void
 	{
 		$this->expectException(InternalServerErrorException::class);
 		$_FILES = [
@@ -82,7 +82,7 @@ class UploadTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiMediaUploadWithValidMedia()
+	public function testApiMediaUploadWithValidMedia(): void
 	{
 		$_FILES = [
 			'media' => [

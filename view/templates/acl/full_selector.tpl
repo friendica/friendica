@@ -9,7 +9,7 @@
 		<div class="panel panel-success">
 			<label class="panel-heading{{if $visibility != 'public'}} collapsed{{/if}}" id="visibility-public-heading-{{$input_group_id}}" aria-expanded="{{if $visibility == 'public'}}true{{else}}false{{/if}}">
 				<input type="radio" name="{{$input_names.visibility}}" id="visibility-public-{{$input_group_id}}" value="public" tabindex="14" {{if $visibility == 'public'}}checked{{/if}}>
-				<i class="fa fa-globe"></i> {{$public_title}}
+				<i class="ri ri-global-line"></i> {{$public_title}}
 			</label>
 			<fieldset id="visibility-public-panel-{{$input_group_id}}" class="panel-collapse collapse{{if $visibility == 'public'}} in{{/if}}" role="tabpanel" aria-labelledby="visibility-public-heading-{{$input_group_id}}" {{if $visibility != 'public'}}disabled{{/if}}>
 				<div class="panel-body">
@@ -44,7 +44,7 @@
 		<div class="panel panel-info">
 			<label class="panel-heading{{if $visibility != 'custom'}} collapsed{{/if}}" id="visibility-custom-heading-{{$input_group_id}}" aria-expanded="{{if $visibility == 'custom'}}true{{else}}false{{/if}}">
 				<input type="radio" name="{{$input_names.visibility}}" id="visibility-custom-{{$input_group_id}}" value="custom" tabindex="15" {{if $visibility == 'custom'}}checked{{/if}}>
-				<i class="fa fa-lock"></i> {{$custom_title}}
+				<i class="ri ri-lock-line"></i> {{$custom_title}}
 			</label>
 			<fieldset id="visibility-custom-panel-{{$input_group_id}}" class="panel-collapse collapse{{if $visibility == 'custom'}} in{{/if}}" role="tabpanel" aria-labelledby="visibility-custom-heading-{{$input_group_id}}" {{if $visibility != 'custom'}}disabled{{/if}}>
 				<input type="hidden" name="{{$input_names.circle_allow}}" value="{{$circle_allow}}"/>

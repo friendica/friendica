@@ -50,10 +50,8 @@ class ExtendedPDO extends PDO
 
 	/**
 	 * Start transaction
-	 *
-	 * @return bool|void
 	 */
-	public function beginTransaction()
+	public function beginTransaction(): bool
 	{
 		if ($this->_transactionDepth <= 0 || !$this->hasSavepoint()) {
 			parent::beginTransaction();
@@ -63,6 +61,8 @@ class ExtendedPDO extends PDO
 		}
 
 		$this->_transactionDepth++;
+
+		return true;
 	}
 
 	/**

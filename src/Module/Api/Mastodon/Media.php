@@ -54,7 +54,7 @@ class Media extends BaseApi
 		}
 
 		$tempFileName = $request['file']['tmp_name'];
-		$fileName     = basename($request['file']['name']);
+		$fileName     = basename((string) $request['file']['name']);
 		$fileSize     = intval($request['file']['size']);
 		$maxFileSize  = Strings::getBytesFromShorthand(DI::config()->get('system', 'maxfilesize'));
 
@@ -92,8 +92,8 @@ class Media extends BaseApi
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		if (DI::mstdnAttachment()->isAttach($this->parameters['id']) && Attach::exists(['id' => substr($this->parameters['id'], 7)])) {
-			$this->jsonExit(DI::mstdnAttachment()->createFromAttach(substr($this->parameters['id'], 7)));
+		if (DI::mstdnAttachment()->isAttach($this->parameters['id']) && Attach::exists(['id' => substr((string) $this->parameters['id'], 7)])) {
+			$this->jsonExit(DI::mstdnAttachment()->createFromAttach(substr((string) $this->parameters['id'], 7)));
 		}
 
 		$photo = Photo::selectFirst(['resource-id'], ['id' => $this->parameters['id'], 'uid' => $uid]);
@@ -142,8 +142,8 @@ class Media extends BaseApi
 			$this->jsonExit(DI::mstdnAttachment()->createFromPhoto($id));
 		}
 
-		if (DI::mstdnAttachment()->isAttach($id) && Attach::exists(['id' => substr($id, 7)])) {
-			$this->jsonExit(DI::mstdnAttachment()->createFromAttach(substr($id, 7)));
+		if (DI::mstdnAttachment()->isAttach($id) && Attach::exists(['id' => substr((string) $id, 7)])) {
+			$this->jsonExit(DI::mstdnAttachment()->createFromAttach(substr((string) $id, 7)));
 		}
 
 		$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());

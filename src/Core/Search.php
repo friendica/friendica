@@ -276,9 +276,9 @@ class Search
 	public static function getSearchPath(string $search): string
 	{
 		if (str_starts_with($search, '#')) {
-			return 'search?tag=' . urlencode(substr($search, 1));
+			return 'search?' . http_build_query(['tag' => substr($search, 1)]);
 		} else {
-			return 'search?q=' . urlencode($search);
+			return 'search?' . http_build_query(['q' => $search]);
 		}
 	}
 }

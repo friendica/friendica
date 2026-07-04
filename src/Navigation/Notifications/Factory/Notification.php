@@ -7,15 +7,12 @@
 
 namespace Friendica\Navigation\Notifications\Factory;
 
-use Friendica\App\BaseURL;
 use Friendica\BaseFactory;
 use Friendica\Capabilities\ICanCreateFromTableRow;
-use Friendica\Contact\LocalRelationship\Repository\LocalRelationship;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Capability\ICanCache;
-use Friendica\Core\L10n;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Model\User;
@@ -27,23 +24,13 @@ use Psr\Log\LoggerInterface;
 
 class Notification extends BaseFactory implements ICanCreateFromTableRow
 {
-	/** @var BaseURL */
-	private $baseUrl;
-	/** @var L10n */
-	private $l10n;
-	/** @var LocalRelationship */
-	private $localRelationshipRepo;
-	/** @var ICanCache */
-	private $cache;
-
-	public function __construct(\Friendica\App\BaseURL $baseUrl, \Friendica\Core\L10n $l10n, \Friendica\Contact\LocalRelationship\Repository\LocalRelationship $localRelationshipRepo, LoggerInterface $logger, ICanCache $cache)
-	{
+	public function __construct(
+		private readonly \Friendica\App\BaseURL $baseUrl,
+		private readonly \Friendica\Core\L10n $l10n,
+		LoggerInterface $logger,
+		private readonly ICanCache $cache,
+	) {
 		parent::__construct($logger);
-
-		$this->baseUrl = $baseUrl;
-		$this->l10n = $l10n;
-		$this->localRelationshipRepo = $localRelationshipRepo;
-		$this->cache = $cache;
 	}
 
 	public function createFromTableRow(array $row): Entity\Notification
@@ -70,7 +57,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 			$type,
 			$actorId,
 			$targetUriId,
-			$parentUriId
+			$parentUriId,
 		);
 	}
 
@@ -86,7 +73,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 			$uid,
 			$verb,
 			Post\UserNotification::TYPE_NONE,
-			$contactId
+			$contactId,
 		);
 	}
 
@@ -101,7 +88,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 		$message = [];
 
 		$cachekey = 'Notification:' . $Notification->id;
-		$result = $this->cache->get($cachekey);
+		$result   = $this->cache->get($cachekey);
 		if (!is_null($result)) {
 			return $result;
 		}
@@ -150,7 +137,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 
 				if (($Notification->verb == Activity::POST) || ($Notification->type === Post\UserNotification::TYPE_SHARED)) {
 					$thrparentid = $item['thr-parent-id'];
-					$item = Post::selectFirst([], ['uri-id' => $thrparentid, 'uid' => [0, $Notification->uid]], ['order' => ['uid' => true]]);
+					$item        = Post::selectFirst([], ['uri-id' => $thrparentid, 'uid' => [0, $Notification->uid]], ['order' => ['uid' => true]]);
 					if (empty($item)) {
 						$this->logger->info('Thread parent post not found', ['uri-id' => $thrparentid]);
 						return $message;
@@ -177,9 +164,9 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 				return $message;
 			}
 
-			$link = $this->baseUrl . '/display/' . urlencode($link_item['guid']);
+			$link = $this->baseUrl . '/display/' . urlencode((string) $link_item['guid']);
 
-			$body = BBCode::toPlaintext($item['body'], false);
+			$body  = BBCode::toPlaintext($item['body'], false);
 			$title = Plaintext::shorten($body, 70);
 			if (!empty($title)) {
 				$title = '"' . trim(str_replace("\n", " ", $title)) . '"';
@@ -270,7 +257,7 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 
 						case Post\UserNotification::TYPE_COMMENT_PARTICIPATION:
 						case Post\UserNotification::TYPE_ACTIVITY_PARTICIPATION:
-						case Post\UserNotification::TYPE_FOLLOW;
+						case Post\UserNotification::TYPE_FOLLOW:
 							if (($causer['id'] == $author['id']) && ($title != '')) {
 								$msg = $l10n->t('%1$s commented in their thread %2$s');
 							} elseif ($causer['id'] == $author['id']) {
@@ -314,10 +301,12 @@ class Notification extends BaseFactory implements ICanCreateFromTableRow
 			// Plain text for the web push api
 			$message['plain'] = sprintf($msg, $causer['name'], $title, $author['name']);
 			// Rich text for other purposes
-			$message['rich'] = sprintf($msg,
+			$message['rich'] = sprintf(
+				$msg,
 				'[url=' . $causer['url'] . ']' . $causer['name'] . '[/url]',
 				'[url=' . $link . ']' . $title . '[/url]',
-				'[url=' . $author['url'] . ']' . $author['name'] . '[/url]');
+				'[url=' . $author['url'] . ']' . $author['name'] . '[/url]',
+			);
 			$message['link'] = $link;
 			$this->cache->set($cachekey, $message, Duration::HOUR);
 		} else {

@@ -27,6 +27,7 @@ use Friendica\Security\PermissionSet\Entity\PermissionSet;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
+use Friendica\Core\Theme;
 
 class Profile
 {
@@ -262,6 +263,8 @@ class Profile
 	 */
 	public static function getVCardHtml(array $profile, bool $block, bool $show_contacts, int $view_as_contact_id = 0): string
 	{
+		DI::statusEditor()->registerAssets();
+
 		$o        = '';
 		$location = false;
 
@@ -274,7 +277,7 @@ class Profile
 			$profile_contact = Contact::selectFirst([], ['id' => $profile['cid']]);
 		}
 
-		$profile['picdate'] = urlencode($profile['picdate']);
+		$profile['picdate'] = urlencode((string) $profile['picdate']);
 
 		$profile['network_link'] = '';
 
@@ -320,14 +323,14 @@ class Profile
 		if (!$local_user_is_self) {
 			if (!$visitor_is_authenticated) {
 				// Remote follow is only available for local profiles
-				if (!empty($profile['nickname']) && str_starts_with($profile_url, (string) DI::baseUrl())) {
+				if (!empty($profile['nickname']) && str_starts_with((string) $profile_url, (string) DI::baseUrl())) {
 					$follow_link = 'profile/' . $profile['nickname'] . '/remote_follow';
 				}
 			} else {
 				if ($visitor_is_following) {
-					$unfollow_link = $visitor_base_path . '/contact/unfollow?url=' . urlencode($profile_url) . '&auto=1';
+					$unfollow_link = $visitor_base_path . '/contact/unfollow?url=' . urlencode((string) $profile_url) . '&auto=1';
 				} else {
-					$follow_link = $visitor_base_path . '/contact/follow?binurl=' . bin2hex($profile_url) . '&auto=1';
+					$follow_link = $visitor_base_path . '/contact/follow?binurl=' . bin2hex((string) $profile_url) . '&auto=1';
 				}
 			}
 
@@ -345,8 +348,8 @@ class Profile
 			$change_profile_picture_text = "";
 		}
 
-		// Fetch the account type
-		$account_type = Contact::getAccountType($profile['account-type']);
+		// Fetch the account type name string
+		$account_type_name = Contact::getAccountType($profile['account-type']);
 
 		if (!empty($profile['address']) || !empty($profile['location'])) {
 			$location = DI::l10n()->t('Location:');
@@ -387,7 +390,7 @@ class Profile
 		$contact_count = 0;
 
 		if (!empty($profile['last-item'])) {
-			$updated = date('c', strtotime($profile['last-item']));
+			$updated = date('c', strtotime((string) $profile['last-item']));
 		}
 
 		if (!$block && $show_contacts) {
@@ -434,14 +437,18 @@ class Profile
 			DI::logger()->warning('Missing hidewall key in profile array', ['profile' => $profile]);
 		}
 
+		$always_open_compose = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'always_open_compose', false);
+
 		if ($profile['account-type'] == Contact::TYPE_COMMUNITY) {
 			$mention_label = DI::l10n()->t('Post to group');
 			$mention_url   = 'compose/0?body=!' . $profile['addr'];
-			$network_label = DI::l10n()->t('View group');
+			$network_label = DI::l10n()->t('Group posts');
+			$network_icon  = 'ri-discuss-line';
 		} else {
 			$mention_label = DI::l10n()->t('Mention');
 			$mention_url   = 'compose/0?body=@' . $profile['addr'];
-			$network_label = DI::l10n()->t('Network Posts');
+			$network_label = DI::l10n()->t('Posts');
+			$network_icon  = 'ri-chat-1-line';
 		}
 		$network_url = 'contact/' . $cid . '/conversations';
 
@@ -450,8 +457,14 @@ class Profile
 			$member_since = [ DI::l10n()->t('Joined:'), DI::l10n()->mediumDate($p['register_date']) ];
 		}
 
+		[$administrator, $moderator] = Contact::getType($profile['id'], $profile['url']);
+
 		$tpl = Renderer::getMarkupTemplate('profile/vcard.tpl');
 		$o .= Renderer::replaceMacros($tpl, [
+			'is_admin'           => $administrator,
+			'admin_title'        => DI::l10n()->t('Administrator'),
+			'is_mod'             => $moderator,
+			'moderator_title'    => DI::l10n()->t('Moderator'),
 			'$is_owner'          => DI::userSession()->getLocalUserId() == $profile['uid'],
 			'$profile'           => $p,
 			'$edit_profile_link' => [
@@ -471,7 +484,9 @@ class Profile
 			'$subscribe_feed_link'         => $profile['hidewall'] ?? 0 ? '' : $profile['poll'],
 			'$wallmessage'                 => DI::l10n()->t('Message'),
 			'$wallmessage_link'            => $wallmessage_link,
-			'$account_type'                => $account_type,
+			'$account_type_name'           => $account_type_name,
+			'$account_type'                => $profile['account-type'],
+			'$page_flags'                  => $profile['page-flags'],
 			'$location'                    => $location,
 			'$homepage'                    => $homepage,
 			'$homepage_verified'           => DI::l10n()->t('This website has been verified to belong to the same person.'),
@@ -481,10 +496,12 @@ class Profile
 			'$updated'                     => $updated,
 			'$diaspora'                    => $diaspora,
 			'$contact_block'               => $contact_block,
+			'$always_open_compose'         => $always_open_compose,
 			'$mention_label'               => $mention_label,
 			'$mention_url'                 => $mention_url,
 			'$network_label'               => $network_label,
 			'$network_url'                 => $network_url,
+			'$network_icon'                => $network_icon,
 		]);
 
 		$hook_data = [
@@ -569,7 +586,7 @@ class Profile
 
 			$isToday = false;
 			foreach ($events as $event) {
-				if (strlen($event['name'])) {
+				if (strlen((string) $event['name'])) {
 					$total++;
 				}
 				if ((strtotime($event['start'] . ' +00:00') < $now) && (strtotime($event['finish'] . ' +00:00') > $now)) {
@@ -579,7 +596,7 @@ class Profile
 			$classToday = $isToday ? ' birthday-today ' : '';
 			if ($total) {
 				foreach ($events as $event) {
-					if (!strlen($event['name'])) {
+					if (!strlen((string) $event['name'])) {
 						continue;
 					}
 
@@ -645,7 +662,7 @@ class Profile
 					continue;
 				}
 
-				if (strlen($rr['summary'])) {
+				if (strlen((string) $rr['summary'])) {
 					$total++;
 				}
 
@@ -661,9 +678,6 @@ class Profile
 				}
 
 				$description = BBCode::toPlaintext($rr['desc'], false) . '... ';
-				if (!$description) {
-					$description = DI::l10n()->t('[No description]');
-				}
 
 				$strt = DateTimeFormat::local($rr['start']);
 
@@ -722,7 +736,7 @@ class Profile
 	 *
 	 * @throws \Exception
 	 */
-	public static function searchProfiles(int $start = 0, int $count = 100, string $search = null): array
+	public static function searchProfiles(int $start = 0, int $count = 100, ?string $search = null): array
 	{
 		if (!empty($search)) {
 			$publish    = (DI::config()->get('system', 'publish_all') ? '' : "AND `publish` ");
@@ -792,7 +806,7 @@ class Profile
 		$permissionSet = DI::permissionSet()->selectOrCreate(
 			new PermissionSet(
 				$profile['uid'],
-				array_column($contacts, 'id') ?? [],
+				array_column($contacts, 'id'),
 			),
 		);
 
@@ -860,7 +874,7 @@ class Profile
 		}
 
 		$parent = User::getOwnerDataById($parent_uid);
-		if (strpos($about, (string) $parent['addr']) || strpos($about, (string) $parent['url'])) {
+		if (strpos((string) $about, (string) $parent['addr']) || strpos((string) $about, (string) $parent['url'])) {
 			return $about;
 		}
 

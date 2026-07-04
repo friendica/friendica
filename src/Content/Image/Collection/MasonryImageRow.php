@@ -21,8 +21,11 @@ class MasonryImageRow extends BaseCollection
 	 * @param int|null       $totalCount
 	 * @param float|null     $heightRatio
 	 */
-	public function __construct(array $entities = [], int $totalCount = null, float $heightRatio = null)
-	{
+	public function __construct(
+		array $entities = [],
+		?int $totalCount = null,
+		?float $heightRatio = null,
+	) {
 		parent::__construct($entities, $totalCount);
 
 		$this->heightRatio = $heightRatio;

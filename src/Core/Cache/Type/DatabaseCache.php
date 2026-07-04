@@ -22,18 +22,11 @@ class DatabaseCache extends AbstractCache implements ICanCache
 {
 	public const NAME = 'database';
 
-	/**
-	 * @var Database
-	 */
-	private $dba;
-
 	private CacheRepository $cacheRepo;
 
-	public function __construct(string $hostname, Database $dba)
+	public function __construct(string $hostname, private readonly Database $dba)
 	{
 		parent::__construct($hostname);
-
-		$this->dba = $dba;
 
 		// #TODO: Replace this with constuctor injection
 		$this->cacheRepo = DI::databaseService()->getCacheRepository();

@@ -21,14 +21,14 @@ class EventDispatcherTest extends TestCase
 	{
 		$eventDispatcher = new EventDispatcher();
 
-		$this->assertInstanceOf(EventDispatcherInterface::class, $eventDispatcher);
+		$this->assertInstanceOf(EventDispatcherInterface::class, $eventDispatcher); // @phpstan-ignore method.alreadyNarrowedType
 	}
 
 	public function testDispatchANamedEventUsesNameAsEventName(): void
 	{
 		$eventDispatcher = new EventDispatcher();
 
-		$eventDispatcher->addListener('test', function (NamedEvent $event) {
+		$eventDispatcher->addListener('test', function (NamedEvent $event): void {
 			$this->assertSame('test', $event->getName());
 		});
 

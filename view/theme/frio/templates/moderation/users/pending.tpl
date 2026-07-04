@@ -39,8 +39,8 @@
 					<td>{{$u.name}}</td>
 					<td>{{$u.email}}</td>
 					<td>
-						<a href="{{$baseurl}}/moderation/users/pending/allow/{{$u.uid}}?t={{$form_security_token}}" class="admin-settings-action-link btn btn-sm btn-primary" title="{{$approve}}"><i class="fa fa-check" aria-hidden="true"></i></a>
-						<a href="{{$baseurl}}/moderation/users/pending/deny/{{$u.uid}}?t={{$form_security_token}}" class="admin-settings-action-link btn btn-sm btn-warning" title="{{$deny}}"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+						<a href="{{$baseurl}}/moderation/users/pending/allow/{{$u.uid}}?t={{$form_security_token}}" class="admin-settings-action-link btn btn-sm btn-primary" title="{{$approve}}"><i class="ri ri-check-line" aria-hidden="true"></i></a>
+						<a href="{{$baseurl}}/moderation/users/pending/deny/{{$u.uid}}?t={{$form_security_token}}" class="admin-settings-action-link btn btn-sm btn-warning" title="{{$deny}}"><i class="ri ri-delete-bin-line" aria-hidden="true"></i></a>
 					</td>
 				</tr>
 			{{if $u.note}}
@@ -54,10 +54,10 @@
 			</tbody>
 		</table>
 		<button type="submit" name="page_users_approve" value="1" class="btn btn-primary">
-			<i class="fa fa-check" aria-hidden="true"></i> {{$approve}}
+			<i class="ri ri-check-line" aria-hidden="true"></i> {{$approve}}
 		</button>
 		<button type="submit" name="page_users_deny" value="1" class="btn btn-warning">
-			<i class="fa fa-trash-o" aria-hidden="true"></i> {{$deny}}
+			<i class="ri ri-delete-bin-line" aria-hidden="true"></i> {{$deny}}
 		</button>
 		{{$pager nofilter}}
 	</form>

@@ -17,12 +17,6 @@ use Psr\Log\LoggerInterface;
 class ProfilerLogger implements LoggerInterface
 {
 	/**
-	 * The Logger of the current call
-	 * @var LoggerInterface
-	 */
-	private $logger;
-
-	/**
 	 * The Profiler for the current call
 	 * @var Profiler
 	 */
@@ -33,9 +27,12 @@ class ProfilerLogger implements LoggerInterface
 	 * @param LoggerInterface $logger   The Logger of the current call
 	 * @param Profiler        $profiler The profiler of the current call
 	 */
-	public function __construct(LoggerInterface $logger, Profiler $profiler)
-	{
-		$this->logger   = $logger;
+	public function __construct(/**
+				 * The Logger of the current call
+				 */
+		private readonly LoggerInterface $logger,
+		Profiler $profiler,
+	) {
 		$this->profiler = $profiler;
 	}
 

@@ -12,7 +12,7 @@
 
 		<div class="event-actions">
 			<a class="btn btn-primary photos-upload-link page-action" href="calendar">
-				<i class="fa fa-mail-reply"></i>
+				<i class="ri ri-reply-line"></i>
 				{{$back_text}}
 			</a>
 		</div>
@@ -86,31 +86,31 @@
 				<div id="event-desc-text-edit-bb" class="comment-edit-bb comment-icon-list">
 					<div class="btn-group">
 						<button type="button" class="btn btn-default icon bb-img" style="cursor: pointer;" title="{{$edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="desc">
-							<i class="fa fa-picture-o"></i>
+							<i class="ri ri-image-line"></i>
 						</button>
 						<button type="button" class="btn btn-default emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}">
-							<i class="fa fa-smile-o"></i>
+							<i class="ri ri-emotion-line"></i>
 						</button>
 					</div>
 
 					<div class="btn-group">
 						<button type="button" class="btn btn-default icon bb-url" style="cursor: pointer;" title="{{$edurl}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="desc">
-							<i class="fa fa-link"></i>
+							<i class="ri ri-link"></i>
 						</button>
 						<button type="button" class="btn btn-default icon underline" style="cursor: pointer;" title="{{$eduline}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="desc">
-							<i class="fa fa-underline"></i>
+							<i class="ri ri-underline"></i>
 						</button>
 						<button type="button" class="btn btn-default icon italic" style="cursor: pointer;" title="{{$editalic}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="desc">
-							<i class="fa fa-italic"></i>
+							<i class="ri ri-italic"></i>
 						</button>
 						<button type="button" class="btn btn-default icon bold" style="cursor: pointer;"  title="{{$edbold}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="desc">
-							<i class="fa fa-bold"></i>
+							<i class="ri ri-bold"></i>
 						</button>
 						<button type="button" class="btn btn-default icon quote" style="cursor: pointer;" title="{{$edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="desc">
-							<i class="fa fa-quote-left"></i>
+							<i class="ri ri-double-quotes-l"></i>
 						</button>
 						<button type="button" class="btn btn-default icon code" style="cursor: pointer;" title="{{$edcode}}" data-role="insert-formatting" data-comment=" " data-bbcode="code" data-id="desc">
-							<i class="fa fa-code"></i>
+							<i class="ri ri-code-line"></i>
 						</button>
 					</div>
 				</div>

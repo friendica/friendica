@@ -25,20 +25,9 @@ use Psr\Log\LoggerInterface;
 
 class Redir extends \Friendica\BaseModule
 {
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var Database */
-	private $database;
-	/** @var AppHelper */
-	private $appHelper;
-
-	public function __construct(AppHelper $appHelper, Database $database, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly AppHelper $appHelper, private readonly Database $database, private readonly IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->session    = $session;
-		$this->database   = $database;
-		$this->appHelper  = $appHelper;
 	}
 
 	protected function rawContent(array $request = [])
@@ -86,7 +75,7 @@ class Redir extends \Friendica\BaseModule
 		$this->checkUrl($contact_url, $url);
 		$target_url = $url ?: $contact_url;
 
-		$gserver = $this->database->selectFirst('gserver', ['url', 'network', 'openwebauth'], ['id' => $contact['gsid']]);
+		$gserver  = $this->database->selectFirst('gserver', ['url', 'network', 'openwebauth'], ['id' => $contact['gsid']]);
 		$basepath = $gserver['url'];
 
 		// This part can be removed, when all server entries had been updated. So removing it in 2025 should be safe.
@@ -159,7 +148,7 @@ class Redir extends \Friendica\BaseModule
 
 		if ($this->session->getRemoteUserId()) {
 			$host       = substr($this->baseUrl->getPath() . ($this->baseUrl->getPath() ? '/' . $this->baseUrl->getPath() : ''), strpos($this->baseUrl->getPath(), '://') + 3);
-			$remotehost = substr($contact['addr'], strpos($contact['addr'], '@') + 1);
+			$remotehost = substr((string) $contact['addr'], strpos((string) $contact['addr'], '@') + 1);
 
 			// On a local instance we have to check if the local user has already authenticated
 			// with the local contact. Otherwise, the local user would ask the local contact

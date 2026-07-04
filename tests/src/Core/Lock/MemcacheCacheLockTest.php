@@ -15,10 +15,8 @@ use Friendica\Core\Lock\Type\CacheLock;
 use Friendica\Test\CacheLockTestCase;
 use Mockery;
 
-/**
- * @requires extension Memcache
- * @group MEMCACHE
- */
+#[\PHPUnit\Framework\Attributes\RequiresPhpExtension('Memcache')]
+#[\PHPUnit\Framework\Attributes\Group('MEMCACHE')]
 class MemcacheCacheLockTest extends CacheLockTestCase
 {
 	private CacheLock $lock;
@@ -60,20 +58,14 @@ class MemcacheCacheLockTest extends CacheLockTestCase
 		return $this->cache;
 	}
 
-	/**
-	 * @small
-	 * @doesNotPerformAssertions
-	 */
-	public function testGetLocks()
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+	public function testGetLocks(): void
 	{
 		static::markTestIncomplete('Race condition because of too fast getAllKeys() which uses a workaround');
 	}
 
-	/**
-	 * @small
-	 * @doesNotPerformAssertions
-	 */
-	public function testGetLocksWithPrefix()
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+	public function testGetLocksWithPrefix(): void
 	{
 		static::markTestIncomplete('Race condition because of too fast getAllKeys() which uses a workaround');
 	}

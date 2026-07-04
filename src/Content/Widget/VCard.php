@@ -36,6 +36,8 @@ class VCard
 			DI::logger()->warning('Incomplete contact', ['contact' => $contact]);
 		}
 
+		DI::statusEditor()->registerAssets();
+
 		$contact_url = Contact::getProfileLink($contact);
 
 		if ($contact['network'] != '') {
@@ -54,6 +56,8 @@ class VCard
 		$showgroup_link   = '';
 
 		$photo = Contact::getPhoto($contact);
+
+		$always_open_compose = false;
 
 		if (DI::userSession()->getLocalUserId()) {
 			if (Contact\User::isIsBlocked($contact['id'], DI::userSession()->getLocalUserId())) {
@@ -89,6 +93,8 @@ class VCard
 				$wallmessage_link = 'message/new/' . $id;
 			}
 
+			$always_open_compose = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'always_open_compose', false);
+
 			if ($contact['contact-type'] == Contact::TYPE_COMMUNITY) {
 				if (!$hide_mention) {
 					$mention_label = DI::l10n()->t('Post to group');
@@ -101,28 +107,37 @@ class VCard
 			}
 		}
 
+		[$administrator, $moderator] = Contact::getType($contact['id'], $contact['url']);
+
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('widget/vcard.tpl'), [
-			'$contact'          => $contact,
-			'$photo'            => $photo,
-			'$url'              => Contact::magicLinkByContact($contact, $contact_url),
-			'$about'            => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['about'] ?? ''),
-			'$xmpp'             => DI::l10n()->t('XMPP:'),
-			'$matrix'           => DI::l10n()->t('Matrix:'),
-			'$location'         => DI::l10n()->t('Location:'),
-			'$network_link'     => $network_link,
-			'$network_svg'      => $network_svg,
-			'$network'          => DI::l10n()->t('Network:'),
-			'$account_type'     => Contact::getAccountType($contact['contact-type']),
-			'$follow'           => DI::l10n()->t('Follow'),
-			'$follow_link'      => $follow_link,
-			'$unfollow'         => DI::l10n()->t('Unfollow'),
-			'$unfollow_link'    => $unfollow_link,
-			'$wallmessage'      => DI::l10n()->t('Message'),
-			'$wallmessage_link' => $wallmessage_link,
-			'$mention'          => $mention_label,
-			'$mention_link'     => $mention_link,
-			'$showgroup'        => DI::l10n()->t('View group'),
-			'$showgroup_link'   => $showgroup_link,
+			'$contact'             => $contact,
+			'$is_admin'            => $administrator,
+			'$admin_title'         => DI::l10n()->t('Administrator'),
+			'$is_mod'              => $moderator,
+			'$moderator_title'     => DI::l10n()->t('Moderator'),
+			'$photo'               => $photo,
+			'$url'                 => Contact::magicLinkByContact($contact, $contact_url),
+			'$about'               => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['about'] ?? ''),
+			'$xmpp'                => DI::l10n()->t('XMPP:'),
+			'$matrix'              => DI::l10n()->t('Matrix:'),
+			'$location'            => DI::l10n()->t('Location:'),
+			'$network_link'        => $network_link,
+			'$network_svg'         => $network_svg,
+			'$network'             => DI::l10n()->t('Network:'),
+			'$account_type_name'   => Contact::getAccountType($contact['contact-type']),
+			'$account_type'        => $contact['contact-type'],
+			'$manually_approve'    => $contact['manually-approve'],
+			'$follow'              => DI::l10n()->t('Follow'),
+			'$follow_link'         => $follow_link,
+			'$unfollow'            => DI::l10n()->t('Unfollow'),
+			'$unfollow_link'       => $unfollow_link,
+			'$wallmessage'         => DI::l10n()->t('Message'),
+			'$wallmessage_link'    => $wallmessage_link,
+			'$always_open_compose' => $always_open_compose,
+			'$mention'             => $mention_label,
+			'$mention_link'        => $mention_link,
+			'$showgroup'           => DI::l10n()->t('Group posts'),
+			'$showgroup_link'      => $showgroup_link,
 		]);
 	}
 }

@@ -11,11 +11,11 @@ For example, for moving to profile page in Firefox, press these three keys simul
 
 ## General
 
-* p - Profile
-* n - Network
+* n - Home
 * l - Channel
 * c - Community
 * s - Search
+* b - Back to my instance (only when remotely signed in on another instance)
 * a - Admin
 * m - Moderation
 * f - Notifications

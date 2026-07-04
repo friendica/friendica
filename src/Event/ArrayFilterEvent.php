@@ -172,13 +172,9 @@ final class ArrayFilterEvent extends Event
 
 	public const DB_VIEW_DEFINITION = 'friendica.data.db_view_definition';
 
-	private array $array;
-
-	public function __construct(string $name, array $array)
+	public function __construct(string $name, private array $array)
 	{
 		parent::__construct($name);
-
-		$this->array = $array;
 	}
 
 	public function getArray(): array

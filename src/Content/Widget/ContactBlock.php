@@ -28,7 +28,7 @@ class ContactBlock
 	 *
 	 * @return string Formatted HTML code or empty string
 	 */
-	public static function getHTML(array $profile, int $visitor_uid = null): string
+	public static function getHTML(array $profile, ?int $visitor_uid = null): string
 	{
 		$o = '';
 

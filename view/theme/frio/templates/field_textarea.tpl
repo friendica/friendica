@@ -13,31 +13,31 @@
 		<div class="comment-icon-list">
 			<div class="btn-group">
 				<button type="button" class="btn btn-default icon bb-img" style="cursor: pointer;" title="{{$field.7.edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="id_{{$field.0}}">
-					<i class="fa fa-picture-o"></i>
+					<i class="ri ri-image-line"></i>
 				</button>
 				<button type="button" class="btn btn-default emojis" style="cursor: pointer;" aria-label="{{$field.7.edemojis}}" title="{{$edemojis}}">
-					<i class="fa fa-smile-o"></i>
+					<i class="ri ri-emotion-line"></i>
 				</button>
 			</div>
 
 			<div class="btn-group">
 				<button type="button" class="btn btn-default icon bb-url" style="cursor: pointer;" title="{{$field.7.edurl}}" data-role="insert-formatting" data-comment=" " data-bbcode="url" data-id="id_{{$field.0}}">
-					<i class="fa fa-link"></i>
+					<i class="ri ri-link"></i>
 				</button>
 				<button type="button" class="btn btn-default icon underline" style="cursor: pointer;" title="{{$field.7.eduline}}" data-role="insert-formatting" data-comment=" " data-bbcode="u" data-id="id_{{$field.0}}">
-					<i class="fa fa-underline"></i>
+					<i class="ri ri-underline"></i>
 				</button>
 				<button type="button" class="btn btn-default icon italic" style="cursor: pointer;" title="{{$field.7.editalic}}" data-role="insert-formatting" data-comment=" " data-bbcode="i" data-id="id_{{$field.0}}">
-					<i class="fa fa-italic"></i>
+					<i class="ri ri-italic"></i>
 				</button>
 				<button type="button" class="btn btn-default icon bold" style="cursor: pointer;"  title="{{$field.7.edbold}}" data-role="insert-formatting" data-comment=" " data-bbcode="b" data-id="id_{{$field.0}}">
-					<i class="fa fa-bold"></i>
+					<i class="ri ri-bold"></i>
 				</button>
 				<button type="button" class="btn btn-default icon quote" style="cursor: pointer;" title="{{$field.7.edquote}}" data-role="insert-formatting" data-comment=" " data-bbcode="quote" data-id="id_{{$field.0}}">
-					<i class="fa fa-quote-left"></i>
+					<i class="ri ri-double-quotes-l"></i>
 				</button>
 				<button type="button" class="btn btn-default icon code" style="cursor: pointer;" title="{{$field.7.edcode}}" data-role="insert-formatting" data-comment=" " data-bbcode="code" data-id="id_{{$field.0}}">
-					<i class="fa fa-code"></i>
+					<i class="ri ri-code-line"></i>
 				</button>
 			</div>
 		</div>

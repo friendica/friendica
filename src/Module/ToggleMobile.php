@@ -22,14 +22,9 @@ use Psr\Log\LoggerInterface;
  */
 class ToggleMobile extends BaseModule
 {
-	/** @var IHandleSessions */
-	private $session;
-
-	public function __construct(IHandleSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Util\Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly IHandleSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Util\Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->session = $session;
 	}
 
 	protected function rawContent(array $request = [])
@@ -44,6 +39,6 @@ class ToggleMobile extends BaseModule
 
 		$this->session->set('show-mobile', !isset($request['off']));
 
-		System::externalRedirect((string)$uri);
+		System::externalRedirect((string) $uri);
 	}
 }

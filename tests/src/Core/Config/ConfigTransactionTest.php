@@ -10,48 +10,36 @@ namespace Friendica\Test\src\Core\Config;
 use Friendica\Core\Config\Capability\ISetConfigValuesTransactionally;
 use Friendica\Core\Config\Model\DatabaseConfig;
 use Friendica\Core\Config\Model\ConfigTransaction;
-use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Database\Database;
 use Friendica\Test\FixtureTestCase;
-use Mockery\Exception\InvalidCountException;
 
 class ConfigTransactionTest extends FixtureTestCase
 {
-	/** @var ConfigFileManager */
-	protected $configFileManager;
-
 	protected function setUp(): void
 	{
 		parent::setUp();
-
-		$this->configFileManager = new ConfigFileManager(
-			$this->root->url(),
-			$this->root->url() . '/addon',
-			$this->root->url() . '/config',
-			$this->root->url() . '/static'
-		);
 	}
 
 	public function dataTests(): array
 	{
 		return [
 			'default' => [
-				'data' => include dirname(__FILE__, 4) . '/datasets/B.node.config.php',
-			]
+				'data' => include dirname(__FILE__, 4) . '/Fixtures/B.node.config.php',
+			],
 		];
 	}
 
-	public function testInstance()
+	public function testInstance(): void
 	{
 		$config            = new DatabaseConfig($this->dice->create(Database::class), new Cache());
 		$configTransaction = new ConfigTransaction($config);
 
-		self::assertInstanceOf(ISetConfigValuesTransactionally::class, $configTransaction);
-		self::assertInstanceOf(ConfigTransaction::class, $configTransaction);
+		self::assertInstanceOf(ISetConfigValuesTransactionally::class, $configTransaction); // @phpstan-ignore staticMethod.alreadyNarrowedType
+		self::assertInstanceOf(ConfigTransaction::class, $configTransaction); // @phpstan-ignore staticMethod.alreadyNarrowedType
 	}
 
-	public function testConfigTransaction()
+	public function testConfigTransaction(): void
 	{
 		$config = new DatabaseConfig($this->dice->create(Database::class), new Cache());
 		$config->set('config', 'key1', 'value1');
@@ -86,29 +74,17 @@ class ConfigTransactionTest extends FixtureTestCase
 		self::assertNull($config->get('system', 'keyDel'));
 		self::assertNull($config->get('delete', 'keyDel'));
 		// the whole category should be gone
-		self::assertNull($tempData['delete'] ?? null);
 	}
 
 	/**
-	 * This test asserts that in empty transactions, no saveData is called, thus no config file writing was performed
+	 * This test asserts that in empty transactions, no setAndSave is called thus no config writing was performed
 	 */
-	public function testNothingToDo()
+	public function testNothingToDo(): void
 	{
-		$this->configFileManager = \Mockery::spy(ConfigFileManager::class);
+		$config = $this->createMock(DatabaseConfig::class);
+		$config->expects(self::never())->method('setAndSave');
 
-		$config            = new DatabaseConfig($this->dice->create(Database::class), new Cache());
 		$configTransaction = new ConfigTransaction($config);
-
-		// commit empty transaction
 		$configTransaction->commit();
-
-		try {
-			$this->configFileManager->shouldNotHaveReceived('saveData');
-		} catch (InvalidCountException $exception) {
-			self::fail($exception);
-		}
-
-		// If not failed, the test ends successfully :)
-		self::assertTrue(true);
 	}
 }

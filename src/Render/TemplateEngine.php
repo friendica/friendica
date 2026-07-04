@@ -13,7 +13,7 @@ namespace Friendica\Render;
 abstract class TemplateEngine
 {
 	/** @var string */
-	static $name;
+	public static $name;
 
 	/** @var string */
 	protected $theme;
@@ -33,7 +33,7 @@ abstract class TemplateEngine
 	 * @param array|null $errors
 	 * @return void
 	 */
-	abstract public function testInstall(array &$errors = null);
+	abstract public function testInstall(?array &$errors = null);
 
 	/**
 	 * Returns the rendered template output from the template string and variables

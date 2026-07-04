@@ -17,11 +17,6 @@ class Typo extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/**
-	 * @var IManageConfigValues
-	 */
-	private $config;
-
 	protected function getHelp()
 	{
 		$help = <<<HELP
@@ -39,11 +34,11 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(IManageConfigValues $config, array $argv = null)
-	{
+	public function __construct(
+		private readonly IManageConfigValues $config,
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->config = $config;
 	}
 
 	protected function doExecute(): int
@@ -67,7 +62,7 @@ HELP;
 		$Iterator = new \RecursiveDirectoryIterator('src');
 
 		foreach (new \RecursiveIteratorIterator($Iterator) as $file) {
-			if (str_ends_with($file, '.php')) {
+			if (str_ends_with((string) $file, '.php')) {
 				$this->checkFile($php_path, $file);
 			}
 		}
@@ -79,7 +74,7 @@ HELP;
 		$Iterator = new \RecursiveDirectoryIterator('tests');
 
 		foreach (new \RecursiveIteratorIterator($Iterator) as $file) {
-			if (str_ends_with($file, '.php')) {
+			if (str_ends_with((string) $file, '.php')) {
 				$this->checkFile($php_path, $file);
 			}
 		}

@@ -1,0 +1,283 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2024 the Friendica project
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/* Compatibility layer for legacy Vier icon class names using Remix Icon */
+[class^="icon-"],
+[class*=" icon-"] {
+	font-family: remixicon;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: inherit;
+	vertical-align: top;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+[class^="icon-"]::before,
+[class*=" icon-"]::before,
+.small-pencil::before,
+.savedsearchdrop::before {
+	font-family: remixicon;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: inherit;
+	vertical-align: top;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon::before {
+	font-family: remixicon;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: inherit;
+	vertical-align: top;
+	font-size: 1.2em;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-large::before {
+	font-size: 1.2em;
+}
+
+.icon-reorder::before {
+	content: "\ef3e";
+}
+
+.icon-home::before,
+.icon.home::before {
+	content: "\ee2b";
+}
+
+.icon-th::before {
+	content: "\ee90";
+}
+
+.icon-calendar::before {
+	content: "\eb27";
+}
+
+.icon-bullseye::before {
+	content: "\ed4c";
+}
+
+.icon-question::before,
+.icon-question-sign::before {
+	content: "\f045";
+}
+
+.icon-envelope::before,
+.icon-envelope-alt::before,
+.icon.mail::before {
+	content: "\eef6";
+}
+
+.icon-bell::before,
+.icon.notify::before {
+	content: "\ef94";
+}
+
+.icon.notify.show::before {
+	content: "\ef93";
+}
+
+.icon-sliders::before {
+	content: "\f0e6";
+}
+
+.icon-trash::before,
+.icon.delete::before,
+.icon.drop::before,
+.icon.drophide::before,
+.savedsearchdrop::before,
+.mail-list-delete-icon::before {
+	content: "\ec2a";
+}
+
+.icon-edit::before,
+.icon.edit::before,
+.icon.pencil::before,
+.small-pencil::before {
+	content: "\efe0";
+}
+
+.icon-link::before,
+.icon.link::before,
+.icon.remote-link::before {
+	content: "\eeb2";
+}
+
+.icon-picture::before,
+.icon.camera::before {
+	content: "\ee4b";
+}
+
+.icon-underline::before {
+	content: "\f244";
+}
+
+.icon-italic::before {
+	content: "\ee6b";
+}
+
+.icon-bold::before {
+	content: "\ead1";
+}
+
+.icon-quote-left::before {
+	content: "\ec51";
+}
+
+.icon-smile::before,
+.icon.smile::before {
+	content: "\ec90";
+}
+
+.icon.commenting::before {
+	content: "\eb51";
+}
+
+.icon-commenting::before {
+	content: "\eb51";
+}
+
+.icon-ok::before {
+	content: "\eb7b";
+}
+
+.icon-remove::before {
+	content: "\eb99";
+}
+
+.icon-remove-circle::before {
+	content: "\eb97";
+}
+
+.icon-circle::before {
+	content: "\f3c1";
+}
+
+.icon-thumbs-up::before {
+	content: "\f207";
+}
+
+.icon-thumbs-down::before {
+	content: "\f205";
+}
+
+.icon-retweet::before {
+	content: "\f074";
+}
+
+.icon-share::before {
+	content: "\f0fe";
+}
+
+.icon-tags::before {
+	content: "\f023";
+}
+
+.icon-folder-close::before {
+	content: "\ed6a";
+}
+
+.icon-bookmark::before {
+	content: "\eae5";
+}
+
+.icon-bookmark-empty::before {
+	content: "\eae4";
+}
+
+.icon-bell-slash::before {
+	content: "\ef9c";
+}
+
+.icon-bell-slash-o::before {
+	content: "\ef94";
+}
+
+.icon-flag::before {
+	content: "\ed3b";
+}
+
+.icon-spinner::before {
+	content: "\eec6";
+}
+
+.icon-plane::before {
+	content: "\f0da";
+}
+
+.icon.lock::before {
+	content: "\eece";
+}
+
+.icon.star::before {
+	content: "\f18b";
+}
+
+.icon.like::before {
+	content: "\f207";
+}
+
+.icon.dislike::before {
+	content: "\f205";
+}
+
+.icon.globe::before {
+	content: "\edcf";
+}
+
+.icon.noglobe::before,
+.icon.block::before {
+	content: "\ed93";
+}
+
+.icon.attach::before {
+	content: "\ea84";
+}
+
+.icon.audio::before,
+.icon.type-audio::before {
+	content: "\ef83";
+}
+
+.icon.video::before,
+.icon.type-video::before {
+	content: "\ef81";
+}
+
+.icon.type-image::before {
+	content: "\ee4b";
+}
+
+.icon.type-text::before {
+	content: "\ed0f";
+}
+
+.icon.type-application::before,
+.icon.type-unkn::before {
+	content: "\ed0f";
+}
+
+.icon-time::before,
+.icon.time::before {
+	content: "\f20f";
+}
+
+.icon.menu::before {
+	content: "\ea4e";
+}
+
+.icon.on::before {
+	content: "\eb81";
+}
+
+.icon.off::before {
+	content: "\eb7f";
+}

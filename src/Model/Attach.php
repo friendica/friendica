@@ -184,7 +184,7 @@ class Attach
 	 * @return boolean|integer Row id on success, False on errors
 	 * @throws InternalServerErrorException
 	 */
-	public static function store(string $data, int $uid, string $filename, string $filetype = '', int $filesize = null, string $allow_cid = '', string $allow_gid = '', string $deny_cid = '', string $deny_gid = '')
+	public static function store(string $data, int $uid, string $filename, string $filetype = '', ?int $filesize = null, string $allow_cid = '', string $allow_gid = '', string $deny_cid = '', string $deny_gid = '')
 	{
 		if ($filetype === '') {
 			$filetype = Mimetype::getContentType($filename);
@@ -263,7 +263,7 @@ class Attach
 	 * @throws InternalServerErrorException
 	 * @see   \Friendica\Database\DBA::update
 	 */
-	public static function update(array $fields, array $conditions, Image $img = null, array $old_fields = []): bool
+	public static function update(array $fields, array $conditions, ?Image $img = null, array $old_fields = []): bool
 	{
 		if (!is_null($img)) {
 			// get items to update
@@ -317,7 +317,7 @@ class Attach
 
 	public static function setPermissionFromBody(array $post)
 	{
-		preg_match_all("/\[attachment\](.*?)\[\/attachment\]/ism", $post['body'], $matches, PREG_SET_ORDER);
+		preg_match_all("/\[attachment\](.*?)\[\/attachment\]/ism", (string) $post['body'], $matches, PREG_SET_ORDER);
 		foreach ($matches as $attachment) {
 			if (DI::baseUrl()->isLocalUrl($attachment[1]) && preg_match('|.*?/attach/(\d+)|', $attachment[1], $match)) {
 				$fields = [

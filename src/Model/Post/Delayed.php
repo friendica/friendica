@@ -142,7 +142,7 @@ class Delayed
 			return [];
 		}
 
-		$parameters = json_decode($worker['parameter'], true);
+		$parameters = json_decode((string) $worker['parameter'], true);
 		if (empty($parameters)) {
 			return [];
 		}

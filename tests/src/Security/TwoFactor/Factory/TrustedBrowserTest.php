@@ -15,17 +15,17 @@ use Psr\Log\NullLogger;
 
 class TrustedBrowserTest extends MockedTestCase
 {
-	public function testCreateFromTableRowSuccess()
+	public function testCreateFromTableRowSuccess(): void
 	{
 		$factory = new TrustedBrowser(new NullLogger());
 
 		$row = [
 			'cookie_hash' => Strings::getRandomHex(),
-			'uid' => 42,
-			'user_agent' => 'PHPUnit',
-			'created' => DateTimeFormat::utcNow(),
-			'trusted' => true,
-			'last_used' => null,
+			'uid'         => 42,
+			'user_agent'  => 'PHPUnit',
+			'created'     => DateTimeFormat::utcNow(),
+			'trusted'     => true,
+			'last_used'   => null,
 		];
 
 		$trustedBrowser = $factory->createFromTableRow($row);
@@ -33,7 +33,7 @@ class TrustedBrowserTest extends MockedTestCase
 		$this->assertEquals($row, $trustedBrowser->toArray());
 	}
 
-	public function testCreateFromTableRowMissingData()
+	public function testCreateFromTableRowMissingData(): void
 	{
 		$this->expectException(\TypeError::class);
 
@@ -41,11 +41,11 @@ class TrustedBrowserTest extends MockedTestCase
 
 		$row = [
 			'cookie_hash' => null,
-			'uid' => null,
-			'user_agent' => null,
-			'created' => null,
-			'trusted' => true,
-			'last_used' => null,
+			'uid'         => null,
+			'user_agent'  => null,
+			'created'     => null,
+			'trusted'     => true,
+			'last_used'   => null,
 		];
 
 		$trustedBrowser = $factory->createFromTableRow($row);
@@ -53,7 +53,7 @@ class TrustedBrowserTest extends MockedTestCase
 		$this->assertEquals($row, $trustedBrowser->toArray());
 	}
 
-	public function testCreateForUserWithUserAgent()
+	public function testCreateForUserWithUserAgent(): void
 	{
 		$factory = new TrustedBrowser(new NullLogger());
 

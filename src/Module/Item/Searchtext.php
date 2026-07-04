@@ -23,14 +23,9 @@ use Psr\Log\LoggerInterface;
  */
 class Searchtext extends BaseModule
 {
-	/** @var IHandleUserSessions */
-	private $session;
-
-	public function __construct(IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(private readonly IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->session = $session;
 	}
 
 	protected function rawContent(array $request = [])
@@ -50,7 +45,7 @@ class Searchtext extends BaseModule
 
 		$search = DBA::selectFirst('post-searchindex', [], ['uri-id' => $item['uri-id']]);
 		if (empty($search)) {
-			throw new HTTPException\NotFoundException();
+			$this->httpExit($this->l10n->t('No search text found for this item. This can happen when the author has set their account to be non-discoverable or their posts to be non-indexable for searches.'));
 		}
 
 		$this->httpExit(Post\Engagement::unescapeKeywords($search['searchtext']));

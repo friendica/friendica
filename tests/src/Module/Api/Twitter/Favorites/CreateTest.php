@@ -28,7 +28,7 @@ class CreateTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiFavoritesCreateDestroyWithInvalidId()
+	public function testApiFavoritesCreateDestroyWithInvalidId(): void
 	{
 		$this->expectException(BadRequestException::class);
 
@@ -41,11 +41,11 @@ class CreateTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiFavoritesCreateDestroyWithCreateAction()
+	public function testApiFavoritesCreateDestroyWithCreateAction(): void
 	{
 		$response = (new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'id' => 3
+				'id' => 3,
 			]);
 
 		$json = $this->toJson($response);
@@ -58,24 +58,23 @@ class CreateTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiFavoritesCreateDestroyWithCreateActionAndRss()
+	public function testApiFavoritesCreateDestroyWithCreateActionAndRss(): void
 	{
 		$response = (new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => ICanCreateResponses::TYPE_RSS]))
 			->run($this->httpExceptionMock, [
-				'id' => 3
+				'id' => 3,
 			]);
 
 		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 
-		self::assertXml((string)$response->getBody(), 'statuses');
+		self::assertXml((string) $response->getBody(), 'statuses');
 	}
 
 	/**
 	 * Test the api_favorites_create_destroy() function without an authenticated user.
 	 *
-	 * @return void
 	 */
-	public function testApiFavoritesCreateDestroyWithoutAuthenticatedUser()
+	public function testApiFavoritesCreateDestroyWithoutAuthenticatedUser(): void
 	{
 		self::markTestIncomplete('Needs refactoring of Lists - replace filter_input() with $request parameter checks');
 

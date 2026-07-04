@@ -23,7 +23,7 @@ abstract class CacheTestCase extends MockedTestCase
 	protected $instance;
 
 	/**
-	 * @var \Friendica\Core\Cache\Capability\ICanCacheInMemory
+	 * @var \Friendica\Core\Cache\Capability\ICanCache
 	 */
 	protected $cache;
 
@@ -32,7 +32,7 @@ abstract class CacheTestCase extends MockedTestCase
 	 *
 	 * @return array
 	 */
-	public function dataTypesInCache()
+	public static function dataTypesInCache()
 	{
 		return [
 			'string'    => ['data' => 'foobar'],
@@ -51,7 +51,7 @@ abstract class CacheTestCase extends MockedTestCase
 	 *
 	 * @return array
 	 */
-	public function dataSimple()
+	public static function dataSimple()
 	{
 		return [
 			'string' => [
@@ -75,13 +75,11 @@ abstract class CacheTestCase extends MockedTestCase
 	}
 
 	/**
-	 * @small
-	 * @dataProvider dataSimple
-	 *
 	 * @param mixed $value1 a first
 	 * @param mixed $value2 a second
 	 */
-	public function testSimple($value1, $value2)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataSimple')]
+	public function testSimple($value1, $value2, $value3, $value4): void
 	{
 		self::assertNull($this->instance->get('value1'));
 
@@ -105,15 +103,14 @@ abstract class CacheTestCase extends MockedTestCase
 	}
 
 	/**
-	 * @small
-	 * @dataProvider dataSimple
 	 *
 	 * @param mixed $value1 a first
 	 * @param mixed $value2 a second
 	 * @param mixed $value3 a third
 	 * @param mixed $value4 a fourth
 	 */
-	public function testClear($value1, $value2, $value3, $value4)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataSimple')]
+	public function testClear($value1, $value2, $value3, $value4): void
 	{
 		$this->instance->set('1_value1', $value1);
 		$this->instance->set('1_value2', $value2);
@@ -161,14 +158,11 @@ abstract class CacheTestCase extends MockedTestCase
 		]);
 	}
 
-	/**
-	 * @medium
-	 */
-	public function testTTL()
+	public function testTTL(): void
 	{
 		static::markTestSkipped('taking too much time without mocking');
 
-		self::assertNull($this->instance->get('value1'));
+		self::assertNull($this->instance->get('value1')); // @phpstan-ignore deadCode.unreachable (skipped test)
 
 		$value = 'foobar';
 		$this->instance->set('value1', $value, 1);
@@ -181,13 +175,10 @@ abstract class CacheTestCase extends MockedTestCase
 	}
 
 	/**
-	 * @small
-	 *
 	 * @param mixed $data the data to store in the cache
-	 *
-	 * @dataProvider dataTypesInCache
 	 */
-	public function testDifferentTypesInCache($data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTypesInCache')]
+	public function testDifferentTypesInCache($data): void
 	{
 		$this->instance->set('val', $data);
 		$received = $this->instance->get('val');
@@ -195,15 +186,12 @@ abstract class CacheTestCase extends MockedTestCase
 	}
 
 	/**
-	 * @small
-	 *
 	 * @param mixed $value1 a first
 	 * @param mixed $value2 a second
 	 * @param mixed $value3 a third
-	 *
-	 * @dataProvider dataSimple
 	 */
-	public function testGetAllKeys($value1, $value2, $value3)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataSimple')]
+	public function testGetAllKeys($value1, $value2, $value3, $value4): void
 	{
 		self::assertTrue($this->instance->set('value1', $value1));
 		self::assertTrue($this->instance->set('value2', $value2));
@@ -222,16 +210,13 @@ abstract class CacheTestCase extends MockedTestCase
 		self::assertNotContains('value2', $list);
 	}
 
-	/**
-	 * @small
-	 */
-	public function testSpaceInKey()
+	public function testSpaceInKey(): void
 	{
 		self::assertTrue($this->instance->set('key space', 'value'));
 		self::assertEquals('value', $this->instance->get('key space'));
 	}
 
-	public function testGetName()
+	public function testGetName(): void
 	{
 		if (defined($this->instance::class . '::NAME')) {
 			self::assertEquals($this->instance::NAME, $this->instance->getName());

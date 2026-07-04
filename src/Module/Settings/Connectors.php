@@ -28,23 +28,9 @@ use Psr\Log\LoggerInterface;
 
 class Connectors extends BaseSettings
 {
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var IManagePersonalConfigValues */
-	private $pconfig;
-	/** @var Database */
-	private $database;
-	/** @var SystemMessages */
-	private $systemMessages;
-
-	public function __construct(SystemMessages $systemMessages, Database $database, IManagePersonalConfigValues $pconfig, IManageConfigValues $config, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly SystemMessages $systemMessages, private readonly Database $database, private readonly IManagePersonalConfigValues $pconfig, private readonly IManageConfigValues $config, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->config         = $config;
-		$this->pconfig        = $pconfig;
-		$this->database       = $database;
-		$this->systemMessages = $systemMessages;
 	}
 
 	protected function post(array $request = [])
@@ -99,9 +85,9 @@ class Connectors extends BaseSettings
 			$this->logger->debug('updating mailaccount', ['response' => $r]);
 			$mailacct = $this->database->selectFirst('mailacct', [], ['uid' => $this->session->getLocalUserId()]);
 			if ($this->database->isResult($mailacct)) {
-				if (strlen($mailacct['server'])) {
+				if (strlen((string) $mailacct['server'])) {
 					$dcrpass = '';
-					openssl_private_decrypt(hex2bin($mailacct['pass']), $dcrpass, $user['prvkey']);
+					openssl_private_decrypt(hex2bin((string) $mailacct['pass']), $dcrpass, $user['prvkey']);
 					$mbox = Email::connect(Email::constructMailboxName($mailacct), $mail_user, $dcrpass);
 					unset($dcrpass);
 					if (!$mbox) {

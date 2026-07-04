@@ -1,0 +1,25 @@
+{
+	"id": "333333333333333333",
+	"uri": null,
+	"url": "https://example.net/@carol/333333333333333333",
+	"spoiler_text": "",
+	"plain_content": "Channel body",
+	"content": "<p>Channel body</p>",
+	"language": null,
+	"reblog": null,
+	"account": {
+		"id": "4000",
+		"username": "carol",
+		"acct": "carol@example.net"
+	},
+	"tags": [
+		{
+			"name": "topic",
+			"url": "https://example.net/tags/topic"
+		}
+	],
+	"mentions": [],
+	"emojis": [],
+	"card": null,
+	"poll": null
+}

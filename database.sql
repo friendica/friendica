@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.08-dev (Blutwurz)
--- DB_UPDATE_VERSION 1595
+-- DB_UPDATE_VERSION 1598
 -- ------------------------------------------
 
 
@@ -393,6 +393,7 @@ CREATE TABLE IF NOT EXISTS `apcontact` (
 	`featured-tags` varbinary(383) COMMENT 'Address for the collection of featured tags',
 	`manually-approve` boolean COMMENT '',
 	`discoverable` boolean COMMENT 'Mastodon extension: true if profile is published in their directory',
+	`indexable` boolean COMMENT 'Mastodon extension: true if public posts may appear in search results',
 	`suspended` boolean COMMENT 'Mastodon extension: true if profile is suspended',
 	`posting-restricted` boolean COMMENT 'lemmy:postingRestrictedToMods',
 	`nick` varchar(255) NOT NULL DEFAULT '' COMMENT '',
@@ -785,6 +786,7 @@ CREATE TABLE IF NOT EXISTS `group` (
 	`id` int unsigned NOT NULL auto_increment COMMENT 'sequential ID',
 	`uid` mediumint unsigned NOT NULL DEFAULT 0 COMMENT 'Owner User id',
 	`visible` boolean NOT NULL DEFAULT '0' COMMENT '1 indicates the member list is not private',
+	`public` boolean NOT NULL DEFAULT '0' COMMENT '1 indicates the circle is public and can be exported',
 	`deleted` boolean NOT NULL DEFAULT '0' COMMENT '1 indicates the circle has been deleted',
 	`cid` int unsigned COMMENT 'Contact id of group. When this field is filled then the members are synced automatically.',
 	`name` varchar(255) NOT NULL DEFAULT '' COMMENT 'human readable name of circle',
@@ -2186,6 +2188,7 @@ CREATE VIEW `channel-post-view` AS SELECT
 	`channel-post`.`uid` AS `uid`,
 	`channel-post`.`uri-id` AS `uri-id`,
 	`channel-post`.`in-timeline` AS `in-timeline`,
+	`post-thread`.`author-id` AS `author-id`,
 	`post-engagement`.`owner-id` AS `contact-id`,
 	`post-engagement`.`owner-id` AS `owner-id`,
 	`post-engagement`.`media-type` AS `media-type`,
@@ -2217,6 +2220,7 @@ CREATE VIEW `system-channel-post-view` AS SELECT
 	`system-channel-post`.`uid` AS `uid`,
 	`system-channel-post`.`uri-id` AS `uri-id`,
 	`system-channel-post`.`in-timeline` AS `in-timeline`,
+	`post-thread`.`author-id` AS `author-id`,
 	`post-engagement`.`owner-id` AS `contact-id`,
 	`post-engagement`.`owner-id` AS `owner-id`,
 	`post-engagement`.`media-type` AS `media-type`,
@@ -2264,6 +2268,7 @@ CREATE VIEW `circle-member-view` AS SELECT
 	`contact`.`contact-type` AS `contact-contact-type`,
 	`group_member`.`gid` AS `circle-id`,
 	`group`.`visible` AS `circle-visible`,
+	`group`.`public` AS `circle-public`,
 	`group`.`deleted` AS `circle-deleted`,
 	`group`.`name` AS `circle-name`
 	FROM `group_member`
@@ -2315,6 +2320,7 @@ CREATE VIEW `post-engagement-user-view` AS SELECT
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
 			AND NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`
+			AND NOT `authorcontact`.`unsearchable` AND NOT `ownercontact`.`unsearchable`
 			AND NOT EXISTS(SELECT `cid`  FROM `user-contact` WHERE `uid` = `post-thread-user`.`uid` AND `cid` IN (`authorcontact`.`id`, `ownercontact`.`id`) AND (`blocked` OR `ignored` OR `is-blocked`))
 			AND NOT EXISTS(SELECT `gsid` FROM `user-gserver` WHERE `uid` = `post-thread-user`.`uid` AND `gsid` IN (`authorcontact`.`gsid`, `ownercontact`.`gsid`) AND `ignored`);
 
@@ -2491,6 +2497,7 @@ CREATE VIEW `post-searchindex-user-view` AS SELECT
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
 			AND NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`
+			AND NOT `authorcontact`.`unsearchable` AND NOT `ownercontact`.`unsearchable`
 			AND NOT EXISTS(SELECT `cid`  FROM `user-contact` WHERE `uid` = `post-thread-user`.`uid` AND `cid` IN (`authorcontact`.`id`, `ownercontact`.`id`) AND (`blocked` OR `ignored` OR `is-blocked`))
 			AND NOT EXISTS(SELECT `gsid` FROM `user-gserver` WHERE `uid` = `post-thread-user`.`uid` AND `gsid` IN (`authorcontact`.`gsid`, `ownercontact`.`gsid`) AND `ignored`);
 
@@ -3673,6 +3680,7 @@ CREATE VIEW `network-thread-view` AS SELECT
 	`post-thread-user`.`mention` AS `mention`,
 	`post-thread-user`.`network` AS `network`,
 	`post-user`.`protocol` AS `protocol`,
+	`post-thread-user`.`author-id` AS `author-id`,
 	`post-thread-user`.`contact-id` AS `contact-id`,
 	`ownercontact`.`contact-type` AS `contact-type`
 	FROM `post-thread-user`
@@ -3703,6 +3711,7 @@ CREATE VIEW `network-thread-circle-view` AS SELECT
 	`post-thread-user`.`mention` AS `mention`,
 	`post-thread-user`.`network` AS `network`,
 	`post-user`.`protocol` AS `protocol`,
+	`post-thread-user`.`author-id` AS `author-id`,
 	`post-thread-user`.`contact-id` AS `contact-id`,
 	`ownercontact`.`contact-type` AS `contact-type`
 	FROM `post-thread-user`

@@ -70,7 +70,7 @@ class Schedule extends BaseProfile
 			// populate our $tags placeholder array:
 			if (!empty($extracted_tags)) {
 				foreach ($extracted_tags as $tag) {
-					$html = '<bdi>' . $tag[1] . '<a href="' . $tag[2] . '" target="_blank" rel="noopener noreferrer">' . $tag[3] . '</a></bdi>';
+					$html = '<bdi><a href="' . $tag[2] . '" target="_blank" rel="noopener noreferrer">' . $tag[1] . $tag[3] . '</a></bdi>';
 					if ($tag[1] == "#") {
 						$tags['hashtags'][] = $html;
 					} elseif ($tag[1] == "@") {

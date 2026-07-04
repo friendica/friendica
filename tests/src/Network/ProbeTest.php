@@ -97,10 +97,7 @@ class ProbeTest extends MockedTestCase
 		return $template;
 	}
 
-	/**
-	 * @small
-	 */
-	public function testGetFeedLinkNoBase()
+	public function testGetFeedLinkNoBase(): void
 	{
 		foreach (self::EXPECTED as $url => $hrefs) {
 			foreach ($hrefs as $href => $expected) {
@@ -113,10 +110,7 @@ class ProbeTest extends MockedTestCase
 		}
 	}
 
-	/**
-	 * @small
-	 */
-	public function testGetFeedLinkBase()
+	public function testGetFeedLinkBase(): void
 	{
 		foreach (self::EXPECTED as $url => $hrefs) {
 			foreach ($hrefs as $href => $expected) {
@@ -129,7 +123,7 @@ class ProbeTest extends MockedTestCase
 		}
 	}
 
-	public function dataCleanUri(): array
+	public static function dataCleanUri(): array
 	{
 		return [
 			'@-first' => [
@@ -158,15 +152,13 @@ class ProbeTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataCleanUri
-	 */
-	public function testCleanUri(string $expected, string $uri)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataCleanUri')]
+	public function testCleanUri(string $expected, string $uri): void
 	{
 		self::assertEquals($expected, Probe::cleanURI($uri));
 	}
 
-	public function dataUri(): array
+	public static function dataUri(): array
 	{
 		return [
 			'Artists4Future_Muenchen@climatejustice.global' => [
@@ -208,10 +200,8 @@ xQIDAQAB
 		];
 	}
 
-	/**
-	 * @dataProvider dataUri
-	 */
-	public function testProbeUri(string $uri, array $assertInfos)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataUri')]
+	public function testProbeUri(string $uri, array $assertInfos): void
 	{
 		self::markTestIncomplete('hard work due mocking 19 different http-requests');
 
@@ -259,7 +249,7 @@ xQIDAQAB
 		 *
 		 */
 
-		$container = [];
+		$container = []; // @phpstan-ignore deadCode.unreachable (skipped test)
 		$history   = Middleware::history($container);
 
 		$this->httpRequestHandler->push($history);

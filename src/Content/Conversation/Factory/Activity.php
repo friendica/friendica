@@ -23,26 +23,15 @@ use Psr\Log\LoggerInterface;
 /**
  * Activity factory class.
  */
-final class Activity
+final readonly class Activity
 {
-	private ActivityRepository $activityRepository;
-	private UserDefinedChannel $channelRepository;
-	private Database $database;
-	private LoggerInterface $logger;
-
 	/**
 	 * ActivityFactory constructor.
 	 *
 	 * @param ActivityRepository $activityRepository
 	 * @param UserDefinedChannel $channelRepository
 	 */
-	public function __construct(ActivityRepository $activityRepository, UserDefinedChannel $channelRepository, Database $database, LoggerInterface $logger)
-	{
-		$this->activityRepository = $activityRepository;
-		$this->channelRepository  = $channelRepository;
-		$this->database           = $database;
-		$this->logger             = $logger;
-	}
+	public function __construct(private ActivityRepository $activityRepository, private UserDefinedChannel $channelRepository, private Database $database, private LoggerInterface $logger) {}
 
 	/**
 	 * Get activities for a user and network.
@@ -194,23 +183,12 @@ final class Activity
 	 */
 	private function setNetworkFilter(array $condition, string $network): array
 	{
-		switch ($network) {
-			case '':
-			case Protocol::DFRN:
-				$network_condition = ["(`network` IN (?, ?, ?) OR `network` IS NULL)", Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA];
-				break;
-
-			case Protocol::ACTIVITYPUB:
-				$network_condition = ["(`network` IN (?, ?) OR `network` IS NULL)", Protocol::ACTIVITYPUB, Protocol::DFRN];
-				break;
-
-			case Protocol::DIASPORA:
-				$network_condition = ["(`network` IN (?, ?) OR `network` IS NULL)", Protocol::DFRN, Protocol::DIASPORA];
-				break;
-
-			default:
-				$network_condition = ["(`network` = ? OR `network` IS NULL)", $network];
-		}
+		$network_condition = match ($network) {
+			'', Protocol::DFRN => ["(`network` IN (?, ?, ?) OR `network` IS NULL)", Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA],
+			Protocol::ACTIVITYPUB => ["(`network` IN (?, ?) OR `network` IS NULL)", Protocol::ACTIVITYPUB, Protocol::DFRN],
+			Protocol::DIASPORA    => ["(`network` IN (?, ?) OR `network` IS NULL)", Protocol::DFRN, Protocol::DIASPORA],
+			default               => ["(`network` = ? OR `network` IS NULL)", $network],
+		};
 
 		return DBA::mergeConditions($condition, $network_condition);
 	}

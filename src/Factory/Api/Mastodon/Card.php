@@ -29,12 +29,12 @@ class Card extends BaseFactory
 			return new \Friendica\Object\Api\Mastodon\Card([], $history);
 		}
 
-		$parts = parse_url($media[0]['url']);
+		$parts = parse_url((string) $media[0]['url']);
 		if (!empty($parts['scheme']) && !empty($parts['host'])) {
 			if (empty($media[0]['publisher-name'])) {
 				$media[0]['publisher-name'] = $parts['host'];
 			}
-			if (empty($media[0]['publisher-url']) || empty(parse_url($media[0]['publisher-url'], PHP_URL_SCHEME))) {
+			if (empty($media[0]['publisher-url']) || empty(parse_url((string) $media[0]['publisher-url'], PHP_URL_SCHEME))) {
 				$media[0]['publisher-url'] = $parts['scheme'] . '://' . $parts['host'];
 
 				if (!empty($parts['port'])) {

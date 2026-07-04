@@ -156,9 +156,29 @@ abstract class DI
 		return self::$dice->create(Content\Item::class);
 	}
 
-	public static function conversation(): Content\Conversation
+	public static function activityFormatter(): Content\Conversation\ActivityFormatter
 	{
-		return self::$dice->create(Content\Conversation::class);
+		return self::$dice->create(Content\Conversation\ActivityFormatter::class);
+	}
+
+	public static function postTemplateBuilder(): Content\Conversation\PostTemplateBuilder
+	{
+		return self::$dice->create(Content\Conversation\PostTemplateBuilder::class);
+	}
+
+	public static function conversationDataProvider(): Content\Conversation\ConversationDataProvider
+	{
+		return self::$dice->create(Content\Conversation\ConversationDataProvider::class);
+	}
+
+	public static function conversationRenderer(): Content\Conversation\ConversationRenderer
+	{
+		return self::$dice->create(Content\Conversation\ConversationRenderer::class);
+	}
+
+	public static function statusEditor(): Content\Conversation\StatusEditor
+	{
+		return self::$dice->create(Content\Conversation\StatusEditor::class);
 	}
 
 	public static function bbCodeVideo(): Content\Text\BBCode\Video

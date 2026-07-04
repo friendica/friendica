@@ -85,9 +85,9 @@ class NPF
 			$bbcode = $shared['shared'];
 		}
 
-		$bbcode = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', $bbcode);
+		$bbcode = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]/ism", '[img]$3[/img]', (string) $bbcode);
 
-		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img=([^\[\]]*)\]([^\[\]]*)\[\/img\]\s*\[/url\]#ism", $bbcode, $pictures, PREG_SET_ORDER)) {
+		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img=([^\[\]]*)\]([^\[\]]*)\[\/img\]\s*\[/url\]#ism", (string) $bbcode, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				if (preg_match('#/photo/.*-[01]\.#ism', $picture[2]) && (preg_match('#/photo/.*-0\.#ism', $picture[1]) || preg_match('#/photos/.*/image/#ism', $picture[1]))) {
 					$bbcode = str_replace($picture[0], "\n\n[img=" . str_replace('-1.', '-0.', $picture[2]) . "]" . $picture[3] . "[/img]\n\n", $bbcode);
@@ -95,9 +95,9 @@ class NPF
 			}
 		}
 
-		$bbcode = preg_replace("/\[img\=(.*?)\](.*?)\[\/img\]/ism", "\n\n[img=$1]$2[/img]\n\n", $bbcode);
+		$bbcode = preg_replace("/\[img\=(.*?)\](.*?)\[\/img\]/ism", "\n\n[img=$1]$2[/img]\n\n", (string) $bbcode);
 
-		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img\]([^\[]+?)\[/img\]\s*\[/url\]#ism", $bbcode, $pictures, PREG_SET_ORDER)) {
+		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img\]([^\[]+?)\[/img\]\s*\[/url\]#ism", (string) $bbcode, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				if (preg_match('#/photo/.*-[01]\.#ism', $picture[2]) && (preg_match('#/photo/.*-0\.#ism', $picture[1]) || preg_match('#/photos/.*/image/#ism', $picture[1]))) {
 					$bbcode = str_replace($picture[0], "\n\n[img]" . str_replace('-1.', '-0.', $picture[2]) . "[/img]\n\n", $bbcode);
@@ -105,7 +105,7 @@ class NPF
 			}
 		}
 
-		$bbcode = preg_replace("/\[img\](.*?)\[\/img\]/ism", "\n\n[img]$1[/img]\n\n", $bbcode);
+		$bbcode = preg_replace("/\[img\](.*?)\[\/img\]/ism", "\n\n[img]$1[/img]\n\n", (string) $bbcode);
 
 		do {
 			$oldbbcode = $bbcode;
@@ -296,8 +296,8 @@ class NPF
 		if (!empty($type)) {
 			$formatting[] = [
 				'start' => $start,
-				'end'   => mb_strlen($text),
-				'type'  => $type
+				'end'   => mb_strlen((string) $text),
+				'type'  => $type,
 			];
 		}
 		return [$npf, $text, $formatting];
@@ -327,9 +327,9 @@ class NPF
 		if (!empty($attributes['href'])) {
 			$formatting[] = [
 				'start' => $start,
-				'end'   => mb_strlen($text),
+				'end'   => mb_strlen((string) $text),
 				'type'  => 'link',
-				'url'   => $attributes['href']
+				'url'   => $attributes['href'],
 			];
 		}
 		return [$npf, $text, $formatting];
@@ -408,7 +408,7 @@ class NPF
 	private static function addLinkBlockForUriId(int $uri_id, int $level, array $npf): array
 	{
 		foreach (Post\Media::getByURIId($uri_id, [Post\Media::HTML]) as $link) {
-			$host = parse_url($link['url'], PHP_URL_HOST);
+			$host = parse_url((string) $link['url'], PHP_URL_HOST);
 			if (in_array($host, ['www.youtube.com', 'youtu.be'])) {
 				$block = [
 					'type'     => 'video',
@@ -554,7 +554,7 @@ class NPF
 						'media' => [
 							'type' => $media['mimetype'],
 							'url'  => $media['url'],
-						]
+						],
 					];
 
 					if (!empty($media['name'])) {
@@ -572,7 +572,7 @@ class NPF
 						'media' => [
 							'type' => $media['mimetype'],
 							'url'  => $media['url'],
-						]
+						],
 					];
 
 					$block = self::addPoster($media, $block);
@@ -587,9 +587,9 @@ class NPF
 						'start' => 0,
 						'end'   => mb_strlen($element->textContent),
 						'type'  => 'link',
-						'url'   => $attributes['src']
-					]
-				]
+						'url'   => $attributes['src'],
+					],
+				],
 			];
 		}
 

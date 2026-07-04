@@ -18,7 +18,7 @@ use ParagonIE\HiddenString\HiddenString;
 class Cache
 {
 	/** @var int[] A list of valid config source  */
-	const VALID_SOURCES = [
+	public const VALID_SOURCES = [
 		self::SOURCE_STATIC,
 		self::SOURCE_FILE,
 		self::SOURCE_DATA,
@@ -27,18 +27,18 @@ class Cache
 	];
 
 	/** @var int Indicates that the cache entry is a default value - Lowest Priority */
-	const SOURCE_STATIC = 0;
+	public const SOURCE_STATIC = 0;
 	/** @var int Indicates that the cache entry is set by file - Low Priority */
-	const SOURCE_FILE = 1;
+	public const SOURCE_FILE = 1;
 	/** @var int Indicates that the cache entry is manually set by the application (per admin page/console) - Middle Priority */
-	const SOURCE_DATA = 2;
+	public const SOURCE_DATA = 2;
 	/** @var int Indicates that the cache entry is set by a server environment variable - High Priority */
-	const SOURCE_ENV = 3;
+	public const SOURCE_ENV = 3;
 	/** @var int Indicates that the cache entry is fixed and must not be changed */
-	const SOURCE_FIX = 5;
+	public const SOURCE_FIX = 5;
 
 	/** @var int Default value for a config source */
-	const SOURCE_DEFAULT = self::SOURCE_FILE;
+	public const SOURCE_DEFAULT = self::SOURCE_FILE;
 
 	/**
 	 * @var array
@@ -56,18 +56,12 @@ class Cache
 	private $delConfig = [];
 
 	/**
-	 * @var bool
-	 */
-	private $hidePasswordOutput;
-
-	/**
 	 * @param array $config             A initial config array
 	 * @param bool  $hidePasswordOutput True, if cache variables should take extra care of password values
 	 * @param int   $source             Sets a source of the initial config values
 	 */
-	public function __construct(array $config = [], bool $hidePasswordOutput = true, int $source = self::SOURCE_DEFAULT)
+	public function __construct(array $config = [], private readonly bool $hidePasswordOutput = true, int $source = self::SOURCE_DEFAULT)
 	{
-		$this->hidePasswordOutput = $hidePasswordOutput;
 		$this->load($config, $source);
 	}
 
@@ -173,16 +167,16 @@ class Cache
 			$this->source[$cat] = [];
 		}
 
-		if (isset($this->source[$cat][$key]) &&
-			$source < $this->source[$cat][$key]) {
+		if (isset($this->source[$cat][$key])
+			&& $source < $this->source[$cat][$key]) {
 			return false;
 		}
 
-		if ($this->hidePasswordOutput &&
-			$key == 'password' &&
-			is_string($value)) {
-			$this->config[$cat][$key] = new HiddenString((string)$value);
-		} else if (is_string($value)) {
+		if ($this->hidePasswordOutput
+			&& $key == 'password'
+			&& is_string($value)) {
+			$this->config[$cat][$key] = new HiddenString((string) $value);
+		} elseif (is_string($value)) {
 			$this->config[$cat][$key] = self::toConfigValue($value);
 		} else {
 			$this->config[$cat][$key] = $value;
@@ -327,7 +321,7 @@ class Cache
 			}
 		}
 
-		$newCache = new Cache();
+		$newCache         = new Cache();
 		$newCache->config = $newConfig;
 		$newCache->source = $newSource;
 

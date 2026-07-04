@@ -16,7 +16,7 @@ class Map
 {
 	public static function byCoordinates($coord, $html_mode = 0)
 	{
-		$coord = trim($coord);
+		$coord = trim((string) $coord);
 		$coord = str_replace([',','/','  '], [' ',' ',' '], $coord);
 		$arr   = ['lat' => trim(substr($coord, 0, strpos($coord, ' '))), 'lon' => trim(substr($coord, strpos($coord, ' ') + 1)), 'mode' => $html_mode, 'html' => ''];
 		Hook::callAll('generate_map', $arr);

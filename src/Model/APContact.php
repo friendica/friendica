@@ -54,7 +54,7 @@ class APContact
 			return $data;
 		}
 
-		$webfinger = Probe::getWebfingerArray($addr);
+		$webfinger = Probe::getWebfingerArray($addr, false);
 		if (empty($webfinger['webfinger']['links'])) {
 			return [];
 		}
@@ -159,7 +159,7 @@ class APContact
 			$apcontact['addr'] = '';
 		}
 
-		if (!isset($apcontact['baseurl']) && empty(parse_url($url, PHP_URL_PATH))) {
+		if (!isset($apcontact['baseurl']) && empty(parse_url((string) $url, PHP_URL_PATH))) {
 			$apcontact['baseurl'] = $url;
 		}
 
@@ -263,11 +263,11 @@ class APContact
 
 		if (!empty($ims)) {
 			foreach ($ims as $link) {
-				if (str_starts_with($link, 'xmpp:')) {
-					$apcontact['xmpp'] = substr($link, 5);
+				if (str_starts_with((string) $link, 'xmpp:')) {
+					$apcontact['xmpp'] = substr((string) $link, 5);
 				}
-				if (str_starts_with($link, 'matrix:')) {
-					$apcontact['matrix'] = substr($link, 7);
+				if (str_starts_with((string) $link, 'matrix:')) {
+					$apcontact['matrix'] = substr((string) $link, 7);
 				}
 			}
 		}
@@ -305,6 +305,30 @@ class APContact
 			$apcontact['alias'] = JsonLD::fetchElement($compacted, 'as:url', '@id');
 			if (is_array($apcontact['alias'])) {
 				$apcontact['alias'] = JsonLD::fetchElement($compacted['as:url'], 'as:href', '@id');
+			}
+		}
+
+		// There seem to be Mastodon versions where you can only use webfinger with the alias.
+		if (isset($apcontact['alias']) && (!isset($apcontact['addr']) || !isset($apcontact['baseurl']))) {
+			$apcontact = array_merge($apcontact, self::fetchWebfingerData($apcontact['alias']));
+		}
+
+		// If nothing is found yet, try to use the nick and the host of the profile URL to query the webfinger data.
+		if (empty($apcontact['addr']) || empty($apcontact['baseurl'])) {
+			try {
+				$apcontact = array_merge($apcontact, self::fetchWebfingerData($apcontact['nick'] . '@' . (new Uri($apcontact['url']))->getAuthority()));
+			} catch (\Throwable $e) {
+				DI::logger()->warning('Unable to coerce APContact URL into a UriInterface object', ['url' => $apcontact['url'], 'error' => $e->getMessage()]);
+			}
+		}
+
+		// The field "as:alsoKnownAs" is used by bird.gy and seems to be the only way to query the webfinger data.
+		$alsoKnownAs = JsonLD::fetchElement($compacted, 'as:alsoKnownAs', '@id');
+		if (isset($alsoKnownAs) && (empty($apcontact['addr']) || empty($apcontact['baseurl']))) {
+			try {
+				$apcontact = array_merge($apcontact, self::fetchWebfingerData($alsoKnownAs . '@' . (new Uri($apcontact['url']))->getAuthority()));
+			} catch (\Throwable $e) {
+				DI::logger()->warning('Unable to coerce APContact URL into a UriInterface object', ['url' => $apcontact['url'], 'error' => $e->getMessage()]);
 			}
 		}
 
@@ -392,6 +416,7 @@ class APContact
 			}
 		}
 
+		$apcontact['indexable']    = JsonLD::fetchElement($compacted, 'toot:indexable', '@value');
 		$apcontact['discoverable'] = JsonLD::fetchElement($compacted, 'toot:discoverable', '@value');
 		if (is_null($apcontact['discoverable']) && in_array($apcontact['type'], ['Application', 'Service'])) {
 			$apcontact['discoverable'] = false;
@@ -408,7 +433,7 @@ class APContact
 
 		// When the photo is too large, try to shorten it by removing parts
 		if (strlen($apcontact['photo'] ?? '') > 383) {
-			$parts = parse_url($apcontact['photo']);
+			$parts = parse_url((string) $apcontact['photo']);
 			unset($parts['fragment']);
 			$apcontact['photo'] = (string) Uri::fromParts((array) $parts);
 
@@ -588,7 +613,7 @@ class APContact
 	 * @param int     $gsid   Global server id
 	 * @return void
 	 */
-	private static function unarchiveInbox(string $url, bool $shared, int $gsid = null)
+	private static function unarchiveInbox(string $url, bool $shared, ?int $gsid = null)
 	{
 		if (empty($url)) {
 			return;
@@ -610,7 +635,11 @@ class APContact
 			return false;
 		}
 
-		$path = parse_url($apcontact['url'], PHP_URL_PATH);
+		if ($apcontact['baseurl'] === 'https://tags.pub') {
+			return true;
+		}
+
+		$path = parse_url((string) $apcontact['url'], PHP_URL_PATH);
 		if (($apcontact['type'] == 'Group') && !empty($apcontact['followers']) && ($apcontact['nick'] == 'relay') && ($path == '/actor')) {
 			return true;
 		}

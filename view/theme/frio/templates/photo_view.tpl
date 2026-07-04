@@ -12,7 +12,7 @@
 <div id="photo-view-{{$id}}" class="generic-page-wrapper">
 	<div class="pull-left" id="photo-edit-link-wrap">
 		<a class="page-action faded-icon" id="photo-album-link" href="{{$album.0}}">
-			<i class="fa fa-folder-open"></i>
+			<i class="ri ri-folder-open-line"></i>
 			{{$album.1}}
 		</a>
 	</div>
@@ -20,31 +20,31 @@
 {{if $tools}}
 	{{if $tools.view}}
 		<a id="photo-edit-link" class="btn btn-primary photo-back-link" href="{{$tools.view.0}}">
-			<i class="page-action fa fa-mail-reply"></i>
+			<i class="page-action ri ri-reply-line"></i>
 			 {{$back_text}}
 		</a>
 	{{/if}}
 	{{if $tools.edit}}
 		<a id="photo-edit-link" class="btn btn-primary" href="{{$tools.edit.0}}">
-			 <i class="page-action fa fa-pencil"></i>
+			 <i class="page-action ri ri-pencil-line"></i>
 			 {{$edit_text}}
 		</a>
 	{{/if}}
 	{{if $tools.delete}}
 		<button id="photo-delete-link" class="btn btn-primary" type="button" data-modal-url="{{$tools.delete.0}}">
-			<i class="page-action fa fa-trash"></i>
+			<i class="page-action ri ri-delete-bin-line"></i>
 			{{$delete_text}}
 		</button>
 	{{/if}}
 	{{if $tools.profile}}
 		<a id="photo-toprofile-link" class="btn btn-primary" href="{{$tools.profile.0}}">
-			<i class="page-action fa fa-user"></i>
+			<i class="page-action ri ri-user-line"></i>
 			{{$use_as_profile_picture_text}}
 		</a>
 	{{/if}}
 	{{if $tools.lock}}
 		<a id="photo-lock-link" onclick="lockview(event, 'photo', {{$id}});" title="{{$tools.lock}}">
-			<i class="page-action fa fa-lg fa-lock faded-icon"></i>
+			<i class="page-action ri ri-lg ri-lock-line faded-icon"></i>
 		</a>
 	{{/if}}
 {{/if}}
@@ -60,10 +60,10 @@
 
 			{{* Overlay buttons for previous and next photo *}}
 			{{if $prevlink}}
-			<a class="photo-prev-link" href="{{$prevlink.0}}"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
+			<a class="photo-prev-link" href="{{$prevlink.0}}"><i class="ri ri-arrow-left-s-line" aria-hidden="true"></i></a>
 			{{/if}}
 			{{if $nextlink}}
-			<a class="photo-next-link" href="{{$nextlink.0}}"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+			<a class="photo-next-link" href="{{$nextlink.0}}"><i class="ri ri-arrow-right-s-line" aria-hidden="true"></i></a>
 			{{/if}}
 		</div>
 

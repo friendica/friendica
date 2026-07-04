@@ -111,7 +111,7 @@ class SemaphoreLock extends AbstractLock
 			$result = [];
 
 			foreach ($keys as $key) {
-				if (str_starts_with($key, $prefix)) {
+				if (str_starts_with((string) $key, $prefix)) {
 					array_push($result, $key);
 				}
 			}

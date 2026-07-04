@@ -13,7 +13,7 @@ use Psr\Http\Message\UriInterface;
 
 class GServerTest extends \PHPUnit\Framework\TestCase
 {
-	public function dataCleanUri(): array
+	public static function dataCleanUri(): array
 	{
 		return [
 			'full-monty' => [
@@ -48,14 +48,14 @@ class GServerTest extends \PHPUnit\Framework\TestCase
 	}
 
 	/**
-	 * @dataProvider dataCleanUri
 	 *
 	 * @param UriInterface $expected
 	 * @param UriInterface $dirtyUri
 	 * @return void
 	 * @throws \Exception
 	 */
-	public function testCleanUri(UriInterface $expected, UriInterface $dirtyUri)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataCleanUri')]
+	public function testCleanUri(UriInterface $expected, UriInterface $dirtyUri): void
 	{
 		$this->assertEquals($expected, GServer::cleanUri($dirtyUri));
 	}

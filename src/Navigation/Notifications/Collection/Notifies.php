@@ -19,7 +19,7 @@ class Notifies extends BaseCollection
 
 	public function setSeen(): Notifies
 	{
-		$notifies = $this->map(function (NotifyEntity $notify) {
+		$notifies = $this->map(function (NotifyEntity $notify): void {
 			$notify->setSeen();
 		});
 

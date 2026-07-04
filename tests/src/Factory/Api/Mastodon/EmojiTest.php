@@ -20,12 +20,12 @@ class EmojiTest extends FixtureTestCase
 		DI::config()->set('system', 'no_smilies', false);
 	}
 
-	public function testBuiltInCollection()
+	public function testBuiltInCollection(): void
 	{
 		$emoji      = DI::mstdnEmoji();
 		$collection = $emoji->createCollectionFromSmilies(Smilies::getList())->getArrayCopy(true);
 		foreach ($collection as $item) {
-			$this->assertTrue(preg_match('(/images/.*)', $item['url']) === 1, $item['url']);
+			$this->assertTrue(preg_match('(/images/.*)', (string) $item['url']) === 1, $item['url']);
 		}
 	}
 }

@@ -15,10 +15,10 @@ use Friendica\BaseModule;
  */
 class SecurityTxt extends BaseModule
 {
-	protected function rawContent(array $request = [])
+	protected function rawContent(array $request = []): never
 	{
 		$name = 'security.txt';
-		$fp = fopen($name, 'rt');
+		$fp   = fopen($name, 'rt');
 
 		header('Content-type: text/plain; charset=utf-8');
 		header("Content-Length: " . filesize($name));

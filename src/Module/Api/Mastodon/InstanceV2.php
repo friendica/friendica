@@ -33,12 +33,6 @@ use Psr\Log\LoggerInterface;
  */
 class InstanceV2 extends BaseApi
 {
-	/** @var Database */
-	private $database;
-
-	/** @var IManageConfigValues */
-	private $config;
-
 	/** @var Header */
 	private $contactHeader;
 
@@ -51,16 +45,13 @@ class InstanceV2 extends BaseApi
 		LoggerInterface $logger,
 		Profiler $profiler,
 		ApiResponse $response,
-		Database $database,
-		IManageConfigValues $config,
+		private readonly Database $database,
+		private readonly IManageConfigValues $config,
 		array $server,
-		array $parameters = []
+		array $parameters = [],
 	) {
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->database      = $database;
-		$this->config        = $config;
-		$this->contactHeader = new Header($config);
+		$this->contactHeader = new Header($this->config);
 	}
 
 	/**
@@ -98,16 +89,16 @@ class InstanceV2 extends BaseApi
 			$registration,
 			$contact,
 			$friendica_extensions,
-			$rules
+			$rules,
 		));
 	}
 
 	private function buildConfigurationInfo(): InstanceEntity\Configuration
 	{
-		$statuses_config = new InstanceEntity\StatusesConfig((int)$this->config->get(
+		$statuses_config = new InstanceEntity\StatusesConfig((int) $this->config->get(
 			'config',
 			'api_import_size',
-			$this->config->get('config', 'max_import_size')
+			$this->config->get('config', 'max_import_size'),
 		), 99, 23);
 
 		$image_size_limit = Strings::getBytesFromShorthand($this->config->get('system', 'maximagesize') ?? 0);
@@ -148,7 +139,7 @@ class InstanceV2 extends BaseApi
 			$adminContact = $this->database->selectFirst(
 				'contact',
 				['uri-id'],
-				['nick' => $administrator['nickname'], 'self' => true]
+				['nick' => $administrator['nickname'], 'self' => true],
 			);
 			$account = DI::mstdnAccount()->createFromUriId($adminContact['uri-id']);
 		}
@@ -161,7 +152,7 @@ class InstanceV2 extends BaseApi
 		return new InstanceEntity\FriendicaExtensions(
 			App::VERSION,
 			App::CODENAME,
-			$this->config->get('system', 'build')
+			$this->config->get('system', 'build'),
 		);
 	}
 

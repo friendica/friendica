@@ -48,8 +48,8 @@
 }
 .checkbox input[type="checkbox"]:checked + label::after,
 .checkbox input[type="radio"]:checked + label::after {
-  font-family: "ForkAwesome";
-  content: "\f00c";
+  font-family: "remixicon";
+  content: "\eb7b";
 }
 .checkbox input[type="checkbox"]:indeterminate + label::after,
 .checkbox input[type="radio"]:indeterminate + label::after {
@@ -304,8 +304,8 @@
 
 input[type="checkbox"].styled:checked + label:after,
 input[type="radio"].styled:checked + label:after {
-  font-family: 'ForkAwesome';
-  content: "\f00c";
+  font-family: 'remixicon';
+  content: "\eb7b";
 }
 input[type="checkbox"] .styled:checked + label::before,
 input[type="radio"] .styled:checked + label::before {

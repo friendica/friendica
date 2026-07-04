@@ -15,7 +15,7 @@ use Psr\Log\NullLogger;
 
 class ProcessTest extends FixtureTestCase
 {
-	public function testStandardProcess()
+	public function testStandardProcess(): void
 	{
 		$factory    = new Factory\Process(new NullLogger());
 		$repository = new Repository\Process(DI::dba(), new NullLogger(), $factory, []);
@@ -28,7 +28,7 @@ class ProcessTest extends FixtureTestCase
 		self::assertEquals(php_uname('n'), $entityNew->hostname);
 	}
 
-	public function testHostnameEnv()
+	public function testHostnameEnv(): void
 	{
 		$factory    = new Factory\Process(new NullLogger());
 		$repository = new Repository\Process(DI::dba(), new NullLogger(), $factory, [Repository\Process::NODE_ENV => 'test_node']);

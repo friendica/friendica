@@ -34,7 +34,7 @@ class MailBuilderTest extends MockedTestCase
 	/** @var BaseURL|MockInterface */
 	private $baseUrl;
 
-	/** @var string */
+	/** @var array */
 	private $defaultHeaders;
 
 	protected function setUp(): void
@@ -68,20 +68,20 @@ class MailBuilderTest extends MockedTestCase
 	/**
 	 * Test if the builder instance can get created
 	 */
-	public function testBuilderInstance()
+	public function testBuilderInstance(): void
 	{
 		$builder = new SampleMailBuilder($this->l10n, $this->baseUrl, $this->config, new NullLogger());
 
-		self::assertInstanceOf(MailBuilder::class, $builder);
+		self::assertInstanceOf(MailBuilder::class, $builder); // @phpstan-ignore staticMethod.alreadyNarrowedType
 	}
 
 	/**
 	 * Test if the builder can create full rendered emails
 	 *
 	 * @todo Create test once "Renderer" and "BBCode" are dynamic
-	 * @doesNotPerformAssertions
 	 */
-	public function testBuilderWithNonRawEmail()
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+	public function testBuilderWithNonRawEmail(): void
 	{
 		static::markTestIncomplete('Cannot easily mock Renderer and BBCode, so skipping tests wit them');
 	}
@@ -89,7 +89,7 @@ class MailBuilderTest extends MockedTestCase
 	/**
 	 * Test if the builder can create a "simple" raw mail
 	 */
-	public function testBuilderWithRawEmail()
+	public function testBuilderWithRawEmail(): void
 	{
 		$builder = new SampleMailBuilder($this->l10n, $this->baseUrl, $this->config, new NullLogger());
 
@@ -101,15 +101,15 @@ class MailBuilderTest extends MockedTestCase
 			->build(true);
 
 		self::assertEmail($testEmail, [
-			'subject' => 'Subject',
-			'html' => 'Html',
-			'text' => 'text',
-			'toAddress' => 'recipient@friendica.local',
-			'fromName' => 'Sender',
+			'subject'     => 'Subject',
+			'html'        => 'Html',
+			'text'        => 'text',
+			'toAddress'   => 'recipient@friendica.local',
+			'fromName'    => 'Sender',
 			'fromAddress' => 'sender@friendica.local',
-			'noReply' => 'no-reply@friendica.local',
-			'uid' => 100,
-			'headers' => $this->defaultHeaders,
+			'noReply'     => 'no-reply@friendica.local',
+			'uid'         => 100,
+			'headers'     => $this->defaultHeaders,
 		]);
 	}
 
@@ -117,7 +117,7 @@ class MailBuilderTest extends MockedTestCase
 	 * Test if the builder throws an exception in case no recipient
 	 *
 	 */
-	public function testBuilderWithEmptyMail()
+	public function testBuilderWithEmptyMail(): void
 	{
 		$this->expectException(UnprocessableEntityException::class);
 		$this->expectExceptionMessage("Recipient address is missing.");
@@ -130,7 +130,7 @@ class MailBuilderTest extends MockedTestCase
 	/**
 	 * Test if the builder throws an exception in case no sender
 	 */
-	public function testBuilderWithEmptySender()
+	public function testBuilderWithEmptySender(): void
 	{
 		$this->expectException(UnprocessableEntityException::class);
 		$this->expectExceptionMessage("Sender address or name is missing.");
@@ -145,7 +145,7 @@ class MailBuilderTest extends MockedTestCase
 	/**
 	 * Test if the builder is capable of creating "empty" mails if needed (not the decision of the builder if so ..)
 	 */
-	public function testBuilderWithoutMessage()
+	public function testBuilderWithoutMessage(): void
 	{
 		$builder = new SampleMailBuilder($this->l10n, $this->baseUrl, $this->config, new NullLogger());
 
@@ -155,18 +155,18 @@ class MailBuilderTest extends MockedTestCase
 			->build(true);
 
 		self::assertEmail($testEmail, [
-			'toAddress' => 'recipient@friendica.local',
-			'fromName' => 'Sender',
+			'toAddress'   => 'recipient@friendica.local',
+			'fromName'    => 'Sender',
 			'fromAddress' => 'sender@friendica.local',
-			'noReply' => 'sender@friendica.local', // no-reply is set same as address in case it's not set
-			'headers' => $this->defaultHeaders,
+			'noReply'     => 'sender@friendica.local', // no-reply is set same as address in case it's not set
+			'headers'     => $this->defaultHeaders,
 		]);
 	}
 
 	/**
 	 * Test if the builder sets for the text the same as for
 	 */
-	public function testBuilderWithJustPreamble()
+	public function testBuilderWithJustPreamble(): void
 	{
 		$builder = new SampleMailBuilder($this->l10n, $this->baseUrl, $this->config, new NullLogger());
 
@@ -176,11 +176,11 @@ class MailBuilderTest extends MockedTestCase
 			->build(true);
 
 		self::assertEmail($testEmail, [
-			'toAddress' => 'recipient@friendica.local',
-			'fromName' => 'Sender',
+			'toAddress'   => 'recipient@friendica.local',
+			'fromName'    => 'Sender',
 			'fromAddress' => 'sender@friendica.local',
-			'noReply' => 'sender@friendica.local', // no-reply is set same as address in case it's not set,
-			'headers' => $this->defaultHeaders,
+			'noReply'     => 'sender@friendica.local', // no-reply is set same as address in case it's not set,
+			'headers'     => $this->defaultHeaders,
 		]);
 	}
 }

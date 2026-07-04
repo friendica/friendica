@@ -28,23 +28,23 @@ use Psr\Log\LoggerInterface;
 
 class Channels extends BaseSettings
 {
-	/** @var UserDefinedChannel */
-	private $channel;
-	/** @var IManagePersonalConfigValues */
-	private $pConfig;
-	/** @var Factory\UserDefinedChannel */
-	private $userDefinedChannel;
-	/** @var IManageConfigValues */
-	private $config;
-
-	public function __construct(Factory\UserDefinedChannel $userDefinedChannel, UserDefinedChannel $channel, App\Page $page, IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly Factory\UserDefinedChannel $userDefinedChannel,
+		private readonly UserDefinedChannel $channel,
+		App\Page $page,
+		IHandleUserSessions $session,
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		private readonly IManagePersonalConfigValues $pConfig,
+		private readonly IManageConfigValues $config,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->userDefinedChannel = $userDefinedChannel;
-		$this->channel            = $channel;
-		$this->config             = $config;
-		$this->pConfig            = $pConfig;
 	}
 
 	protected function post(array $request = [])
@@ -70,7 +70,7 @@ class Channels extends BaseSettings
 			$channel = $this->userDefinedChannel->createFromTableRow([
 				'label'            => $request['new_label'],
 				'description'      => $request['new_description'],
-				'access-key'       => substr(mb_strtolower($request['new_access_key']), 0, 1),
+				'access-key'       => substr(mb_strtolower((string) $request['new_access_key']), 0, 1),
 				'uid'              => $uid,
 				'circle'           => (int) $request['new_circle'],
 				'include-tags'     => Strings::cleanTags($request['new_include_tags']),
@@ -105,7 +105,7 @@ class Channels extends BaseSettings
 				'id'               => $id,
 				'label'            => $request['label'][$id],
 				'description'      => $request['description'][$id],
-				'access-key'       => substr(mb_strtolower($request['access_key'][$id]), 0, 1),
+				'access-key'       => substr(mb_strtolower((string) $request['access_key'][$id]), 0, 1),
 				'uid'              => $uid,
 				'circle'           => (int) $request['circle'][$id],
 				'include-tags'     => Strings::cleanTags($request['include_tags'][$id]),
@@ -193,9 +193,16 @@ class Channels extends BaseSettings
 				'image'        => ["image[$channel->code]", $this->t("Images"), $channel->mediaType & 1],
 				'video'        => ["video[$channel->code]", $this->t("Videos"), $channel->mediaType & 2],
 				'audio'        => ["audio[$channel->code]", $this->t("Audio"), $channel->mediaType & 4],
-				'languages'    => ["languages[$channel->code][]", $this->t('Languages'), $channel->languages ?? $channel_languages, $this->t('Select all languages that you want to see in this channel. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'), $languages, 'multiple'],
-				'publish'      => $publish,
-				'delete'       => ["delete[$channel->code]", $this->t("Delete channel") . ' (' . $channel->label . ')', false, $this->t("Check to delete this entry from the channel list")],
+				'languages'    => [
+					"languages[$channel->code][]",
+					$this->t('Languages'),
+					$channel->languages ?: $channel_languages,
+					$this->t('Select all languages that you want to see in this channel. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list.'),
+					$languages,
+					'multiple',
+				],
+				'publish' => $publish,
+				'delete'  => ["delete[$channel->code]", $this->t("Delete channel") . ' (' . $channel->label . ')', false, $this->t("Check to delete this entry from the channel list")],
 			];
 		}
 

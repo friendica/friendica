@@ -6,14 +6,17 @@
   *}}
 <nav id="sidebar-photos-albums" class="widget">
 	<div class="pull-left">
-		<h3>{{$title}}</h3>
+		<h3>
+			<i class="ri ri-image-line"></i>
+			{{$title}}
+		</h3>
 	</div>
 
 	<div class="pull-right">
 		{{if $can_post}}
 			<div class="photos-upload-link">
 				<a href="{{$upload.1}}" title="{{$upload.0}}" class="widget-action faded-icon" data-toggle="tooltip">
-					<i class="fa fa-plus"></i>
+					<i class="ri ri-add-line"></i>
 				</a>
 			</div>
 		{{/if}}

@@ -53,7 +53,7 @@ Some parts of this template will be moved by js to other places (see theme.js) -
 
 {{if $s}}
 	<a href="search/saved/add?term={{$q}}&amp;return_url={{$return_url}}" class="action-button btn btn-primary pull-right" id="search-save">
-		<i class="fa fa-lg fa-floppy-o" aria-hidden="true"></i>
+		<i class="ri ri-lg ri-save-line" aria-hidden="true"></i>
 		<span>{{$action_text}}</span>
 	</a>
 {{/if}}

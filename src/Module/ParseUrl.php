@@ -27,14 +27,11 @@ class ParseUrl extends BaseModule
 	/** @var IHandleUserSessions */
 	protected $userSession;
 
-	private EventDispatcherInterface $eventDispatcher;
-
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $userSession, EventDispatcherInterface $eventDispatcher, $server, array $parameters = [])
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $userSession, private readonly EventDispatcherInterface $eventDispatcher, $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->userSession     = $userSession;
-		$this->eventDispatcher = $eventDispatcher;
+		$this->userSession = $userSession;
 	}
 
 	protected function rawContent(array $request = [])

@@ -43,15 +43,14 @@ trait MemcacheCommandTrait
 	protected function getMemcacheKeys(): array
 	{
 		$string = $this->sendMemcacheCommand("stats items");
-		$lines  = explode("\r\n", $string);
+		$lines  = explode("\r\n", (string) $string);
 		$keys   = [];
 
 		foreach ($lines as $line) {
 			if (preg_match("/STAT items:([\d]+):number ([\d]+)/", $line, $matches)
-				&& isset($matches[1])
 				&& !in_array($matches[1], $keys)) {
 				$string = $this->sendMemcacheCommand("stats cachedump " . $matches[1] . " " . $matches[2]);
-				preg_match_all("/ITEM (.*?) /", $string, $matches);
+				preg_match_all("/ITEM (.*?) /", (string) $string, $matches);
 				$keys = array_merge($keys, $matches[1]);
 			}
 		}

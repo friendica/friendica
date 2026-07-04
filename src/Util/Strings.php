@@ -177,7 +177,7 @@ class Strings
 	 *
 	 * @return string		Transformed string.
 	 */
-	public static function deindent(string $text, string $chr = "[\t ]", int $count = null): string
+	public static function deindent(string $text, string $chr = "[\t ]", ?int $count = null): string
 	{
 		$lines = explode("\n", $text);
 
@@ -192,7 +192,7 @@ class Strings
 		}
 
 		for ($k = 0; $k < count($lines); $k++) {
-			$lines[$k] = preg_replace("|^" . $chr . "{" . $count . "}|", "", $lines[$k]);
+			$lines[$k] = preg_replace("|^" . $chr . "{" . $count . "}|", "", (string) $lines[$k]);
 		}
 
 		return implode("\n", $lines);
@@ -441,7 +441,7 @@ class Strings
 	 * @return string
 	 * @see substr_replace()
 	 */
-	public static function substringReplace(string $string, string $replacement, int $start, int $length = null): string
+	public static function substringReplace(string $string, string $replacement, int $start, ?int $length = null): string
 	{
 		$string_length = mb_strlen($string);
 

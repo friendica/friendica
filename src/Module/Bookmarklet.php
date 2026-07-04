@@ -44,9 +44,9 @@ class Bookmarklet extends BaseModule
 
 			$x = [
 				'title'   => trim($_REQUEST['title'] ?? '', '*'),
-				'content' => $content
+				'content' => $content,
 			];
-			$output = DI::conversation()->statusEditor($x, 0, false);
+			$output = DI::statusEditor()->renderEditor($x, 0, false);
 			$output .= "<script>window.resizeTo(800,550);</script>";
 		} else {
 			$output = '<h2>' . DI::l10n()->t('The post was created') . '</h2>';

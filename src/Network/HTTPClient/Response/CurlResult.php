@@ -10,6 +10,8 @@ namespace Friendica\Network\HTTPClient\Response;
 use Friendica\Network\HTTPClient\Capability\ICanHandleHttpResponses;
 use Friendica\Network\HTTPException\UnprocessableEntityException;
 use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Psr7\Stream;
+use Psr\Http\Message\StreamInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -45,12 +47,7 @@ class CurlResult implements ICanHandleHttpResponses
 	/**
 	 * @var boolean true (if HTTP 410 result) or false
 	 */
-	private $isGone;
-
-	/**
-	 * @var string the URL which was called
-	 */
-	private $url;
+	private bool $isGone;
 
 	/**
 	 * @var string in case of redirect, content was finally retrieved from this URL
@@ -83,16 +80,6 @@ class CurlResult implements ICanHandleHttpResponses
 	private $isTimeout;
 
 	/**
-	 * @var int the error number or 0 (zero) if no error
-	 */
-	private $errorNumber;
-
-	/**
-	 * @var string the error message or '' (the empty string) if no
-	 */
-	private $error;
-
-	/**
 	 * @var LoggerInterface
 	 */
 	protected $logger;
@@ -121,7 +108,7 @@ class CurlResult implements ICanHandleHttpResponses
 	 *
 	 * @throws UnprocessableEntityException when HTTP code of the CURL response is missing
 	 */
-	public function __construct(LoggerInterface $logger, string $url, string $result, array $info, int $errorNumber = 0, string $error = '')
+	public function __construct(LoggerInterface $logger, private readonly string $url, string $result, array $info, private readonly int $errorNumber = 0, private readonly string $error = '')
 	{
 		$this->logger = $logger;
 
@@ -129,13 +116,10 @@ class CurlResult implements ICanHandleHttpResponses
 			throw new UnprocessableEntityException('CURL response doesn\'t contains a response HTTP code');
 		}
 
-		$this->returnCode  = $info['http_code'];
-		$this->url         = $url;
-		$this->info        = $info;
-		$this->errorNumber = $errorNumber;
-		$this->error       = $error;
+		$this->returnCode = $info['http_code'];
+		$this->info       = $info;
 
-		$this->logger->debug('construct', ['url' => $url, 'returncode' => $this->returnCode, 'result' => $result]);
+		$this->logger->debug('construct', ['url' => $this->url, 'returncode' => $this->returnCode, 'result' => $result]);
 
 		$this->parseBodyHeader($result);
 		$this->checkSuccess();
@@ -151,13 +135,13 @@ class CurlResult implements ICanHandleHttpResponses
 
 		$header = '';
 		$base   = $result;
-		while (preg_match('/^HTTP\/.+? \d+/', $base)) {
-			$chunk = substr($base, 0, strpos($base, "\r\n\r\n") + 4);
+		while (preg_match('/^HTTP\/.+? \d+/', (string) $base)) {
+			$chunk = substr((string) $base, 0, strpos((string) $base, "\r\n\r\n") + 4);
 			$header .= $chunk;
-			$base = substr($base, strlen($chunk));
+			$base = substr((string) $base, strlen($chunk));
 		}
 
-		$this->body          = substr($result, strlen($header));
+		$this->body          = substr((string) $result, strlen($header));
 		$this->header        = $header;
 		$this->header_fields = []; // Is filled on demand
 	}
@@ -318,7 +302,7 @@ class CurlResult implements ICanHandleHttpResponses
 	/** {@inheritDoc} */
 	public function isGone(): bool
 	{
-		return $this->isSuccess;
+		return $this->isGone;
 	}
 
 	/** {@inheritDoc} */
@@ -367,5 +351,17 @@ class CurlResult implements ICanHandleHttpResponses
 	public function isTimeout(): bool
 	{
 		return $this->isTimeout;
+	}
+
+	/** {@inheritDoc} */
+	public function getBodyStream(): StreamInterface
+	{
+		$stream = fopen('php://temp', 'r+');
+		if ($stream === false) {
+			throw new \RuntimeException('Failed to open php://temp stream');
+		}
+		fwrite($stream, $this->body);
+		rewind($stream);
+		return new Stream($stream);
 	}
 }

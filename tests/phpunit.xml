@@ -1,26 +1,42 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <phpunit
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
 		bootstrap="bootstrap.php"
-		verbose="true"
-		timeoutForSmallTests="900"
-		timeoutForMediumTests="900"
-		timeoutForLargeTests="900"
-		xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+		colors="true"
+		cacheDirectory="./.phpunit.result.cache"
+		executionOrder="depends,defects"
+		requireCoverageMetadata="false"
+		beStrictAboutCoverageMetadata="true"
+		beStrictAboutOutputDuringTests="true"
+		displayDetailsOnAllIssues="true"
+		displayDetailsOnPhpunitDeprecations="true"
+		failOnDeprecation="false"
+		failOnEmptyTestSuite="true"
+		failOnIncomplete="false"
+		failOnNotice="false"
+		failOnPhpunitDeprecation="false"
+		failOnRisky="true"
+		failOnSkipped="false"
+		failOnWarning="false"
+>
 	<testsuites>
-		<testsuite name="friendica">
-			<directory suffix="Test.php">functional/</directory>
+		<testsuite name="legacy">
 			<directory suffix="Test.php">src/</directory>
-			<directory suffix="Test.php">Unit/</directory>
 		</testsuite>
 		<testsuite name="unit">
 			<directory suffix="Test.php">Unit/</directory>
 		</testsuite>
+		<testsuite name="functional">
+			<directory suffix="Test.php">Functional/</directory>
+		</testsuite>
+		<testsuite name="integration">
+			<directory suffix="Test.php">Integration/</directory>
+		</testsuite>
 	</testsuites>
-	<!-- Filters for Code Coverage -->
-	<coverage>
+	<source restrictNotices="true" restrictWarnings="true" ignoreIndirectDeprecations="true" >
 		<include>
-			<directory suffix=".php">..</directory>
+			<directory>../</directory>
 		</include>
 		<exclude>
 			<directory suffix=".php">../config/</directory>
@@ -32,5 +48,5 @@
 			<directory suffix=".php">../view/</directory>
 			<directory suffix=".php">../vendor/</directory>
 		</exclude>
-	</coverage>
+	</source>
 </phpunit>

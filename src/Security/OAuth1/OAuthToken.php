@@ -9,10 +9,6 @@ namespace Friendica\Security\OAuth1;
 
 class OAuthToken implements \Stringable
 {
-	// access tokens and request tokens
-	public $key;
-	public $secret;
-
 	public $expires;
 	public $scope;
 	public $uid;
@@ -24,11 +20,7 @@ class OAuthToken implements \Stringable
 	 * @param $key
 	 * @param $secret
 	 */
-	public function __construct($key, $secret)
-	{
-		$this->key    = $key;
-		$this->secret = $secret;
-	}
+	public function __construct(public $key, public $secret) {}
 
 	/**
 	 * generates the basic string serialization of a token that a server

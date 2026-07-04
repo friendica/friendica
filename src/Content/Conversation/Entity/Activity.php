@@ -14,17 +14,6 @@ namespace Friendica\Content\Conversation\Entity;
  */
 final class Activity
 {
-	public int $uid;
-	public string $network;
-	public array $languages;
-	public int $cid;
-	public string $expires;
-	public int $medianComments;
-	public int $medianActivities;
-	public int $medianViews;
-	public int $medianThreadScore;
-	public int $medianPostScore;
-
 	/**
 	 * Activity constructor.
 	 *
@@ -39,29 +28,7 @@ final class Activity
 	 * @param int $medianThreadScore
 	 * @param int $medianPostScore
 	 */
-	public function __construct(
-		int $uid,
-		string $network,
-		array $languages,
-		int $cid,
-		string $expires,
-		int $medianComments,
-		int $medianActivities,
-		int $medianViews,
-		int $medianThreadScore,
-		int $medianPostScore
-	) {
-		$this->uid               = $uid;
-		$this->network           = $network;
-		$this->languages         = $languages;
-		$this->cid               = $cid;
-		$this->expires           = $expires;
-		$this->medianComments    = $medianComments;
-		$this->medianActivities  = $medianActivities;
-		$this->medianViews       = $medianViews;
-		$this->medianThreadScore = $medianThreadScore;
-		$this->medianPostScore   = $medianPostScore;
-	}
+	public function __construct(public int $uid, public string $network, public array $languages, public int $cid, public string $expires, public int $medianComments, public int $medianActivities, public int $medianViews, public int $medianThreadScore, public int $medianPostScore) {}
 
 	/**
 	 * Create an Activity instance from an array.

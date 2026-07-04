@@ -19,14 +19,9 @@ use Psr\Log\LoggerInterface;
 
 class Attachment extends BaseFactory
 {
-	/** @var BaseURL */
-	private $baseUrl;
-
-	public function __construct(LoggerInterface $logger, BaseURL $baseURL)
+	public function __construct(LoggerInterface $logger, private readonly BaseURL $baseUrl)
 	{
 		parent::__construct($logger);
-
-		$this->baseUrl = $baseURL;
 	}
 
 	/**
@@ -67,7 +62,7 @@ class Attachment extends BaseFactory
 	 */
 	private function createFromMediaArray(array $attachment): \Friendica\Object\Api\Mastodon\Attachment
 	{
-		$filetype = !empty($attachment['mimetype']) ? strtolower(substr($attachment['mimetype'], 0, strpos($attachment['mimetype'], '/'))) : '';
+		$filetype = !empty($attachment['mimetype']) ? strtolower(substr((string) $attachment['mimetype'], 0, strpos((string) $attachment['mimetype'], '/'))) : '';
 
 		if (($filetype == 'audio') || ($attachment['type'] == Post\Media::AUDIO)) {
 			$type = 'audio';

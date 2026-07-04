@@ -21,7 +21,7 @@ class Pending extends BaseUsers
 
 		self::checkFormSecurityTokenRedirectOnError('moderation/users/pending', 'admin_users_pending');
 
-		$pending = $request['pending'] ?? [];
+		$pending = (array) ($request['pending'] ?? []);
 
 		if (!empty($request['page_users_approve'])) {
 			foreach ($pending as $hash) {
@@ -45,7 +45,7 @@ class Pending extends BaseUsers
 		parent::content();
 
 		$action = $this->parameters['action'] ?? '';
-		$uid    = $this->parameters['uid'] ?? 0;
+		$uid    = $this->parameters['uid']    ?? 0;
 
 		if ($uid) {
 			$user = User::getById($uid, ['username', 'blocked']);
@@ -61,13 +61,12 @@ class Pending extends BaseUsers
 				User::allow(Register::getPendingForUser($uid)['hash'] ?? '');
 				$this->systemMessages->addNotice($this->t('Account approved.'));
 				$this->baseUrl->redirect('moderation/users/pending');
-				break;
+				// no break
 			case 'deny':
 				self::checkFormSecurityTokenRedirectOnError('moderation/users/pending', 'admin_users_pending', 't');
 				User::deny(Register::getPendingForUser($uid)['hash'] ?? '');
 				$this->systemMessages->addNotice($this->t('Registration revoked'));
 				$this->baseUrl->redirect('moderation/users/pending');
-				break;
 		}
 
 		$pager = new Pager($this->l10n, $this->args->getQueryString(), 100);
@@ -79,14 +78,14 @@ class Pending extends BaseUsers
 		$t = Renderer::getMarkupTemplate('moderation/users/pending.tpl');
 		return self::getTabsHTML('pending') . Renderer::replaceMacros($t, [
 			// strings //
-			'$title' => $this->t('Administration'),
-			'$page' => $this->t('User registrations awaiting review'),
-			'$select_all' => $this->t('select all'),
-			'$th_pending' => [$this->t('Request date'), $this->t('Name'), $this->t('Email')],
-			'$no_pending' => $this->t('No registrations.'),
+			'$title'           => $this->t('Administration'),
+			'$page'            => $this->t('User registrations awaiting review'),
+			'$select_all'      => $this->t('select all'),
+			'$th_pending'      => [$this->t('Request date'), $this->t('Name'), $this->t('Email')],
+			'$no_pending'      => $this->t('No registrations.'),
 			'$pendingnotetext' => $this->t('Note from the user'),
-			'$approve' => $this->t('Approve'),
-			'$deny' => $this->t('Deny'),
+			'$approve'         => $this->t('Approve'),
+			'$deny'            => $this->t('Deny'),
 
 			'$form_security_token' => self::getFormSecurityToken('admin_users_pending'),
 
@@ -94,8 +93,8 @@ class Pending extends BaseUsers
 			'$query_string' => $this->args->getQueryString(),
 
 			'$pending' => $pending,
-			'$count' => $count,
-			'$pager' => $pager->renderFull($count),
+			'$count'   => $count,
+			'$pager'   => $pager->renderFull($count),
 		]);
 	}
 }

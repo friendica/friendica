@@ -27,12 +27,7 @@ final class DiceContainer implements Container
 		return new self($dice);
 	}
 
-	private Dice $container;
-
-	private function __construct(Dice $container)
-	{
-		$this->container = $container;
-	}
+	private function __construct(private Dice $container) {}
 
 	/**
 	 * Returns a fully constructed object based on $name using $args and $share as constructor arguments if supplied

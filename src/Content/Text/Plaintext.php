@@ -111,7 +111,7 @@ class Plaintext
 		if (($item['title'] != '') && ($post['text'] != '')) {
 			$post['text'] = trim($item['title'] . "\n\n" . $post['text']);
 		} elseif ($item['title'] != '') {
-			$post['text'] = trim($item['title']);
+			$post['text'] = trim((string) $item['title']);
 		}
 
 		$abstract = '';
@@ -175,13 +175,13 @@ class Plaintext
 
 				// Will the text be shortened in the link?
 				// Or is the link the last item in the post?
-				if (($limit > 0) && ($pos < $limit) && (($pos + self::URL_LENGTH > $limit) || ($pos + mb_strlen($link) == mb_strlen($msg)))) {
+				if (($limit > 0) && ($pos < $limit) && (($pos + self::URL_LENGTH > $limit) || ($pos + mb_strlen((string) $link) == mb_strlen($msg)))) {
 					$msg = trim(str_replace($link, '', $msg));
 				} elseif (($limit == 0) || ($pos < $limit)) {
 					// The limit has to be increased since it will be shortened - but not now
 					// Only do it with Twitter
-					if (($limit > 0) && (mb_strlen($link) > self::URL_LENGTH) && ($htmlmode == BBCode::TWITTER)) {
-						$limit = $limit - self::URL_LENGTH + mb_strlen($link);
+					if (($limit > 0) && (mb_strlen((string) $link) > self::URL_LENGTH) && ($htmlmode == BBCode::TWITTER)) {
+						$limit = $limit - self::URL_LENGTH + mb_strlen((string) $link);
 					}
 
 					$link = '';
@@ -207,7 +207,7 @@ class Plaintext
 			$post['parts'] = self::getParts(trim($complete_msg), $limit);
 
 			// Twitter is using its own limiter, so we always assume that shortened links will have this length
-			if (mb_strlen($link) > 0) {
+			if (mb_strlen((string) $link) > 0) {
 				$limit = $limit - self::URL_LENGTH;
 			}
 
@@ -217,7 +217,7 @@ class Plaintext
 				} elseif (!isset($post['url'])) {
 					$limit       = $limit - self::URL_LENGTH;
 					$post['url'] = $item['plink'];
-				} elseif (str_contains($item['body'], '[share')) {
+				} elseif (str_contains((string) $item['body'], '[share')) {
 					$post['url'] = $item['plink'];
 				} elseif (DI::pConfig()->get($item['uid'], 'system', 'no_intelligent_shortening')) {
 					$post['url'] = $item['plink'];
@@ -324,7 +324,7 @@ class Plaintext
 
 		// Remove mentions and hashtag links
 		$URLSearchString = '^\[\]';
-		$post['text']    = preg_replace("/([#!@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', $item['body']);
+		$post['text']    = preg_replace("/([#!@])\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism", '$1$3', (string) $item['body']);
 
 		// Remove abstract
 		$post['text'] = BBCode::stripAbstract($post['text']);

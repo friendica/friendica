@@ -35,12 +35,17 @@ class BoundariesPager extends Pager
 	 * @param string  $last_item_id  The id† of the last item in the displayed item list
 	 * @param integer $itemsPerPage  An optional number of items per page to override the default value
 	 */
-	public function __construct(L10n $l10n, string $queryString, string $first_item_id = null, string $last_item_id = null, int $itemsPerPage = 50)
-	{
+	public function __construct(
+		L10n $l10n,
+		string $queryString,
+		?string $first_item_id = null,
+		?string $last_item_id = null,
+		int $itemsPerPage = 50,
+	) {
 		parent::__construct($l10n, $queryString, $itemsPerPage);
 
 		$this->first_item_id = $first_item_id;
-		$this->last_item_id = $last_item_id;
+		$this->last_item_id  = $last_item_id;
 
 		$parsed = parse_url($this->getBaseQueryString());
 		if (!empty($parsed['query'])) {
@@ -53,7 +58,7 @@ class BoundariesPager extends Pager
 
 			$parsed['query'] = http_build_query($queryParameters);
 
-			$url = (string)Uri::fromParts((array)$parsed);
+			$url = (string) Uri::fromParts((array) $parsed);
 
 			$this->setQueryString($url);
 		}
@@ -95,21 +100,23 @@ class BoundariesPager extends Pager
 		$data = [
 			'class' => 'pager',
 			'prev'  => [
-				'url'   => Strings::ensureQueryParameter($this->baseQueryString .
-					($this->first_item_id >= $this->last_item_id ?
-						'&min_id=' . $this->first_item_id : '&max_id=' . $this->first_item_id)
+				'url' => Strings::ensureQueryParameter(
+					$this->baseQueryString
+					. ($this->first_item_id >= $this->last_item_id
+						? '&min_id=' . $this->first_item_id : '&max_id=' . $this->first_item_id),
 				),
 				'text'  => $this->l10n->t('newer'),
-				'class' => 'previous' . ($this->first_page ? ' disabled' : '')
+				'class' => 'previous' . ($this->first_page ? ' disabled' : ''),
 			],
-			'next'  => [
-				'url'   => Strings::ensureQueryParameter($this->baseQueryString .
-					($this->first_item_id >= $this->last_item_id ?
-					'&max_id=' . $this->last_item_id : '&min_id=' . $this->last_item_id)
+			'next' => [
+				'url' => Strings::ensureQueryParameter(
+					$this->baseQueryString
+					. ($this->first_item_id >= $this->last_item_id
+					? '&max_id=' . $this->last_item_id : '&min_id=' . $this->last_item_id),
 				),
 				'text'  => $this->l10n->t('older'),
-				'class' =>  'next' . ($displayedItemCount < $this->getItemsPerPage() ? ' disabled' : '')
-			]
+				'class' => 'next' . ($displayedItemCount < $this->getItemsPerPage() ? ' disabled' : ''),
+			],
 		];
 
 		$tpl = Renderer::getMarkupTemplate('paginate.tpl');

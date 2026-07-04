@@ -16,7 +16,7 @@ use Friendica\DI;
 require_once 'view/theme/frio/php/Image.php';
 require_once 'view/theme/frio/php/scheme.php';
 
-function theme_post(AppHelper $appHelper)
+function theme_post(AppHelper $appHelper): void
 {
 	if (!DI::userSession()->getLocalUserId()) {
 		return;
@@ -63,7 +63,7 @@ function theme_post(AppHelper $appHelper)
 	}
 }
 
-function theme_admin_post()
+function theme_admin_post(): void
 {
 	if (!DI::userSession()->isSiteAdmin()) {
 		return;

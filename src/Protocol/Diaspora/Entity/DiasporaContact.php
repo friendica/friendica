@@ -10,7 +10,7 @@ namespace Friendica\Protocol\Diaspora\Entity;
 use Psr\Http\Message\UriInterface;
 
 /**
- * @property-read int $uriId
+ * @property-read int|null $uriId
  * @property-read UriInterface $url
  * @property-read string $guid
  * @property-read string $addr
@@ -38,7 +38,7 @@ use Psr\Http\Message\UriInterface;
  */
 class DiasporaContact extends \Friendica\BaseEntity
 {
-	/** @var int */
+	/** @var int|null */
 	protected $uriId;
 	/** @var UriInterface */
 	protected $url;
@@ -90,12 +90,31 @@ class DiasporaContact extends \Friendica\BaseEntity
 	protected $post_count;
 
 	public function __construct(
-		UriInterface $url, \DateTime $created, string $guid = null, string $addr = null, UriInterface $alias = null,
-		string $nick = null, string $name = null, string $givenName = null, string $familyName = null,
-		UriInterface $photo = null, UriInterface $photoMedium = null, UriInterface $photoSmall = null,
-		UriInterface $batch = null, UriInterface $notify = null, UriInterface $poll = null, string $subscribe = null,
-		bool $searchable = null, string $pubKey = null, UriInterface $baseurl = null, int $gsid = null,
-		\DateTime $updated = null, int $interacting_count = 0, int $interacted_count = 0, int $post_count = 0, int $uriId = null
+		UriInterface $url,
+		\DateTime $created,
+		?string $guid = null,
+		?string $addr = null,
+		?UriInterface $alias = null,
+		?string $nick = null,
+		?string $name = null,
+		?string $givenName = null,
+		?string $familyName = null,
+		?UriInterface $photo = null,
+		?UriInterface $photoMedium = null,
+		?UriInterface $photoSmall = null,
+		?UriInterface $batch = null,
+		?UriInterface $notify = null,
+		?UriInterface $poll = null,
+		?string $subscribe = null,
+		?bool $searchable = null,
+		?string $pubKey = null,
+		?UriInterface $baseurl = null,
+		?int $gsid = null,
+		?\DateTime $updated = null,
+		int $interacting_count = 0,
+		int $interacted_count = 0,
+		int $post_count = 0,
+		?int $uriId = null,
 	) {
 		$this->uriId             = $uriId;
 		$this->url               = $url;

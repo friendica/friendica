@@ -13,14 +13,5 @@ namespace Friendica\Federation\Entity;
  */
 final class DeliveryQueueAggregate extends \Friendica\BaseEntity
 {
-	/** @var int */
-	protected $targetServerId;
-	/** @var int */
-	protected $failed;
-
-	public function __construct(int $targetServerId, int $failed)
-	{
-		$this->targetServerId = $targetServerId;
-		$this->failed         = $failed;
-	}
+	public function __construct(protected int $targetServerId, protected int $failed) {}
 }

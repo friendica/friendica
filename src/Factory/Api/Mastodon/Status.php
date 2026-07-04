@@ -34,54 +34,21 @@ use Psr\Log\LoggerInterface;
 
 class Status extends BaseFactory
 {
-	/** @var Database */
-	private $dba;
-	/** @var Account */
-	private $mstdnAccountFactory;
-	/** @var Mention */
-	private $mstdnMentionFactory;
-	/** @var Tag */
-	private $mstdnTagFactory;
-	/** @var Card */
-	private $mstdnCardFactory;
-	/** @var Attachment */
-	private $mstdnAttachmentFactory;
-	/** @var Emoji */
-	private $mstdnEmojiFactory;
-	/** @var Poll */
-	private $mstdnPollFactory;
-	/** @var ContentItem */
-	private $contentItem;
-	/** @var ACLFormatter */
-	private $aclFormatter;
-	private EventDispatcherInterface $eventDispatcher;
-
 	public function __construct(
-		EventDispatcherInterface $eventDispatcher,
+		private readonly EventDispatcherInterface $eventDispatcher,
 		LoggerInterface $logger,
-		Database $dba,
-		Account $mstdnAccountFactory,
-		Mention $mstdnMentionFactory,
-		Tag $mstdnTagFactory,
-		Card $mstdnCardFactory,
-		Attachment $mstdnAttachmentFactory,
-		Emoji $mstdnEmojiFactory,
-		Poll $mstdnPollFactory,
-		ContentItem $contentItem,
-		ACLFormatter $aclFormatter,
+		private readonly Database $dba,
+		private readonly Account $mstdnAccountFactory,
+		private readonly Mention $mstdnMentionFactory,
+		private readonly Tag $mstdnTagFactory,
+		private readonly Card $mstdnCardFactory,
+		private readonly Attachment $mstdnAttachmentFactory,
+		private readonly Emoji $mstdnEmojiFactory,
+		private readonly Poll $mstdnPollFactory,
+		private readonly ContentItem $contentItem,
+		private readonly ACLFormatter $aclFormatter,
 	) {
 		parent::__construct($logger);
-		$this->dba                    = $dba;
-		$this->mstdnAccountFactory    = $mstdnAccountFactory;
-		$this->mstdnMentionFactory    = $mstdnMentionFactory;
-		$this->mstdnTagFactory        = $mstdnTagFactory;
-		$this->mstdnCardFactory       = $mstdnCardFactory;
-		$this->mstdnAttachmentFactory = $mstdnAttachmentFactory;
-		$this->mstdnEmojiFactory      = $mstdnEmojiFactory;
-		$this->mstdnPollFactory       = $mstdnPollFactory;
-		$this->contentItem            = $contentItem;
-		$this->aclFormatter           = $aclFormatter;
-		$this->eventDispatcher        = $eventDispatcher;
 	}
 
 	/**
@@ -202,7 +169,7 @@ class Status extends BaseFactory
 		if (in_array($item['network'], Protocol::FEDERATED)) {
 			$gserver = $this->dba->selectFirst('gserver', ['site_name', 'platform', 'version'], ['id' => $item['author-gsid']]);
 			if (!empty($gserver)) {
-				$platform = ucfirst($gserver['platform']);
+				$platform = ucfirst((string) $gserver['platform']);
 				$version  = $gserver['version'];
 				$sitename = $gserver['site_name'];
 			}
@@ -222,6 +189,10 @@ class Status extends BaseFactory
 		$hook_data = $this->eventDispatcher->dispatch(
 			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, $hook_data),
 		)->getArray();
+
+		if ($this->contentItem->redundantSummary($item['body'], $item['content-warning'])) {
+			$item['content-warning'] = '';
+		}
 
 		$filter_reasons = $hook_data['filter_reasons'];
 		unset($hook_data);
@@ -267,7 +238,7 @@ class Status extends BaseFactory
 			}
 			$emojis = $this->mstdnEmojiFactory->createCollectionFromArray($used_smilies)->getArrayCopy(true);
 		} else {
-			if (preg_match_all("(\[emoji=(.*?)](.*?)\[/emoji])ism", $item['body'] ?: $item['raw-body'], $matches)) {
+			if (preg_match_all("(\[emoji=(.*?)](.*?)\[/emoji])ism", $item['body'] ?: (string) $item['raw-body'], $matches)) {
 				$emojis = $this->mstdnEmojiFactory->createCollectionFromArray(array_combine($matches[2], $matches[1]))->getArrayCopy(true);
 			}
 		}

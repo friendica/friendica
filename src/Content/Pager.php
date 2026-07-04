@@ -17,7 +17,7 @@ use Friendica\Util\Strings;
 class Pager
 {
 	/** @var int Default count of items per page */
-	const ITEMS_PER_PAGE = 50;
+	public const ITEMS_PER_PAGE = 50;
 
 	/** @var integer */
 	private $page = 1;
@@ -44,7 +44,7 @@ class Pager
 
 		$this->setQueryString($queryString);
 		$this->setItemsPerPage($itemsPerPage);
-		$this->setPage((int)($_GET['page'] ?? 0) ?: 1);
+		$this->setPage((int) ($_GET['page'] ?? 0) ?: 1);
 	}
 
 	/**
@@ -122,7 +122,7 @@ class Pager
 	{
 		$stripped = preg_replace('/([&?]page=[0-9]*)/', '', $queryString);
 
-		$stripped = trim($stripped, '/');
+		$stripped = trim((string) $stripped, '/');
 
 		$this->baseQueryString = $stripped;
 	}
@@ -155,13 +155,13 @@ class Pager
 			'prev'  => [
 				'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . ($this->getPage() - 1)),
 				'text'  => $this->l10n->t('newer'),
-				'class' => 'previous' . ($this->getPage() == 1 ? ' disabled' : '')
+				'class' => 'previous' . ($this->getPage() == 1 ? ' disabled' : ''),
 			],
 			'next' => [
 				'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . ($this->getPage() + 1)),
 				'text'  => $this->l10n->t('older'),
-				'class' => 'next' . ($displayedItemCount < $this->getItemsPerPage() ? ' disabled' : '')
-			]
+				'class' => 'next' . ($displayedItemCount < $this->getItemsPerPage() ? ' disabled' : ''),
+			],
 		];
 
 		$tpl = Renderer::getMarkupTemplate('paginate.tpl');
@@ -200,12 +200,12 @@ class Pager
 			$data['first'] = [
 				'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=1'),
 				'text'  => $this->l10n->t('first'),
-				'class' => $this->getPage() == 1 ? 'disabled' : ''
+				'class' => $this->getPage() == 1 ? 'disabled' : '',
 			];
 			$data['prev'] = [
 				'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . ($this->getPage() - 1)),
 				'text'  => $this->l10n->t('prev'),
-				'class' => $this->getPage() == 1 ? 'disabled' : ''
+				'class' => $this->getPage() == 1 ? 'disabled' : '',
 			];
 
 			$numpages = (int) ceil($totalItemCount / $this->getItemsPerPage());
@@ -226,13 +226,13 @@ class Pager
 					$pages[$i] = [
 						'url'   => '#',
 						'text'  => $i,
-						'class' => 'current active'
+						'class' => 'current active',
 					];
 				} else {
 					$pages[$i] = [
 						'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . $i),
 						'text'  => $i,
-						'class' => 'n'
+						'class' => 'n',
 					];
 				}
 			}
@@ -244,12 +244,12 @@ class Pager
 			$data['next'] = [
 				'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . ($this->getPage() + 1)),
 				'text'  => $this->l10n->t('next'),
-				'class' => $this->getPage() == $lastpage ? 'disabled' : ''
+				'class' => $this->getPage() == $lastpage ? 'disabled' : '',
 			];
 			$data['last'] = [
 				'url'   => Strings::ensureQueryParameter($this->baseQueryString . '&page=' . $lastpage),
 				'text'  => $this->l10n->t('last'),
-				'class' => $this->getPage() == $lastpage ? 'disabled' : ''
+				'class' => $this->getPage() == $lastpage ? 'disabled' : '',
 			];
 		}
 

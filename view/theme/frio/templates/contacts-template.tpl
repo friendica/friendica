@@ -42,7 +42,7 @@
 		<ul class="nav nav-pills preferences">
 			<li class="dropdown pull-right">
 				<button type="button" class="btn btn-link dropdown-toggle" id="BatchActionDropdownMenuTools" data-toggle="dropdown" aria-expanded="false">
-					<i class="fa fa-angle-down"></i>&nbsp;{{$h_batch_actions}}
+					<i class="ri ri-arrow-down-s-line"></i>&nbsp;{{$h_batch_actions}}
 				</button>
 				<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="BatchActionDropdownMenuTools">
 				{{foreach $batch_actions as $n=>$l}}

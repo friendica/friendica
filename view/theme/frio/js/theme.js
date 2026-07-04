@@ -40,14 +40,10 @@ $(document).ready(function () {
 		return false;
 	});
 
+	// TODO: Make PHP add the selected class to the relevant HTML element(s) and remove these
 	// add the class "selected" to circle widgets li if li > a does have the class circle-selected
 	if ($("#sidebar-circle-ul li a").hasClass("circle-selected")) {
 		$("#sidebar-circle-ul li a.circle-selected").parent("li").addClass("selected");
-	}
-
-	// add the class "selected" to groups widgets li if li > a does have the class group-selected
-	if ($("#group-list-sidebar-ul li a").hasClass("group-selected")) {
-		$("#group-list-sidebar-ul li a.group-selected").parent("li").addClass("selected");
 	}
 
 	// add the class "active" to tabmenuli if li > a does have the class active
@@ -61,7 +57,7 @@ $(document).ready(function () {
 	$(".field.select > select, .field.custom > select").addClass("form-control");
 
 	// move the tabbar to the second nav bar
-	$("section .tabbar-wrapper").first().appendTo("#topbar-second > .container > #tabmenu");
+	$("section .tabbar-wrapper").first().appendTo("#topbar-second > .container-fluid > #tabmenu");
 
 	// make responsive tabmenu with flexmenu.js
 	// the menupoints which doesn't fit in the second nav bar will moved to a
@@ -76,7 +72,7 @@ $(document).ready(function () {
 	// add Jot button to the second navbar
 	let $jotButton = $("#jotOpen");
 	if ($jotButton.length) {
-		$jotButton.appendTo("#topbar-second > .container > #navbar-button");
+		$jotButton.appendTo("#topbar-second > .container-fluid > #navbar-button");
 		if ($("#jot-popup").is(":hidden")) {
 			$jotButton.hide();
 		}
@@ -136,7 +132,7 @@ $(document).ready(function () {
 
 	// add search-heading to the second navbar
 	if ($(".search-heading").length) {
-		$(".search-heading").appendTo("#topbar-second > .container > #tabmenu");
+		$(".search-heading").appendTo("#topbar-second > .container-fluid > #tabmenu");
 	}
 
 	// add search results heading to the second navbar
@@ -154,7 +150,7 @@ $(document).ready(function () {
 		// insert the plain text in a <h4> heading and give it a class
 		var newText = '<h4 class="search-heading">' + searchText + "</h4>";
 		// append the new heading to the navbar
-		$("#topbar-second > .container > #tabmenu").append(newText);
+		$("#topbar-second > .container-fluid > #tabmenu").append(newText);
 
 		// try to get the value of the original search input to insert it
 		// as value in the nav-search-input
@@ -179,7 +175,7 @@ $(document).ready(function () {
 	}
 
 	// move the "Save the search" button to the second navbar
-	$(".search-content-wrapper #search-save").appendTo("#topbar-second > .container > #navbar-button");
+	$(".search-content-wrapper #search-save").appendTo("#topbar-second > .container-fluid > #navbar-button");
 
 	// append the vcard-short-info to the second nav after passing the element
 	// with .fn (vcard username). Use scrollspy to get the scroll position.
@@ -234,7 +230,7 @@ $(document).ready(function () {
 		// remove the old heading element
 		heading.remove(),
 			// put the new element to the second nav bar
-			$("#topbar-second > .container > #tabmenu").append(newText);
+			$("#topbar-second > .container-fluid > #tabmenu").append(newText);
 	}
 
 	// Dropdown menus with the class "dropdown-head" will display the active tab
@@ -771,34 +767,34 @@ function doActivityItemAction(ident, verb, un) {
 	var thumbsClass = '';
 	switch (verb) {
 		case 'like':
-			thumbsClass = 'fa-thumbs-up';
+			thumbsClass = 'ri-thumb-up-line';
 			break;
 		case 'dislike':
-			thumbsClass = 'fa-thumbs-down';
+			thumbsClass = 'ri-thumb-down-line';
 			break;
 		case 'announce':
-			thumbsClass = 'fa-retweet';
+			thumbsClass = 'ri-repeat-line';
 			break;
 		case 'attendyes':
-			thumbsClass = 'fa-check';
+			thumbsClass = 'ri-check-line';
 			break;
 		case 'attendno':
-			thumbsClass = 'fa-times';
+			thumbsClass = 'ri-close-line';
 			break;
 		case 'attendmaybe':
-			thumbsClass = 'fa-question';
+			thumbsClass = 'ri-question-line';
 	}
 	if (verb.indexOf('announce') === 0 ) {
 		// Share-Button(s)
 		// remove share-symbol, to replace it by rotator
-		$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').removeClass('fa-share');
-		$('button[id^=announce-' + ident.toString() + '] i:first-child').removeClass('fa-retweet');
+		$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').removeClass('ri-share-forward-line');
+		$('button[id^=announce-' + ident.toString() + '] i:first-child').removeClass('ri-repeat-line');
 		// avoid multiple rotators on like/share-button if klicked multiple times.
 		if ($('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').length == 0) {
 			// append rotator to the shareMenu-button for small media
 			$('<img>')
 				.attr({id: 'waitfor-' + verb + '-' + ident.toString(), src: 'images/rotator.gif'})
-				.addClass('fa')
+				.addClass('ri')
 				.appendTo($('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child' ));
 		}
 	}
@@ -807,7 +803,7 @@ function doActivityItemAction(ident, verb, un) {
 	if ($('button:not(button.dropdown-toggle) img#waitfor-' + verb + '-' + ident.toString()).length == 0) {
 		$('<img>')
 			.attr({id: 'waitfor-' + verb + '-' + ident.toString(), src: 'images/rotator.gif'})
-			.addClass('fa')
+			.addClass('ri')
 			.appendTo($('button[id^=' + verb + '-' + ident.toString() + '] i:first-child'));
 	}
 	$.post('item/' + ident.toString() + '/activity/' + _verb)
@@ -829,7 +825,7 @@ function doActivityItemAction(ident, verb, un) {
 				$('a[id^=' + verb + '-' + ident.toString() + ']' )
 					.removeClass('active')
 					.attr('href', 'javascript:doActivityItemAction(' + ident +', "' + verb + '")');
-				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).addClass('fa-retweet').removeClass('fa-ban');
+				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).addClass('ri-repeat-line').removeClass('ri-forbid-2-line');
 			} else {
 				// like/dislike buttons
 				$('button[id^=' + verb + '-' + ident.toString() + ']' )
@@ -839,12 +835,12 @@ function doActivityItemAction(ident, verb, un) {
 				$('a[id^=' + verb + '-' + ident.toString() + ']' )
 					.addClass('active')
 					.attr('href', 'javascript:doActivityItemAction(' + ident + ', "' + verb + '", true )');
-				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).removeClass('fa-retweet').addClass('fa-ban');
+				$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child' ).removeClass('ri-repeat-line').addClass('ri-forbid-2-line');
 			}
 			$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
 			if (verb.indexOf('announce') === 0 ) {
 				// ShareMenuButton
-				$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
+				$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('ri-share-forward-line');
 				if (data.verb == 'un' + verb) {
 					$('button[id^=shareMenuOptions-' + ident.toString() + ']').removeClass('active');
 				} else {
@@ -858,7 +854,7 @@ function doActivityItemAction(ident, verb, un) {
 			 * reset all buttons
 			 */
 			$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
-			$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
+			$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('ri-share-forward-line');
 			$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
 			$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
 			$.jGrowl(aActErr[verb] + '<br>(' + aErrType['srvErr'] + ')', {sticky: false, theme: 'info', life: 5000});
@@ -867,7 +863,7 @@ function doActivityItemAction(ident, verb, un) {
 	.error(function(data){
 		// Server could not be reached successfully
 		$('img[id^=waitfor-' + verb + '-' + ident.toString() + ']').remove();
-		$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('fa-share');
+		$('button[id^=shareMenuOptions-' + ident.toString() + '] i:first-child').addClass('ri-share-forward-line');
 		$('button[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
 		$('a[id^=' + verb + '-' + ident.toString() + '] i:first-child').addClass(thumbsClass);
 		$.jGrowl(aActErr[verb] + '<br>(' + aErrType['netErr'] + ')', {sticky: false, theme: 'info', life: 5000});

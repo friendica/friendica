@@ -4,46 +4,44 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<nav>
+<!-- NOTE: Place "sidebar-widget-list" only on one element: The one that should be expanded/collapsed -->
+<nav id='{{$type}}-sidebar' class="widget">
 	{{if $type == "channel"}}
-		{{assign var="icon" value="fa-th-large"}}
+		{{assign var="icon" value="ri-broadcast-line"}}
 	{{else if $type == "accounttype"}}
-		{{assign var="icon" value="fa-umbrella"}}
+		{{assign var="icon" value="ri-shapes-line"}}
 	{{else if $type == "rel"}}
-		{{assign var="icon" value="fa-exchange"}}
+		{{assign var="icon" value="ri-arrow-left-right-line"}}
 	{{else if $type == "circle"}}
-		{{assign var="icon" value="fa-user-circle"}}
+		{{assign var="icon" value="ri-bubble-chart-line"}}
+	{{else if $type == "nets"}}
+		{{assign var="icon" value="ri-message-2-line"}}
 	{{else}} {{* fallback to type="file" *}}
-		{{assign var="icon" value="fa-folder"}}
+		{{assign var="icon" value="ri-folder-line"}}
 	{{/if}}
-	<span id="{{$type}}-sidebar-inflated" class="widget inflated fakelink">
-		<button class="fakelink" onclick="openCloseWidget('{{$type}}-sidebar', '{{$type}}-sidebar-inflated');" aria-expanded="false">
+	<div>
+		<!-- TODO: Modify aria-expanded and set it to true/false in JS? -->
+		<button class="widget-btn fakelink" onclick="openCloseWidget('{{$type}}-sidebar');" aria-expanded="false">
 			<h3>
-				<i class="fa {{$icon}}" aria-hidden="true"></i>
+				<i class="ri {{$icon}}" aria-hidden="true"></i>
 				{{$title}}
 			</h3>
 		</button>
-	</span>
-	<div id="{{$type}}-sidebar" class="widget">
-		<button class="fakelink" onclick="openCloseWidget('{{$type}}-sidebar', '{{$type}}-sidebar-inflated');" aria-expanded="true">
-			<h3>
-				<i class="fa {{$icon}}" aria-hidden="true"></i>
-			{{$title}}
-			</h3>
-		</button>
-		<div id="{{$type}}-desc">{{$desc nofilter}}</div>
-		<ul class="{{$type}}-ul">
-			{{if $all_label}}
-				<li {{if !is_null($selected) && !$selected}}class="selected" {{/if}}><a href="{{$base}}" class="{{$type}}-link{{if !$selected}} {{$type}}-selected{{/if}} {{$type}}-all">{{$all_label}}</a>
-				</li>
-			{{/if}}
-			{{foreach $options as $option}}
-				<li {{if $selected == $option.ref}}class="selected" {{/if}}><a href="{{$base}}{{$type}}={{$option.ref}}" class="{{$type}}-link{{if $selected == $option.ref}} {{$type}}-selected{{/if}}">{{$option.name}}</a>
-				</li>
-			{{/foreach}}
-		</ul>
+		<div id="{{$type}}-sidebar" class="sidebar-widget-list">
+			<div id="{{$type}}-desc">{{$desc nofilter}}</div>
+			<ul class="{{$type}}-ul">
+				{{if $all_label}}
+					<li {{if !is_null($selected) && !$selected}}class="selected" {{/if}}><a href="{{$base}}" class="{{$type}}-link{{if !$selected}} {{$type}}-selected{{/if}} {{$type}}-all">{{$all_label}}</a>
+					</li>
+				{{/if}}
+				{{foreach $options as $option}}
+					<li {{if $selected == $option.ref}}class="selected" {{/if}}><a href="{{$base}}{{$type}}={{$option.ref}}" class="{{$type}}-link{{if $selected == $option.ref}} {{$type}}-selected{{/if}}">{{$option.name}}</a>
+					</li>
+				{{/foreach}}
+			</ul>
+		</div>
 	</div>
 </nav>
 <script>
-	initWidget('{{$type}}-sidebar', '{{$type}}-sidebar-inflated');
+	initWidget('{{$type}}-sidebar');
 </script>

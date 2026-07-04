@@ -49,10 +49,13 @@ final class FriendicaSmartyEngine extends TemplateEngine
 	}
 
 	/**
-	 * @inheritDoc
+	 * Test install
+	 *
+	 * @param-out array $errors Array of errors passed by reference
 	 */
-	public function testInstall(array &$errors = null)
+	public function testInstall(?array &$errors = null)
 	{
+		/** @phpstan-ignore paramOut.type(ignore wrong param type in Smarty::testInstall()) */
 		$this->smarty->testInstall($errors);
 	}
 
@@ -77,7 +80,7 @@ final class FriendicaSmartyEngine extends TemplateEngine
 
 		foreach ($vars as $key => $value) {
 			if ($key[0] === '$') {
-				$key = substr($key, 1);
+				$key = substr((string) $key, 1);
 			}
 
 			$this->smarty->assign($key, $value);

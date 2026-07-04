@@ -19,7 +19,6 @@ use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Module\Conversation\Community;
-use Friendica\Module\Home;
 use Friendica\Module\Security\Login;
 use Friendica\Network\HTTPException;
 use Friendica\Security\OpenWebAuth;
@@ -32,7 +31,6 @@ class Nav
 		'community'     => null,
 		'channel'       => null,
 		'network'       => null,
-		'home'          => null,
 		'profiles'      => null,
 		'introductions' => null,
 		'notifications' => null,
@@ -42,7 +40,7 @@ class Nav
 		'contacts'      => null,
 		'delegation'    => null,
 		'calendar'      => null,
-		'register'      => null
+		'register'      => null,
 	];
 
 	/**
@@ -52,31 +50,7 @@ class Nav
 	 */
 	private $appMenu = null;
 
-	/** @var BaseURL */
-	private $baseUrl;
-	/** @var L10n */
-	private $l10n;
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var Database */
-	private $database;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var Router */
-	private $router;
-
-	private EventDispatcherInterface $eventDispatcher;
-
-	public function __construct(BaseURL $baseUrl, L10n $l10n, IHandleUserSessions $session, Database $database, IManageConfigValues $config, Router $router, EventDispatcherInterface $eventDispatcher)
-	{
-		$this->baseUrl         = $baseUrl;
-		$this->l10n            = $l10n;
-		$this->session         = $session;
-		$this->database        = $database;
-		$this->config          = $config;
-		$this->router          = $router;
-		$this->eventDispatcher = $eventDispatcher;
-	}
+	public function __construct(private readonly BaseURL $baseUrl, private readonly L10n $l10n, private readonly IHandleUserSessions $session, private readonly Database $database, private readonly IManageConfigValues $config, private readonly Router $router, private readonly EventDispatcherInterface $eventDispatcher) {}
 
 	/**
 	 * Set a menu item in navbar as selected
@@ -118,11 +92,11 @@ class Nav
 			'$home'                 => $this->l10n->t('Home'),
 			'$skip'                 => $this->l10n->t('Skip to main content'),
 			'$clear_notifs'         => $this->l10n->t('Clear notifications'),
-			'$search_placeholder'   => $this->l10n->t('Search: @name, !group, #tags, content')
+			'$search_placeholder'   => $this->l10n->t('Search: @name, !group, #tags, content'),
 		]);
 
 		$nav = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::PAGE_HEADER, $nav)
+			new HtmlFilterEvent(HtmlFilterEvent::PAGE_HEADER, $nav),
 		)->getHtml();
 
 		return $nav;
@@ -161,7 +135,7 @@ class Nav
 			$arr = ['app_menu' => $appMenu];
 
 			$arr = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::APP_MENU, $arr)
+				new ArrayFilterEvent(ArrayFilterEvent::APP_MENU, $arr),
 			)->getArray();
 
 			$appMenu = $arr['app_menu'] ?? [];
@@ -199,11 +173,9 @@ class Nav
 			'apps'          => null,
 			'community'     => null,
 			'channel'       => null,
-			'home'          => null,
 			'calendar'      => null,
 			'login'         => null,
 			'logout'        => null,
-			'langselector'  => null,
 			'messages'      => null,
 			'network'       => null,
 			'notifications' => null,
@@ -224,11 +196,9 @@ class Nav
 
 		if ($this->session->isAuthenticated()) {
 			// user menu
-			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/profile', $this->l10n->t('Profile'), '', $this->l10n->t('Your profile page'), 'fa-user'];
-			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Conversations'), '', $this->l10n->t('Conversations you started'), 'fa-commenting'];
-			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/photos', $this->l10n->t('Photos'), '', $this->l10n->t('Your photos'), 'fa-picture-o'];
-			$nav['usermenu'][] = ['calendar/', $this->l10n->t('Calendar'), '', $this->l10n->t('Your calendar'), 'fa-calendar'];
-			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Your personal notes'), 'fa-book'];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Posts'), '', $this->l10n->t('My posts'), 'ri-chat-1-line'];
+			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/photos', $this->l10n->t('Photos'), '', $this->l10n->t('My photos'), 'ri-image-line'];
+			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Only you can see these'), 'ri-sticky-note-line'];
 
 			// user info
 			$contact  = $this->database->selectFirst('contact', ['id', 'url', 'avatar', 'micro', 'name', 'nick', 'baseurl', 'updated'], ['uid' => $this->session->getLocalUserId(), 'self' => true]);
@@ -236,16 +206,6 @@ class Nav
 				'icon' => Contact::getMicro($contact),
 				'name' => $contact['name'],
 			];
-		}
-
-		// "Home" should also take you home from an authenticated remote profile connection
-		$homelink = $this->session->getMyUrl();
-		if (!$homelink) {
-			$homelink = $this->session->get('visitor_home', '');
-		}
-
-		if ($this->router->getModuleClass() != Home::class && !$this->session->getLocalUserId()) {
-			$nav['home'] = [$homelink, $this->l10n->t('Home'), '', $this->l10n->t('Home Page')];
 		}
 
 		if (\Friendica\Module\Register::getPolicy() === \Friendica\Module\Register::OPEN && !$this->session->isAuthenticated()) {
@@ -268,7 +228,7 @@ class Nav
 			$nav['searchoption'] = [
 				$this->l10n->t('Full Text'),
 				$this->l10n->t('Tags'),
-				$this->l10n->t('Contacts')
+				$this->l10n->t('Contacts'),
 			];
 
 			if ($this->config->get('system', 'poco_local_search')) {
@@ -281,9 +241,9 @@ class Nav
 			$gdirpath = OpenWebAuth::getZrlUrl($this->config->get('system', 'directory'), true);
 		}
 
-		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::COMMUNITY) && (($this->session->getLocalUserId() || $this->config->get('system', 'community_page_style') != Community::DISABLED_VISITOR) &&
-			!($this->config->get('system', 'community_page_style') == Community::DISABLED))) {
-			$nav['community'] = ['community', $this->l10n->t('Community'), '', $this->l10n->t('Conversations on this and other servers')];
+		if (Feature::isEnabled($this->session->getLocalUserId(), Feature::COMMUNITY) && (($this->session->getLocalUserId() || $this->config->get('system', 'community_page_style') != Community::DISABLED_VISITOR)
+			&& !($this->config->get('system', 'community_page_style') == Community::DISABLED))) {
+			$nav['community'] = ['community', $this->l10n->t('Community'), '', $this->l10n->t('Community')];
 		}
 
 		if ($this->session->getLocalUserId()) {
@@ -300,9 +260,7 @@ class Nav
 
 		// The following nav links are only show to logged-in users
 		if ($this->session->getLocalUserNickname()) {
-			$nav['network'] = ['network', $this->l10n->t('Network'), '', $this->l10n->t('Conversations from your friends')];
-
-			$nav['home'] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Home'), '', $this->l10n->t('Your posts and conversations')];
+			$nav['network'] = ['network', $this->l10n->t('Home'), '', $this->l10n->t('Home')];
 
 			// Don't show notifications for public communities
 			if ($this->session->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {
@@ -332,7 +290,10 @@ class Nav
 
 		// Show the link to the admin configuration page if user is admin
 		if ($this->session->isSiteAdmin()) {
-			$nav['admin']      = ['admin/', $this->l10n->t('Admin'), '', $this->l10n->t('Site setup and configuration')];
+			$nav['admin'] = ['admin/', $this->l10n->t('Admin'), '', $this->l10n->t('Site setup and configuration')];
+		}
+		// Show the link to the moderation page if user is a moderator
+		if ($this->session->isModerator()) {
 			$nav['moderation'] = ['moderation/', $this->l10n->t('Moderation'), '', $this->l10n->t('Content and user moderation')];
 		}
 
@@ -353,7 +314,7 @@ class Nav
 		];
 
 		$nav_info = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NAV_INFO, $nav_info)
+			new ArrayFilterEvent(ArrayFilterEvent::NAV_INFO, $nav_info),
 		)->getArray();
 
 		return $nav_info;

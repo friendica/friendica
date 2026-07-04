@@ -30,11 +30,9 @@ class LoggerManagerTest extends TestCase
 	protected function tearDown(): void
 	{
 		$reflectionProperty = new \ReflectionProperty(LoggerManager::class, 'logger');
-		$reflectionProperty->setAccessible(true);
 		$reflectionProperty->setValue(null, null);
 
 		$reflectionProperty = new \ReflectionProperty(LoggerManager::class, 'logChannel');
-		$reflectionProperty->setAccessible(true);
 		$reflectionProperty->setValue(null, LogChannel::DEFAULT);
 	}
 
@@ -42,17 +40,17 @@ class LoggerManagerTest extends TestCase
 	{
 		$factory = new LoggerManager(
 			$this->createStub(IManageConfigValues::class),
-			$this->createStub(LoggerFactory::class)
+			$this->createStub(LoggerFactory::class),
 		);
 
-		$this->assertInstanceOf(LoggerInterface::class, $factory->getLogger());
+		$this->assertInstanceOf(LoggerInterface::class, $factory->getLogger()); // @phpstan-ignore method.alreadyNarrowedType
 	}
 
 	public function testGetLoggerReturnsSameObject(): void
 	{
 		$factory = new LoggerManager(
 			$this->createStub(IManageConfigValues::class),
-			$this->createStub(LoggerFactory::class)
+			$this->createStub(LoggerFactory::class),
 		);
 
 		$this->assertSame($factory->getLogger(), $factory->getLogger());
@@ -67,7 +65,7 @@ class LoggerManagerTest extends TestCase
 
 		$factory = new LoggerManager(
 			$config,
-			$this->createStub(LoggerFactory::class)
+			$this->createStub(LoggerFactory::class),
 		);
 
 		$this->assertInstanceOf(NullLogger::class, $factory->getLogger());
@@ -77,13 +75,13 @@ class LoggerManagerTest extends TestCase
 	{
 		$config = $this->createStub(IManageConfigValues::class);
 		$config->method('get')->willReturnMap([
-			['system', 'debugging', null, false],
-			['system', 'profiling', null, true],
+			['system', 'debugging', false, false],
+			['system', 'profiling', false, true],
 		]);
 
 		$factory = new LoggerManager(
 			$config,
-			$this->createStub(LoggerFactory::class)
+			$this->createStub(LoggerFactory::class),
 		);
 
 		$this->assertInstanceOf(ProfilerLogger::class, $factory->getLogger());
@@ -99,7 +97,7 @@ class LoggerManagerTest extends TestCase
 
 		$factory = new LoggerManager(
 			$config,
-			$this->createStub(LoggerFactory::class)
+			$this->createStub(LoggerFactory::class),
 		);
 
 		$logger1 = $factory->getLogger();
@@ -119,7 +117,7 @@ class LoggerManagerTest extends TestCase
 
 		$factory = new LoggerManager(
 			$config,
-			$this->createStub(LoggerFactory::class)
+			$this->createStub(LoggerFactory::class),
 		);
 
 		$factory->changeLogChannel(LogChannel::WORKER);

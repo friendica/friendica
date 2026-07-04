@@ -61,24 +61,6 @@ class Jetstream
 	private $self   = [];
 	private $capped = false;
 
-	/** @var LoggerInterface */
-	private $logger;
-
-	/** @var \Friendica\Core\Config\Capability\IManageConfigValues */
-	private $config;
-
-	/** @var IManageKeyValuePairs */
-	private $keyValue;
-
-	/** @var ATProtocol */
-	private $atprotocol;
-
-	/** @var Actor */
-	private $actor;
-
-	/** @var Processor */
-	private $processor;
-
 	/** @var \WebSocket\Client */
 	private $client;
 
@@ -92,15 +74,8 @@ class Jetstream
 	 * @param Actor $actor
 	 * @param Processor $processor
 	 */
-	public function __construct(LoggerInterface $logger, IManageConfigValues $config, IManageKeyValuePairs $keyValue, ATProtocol $atprotocol, Actor $actor, Processor $processor)
+	public function __construct(private readonly LoggerInterface $logger, private readonly IManageConfigValues $config, private readonly IManageKeyValuePairs $keyValue, private readonly ATProtocol $atprotocol, private readonly Actor $actor, private readonly Processor $processor)
 	{
-		$this->logger     = $logger;
-		$this->config     = $config;
-		$this->keyValue   = $keyValue;
-		$this->atprotocol = $atprotocol;
-		$this->actor      = $actor;
-		$this->processor  = $processor;
-
 		$this->atprotocol->setApiForUser(0);
 	}
 
@@ -144,7 +119,7 @@ class Jetstream
 						$this->logger->notice('Empty message received');
 						break;
 					}
-					$data = json_decode($message);
+					$data = json_decode((string) $message);
 					if (is_object($data)) {
 						$timestamp = $data->time_us;
 						$this->route($data);
@@ -173,13 +148,13 @@ class Jetstream
 				}
 				$last_timeout = time();
 			}
+
 			try {
 				$this->client->close();
 			} catch (\WebSocket\ConnectionException $e) {
 				$this->logger->error('Error while trying to close the connection', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 			}
 		}
-		$this->logger->notice('Stop listening');
 	}
 
 	/**
@@ -481,19 +456,11 @@ class Jetstream
 	 */
 	private function routeLike(stdClass $data): void
 	{
-		switch ($data->commit->operation) {
-			case 'delete':
-				$this->processor->deleteRecord($data);
-				break;
-
-			case 'create':
-				$this->processor->createLike($data);
-				break;
-
-			default:
-				$this->storeCommitMessage($data);
-				break;
-		}
+		match ($data->commit->operation) {
+			'delete' => $this->processor->deleteRecord($data),
+			'create' => $this->processor->createLike($data),
+			default  => $this->storeCommitMessage($data),
+		};
 	}
 
 	/**
@@ -504,23 +471,12 @@ class Jetstream
 	 */
 	private function routeProfile(stdClass $data): void
 	{
-		switch ($data->commit->operation) {
-			case 'delete':
-				$this->storeCommitMessage($data);
-				break;
-
-			case 'create':
-				$this->actor->updateContactByDID($data->did, 0);
-				break;
-
-			case 'update':
-				$this->actor->updateContactByDID($data->did, 0);
-				break;
-
-			default:
-				$this->storeCommitMessage($data);
-				break;
-		}
+		match ($data->commit->operation) {
+			'delete' => $this->storeCommitMessage($data),
+			'create' => $this->actor->updateContactByDID($data->did, 0),
+			'update' => $this->actor->updateContactByDID($data->did, 0),
+			default  => $this->storeCommitMessage($data),
+		};
 	}
 
 	/**

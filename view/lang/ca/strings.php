@@ -9,90 +9,6 @@ $a->strings['Unable to locate original post.'] = 'No es pot localitzar post orig
 $a->strings['Empty post discarded.'] = 'Buidat després de rebutjar.';
 $a->strings['Item not found.'] = 'Article no trobat.';
 $a->strings['Permission denied.'] = 'Permís denegat.';
-$a->strings['No valid account found.'] = 'Compte no vàlid trobat.';
-$a->strings['Password reset request issued. Check your email.'] = 'Sol·licitut de restabliment de contrasenya enviat. Comprovi el seu correu.';
-$a->strings['
-		Dear %1$s,
-			A request was recently received at "%2$s" to reset your account
-		password. In order to confirm this request, please select the verification link
-		below or paste it into your web browser address bar.
-
-		If you did NOT request this change, please DO NOT follow the link
-		provided and ignore and/or delete this email, the request will expire shortly.
-
-		Your password will not be changed unless we can verify that you
-		issued this request.'] = '
-		Benvolgut %1$s,
-			Recentment es va rebre una sol·licitud a "%2$s" per restablir el vostre compte
-		contrasenya Per confirmar aquesta sol·licitud, seleccioneu l’enllaç de verificació
-		a continuació o enganxeu-lo a la barra d\'adreces del navegador web
-		Si NO heu sol·licitat aquest canvi, NO seguiu l\'enllaç
-		sempre que, ignorant i / o suprimint aquest correu electrònic, la sol·licitud caducarà en breu.
-
-		La vostra contrasenya no es canviarà tret que puguem verificar-la
-va emetre aquesta sol·licitud.';
-$a->strings['
-		Follow this link soon to verify your identity:
-
-		%1$s
-
-		You will then receive a follow-up message containing the new password.
-		You may change that password from your account settings page after logging in.
-
-		The login details are as follows:
-
-		Site Location:	%2$s
-		Login Name:	%3$s'] = '
-		Seguiu aquest enllaç aviat per verificar la vostra identitat:
-
-		%1$s
-
-		A continuació, rebrà un missatge de seguiment que conté la nova contrasenya.
-		Podeu canviar aquesta contrasenya des de la pàgina de configuració del compte després d’iniciar la sessió.
-		Els detalls d’inici de sessió són els següents:
-
-		Ubicació del lloc:	%2$s
-		Nom d\'usuari:	%3$s';
-$a->strings['Password reset requested at %s'] = 'Contrasenya restablerta enviada a %s';
-$a->strings['Request could not be verified. (You may have previously submitted it.) Password reset failed.'] = 'La sol·licitut no pot ser verificada. (Hauries de presentar-la abans). Restabliment de contrasenya fracassat.';
-$a->strings['Request has expired, please make a new one.'] = 'La sol·licitud ha caducat, fes-ne una de nova.';
-$a->strings['Forgot your Password?'] = 'Has Oblidat la Contrasenya?';
-$a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Introdueixi la seva adreça de correu i enivii-la per restablir la seva contrasenya. Llavors comprovi el seu correu per a les següents instruccións. ';
-$a->strings['Password Reset'] = 'Restabliment de Contrasenya';
-$a->strings['Your password has been reset as requested.'] = 'La teva contrasenya fou restablerta com vas demanar.';
-$a->strings['Your new password is'] = 'La teva nova contrasenya es';
-$a->strings['Save or copy your new password - and then'] = 'Guarda o copia la nova contrasenya - i llavors';
-$a->strings['click here to login'] = 'clica aquí per identificarte';
-$a->strings['Your password may be changed from the <em>Settings</em> page after successful login.'] = 'Pots camviar la contrasenya des de la pàgina de <em>Configuración</em> desprès d\'accedir amb èxit.';
-$a->strings['
-			Dear %1$s,
-				Your password has been changed as requested. Please retain this
-			information for your records (or change your password immediately to
-			something that you will remember).
-		'] = '
-			Benvolgut %1$s,
-				La vostra contrasenya s\'ha canviat segons la sol·licitud. Conserveu-ho
-			informació sobre els vostres registres (o canviar-ne la contrasenya immediatament a
-			cosa que recordareu).
-		';
-$a->strings['
-			Your login details are as follows:
-
-			Site Location:	%1$s
-			Login Name:	%2$s
-			Password:	%3$s
-
-			You may change that password from your account settings page after logging in.
-		'] = '
-			Les dades de connexió són les següents:
-
-			Ubicació del lloc:	%1$s
-			Nom d\'usuari:	%2$s
-			Contrasenya:	%3$s
-
-			odeu canviar aquesta contrasenya des de la pàgina de configuració del compte després d’iniciar la sessió..
-		';
-$a->strings['Your password has been changed at %s'] = 'La teva contrasenya ha estat canviada a %s';
 $a->strings['Messages'] = 'Missatges';
 $a->strings['New Message'] = 'Nou Missatge';
 $a->strings['No recipient selected.'] = 'No s\'ha seleccionat destinatari.';
@@ -104,8 +20,6 @@ $a->strings['Conversation not found.'] = 'No s\'ha trobat la conversa.';
 $a->strings['Please enter a link URL:'] = 'Sius plau, entri l\'enllaç URL:';
 $a->strings['Send Private Message'] = 'Enviant Missatge Privat';
 $a->strings['To:'] = 'Per a:';
-$a->strings['Subject:'] = 'Assumpte::';
-$a->strings['Your message:'] = 'El teu missatge:';
 $a->strings['Upload photo'] = 'Carregar foto';
 $a->strings['Insert web link'] = 'Inserir enllaç web';
 $a->strings['Please wait'] = 'Si us plau esperi';
@@ -115,6 +29,8 @@ $a->strings['D, d M Y - g:i A'] = 'D, d M Y - g:i A';
 $a->strings['Delete conversation'] = 'Esborrar conversació';
 $a->strings['No secure communications available. You <strong>may</strong> be able to respond from the sender\'s profile page.'] = 'Comunicacions degures no disponibles. Tú <strong>pots</strong> respondre des de la pàgina de perfil del remitent.';
 $a->strings['Send Reply'] = 'Enviar Resposta';
+$a->strings['Subject:'] = 'Assumpte::';
+$a->strings['Your message:'] = 'El teu missatge:';
 $a->strings['Unknown sender - %s'] = 'remitent desconegut - %s';
 $a->strings['You and %s'] = 'Tu i %s';
 $a->strings['%s and You'] = '%s i Tu';
@@ -122,24 +38,18 @@ $a->strings['%d message'] = [
 	0 => '%d missatge',
 	1 => '%d missatges',
 ];
-$a->strings['Personal Notes'] = 'Notes Personals';
-$a->strings['Save'] = 'Guardar';
 $a->strings['Photo Albums'] = 'Àlbum de Fotos';
 $a->strings['Recent Photos'] = 'Fotos Recents';
-$a->strings['Upload Photos'] = 'Carregar Fotos';
 $a->strings['everybody'] = 'tothom';
 $a->strings['Contact information unavailable'] = 'Informació del Contacte no disponible';
 $a->strings['Album not found.'] = 'Àlbum no trobat.';
-$a->strings['a photo'] = 'una foto';
-$a->strings['%1$s was tagged in %2$s by %3$s'] = '%1$s fou etiquetat a %2$s per %3$s';
 $a->strings['Public access denied.'] = 'Accés públic denegat.';
 $a->strings['No photos selected'] = 'No s\'han seleccionat fotos';
-$a->strings['New album name: '] = 'Nou nom d\'àlbum:';
-$a->strings['Do not show a status post for this upload'] = 'No tornis a mostrar un missatge d\'estat d\'aquesta pujada';
 $a->strings['Permissions'] = 'Permisos';
 $a->strings['Do you really want to delete this photo album and all its photos?'] = 'Realment vols esborrar aquest album de fotos amb totes les fotos?';
 $a->strings['Delete Album'] = 'Eliminar Àlbum';
 $a->strings['Cancel'] = 'Cancel·lar';
+$a->strings['New album name: '] = 'Nou nom d\'àlbum:';
 $a->strings['Edit Album'] = 'Editar Àlbum';
 $a->strings['Show Newest First'] = 'Mostrar el més Nou Primer';
 $a->strings['Show Oldest First'] = 'Mostrar el més Antic Primer';
@@ -151,21 +61,12 @@ $a->strings['Delete Photo'] = 'Eliminar Foto';
 $a->strings['View photo'] = 'Veure foto';
 $a->strings['Edit photo'] = 'Editar foto';
 $a->strings['View Full Size'] = 'Veure\'l a Mida Completa';
-$a->strings['Tags'] = 'Etiquetes';
 $a->strings['New album name'] = 'Nou nom d\'àlbum';
 $a->strings['Caption'] = 'Títol';
-$a->strings['Add a Tag'] = 'Afegir una etiqueta';
-$a->strings['Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping'] = 'Exemple: @bob, @Barbara_jensen, @jim@example.com,  #California, #camping';
 $a->strings['Rotate CW (right)'] = 'Rotar CW (dreta)';
 $a->strings['Rotate CCW (left)'] = 'Rotar CCW (esquerra)';
-$a->strings['This is you'] = 'Aquest ets tu';
-$a->strings['Comment'] = 'Comentari';
-$a->strings['Preview'] = 'Vista prèvia';
-$a->strings['Select'] = 'Selecionar';
-$a->strings['Delete'] = 'Esborrar';
-$a->strings['I like this (toggle)'] = 'M\'agrada això (canviar)';
-$a->strings['I don\'t like this (toggle)'] = 'No m\'agrada això (canviar)';
 $a->strings['Edit'] = 'Editar';
+$a->strings['Delete'] = 'Esborrar';
 $a->strings['Delete this item?'] = 'Esborrar aquest element?';
 $a->strings['toggle mobile'] = 'canviar a mòbil';
 $a->strings['Page not found.'] = 'Pàgina no trobada.';
@@ -188,7 +89,6 @@ $a->strings['Tag term:'] = 'Terminis de l\'etiqueta:';
 $a->strings['Where are you right now?'] = 'On ets ara?';
 $a->strings['Delete item(s)?'] = 'Esborrar element(s)?';
 $a->strings['New Post'] = 'Missatge nou';
-$a->strings['Share'] = 'Compartir';
 $a->strings['upload photo'] = 'carregar fotos';
 $a->strings['Attach file'] = 'Adjunta fitxer';
 $a->strings['attach file'] = 'adjuntar arxiu';
@@ -208,10 +108,12 @@ $a->strings['Set title'] = 'Canviar títol';
 $a->strings['Categories (comma-separated list)'] = 'Categories (lista separada per comes)';
 $a->strings['Permission settings'] = 'Configuració de permisos';
 $a->strings['Public post'] = 'Enviament públic';
+$a->strings['Preview'] = 'Vista prèvia';
 $a->strings['Message'] = 'Missatge';
 $a->strings['remove'] = 'esborrar';
 $a->strings['Delete Selected Items'] = 'Esborra els Elements Seleccionats';
 $a->strings['%s reshared this.'] = '%s va tornar a compartir això';
+$a->strings['Select'] = 'Selecionar';
 $a->strings['View %s\'s profile @ %s'] = 'Veure perfil de %s @ %s';
 $a->strings['Categories:'] = 'Categories:';
 $a->strings['Filed under:'] = 'Arxivat a:';
@@ -219,13 +121,13 @@ $a->strings['%s from %s'] = '%s des de %s';
 $a->strings['View in context'] = 'Veure en context';
 $a->strings['Personal'] = 'Personal';
 $a->strings['Posts that mention or involve you'] = 'Missatge que et menciona o t\'impliquen';
-$a->strings['Starred'] = 'Favorits';
 $a->strings['Favourite Posts'] = 'Enviaments Favorits';
 $a->strings['General Features'] = 'Característiques Generals';
 $a->strings['Post Composition Features'] = 'Característiques de Composició d\'Enviaments';
 $a->strings['Post/Comment Tools'] = 'Eines d\'Enviaments/Comentaris';
 $a->strings['Post Categories'] = 'Categories en Enviaments';
 $a->strings['Add categories to your posts'] = 'Afegeix categories als teus enviaments';
+$a->strings['Summary'] = 'Sumari';
 $a->strings['Archives'] = 'Arxius';
 $a->strings['Saved Searches'] = 'Cerques Guardades';
 $a->strings['Saved Folders'] = 'Carpetes Guardades';
@@ -234,14 +136,11 @@ $a->strings['event'] = 'esdeveniment';
 $a->strings['status'] = 'estatus';
 $a->strings['photo'] = 'foto';
 $a->strings['%1$s tagged %2$s\'s %3$s with %4$s'] = '%1$s etiquetats %2$s %3$s amb %4$s';
-$a->strings['Follow Thread'] = 'Seguir el Fil';
 $a->strings['View Status'] = 'Veure Estatus';
 $a->strings['View Profile'] = 'Veure Perfil';
 $a->strings['View Photos'] = 'Veure Fotos';
 $a->strings['Network Posts'] = 'Enviaments a la Xarxa';
 $a->strings['View Contact'] = 'Veure contacte';
-$a->strings['Block'] = 'Bloquejar';
-$a->strings['Ignore'] = 'Ignorar';
 $a->strings['Connect/Follow'] = 'Connectar/Seguir';
 $a->strings['Nothing new here'] = 'Res nou aquí';
 $a->strings['Home'] = 'Inici';
@@ -263,6 +162,7 @@ $a->strings['Addon applications, utilities, games'] = 'Afegits: aplicacions, uti
 $a->strings['Search'] = 'Cercar';
 $a->strings['Search site content'] = 'Busca contingut en el lloc';
 $a->strings['Full Text'] = 'Text Complet';
+$a->strings['Tags'] = 'Etiquetes';
 $a->strings['Contacts'] = 'Contactes';
 $a->strings['Community'] = 'Comunitat';
 $a->strings['Directory'] = 'Directori';
@@ -368,43 +268,6 @@ $a->strings['Note: as a security measure, you should give the web server write a
 $a->strings['view/smarty3 is writable'] = 'view/smarty3 es escribible';
 $a->strings['Url rewrite is working'] = 'URL rewrite està treballant';
 $a->strings['Could not connect to database.'] = 'No puc connectar a la base de dades.';
-$a->strings['Monday'] = 'Dilluns';
-$a->strings['Tuesday'] = 'Dimarts';
-$a->strings['Wednesday'] = 'Dimecres';
-$a->strings['Thursday'] = 'Dijous';
-$a->strings['Friday'] = 'Divendres';
-$a->strings['Saturday'] = 'Dissabte';
-$a->strings['Sunday'] = 'Diumenge';
-$a->strings['January'] = 'Gener';
-$a->strings['February'] = 'Febrer';
-$a->strings['March'] = 'Març';
-$a->strings['April'] = 'Abril';
-$a->strings['May'] = 'Maig';
-$a->strings['June'] = 'Juny';
-$a->strings['July'] = 'Juliol';
-$a->strings['August'] = 'Agost';
-$a->strings['September'] = 'Setembre';
-$a->strings['October'] = 'Octubre';
-$a->strings['November'] = 'Novembre';
-$a->strings['December'] = 'Desembre';
-$a->strings['Mon'] = 'Dl';
-$a->strings['Tue'] = 'Dt';
-$a->strings['Wed'] = 'Dc';
-$a->strings['Thu'] = 'Dj';
-$a->strings['Fri'] = 'Dv';
-$a->strings['Sat'] = 'Ds';
-$a->strings['Sun'] = 'Dg';
-$a->strings['Jan'] = 'Gen';
-$a->strings['Feb'] = 'Feb';
-$a->strings['Mar'] = 'Mar';
-$a->strings['Apr'] = 'Abr';
-$a->strings['Jun'] = 'Jun';
-$a->strings['Jul'] = 'Jul';
-$a->strings['Aug'] = 'Ago';
-$a->strings['Sep'] = 'Set';
-$a->strings['Oct'] = 'Oct';
-$a->strings['Nov'] = 'Nov';
-$a->strings['Dec'] = 'Des';
 $a->strings['Storage base path'] = 'Ruta base d\'emmagatzematge';
 $a->strings['Folder where uploaded files are saved. For maximum security, This should be a path outside web server folder tree'] = 'Carpeta on es desen els fitxers penjats. Per a la màxima seguretat, aquest ha de ser un camí fora de l\'arbre de carpetes del servidor web';
 $a->strings['Enter a valid existing folder'] = 'Introduïu una carpeta existent vàlida';
@@ -444,9 +307,44 @@ $a->strings['Use mailto: in front of address to force email check.'] = 'Emprar m
 $a->strings['Limited profile. This person will be unable to receive direct/personal notifications from you.'] = 'Perfil limitat. Aquesta persona no podrà rebre notificacions personals/directes de tu.';
 $a->strings['Unable to retrieve contact information.'] = 'No es pot recuperar la informació de contacte.';
 $a->strings['Starts:'] = 'Inici:';
-$a->strings['Finishes:'] = 'Acaba:';
 $a->strings['all-day'] = 'tot el dia';
+$a->strings['Sun'] = 'Dg';
+$a->strings['Mon'] = 'Dl';
+$a->strings['Tue'] = 'Dt';
+$a->strings['Wed'] = 'Dc';
+$a->strings['Thu'] = 'Dj';
+$a->strings['Fri'] = 'Dv';
+$a->strings['Sat'] = 'Ds';
+$a->strings['Sunday'] = 'Diumenge';
+$a->strings['Monday'] = 'Dilluns';
+$a->strings['Tuesday'] = 'Dimarts';
+$a->strings['Wednesday'] = 'Dimecres';
+$a->strings['Thursday'] = 'Dijous';
+$a->strings['Friday'] = 'Divendres';
+$a->strings['Saturday'] = 'Dissabte';
+$a->strings['Jan'] = 'Gen';
+$a->strings['Feb'] = 'Feb';
+$a->strings['Mar'] = 'Mar';
+$a->strings['Apr'] = 'Abr';
+$a->strings['May'] = 'Maig';
+$a->strings['Jun'] = 'Jun';
+$a->strings['Jul'] = 'Jul';
+$a->strings['Aug'] = 'Ago';
 $a->strings['Sept'] = 'Set';
+$a->strings['Oct'] = 'Oct';
+$a->strings['Nov'] = 'Nov';
+$a->strings['Dec'] = 'Des';
+$a->strings['January'] = 'Gener';
+$a->strings['February'] = 'Febrer';
+$a->strings['March'] = 'Març';
+$a->strings['April'] = 'Abril';
+$a->strings['June'] = 'Juny';
+$a->strings['July'] = 'Juliol';
+$a->strings['August'] = 'Agost';
+$a->strings['September'] = 'Setembre';
+$a->strings['October'] = 'Octubre';
+$a->strings['November'] = 'Novembre';
+$a->strings['December'] = 'Desembre';
 $a->strings['today'] = 'avui';
 $a->strings['month'] = 'mes';
 $a->strings['week'] = 'setmana';
@@ -454,12 +352,6 @@ $a->strings['day'] = 'dia';
 $a->strings['No events to display'] = 'No hi ha esdeveniments per mostrar';
 $a->strings['Access to this profile has been restricted.'] = 'L\'accés a aquest perfil ha estat restringit.';
 $a->strings['l, F j'] = 'l, F j';
-$a->strings['Edit event'] = 'Editar esdeveniment';
-$a->strings['Duplicate event'] = 'Esdeveniment duplicat';
-$a->strings['Delete event'] = 'Esborrar esdeveniment';
-$a->strings['l F d, Y \@ g:i A'] = 'l F d, Y \@ g:i A';
-$a->strings['D g:i A'] = 'D g:i A';
-$a->strings['g:i A'] = 'g:i A';
 $a->strings['Show map'] = 'Mostra el mapa';
 $a->strings['Hide map'] = 'Amaga el mapa';
 $a->strings['%s\'s birthday'] = '%s aniversari';
@@ -467,16 +359,14 @@ $a->strings['Happy Birthday %s'] = 'Feliç Aniversari %s';
 $a->strings['activity'] = 'activitat';
 $a->strings['post'] = 'missatge';
 $a->strings['bytes'] = 'bytes';
-$a->strings['View on separate page'] = 'Veure en un altre pàgina';
 $a->strings['[no subject]'] = '[Sense assumpte]';
 $a->strings['Wall Photos'] = 'Fotos del Mur';
 $a->strings['Homepage:'] = 'Pàgina web:';
 $a->strings['About:'] = 'Acerca de:';
-$a->strings['F d'] = 'F d';
+$a->strings['Edit profile'] = 'Editar perfil';
 $a->strings['[today]'] = '[avui]';
 $a->strings['Birthday Reminders'] = 'Recordatori d\'Aniversaris';
 $a->strings['Birthdays this week:'] = 'Aniversari aquesta setmana';
-$a->strings['g A l F d'] = 'g A l F d';
 $a->strings['[No description]'] = '[sense descripció]';
 $a->strings['Event Reminders'] = 'Recordatori d\'Esdeveniments';
 $a->strings['Hometown:'] = 'Lloc de residència:';
@@ -486,7 +376,6 @@ $a->strings['Religious Views:'] = 'Creencies Religioses:';
 $a->strings['Likes:'] = 'Agrada:';
 $a->strings['Dislikes:'] = 'No Agrada';
 $a->strings['Title/Description:'] = 'Títol/Descripció:';
-$a->strings['Summary'] = 'Sumari';
 $a->strings['Musical interests'] = 'Gustos musicals';
 $a->strings['Books, literature'] = 'Llibres, Literatura';
 $a->strings['Television'] = 'Televisió';
@@ -531,7 +420,6 @@ $a->strings['Attempt to execute this update step automatically'] = 'Intentant ex
 $a->strings['No'] = 'No';
 $a->strings['Yes'] = 'Si';
 $a->strings['Other'] = 'Altres';
-$a->strings['Logs'] = 'Registres';
 $a->strings['Clear'] = 'Netejar';
 $a->strings['Enable Debugging'] = 'Habilitar Depuració';
 $a->strings['Log file'] = 'Arxiu de registre';
@@ -596,6 +484,7 @@ $a->strings['Network timeout'] = 'Temps excedit a la xarxa';
 $a->strings['Value is in seconds. Set to 0 for unlimited (not recommended).'] = 'Valor en segons. Canviat a 0 es sense límits (no recomenat)';
 $a->strings['Maximum Load Average'] = 'Càrrega Màxima Sostinguda';
 $a->strings['Temp path'] = 'Camí a carpeta temporal';
+$a->strings['Save'] = 'Guardar';
 $a->strings['Message queues'] = 'Cues de missatges';
 $a->strings['Version'] = 'Versió';
 $a->strings['Screenshot'] = 'Captura de pantalla';
@@ -608,6 +497,7 @@ $a->strings['Item was not found.'] = 'Element no trobat.';
 $a->strings['Please login to continue.'] = 'Per favor, accedeixi per a continuar.';
 $a->strings['Additional features'] = 'Característiques Adicionals';
 $a->strings['DB updates'] = 'Actualitzacions de BD';
+$a->strings['Logs'] = 'Registres';
 $a->strings['User registrations waiting for confirmation'] = 'Registre d\'usuari a l\'espera de confirmació';
 $a->strings['Users'] = 'Usuaris';
 $a->strings['Profile Details'] = 'Detalls del Perfil';
@@ -620,15 +510,13 @@ $a->strings['Connected apps'] = 'App connectada';
 $a->strings['Export personal data'] = 'Exportar dades personals';
 $a->strings['Remove account'] = 'Esborrar compte';
 $a->strings['Event title and start time are required.'] = 'Títol d\'esdeveniment i hora d\'inici requerits.';
-$a->strings['Event Starts:'] = 'Inici d\'Esdeveniment:';
+$a->strings['Edit event'] = 'Editar esdeveniment';
 $a->strings['Required'] = 'Requerit';
-$a->strings['Finish date/time is not known or not relevant'] = 'La data/hora de finalització no es coneixen o no són relevants';
-$a->strings['Event Finishes:'] = 'L\'esdeveniment Finalitza:';
+$a->strings['Location'] = 'Ubicació';
+$a->strings['Description'] = 'Descripció';
 $a->strings['Share this event'] = 'Compartir aquest esdeveniment';
-$a->strings['Submit'] = 'Enviar';
 $a->strings['Basic'] = 'Basic';
 $a->strings['calendar'] = 'calendari';
-$a->strings['Events'] = 'Esdeveniments';
 $a->strings['list'] = 'llista';
 $a->strings['Contact not found.'] = 'Contacte no trobat';
 $a->strings['Invalid contact.'] = 'Contacte no vàlid.';
@@ -645,13 +533,17 @@ $a->strings['Hidden'] = 'Amagat';
 $a->strings['Only show hidden contacts'] = 'Mostrar únicament els contactes amagats';
 $a->strings['Search your contacts'] = 'Cercant el seus contactes';
 $a->strings['Update'] = 'Actualitzar';
+$a->strings['Block'] = 'Bloquejar';
 $a->strings['Unblock'] = 'Desbloquejar';
+$a->strings['Ignore'] = 'Ignorar';
 $a->strings['Unignore'] = 'Treure d\'Ignorats';
 $a->strings['Advanced Contact Settings'] = 'Ajustos Avançats per als Contactes';
 $a->strings['Friend'] = 'Amic';
+$a->strings['This is you'] = 'Aquest ets tu';
 $a->strings['Visit %s\'s profile [%s]'] = 'Visitar perfil de %s [%s]';
 $a->strings['Contact update failed.'] = 'Fracassà l\'actualització de Contacte';
 $a->strings['Return to contact editor'] = 'Tornar al editor de contactes';
+$a->strings['Submit'] = 'Enviar';
 $a->strings['Name'] = 'Nom';
 $a->strings['Account Nickname'] = 'Àlies del Compte';
 $a->strings['Account URL'] = 'Adreça URL del Compte';
@@ -703,13 +595,13 @@ $a->strings['You aren\'t following this contact.'] = 'No seguiu aquest contacte.
 $a->strings['Unfollowing is currently not supported by your network.'] = 'Actualment, la vostra xarxa no és compatible amb el fet de seguir.';
 $a->strings['Disconnect/Unfollow'] = 'Desconnecta / Deixa de seguir';
 $a->strings['Not available.'] = 'No disponible.';
+$a->strings['l F d, Y \@ g:i A'] = 'l F d, Y \@ g:i A';
 $a->strings['Time Conversion'] = 'Temps de Conversió';
 $a->strings['Friendica provides this service for sharing events with other networks and friends in unknown timezones.'] = 'Friendica ofereix aquest servei per a compartir esdeveniments amb d\'altres xarxes i amics en zones horaries que son desconegudes';
 $a->strings['UTC time: %s'] = 'hora UTC: %s';
 $a->strings['Current timezone: %s'] = 'Zona horària actual: %s';
 $a->strings['Converted localtime: %s'] = 'Conversión de hora local: %s';
 $a->strings['Please select your timezone:'] = 'Si us plau, seleccioneu la vostra zona horària:';
-$a->strings['No entries (some entries may be hidden).'] = 'No hi ha entrades (algunes de les entrades poden estar amagades).';
 $a->strings['Find on this site'] = 'Trobat en aquest lloc';
 $a->strings['Site Directory'] = 'Directori Local';
 $a->strings['- select -'] = '- seleccionar -';
@@ -758,6 +650,20 @@ $a->strings['Enter email addresses, one per line:'] = 'Entri adreçes de correu,
 $a->strings['You are cordially invited to join me and other close friends on Friendica - and help us to create a better social web.'] = 'Estàs cordialment convidat a ajuntarte a mi i altres amics propers en Friendica - i ajudar-nos a crear una millor web social.';
 $a->strings['You will need to supply this invitation code: $invite_code'] = 'Vostè haurà de proporcionar aquest codi d\'invitació: $invite_code';
 $a->strings['Once you have registered, please connect with me via my profile page at:'] = 'Un cop registrat, si us plau contactar amb mi a través de la meva pàgina de perfil a:';
+$a->strings['No valid account found.'] = 'Compte no vàlid trobat.';
+$a->strings['Password reset request issued. Check your email.'] = 'Sol·licitut de restabliment de contrasenya enviat. Comprovi el seu correu.';
+$a->strings['Password reset requested at %s'] = 'Contrasenya restablerta enviada a %s';
+$a->strings['Request could not be verified. (You may have previously submitted it.) Password reset failed.'] = 'La sol·licitut no pot ser verificada. (Hauries de presentar-la abans). Restabliment de contrasenya fracassat.';
+$a->strings['Request has expired, please make a new one.'] = 'La sol·licitud ha caducat, fes-ne una de nova.';
+$a->strings['Forgot your Password?'] = 'Has Oblidat la Contrasenya?';
+$a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Introdueixi la seva adreça de correu i enivii-la per restablir la seva contrasenya. Llavors comprovi el seu correu per a les següents instruccións. ';
+$a->strings['Password Reset'] = 'Restabliment de Contrasenya';
+$a->strings['Your password has been reset as requested.'] = 'La teva contrasenya fou restablerta com vas demanar.';
+$a->strings['Your new password is'] = 'La teva nova contrasenya es';
+$a->strings['Save or copy your new password - and then'] = 'Guarda o copia la nova contrasenya - i llavors';
+$a->strings['click here to login'] = 'clica aquí per identificarte';
+$a->strings['Your password may be changed from the <em>Settings</em> page after successful login.'] = 'Pots camviar la contrasenya des de la pàgina de <em>Configuración</em> desprès d\'accedir amb èxit.';
+$a->strings['Your password has been changed at %s'] = 'La teva contrasenya ha estat canviada a %s';
 $a->strings['System down for maintenance'] = 'Sistema apagat per manteniment';
 $a->strings['Files'] = 'Arxius';
 $a->strings['Upload'] = 'Pujar';
@@ -771,6 +677,7 @@ $a->strings['Organisation Page'] = 'Página de organización';
 $a->strings['News Page'] = 'Página de noticias';
 $a->strings['select all'] = 'Seleccionar tot';
 $a->strings['Item not found'] = 'Element no trobat';
+$a->strings['Comment'] = 'Comentari';
 $a->strings['Registered users'] = 'Usuaris registrats';
 $a->strings['Pending registrations'] = 'Registres d\'usuari pendents';
 $a->strings['%s user deleted'] = [
@@ -798,14 +705,6 @@ $a->strings['Home Notifications'] = 'Notificacions d\'Inici';
 $a->strings['{0} requested registration'] = '{0} solicituts de registre';
 $a->strings['Authorize application connection'] = 'Autoritzi la connexió de aplicacions';
 $a->strings['Do you want to authorize this application to access your posts and contacts, and/or create new posts for you?'] = 'Vol autoritzar a aquesta aplicació per accedir als teus missatges i contactes, i/o crear nous enviaments per a vostè?';
-$a->strings['No contact provided.'] = 'No s’ha proporcionat cap contacte.';
-$a->strings['Couldn\'t fetch information for contact.'] = 'No s\'ha pogut obtenir informació per al contacte.';
-$a->strings['Couldn\'t fetch friends for contact.'] = 'No s\'ha pogut buscar amics per contactar-los.';
-$a->strings['Done'] = 'Fet';
-$a->strings['success'] = 'èxit';
-$a->strings['failed'] = 'suspendre';
-$a->strings['ignored'] = 'ignorar';
-$a->strings['Keep this window open until done.'] = 'Manteniu aquesta finestra oberta fins que no hàgiu acabat.';
 $a->strings['Edit post'] = 'Editar Enviament';
 $a->strings['web link'] = 'enllaç de web';
 $a->strings['Insert video link'] = 'Insertar enllaç de video';
@@ -820,12 +719,9 @@ $a->strings['No contacts.'] = 'Sense Contactes';
 $a->strings['Image file is empty.'] = 'El fitxer de imatge és buit.';
 $a->strings['View Album'] = 'Veure Àlbum';
 $a->strings['Profile not found.'] = 'Perfil no trobat.';
-$a->strings['j F, Y'] = 'j F, Y';
-$a->strings['j F'] = 'j F';
 $a->strings['Birthday:'] = 'Aniversari:';
 $a->strings['Age: '] = 'Edat:';
 $a->strings['Description:'] = 'Descripció:';
-$a->strings['Edit profile'] = 'Editar perfil';
 $a->strings['Profile unavailable.'] = 'Perfil no disponible';
 $a->strings['Invalid locator'] = 'Localitzador no vàlid';
 $a->strings['Friend/Connection Request'] = 'Sol·licitud d\'Amistat';
@@ -885,11 +781,8 @@ $a->strings['Allow friends to tag your posts?'] = 'Permet als amics d\'etiquetar
 $a->strings['Default Post Permissions'] = 'Permisos de Correu per Defecte';
 $a->strings['Automatically expire posts after this many days:'] = 'Després de aquests nombre de dies, els missatges caduquen automàticament:';
 $a->strings['If empty, posts will not expire. Expired posts will be deleted'] = 'Si està buit, els missatges no caducarà. Missatges caducats s\'eliminaran';
-$a->strings['Notification Settings'] = 'Ajustos de Notificació';
-$a->strings['Send a notification email when:'] = 'Envia un correu notificant quan:';
 $a->strings['You receive an introduction'] = 'Has rebut una presentació';
 $a->strings['Your introductions are confirmed'] = 'La teva presentació està confirmada';
-$a->strings['Someone writes on your profile wall'] = 'Algú ha escrit en el teu mur de perfil';
 $a->strings['Someone writes a followup comment'] = 'Algú ha escrit un comentari de seguiment';
 $a->strings['You receive a private message'] = 'Has rebut un missatge privat';
 $a->strings['You receive a friend suggestion'] = 'Has rebut una suggerencia d\'un amic';
@@ -905,7 +798,6 @@ $a->strings['Change the behaviour of this account for special situations'] = 'Ca
 $a->strings['Relocate'] = 'traslladar-se';
 $a->strings['If you have moved this profile from another server, and some of your contacts don\'t receive your updates, try pushing this button.'] = 'Si heu mogut aquest perfil d\'un altre servidor i alguns dels vostres contactes no reben les vostres actualitzacions, proveu de prémer aquest botó.';
 $a->strings['Resend relocate message to contacts'] = 'Torneu a enviar el missatge a contactes';
-$a->strings['Description'] = 'Descripció';
 $a->strings['Add'] = 'Afegir';
 $a->strings['Failed to connect with email account using the settings provided.'] = 'Connexió fracassada amb el compte de correu emprant la configuració proveïda.';
 $a->strings['Email access is disabled on this site.'] = 'L\'accés al correu està deshabilitat en aquest lloc.';
@@ -943,7 +835,6 @@ $a->strings['Connected Apps'] = 'Aplicacions conectades';
 $a->strings['Remove authorization'] = 'retirar l\'autorització';
 $a->strings['(click to open/close)'] = '(clicar per a obrir/tancar)';
 $a->strings['Edit Profile Details'] = 'Editor de Detalls del Perfil';
-$a->strings['Location'] = 'Ubicació';
 $a->strings['Miscellaneous'] = 'Miscel·lania';
 $a->strings['Street Address:'] = 'Direcció:';
 $a->strings['Locality/City:'] = 'Localitat/Ciutat:';
@@ -952,9 +843,7 @@ $a->strings['Postal/Zip Code:'] = 'Codi Postal:';
 $a->strings['Country:'] = 'País';
 $a->strings['Homepage URL:'] = 'Pàgina web URL:';
 $a->strings['Public Keywords:'] = 'Paraules Clau Públiques';
-$a->strings['(Used for suggesting potential friends, can be seen by others)'] = '(Emprat per suggerir potencials amics, Altres poden veure-ho)';
 $a->strings['Private Keywords:'] = 'Paraules Clau Privades:';
-$a->strings['(Used for searching profiles, never shown to others)'] = '(Emprat durant la cerca de perfils, mai mostrat a ningú)';
 $a->strings['Image size reduction [%s] failed.'] = 'La reducció de la imatge [%s] va fracassar.';
 $a->strings['Shift-reload the page or clear browser cache if the new photo does not display immediately.'] = 'Recarregui la pàgina o netegi la caché del navegador si la nova foto no apareix immediatament.';
 $a->strings['Unable to process image'] = 'No es pot processar la imatge';
@@ -1076,6 +965,9 @@ $a->strings['You may visit them online at %s'] = 'El pot visitar en línia a %s'
 $a->strings['Please contact the sender by replying to this post if you do not wish to receive these messages.'] = 'Si us plau, poseu-vos en contacte amb el remitent responent a aquest missatge si no voleu rebre aquests missatges.';
 $a->strings['%s posted an update.'] = '%s ha publicat una actualització.';
 $a->strings['This entry was edited'] = 'L\'entrada fou editada';
+$a->strings['Starred'] = 'Favorits';
+$a->strings['I like this (toggle)'] = 'M\'agrada això (canviar)';
+$a->strings['I don\'t like this (toggle)'] = 'No m\'agrada això (canviar)';
 $a->strings['to'] = 'a';
 $a->strings['Wall-to-Wall'] = 'Mur-a-Mur';
 $a->strings['via Wall-To-Wall:'] = 'via Mur-a-Mur';

@@ -12,20 +12,27 @@ use Friendica\Util\Strings;
 class OAuthRequest implements \Stringable
 {
 	private $parameters;
-	private $http_method;
 	private $http_url;
 	// for debug purposes
 	public $base_string;
 	public static $version    = '1.0';
 	public static $POST_INPUT = 'php://input';
 
-	public function __construct($http_method, $http_url, $parameters = null)
-	{
-		@$parameters or $parameters = [];
-		$parameters                 = array_merge(OAuthUtil::parse_parameters(parse_url($http_url, PHP_URL_QUERY)), $parameters);
-		$this->parameters           = $parameters;
-		$this->http_method          = $http_method;
-		$this->http_url             = $http_url;
+	/**
+	 * @param array|null $parameters
+	 */
+	public function __construct(
+		private $http_method,
+		$http_url,
+		$parameters = null,
+	) {
+		if (is_null($parameters)) {
+			$parameters = [];
+		}
+
+		$parameters       = array_merge(OAuthUtil::parse_parameters(parse_url((string) $http_url, PHP_URL_QUERY)), $parameters);
+		$this->parameters = $parameters;
+		$this->http_url   = $http_url;
 	}
 
 
@@ -66,7 +73,7 @@ class OAuthRequest implements \Stringable
 			if (
 				$http_method == "POST"
 				&& @strstr(
-					$request_headers["Content-Type"],
+					(string) $request_headers["Content-Type"],
 					"application/x-www-form-urlencoded",
 				)
 			) {
@@ -78,7 +85,7 @@ class OAuthRequest implements \Stringable
 
 			// We have a Authorization-header with OAuth data. Parse the header
 			// and add those overriding any duplicates from GET or POST
-			if (@substr($request_headers['Authorization'], 0, 6) == "OAuth ") {
+			if (@substr((string) $request_headers['Authorization'], 0, 6) == "OAuth ") {
 				$header_parameters = OAuthUtil::split_header(
 					$request_headers['Authorization'],
 				);
@@ -87,7 +94,7 @@ class OAuthRequest implements \Stringable
 		}
 		// fix for friendica redirect system
 
-		$http_url = substr($http_url, 0, strpos($http_url, (string) $parameters['pagename']) + strlen($parameters['pagename']));
+		$http_url = substr((string) $http_url, 0, strpos((string) $http_url, (string) $parameters['pagename']) + strlen((string) $parameters['pagename']));
 		unset($parameters['pagename']);
 
 		return new OAuthRequest($http_method, $http_url, $parameters);
@@ -104,10 +111,13 @@ class OAuthRequest implements \Stringable
 	 *
 	 * @return OAuthRequest
 	 */
-	public static function from_consumer_and_token(OAuthConsumer $consumer, $http_method, $http_url, array $parameters = null, OAuthToken $token = null)
+	public static function from_consumer_and_token(OAuthConsumer $consumer, $http_method, $http_url, ?array $parameters = null, ?OAuthToken $token = null)
 	{
-		@$parameters or $parameters = [];
-		$defaults                   = [
+		if (is_null($parameters)) {
+			$parameters = [];
+		}
+
+		$defaults = [
 			"oauth_version"      => OAuthRequest::$version,
 			"oauth_nonce"        => OAuthRequest::generate_nonce(),
 			"oauth_timestamp"    => OAuthRequest::generate_timestamp(),
@@ -197,7 +207,7 @@ class OAuthRequest implements \Stringable
 	 */
 	public function get_normalized_http_method()
 	{
-		return strtoupper($this->http_method);
+		return strtoupper((string) $this->http_method);
 	}
 
 	/**
@@ -206,20 +216,20 @@ class OAuthRequest implements \Stringable
 	 */
 	public function get_normalized_http_url()
 	{
-		$parts = parse_url($this->http_url);
+		$parts = parse_url((string) $this->http_url);
 
-		$port   = @$parts['port'];
 		$scheme = $parts['scheme'];
+		$port   = $parts['port'] ?? ($scheme === 'https') ? '443' : '80';
 		$host   = $parts['host'];
 		$path   = @$parts['path'];
 
-		$port or $port = ($scheme == 'https') ? '443' : '80';
-
-		if (($scheme == 'https' && $port != '443')
-			|| ($scheme == 'http' && $port != '80')
+		if (
+			($scheme === 'https' && $port != '443')
+			|| ($scheme === 'http' && $port != '80')
 		) {
 			$host = "$host:$port";
 		}
+
 		return "$scheme://$host$path";
 	}
 
@@ -271,7 +281,7 @@ class OAuthRequest implements \Stringable
 		}
 
 		foreach ($this->parameters as $k => $v) {
-			if (!str_starts_with($k, "oauth")) {
+			if (!str_starts_with((string) $k, "oauth")) {
 				continue;
 			}
 			if (is_array($v)) {

@@ -11,18 +11,7 @@ use Friendica\BaseEntity;
 
 class AclReceivers extends BaseEntity
 {
-	protected array $allowContacts   = [];
-	protected array $allowCircles = [];
-	protected array $denyContacts    = [];
-	protected array $denyCircles  = [];
-
-	public function __construct(array $allowContacts = [], array $allowCircles = [], array $denyContacts = [], array $denyCircles = [])
-	{
-		$this->allowContacts = $allowContacts;
-		$this->allowCircles  = $allowCircles;
-		$this->denyContacts  = $denyContacts;
-		$this->denyCircles   = $denyCircles;
-	}
+	public function __construct(protected array $allowContacts = [], protected array $allowCircles = [], protected array $denyContacts = [], protected array $denyCircles = []) {}
 
 	public function isEmpty(): bool
 	{

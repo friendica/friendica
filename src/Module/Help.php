@@ -56,7 +56,7 @@ class Help extends BaseModule
 			DI::page()['aside'] = Markdown::convert($home, false);
 		}
 
-		if (!strlen($text)) {
+		if (!strlen((string) $text)) {
 			throw new HTTPException\NotFoundException();
 		}
 

@@ -13,7 +13,7 @@ use Friendica\Test\MockedTestCase;
 
 class UserSessionTest extends MockedTestCase
 {
-	public function dataLocalUserId()
+	public static function dataLocalUserId()
 	{
 		return [
 			'standard' => [
@@ -52,21 +52,19 @@ class UserSessionTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataLocalUserId
-	 */
-	public function testGetLocalUserId(array $data, $expected)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataLocalUserId')]
+	public function testGetLocalUserId(array $data, $expected): void
 	{
 		$userSession = new UserSession(new ArraySession($data));
 		$this->assertEquals($expected, $userSession->getLocalUserId());
 	}
 
-	public function testPublicContactId()
+	public function testPublicContactId(): void
 	{
 		$this->markTestSkipped('Needs Contact::getIdForURL testable first');
 	}
 
-	public function dataGetRemoteUserId()
+	public static function dataGetRemoteUserId()
 	{
 		return [
 			'standard' => [
@@ -105,17 +103,15 @@ class UserSessionTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataGetRemoteUserId
-	 */
-	public function testGetRemoteUserId(array $data, $expected)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataGetRemoteUserId')]
+	public function testGetRemoteUserId(array $data, $expected): void
 	{
 		$userSession = new UserSession(new ArraySession($data));
 		$this->assertEquals($expected, $userSession->getRemoteUserId());
 	}
 
 	/// @fixme Add more data when Contact::getIdForUrl is a dynamic class
-	public function dataGetRemoteContactId()
+	public static function dataGetRemoteContactId()
 	{
 		return [
 			'remote_exists' => [
@@ -128,16 +124,14 @@ class UserSessionTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataGetRemoteContactId
-	 */
-	public function testGetRemoteContactId(int $uid, array $data, $expected)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataGetRemoteContactId')]
+	public function testGetRemoteContactId(int $uid, array $data, $expected): void
 	{
 		$userSession = new UserSession(new ArraySession($data));
 		$this->assertEquals($expected, $userSession->getRemoteContactID($uid));
 	}
 
-	public function dataGetUserIdForVisitorContactID()
+	public static function dataGetUserIdForVisitorContactID()
 	{
 		return [
 			'standard' => [
@@ -163,14 +157,14 @@ class UserSessionTest extends MockedTestCase
 		];
 	}
 
-	/** @dataProvider dataGetUserIdForVisitorContactID */
-	public function testGetUserIdForVisitorContactID(int $cid, array $data, $expected)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataGetUserIdForVisitorContactID')]
+	public function testGetUserIdForVisitorContactID(int $cid, array $data, $expected): void
 	{
 		$userSession = new UserSession(new ArraySession($data));
 		$this->assertSame($expected, $userSession->getUserIDForVisitorContactID($cid));
 	}
 
-	public function dataAuthenticated()
+	public static function dataAuthenticated()
 	{
 		return [
 			'authenticated' => [
@@ -201,16 +195,14 @@ class UserSessionTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataAuthenticated
-	 */
-	public function testIsAuthenticated(array $data, $expected)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataAuthenticated')]
+	public function testIsAuthenticated(array $data, $expected): void
 	{
 		$userSession = new UserSession(new ArraySession($data));
 		$this->assertEquals($expected, $userSession->isAuthenticated());
 	}
 
-	public function dataIsVisitor()
+	public static function dataIsVisitor()
 	{
 		return [
 			'local_user' => [
@@ -248,16 +240,14 @@ class UserSessionTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataIsVisitor
-	 */
-	public function testIsVisitor(array $data, $expected)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataIsVisitor')]
+	public function testIsVisitor(array $data, $expected): void
 	{
 		$userSession = new UserSession(new ArraySession($data));
 		$this->assertEquals($expected, $userSession->isVisitor());
 	}
 
-	public function dataIsUnauthenticated()
+	public static function dataIsUnauthenticated()
 	{
 		return [
 			'local_user' => [
@@ -301,10 +291,8 @@ class UserSessionTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataIsUnauthenticated
-	 */
-	public function testIsUnauthenticated(array $data, $expected)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataIsUnauthenticated')]
+	public function testIsUnauthenticated(array $data, $expected): void
 	{
 		$userSession = new UserSession(new ArraySession($data));
 		$this->assertEquals($expected, $userSession->isUnauthenticated());

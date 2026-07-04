@@ -11,7 +11,6 @@ use Friendica\BaseRepository;
 use Friendica\Content\Conversation\Collection\UserDefinedChannels;
 use Friendica\Content\Conversation\Entity\UserDefinedChannel as UserDefinedChannelEntity;
 use Friendica\Content\Conversation\Factory\UserDefinedChannel as UserDefinedChannelFactory;
-use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Database\Database;
@@ -37,27 +36,21 @@ class UserDefinedChannel extends BaseRepository
 {
 	protected static $table_name = 'channel';
 
-	/** @var UserDefinedChannelFactory */
-	protected $factory;
-
-	private ICanCache $cache;
-	private IManageConfigValues $config;
-
 	/**
 	 * UserDefinedChannel repository constructor.
-	 *
-	 * @param Database $database Database access layer.
-	 * @param LoggerInterface $logger Logger instance.
-	 * @param UserDefinedChannelFactory $factory Entity factory.
-	 * @param IManageConfigValues $config Configuration manager.
-	 * @param ICanCache $cache Cache capability.
 	 */
-	public function __construct(Database $database, LoggerInterface $logger, UserDefinedChannelFactory $factory, IManageConfigValues $config, ICanCache $cache)
-	{
-		parent::__construct($database, $logger, $factory);
+	public function __construct(
+		Database $database,
+		LoggerInterface $logger,
+		private readonly UserDefinedChannelFactory $entityFactory,
+		private readonly IManageConfigValues $config,
+	) {
+		parent::__construct($database, $logger, $entityFactory);
+	}
 
-		$this->config = $config;
-		$this->cache  = $cache;
+	protected function getFactory(): UserDefinedChannelFactory
+	{
+		return $this->entityFactory;
 	}
 
 	/**
@@ -72,7 +65,7 @@ class UserDefinedChannel extends BaseRepository
 
 		$Entities = new UserDefinedChannels();
 		foreach ($rows as $fields) {
-			$Entities[] = $this->factory->createFromTableRow($fields);
+			$Entities[] = $this->getFactory()->createFromTableRow($fields);
 		}
 
 		return $Entities;
@@ -102,7 +95,7 @@ class UserDefinedChannel extends BaseRepository
 	{
 		$fields = $this->_selectFirstRowAsArray(['id' => $id, 'uid' => $uid]);
 
-		return $this->factory->createFromTableRow($fields);
+		return $this->getFactory()->createFromTableRow($fields);
 	}
 
 	/**
@@ -189,7 +182,7 @@ class UserDefinedChannel extends BaseRepository
 	 */
 	private function isValid(string $searchtext): bool
 	{
-		if ($searchtext == '') {
+		if ($searchtext === '') {
 			return true;
 		}
 
@@ -216,7 +209,7 @@ class UserDefinedChannel extends BaseRepository
 		$usercondition = ['uid' => $uids];
 		$condition     = DBA::mergeConditions($usercondition, ["`languages` != ? AND `include-tags` = ? AND `full-text-search` = ? AND `circle` = ?", '', '', '', 0]);
 		foreach ($this->select($condition) as $channel) {
-			if (!empty($channel->languages) && in_array($language, $channel->languages)) {
+			if (in_array($language, $channel->languages)) {
 				return true;
 			}
 		}
@@ -268,7 +261,7 @@ class UserDefinedChannel extends BaseRepository
 				}
 
 				if (
-					($channel->circle ?? 0)
+					($channel->circle > 0)
 					&& !$this->inCircle($channel->circle, $channel->uid, $owner_id)
 					&& !$this->inCircle($channel->circle, $channel->uid, $reshare_id)
 				) {
@@ -382,7 +375,7 @@ class UserDefinedChannel extends BaseRepository
 	 */
 	private function inCircle(int $circleId, int $uid, int $cid): bool
 	{
-		if ($cid == 0) {
+		if ($cid === 0) {
 			return false;
 		}
 
@@ -405,7 +398,7 @@ class UserDefinedChannel extends BaseRepository
 		if (empty($tags)) {
 			return false;
 		}
-		array_walk($tags, function (&$value) {
+		array_walk($tags, function (&$value): void {
 			$value = mb_strtolower($value);
 		});
 		foreach (explode(',', $tagList) as $tag) {
@@ -483,9 +476,9 @@ class UserDefinedChannel extends BaseRepository
 		$condition = [];
 
 		if (!empty($channel->circle)) {
-			if ($channel->circle == UserDefinedChannelEntity::CIRCLE_FOLLOWING) {
+			if ($channel->circle === UserDefinedChannelEntity::CIRCLE_FOLLOWING) {
 				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` IN (?, ?))", $uid, Contact::SHARING, Contact::FRIEND];
-			} elseif ($channel->circle == UserDefinedChannelEntity::CIRCLE_FOLLOWERS) {
+			} elseif ($channel->circle === UserDefinedChannelEntity::CIRCLE_FOLLOWERS) {
 				$condition = ["`owner-id` IN (SELECT `pid` FROM `account-user-view` WHERE `uid` = ? AND `rel` = ?)", $uid, Contact::FOLLOWER];
 			} elseif ($channel->circle > 0) {
 				$condition = DBA::mergeConditions($condition, ["`owner-id` IN (SELECT `pid` FROM `group_member` INNER JOIN `account-user-view` ON `group_member`.`contact-id` = `account-user-view`.`id` WHERE `gid` = ? AND `account-user-view`.`uid` = ?)", $channel->circle, $uid]);
@@ -558,7 +551,7 @@ class UserDefinedChannel extends BaseRepository
 	 * Convert include tag list into full-text search tag terms.
 	 *
 	 * @param string $includeTags Comma-separated include tags.
-	 * @return string Full-text search fragment or empty string.
+	 * @return non-empty-string Full-text search fragment or empty string.
 	 */
 	private function addIncludeTags(string $includeTags): string
 	{
@@ -567,11 +560,7 @@ class UserDefinedChannel extends BaseRepository
 			$tagterms .= ' tag:' . $tag;
 		}
 
-		if ($tagterms) {
-			return ' +(' . trim($tagterms) . ')';
-		} else {
-			return '';
-		}
+		return ' +(' . trim($tagterms) . ')';
 	}
 
 	/**

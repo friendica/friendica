@@ -21,20 +21,9 @@ use Psr\Log\LoggerInterface;
 
 class Action extends \Friendica\BaseModule
 {
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var UserGServer */
-	private $repository;
-	/** @var GServer */
-	private $gserverRepo;
-
-	public function __construct(GServer $gserverRepo, UserGServer $repository, IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly GServer $gserverRepo, private readonly UserGServer $repository, private readonly IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->session     = $session;
-		$this->repository  = $repository;
-		$this->gserverRepo = $gserverRepo;
 	}
 
 	public function content(array $request = []): string
@@ -81,16 +70,11 @@ class Action extends \Friendica\BaseModule
 
 		$userGServer = $this->repository->getOneByUserAndServer($this->session->getLocalUserId(), $this->parameters['gsid']);
 
-		switch ($this->parameters['action']) {
-			case 'ignore':
-				$userGServer->ignore();
-				break;
-			case 'unignore':
-				$userGServer->unignore();
-				break;
-			default:
-				throw new BadRequestException('Unknown user server action ' . $this->parameters['action']);
-		}
+		match ($this->parameters['action']) {
+			'ignore'   => $userGServer->ignore(),
+			'unignore' => $userGServer->unignore(),
+			default    => throw new BadRequestException('Unknown user server action ' . $this->parameters['action']),
+		};
 
 		$this->repository->save($userGServer);
 

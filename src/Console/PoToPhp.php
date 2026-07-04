@@ -214,14 +214,14 @@ HELP;
 	private static function render($tree): string
 	{
 		if (is_array($tree)) {
-			$if   = trim($tree['if']);
-			$then = trim($tree['then']);
+			$if   = trim((string) $tree['if']);
+			$then = trim((string) $tree['then']);
 			$else = self::render($tree['else']);
 
 			return "if ({$if}) { return {$then}; } else {$else}";
 		}
 
-		$tree = trim($tree);
+		$tree = trim((string) $tree);
 
 		return " { return {$tree}; }";
 	}

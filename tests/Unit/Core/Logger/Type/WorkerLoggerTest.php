@@ -5,7 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Test\src\Core\Logger\Type;
+namespace Friendica\Test\Unit\Core\Logger\Type;
 
 use Friendica\Core\Logger\Type\WorkerLogger;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +18,7 @@ class WorkerLoggerTest extends TestCase
 		self::assertMatchesRegularExpression('/^[a-zA-Z0-9]{' . WorkerLogger::WORKER_ID_LENGTH . '}+$/', $uid);
 	}
 
-	public function dataTest()
+	public static function dataTest(): array
 	{
 		return [
 			'info' => [
@@ -48,7 +48,7 @@ class WorkerLoggerTest extends TestCase
 			],
 			'notice' => [
 				'func'    => 'notice',
-				'msg'     => 'Notice' . ' alert' . true . 'with' . '\'strange\'' . 1.24. 'behavior',
+				'msg'     => 'Notice' . ' alert' . true . 'with' . '\'strange\'' . 1.24 . 'behavior',
 				'context' => ['test' => 'it'],
 			],
 			'debug' => [
@@ -61,9 +61,9 @@ class WorkerLoggerTest extends TestCase
 
 	/**
 	 * Test the WorkerLogger with different log calls
-	 * @dataProvider dataTest
 	 */
-	public function testLogMethod($func, $msg, $context = [])
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTest')]
+	public function testLogMethod($func, $msg, $context = []): void
 	{
 		$logger = $this->createMock(LoggerInterface::class);
 
@@ -83,7 +83,7 @@ class WorkerLoggerTest extends TestCase
 	/**
 	 * Test the WorkerLogger with
 	 */
-	public function testLog()
+	public function testLog(): void
 	{
 		$logger = $this->createMock(LoggerInterface::class);
 
@@ -103,7 +103,7 @@ class WorkerLoggerTest extends TestCase
 	/**
 	 * Test the WorkerLogger after setting a worker function
 	 */
-	public function testChangedId()
+	public function testChangedId(): void
 	{
 		$logger = $this->createMock(LoggerInterface::class);
 
@@ -135,7 +135,7 @@ class WorkerLoggerTest extends TestCase
 		$workLogger->log('debug', 'a test', $context2);
 	}
 
-	public function testReplaceDefaultContextReturnsOldDefaultContext()
+	public function testReplaceDefaultContextReturnsOldDefaultContext(): void
 	{
 		$logger = $this->createStub(LoggerInterface::class);
 
@@ -145,12 +145,12 @@ class WorkerLoggerTest extends TestCase
 
 		$this->assertSame(
 			['worker_id', 'worker_cmd'],
-			array_keys($workLogger->replaceDefaultContext($newContext))
+			array_keys($workLogger->replaceDefaultContext($newContext)),
 		);
 
 		$this->assertSame(
 			$newContext,
-			$workLogger->replaceDefaultContext([])
+			$workLogger->replaceDefaultContext([]),
 		);
 	}
 }

@@ -32,6 +32,6 @@
 <div id="photo-photo"><a href="{{$photo.href}}" title="{{$photo.title}}"><img src="{{$photo.src}}" /></a></div>
 {{if $nextlink}}<div id="photo-next-link"><a href="{{$nextlink.0}}">{{$nextlink.1 nofilter}}</a></div>{{/if}}
 <div id="photo-photo-end"></div>
-<div id="photo-caption">{{$desc nofilter}}</div>
+<div id="photo-caption">{{$desc}}</div>
 {{if $edit}}{{$edit nofilter}}{{/if}}
 

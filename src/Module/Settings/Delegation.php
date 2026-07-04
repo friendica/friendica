@@ -27,17 +27,9 @@ use Psr\Log\LoggerInterface;
  */
 class Delegation extends BaseSettings
 {
-	/** @var SystemMessages */
-	private $systemMessages;
-	/** @var Database */
-	private $db;
-
-	public function __construct(Database $db, SystemMessages $systemMessages, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly Database $db, private readonly SystemMessages $systemMessages, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->systemMessages = $systemMessages;
-		$this->db             = $db;
 	}
 
 	protected function post(array $request = [])

@@ -23,32 +23,38 @@ use Psr\Log\LoggerInterface;
 
 class Index extends BaseSettings
 {
-	/** @var Repository\UserGServer */
-	private $repository;
-	/** @var SystemMessages */
-	private $systemMessages;
-
-	public function __construct(SystemMessages $systemMessages, Repository\UserGServer $repository, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly SystemMessages $systemMessages,
+		private readonly Repository\UserGServer $repository,
+		IHandleUserSessions $session,
+		App\Page $page,
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->repository     = $repository;
-		$this->systemMessages = $systemMessages;
 	}
 
 	protected function post(array $request = [])
 	{
 		self::checkFormSecurityTokenRedirectOnError($this->args->getQueryString(), 'settings-server');
 
-		foreach ($request['delete'] ?? [] as $gsid => $delete) {
-			if ($delete) {
-				unset($request['ignored'][$gsid]);
+		if (array_key_exists('delete', $request) && is_array($request['delete'])) {
+			foreach ($request['delete'] as $gsid => $delete) {
+				if ($delete) {
+					unset($request['ignored'][$gsid]);
 
-				try {
-					$userGServer = $this->repository->selectOneByUserAndServer($this->session->getLocalUserId(), $gsid, false);
-					$this->repository->delete($userGServer);
-				} catch (NotFoundException) {
-					// Nothing to delete
+					try {
+						$userGServer = $this->repository->selectOneByUserAndServer($this->session->getLocalUserId(), $gsid, false);
+						$this->repository->delete($userGServer);
+					} catch (NotFoundException) {
+						// Nothing to delete
+					}
 				}
 			}
 		}

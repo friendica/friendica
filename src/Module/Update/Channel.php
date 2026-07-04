@@ -7,7 +7,7 @@
 
 namespace Friendica\Module\Update;
 
-use Friendica\Content\Conversation;
+use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Core\System;
 use Friendica\Module\Conversation\Channel as ChannelModule;
 
@@ -30,7 +30,7 @@ class Channel extends ChannelModule
 				$items = $this->getCommunityItems();
 			}
 
-			$o = $this->conversation->render($items, Conversation::MODE_CHANNEL, true, false, 'created', $this->session->getLocalUserId());
+			$o = $this->conversationRenderer->renderThreaded($items, ConversationRenderer::MODE_CHANNEL, true, ConversationRenderer::ORDER_CREATED, $this->session->getLocalUserId(), $request);
 		}
 
 		System::htmlUpdateExit($o);

@@ -25,15 +25,20 @@ use Psr\Log\LoggerInterface;
  */
 class Update extends BaseApi
 {
-	/** @var FriendicaPhoto */
-	private $friendicaPhoto;
-
-
-	public function __construct(FriendicaPhoto $friendicaPhoto, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly FriendicaPhoto $friendicaPhoto,
+		\Friendica\Factory\Api\Mastodon\Error $errorFactory,
+		AppHelper $appHelper,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		ApiResponse $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->friendicaPhoto = $friendicaPhoto;
 	}
 
 	protected function post(array $request = [])
@@ -84,22 +89,22 @@ class Update extends BaseApi
 		}
 
 		if (!is_null($allow_cid)) {
-			$allow_cid                   = trim($allow_cid);
+			$allow_cid                   = trim((string) $allow_cid);
 			$updated_fields['allow_cid'] = $allow_cid;
 		}
 
 		if (!is_null($deny_cid)) {
-			$deny_cid                   = trim($deny_cid);
+			$deny_cid                   = trim((string) $deny_cid);
 			$updated_fields['deny_cid'] = $deny_cid;
 		}
 
 		if (!is_null($allow_gid)) {
-			$allow_gid                   = trim($allow_gid);
+			$allow_gid                   = trim((string) $allow_gid);
 			$updated_fields['allow_gid'] = $allow_gid;
 		}
 
 		if (!is_null($deny_gid)) {
-			$deny_gid                   = trim($deny_gid);
+			$deny_gid                   = trim((string) $deny_gid);
 			$updated_fields['deny_gid'] = $deny_gid;
 		}
 
@@ -127,15 +132,14 @@ class Update extends BaseApi
 			$answer = ['result' => 'updated', 'message' => 'Image id `' . $photo_id . '` has been updated.'];
 			$this->response->addFormattedContent('photo_update', ['$result' => $answer], $this->parameters['extension'] ?? null);
 			return;
-		} else {
-			if ($nothingtodo) {
-				$answer = ['result' => 'cancelled', 'message' => 'Nothing to update for image id `' . $photo_id . '`.'];
-				$this->response->addFormattedContent('photo_update', ['$result' => $answer], $this->parameters['extension'] ?? null);
-				return;
-			}
-			throw new HTTPException\InternalServerErrorException('unknown error - update photo entry in database failed');
 		}
 
-		throw new HTTPException\InternalServerErrorException('unknown error - this error on uploading or updating a photo should never happen');
+		if ($nothingtodo) {
+			$answer = ['result' => 'cancelled', 'message' => 'Nothing to update for image id `' . $photo_id . '`.'];
+			$this->response->addFormattedContent('photo_update', ['$result' => $answer], $this->parameters['extension'] ?? null);
+			return;
+		}
+
+		throw new HTTPException\InternalServerErrorException('unknown error - update photo entry in database failed');
 	}
 }

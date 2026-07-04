@@ -47,7 +47,7 @@ class Queue extends BaseAdmin
 		$r = [];
 		while ($entry = DBA::fetch($entries)) {
 			// fix GH-5469. ref: src/Core/Worker.php:217
-			$param = Arrays::recursiveImplode(json_decode($entry['parameter'], true), ': ');
+			$param = Arrays::recursiveImplode(json_decode((string) $entry['parameter'], true), ': ');
 			// Truncate long parameters to prevent text overflow
 			if (strlen($param) > 300) {
 				$param = substr($param, 0, 300) . '...';

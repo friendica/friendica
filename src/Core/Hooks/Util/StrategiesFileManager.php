@@ -27,16 +27,13 @@ class StrategiesFileManager
 	public const STRATEGY_DEFAULT_KEY = '';
 	public const STATIC_DIR           = 'static';
 	public const CONFIG_NAME          = 'strategies';
-
-	private IManageConfigValues $configuration;
-	protected array $config = [];
+	protected array $config           = [];
 	/** @var string */
 	protected $basePath;
 
-	public function __construct(string $basePath, IManageConfigValues $configuration)
+	public function __construct(string $basePath, private readonly IManageConfigValues $configuration)
 	{
-		$this->basePath      = $basePath;
-		$this->configuration = $configuration;
+		$this->basePath = $basePath;
 	}
 
 	/**
@@ -95,7 +92,7 @@ class StrategiesFileManager
 		$returnConfig = [];
 
 		foreach ($addons as $addon) {
-			$addonName = Strings::sanitizeFilePathItem(trim($addon));
+			$addonName = Strings::sanitizeFilePathItem(trim((string) $addon));
 
 			$configFile = $this->basePath . '/addon/' . $addonName . '/' . static::STATIC_DIR . '/strategies.config.php';
 

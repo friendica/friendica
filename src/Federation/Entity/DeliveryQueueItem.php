@@ -20,29 +20,5 @@ use DateTimeImmutable;
  */
 final class DeliveryQueueItem extends \Friendica\BaseEntity
 {
-	/** @var int */
-	protected $targetServerId;
-	/** @var int */
-	protected $postUriId;
-	/** @var DateTimeImmutable */
-	protected $created;
-	/** @var string */
-	protected $command;
-	/** @var int */
-	protected $targetContactId;
-	/** @var int */
-	protected $senderUserId;
-	/** @var int */
-	protected $failed;
-
-	public function __construct(int $targetServerId, int $postUriId, DateTimeImmutable $created, string $command, int $targetContactId, int $senderUserId, int $failed = 0)
-	{
-		$this->targetServerId  = $targetServerId;
-		$this->postUriId       = $postUriId;
-		$this->created         = $created;
-		$this->command         = $command;
-		$this->targetContactId = $targetContactId;
-		$this->senderUserId    = $senderUserId;
-		$this->failed          = $failed;
-	}
+	public function __construct(protected int $targetServerId, protected int $postUriId, protected DateTimeImmutable $created, protected string $command, protected int $targetContactId, protected int $senderUserId, protected int $failed = 0) {}
 }

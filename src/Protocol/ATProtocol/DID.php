@@ -28,7 +28,7 @@ class DID
 	{
 		$host = DI::baseUrl()->getHost();
 
-		if (($host == $server['SERVER_NAME']) || !strpos($server['SERVER_NAME'], '.' . $host)) {
+		if (($host == $server['SERVER_NAME']) || !strpos((string) $server['SERVER_NAME'], '.' . $host)) {
 			return;
 		}
 

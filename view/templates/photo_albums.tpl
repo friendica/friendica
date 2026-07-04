@@ -5,7 +5,10 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <nav id="sidebar-photos-albums" class="widget">
-	<h3>{{$title}}</h3>
+	<h3>
+		<i class="ri ri-image-line"></i>
+		{{$title}}
+	 </h3>
 	<ul role="menubar" class="sidebar-photos-albums-ul">
 		<li role="menuitem" class="sidebar-photos-albums-li">
 			<a href="profile/{{$nick}}/photos" class="sidebar-photos-albums-element" title="{{$title}}">{{$recent}}</a>

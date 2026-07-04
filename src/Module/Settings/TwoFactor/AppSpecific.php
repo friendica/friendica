@@ -34,8 +34,20 @@ class AppSpecific extends BaseSettings
 	/** @var SystemMessages */
 	protected $systemMessages;
 
-	public function __construct(SystemMessages $systemMessages, IManagePersonalConfigValues $pConfig, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		SystemMessages $systemMessages,
+		IManagePersonalConfigValues $pConfig,
+		IHandleUserSessions $session,
+		App\Page $page,
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->pConfig        = $pConfig;
@@ -84,8 +96,8 @@ class AppSpecific extends BaseSettings
 				case 'revoke_all':
 					AppSpecificPassword::deleteAllForUser($this->session->getLocalUserId());
 					$this->systemMessages->addInfo($this->t('App-specific passwords successfully revoked.'));
+
 					$this->baseUrl->redirect('settings/2fa/app_specific?t=' . self::getFormSecurityToken('settings_2fa_password'));
-					break;
 			}
 		}
 

@@ -151,13 +151,13 @@ class Smilies
 	 * @return array with smilie codes (colon included) as the keys, their image urls as values;
 	 *               the normalized string is put under the '' (empty string) key
 	 */
-	public static function extractUsedSmilies(string $text, string &$normalized = null): array
+	public static function extractUsedSmilies(string $text, ?string &$normalized = null): array
 	{
 		$emojis = [];
 
 		$normalized = BBCode::performWithEscapedTags($text, ['code'], function ($text) use (&$emojis) {
 			return BBCode::performWithEscapedTags($text, ['noparse', 'nobb', 'pre'], function ($text) use (&$emojis) {
-				if (str_contains($text, '[nosmile]') || self::noSmilies()) {
+				if (str_contains((string) $text, '[nosmile]') || self::noSmilies()) {
 					return $text;
 				}
 				$smilies    = self::getList();
@@ -166,6 +166,7 @@ class Smilies
 					array_combine($smilies['texts'], $smilies['icons']),
 					$text,
 					function (string $name, string $image) use ($normalized, &$emojis) {
+						/** @phpstan-ignore function.impossibleType() */
 						if (array_key_exists($name, $normalized)) {
 							return $normalized[$name];
 						}
@@ -212,13 +213,13 @@ class Smilies
 		$ord2_bitset = 0;
 		$prefixes    = [];
 		foreach ($words as $word => $_) {
-			if (strlen($word) < 2) {
+			if (strlen((string) $word) < 2) {
 				continue;
 			}
 			$ord1 = ord($word[0]);
 			$ord2 = ord($word[1]);
 			// A smiley shortcode must not begin or end with whitespaces.
-			if (ctype_space($word[0]) || ctype_space($word[strlen($word) - 1])) {
+			if (ctype_space($word[0]) || ctype_space($word[strlen((string) $word) - 1])) {
 				continue;
 			}
 			$ord1_bitset |= 1 << ($ord1 & 31);
@@ -242,7 +243,7 @@ class Smilies
 			$d = $subject[$i + 1];
 			if (($ord1_bitset & (1 << (ord($c) & 31))) && ($ord2_bitset & (1 << (ord($d) & 31))) && array_key_exists($c, $prefixes)) {
 				foreach ($prefixes[$c] as $word) {
-					$wlength = strlen($word);
+					$wlength = strlen((string) $word);
 					if (substr($subject, $i, $wlength) === $word) {
 						// Check for boundaries
 						if (($i === 0 || ctype_space($subject[$i - 1]) || ctype_punct($subject[$i - 1]))
@@ -340,14 +341,14 @@ class Smilies
 			return $text;
 		}
 
-		$text = preg_replace_callback('/<(pre)>(.*?)<\/pre>/ism', [self::class, 'encode'], $text);
-		$text = preg_replace_callback('/<(code)>(.*?)<\/code>/ism', [self::class, 'encode'], $text);
+		$text = preg_replace_callback('/<(pre)>(.*?)<\/pre>/ism', self::encode(...), $text);
+		$text = preg_replace_callback('/<(code)>(.*?)<\/code>/ism', self::encode(...), (string) $text);
 
 		if ($no_images) {
 			$cleaned = ['texts' => [], 'icons' => []];
 			$icons   = $smilies['icons'];
 			foreach ($icons as $key => $icon) {
-				if (!strstr($icon, '<img ')) {
+				if (!strstr((string) $icon, '<img ')) {
 					$cleaned['texts'][] = $smilies['texts'][$key];
 					$cleaned['icons'][] = $smilies['icons'][$key];
 				}
@@ -355,11 +356,11 @@ class Smilies
 			$smilies = $cleaned;
 		}
 
-		$text = preg_replace_callback('/\B&lt;3+?\b/', [self::class, 'heartReplaceCallback'], $text);
+		$text = preg_replace_callback('/\B&lt;3+?\b/', self::heartReplaceCallback(...), (string) $text);
 		$text = self::strOrigReplace($smilies['texts'], $smilies['icons'], $text);
 
-		$text = preg_replace_callback('/<(code)>(.*?)<\/code>/ism', [self::class, 'decode'], $text);
-		$text = preg_replace_callback('/<(pre)>(.*?)<\/pre>/ism', [self::class, 'decode'], $text);
+		$text = preg_replace_callback('/<(code)>(.*?)<\/code>/ism', self::decode(...), $text);
+		$text = preg_replace_callback('/<(pre)>(.*?)<\/pre>/ism', self::decode(...), (string) $text);
 
 		return $text;
 	}
@@ -396,7 +397,7 @@ class Smilies
 	 */
 	private static function heartReplaceCallback(array $matches): string
 	{
-		return str_repeat('❤', strlen($matches[0]) - 4);
+		return str_repeat('❤', strlen((string) $matches[0]) - 4);
 	}
 
 	/**

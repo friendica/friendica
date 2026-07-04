@@ -16,6 +16,9 @@ use Friendica\Model\Contact;
  */
 class RandomProfile extends BaseModule
 {
+	/**
+	 * @return never
+	 */
 	protected function content(array $request = []): string
 	{
 		$appHelper = DI::appHelper();
@@ -28,7 +31,5 @@ class RandomProfile extends BaseModule
 		}
 
 		DI::baseUrl()->redirect('profile');
-
-		return '';
 	}
 }

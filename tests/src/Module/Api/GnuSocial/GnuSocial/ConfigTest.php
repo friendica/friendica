@@ -16,7 +16,7 @@ class ConfigTest extends ApiTestCase
 	/**
 	 * Test the api_statusnet_config() function.
 	 */
-	public function testApiStatusnetConfig()
+	public function testApiStatusnetConfig(): void
 	{
 		$response = (new Config(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);

@@ -20,7 +20,7 @@ class ShowTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesShow()
+	public function testApiStatusesShow(): void
 	{
 		$this->expectException(BadRequestException::class);
 
@@ -34,7 +34,7 @@ class ShowTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesShowWithId()
+	public function testApiStatusesShowWithId(): void
 	{
 		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
@@ -52,7 +52,7 @@ class ShowTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesShowWithConversation()
+	public function testApiStatusesShowWithConversation(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
@@ -76,9 +76,8 @@ class ShowTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_show() function with an unallowed user.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesShowWithUnallowedUser()
+	public function testApiStatusesShowWithUnallowedUser(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 

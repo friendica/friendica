@@ -1,14 +1,12 @@
 <?php
 
-// Copyright (C) 2010-2024, the Friendica project
-// SPDX-FileCopyrightText: 2010-2024 the Friendica project
+// Copyright (C) 2010-2026, the Friendica project
+// SPDX-FileCopyrightText: 2010-2026 the Friendica project
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 namespace Friendica\Model;
 
-use DivineOmega\DOFileCachePSR6\CacheItemPool;
-use DivineOmega\PasswordExposed;
 use ErrorException;
 use Exception;
 use Friendica\App;
@@ -36,6 +34,9 @@ use Friendica\Util\Network;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
 use ImagickException;
+use JordJD\DOFileCachePSR6\CacheItemPool;
+use JordJD\PasswordExposed\Enums\PasswordStatus;
+use JordJD\PasswordExposed\PasswordExposedChecker;
 use LightOpenID;
 
 /**
@@ -123,23 +124,14 @@ class User
 	 */
 	public static function getAccountTypeByString(string $accounttype)
 	{
-		switch ($accounttype) {
-			case 'person':
-				return self::ACCOUNT_TYPE_PERSON;
-
-			case 'organisation':
-				return self::ACCOUNT_TYPE_ORGANISATION;
-
-			case 'news':
-				return self::ACCOUNT_TYPE_NEWS;
-
-			case 'community':
-				return self::ACCOUNT_TYPE_COMMUNITY;
-
-			case 'relay':
-				return self::ACCOUNT_TYPE_RELAY;
-		}
-		return null;
+		return match ($accounttype) {
+			'person'       => self::ACCOUNT_TYPE_PERSON,
+			'organisation' => self::ACCOUNT_TYPE_ORGANISATION,
+			'news'         => self::ACCOUNT_TYPE_NEWS,
+			'community'    => self::ACCOUNT_TYPE_COMMUNITY,
+			'relay'        => self::ACCOUNT_TYPE_RELAY,
+			default        => null,
+		};
 	}
 
 	/**
@@ -547,7 +539,7 @@ class User
 			// Check if the avatar field is filled and the photo directs to the correct path
 			$avatar = Photo::selectFirst(['resource-id'], ['uid' => $uid, 'profile' => true]);
 			if (DBA::isResult($avatar)) {
-				$repair = empty($owner['avatar']) || !strpos($owner['photo'], (string) $avatar['resource-id']);
+				$repair = empty($owner['avatar']) || !strpos((string) $owner['photo'], (string) $avatar['resource-id']);
 			}
 		}
 
@@ -696,7 +688,7 @@ class User
 		DBA::close($channels);
 
 		foreach (DI::userDefinedChannel()->select(["NOT `languages` IS NULL"]) as $channel) {
-			foreach ($channel->languages ?? [] as $language) {
+			foreach ($channel->languages as $language) {
 				$languages[$language] = $language;
 			}
 		}
@@ -754,7 +746,7 @@ class User
 			if (AppSpecificPassword::authenticateUser($user['uid'], $password)) {
 				return $user['uid'];
 			}
-		} elseif (!str_contains($user['password'], '$')) {
+		} elseif (!str_contains((string) $user['password'], '$')) {
 			//Legacy hash that has not been replaced by a new hash yet
 			if (self::hashPasswordLegacy($password) === $user['password']) {
 				self::updatePasswordHashed($user['uid'], self::hashPassword($password));
@@ -764,12 +756,12 @@ class User
 		} elseif (!empty($user['legacy_password'])) {
 			//Legacy hash that has been double-hashed and not replaced by a new hash yet
 			//Warning: `legacy_password` is not necessary in sync with the content of `password`
-			if (password_verify(self::hashPasswordLegacy($password), $user['password'])) {
+			if (password_verify(self::hashPasswordLegacy($password), (string) $user['password'])) {
 				self::updatePasswordHashed($user['uid'], self::hashPassword($password));
 
 				return $user['uid'];
 			}
-		} elseif (password_verify($password, $user['password'])) {
+		} elseif (password_verify($password, (string) $user['password'])) {
 			//New password hash
 			if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
 				self::updatePasswordHashed($user['uid'], self::hashPassword($password));
@@ -941,9 +933,9 @@ class User
 		]);
 
 		try {
-			$passwordExposedChecker = new PasswordExposed\PasswordExposedChecker(null, $cache);
+			$passwordExposedChecker = new PasswordExposedChecker(null, $cache);
 
-			return $passwordExposedChecker->passwordExposed($password) === PasswordExposed\Enums\PasswordStatus::EXPOSED;
+			return $passwordExposedChecker->passwordExposed($password) === PasswordStatus::EXPOSED;
 		} catch (Exception $e) {
 			DI::logger()->error('Password Exposed Exception: ' . $e->getMessage(), [
 				'code'  => $e->getCode(),
@@ -995,7 +987,7 @@ class User
 	 * @param string|null $delimiter Whether the regular expression is meant to be wrapper in delimiter characters
 	 * @return string
 	 */
-	public static function getPasswordRegExp(string $delimiter = null): string
+	public static function getPasswordRegExp(?string $delimiter = null): string
 	{
 		$allowed_characters = ':!"#$%&\'()*+,-./;<=>?@[\]^_`{|}~';
 
@@ -1003,6 +995,7 @@ class User
 			$allowed_characters = preg_quote($allowed_characters, $delimiter);
 		}
 
+		/** @phpstan-ignore identical.alwaysTrue(value of PASSWORD_DEFAULT will be change in a future PHP version) */
 		return '^[a-zA-Z0-9' . $allowed_characters . ']' . (PASSWORD_DEFAULT === PASSWORD_BCRYPT ? '{1,72}' : '+') . '$';
 	}
 
@@ -1026,6 +1019,7 @@ class User
 			throw new Exception(DI::l10n()->t('The new password has been exposed in a public data dump, please choose another.'));
 		}
 
+		/** @phpstan-ignore identical.alwaysTrue(value of PASSWORD_DEFAULT will be change in a future PHP version) */
 		if (PASSWORD_DEFAULT === PASSWORD_BCRYPT && strlen($password) > 72) {
 			throw new Exception(DI::l10n()->t('The password length is limited to 72 characters.'));
 		}
@@ -1083,8 +1077,11 @@ class User
 	 */
 	public static function isModerator(int $uid): bool
 	{
-		// @todo Replace with a moderator check in the future
-		return self::isSiteAdmin($uid);
+		if (self::isSiteAdmin($uid)) {
+			return true;
+		}
+
+		return in_array($uid, self::getModeratorUids(), true);
 	}
 
 	/**
@@ -1102,7 +1099,7 @@ class User
 		$forbidden_nicknames = DI::config()->get('system', 'forbidden_nicknames', '');
 		if (!empty($forbidden_nicknames)) {
 			$forbidden = explode(',', $forbidden_nicknames);
-			$forbidden = array_map('trim', $forbidden);
+			$forbidden = array_map(trim(...), $forbidden);
 		} else {
 			$forbidden = [];
 		}
@@ -1166,7 +1163,7 @@ class User
 			$mimetype = $photo['type'];
 		}
 
-		return $url . $user['nickname'] . Images::getExtensionByMimeType($mimetype) . ($updated ? '?ts=' . strtotime($updated) : '');
+		return $url . $user['nickname'] . Images::getExtensionByMimeType($mimetype) . ($updated ? '?ts=' . strtotime((string) $updated) : '');
 	}
 
 	/**
@@ -1196,7 +1193,7 @@ class User
 			return '';
 		}
 
-		return $url . $user['nickname'] . Images::getExtensionByMimeType($mimetype) . ($updated ? '?ts=' . strtotime($updated) : '');
+		return $url . $user['nickname'] . Images::getExtensionByMimeType($mimetype) . ($updated ? '?ts=' . strtotime((string) $updated) : '');
 	}
 
 	/**
@@ -1226,17 +1223,17 @@ class User
 		$ignore_invites = (array_key_exists('ignore_invites', $data) && is_bool($data['ignore_invites'])) ? $data['ignore_invites'] : false;
 		$invite_id      = (array_key_exists('invite_id', $data) && is_string($data['invite_id'])) ? trim($data['invite_id']) : '';
 
-		$username   = !empty($data['username'])   ? trim($data['username'])   : '';
-		$nickname   = !empty($data['nickname'])   ? trim($data['nickname'])   : '';
-		$email      = !empty($data['email'])      ? trim($data['email'])      : '';
-		$openid_url = !empty($data['openid_url']) ? trim($data['openid_url']) : '';
-		$photo      = !empty($data['photo'])      ? trim($data['photo'])      : '';
-		$password   = !empty($data['password'])   ? trim($data['password'])   : '';
-		$password1  = !empty($data['password1'])  ? trim($data['password1'])  : '';
-		$confirm    = !empty($data['confirm'])    ? trim($data['confirm'])    : '';
+		$username   = !empty($data['username'])   ? trim((string) $data['username'])   : '';
+		$nickname   = !empty($data['nickname'])   ? trim((string) $data['nickname'])   : '';
+		$email      = !empty($data['email'])      ? trim((string) $data['email'])      : '';
+		$openid_url = !empty($data['openid_url']) ? trim((string) $data['openid_url']) : '';
+		$photo      = !empty($data['photo'])      ? trim((string) $data['photo'])      : '';
+		$password   = !empty($data['password'])   ? trim((string) $data['password'])   : '';
+		$password1  = !empty($data['password1'])  ? trim((string) $data['password1'])  : '';
+		$confirm    = !empty($data['confirm'])    ? trim((string) $data['confirm'])    : '';
 		$blocked    = !empty($data['blocked']);
 		$verified   = !empty($data['verified']);
-		$language   = !empty($data['language'])   ? trim($data['language'])   : 'en';
+		$language   = !empty($data['language'])   ? trim((string) $data['language'])   : 'en';
 
 		$netpublish = $publish = !empty($data['profile_publish_reg']);
 
@@ -1302,18 +1299,18 @@ class User
 			$username_max_length = $tmp;
 		}
 
-		if (mb_strlen($username) < $username_min_length) {
+		if (mb_strlen((string) $username) < $username_min_length) {
 			throw new Exception(DI::l10n()->tt('Username should be at least %s character.', 'Username should be at least %s characters.', $username_min_length));
 		}
 
-		if (mb_strlen($username) > $username_max_length) {
+		if (mb_strlen((string) $username) > $username_max_length) {
 			throw new Exception(DI::l10n()->tt('Username should be at most %s character.', 'Username should be at most %s characters.', $username_max_length));
 		}
 
 		// So now we are just looking for a space in the display name.
 		$loose_reg = DI::config()->get('system', 'no_regfullname');
 		if (!$loose_reg) {
-			$username = mb_convert_case($username, MB_CASE_TITLE, 'UTF-8');
+			$username = mb_convert_case((string) $username, MB_CASE_TITLE, 'UTF-8');
 			if (!str_contains($username, ' ')) {
 				throw new Exception(DI::l10n()->t("That doesn't appear to be your full (First Last) name."));
 			}
@@ -1437,7 +1434,7 @@ class User
 		}
 
 		$fields = ['def_gid' => $def_gid];
-		if (DI::config()->get('system', 'newuser_private') && $def_gid) {
+		if (DI::config()->get('system', 'newuser_private')) {
 			$fields['allow_gid'] = '<' . $def_gid . '>';
 		}
 
@@ -2043,17 +2040,17 @@ class User
 		while ($user = DBA::fetch($userStmt)) {
 			$statistics['total_users']++;
 
-			if ((strtotime($user['last-activity']) > $halfyear) || (strtotime($user['last-item']) > $halfyear)
+			if ((strtotime((string) $user['last-activity']) > $halfyear) || (strtotime((string) $user['last-item']) > $halfyear)
 			) {
 				$statistics['active_users_halfyear']++;
 			}
 
-			if ((strtotime($user['last-activity']) > $month) || (strtotime($user['last-item']) > $month)
+			if ((strtotime((string) $user['last-activity']) > $month) || (strtotime((string) $user['last-item']) > $month)
 			) {
 				$statistics['active_users_monthly']++;
 			}
 
-			if ((strtotime($user['last-activity']) > $week) || (strtotime($user['last-item']) > $week)
+			if ((strtotime((string) $user['last-activity']) > $week) || (strtotime((string) $user['last-item']) > $week)
 			) {
 				$statistics['active_users_weekly']++;
 			}
@@ -2124,6 +2121,61 @@ class User
 	{
 		$condition = [
 			'email'           => self::getAdminEmailList(),
+			'parent-uid'      => null,
+			'blocked'         => false,
+			'verified'        => true,
+			'account_removed' => false,
+			'account_expired' => false,
+		];
+
+		return DBA::selectToArray('user', $fields, $condition, ['order' => ['uid']]);
+	}
+
+	/**
+	 * Returns a list of moderator user IDs from the comma-separated list in the config
+	 *
+	 * @return array
+	 */
+	public static function getModeratorUids(): array
+	{
+		$moderatorUsers = DI::config()->get('system', 'moderator_users');
+		if (empty($moderatorUsers)) {
+			return [];
+		}
+
+		$uids = [];
+		foreach (explode(',', (string) $moderatorUsers) as $moderatorUid) {
+			$moderatorUid = (int) trim($moderatorUid);
+			if ($moderatorUid > 0) {
+				$uids[$moderatorUid] = $moderatorUid;
+			}
+		}
+
+		$uids = array_values($uids);
+		sort($uids);
+
+		return $uids;
+	}
+
+	/**
+	 * Returns the complete list of explicitly assigned moderator user accounts
+	 *
+	 * @param array $fields
+	 * @return array
+	 * @throws Exception
+	 */
+	public static function getModeratorList(array $fields = []): array
+	{
+		$moderatorUids = array_values(array_filter(self::getModeratorUids(), function (int $uid): bool {
+			return $uid !== 0;
+		}));
+		if (empty($moderatorUids)) {
+			return [];
+		}
+
+		$condition = [
+			'uid'             => $moderatorUids,
+			'account-type'    => self::ACCOUNT_TYPE_PERSON,
 			'parent-uid'      => null,
 			'blocked'         => false,
 			'verified'        => true,

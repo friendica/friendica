@@ -22,7 +22,7 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 use Friendica\Util\Temporal;
 
-function message_init()
+function message_init(): void
 {
 	$tabs               = '';
 	DI::page()['title'] = DI::l10n()->t('Messages');
@@ -50,7 +50,7 @@ function message_init()
 	]);
 }
 
-function message_post()
+function message_post(): void
 {
 	if (!DI::userSession()->getLocalUserId()) {
 		DI::sysmsg()->addNotice(DI::l10n()->t('Permission denied.'));
@@ -58,9 +58,9 @@ function message_post()
 	}
 
 	$sender_id = DI::userSession()->getLocalUserId();
-	$replyto   = !empty($_REQUEST['replyto'])   ? trim($_REQUEST['replyto'])                   : '';
-	$subject   = !empty($_REQUEST['subject'])   ? trim($_REQUEST['subject'])                   : '';
-	$body      = !empty($_REQUEST['body'])      ? Strings::escapeHtml(trim($_REQUEST['body'])) : '';
+	$replyto   = !empty($_REQUEST['replyto'])   ? trim((string) $_REQUEST['replyto'])                   : '';
+	$subject   = !empty($_REQUEST['subject'])   ? trim((string) $_REQUEST['subject'])                   : '';
+	$body      = !empty($_REQUEST['body'])      ? Strings::escapeHtml(trim((string) $_REQUEST['body'])) : '';
 	$recipient = !empty($_REQUEST['recipient']) ? intval($_REQUEST['recipient'])               : 0;
 
 	$ret     = Mail::send($sender_id, $recipient, $body, $subject, $replyto);

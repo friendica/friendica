@@ -17,16 +17,10 @@ use Friendica\Core\Storage\Capability\ICanConfigureStorage;
 class FilesystemConfig implements ICanConfigureStorage
 {
 	// Default base folder
-	const DEFAULT_BASE_FOLDER = 'storage';
-
-	/** @var IManageConfigValues */
-	private $config;
+	public const DEFAULT_BASE_FOLDER = 'storage';
 
 	/** @var string */
 	private $storagePath;
-
-	/** @var L10n */
-	private $l10n;
 
 	/**
 	 * Returns the current storage path
@@ -44,13 +38,10 @@ class FilesystemConfig implements ICanConfigureStorage
 	 * @param IManageConfigValues $config
 	 * @param L10n                $l10n
 	 */
-	public function __construct(IManageConfigValues $config, L10n $l10n)
+	public function __construct(private readonly IManageConfigValues $config, private readonly L10n $l10n)
 	{
-		$this->config = $config;
-		$this->l10n   = $l10n;
-
 		$path              = $this->config->get('storage', 'filesystem_path', self::DEFAULT_BASE_FOLDER);
-		$this->storagePath = rtrim($path, '/');
+		$this->storagePath = rtrim((string) $path, '/');
 	}
 
 	/**
@@ -63,8 +54,8 @@ class FilesystemConfig implements ICanConfigureStorage
 				'input',
 				$this->l10n->t('Storage base path'),
 				$this->storagePath,
-				$this->l10n->t('Folder where uploaded files are saved. For maximum security, This should be a path outside web server folder tree')
-			]
+				$this->l10n->t('Folder where uploaded files are saved. For maximum security, This should be a path outside web server folder tree'),
+			],
 		];
 	}
 
@@ -76,7 +67,7 @@ class FilesystemConfig implements ICanConfigureStorage
 		$storagePath = $data['storagepath'] ?? '';
 		if ($storagePath === '' || !is_dir($storagePath)) {
 			return [
-				'storagepath' => $this->l10n->t('Enter a valid existing folder')
+				'storagepath' => $this->l10n->t('Enter a valid existing folder'),
 			];
 		};
 		$this->config->set('storage', 'filesystem_path', $storagePath);

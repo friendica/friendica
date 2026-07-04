@@ -8,7 +8,6 @@
 namespace Friendica\Core\Config\Capability;
 
 use Friendica\Core\Config\Exception\ConfigPersistenceException;
-use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Config\ValueObject\Cache;
 
 /**
@@ -42,7 +41,7 @@ interface IManageConfigValues
 	 * @throws ConfigPersistenceException In case the persistence layer throws errors
 	 *
 	 */
-	public function get(string $cat, string $key = null, $default_value = null);
+	public function get(string $cat, ?string $key = null, $default_value = null);
 
 	/**
 	 * Returns true, if the current config can be changed

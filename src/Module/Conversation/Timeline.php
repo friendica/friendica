@@ -85,10 +85,25 @@ class Timeline extends BaseModule
 	protected $cache;
 	/** @var UserDefinedChannel */
 	protected $channelRepository;
-	protected ActivityFactory $activityFactory;
 
-	public function __construct(UserDefinedChannel $channel, Mode $mode, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, ActivityFactory $activityFactory, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server = [], array $parameters = [])
-	{
+	public function __construct(
+		UserDefinedChannel $channel,
+		Mode $mode,
+		IHandleUserSessions $session,
+		Database $database,
+		IManagePersonalConfigValues $pConfig,
+		IManageConfigValues $config,
+		ICanCache $cache,
+		protected ActivityFactory $activityFactory,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server = [],
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->channelRepository = $channel;
@@ -98,7 +113,6 @@ class Timeline extends BaseModule
 		$this->pConfig           = $pConfig;
 		$this->config            = $config;
 		$this->cache             = $cache;
-		$this->activityFactory   = $activityFactory;
 	}
 
 	/**
@@ -222,7 +236,7 @@ class Timeline extends BaseModule
 		return $tabs;
 	}
 
-	public function getChannelItemsForAPI(string $channel, int $uid, int $limit, int $min = null, int $max = null): array
+	public function getChannelItemsForAPI(string $channel, int $uid, int $limit, ?int $min = null, ?int $max = null): array
 	{
 		$this->itemsPerPage = $limit;
 		$this->itemUriId    = 0;
@@ -462,7 +476,7 @@ class Timeline extends BaseModule
 		}
 
 		$items    = [];
-		$fields   = ['uri-id', 'owner-id', 'comments', 'activities'];
+		$fields   = ['uri-id', 'owner-id', 'author-id', 'comments', 'activities'];
 		$fields[] = $this->order;
 		$result   = $this->database->select($table, $fields, $condition, $params);
 		if ($this->database->errorNo()) {

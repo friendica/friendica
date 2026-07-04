@@ -59,8 +59,14 @@ class Notification extends BaseDataTransferObject
 	 *
 	 * @throws HttpException\InternalServerErrorException|Exception
 	 */
-	public function __construct(int $id, string $type, \DateTime $created_at, Account $account = null, Status $status = null, bool $dismissed = false)
-	{
+	public function __construct(
+		int $id,
+		string $type,
+		\DateTime $created_at,
+		?Account $account = null,
+		?Status $status = null,
+		bool $dismissed = false,
+	) {
 		$this->id         = (string) $id;
 		$this->type       = $type;
 		$this->created_at = $created_at->format(DateTimeFormat::JSON);

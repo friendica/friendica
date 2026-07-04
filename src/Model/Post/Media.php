@@ -229,7 +229,7 @@ class Media
 	{
 		if (DI::baseUrl()->isLocalUrl($media['url'])) {
 			$media = self::fetchLocalData($media);
-			if (preg_match('|.*?/search\?(.+)|', $media['url'], $matches)) {
+			if (preg_match('|.*?/search\?(.+)|', (string) $media['url'], $matches)) {
 				return $media;
 			}
 			if (empty($media['mimetype']) || empty($media['size'])) {
@@ -319,7 +319,7 @@ class Media
 		}
 
 		if (empty($media['name'])) {
-			$media['name'] = basename(parse_url($media['url'], PHP_URL_PATH));
+			$media['name'] = basename(parse_url((string) $media['url'], PHP_URL_PATH));
 		}
 		return $media;
 	}
@@ -393,7 +393,7 @@ class Media
 
 		if (
 			!empty($item['plink']) && Strings::compareLink($item['plink'], $media['url'])
-			&& parse_url($item['plink'], PHP_URL_HOST) != parse_url($item['uri'], PHP_URL_HOST)
+			&& parse_url((string) $item['plink'], PHP_URL_HOST) != parse_url((string) $item['uri'], PHP_URL_HOST)
 		) {
 			DI::logger()->debug('Not a link to an activity', ['uri-id' => $media['uri-id'], 'url' => $media['url'], 'plink' => $item['plink'], 'uri' => $item['uri']]);
 			$media['type'] = $media['type'] == self::ACTIVITY ? self::JSON : $media['type'];
@@ -429,7 +429,7 @@ class Media
 		$media['publisher-image'] = null;
 
 		if (!empty($item['language'])) {
-			$media['language'] = array_key_first(json_decode($item['language'], true));
+			$media['language'] = array_key_first(json_decode((string) $item['language'], true));
 		}
 
 		$media['published'] = $item['created'];
@@ -575,7 +575,7 @@ class Media
 	 */
 	private static function fetchLocalData(array $media): array
 	{
-		if (preg_match('|.*?/attach/(\d+)|', $media['url'], $matches)) {
+		if (preg_match('|.*?/attach/(\d+)|', (string) $media['url'], $matches)) {
 			$attachment = Attach::selectFirst(['id', 'filename', 'filetype', 'filesize'], ['id' => $matches[1]]);
 			if (!empty($attachment)) {
 				$media['attach-id'] = $attachment['id'];
@@ -586,7 +586,7 @@ class Media
 			return $media;
 		}
 
-		if (!preg_match('|.*?/photo/(.*[a-fA-F0-9])\-(.*[0-9])\..*[\w]|', $media['url'], $matches)) {
+		if (!preg_match('|.*?/photo/(.*[a-fA-F0-9])\-(.*[0-9])\..*[\w]|', (string) $media['url'], $matches)) {
 			return $media;
 		}
 		$photo = Photo::selectFirst(['type', 'datasize', 'width', 'height', 'blurhash'], ['resource-id' => $matches[1], 'scale' => $matches[2]]);
@@ -902,7 +902,7 @@ class Media
 		$unshared_body = $body = preg_replace("/\[img\=([0-9]*)x([0-9]*)\](.*?)\[\/img\]$endmatchpattern/ism", '[img]$3[/img]', $body);
 
 		$attachments = [];
-		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img=([^\[\]]*)\]([^\[\]]*)\[\/img\]\s*\[/url\]$endmatchpattern#ism", $body, $pictures, PREG_SET_ORDER)) {
+		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img=([^\[\]]*)\]([^\[\]]*)\[\/img\]\s*\[/url\]$endmatchpattern#ism", (string) $body, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				if (self::isLinkToImagePage($picture[1], $picture[2])) {
 					$body  = str_replace($picture[0], '', $body);
@@ -939,7 +939,7 @@ class Media
 			}
 		}
 
-		if (preg_match_all("/\[img=([^\[\]]*)\]([^\[\]]*)\[\/img\]$endmatchpattern/Usi", $body, $pictures, PREG_SET_ORDER)) {
+		if (preg_match_all("/\[img=([^\[\]]*)\]([^\[\]]*)\[\/img\]$endmatchpattern/Usi", (string) $body, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				$body = str_replace($picture[0], '', $body);
 
@@ -947,7 +947,7 @@ class Media
 			}
 		}
 
-		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img\]([^\[]+?)\[/img\]\s*\[/url\]$endmatchpattern#ism", $body, $pictures, PREG_SET_ORDER)) {
+		if (preg_match_all("#\[url=([^\]]+?)\]\s*\[img\]([^\[]+?)\[/img\]\s*\[/url\]$endmatchpattern#ism", (string) $body, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				if (self::isLinkToImagePage($picture[1], $picture[2])) {
 					$body  = str_replace($picture[0], '', $body);
@@ -984,7 +984,7 @@ class Media
 			}
 		}
 
-		if (preg_match_all("/\[img\]([^\[\]]*)\[\/img\]$endmatchpattern/ism", $body, $pictures, PREG_SET_ORDER)) {
+		if (preg_match_all("/\[img\]([^\[\]]*)\[\/img\]$endmatchpattern/ism", (string) $body, $pictures, PREG_SET_ORDER)) {
 			foreach ($pictures as $picture) {
 				$body = str_replace($picture[0], '', $body);
 
@@ -992,7 +992,7 @@ class Media
 			}
 		}
 
-		if (preg_match_all("/\[audio\]([^\[\]]*)\[\/audio\]$endmatchpattern/ism", $body, $audios, PREG_SET_ORDER)) {
+		if (preg_match_all("/\[audio\]([^\[\]]*)\[\/audio\]$endmatchpattern/ism", (string) $body, $audios, PREG_SET_ORDER)) {
 			foreach ($audios as $audio) {
 				$body = str_replace($audio[0], '', $body);
 
@@ -1000,7 +1000,7 @@ class Media
 			}
 		}
 
-		if (preg_match_all("/\[video\]([^\[\]]*)\[\/video\]$endmatchpattern/ism", $body, $videos, PREG_SET_ORDER)) {
+		if (preg_match_all("/\[video\]([^\[\]]*)\[\/video\]$endmatchpattern/ism", (string) $body, $videos, PREG_SET_ORDER)) {
 			foreach ($videos as $video) {
 				$body = str_replace($video[0], '', $body);
 
@@ -1008,7 +1008,7 @@ class Media
 			}
 		}
 
-		if (preg_match_all("/\[embed\]([^\[\]]*)\[\/embed\]$endmatchpattern/ism", $body, $embeds, PREG_SET_ORDER)) {
+		if (preg_match_all("/\[embed\]([^\[\]]*)\[\/embed\]$endmatchpattern/ism", (string) $body, $embeds, PREG_SET_ORDER)) {
 			foreach ($embeds as $embed) {
 				$body = str_replace($embed[0], '', $body);
 
@@ -1029,7 +1029,7 @@ class Media
 			}
 		}
 
-		return trim($body);
+		return trim((string) $body);
 	}
 
 	/**
@@ -1075,7 +1075,7 @@ class Media
 		$body = preg_replace("/([#@!])\[url\=(.*?)\](.*?)\[\/url\]/ism", '', $body);
 
 		// Search for pure links
-		if (preg_match_all("/\[url\](https?:.*?)\[\/url\]/ism", $body, $matches)) {
+		if (preg_match_all("/\[url\](https?:.*?)\[\/url\]/ism", (string) $body, $matches)) {
 			foreach ($matches[1] as $url) {
 				DI::logger()->info('Got page url (link without description)', ['uri-id' => $uriid, 'url' => $url]);
 				$result = self::insert(['uri-id' => $uriid, 'type' => self::UNKNOWN, 'url' => $url], false);
@@ -1091,7 +1091,7 @@ class Media
 		}
 
 		// Search for links with descriptions
-		if (preg_match_all("#\[url=(https?://.+?)].+?\[/url]#ism", $body, $matches)) {
+		if (preg_match_all("#\[url=(https?://.+?)].+?\[/url]#ism", (string) $body, $matches)) {
 			foreach ($matches[1] as $url) {
 				DI::logger()->info('Got page url (link with description)', ['uri-id' => $uriid, 'url' => $url]);
 				$result = self::insert(['uri-id' => $uriid, 'type' => self::UNKNOWN, 'url' => $url], false);
@@ -1324,7 +1324,7 @@ class Media
 			$body = self::addAttachmentToBody($media, $body);
 		}
 
-		if (preg_match("/.*(\[attachment.*?\].*?\[\/attachment\]).*/ism", $original_body, $match)) {
+		if (preg_match("/.*(\[attachment.*?\].*?\[\/attachment\]).*/ism", (string) $original_body, $match)) {
 			$body .= "\n" . $match[1];
 		}
 

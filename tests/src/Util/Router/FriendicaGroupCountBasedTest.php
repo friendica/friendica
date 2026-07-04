@@ -16,7 +16,7 @@ use Friendica\Util\Router\FriendicaGroupCountBased;
 
 class FriendicaGroupCountBasedTest extends MockedTestCase
 {
-	public function testOptions()
+	public function testOptions(): void
 	{
 		$collector = new RouteCollector(new Std(), new GroupCountBased());
 		$collector->addRoute('GET', '/get', Options::class);

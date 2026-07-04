@@ -11,7 +11,7 @@
 	<div id="profile-edit-links">
 		<ul class="nav nav-pills preferences">
 			<li>
-				<a class="btn btn-primary" href="profile/{{$nickname}}/profile"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;{{$l10n.viewprof}}</a>
+				<a class="btn btn-primary" href="profile/{{$nickname}}/profile"><i class="ri ri-eye-line" aria-hidden="true"></i>&nbsp;{{$l10n.viewprof}}</a>
 			</li>
 		</ul>
 	</div>

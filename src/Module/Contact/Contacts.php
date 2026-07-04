@@ -24,17 +24,9 @@ use Psr\Log\LoggerInterface;
 
 class Contacts extends BaseModule
 {
-	/** @var IHandleUserSessions */
-	private $userSession;
-	/** @var App\Page */
-	private $page;
-
-	public function __construct(App\Page $page, IHandleUserSessions $userSession, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private App\Page $page, private readonly IHandleUserSessions $userSession, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->userSession = $userSession;
-		$this->page        = $page;
 	}
 
 	protected function content(array $request = []): string
@@ -109,7 +101,7 @@ class Contacts extends BaseModule
 				$title   = $this->tt('Friend (%s)', 'Friends (%s)', $total);
 				$desc    = $this->t(
 					'These contacts both follow and are followed by <strong>%s</strong>.',
-					htmlentities($contact['name'], ENT_COMPAT, 'UTF-8')
+					htmlentities((string) $contact['name'], ENT_COMPAT, 'UTF-8'),
 				);
 				break;
 			case 'common':
@@ -117,7 +109,7 @@ class Contacts extends BaseModule
 				$title   = $this->tt('Common contact (%s)', 'Common contacts (%s)', $total);
 				$desc    = $this->t(
 					'Both <strong>%s</strong> and yourself have publicly interacted with these contacts (follow, comment or likes on public posts).',
-					htmlentities($contact['name'], ENT_COMPAT, 'UTF-8')
+					htmlentities((string) $contact['name'], ENT_COMPAT, 'UTF-8'),
 				);
 				break;
 			default:
@@ -137,11 +129,11 @@ class Contacts extends BaseModule
 				$contact = Model\Contact::selectFirst(
 					[],
 					['uri-id' => $contact['uri-id'], 'uid' => [0, $this->userSession->getLocalUserId()]],
-					['order'  => ['uid' => 'DESC']]
+					['order'  => ['uid' => 'DESC']],
 				);
 				return Module\Contact::getContactTemplateVars($contact);
 			},
-			$friends
+			$friends,
 		);
 
 		$tpl = Renderer::getMarkupTemplate('profile/contacts.tpl');

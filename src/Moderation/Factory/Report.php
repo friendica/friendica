@@ -17,14 +17,11 @@ use Psr\Log\LoggerInterface;
 
 class Report extends \Friendica\BaseFactory implements ICanCreateFromTableRow
 {
-	/** @var ClockInterface */
-	private $clock;
-
-	public function __construct(LoggerInterface $logger, ClockInterface $clock)
-	{
+	public function __construct(
+		LoggerInterface $logger,
+		private readonly ClockInterface $clock,
+	) {
 		parent::__construct($logger);
-
-		$this->clock = $clock;
 	}
 
 	/**
@@ -34,7 +31,7 @@ class Report extends \Friendica\BaseFactory implements ICanCreateFromTableRow
 	 * @return Entity\Report
 	 * @throws \Exception
 	 */
-	public function createFromTableRow(array $row, Collection\Report\Posts $posts = null, Collection\Report\Rules $rules = null): Entity\Report
+	public function createFromTableRow(array $row, ?Collection\Report\Posts $posts = null, ?Collection\Report\Rules $rules = null): Entity\Report
 	{
 		return new Entity\Report(
 			$row['reporter-id'],
@@ -74,7 +71,7 @@ class Report extends \Friendica\BaseFactory implements ICanCreateFromTableRow
 	 * @return Entity\Report
 	 * @see \Friendica\Module\Api\Mastodon\Reports::post()
 	 */
-	public function createFromReportsRequest(array $rules, int $reporterId, int $cid, int $gsid, string $comment = '', string $category = '', bool $forward = false, array $postUriIds = [], array $ruleIds = [], int $uid = null): Entity\Report
+	public function createFromReportsRequest(array $rules, int $reporterId, int $cid, int $gsid, string $comment = '', string $category = '', bool $forward = false, array $postUriIds = [], array $ruleIds = [], ?int $uid = null): Entity\Report
 	{
 		if (count($ruleIds)) {
 			$categoryId = Entity\Report::CATEGORY_VIOLATION;

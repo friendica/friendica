@@ -12,7 +12,7 @@ use Friendica\Test\MockedTestCase;
 
 class VideoTest extends MockedTestCase
 {
-	public function dataVideo()
+	public static function dataVideo()
 	{
 		return [
 			'youtube' => [
@@ -46,16 +46,15 @@ class VideoTest extends MockedTestCase
 			'invalid' => [
 				'input'  => '[video]invalid.link/video.mp4[/video]',
 				'assert' => '[video]invalid.link/video.mp4[/video]',
-			]
+			],
 		];
 	}
 
 	/**
 	 * Test if the BBCode is successfully transformed for video links
-	 *
-	 * @dataProvider dataVideo
 	 */
-	public function testTransform(string $input, string $assert)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataVideo')]
+	public function testTransform(string $input, string $assert): void
 	{
 		$bbCodeVideo = new Video();
 

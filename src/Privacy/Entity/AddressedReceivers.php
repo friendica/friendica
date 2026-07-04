@@ -11,20 +11,7 @@ use Friendica\BaseEntity;
 
 class AddressedReceivers extends BaseEntity
 {
-	protected array $to         = [];
-	protected array $cc         = [];
-	protected array $bcc        = [];
-	protected array $audience   = [];
-	protected array $attributed = [];
-
-	public function __construct(array $to = [], array $cc = [], array $bcc = [], array $audience = [], array $attributed = [])
-	{
-		$this->to         = $to;
-		$this->cc         = $cc;
-		$this->bcc        = $bcc;
-		$this->audience   = $audience;
-		$this->attributed = $attributed;
-	}
+	public function __construct(protected array $to = [], protected array $cc = [], protected array $bcc = [], protected array $audience = [], protected array $attributed = []) {}
 
 	public function isEmpty(): bool
 	{

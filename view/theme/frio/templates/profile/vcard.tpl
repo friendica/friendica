@@ -32,20 +32,37 @@
 	<div class="panel-body">
 		<div class="profile-header">
 			<h3 class="fn p-name" dir="auto">{{$profile.name}}</h3>
+			{{if $is_admin}}<span class="badge badge-admin"><i class="ri ri-medal-2-fill" aria-hidden="true"></i> {{$admin_title}}</span>{{/if}}
+			{{if $is_mod}}<span class="badge badge-mod"><i class="ri ri-shield-user-line" aria-hidden="true"></i> {{$moderator_title}}</span>{{/if}}
 
 			{{if $profile.addr}}<div class="p-addr">{{include file="sub/punct_wrap.tpl" text=$profile.addr}}</div>{{/if}}
 			{{if $is_owner }}
 				<div class="edit-profile-link-wrapper">
 					<a class="btn btn-primary" href="{{$edit_profile_link.url}}">
-						<i class="fa fa-pencil" aria-hidden="true"></i>
+						<i class="ri ri-pencil-line" aria-hidden="true"></i>
 						{{$edit_profile_link.text}}
 					</a>
 				</div>
 			{{/if}}
 
 			{{if $profile.about}}<div class="title" dir="auto">{{$profile.about nofilter}}</div>{{/if}}
+			{{if $account_type == 1 }}
+				{{$acct_icon = "ri-building-4-line"}}
+			{{else if $account_type == 2}}
+				{{$acct_icon = "ri-newspaper-line"}}
+			{{else if $account_type == 3 && $page_flags == 2}}
+				{{$acct_icon = "ri-team-line"}}
+			{{else if $account_type == 3 && $page_flags == 6}}
+				{{$acct_icon = "ri-group-3-line"}}
+			{{else if $account_type == 3 && $page_flags == 5}}
+				{{$acct_icon = "ri-spy-line"}}
+			{{else if $account_type == 4}}
+				{{$acct_icon = "ri-broadcast-line"}}
+			{{else}}
+				{{$acct_icon = ''}}
+			{{/if}}
+			{{if $account_type_name}}<div class="account-type" data-acct="{{$account_type}}" data-flag="{{$page_flags}}">(<i class="ri {{$acct_icon}}" aria-hidden="true"></i> {{$account_type_name}})</div>{{/if}}
 
-			{{if $account_type}}<div class="account-type">({{$account_type}})</div>{{/if}}
 		</div>
 
 		{{if $follow_link || $unfollow_link || $wallmessage_link}}
@@ -54,12 +71,12 @@
 					<div id="dfrn-request-link-button">
 						{{if $unfollow_link}}
 							<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$unfollow_link}}">
-								<span><i class="fa fa-user-times"></i></span>
+								<span><i class="ri ri-user-unfollow-line"></i></span>
 								<span>{{$unfollow}}</span>
 							</a>
 						{{else}}
 							<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$follow_link}}">
-								<span><i class="fa fa-user-plus"></i></span>
+								<span><i class="ri ri-user-add-line"></i></span>
 								<span>{{$follow}}</span>
 							</a>
 						{{/if}}
@@ -68,7 +85,7 @@
 				{{if $subscribe_feed_link}}
 					<div id="subscribe-feed-link-button">
 						<a id="subscribe-feed-link" class="btn btn-labeled btn-primary" href="{{$subscribe_feed_link}}">
-							<span><i class="fa fa-rss"></i></span>
+							<span><i class="ri ri-rss-line"></i></span>
 							<span>{{$subscribe_feed}}</span>
 						</a>
 					</div>
@@ -76,23 +93,25 @@
 				{{if $wallmessage_link}}
 					<div id="wallmessage-link-button">
 						<button type="button" id="wallmessage-link" class="btn btn-labeled btn-primary" onclick="openWallMessage('{{$wallmessage_link}}')">
-							<span><i class="fa fa-envelope"></i></span>
+							<span><i class="ri ri-mail-line"></i></span>
 							<span>{{$wallmessage}}</span>
 						</button>
 					</div>
 				{{/if}}
 				{{if $profile.addr}}
 					<div id="jotOpen" class="pull-right">
-						<button type="button" id="mention-link" class="action-button btn btn-labeled btn-primary" onclick="openWallMessage('{{$mention_url}}')">
-							<i class="fa fa-lg fa-pencil"></i>
+						<button type="button" id="mention-link" class="action-button btn btn-labeled btn-primary" onclick="{{if $always_open_compose}}window.location.href='{{$mention_url}}'{{else}}openWallMessage('{{$mention_url}}'){{/if}}">
+							<i class="ri ri-lg ri-pencil-line"></i>
 							<span>{{$mention_label}}</span>
 						</button>
 					</div>
 				{{/if}}
 				{{if $network_label}}
+				{{* NOTE: This effectively links to the Contact's posts/conversations URL *}}
+				{{* Despite the naming here this is not currently only used for groups but also other accounts *}}
 					<div id="showgroup-button">
 						<a id="showgroup" class="btn btn-labeled btn-primary" href="{{$network_url}}">
-							<span><i class="fa fa-group"></i></span>
+							<span><i class="ri {{$network_icon}}"></i></span>
 							<span>{{$network_label}}</span>
 						</a>
 					</div>
@@ -104,7 +123,7 @@
 
 		{{if $location}}
 			<div class="location detail">
-				<span class="location-label icon"><i class="fa fa-map-marker" title="{{$location}}"></i></span>
+				<span class="location-label icon"><i class="ri ri-map-pin-line" title="{{$location}}"></i></span>
 				<span class="adr">
 					{{if $profile.address}}<p class="street-address p-street-address">{{$profile.address nofilter}}</p>
 					{{/if}}
@@ -115,14 +134,14 @@
 
 		{{if $profile.xmpp}}
 			<div class="xmpp">
-				<span class="xmpp-label icon"><i class="fa fa-xmpp" title="{{$xmpp}}"></i></span>
+				<span class="xmpp-label icon"><i class="ri ri-chat-3-line" title="{{$xmpp}}"></i></span>
 				<span class="xmpp-data"><a href="xmpp:{{$profile.xmpp}}" rel="me" target="_blank" rel="noopener noreferrer">{{include file="sub/punct_wrap.tpl" text=$profile.xmpp}}</a></span>
 			</div>
 		{{/if}}
 
 		{{if $profile.matrix}}
 			<div class="matrix">
-				<span class="matrix-label icon"><i class="fa fa-matrix-org" title="{{$matrix}}"></i></span>
+				<span class="matrix-label icon"><i class="ri ri-grid-line" title="{{$matrix}}"></i></span>
 				<span class="matrix-data"><a href="matrix:{{$profile.matrix}}" rel="me" target="_blank" rel="noopener noreferrer">{{include file="sub/punct_wrap.tpl" text=$profile.matrix}}</a></span>
 			</div>
 		{{/if}}
@@ -135,7 +154,7 @@
 
 		{{if $homepage}}
 			<div class="homepage detail">
-				<span class="homepage-label icon"><i class="fa fa-external-link" title="{{$homepage}}"></i></span>
+				<span class="homepage-label icon"><i class="ri ri-external-link-line" title="{{$homepage}}"></i></span>
 				<span class="homepage-url u-url"><a href="{{$profile.homepage}}" rel="me" target="_blank" rel="noopener noreferrer">{{include file="sub/punct_wrap.tpl" text=$profile.homepage}}</a>{{if $profile.homepage_verified}}
 					<span title="{{$homepage_verified}}">✔</span>{{/if}}</span>
 			</div>

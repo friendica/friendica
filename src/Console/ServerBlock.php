@@ -23,9 +23,6 @@ class ServerBlock extends Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/** @var DomainPatternBlocklist */
-	private $blocklist;
-
 	protected function getHelp(): string
 	{
 		return <<<HELP
@@ -54,11 +51,9 @@ Options
 HELP;
 	}
 
-	public function __construct(DomainPatternBlocklist $blocklist, $argv = null)
+	public function __construct(private readonly DomainPatternBlocklist $blocklist, $argv = null)
 	{
 		parent::__construct($argv);
-
-		$this->blocklist = $blocklist;
 	}
 
 	protected function doExecute(): int
@@ -68,18 +63,13 @@ HELP;
 			return 0;
 		}
 
-		switch ($this->getArgument(0)) {
-			case 'add':
-				return $this->addBlockedServer();
-			case 'remove':
-				return $this->removeBlockedServer();
-			case 'export':
-				return $this->exportBlockedServers();
-			case 'import':
-				return $this->importBlockedServers();
-			default:
-				throw new CommandArgsException('Unknown command.');
-		}
+		return match ($this->getArgument(0)) {
+			'add'    => $this->addBlockedServer(),
+			'remove' => $this->removeBlockedServer(),
+			'export' => $this->exportBlockedServers(),
+			'import' => $this->importBlockedServers(),
+			default  => throw new CommandArgsException('Unknown command.'),
+		};
 	}
 
 	/**

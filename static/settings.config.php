@@ -190,6 +190,14 @@ return [
 		// The maximum number of posts on the global community page from a single server.
 		'max_server_posts_community_page' => 0,
 
+		// max_comments (Integer)
+		// Maximum numbers of comments per post
+		'max_comments' => 100,
+
+		// max_display_comments (Integer)
+		// Maximum numbers of comments per post on the display page
+		'max_display_comments' => 1000,
+
 		// maximagesize (Integer)
 		// Maximum size in bytes of an uploaded photo.
 		'maximagesize' => 800000,

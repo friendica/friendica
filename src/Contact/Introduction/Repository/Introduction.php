@@ -20,14 +20,19 @@ use Psr\Log\LoggerInterface;
 
 class Introduction extends BaseRepository
 {
-	/** @var IntroductionFactory */
-	protected $factory;
-
 	protected static $table_name = 'intro';
 
-	public function __construct(Database $database, LoggerInterface $logger, IntroductionFactory $factory)
+	public function __construct(
+		Database $database,
+		LoggerInterface $logger,
+		private readonly IntroductionFactory $entityFactory,
+	) {
+		parent::__construct($database, $logger, $entityFactory);
+	}
+
+	protected function getFactory(): IntroductionFactory
 	{
-		parent::__construct($database, $logger, $factory);
+		return $this->entityFactory;
 	}
 
 	/**
@@ -37,7 +42,7 @@ class Introduction extends BaseRepository
 	{
 		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
-		return $this->factory->createFromTableRow($fields);
+		return $this->getFactory()->createFromTableRow($fields);
 	}
 
 	/**
@@ -160,7 +165,7 @@ class Introduction extends BaseRepository
 
 			if ($introduction->id) {
 				$this->db->update(self::$table_name, $fields, ['id' => $introduction->id]);
-				return $this->factory->createFromTableRow($fields);
+				return $this->getFactory()->createFromTableRow($fields);
 			} else {
 				$this->db->insert(self::$table_name, $fields);
 				return $this->selectOneById($this->db->lastInsertId(), $introduction->uid);

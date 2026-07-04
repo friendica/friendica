@@ -15,7 +15,7 @@ final class DeliveryQueueAggregates extends \Friendica\BaseCollection
 	 * @param Entity\DeliveryQueueAggregate[] $entities
 	 * @param int|null                        $totalCount
 	 */
-	public function __construct(array $entities = [], int $totalCount = null)
+	public function __construct(array $entities = [], ?int $totalCount = null)
 	{
 		parent::__construct($entities, $totalCount);
 	}

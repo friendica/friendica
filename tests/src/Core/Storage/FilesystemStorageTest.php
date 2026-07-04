@@ -35,7 +35,7 @@ class FilesystemStorageTest extends StorageTestCase
 	/**
 	 * Test the exception in case of missing directory permissions during put new files
 	 */
-	public function testMissingDirPermissionsDuringPut()
+	public function testMissingDirPermissionsDuringPut(): void
 	{
 		$this->expectException(StorageException::class);
 		$this->expectExceptionMessageMatches("/Filesystem storage failed to create \".*\". Check you write permissions./");
@@ -50,7 +50,7 @@ class FilesystemStorageTest extends StorageTestCase
 	/**
 	 * Test the exception in case the directory isn't writeable
 	 */
-	public function testMissingDirPermissions()
+	public function testMissingDirPermissions(): void
 	{
 		$this->expectException(StorageException::class);
 		$this->expectExceptionMessageMatches("/Path \".*\" does not exist or is not writeable./");
@@ -63,11 +63,11 @@ class FilesystemStorageTest extends StorageTestCase
 	 * Test the exception in case of missing file permissions
 	 *
 	 */
-	public function testMissingFilePermissions()
+	public function testMissingFilePermissions(): void
 	{
 		static::markTestIncomplete("Cannot catch file_put_content() error due vfsStream failure");
 
-		$this->expectException(StorageException::class);
+		$this->expectException(StorageException::class); // @phpstan-ignore deadCode.unreachable (skipped test)
 		$this->expectExceptionMessageMatches("/Filesystem storage failed to save data to \".*\". Check your write permissions/");
 
 		vfsStream::create(['storage' => ['f0' => ['c0' => ['k0i0' => '']]]], $this->root);
@@ -81,7 +81,7 @@ class FilesystemStorageTest extends StorageTestCase
 	/**
 	 * Test the backend storage of the Filesystem Storage class
 	 */
-	public function testDirectoryTree()
+	public function testDirectoryTree(): void
 	{
 		$instance = $this->getInstance();
 

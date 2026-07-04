@@ -40,8 +40,8 @@ class Directory
 		Hook::callAll('globaldir_update', $arr);
 
 		DI::logger()->info('Updating directory: ' . $arr['url']);
-		if (strlen($arr['url'])) {
-			DI::httpClient()->fetch($dir . '?url=' . bin2hex($arr['url']), HttpClientAccept::HTML, 0, '', HttpClientRequest::CONTACTDISCOVER);
+		if (strlen((string) $arr['url'])) {
+			DI::httpClient()->fetch($dir . '?url=' . bin2hex((string) $arr['url']), HttpClientAccept::HTML, 0, '', HttpClientRequest::CONTACTDISCOVER);
 		}
 
 		return;

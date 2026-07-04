@@ -34,16 +34,13 @@ class DiasporaContact extends BaseRepository
 
 	protected static $table_name = 'diaspora-contact-view';
 
-	/** @var DiasporaContactFactory */
-	protected $factory;
-	/** @var DbaDefinition */
-	private $definition;
-
-	public function __construct(DbaDefinition $definition, Database $database, LoggerInterface $logger, DiasporaContactFactory $factory)
-	{
-		parent::__construct($database, $logger, $factory);
-
-		$this->definition = $definition;
+	public function __construct(
+		private readonly DbaDefinition $definition,
+		Database $database,
+		LoggerInterface $logger,
+		private readonly DiasporaContactFactory $entityFactory,
+	) {
+		parent::__construct($database, $logger, $entityFactory);
 	}
 
 	/**
@@ -53,7 +50,7 @@ class DiasporaContact extends BaseRepository
 	{
 		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
-		return $this->factory->createFromTableRow($fields);
+		return $this->getFactory()->createFromTableRow($fields);
 	}
 
 	/**
@@ -240,7 +237,7 @@ class DiasporaContact extends BaseRepository
 			$post_count        = $this->db->count('post', ['author-id' => $contact['id'], 'gravity' => [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT]]);
 		}
 
-		$DiasporaContact = $this->factory->createfromProbeData(
+		$DiasporaContact = $this->getFactory()->createfromProbeData(
 			$data,
 			$uriId,
 			new DateTime($contact['created'] ?? 'now', new DateTimeZone('UTC')),
@@ -269,5 +266,10 @@ class DiasporaContact extends BaseRepository
 		$diasporaContact = $this->db->selectFirst(self::$table_name, ['url'], ['guid' => $guid]);
 
 		return $diasporaContact['url'] ?? null;
+	}
+
+	protected function getFactory(): DiasporaContactFactory
+	{
+		return $this->entityFactory;
 	}
 }

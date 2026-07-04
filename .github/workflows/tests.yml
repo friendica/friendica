@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
@@ -37,7 +37,7 @@ jobs:
         run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@v4"
 
       - name: Run Unit tests
         run: composer run test:unit
@@ -93,7 +93,7 @@ jobs:
       # Install composer dependencies and handle caching in one go.
       # @link https://github.com/marketplace/actions/install-php-dependencies-with-composer
       - name: "Install Composer dependencies"
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@v4"
 
       - name: Start mysql service
         run: sudo /etc/init.d/mysql start

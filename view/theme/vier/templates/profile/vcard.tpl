@@ -11,6 +11,8 @@
 	</div>
 
 	{{if $profile.addr}}<div class="p-addr">{{$profile.addr}}</div>{{/if}}
+	{{if $is_admin}}<div class="badge badge-admin"><i class="ri ri-medal-2-fill" aria-hidden="true"></i> {{$admin_title}}</div>{{/if}}
+	{{if $is_mod}}<div class="badge badge-mod"><i class="ri ri-shield-user-line" aria-hidden="true"></i> {{$moderator_title}}</div>{{/if}}
 
 	<div id="profile-photo-wrapper">
 		<a class="vcard-anchor" href="{{$picture_dest_url}}" style="position: relative;">
@@ -21,7 +23,23 @@
 		</a>
 	</div>
 
-	{{if $account_type}}<div class="account-type">{{$account_type}}</div>{{/if}}
+			{{if $account_type == 1 }}
+				{{$acct_icon = "ri-building-4-line"}}
+			{{else if $account_type == 2}}
+				{{$acct_icon = "ri-newspaper-line"}}
+			{{else if $account_type == 3 && $page_flags == 2}}
+				{{$acct_icon = "ri-team-line"}}
+			{{else if $account_type == 3 && $page_flags == 6}}
+				{{$acct_icon = "ri-group-3-line"}}
+			{{else if $account_type == 3 && $page_flags == 5}}
+				{{$acct_icon = "ri-spy-line"}}
+			{{else if $account_type == 4}}
+				{{$acct_icon = "ri-broadcast-line"}}
+			{{else}}
+				{{$acct_icon = ''}}
+			{{/if}}
+			{{if $account_type_name}}<div class="account-type" data-acct="{{$account_type}}" data-flag="{{$page_flags}}">(<i class="ri {{$acct_icon}}" aria-hidden="true"></i> {{$account_type_name}})</div>{{/if}}
+
 	{{if $profile.network_link}}<dl class="network"><dt class="network-label">{{$network}}</dt><dd class="x-network">{{$profile.network_link nofilter}}</dd></dl>{{/if}}
 	{{if $is_owner }}
 		<div class="edit-profile-link-wrapper">

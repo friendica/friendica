@@ -14,9 +14,8 @@ class PublicTimelineTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_public_timeline() function.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesPublicTimeline()
+	public function testApiStatusesPublicTimeline(): void
 	{
 		self::markTestIncomplete('Needs PublicTimeline to not set header during call (like at BaseApi::setLinkHeader');
 
@@ -34,9 +33,8 @@ class PublicTimelineTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_public_timeline() function with the exclude_replies parameter.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesPublicTimelineWithExcludeReplies()
+	public function testApiStatusesPublicTimelineWithExcludeReplies(): void
 	{
 		self::markTestIncomplete('Needs PublicTimeline to not set header during call (like at BaseApi::setLinkHeader');
 
@@ -54,9 +52,8 @@ class PublicTimelineTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_public_timeline() function with a negative page parameter.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesPublicTimelineWithNegativePage()
+	public function testApiStatusesPublicTimelineWithNegativePage(): void
 	{
 		self::markTestIncomplete('Needs PublicTimeline to not set header during call (like at BaseApi::setLinkHeader');
 
@@ -73,9 +70,8 @@ class PublicTimelineTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_public_timeline() function with an unallowed user.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesPublicTimelineWithUnallowedUser()
+	public function testApiStatusesPublicTimelineWithUnallowedUser(): void
 	{
 		self::markTestIncomplete('Needs PublicTimeline to not set header during call (like at BaseApi::setLinkHeader');
 
@@ -87,9 +83,8 @@ class PublicTimelineTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_public_timeline() function with an RSS result.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesPublicTimelineWithRss()
+	public function testApiStatusesPublicTimelineWithRss(): void
 	{
 		self::markTestIncomplete('Needs PublicTimeline to not set header during call (like at BaseApi::setLinkHeader');
 

@@ -407,7 +407,7 @@ class Images
 	 */
 	private static function sanitizeExifArray(array $exif): array
 	{
-		array_walk_recursive($exif, function (&$value) {
+		array_walk_recursive($exif, function (&$value): void {
 			if (is_string($value)) {
 				$value = trim(iconv('UTF-8', 'UTF-8//IGNORE', $value));
 			}
@@ -497,7 +497,7 @@ class Images
 	 * @param string $description
 	 * @return string
 	 */
-	public static function getBBCodeByUrl(string $photo, string $preview = null, string $description = ''): string
+	public static function getBBCodeByUrl(string $photo, ?string $preview = null, string $description = ''): string
 	{
 		if (!empty($preview)) {
 			return '[url=' . $photo . '][img=' . $preview . ']' . $description . '[/img][/url]';

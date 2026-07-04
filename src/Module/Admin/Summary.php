@@ -85,7 +85,7 @@ class Summary extends BaseAdmin
 		$last_worker_call = DI::keyValue()->get('last_worker_execution');
 		if (!$last_worker_call) {
 			$warningtext[] = DI::l10n()->t('The worker was never executed. Please check your database structure!');
-		} elseif ((strtotime(DateTimeFormat::utcNow()) - strtotime($last_worker_call)) > 60 * 60) {
+		} elseif ((strtotime(DateTimeFormat::utcNow()) - strtotime((string) $last_worker_call)) > 60 * 60) {
 			$warningtext[] = DI::l10n()->t('The last worker execution was on %s UTC. This is older than one hour. Please check your crontab settings.', $last_worker_call);
 		}
 

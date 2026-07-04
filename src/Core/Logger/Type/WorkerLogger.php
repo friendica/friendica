@@ -19,12 +19,7 @@ use Psr\Log\LoggerInterface;
 class WorkerLogger implements LoggerInterface, DefaultContextLogger
 {
 	/** @var int Length of the unique worker id */
-	const WORKER_ID_LENGTH = 7;
-
-	/**
-	 * @var LoggerInterface The original Logger instance
-	 */
-	private $logger;
+	public const WORKER_ID_LENGTH = 7;
 
 	/**
 	 * @var string the current worker ID
@@ -43,9 +38,8 @@ class WorkerLogger implements LoggerInterface, DefaultContextLogger
 	 *
 	 * @throws LoggerException
 	 */
-	public function __construct(LoggerInterface $logger)
+	public function __construct(private readonly LoggerInterface $logger)
 	{
-		$this->logger = $logger;
 		try {
 			$this->workerId = Strings::getRandomHex(self::WORKER_ID_LENGTH);
 		} catch (\Exception $exception) {

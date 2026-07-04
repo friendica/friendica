@@ -14,7 +14,6 @@ use Friendica\Model\Photo;
 use Friendica\Module\BaseSettings;
 use Friendica\Network\HTTPException;
 use Friendica\Object\Image;
-use Friendica\Util\Images;
 use Friendica\Util\Strings;
 use Friendica\Util\Proxy;
 
@@ -33,8 +32,8 @@ class Index extends BaseSettings
 			return;
 		}
 
-		$src = $_FILES['userfile']['tmp_name'];
-		$filename = basename($_FILES['userfile']['name']);
+		$src      = $_FILES['userfile']['tmp_name'];
+		$filename = basename((string) $_FILES['userfile']['name']);
 		$filesize = intval($_FILES['userfile']['size']);
 		$filetype = $_FILES['userfile']['type'];
 
@@ -47,7 +46,7 @@ class Index extends BaseSettings
 		}
 
 		$imagedata = @file_get_contents($src);
-		$Image = new Image($imagedata, $filetype, $filename);
+		$Image     = new Image($imagedata, $filetype, $filename);
 
 		if (!$Image->isValid()) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Unable to process image.'));
@@ -63,12 +62,12 @@ class Index extends BaseSettings
 			$Image->scaleDown($max_length);
 		}
 
-		$width = $Image->getWidth();
+		$width  = $Image->getWidth();
 		$height = $Image->getHeight();
 
 		if ($width < 175 || $height < 175) {
 			$Image->scaleUp(Proxy::PIXEL_SMALL);
-			$width = $Image->getWidth();
+			$width  = $Image->getWidth();
 			$height = $Image->getHeight();
 		}
 
@@ -105,20 +104,21 @@ class Index extends BaseSettings
 		$contact = Contact::selectFirst(['avatar'], ['uid' => DI::userSession()->getLocalUserId(), 'self' => true]);
 
 		$tpl = Renderer::getMarkupTemplate('settings/profile/photo/index.tpl');
-		$o = Renderer::replaceMacros($tpl, [
-			'$title'           => DI::l10n()->t('Profile Picture Settings'),
-			'$current_picture' => DI::l10n()->t('Current Profile Picture'),
-			'$upload_picture'  => DI::l10n()->t('Upload Profile Picture'),
-			'$lbl_upfile'      => DI::l10n()->t('Upload Picture:'),
-			'$submit'          => DI::l10n()->t('Upload'),
-			'$avatar'          => $contact['avatar'],
+		$o   = Renderer::replaceMacros($tpl, [
+			'$title'               => DI::l10n()->t('Profile Picture Settings'),
+			'$current_picture'     => DI::l10n()->t('Current Profile Picture'),
+			'$upload_picture'      => DI::l10n()->t('Upload Profile Picture'),
+			'$lbl_upfile'          => DI::l10n()->t('Upload Picture:'),
+			'$submit'              => DI::l10n()->t('Upload'),
+			'$avatar'              => $contact['avatar'],
 			'$form_security_token' => self::getFormSecurityToken('settings_profile_photo'),
-			'$select'          => sprintf('%s %s',
+			'$select'              => sprintf(
+				'%s %s',
 				DI::l10n()->t('or'),
-				($newuser) ?
-					'<a href="' . DI::baseUrl() . '">' . DI::l10n()->t('skip this step') . '</a>'
+				($newuser)
+					? '<a href="' . DI::baseUrl() . '">' . DI::l10n()->t('skip this step') . '</a>'
 					: '<a href="' . DI::baseUrl() . '/profile/' . DI::userSession()->getLocalUserNickname() . '/photos">'
-						. DI::l10n()->t('select a photo from your photo albums') . '</a>'
+						. DI::l10n()->t('select a photo from your photo albums') . '</a>',
 			),
 		]);
 

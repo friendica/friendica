@@ -17,7 +17,7 @@
  * information.
  */
 
-use Friendica\Content\Conversation;
+use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
@@ -32,7 +32,7 @@ use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
 
-function item_post()
+function item_post(): void
 {
 	$uid = DI::userSession()->getLocalUserId();
 
@@ -74,7 +74,7 @@ function item_post()
 	}
 }
 
-function item_drop(int $uid, string $dropitems)
+function item_drop(int $uid, string $dropitems): void
 {
 	$arr_drop = explode(',', $dropitems);
 	foreach ($arr_drop as $item) {
@@ -84,7 +84,7 @@ function item_drop(int $uid, string $dropitems)
 	System::jsonExit(['success' => 1]);
 }
 
-function item_edit(int $uid, array $request, bool $preview, string $return_path)
+function item_edit(int $uid, array $request, bool $preview, string $return_path): void
 {
 	$post = Post::selectFirst(Item::ITEM_FIELDLIST, ['id' => $request['post_id'], 'uid' => $uid]);
 	if (!DBA::isResult($post)) {
@@ -132,7 +132,7 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	throw new HTTPException\OKException(DI::l10n()->t('Post updated.'));
 }
 
-function item_insert(int $uid, array $request, bool $preview, string $return_path)
+function item_insert(int $uid, array $request, bool $preview, string $return_path): void
 {
 	$post = ['uid' => $uid];
 	$post = DI::contentItem()->initializePost($post);
@@ -246,7 +246,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 
 	$post = DI::contentItem()->finalizePost($post, $preview);
 
-	if (!strlen($post['body'])) {
+	if (!strlen((string) $post['body'])) {
 		if ($preview) {
 			System::jsonExit(['preview' => '']);
 		}
@@ -279,7 +279,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 		$post['owner-contact-type'] = Contact::TYPE_PERSON;
 		$post['owner-network']      = Protocol::DFRN;
 
-		$o = DI::conversation()->render([$post], Conversation::MODE_SEARCH, false, true);
+		$o = DI::conversationRenderer()->renderFlat([$post], ConversationRenderer::MODE_SEARCH, true, DI::userSession()->getLocalUserId());
 
 		System::jsonExit(['preview' => $o]);
 	}
@@ -320,9 +320,12 @@ function item_process(array $post, array $request, bool $preview, string $return
 		}
 
 		item_post_return(DI::baseUrl(), $return_path);
+	} elseif (!empty($request['scheduled_at'])) {
+		$post['created'] = $scheduled_at;
+		unset($post['edited']);
+		unset($post['commented']);
+		unset($post['changed']);
 	}
-
-	$post['created'] = $scheduled_at;
 
 	if (!empty($post['cancel'])) {
 		DI::logger()->info('mod_item: post cancelled by addon.');
@@ -341,7 +344,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 	return $post;
 }
 
-function item_post_return($baseurl, $return_path)
+function item_post_return($baseurl, $return_path): void
 {
 	if ($return_path) {
 		DI::baseUrl()->redirect($return_path);
@@ -481,7 +484,7 @@ function drop_item(int $id, string $return = ''): string
 	return '';
 }
 
-function item_redirect_after_action(array $item, string $returnUrlHex)
+function item_redirect_after_action(array $item, string $returnUrlHex): void
 {
 	$return_url = hex2bin($returnUrlHex);
 

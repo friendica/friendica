@@ -7,7 +7,7 @@
 
 <nav id="sidebar-calendar" class="widget">
   <h3>
-    <i class="fa fa-upload" aria-hidden="true"></i>
+    <i class="ri ri-upload-line" aria-hidden="true"></i>
     {{$etitle}}
   </h3>
 

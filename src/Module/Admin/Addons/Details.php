@@ -106,7 +106,7 @@ class Details extends BaseAdmin
 		$addonAuthors = [];
 
 		foreach ($addonInfo->getAuthors() as $addonAuthor) {
-			if (array_key_exists('link', $addonAuthor) && empty(parse_url($addonAuthor['link'], PHP_URL_SCHEME))) {
+			if (array_key_exists('link', $addonAuthor) && empty(parse_url((string) $addonAuthor['link'], PHP_URL_SCHEME))) {
 				$contact = Contact::getByURL($addonAuthor['link'], false);
 
 				if (!empty($contact['url'])) {
@@ -120,7 +120,7 @@ class Details extends BaseAdmin
 		$addonMaintainers = [];
 
 		foreach ($addonInfo->getMaintainers() as $addonMaintainer) {
-			if (array_key_exists('link', $addonMaintainer) && empty(parse_url($addonMaintainer['link'], PHP_URL_SCHEME))) {
+			if (array_key_exists('link', $addonMaintainer) && empty(parse_url((string) $addonMaintainer['link'], PHP_URL_SCHEME))) {
 				$contact = Contact::getByURL($addonMaintainer['link'], false);
 
 				if (!empty($contact['url'])) {

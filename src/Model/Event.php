@@ -96,7 +96,7 @@ class Event
 				. '</span></div>' . "\r\n";
 
 			// Include a map of the location if the [map] BBCode is used.
-			if (str_contains($event['location'], "[map")) {
+			if (str_contains((string) $event['location'], "[map")) {
 				$map = Map::byLocation($event['location'], $simple);
 				if ($map !== $event['location']) {
 					$o .= $map;
@@ -183,7 +183,7 @@ class Event
 
 	public static function sortByDate(array $event_list): array
 	{
-		usort($event_list, [self::class, 'compareDatesCallback']);
+		usort($event_list, self::compareDatesCallback(...));
 		return $event_list;
 	}
 
@@ -193,7 +193,7 @@ class Event
 		$date_b = DateTimeFormat::local($event_b['start']);
 
 		if ($date_a === $date_b) {
-			return strcasecmp($event_a['desc'], $event_b['desc']);
+			return strcasecmp((string) $event_a['desc'], (string) $event_b['desc']);
 		}
 
 		return strcmp($date_a, $date_b);
@@ -562,7 +562,7 @@ class Event
 	 * @throws NotFoundException
 	 * @throws UnauthorizedException
 	 */
-	public static function getListByDate(int $owner_uid, string $start = null, string $finish = null, ?bool $ignore = false): array
+	public static function getListByDate(int $owner_uid, ?string $start = null, ?string $finish = null, ?bool $ignore = false): array
 	{
 		// Only allow events if there is a valid owner_id.
 		if ($owner_uid == 0) {
@@ -703,8 +703,8 @@ class Event
 				foreach ($events as $event) {
 					/// @todo The time / date entries don't include any information about the
 					/// timezone the event is scheduled in :-/
-					$tmp1        = strtotime($event['start']);
-					$tmp2        = strtotime($event['finish']);
+					$tmp1        = strtotime((string) $event['start']);
+					$tmp2        = strtotime((string) $event['finish']);
 					$time_format = "%H:%M:%S";
 					$date_format = "%Y-%m-%d";
 
@@ -844,18 +844,11 @@ class Event
 		}
 
 		// Get the file extension for the format.
-		switch ($format) {
-			case "ical":
-				$file_ext = "ics";
-				break;
-
-			case "csv":
-				$file_ext = "csv";
-				break;
-
-			default:
-				$file_ext = "";
-		}
+		$file_ext = match ($format) {
+			"ical"  => "ics",
+			"csv"   => "csv",
+			default => "",
+		};
 
 		$return = [
 			'success'   => $process,

@@ -8,7 +8,6 @@
 namespace Friendica\Console;
 
 use Asika\SimpleConsole\CommandArgsException;
-use Friendica\Database\Database;
 use Friendica\Model\APContact;
 use Friendica\Protocol\ActivityPub\Transmitter;
 use Friendica\Protocol\Relay as ProtocolRelay;
@@ -22,11 +21,6 @@ use Friendica\Protocol\Relay as ProtocolRelay;
 class Relay extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
-
-	/**
-	 * @var Database
-	 */
-	private $dba;
 
 
 	protected function getHelp()
@@ -56,11 +50,10 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(\Friendica\Database\Database $dba, array $argv = null)
-	{
+	public function __construct(
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->dba = $dba;
 	}
 
 	protected function doExecute(): int

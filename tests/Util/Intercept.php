@@ -27,7 +27,7 @@ class Intercept extends php_user_filter
 	{
 		while ($bucket = stream_bucket_make_writeable($in)) {
 			self::$cache .= $bucket->data;
-			$consumed += $bucket->datalen;
+			$consumed += (int) $bucket->datalen;
 			stream_bucket_append($out, $bucket);
 		}
 		return PSFS_FEED_ME;
@@ -36,7 +36,8 @@ class Intercept extends php_user_filter
 	/**
 	 * Registers the interceptor and prevents therefore the output to STDOUT
 	 */
-	public static function setUp() {
+	public static function setUp()
+	{
 		stream_filter_register("intercept", Intercept::class);
 		stream_filter_append(STDOUT, "intercept");
 		stream_filter_append(STDERR, "intercept");
@@ -45,7 +46,8 @@ class Intercept extends php_user_filter
 	/**
 	 * Resets the cache
 	 */
-	public static function reset() {
+	public static function reset()
+	{
 		self::$cache = '';
 	}
 }

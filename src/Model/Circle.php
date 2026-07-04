@@ -51,7 +51,7 @@ class Circle
 	 * @return bool
 	 * @throws \Exception
 	 */
-	public static function exists(int $circle_id, int $uid = null): bool
+	public static function exists(int $circle_id, ?int $uid = null): bool
 	{
 		$condition = ['id' => $circle_id, 'deleted' => false];
 
@@ -104,15 +104,21 @@ class Circle
 	/**
 	 * Update circle information.
 	 *
-	 * @param int    $id   Circle ID
-	 * @param string $name Circle name
+	 * @param int       $id     Circle ID
+	 * @param string    $name   Circle name
+	 * @param bool|null $public Circle public state (null to keep unchanged)
 	 *
 	 * @return bool Was the update successful?
 	 * @throws \Exception
 	 */
-	public static function update(int $id, string $name): bool
+	public static function update(int $id, string $name, ?bool $public = null): bool
 	{
-		return DBA::update('group', ['name' => $name], ['id' => $id]);
+		$fields = ['name' => $name];
+		if ($public !== null) {
+			$fields['public'] = $public;
+		}
+
+		return DBA::update('group', $fields, ['id' => $id]);
 	}
 
 	/**
@@ -233,11 +239,11 @@ class Circle
 				$user['def_gid'] = 0;
 				$change          = true;
 			}
-			if (str_contains($user['allow_gid'], '<' . $gid . '>')) {
+			if (str_contains((string) $user['allow_gid'], '<' . $gid . '>')) {
 				$user['allow_gid'] = str_replace('<' . $gid . '>', '', $user['allow_gid']);
 				$change            = true;
 			}
-			if (str_contains($user['deny_gid'], '<' . $gid . '>')) {
+			if (str_contains((string) $user['deny_gid'], '<' . $gid . '>')) {
 				$user['deny_gid'] = str_replace('<' . $gid . '>', '', $user['deny_gid']);
 				$change           = true;
 			}
@@ -280,7 +286,7 @@ class Circle
 		if (!$ucid) {
 			throw new HTTPException\NotFoundException('Invalid contact.');
 		}
-
+		DI::logger()->debug('Adding contact to circle', ['gid' => $gid, 'cid' => $cid, 'ucid' => $ucid]);
 		return DBA::insert('group_member', ['gid' => $gid, 'contact-id' => $ucid], Database::INSERT_IGNORE);
 	}
 
@@ -389,7 +395,7 @@ class Circle
 	 */
 	public static function expand(int $uid, array $circle_ids, bool $check_dead = false, bool $expand_followers = true): array
 	{
-		if (!is_array($circle_ids) || !count($circle_ids)) {
+		if (count($circle_ids) === 0) {
 			return [];
 		}
 

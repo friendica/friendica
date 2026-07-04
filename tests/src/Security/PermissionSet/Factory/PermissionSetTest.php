@@ -24,7 +24,7 @@ class PermissionSetTest extends MockedTestCase
 		$this->permissionSet = new PermissionSet(new NullLogger(), new ACLFormatter());
 	}
 
-	public function dataInput()
+	public static function dataInput()
 	{
 		return [
 			'new' => [
@@ -90,7 +90,7 @@ class PermissionSetTest extends MockedTestCase
 					'deny_cid'  => [],
 					'deny_gid'  => [],
 				],
-			]
+			],
 		];
 	}
 
@@ -107,10 +107,9 @@ class PermissionSetTest extends MockedTestCase
 
 	/**
 	 * Test the createFromTableRow method
-	 *
-	 * @dataProvider dataInput
 	 */
-	public function testCreateFromTableRow(array $input, array $assertion)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataInput')]
+	public function testCreateFromTableRow(array $input, array $assertion): void
 	{
 		$permissionSet = $this->permissionSet->createFromTableRow($input);
 
@@ -119,17 +118,16 @@ class PermissionSetTest extends MockedTestCase
 
 	/**
 	 * Test the createFromString method
-	 *
-	 * @dataProvider dataInput
 	 */
-	public function testCreateFromString(array $input, array $assertion)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataInput')]
+	public function testCreateFromString(array $input, array $assertion): void
 	{
 		$permissionSet = $this->permissionSet->createFromString(
 			$input['uid'],
 			$input['allow_cid'] ?? '',
 			$input['allow_gid'] ?? '',
-			$input['deny_cid'] ?? '',
-			$input['deny_gid'] ?? ''
+			$input['deny_cid']  ?? '',
+			$input['deny_gid']  ?? '',
 		);
 
 		unset($assertion['id']);

@@ -14,7 +14,7 @@ use Friendica\Test\ApiTestCase;
 
 class RateLimitStatusTest extends ApiTestCase
 {
-	public function testWithJson()
+	public function testWithJson(): void
 	{
 		$response = (new RateLimitStatus(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock);
@@ -23,21 +23,21 @@ class RateLimitStatusTest extends ApiTestCase
 
 		self::assertEquals([
 			'Content-type'                => ['application/json'],
-			ICanCreateResponses::X_HEADER => ['json']
+			ICanCreateResponses::X_HEADER => ['json'],
 		], $response->getHeaders());
 		self::assertEquals(150, $result->remaining_hits);
 		self::assertEquals(150, $result->hourly_limit);
 		self::assertIsInt($result->reset_time_in_seconds);
 	}
 
-	public function testWithXml()
+	public function testWithXml(): void
 	{
 		$response = (new RateLimitStatus(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'xml']))
 			->run($this->httpExceptionMock);
 
 		self::assertEquals([
 			'Content-type'                => ['text/xml'],
-			ICanCreateResponses::X_HEADER => ['xml']
+			ICanCreateResponses::X_HEADER => ['xml'],
 		], $response->getHeaders());
 		self::assertXml($response->getBody(), 'hash');
 	}

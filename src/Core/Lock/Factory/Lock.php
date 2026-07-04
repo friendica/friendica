@@ -28,35 +28,26 @@ class Lock
 	/**
 	 * @var string The default driver for caching
 	 */
-	const DEFAULT_DRIVER = 'default';
+	public const DEFAULT_DRIVER = 'default';
 
-	/**
-	 * @var IManageConfigValues The configuration to read parameters out of the config
-	 */
-	private $config;
-
-	/**
-	 * @var Database The database connection in case that the cache is used the dba connection
-	 */
-	private $dba;
-
-	/**
-	 * @var Cache The memory cache driver in case we use it
-	 */
-	private $cacheFactory;
-
-	/**
-	 * @var LoggerInterface The Friendica Logger
-	 */
-	private $logger;
-
-	public function __construct(Cache $cacheFactory, IManageConfigValues $config, Database $dba, LoggerInterface $logger)
-	{
-		$this->cacheFactory = $cacheFactory;
-		$this->config       = $config;
-		$this->dba          = $dba;
-		$this->logger       = $logger;
-	}
+	public function __construct(
+		/**
+		 * @var Cache The memory cache driver in case we use it
+		 */
+		private readonly Cache $cacheFactory,
+		/**
+		 * @var IManageConfigValues The configuration to read parameters out of the config
+		 */
+		private readonly IManageConfigValues $config,
+		/**
+		 * @var Database The database connection in case that the cache is used the dba connection
+		 */
+		private readonly Database $dba,
+		/**
+		 * @var LoggerInterface The Friendica Logger
+		 */
+		private readonly LoggerInterface $logger,
+	) {}
 
 	public function create()
 	{
@@ -74,6 +65,7 @@ class Lock
 					} else {
 						throw new \Exception(sprintf('Incompatible cache driver \'%s\' for lock used', $lock_type));
 					}
+					// no break
 				case 'database':
 					return new LockType\DatabaseLock($this->dba);
 				case 'semaphore':

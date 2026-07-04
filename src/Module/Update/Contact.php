@@ -32,8 +32,6 @@ use Psr\Log\LoggerInterface;
  */
 final class Contact extends ContactModule
 {
-	private UserSession $userSession;
-
 	/**
 	 * Contact update module constructor.
 	 *
@@ -47,10 +45,9 @@ final class Contact extends ContactModule
 	 * @param array $parameters
 	 * @param UserSession $userSession
 	 */
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters, UserSession $userSession)
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters, private readonly UserSession $userSession)
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-		$this->userSession = $userSession;
 	}
 
 	/**

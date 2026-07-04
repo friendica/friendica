@@ -83,7 +83,7 @@ class Theme
 			foreach ($comment_lines as $comment_line) {
 				$comment_line = trim($comment_line, "\t\n\r */");
 				if (str_contains($comment_line, ':')) {
-					[$key, $value] = array_map("trim", explode(":", $comment_line, 2));
+					[$key, $value] = array_map(trim(...), explode(":", $comment_line, 2));
 					$key           = strtolower($key);
 					if ($key == "author") {
 						$result = preg_match("|([^<]+)<([^>]+)>|", $value, $matches);
@@ -286,7 +286,7 @@ class Theme
 	 * @param int|null $uid   Current logged-in user id
 	 * @return string|null
 	 */
-	public static function getBackgroundColor(string $theme, int $uid = null)
+	public static function getBackgroundColor(string $theme, ?int $uid = null)
 	{
 		$theme = Strings::sanitizeFilePathItem($theme);
 
@@ -312,7 +312,7 @@ class Theme
 	 * @param int|null $uid   Current logged-in user id
 	 * @return string|null
 	 */
-	public static function getThemeColor(string $theme, int $uid = null)
+	public static function getThemeColor(string $theme, ?int $uid = null)
 	{
 		$theme = Strings::sanitizeFilePathItem($theme);
 

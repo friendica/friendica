@@ -20,7 +20,7 @@ class StatusesTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiListsStatuses()
+	public function testApiListsStatuses(): void
 	{
 		$this->expectException(BadRequestException::class);
 
@@ -31,7 +31,7 @@ class StatusesTest extends ApiTestCase
 	/**
 	 * Test the api_lists_statuses() function with a list ID.
 	 */
-	public function testApiListsStatusesWithListId()
+	public function testApiListsStatusesWithListId(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
@@ -54,7 +54,7 @@ class StatusesTest extends ApiTestCase
 	/**
 	 * Test the api_lists_statuses() function with a list ID and a RSS result.
 	 */
-	public function testApiListsStatusesWithListIdAndRss()
+	public function testApiListsStatusesWithListIdAndRss(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
@@ -70,9 +70,8 @@ class StatusesTest extends ApiTestCase
 	/**
 	 * Test the api_lists_statuses() function with an unallowed user.
 	 *
-	 * @return void
 	 */
-	public function testApiListsStatusesWithUnallowedUser()
+	public function testApiListsStatusesWithUnallowedUser(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 
