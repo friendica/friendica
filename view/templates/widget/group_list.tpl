@@ -4,7 +4,9 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
+<!-- NOTE: Place "sidebar-widget-list" only on one element: The one that should be expanded/collapsed -->
 <script>
+	/* TODO: Consider making a reusable version of this in e.g. main.js instead */
 	function showHideGroupList() {
 		if ($("li[id^='group-widget-entry-extended-']").is(':visible')) {
 			$("li[id^='group-widget-entry-extended-']").hide();
@@ -16,67 +18,55 @@
 		}
 	}
 </script>
-<nav id="group-list-sidebar-frame">
-	<span id="group-list-sidebar-inflated" class="widget inflated fakelink">
-		<button class="fakelink" onclick="openCloseWidget('group-list-sidebar', 'group-list-sidebar-inflated');"
-			aria-expanded="false">
-			<h3>
-				<i class="fa fa-users" aria-hidden="true"></i>
-				{{$title}}
-			</h3>
-		</button>
-	</span>
-	<div id="group-list-sidebar" class="widget">
-		<div id="sidebar-group-header" class="sidebar-widget-header">
-			<button class="fakelink" onclick="openCloseWidget('group-list-sidebar', 'group-list-sidebar-inflated');" aria-expanded="true">
-				<h3>
-					<i class="fa fa-users" aria-hidden="true"></i>
-					{{$title}}
-				</h3>
-			</button>
-			<a class="pull-right widget-action widget-action-top faded-icon" id="sidebar-new-group"
-				href="{{$new_group_page}}" data-toggle="tooltip" title="{{$create_new_group}}">
-				<i class="fa fa-plus" aria-hidden="true"></i>
-			</a>
-			{{if $addon_group_directory_enabled}}
-				<a class="pull-right widget-action widget-action-top faded-icon" id="sidebar-group-directory"
-					href="/groupdirectory" data-toggle="tooltip" title="{{$visit_groupdirectory}}">
-					<i class="fa fa-search" aria-hidden="true"></i>
-				</a>
-			{{/if}}
-		</div>
-		<div id="sidebar-group-list" class="sidebar-widget-list">
-			{{* The list of available groups *}}
-			<ul id="group-list-sidebar-ul">
-				{{foreach $groups as $group}}
-					{{if $group.id <= $visible_groups}}
-						<li class="group-widget-entry group-{{$group.cid}}" id="group-widget-entry-{{$group.id}}">
-							<span class="notify badge pull-right"></span>
-							<a href="{{$group.external_url}}" title="{{$group.link_desc}}" class="label sparkle" target="_blank" rel="noopener noreferrer">
-								<img class="group-list-img" src="{{$group.micro}}" alt="{{$group.link_desc}}" />
-							</a>
-							<a class="group-widget-link" id="group-widget-link-{{$group.id}}" href="{{$group.url}}">{{$group.name}}</a>
-						</li>
-					{{/if}}
+<nav id="group-sidebar" class="widget">
+	<button class="widget-btn fakelink" onclick="openCloseWidget('group-sidebar');" aria-expanded="false">
+		<h3>
+			<i class="ri ri-discuss-line" aria-hidden="true"></i>
+			{{$title}}
+		</h3>
+	</button>
+	<a class="pull-right widget-action widget-action-top faded-icon" id="sidebar-new-group"
+		href="{{$new_group_page}}" data-toggle="tooltip" title="{{$create_new_group}}">
+		<i class="ri ri-add-line" aria-hidden="true"></i>
+	</a>
+	{{if $addon_group_directory_enabled}}
+		<a class="pull-right widget-action widget-action-top faded-icon" id="sidebar-group-directory"
+			href="/groupdirectory" data-toggle="tooltip" title="{{$visit_groupdirectory}}">
+			<i class="ri ri-search-line" aria-hidden="true"></i>
+		</a>
+	{{/if}}
 
-					{{if $group.id > $visible_groups}}
-						<li class="group-widget-entry group-{{$group.cid}}" id="group-widget-entry-extended-{{$group.id}}" style="display: none;">
-							<span class="notify badge pull-right"></span>
-							<a href="{{$group.external_url}}" title="{{$group.link_desc}}" class="label sparkle" target="_blank" rel="noopener noreferrer">
-								<img class="group-list-img" src="{{$group.micro}}" alt="{{$group.link_desc}}" />
-							</a>
-							<a class="group-widget-link" id="group-widget-link-{{$group.id}}" href="{{$group.url}}">{{$group.name}}</a>
-						</li>
-					{{/if}}
-				{{/foreach}}
-
-				{{if $total > $visible_groups }}
-					<li onclick="showHideGroupList(); return false;" id="group-widget-collapse" class="group-widget-link fakelink tool">{{$showmore}}</li>
+	<div id="group-list-sidebar" class="sidebar-widget-list">
+		{{* The list of available groups *}}
+		<ul id="group-list-sidebar-ul">
+			{{foreach $groups as $group}}
+				{{if $group.id <= $visible_groups}}
+					<li class="group-widget-entry group-{{$group.cid}}" id="group-widget-entry-{{$group.id}}">
+						<span class="notify badge pull-right"></span>
+						<a href="{{$group.external_url}}" title="{{$group.link_desc}}" class="label sparkle" target="_blank" rel="noopener noreferrer">
+							<img src="{{$group.micro}}" alt="{{$group.link_desc}}" />
+						</a>
+						<a class="group-widget-link" id="group-widget-link-{{$group.id}}" href="{{$group.url}}">{{$group.name}}</a>
+					</li>
 				{{/if}}
-			</ul>
-		</div>
+
+				{{if $group.id > $visible_groups}}
+					<li class="group-widget-entry group-{{$group.cid}}" id="group-widget-entry-extended-{{$group.id}}" style="display: none;">
+						<span class="notify badge pull-right"></span>
+						<a href="{{$group.external_url}}" title="{{$group.link_desc}}" class="label sparkle" target="_blank" rel="noopener noreferrer">
+							<img src="{{$group.micro}}" alt="{{$group.link_desc}}" />
+						</a>
+						<a class="group-widget-link" id="group-widget-link-{{$group.id}}" href="{{$group.url}}">{{$group.name}}</a>
+					</li>
+				{{/if}}
+			{{/foreach}}
+
+			{{if $total > $visible_groups }}
+				<li onclick="showHideGroupList(); return false;" id="group-widget-collapse" class="group-widget-link widget-show-more fakelink tool">{{$showmore}}</li>
+			{{/if}}
+		</ul>
 	</div>
 </nav>
 <script>
-	initWidget('group-list-sidebar', 'group-list-sidebar-inflated');
+	initWidget('group-sidebar');
 </script>

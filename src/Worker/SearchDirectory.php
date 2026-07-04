@@ -33,7 +33,7 @@ class SearchDirectory
 			}
 		}
 
-		$x = DI::httpClient()->fetch(Search::getGlobalDirectory() . '/lsearch?p=1&n=500&search=' . urlencode($search), HttpClientAccept::JSON, 0, '', HttpClientRequest::CONTACTDISCOVER);
+		$x = DI::httpClient()->fetch(Search::getGlobalDirectory() . '/lsearch?p=1&n=500&search=' . urlencode((string) $search), HttpClientAccept::JSON, 0, '', HttpClientRequest::CONTACTDISCOVER);
 		$j = json_decode($x);
 
 		if (!empty($j->results)) {

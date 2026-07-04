@@ -27,6 +27,7 @@ steps:
     image: php:${PHP_MAJOR_VERSION}
     commands:
       - find . -name \*.php -not -path './vendor/*' -not -path './view/asset/*' -print0 | xargs -0 -n1 php -l
+
   restore_cache:
     image: meltwater/drone-cache:dev
     settings:
@@ -38,6 +39,7 @@ steps:
         - '.composer'
     volumes:
       - /tmp/drone-cache:/tmp/cache
+
   composer_install:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     commands:
@@ -47,6 +49,7 @@ steps:
       - ./bin/composer.phar install --prefer-dist
     volumes:
       - /etc/hosts:/etc/hosts
+
   rebuild_cache:
     image: meltwater/drone-cache:dev
     settings:
@@ -58,20 +61,7 @@ steps:
         - '.composer'
     volumes:
       - /tmp/drone-cache:/tmp/cache
-  phpstan:
-    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
-    when:
-      matrix:
-        PHP_MAJOR_VERSION: 8.5
-    commands:
-      - bin/composer.phar run phpstan;
-  phpstan-addons:
-    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
-    when:
-      matrix:
-        PHP_MAJOR_VERSION: 8.5
-    commands:
-      - bin/composer.phar run phpstan-addons;
+
   test:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     environment:
@@ -90,10 +80,11 @@ steps:
       - if [ "${PHP_MAJOR_VERSION}" = "8.5" -a "${CI_REPO}" = "friendica/friendica" ]; then
           phpenmod xdebug;
           export XDEBUG_MODE=coverage;
-          phpunit --configuration tests/phpunit.xml -d memory_limit=-1 --coverage-clover clover.xml;
+          vendor/bin/phpunit --configuration tests/phpunit.xml -d memory_limit=-1 --coverage-clover clover.xml;
         else
-          phpunit --configuration tests/phpunit.xml -d memory_limit=-1;
+          vendor/bin/phpunit --configuration tests/phpunit.xml -d memory_limit=-1;
         fi
+
   codecov:
     image: friendicaci/codecov
     when:

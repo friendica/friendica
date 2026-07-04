@@ -33,7 +33,7 @@ class ScheduledStatus extends BaseDataTransferObject
 		'poll'           => null,
 		'idempotency'    => null,
 		'in_reply_to_id' => null,
-		'application_id' => ''
+		'application_id' => '',
 	];
 	/** @var array */
 	protected $media_attachments = [];
@@ -45,11 +45,16 @@ class ScheduledStatus extends BaseDataTransferObject
 	 * @param array $parameters   Parameters for the workerqueue entry for the delayed post
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(array $delayed_post, array $parameters, array $media_ids = null, array $media_attachments = [], int $in_reply_to_id = null)
-	{
+	public function __construct(
+		array $delayed_post,
+		array $parameters,
+		?array $media_ids = null,
+		array $media_attachments = [],
+		?int $in_reply_to_id = null,
+	) {
 		$visibility = ['public', 'private', 'unlisted'];
 
-		$this->id           = (string)$delayed_post['id'];
+		$this->id           = (string) $delayed_post['id'];
 		$this->scheduled_at = DateTimeFormat::utc($delayed_post['delayed'], DateTimeFormat::JSON);
 
 		$this->params = [
@@ -62,7 +67,7 @@ class ScheduledStatus extends BaseDataTransferObject
 			'poll'           => null,
 			'idempotency'    => null,
 			'in_reply_to_id' => $in_reply_to_id,
-			'application_id' => ''
+			'application_id' => '',
 		];
 
 		$this->media_attachments = $media_attachments;

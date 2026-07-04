@@ -12,92 +12,6 @@ $a->strings['Item couldn\'t be fetched.'] = 'Item kan niet worden opgehaald.';
 $a->strings['Empty post discarded.'] = 'Lege post weggegooid.';
 $a->strings['Item not found.'] = 'Item niet gevonden.';
 $a->strings['Permission denied.'] = 'Toegang geweigerd';
-$a->strings['No valid account found.'] = 'Geen geldige account gevonden.';
-$a->strings['Password reset request issued. Check your email.'] = 'Verzoek om wachtwoord opnieuw in te stellen werd verstuurd. Kijk uw e-mail na.';
-$a->strings['
-		Dear %1$s,
-			A request was recently received at "%2$s" to reset your account
-		password. In order to confirm this request, please select the verification link
-		below or paste it into your web browser address bar.
-
-		If you did NOT request this change, please DO NOT follow the link
-		provided and ignore and/or delete this email, the request will expire shortly.
-
-		Your password will not be changed unless we can verify that you
-		issued this request.'] = '
-		Beste %1$s,
-			Er is recent om "%2$s" een verzoek gekomen om je wachtwoord te resetten.
-		Om dit verzoek te bevestigen, gelieve de verificatie link hieronder te volgen of in je browser te kopiëren.
-
-		Als je dit verzoek NIET hebt gedaan, volg deze link dan NIET en negeer 
-		en/of verwijder deze email, het verzoek zal binnenkort vanzelf ongeldig worden.
-
-		Je wachtwoord zal niet aangepast worden tenzij we kunnen verifiëren
-		dat je dit verzoek verzonden hebt.';
-$a->strings['
-		Follow this link soon to verify your identity:
-
-		%1$s
-
-		You will then receive a follow-up message containing the new password.
-		You may change that password from your account settings page after logging in.
-
-		The login details are as follows:
-
-		Site Location:	%2$s
-		Login Name:	%3$s'] = '
-		Volg nu deze link om je identiteit te bevestigen:
-
-		%1$s
-
-		Je zal dan een boodschap krijgen met je nieuw wachtwoord.
-		Je kunt je wachtwoord veranderen in je instelling pagina nadat je ingelogd bent.
-
-		De login details zijn de volgende:
-
-		Site locatie:	%2$s
-		Login naam:	%3$s';
-$a->strings['Password reset requested at %s'] = 'Op %s werd gevraagd je wachtwoord opnieuw in te stellen';
-$a->strings['Request could not be verified. (You may have previously submitted it.) Password reset failed.'] = 'Verzoek kon niet geverifieerd worden. (Misschien heb je het voordien al ingediend.) Wachtwoord niet opnieuw ingesteld.';
-$a->strings['Request has expired, please make a new one.'] = 'Aanvraag is verlopen, gelieve een nieuwe aan te maken.';
-$a->strings['Forgot your Password?'] = 'Wachtwoord vergeten?';
-$a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Voer je e-mailadres in en verstuur het om je wachtwoord opnieuw in te stellen. Kijk dan je e-mail na voor verdere instructies.';
-$a->strings['Password Reset'] = 'Wachtwoord opnieuw instellen';
-$a->strings['Your password has been reset as requested.'] = 'Je wachtwoord is opnieuw ingesteld zoals gevraagd.';
-$a->strings['Your new password is'] = 'Je nieuwe wachtwoord is';
-$a->strings['Save or copy your new password - and then'] = 'Bewaar of kopieer je nieuw wachtwoord - en dan';
-$a->strings['click here to login'] = 'klik hier om in te loggen';
-$a->strings['Your password may be changed from the <em>Settings</em> page after successful login.'] = 'Je kunt dit wachtwoord veranderen nadat je bent ingelogd op de <em>Instellingen></em> pagina.';
-$a->strings['Your password has been reset.'] = 'Je wachtwoord is opnieuw ingesteld.';
-$a->strings['
-			Dear %1$s,
-				Your password has been changed as requested. Please retain this
-			information for your records (or change your password immediately to
-			something that you will remember).
-		'] = '
-			Beste %1$s,
-				Je wachtwoord is aangepast zoals je gevraagd hebt. Hou deze informatie
-			alstublieft bij (of pas je wachtwoord onmiddellijk aan
-			naar iets wat je je kan herinneren).
-		';
-$a->strings['
-			Your login details are as follows:
-
-			Site Location:	%1$s
-			Login Name:	%2$s
-			Password:	%3$s
-
-			You may change that password from your account settings page after logging in.
-		'] = '
-			Je login details zijn de volgende:
-
-			Site Locatie:	%1$s
-			Login Naam:	%2$s
-			Wachtwwoord:	%3$s
-
-			Je kan dit wachtwoord in het account instellingen aanpassen nadat je ingelogd bent.
-		';
-$a->strings['Your password has been changed at %s'] = 'Je wachtwoord is veranderd op %s';
 $a->strings['Messages'] = 'Privéberichten';
 $a->strings['New Message'] = 'Nieuw Bericht';
 $a->strings['No recipient selected.'] = 'Geen ontvanger geselecteerd.';
@@ -111,8 +25,6 @@ $a->strings['Conversation was not removed.'] = 'Conversatie was niet verwijderd.
 $a->strings['Please enter a link URL:'] = 'Vul een internetadres/URL in:';
 $a->strings['Send Private Message'] = 'Verstuur privébericht';
 $a->strings['To:'] = 'Aan:';
-$a->strings['Subject:'] = 'Onderwerp:';
-$a->strings['Your message:'] = 'Jouw bericht:';
 $a->strings['Upload photo'] = 'Foto uploaden';
 $a->strings['Insert web link'] = 'Voeg een webadres in';
 $a->strings['Please wait'] = 'Even geduld';
@@ -122,6 +34,8 @@ $a->strings['D, d M Y - g:i A'] = 'D, d M Y - g:i A';
 $a->strings['Delete conversation'] = 'Verwijder gesprek';
 $a->strings['No secure communications available. You <strong>may</strong> be able to respond from the sender\'s profile page.'] = 'Geen beveiligde communicatie beschikbaar. Je kunt <strong>misschien</strong> antwoorden vanaf de profiel-pagina van de afzender.';
 $a->strings['Send Reply'] = 'Verstuur Antwoord';
+$a->strings['Subject:'] = 'Onderwerp:';
+$a->strings['Your message:'] = 'Jouw bericht:';
 $a->strings['Unknown sender - %s'] = 'Onbekende afzender - %s';
 $a->strings['You and %s'] = 'Jij en %s';
 $a->strings['%s and You'] = '%s en jij';
@@ -129,29 +43,22 @@ $a->strings['%d message'] = [
 	0 => '%d bericht',
 	1 => '%d berichten',
 ];
-$a->strings['Personal Notes'] = 'Persoonlijke Nota\'s';
-$a->strings['Save'] = 'Bewaren';
 $a->strings['User not found.'] = 'Gebruiker niet gevonden.';
 $a->strings['Photo Albums'] = 'Fotoalbums';
 $a->strings['Recent Photos'] = 'Recente foto\'s';
-$a->strings['Upload Photos'] = 'Upload foto\'s';
 $a->strings['everybody'] = 'iedereen';
 $a->strings['Contact information unavailable'] = 'Contactinformatie niet beschikbaar';
 $a->strings['Album not found.'] = 'Album niet gevonden';
 $a->strings['Album successfully deleted'] = 'Album succesvol gedeeld';
 $a->strings['Album was empty.'] = 'Het album was leeg';
 $a->strings['Failed to delete the photo.'] = 'Foto verwijderen mislukt.';
-$a->strings['a photo'] = 'een foto';
-$a->strings['%1$s was tagged in %2$s by %3$s'] = '%1$s is gelabeld in %2$s door %3$s';
 $a->strings['Public access denied.'] = 'Niet vrij toegankelijk';
 $a->strings['No photos selected'] = 'Geen foto\'s geselecteerd';
-$a->strings['New album name: '] = 'Nieuwe albumnaam: ';
-$a->strings['or select existing album:'] = 'Of selecteer bestaand album:';
-$a->strings['Do not show a status post for this upload'] = 'Toon geen bericht op je tijdlijn van deze upload';
 $a->strings['Permissions'] = 'Rechten';
 $a->strings['Do you really want to delete this photo album and all its photos?'] = 'Wil je echt dit fotoalbum en alle foto\'s erin verwijderen?';
 $a->strings['Delete Album'] = 'Verwijder album';
 $a->strings['Cancel'] = 'Annuleren';
+$a->strings['New album name: '] = 'Nieuwe albumnaam: ';
 $a->strings['Edit Album'] = 'Album wijzigen';
 $a->strings['Show Newest First'] = 'Toon niewste eerst';
 $a->strings['Show Oldest First'] = 'Toon oudste eerst';
@@ -165,25 +72,13 @@ $a->strings['Edit photo'] = 'Bewerk foto';
 $a->strings['Delete photo'] = 'Foto verwijderen';
 $a->strings['Private Photo'] = 'Privé foto';
 $a->strings['View Full Size'] = 'Bekijk in volledig formaat';
-$a->strings['Tags'] = 'Labels';
-$a->strings['[Select tags to remove]'] = '[Selecteer tags om te verwijderen]';
 $a->strings['New album name'] = 'Nieuwe albumnaam';
 $a->strings['Caption'] = 'Onderschrift';
-$a->strings['Add a Tag'] = 'Een label toevoegen';
-$a->strings['Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping'] = 'Voorbeeld: @bob, @Barbara_Jansen, @jan@voorbeeld.nl, #Ardennen, #camping ';
 $a->strings['Do not rotate'] = 'Niet roteren';
 $a->strings['Rotate CW (right)'] = 'Roteren met de klok mee (rechts)';
 $a->strings['Rotate CCW (left)'] = 'Roteren tegen de klok in (links)';
-$a->strings['This is you'] = 'Dit ben jij';
-$a->strings['Comment'] = 'Reacties';
-$a->strings['Preview'] = 'Voorvertoning';
-$a->strings['Loading...'] = 'Aan het laden...';
-$a->strings['Select'] = 'Kies';
-$a->strings['Delete'] = 'Verwijder';
-$a->strings['I like this (toggle)'] = 'Vind ik leuk';
-$a->strings['I don\'t like this (toggle)'] = 'Vind ik niet leuk';
 $a->strings['Edit'] = 'Bewerken';
-$a->strings['Map'] = 'Kaart';
+$a->strings['Delete'] = 'Verwijder';
 $a->strings['Delete this item?'] = 'Dit item verwijderen?';
 $a->strings['toggle mobile'] = 'mobiel thema omwisselen';
 $a->strings['Page not found.'] = 'Pagina niet gevonden';
@@ -249,7 +144,7 @@ $a->strings['Tag term:'] = 'Label:';
 $a->strings['Where are you right now?'] = 'Waar ben je nu?';
 $a->strings['Delete item(s)?'] = 'Item(s) verwijderen?';
 $a->strings['New Post'] = 'Nieuw bericht';
-$a->strings['Share'] = 'Delen';
+$a->strings['Loading...'] = 'Aan het laden...';
 $a->strings['upload photo'] = 'Foto uploaden';
 $a->strings['Attach file'] = 'Bestand bijvoegen';
 $a->strings['attach file'] = 'bestand bijvoegen';
@@ -269,11 +164,13 @@ $a->strings['Set title'] = 'Titel plaatsen';
 $a->strings['Categories (comma-separated list)'] = 'Categorieën (komma-gescheiden lijst)';
 $a->strings['Permission settings'] = 'Instellingen van rechten';
 $a->strings['Public post'] = 'Openbare post';
+$a->strings['Preview'] = 'Voorvertoning';
 $a->strings['Message'] = 'Bericht';
 $a->strings['Open Compose page'] = 'Open de opstelpagina';
 $a->strings['remove'] = 'verwijder';
 $a->strings['Delete Selected Items'] = 'Geselecteerde items verwijderen';
 $a->strings['%s reshared this.'] = '%s heeft dit gedeeld';
+$a->strings['Select'] = 'Kies';
 $a->strings['View %s\'s profile @ %s'] = 'Bekijk het profiel van %s @ %s';
 $a->strings['Categories:'] = 'Categorieën:';
 $a->strings['Filed under:'] = 'Bewaard onder:';
@@ -289,17 +186,15 @@ $a->strings['Latest Posts'] = 'Laatste Berichten';
 $a->strings['Sort by post received date'] = 'Sorteren naar ontvangstdatum bericht';
 $a->strings['Personal'] = 'Persoonlijk';
 $a->strings['Posts that mention or involve you'] = 'Alleen berichten die jou vermelden of op jou betrekking hebben';
-$a->strings['Starred'] = 'Met ster';
 $a->strings['Favourite Posts'] = 'Favoriete berichten';
 $a->strings['General Features'] = 'Algemene functies';
-$a->strings['Photo Location'] = 'Foto Locatie';
-$a->strings['Photo metadata is normally stripped. This extracts the location (if present) prior to stripping metadata and links it to a map.'] = 'Foto metadata wordt normaal verwijderd. Dit extraheert de locatie (indien aanwezig) vooraleer de metadata te verwijderen en verbindt die met een kaart.';
 $a->strings['Post Composition Features'] = 'Functies voor het opstellen van berichten';
 $a->strings['Explicit Mentions'] = 'Expliciete vermeldingen';
 $a->strings['Add explicit mentions to comment box for manual control over who gets mentioned in replies.'] = 'Voeg expliciete vermeldingen toe aan het opmerkingenvak voor handmatige controle over wie in antwoorden wordt vermeld.';
 $a->strings['Post/Comment Tools'] = 'Bericht-/reactiehulpmiddelen';
 $a->strings['Post Categories'] = 'Categorieën berichten';
 $a->strings['Add categories to your posts'] = 'Voeg categorieën toe aan je berichten';
+$a->strings['Summary'] = 'Samenvatting';
 $a->strings['Archives'] = 'Archieven';
 $a->strings['Protocols'] = 'Protocollen';
 $a->strings['Account Types'] = 'Account Types';
@@ -316,14 +211,11 @@ $a->strings['event'] = 'gebeurtenis';
 $a->strings['status'] = 'status';
 $a->strings['photo'] = 'foto';
 $a->strings['%1$s tagged %2$s\'s %3$s with %4$s'] = '%1$s labelde %3$s van %2$s met %4$s';
-$a->strings['Follow Thread'] = 'Gesprek volgen';
 $a->strings['View Status'] = 'Bekijk status';
 $a->strings['View Profile'] = 'Bekijk profiel';
 $a->strings['View Photos'] = 'Bekijk foto\'s';
 $a->strings['Network Posts'] = 'Netwerkberichten';
 $a->strings['View Contact'] = 'Bekijk contact';
-$a->strings['Block'] = 'Blokkeren';
-$a->strings['Ignore'] = 'Negeren';
 $a->strings['Connect/Follow'] = 'Verbind/Volg';
 $a->strings['Nothing new here'] = 'Niets nieuw hier';
 $a->strings['Home'] = 'Tijdlijn';
@@ -347,6 +239,7 @@ $a->strings['Addon applications, utilities, games'] = 'Extra toepassingen, hulpm
 $a->strings['Search'] = 'Zoeken';
 $a->strings['Search site content'] = 'Doorzoek de inhoud van de website';
 $a->strings['Full Text'] = 'Volledige tekst';
+$a->strings['Tags'] = 'Labels';
 $a->strings['Contacts'] = 'Contacten';
 $a->strings['Community'] = 'Website';
 $a->strings['Conversations on this and other servers'] = 'Gesprekken op deze en andere servers';
@@ -489,43 +382,6 @@ $a->strings['ImageMagick PHP extension is not installed'] = 'ImageMagick PHP ext
 $a->strings['ImageMagick PHP extension is installed'] = 'ImageMagick PHP extensie is geïnstalleerd';
 $a->strings['Database already in use.'] = 'Database al in gebruik.';
 $a->strings['Could not connect to database.'] = 'Kon geen toegang krijgen tot de database.';
-$a->strings['Monday'] = 'Maandag';
-$a->strings['Tuesday'] = 'Dinsdag';
-$a->strings['Wednesday'] = 'Woensdag';
-$a->strings['Thursday'] = 'Donderdag';
-$a->strings['Friday'] = 'Vrijdag';
-$a->strings['Saturday'] = 'Zaterdag';
-$a->strings['Sunday'] = 'Zondag';
-$a->strings['January'] = 'Januari';
-$a->strings['February'] = 'Februari';
-$a->strings['March'] = 'Maart';
-$a->strings['April'] = 'April';
-$a->strings['May'] = 'Mei';
-$a->strings['June'] = 'Juni';
-$a->strings['July'] = 'Juli';
-$a->strings['August'] = 'Augustus';
-$a->strings['September'] = 'September';
-$a->strings['October'] = 'Oktober';
-$a->strings['November'] = 'November';
-$a->strings['December'] = 'December';
-$a->strings['Mon'] = 'Maa';
-$a->strings['Tue'] = 'Din';
-$a->strings['Wed'] = 'Woe';
-$a->strings['Thu'] = 'Don';
-$a->strings['Fri'] = 'Vrij';
-$a->strings['Sat'] = 'Zat';
-$a->strings['Sun'] = 'Zon';
-$a->strings['Jan'] = 'Jan';
-$a->strings['Feb'] = 'Feb';
-$a->strings['Mar'] = 'Maa';
-$a->strings['Apr'] = 'Apr';
-$a->strings['Jun'] = 'Jun';
-$a->strings['Jul'] = 'Jul';
-$a->strings['Aug'] = 'Aug';
-$a->strings['Sep'] = 'Sep';
-$a->strings['Oct'] = 'Okt';
-$a->strings['Nov'] = 'Nov';
-$a->strings['Dec'] = 'Dec';
 $a->strings['Friendica can\'t display this page at the moment, please contact the administrator.'] = 'Friendica kan deze pagina momenteel niet weergeven, neem contact op met de beheerder.';
 $a->strings['Enter a valid existing folder'] = 'Geef een geldige bestaande folder in';
 $a->strings['Update %s failed. See error logs.'] = 'Wijziging %s mislukt. Lees de error logbestanden.';
@@ -568,9 +424,44 @@ $a->strings['Use mailto: in front of address to force email check.'] = 'Gebruik 
 $a->strings['Limited profile. This person will be unable to receive direct/personal notifications from you.'] = 'Profiel met restricties. Deze peresoon zal geen directe/persoonlijke notificaties van jou kunnen ontvangen.';
 $a->strings['Unable to retrieve contact information.'] = 'Het was niet mogelijk informatie over dit contact op te halen.';
 $a->strings['Starts:'] = 'Begint:';
-$a->strings['Finishes:'] = 'Eindigt:';
 $a->strings['all-day'] = 'de hele dag';
+$a->strings['Sun'] = 'Zon';
+$a->strings['Mon'] = 'Maa';
+$a->strings['Tue'] = 'Din';
+$a->strings['Wed'] = 'Woe';
+$a->strings['Thu'] = 'Don';
+$a->strings['Fri'] = 'Vrij';
+$a->strings['Sat'] = 'Zat';
+$a->strings['Sunday'] = 'Zondag';
+$a->strings['Monday'] = 'Maandag';
+$a->strings['Tuesday'] = 'Dinsdag';
+$a->strings['Wednesday'] = 'Woensdag';
+$a->strings['Thursday'] = 'Donderdag';
+$a->strings['Friday'] = 'Vrijdag';
+$a->strings['Saturday'] = 'Zaterdag';
+$a->strings['Jan'] = 'Jan';
+$a->strings['Feb'] = 'Feb';
+$a->strings['Mar'] = 'Maa';
+$a->strings['Apr'] = 'Apr';
+$a->strings['May'] = 'Mei';
+$a->strings['Jun'] = 'Jun';
+$a->strings['Jul'] = 'Jul';
+$a->strings['Aug'] = 'Aug';
 $a->strings['Sept'] = 'Sep';
+$a->strings['Oct'] = 'Okt';
+$a->strings['Nov'] = 'Nov';
+$a->strings['Dec'] = 'Dec';
+$a->strings['January'] = 'Januari';
+$a->strings['February'] = 'Februari';
+$a->strings['March'] = 'Maart';
+$a->strings['April'] = 'April';
+$a->strings['June'] = 'Juni';
+$a->strings['July'] = 'Juli';
+$a->strings['August'] = 'Augustus';
+$a->strings['September'] = 'September';
+$a->strings['October'] = 'Oktober';
+$a->strings['November'] = 'November';
+$a->strings['December'] = 'December';
 $a->strings['today'] = 'vandaag';
 $a->strings['month'] = 'maand';
 $a->strings['week'] = 'week';
@@ -578,12 +469,6 @@ $a->strings['day'] = 'dag';
 $a->strings['No events to display'] = 'Geen gebeurtenissen te tonen';
 $a->strings['Access to this profile has been restricted.'] = 'Toegang tot dit profiel is beperkt.';
 $a->strings['l, F j'] = 'l j F';
-$a->strings['Edit event'] = 'Gebeurtenis bewerken';
-$a->strings['Duplicate event'] = 'Duplicate gebeurtenis';
-$a->strings['Delete event'] = 'Verwijder gebeurtenis';
-$a->strings['l F d, Y \@ g:i A'] = 'l F d, Y \@ g:i A';
-$a->strings['D g:i A'] = 'D g:i A';
-$a->strings['g:i A'] = 'g:i A';
 $a->strings['Show map'] = 'Toon kaart';
 $a->strings['Hide map'] = 'Verberg kaart';
 $a->strings['%s\'s birthday'] = '%s\'s verjaardag';
@@ -591,17 +476,15 @@ $a->strings['Happy Birthday %s'] = 'Gefeliciteerd %s';
 $a->strings['activity'] = 'activiteit';
 $a->strings['post'] = 'bericht';
 $a->strings['bytes'] = 'bytes';
-$a->strings['View on separate page'] = 'Bekijk op aparte pagina';
 $a->strings['[no subject]'] = '[geen onderwerp]';
 $a->strings['Wall Photos'] = 'Tijdlijn foto\'s';
 $a->strings['Homepage:'] = 'Website:';
 $a->strings['About:'] = 'Over:';
+$a->strings['Edit profile'] = 'Bewerk profiel';
 $a->strings['Atom feed'] = 'Atom feed';
-$a->strings['F d'] = 'd F';
 $a->strings['[today]'] = '[vandaag]';
 $a->strings['Birthday Reminders'] = 'Verjaardagsherinneringen';
 $a->strings['Birthdays this week:'] = 'Verjaardagen deze week:';
-$a->strings['g A l F d'] = 'G l j F';
 $a->strings['[No description]'] = '[Geen omschrijving]';
 $a->strings['Event Reminders'] = 'Gebeurtenisherinneringen';
 $a->strings['Upcoming events the next 7 days:'] = 'Evenementen de komende 7 dagen:';
@@ -614,7 +497,6 @@ $a->strings['Religious Views:'] = 'Geloof:';
 $a->strings['Likes:'] = 'Houdt van:';
 $a->strings['Dislikes:'] = 'Houdt niet van:';
 $a->strings['Title/Description:'] = 'Titel/Beschrijving:';
-$a->strings['Summary'] = 'Samenvatting';
 $a->strings['Musical interests'] = 'Muzikale interesses';
 $a->strings['Books, literature'] = 'Boeken, literatuur';
 $a->strings['Television'] = 'Televisie';
@@ -725,7 +607,6 @@ $a->strings['This page offers you some numbers to the known part of the federate
 $a->strings['Federation Statistics'] = 'Federatie Statistieken';
 $a->strings['PHP log currently enabled.'] = 'PHP log momenteel geactiveerd';
 $a->strings['PHP log currently disabled.'] = 'PHP log momenteel gedeactiveerd';
-$a->strings['Logs'] = 'Logs';
 $a->strings['Clear'] = 'Wis';
 $a->strings['Enable Debugging'] = 'Activeer Debugging';
 $a->strings['Log file'] = 'Logbestand';
@@ -872,6 +753,7 @@ $a->strings['tags'] = 'tags';
 $a->strings['Server tags'] = 'Server tags';
 $a->strings['Allow user tags'] = 'Sta gebruiker tags toe.';
 $a->strings['Start Relocation'] = 'Start verhuis';
+$a->strings['Save'] = 'Bewaren';
 $a->strings['Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />'] = 'Je DB opereert nog met MyISAM tabellen. Best is van engine te veranderen naar InnoDB. Aangezien Friendica in de toekomst gebruik zal maken van InnoDB features, zou je dit best aanpassen! Zie <a href="%s">hier</a> voor een gids die je kan helpen om de tabel engines te converteren. Je kan ook het commando<tt>php bin/console.php dbstructure toinnodb</tt> van je Friendica installatie gebruiken voor een automatische conversie.<br />';
 $a->strings['There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s'] = 'Er is een nieuwe versie van Friendica beschikbaar om te downloaden. Je huidige versie is %1$s, upstream versie is %2$s';
 $a->strings['The database update failed. Please run "php bin/console.php dbstructure update" from the command line and have a look at the errors that might appear.'] = 'Database update is mislukt. Gelieve  "php bin/console.php dbstructure update" vanaf de command line uit te voeren en de foutmeldingen die zouden kunnen verschijnen na te kijken.';
@@ -911,11 +793,12 @@ $a->strings['Database'] = 'Database';
 $a->strings['DB updates'] = 'DB aanpassingen';
 $a->strings['Inspect Deferred Workers'] = 'Inspecteer uitgestelde workers';
 $a->strings['Inspect worker Queue'] = 'Taakwachtrij inspecteren';
+$a->strings['Logs'] = 'Logs';
+$a->strings['View'] = 'Beeld';
 $a->strings['Diagnostics'] = 'Diagnostiek';
 $a->strings['PHP Info'] = 'PHP Info';
 $a->strings['probe address'] = 'probe adres';
 $a->strings['check webfinger'] = 'check webfinger';
-$a->strings['Addon Features'] = 'Addon Features';
 $a->strings['User registrations waiting for confirmation'] = 'Gebruikersregistraties wachten op bevestiging';
 $a->strings['Daily posting limit of %d post reached. The post was rejected.'] = [
 	0 => 'De dagelijkse limiet van %d bericht is bereikt. Dit bericht werd niet aanvaard.',
@@ -950,19 +833,16 @@ $a->strings['The post was created'] = 'Het bericht is aangemaakt';
 $a->strings['Failed to remove event'] = 'Kon remote event niet verwijderen';
 $a->strings['Event can not end before it has started.'] = 'Gebeurtenis kan niet eindigen voor het begin.';
 $a->strings['Event title and start time are required.'] = 'Titel en begintijd van de gebeurtenis zijn vereist.';
+$a->strings['Edit event'] = 'Gebeurtenis bewerken';
 $a->strings['Starting date and Title are required.'] = 'Start datum en Titel zijn verplicht.';
-$a->strings['Event Starts:'] = 'Gebeurtenis begint:';
 $a->strings['Required'] = 'Vereist';
-$a->strings['Finish date/time is not known or not relevant'] = 'Einddatum/tijd is niet gekend of niet relevant';
-$a->strings['Event Finishes:'] = 'Gebeurtenis eindigt:';
+$a->strings['Location'] = 'Plaats';
+$a->strings['Description'] = 'Omschrijving';
 $a->strings['Share this event'] = 'Deel deze gebeurtenis';
-$a->strings['Submit'] = 'Verstuur';
 $a->strings['Basic'] = 'Basis';
 $a->strings['This calendar format is not supported'] = 'Dit kalender formaat is niet ondersteund';
 $a->strings['No exportable data found'] = 'Geen exporteerbare data gevonden';
 $a->strings['calendar'] = 'kalender';
-$a->strings['Events'] = 'Gebeurtenissen';
-$a->strings['View'] = 'Beeld';
 $a->strings['list'] = 'lijst';
 $a->strings['Contact not found.'] = 'Contact niet gevonden';
 $a->strings['Invalid contact.'] = 'Ongeldig contact.';
@@ -989,7 +869,9 @@ $a->strings['Only show hidden contacts'] = 'Toon alleen verborgen contacten';
 $a->strings['Search your contacts'] = 'Doorzoek je contacten';
 $a->strings['Results for: %s'] = 'Resultaten voor: %s';
 $a->strings['Update'] = 'Wijzigen';
+$a->strings['Block'] = 'Blokkeren';
 $a->strings['Unblock'] = 'Blokkering opheffen';
+$a->strings['Ignore'] = 'Negeren';
 $a->strings['Unignore'] = 'Negeer niet meer';
 $a->strings['Batch Actions'] = 'Bulk Acties';
 $a->strings['Conversations started by this contact'] = 'Gesprekken gestart door dit contact';
@@ -998,9 +880,11 @@ $a->strings['Advanced Contact Settings'] = 'Geavanceerde instellingen voor conta
 $a->strings['Friend'] = 'Vriend';
 $a->strings['Pending outgoing contact request'] = 'In afwachting van uitgaande contactaanvraag';
 $a->strings['Pending incoming contact request'] = 'In afwachting van inkomende contactaanvraag';
+$a->strings['This is you'] = 'Dit ben jij';
 $a->strings['Visit %s\'s profile [%s]'] = 'Bekijk het profiel van %s [%s]';
 $a->strings['Contact update failed.'] = 'Aanpassen van contact mislukt.';
 $a->strings['Return to contact editor'] = 'Ga terug naar contactbewerker';
+$a->strings['Submit'] = 'Verstuur';
 $a->strings['Name'] = 'Naam';
 $a->strings['Account Nickname'] = 'Bijnaam account';
 $a->strings['Account URL'] = 'URL account';
@@ -1096,6 +980,7 @@ $a->strings['Error'] = [
 ];
 $a->strings['You must be logged in to use this module'] = 'Je moet ingelogd zijn om deze module te gebruiken';
 $a->strings['Source URL'] = 'Bron URL';
+$a->strings['l F d, Y \@ g:i A'] = 'l F d, Y \@ g:i A';
 $a->strings['Time Conversion'] = 'Tijdsconversie';
 $a->strings['Friendica provides this service for sharing events with other networks and friends in unknown timezones.'] = 'Friendica biedt deze dienst aan om gebeurtenissen te delen met andere netwerken en vrienden in onbekende tijdzones.';
 $a->strings['UTC time: %s'] = 'UTC tijd: %s';
@@ -1104,7 +989,6 @@ $a->strings['Converted localtime: %s'] = 'Omgerekende lokale tijd: %s';
 $a->strings['Please select your timezone:'] = 'Selecteer je tijdzone:';
 $a->strings['Only logged in users are permitted to perform a probing.'] = 'Alleen ingelogde gebruikers hebben toelating om aan probing te doen.';
 $a->strings['Lookup address'] = 'Opzoekadres';
-$a->strings['No entries (some entries may be hidden).'] = 'Geen gegevens (sommige gegevens kunnen verborgen zijn).';
 $a->strings['Find on this site'] = 'Op deze website zoeken';
 $a->strings['Results for:'] = 'Resultaten voor:';
 $a->strings['Site Directory'] = 'Websitegids';
@@ -1185,6 +1069,21 @@ $a->strings['Clear the location'] = 'Wis de locatie';
 $a->strings['Location services are unavailable on your device'] = 'Locatiediensten zijn niet beschikbaar op uw apparaat';
 $a->strings['Location services are disabled. Please check the website\'s permissions on your device'] = 'Locatiediensten zijn uitgeschakeld. Controleer de toestemmingen van de website op uw apparaat';
 $a->strings['The feed for this item is unavailable.'] = 'De tijdlijn voor dit item is niet beschikbaar';
+$a->strings['No valid account found.'] = 'Geen geldige account gevonden.';
+$a->strings['Password reset request issued. Check your email.'] = 'Verzoek om wachtwoord opnieuw in te stellen werd verstuurd. Kijk uw e-mail na.';
+$a->strings['Password reset requested at %s'] = 'Op %s werd gevraagd je wachtwoord opnieuw in te stellen';
+$a->strings['Request could not be verified. (You may have previously submitted it.) Password reset failed.'] = 'Verzoek kon niet geverifieerd worden. (Misschien heb je het voordien al ingediend.) Wachtwoord niet opnieuw ingesteld.';
+$a->strings['Request has expired, please make a new one.'] = 'Aanvraag is verlopen, gelieve een nieuwe aan te maken.';
+$a->strings['Forgot your Password?'] = 'Wachtwoord vergeten?';
+$a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Voer je e-mailadres in en verstuur het om je wachtwoord opnieuw in te stellen. Kijk dan je e-mail na voor verdere instructies.';
+$a->strings['Password Reset'] = 'Wachtwoord opnieuw instellen';
+$a->strings['Your password has been reset as requested.'] = 'Je wachtwoord is opnieuw ingesteld zoals gevraagd.';
+$a->strings['Your new password is'] = 'Je nieuwe wachtwoord is';
+$a->strings['Save or copy your new password - and then'] = 'Bewaar of kopieer je nieuw wachtwoord - en dan';
+$a->strings['click here to login'] = 'klik hier om in te loggen';
+$a->strings['Your password may be changed from the <em>Settings</em> page after successful login.'] = 'Je kunt dit wachtwoord veranderen nadat je bent ingelogd op de <em>Instellingen></em> pagina.';
+$a->strings['Your password has been reset.'] = 'Je wachtwoord is opnieuw ingesteld.';
+$a->strings['Your password has been changed at %s'] = 'Je wachtwoord is veranderd op %s';
 $a->strings['System down for maintenance'] = 'Systeem onbeschikbaar wegens onderhoud';
 $a->strings['A Decentralized Social Network'] = 'Een gedecentraliseerd sociaal netwerk';
 $a->strings['Files'] = 'Bestanden';
@@ -1234,6 +1133,7 @@ $a->strings['The GUID of the item you want to delete.'] = 'De GUID van het item 
 $a->strings['Type'] = 'Type';
 $a->strings['Item not found'] = 'Item niet gevonden';
 $a->strings['Item Guid'] = 'Item identificatie';
+$a->strings['Comment'] = 'Reacties';
 $a->strings['Registered users'] = 'Geregistreerde gebruikers';
 $a->strings['Pending registrations'] = 'Registraties die in de wacht staan';
 $a->strings['You can\'t remove yourself'] = 'Je kan jezelf niet verwijderen';
@@ -1271,14 +1171,6 @@ $a->strings['Show unread'] = 'Toon ongelezen';
 $a->strings['{0} requested registration'] = '{0} vroeg om zich te registreren';
 $a->strings['Authorize application connection'] = 'Verbinding met de applicatie goedkeuren';
 $a->strings['Do you want to authorize this application to access your posts and contacts, and/or create new posts for you?'] = 'Wil je deze toepassing toestemming geven om jouw berichten en contacten in te kijken, en/of nieuwe berichten in jouw plaats aan te maken?';
-$a->strings['No contact provided.'] = 'Geen contact opgegeven.';
-$a->strings['Couldn\'t fetch information for contact.'] = 'Kon de informatie voor het contact niet ophalen.';
-$a->strings['Couldn\'t fetch friends for contact.'] = 'Kon de vrienden van contact niet ophalen.';
-$a->strings['Done'] = 'Klaar';
-$a->strings['success'] = 'Succesvol';
-$a->strings['failed'] = 'Mislukt';
-$a->strings['ignored'] = 'Verboden';
-$a->strings['Keep this window open until done.'] = 'Houd dit scherm open tot het klaar is';
 $a->strings['The Photo with id %s is not available.'] = 'De foto met id %s is niet beschikbaar';
 $a->strings['Invalid photo with id %s.'] = 'Ongeldige foto met ID %s';
 $a->strings['Edit post'] = 'Bericht bewerken';
@@ -1303,9 +1195,6 @@ $a->strings['Image file is empty.'] = 'Afbeeldingsbestand is leeg.';
 $a->strings['View Album'] = 'Album bekijken';
 $a->strings['Profile not found.'] = 'Profiel niet gevonden';
 $a->strings['Display name:'] = 'Weergave naam:';
-$a->strings['Member since:'] = 'Lid sinds:';
-$a->strings['j F, Y'] = 'F j Y';
-$a->strings['j F'] = 'F j';
 $a->strings['Birthday:'] = 'Verjaardag:';
 $a->strings['Age: '] = 'Leeftijd:';
 $a->strings['%d year old'] = [
@@ -1314,7 +1203,6 @@ $a->strings['%d year old'] = [
 ];
 $a->strings['Description:'] = 'Beschrijving:';
 $a->strings['View profile as:'] = 'Bekijk profiel als:';
-$a->strings['Edit profile'] = 'Bewerk profiel';
 $a->strings['Profile unavailable.'] = 'Profiel onbeschikbaar';
 $a->strings['Invalid locator'] = 'Ongeldige plaatsbepaler';
 $a->strings['The provided profile link doesn\'t seem to be valid'] = 'De verstrekte profiellink lijkt niet geldig te zijn';
@@ -1439,22 +1327,16 @@ $a->strings['Your contacts may write posts on your profile wall. These posts wil
 $a->strings['Allow friends to tag your posts?'] = 'Sta vrienden toe om jouw berichten te labelen?';
 $a->strings['Your contacts can add additional tags to your posts.'] = 'Je contacten kunnen tags toevoegen aan je berichten.';
 $a->strings['Default Post Permissions'] = 'Standaard rechten voor nieuwe berichten';
-$a->strings['Expiration settings'] = 'Vervalinstellingen';
 $a->strings['Automatically expire posts after this many days:'] = 'Laat berichten automatisch vervallen na zo veel dagen:';
 $a->strings['If empty, posts will not expire. Expired posts will be deleted'] = 'Berichten zullen niet vervallen indien leeg. Vervallen berichten zullen worden verwijderd.';
 $a->strings['Expire posts'] = 'Verlopen berichten';
 $a->strings['When activated, posts and comments will be expired.'] = 'Indien geactiveerd, zullen berichten en opmerkingen verlopen.';
 $a->strings['Expire personal notes'] = 'Verloop persoonlijke notities';
 $a->strings['When activated, the personal notes on your profile page will be expired.'] = 'Indien geactiveerd, verlopen de persoonlijke notities op uw profielpagina.';
-$a->strings['Expire starred posts'] = 'Berichten met ster laten vervallen';
-$a->strings['Starring posts keeps them from being expired. That behaviour is overwritten by this setting.'] = 'Berichten met een ster verhinderen dat ze verlopen. Dat gedrag wordt door deze instelling overschreven.';
 $a->strings['Only expire posts by others'] = 'Laat alleen berichten van anderen verlopen';
 $a->strings['When activated, your own posts never expire. Then the settings above are only valid for posts you received.'] = 'Indien geactiveerd, vervallen je eigen berichten nooit. Dan zijn bovenstaande instellingen alleen geldig voor berichten die je hebt ontvangen.';
-$a->strings['Notification Settings'] = 'Notificatie Instellingen';
-$a->strings['Send a notification email when:'] = 'Stuur een notificatie e-mail wanneer:';
 $a->strings['You receive an introduction'] = 'Je ontvangt een vriendschaps- of connectieverzoek';
 $a->strings['Your introductions are confirmed'] = 'Jouw vriendschaps- of connectieverzoeken zijn bevestigd';
-$a->strings['Someone writes on your profile wall'] = 'Iemand iets op je tijdlijn schrijft';
 $a->strings['Someone writes a followup comment'] = 'Iemand een reactie schrijft';
 $a->strings['You receive a private message'] = 'Je een privé-bericht ontvangt';
 $a->strings['You receive a friend suggestion'] = 'Je een suggestie voor een vriendschap ontvangt';
@@ -1471,7 +1353,6 @@ $a->strings['Relocate'] = 'Verhuis';
 $a->strings['If you have moved this profile from another server, and some of your contacts don\'t receive your updates, try pushing this button.'] = 'Als je je profiel van een andere server hebt verhuisd, en er zijn contacten die geen updates van je ontvangen, probeer dan eens deze knop.';
 $a->strings['Resend relocate message to contacts'] = 'Stuur verhuis boodschap naar contacten';
 $a->strings['Addon Settings'] = 'Addon instellingen';
-$a->strings['Description'] = 'Omschrijving';
 $a->strings['Add'] = 'Toevoegen';
 $a->strings['Failed to connect with email account using the settings provided.'] = 'Ik kon geen verbinding maken met het e-mail account met de gegeven instellingen.';
 $a->strings['Diaspora (Socialhome, Hubzilla)'] = 'Diaspora (Socialhome, Hubzilla)';
@@ -1494,7 +1375,6 @@ $a->strings['Action after import:'] = 'Actie na importeren:';
 $a->strings['Move to folder'] = 'Naar map verplaatsen';
 $a->strings['Move to folder:'] = 'Verplaatsen naar map:';
 $a->strings['Importing Contacts done'] = 'Importeren Contacten voltooid';
-$a->strings['Upload a CSV file that contains the handle of your followed accounts in the first column you exported from the old account.'] = 'Upload een CSV-bestand met de handle van uw gevolgde gebruikers in de eerste kolom die u uit de oude gebruiker hebt geëxporteerd.';
 $a->strings['Upload File'] = 'Upload bestand';
 $a->strings['Delegation successfully granted.'] = 'Delegatie met succes verleend.';
 $a->strings['Parent user not found, unavailable or password doesn\'t match.'] = 'Brongebruiker niet gevonden, niet beschikbaar of wachtwoord komt niet overeen.';
@@ -1534,7 +1414,6 @@ $a->strings['Add a new profile field'] = 'Voeg nieuw profielveld toe';
 $a->strings['Profile Actions'] = 'Profiel Acties';
 $a->strings['Edit Profile Details'] = 'Profieldetails bewerken';
 $a->strings['Profile picture'] = 'Profiel foto';
-$a->strings['Location'] = 'Plaats';
 $a->strings['Miscellaneous'] = 'Diversen';
 $a->strings['Custom Profile Fields'] = 'Aangepaste profielvelden';
 $a->strings['Street Address:'] = 'Postadres:';
@@ -1545,9 +1424,7 @@ $a->strings['Country:'] = 'Land:';
 $a->strings['XMPP (Jabber) address:'] = 'XMPP (Jabber) adres:';
 $a->strings['Homepage URL:'] = 'Adres tijdlijn:';
 $a->strings['Public Keywords:'] = 'Publieke Sleutelwoorden:';
-$a->strings['(Used for suggesting potential friends, can be seen by others)'] = '(Gebruikt om mogelijke vrienden voor te stellen, kan door anderen gezien worden)';
 $a->strings['Private Keywords:'] = 'Privé Sleutelwoorden:';
-$a->strings['(Used for searching profiles, never shown to others)'] = '(Gebruikt om profielen te zoeken, nooit aan anderen getoond)';
 $a->strings['Image size reduction [%s] failed.'] = 'Verkleining van de afbeelding [%s] mislukt.';
 $a->strings['Shift-reload the page or clear browser cache if the new photo does not display immediately.'] = 'Shift-herlaad de pagina, of maak de browser cache leeg als nieuwe foto\'s niet onmiddellijk verschijnen.';
 $a->strings['Unable to process image'] = 'Ik kan de afbeelding niet verwerken';
@@ -1763,6 +1640,9 @@ $a->strings['Remove locally'] = 'Verwijder lokaal';
 $a->strings['I will attend'] = 'Ik zal er zijn';
 $a->strings['I will not attend'] = 'Ik zal er niet zijn';
 $a->strings['I might attend'] = 'Ik ga misschien';
+$a->strings['Starred'] = 'Met ster';
+$a->strings['I like this (toggle)'] = 'Vind ik leuk';
+$a->strings['I don\'t like this (toggle)'] = 'Vind ik niet leuk';
 $a->strings['to'] = 'aan';
 $a->strings['Wall-to-Wall'] = 'wall-to-wall';
 $a->strings['via Wall-To-Wall:'] = 'via wall-to-wall';

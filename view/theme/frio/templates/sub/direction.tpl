@@ -8,27 +8,27 @@
 	<span class="direction" title="{{$direction.title}}">
 		<span aria-hidden="true">&bull;</span>
 		{{if $direction.direction == 1}}
-			<i class="fa fa-inbox"></i>
+			<i class="ri ri-inbox-line"></i>
 		{{elseif $direction.direction == 2}}
-			<i class="fa fa-download"></i>
+			<i class="ri ri-download-line"></i>
 		{{elseif $direction.direction == 3}}
-			<i class="fa fa-retweet"></i>
+			<i class="ri ri-repeat-line"></i>
 		{{elseif $direction.direction == 4}}
-			<i class="fa fa-hashtag"></i>
+			<i class="ri ri-hashtag"></i>
 		{{elseif $direction.direction == 5}}
-			<i class="fa fa-comment-o"></i>
+			<i class="ri ri-chat-1-line"></i>
 		{{elseif $direction.direction == 6}}
-			<i class="fa fa-user"></i>
+			<i class="ri ri-user-line"></i>
 		{{elseif $direction.direction == 7}}
-			<i class="fa fa-at"></i>
+			<i class="ri ri-at-line"></i>
 		{{elseif $direction.direction == 8}}
-			<i class="fa fa-share"></i>
+			<i class="ri ri-save-line"></i>
 		{{elseif $direction.direction == 9}}
-			<i class="fa fa-globe"></i>
+			<i class="ri ri-global-line"></i>
 		{{elseif $direction.direction == 10}}
-			<i class="fa fa-inbox"></i>
+			<i class="ri ri-server-line"></i>
 		{{elseif $direction.direction == 11}}
-			<i class="fa fa-sticky-note"></i>
+			<i class="ri ri-broadcast-line"></i>
 		{{/if}}
 	</span>
 {{/if}}

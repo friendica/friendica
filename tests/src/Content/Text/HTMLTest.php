@@ -16,16 +16,16 @@ use Psr\Http\Message\UriInterface;
 
 class HTMLTest extends FixtureTestCase
 {
-	public function dataHTML()
+	public static function dataHTML()
 	{
-		$inputFiles = glob(__DIR__ . '/../../../datasets/content/text/html/*.html');
+		$inputFiles = glob(__DIR__ . '/../../../Fixtures/content/text/html/*.html');
 
 		$data = [];
 
 		foreach ($inputFiles as $file) {
 			$data[str_replace('.html', '', $file)] = [
 				'input'    => file_get_contents($file),
-				'expected' => file_get_contents(str_replace('.html', '.txt', $file))
+				'expected' => file_get_contents(str_replace('.html', '.txt', $file)),
 			];
 		}
 
@@ -35,30 +35,29 @@ class HTMLTest extends FixtureTestCase
 	/**
 	 * Test convert different input Markdown text into HTML
 	 *
-	 * @dataProvider dataHTML
 	 *
 	 * @param string $input    The Markdown text to test
 	 * @param string $expected The expected HTML output
-	 *
 	 * @throws Exception
 	 */
-	public function testToPlaintext(string $input, string $expected)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataHTML')]
+	public function testToPlaintext(string $input, string $expected): void
 	{
 		$output = HTML::toPlaintext($input, 0);
 
 		self::assertEquals($expected, $output);
 	}
 
-	public function dataHTMLText()
+	public static function dataHTMLText()
 	{
 		return [
 			'bug-7665-audio-tag' => [
 				'expectedBBCode' => '[audio]http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3[/audio]',
-				'html' => '<audio src="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3" controls="controls"><a href="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3">http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3</a></audio>',
+				'html'           => '<audio src="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3" controls="controls"><a href="http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3">http://www.cendrones.fr/colloque2017/jonathanbocquet.mp3</a></audio>',
 			],
 			'bug-8075-html-tags' => [
 				'expectedBBCode' => "<big rant here> I don't understand tests",
-				'html' => "&lt;big rant here&gt; I don't understand tests",
+				'html'           => "&lt;big rant here&gt; I don't understand tests",
 			],
 			'bug-10877-code-entities' => [
 				'expectedBBCode' => "Now playing
@@ -72,7 +71,7 @@ its surprisingly good",
 			],
 			'bug-11851-content-0' => [
 				'expectedBBCode' => '[url=https://dev-friendica.mrpetovan.com/profile/hypolite]@hypolite[/url] 0',
-				'html' => '<p><span class="h-card"><a href="https://dev-friendica.mrpetovan.com/profile/hypolite" class="u-url mention">@<span>hypolite</span></a></span> 0</p>',
+				'html'           => '<p><span class="h-card"><a href="https://dev-friendica.mrpetovan.com/profile/hypolite" class="u-url mention">@<span>hypolite</span></a></span> 0</p>',
 			],
 			'bug-12842-ul-new-lines' => [
 				'expectedBBCode' => 'This is:
@@ -81,7 +80,7 @@ its surprisingly good",
 [li]amazing[/li]
 [li]list[/li]
 [/ul]',
-				'html'=> '<p>This is:</p><ul><li>some</li><li>amazing</li><li>list</li></ul>',
+				'html' => '<p>This is:</p><ul><li>some</li><li>amazing</li><li>list</li></ul>',
 			],
 			'bug-12842-ol-new-lines' => [
 				'expectedBBCode' => 'This is:
@@ -90,7 +89,7 @@ its surprisingly good",
 [li]amazing[/li]
 [li]list[/li]
 [/ol]',
-				'html'=> '<p>This is:</p><ol><li>some</li><li>amazing</li><li>list</li></ol>',
+				'html' => '<p>This is:</p><ol><li>some</li><li>amazing</li><li>list</li></ol>',
 			],
 		];
 	}
@@ -98,21 +97,20 @@ its surprisingly good",
 	/**
 	 * Test convert bbcodes to HTML
 	 *
-	 * @dataProvider dataHTMLText
 	 *
 	 * @param string $expectedBBCode Expected BBCode output
 	 * @param string $html           HTML text
-	 *
 	 * @throws InternalServerErrorException
 	 */
-	public function testToBBCode(string $expectedBBCode, string $html)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataHTMLText')]
+	public function testToBBCode(string $expectedBBCode, string $html): void
 	{
 		$actual = HTML::toBBCode($html);
 
 		self::assertEquals($expectedBBCode, $actual);
 	}
 
-	public function dataXpathQuote(): array
+	public static function dataXpathQuote(): array
 	{
 		return [
 			'no quotes' => [
@@ -149,16 +147,16 @@ its surprisingly good",
 	}
 
 	/**
-	 * @dataProvider dataXpathQuote
 	 * @param string $value
 	 * @return void
 	 * @throws \DOMException
 	 */
-	public function testXpathQuote(string $value)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataXpathQuote')]
+	public function testXpathQuote(string $value): void
 	{
-		$dom = new \DOMDocument();
-		$element = $dom->createElement('test');
-		$attribute = $dom->createAttribute('value');
+		$dom              = new \DOMDocument();
+		$element          = $dom->createElement('test');
+		$attribute        = $dom->createAttribute('value');
 		$attribute->value = $value;
 		$element->appendChild($attribute);
 		$dom->appendChild($element);
@@ -171,101 +169,101 @@ its surprisingly good",
 		$this->assertEquals(1, $result->length);
 	}
 
-	public function dataCheckRelMeLink(): array
+	public static function dataCheckRelMeLink(): array
 	{
 		$aSingleRelValue = new \DOMDocument();
-		$aSingleRelValue->load(__DIR__ . '/../../../datasets/dom/relme/a-single-rel-value.html');
+		$aSingleRelValue->load(__DIR__ . '/../../../Fixtures/dom/relme/a-single-rel-value.html');
 
 		$aMultipleRelValueStart = new \DOMDocument();
-		$aMultipleRelValueStart->load(__DIR__ . '/../../../datasets/dom/relme/a-multiple-rel-value-start.html');
+		$aMultipleRelValueStart->load(__DIR__ . '/../../../Fixtures/dom/relme/a-multiple-rel-value-start.html');
 
 		$aMultipleRelValueMiddle = new \DOMDocument();
-		$aMultipleRelValueMiddle->load(__DIR__ . '/../../../datasets/dom/relme/a-multiple-rel-value-middle.html');
+		$aMultipleRelValueMiddle->load(__DIR__ . '/../../../Fixtures/dom/relme/a-multiple-rel-value-middle.html');
 
 		$aMultipleRelValueEnd = new \DOMDocument();
-		$aMultipleRelValueEnd->load(__DIR__ . '/../../../datasets/dom/relme/a-multiple-rel-value-end.html');
+		$aMultipleRelValueEnd->load(__DIR__ . '/../../../Fixtures/dom/relme/a-multiple-rel-value-end.html');
 
 		$linkSingleRelValue = new \DOMDocument();
-		$linkSingleRelValue->load(__DIR__ . '/../../../datasets/dom/relme/link-single-rel-value.html');
+		$linkSingleRelValue->load(__DIR__ . '/../../../Fixtures/dom/relme/link-single-rel-value.html');
 
 		$meUrl = new Uri('https://example.com/profile/me');
 
 		return [
 			'a-single-rel-value' => [
-				'doc' => $aSingleRelValue,
-				'meUrl' => $meUrl
+				'doc'   => $aSingleRelValue,
+				'meUrl' => $meUrl,
 			],
 			'a-multiple-rel-value-start' => [
-				'doc' => $aMultipleRelValueStart,
-				'meUrl' => $meUrl
+				'doc'   => $aMultipleRelValueStart,
+				'meUrl' => $meUrl,
 			],
 			'a-multiple-rel-value-middle' => [
-				'doc' => $aMultipleRelValueMiddle,
-				'meUrl' => $meUrl
+				'doc'   => $aMultipleRelValueMiddle,
+				'meUrl' => $meUrl,
 			],
 			'a-multiple-rel-value-end' => [
-				'doc' => $aMultipleRelValueEnd,
-				'meUrl' => $meUrl
+				'doc'   => $aMultipleRelValueEnd,
+				'meUrl' => $meUrl,
 			],
 			'link-single-rel-value' => [
-				'doc' => $linkSingleRelValue,
-				'meUrl' => $meUrl
+				'doc'   => $linkSingleRelValue,
+				'meUrl' => $meUrl,
 			],
 		];
 	}
 
 
 	/**
-	 * @dataProvider dataCheckRelMeLink
 	 * @param \DOMDocument $doc
 	 * @param UriInterface $meUrl
 	 * @return void
 	 */
-	public function testCheckRelMeLink(\DOMDocument $doc, UriInterface $meUrl)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataCheckRelMeLink')]
+	public function testCheckRelMeLink(\DOMDocument $doc, UriInterface $meUrl): void
 	{
 		$this->assertTrue(HTML::checkRelMeLink($doc, $meUrl));
 	}
 
-	public function dataCheckRelMeLinkFail(): array
+	public static function dataCheckRelMeLinkFail(): array
 	{
 		$aSingleRelValueFail = new \DOMDocument();
-		$aSingleRelValueFail->load(__DIR__ . '/../../../datasets/dom/relme/a-single-rel-value-fail.html');
+		$aSingleRelValueFail->load(__DIR__ . '/../../../Fixtures/dom/relme/a-single-rel-value-fail.html');
 
 		$linkSingleRelValueFail = new \DOMDocument();
-		$linkSingleRelValueFail->load(__DIR__ . '/../../../datasets/dom/relme/link-single-rel-value-fail.html');
+		$linkSingleRelValueFail->load(__DIR__ . '/../../../Fixtures/dom/relme/link-single-rel-value-fail.html');
 
 		$meUrl = new Uri('https://example.com/profile/me');
 
 		return [
 			'a-single-rel-value-fail' => [
-				'doc' => $aSingleRelValueFail,
-				'meUrl' => $meUrl
+				'doc'   => $aSingleRelValueFail,
+				'meUrl' => $meUrl,
 			],
 			'link-single-rel-value-fail' => [
-				'doc' => $linkSingleRelValueFail,
-				'meUrl' => $meUrl
+				'doc'   => $linkSingleRelValueFail,
+				'meUrl' => $meUrl,
 			],
 		];
 	}
 
 
 	/**
-	 * @dataProvider dataCheckRelMeLinkFail
 	 * @param \DOMDocument $doc
 	 * @param UriInterface $meUrl
 	 * @return void
 	 */
-	public function testCheckRelMeLinkFail(\DOMDocument $doc, UriInterface $meUrl)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataCheckRelMeLinkFail')]
+	public function testCheckRelMeLinkFail(\DOMDocument $doc, UriInterface $meUrl): void
 	{
 		$this->assertFalse(HTML::checkRelMeLink($doc, $meUrl));
 	}
 
-	public function dataExtractCharset(): array
+	public static function dataExtractCharset(): array
 	{
 		return [
 			'https://github.com/friendica/friendica/issues/12488#issuecomment-1376002081' => [
 				'expected' => 'utf-8',
-				'html' => "<!DOCTYPE html><html class=\"avada-html-layout-boxed avada-html-header-position-top avada-is-100-percent-template\" lang=\"de-DE\"><head><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" /><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' /><link media=\"all\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_4372ae792776d3f3b480128adfe5d963.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 1024px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_6095961ca8c29f35e48df70b487c1938.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 800px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_7d3c636bd40df7ad6e29d09d0714f1be.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 640px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_8485e43c13a94028c51c756c74616e14.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 672px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_86b299cecf2954b03d4fce86231a9a89.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-width: 672px) and (max-width: 704px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_95b3559b249f57dccc69495d01f8be99.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-width: 704px) and (max-width: 736px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_0754b57cf830ebbbaee1af425a7c65df.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-width: 736px) and (max-width: 768px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_9ba9567361176393820b68657b834cfb.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-width: 768px) and (max-width: 800px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_6ef5f1d5b3ca2efaff54396a0c72faf1.css\" rel=\"stylesheet\" /><style media=\"only screen and (min-width: 801px)\">.fusion-icon-only-link .menu-title{display:none}</style><link media=\"only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_ba9c1102da3617f94e057a5dc5b7d661.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_eb19b064f51835fc56da3f2b4921c426.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 782px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_69632eafdf45ec08e9e1c1d0787035a7.css\" rel=\"stylesheet\" /><style media=\"only screen and (max-width: 768px)\">.fusion-tabs.vertical-tabs .tab-pane{max-width:none!important}</style><link media=\"only screen and (min-width: 800px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_f22aa9b833f472e249c88c1e6aca87ff.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-device-width: 640px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_abc513797044f7d1895a401139f11947.css\" rel=\"stylesheet\" /><title>Mit Vollgas in den Abgrund … - Austria Insiderinfo</title><meta name=\"description\" content=\"Viele sagen, dass wir in Bezug auf die Klimakrise sehenden Auges auf den Abgrund zufahren. Ein Abgrund, den mittlerweile auch fast alle sehen.\" /><link rel=\"canonical\" href=\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\" /><meta property=\"og:locale\" content=\"de_DE\" /><meta property=\"og:type\" content=\"article\" /><meta property=\"og:title\" content=\"Mit Vollgas in den Abgrund … - Austria Insiderinfo\" /><meta property=\"og:description\" content=\"Viele sagen, dass wir in Bezug auf die Klimakrise sehenden Auges auf den Abgrund zufahren. Ein Abgrund, den mittlerweile auch fast alle sehen.\" /><meta property=\"og:url\" content=\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\" /><meta property=\"og:site_name\" content=\"Austria Insiderinfo\" /><meta property=\"article:publisher\" content=\"https://www.facebook.com/WandernAustria/\" /><meta property=\"article:author\" content=\"https://www.facebook.com/DeepThought208\" /><meta property=\"article:published_time\" content=\"2023-01-07T09:45:13+00:00\" /><meta property=\"article:modified_time\" content=\"2023-01-07T09:49:46+00:00\" /><meta property=\"og:image\" content=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\" /><meta property=\"og:image:width\" content=\"1280\" /><meta property=\"og:image:height\" content=\"854\" /><meta property=\"og:image:type\" content=\"image/jpeg\" /><meta name=\"author\" content=\"Horst Gassner\" /><meta name=\"twitter:card\" content=\"summary_large_image\" /><meta name=\"twitter:creator\" content=\"@WandernAustria\" /><meta name=\"twitter:site\" content=\"@WandernAustria\" /><meta name=\"twitter:label1\" content=\"Verfasst von\" /><meta name=\"twitter:data1\" content=\"Horst Gassner\" /><meta name=\"twitter:label2\" content=\"Geschätzte Lesezeit\" /><meta name=\"twitter:data2\" content=\"5 Minuten\" /> <script type=\"application/ld+json\" class=\"yoast-schema-graph\">{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"Article\",\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#article\",\"isPartOf\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\"},\"author\":{\"name\":\"Horst Gassner\",\"@id\":\"https://blog.austria-insiderinfo.com/#/schema/person/d99ce56c2852365abf50d9e23d37be8c\"},\"headline\":\"Mit Vollgas in den Abgrund …\",\"datePublished\":\"2023-01-07T09:45:13+00:00\",\"dateModified\":\"2023-01-07T09:49:46+00:00\",\"mainEntityOfPage\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\"},\"wordCount\":771,\"commentCount\":0,\"publisher\":{\"@id\":\"https://blog.austria-insiderinfo.com/#organization\"},\"image\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#primaryimage\"},\"thumbnailUrl\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\",\"keywords\":[\"Klimakrise\"],\"articleSection\":[\"Nachhaltigkeit\",\"Natur- &amp; Umweltschutz\"],\"inLanguage\":\"de-DE\",\"potentialAction\":[{\"@type\":\"CommentAction\",\"name\":\"Comment\",\"target\":[\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#respond\"]}]},{\"@type\":\"WebPage\",\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\",\"url\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\",\"name\":\"Mit Vollgas in den Abgrund … - Austria Insiderinfo\",\"isPartOf\":{\"@id\":\"https://blog.austria-insiderinfo.com/#website\"},\"primaryImageOfPage\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#primaryimage\"},\"image\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#primaryimage\"},\"thumbnailUrl\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\",\"datePublished\":\"2023-01-07T09:45:13+00:00\",\"dateModified\":\"2023-01-07T09:49:46+00:00\",\"description\":\"Viele sagen, dass wir in Bezug auf die Klimakrise sehenden Auges auf den Abgrund zufahren. Ein Abgrund, den mittlerweile auch fast alle sehen.\",\"breadcrumb\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#breadcrumb\"},\"inLanguage\":\"de-DE\",\"potentialAction\":[{\"@type\":\"ReadAction\",\"target\":[\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\"]}]},{\"@type\":\"ImageObject\",\"inLanguage\":\"de-DE\",\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#primaryimage\",\"url\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\",\"contentUrl\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\",\"width\":1280,\"height\":854,\"caption\":\"Mit Vollgas in den Abgrund\"},{\"@type\":\"BreadcrumbList\",\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#breadcrumb\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Startseite\",\"item\":\"https://blog.austria-insiderinfo.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Mit Vollgas in den Abgrund …\"}]},{\"@type\":\"WebSite\",\"@id\":\"https://blog.austria-insiderinfo.com/#website\",\"url\":\"https://blog.austria-insiderinfo.com/\",\"name\":\"Austria Insiderinfo\",\"description\":\"Wanderungen, Fotografie und Nachhaltigkeit\",\"publisher\":{\"@id\":\"https://blog.austria-insiderinfo.com/#organization\"},\"potentialAction\":[{\"@type\":\"SearchAction\",\"target\":{\"@type\":\"EntryPoint\",\"urlTemplate\":\"https://blog.austria-insiderinfo.com/?s={search_term_string}\"},\"query-input\":\"required name=search_term_string\"}],\"inLanguage\":\"de-DE\"},{\"@type\":\"Organization\",\"@id\":\"https://blog.austria-insiderinfo.com/#organization\",\"name\":\"Austria Insiderinfo\",\"url\":\"https://blog.austria-insiderinfo.com/\",\"logo\":{\"@type\":\"ImageObject\",\"inLanguage\":\"de-DE\",\"@id\":\"https://blog.austria-insiderinfo.com/#/schema/logo/image/\",\"url\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2015/12/Austria-Insider-Info-new-Square.png\",\"contentUrl\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2015/12/Austria-Insider-Info-new-Square.png\",\"width\":551,\"height\":551,\"caption\":\"Austria Insiderinfo\"},\"image\":{\"@id\":\"https://blog.austria-insiderinfo.com/#/schema/logo/image/\"},\"sameAs\":[\"https://www.linkedin.com/in/horst-gassner/\",\"https://www.pinterest.com/horstgassner/\",\"https://www.youtube.com/user/horstgassner\",\"https://www.facebook.com/WandernAustria/\",\"https://twitter.com/WandernAustria\"]},{\"@type\":\"Person\",\"@id\":\"https://blog.austria-insiderinfo.com/#/schema/person/d99ce56c2852365abf50d9e23d37be8c\",\"name\":\"Horst Gassner\",\"sameAs\":[\"https://austria-insiderinfo.com\",\"https://www.facebook.com/DeepThought208\",\"https://www.instagram.com/wandernaustria/\",\"https://www.pinterest.at/horstgassner/\",\"https://twitter.com/WandernAustria\",\"https://www.youtube.com/c/HorstGassner\"]}]}</script> <link rel=\"alternate\" type=\"application/rss+xml\" title=\"Austria Insiderinfo &raquo; Feed\" href=\"https://blog.austria-insiderinfo.com/feed/\" /><link rel=\"alternate\" type=\"application/rss+xml\" title=\"Austria Insiderinfo &raquo; Kommentar-Feed\" href=\"https://blog.austria-insiderinfo.com/comments/feed/\" /><link rel=\"shortcut icon\" href=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2020/07/favicon-32x32-1.png\" type=\"image/x-icon\" /><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2020/07/apple-114x114-1.png\"><link rel=\"icon\" sizes=\"192x192\" href=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2020/07/apple-57x57-1.png\"><meta name=\"msapplication-TileImage\" content=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2020/07/apple-72x72-1.png\"><link rel=\"alternate\" type=\"application/rss+xml\" title=\"Austria Insiderinfo &raquo; Mit Vollgas in den Abgrund … Kommentar-Feed\" href=\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/feed/\" /><style id='avada-stylesheet-inline-css' type='text/css'>/********* Compiled CSS - Do not edit *********/ :root{--button_padding:11px 23px;}/* latin-ext */
+				'html'     => "<!DOCTYPE html><html class=\"avada-html-layout-boxed avada-html-header-position-top avada-is-100-percent-template\" lang=\"de-DE\"><head><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" /><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" /><meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' /><link media=\"all\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_4372ae792776d3f3b480128adfe5d963.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 1024px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_6095961ca8c29f35e48df70b487c1938.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 800px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_7d3c636bd40df7ad6e29d09d0714f1be.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 640px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_8485e43c13a94028c51c756c74616e14.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 672px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_86b299cecf2954b03d4fce86231a9a89.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-width: 672px) and (max-width: 704px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_95b3559b249f57dccc69495d01f8be99.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-width: 704px) and (max-width: 736px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_0754b57cf830ebbbaee1af425a7c65df.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-width: 736px) and (max-width: 768px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_9ba9567361176393820b68657b834cfb.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-width: 768px) and (max-width: 800px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_6ef5f1d5b3ca2efaff54396a0c72faf1.css\" rel=\"stylesheet\" /><style media=\"only screen and (min-width: 801px)\">.fusion-icon-only-link .menu-title{display:none}</style><link media=\"only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_ba9c1102da3617f94e057a5dc5b7d661.css\" rel=\"stylesheet\" /><link media=\"only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_eb19b064f51835fc56da3f2b4921c426.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-width: 782px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_69632eafdf45ec08e9e1c1d0787035a7.css\" rel=\"stylesheet\" /><style media=\"only screen and (max-width: 768px)\">.fusion-tabs.vertical-tabs .tab-pane{max-width:none!important}</style><link media=\"only screen and (min-width: 800px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_f22aa9b833f472e249c88c1e6aca87ff.css\" rel=\"stylesheet\" /><link media=\"only screen and (max-device-width: 640px)\" href=\"https://blog.austria-insiderinfo.com/wp-content/cache/autoptimize/css/autoptimize_abc513797044f7d1895a401139f11947.css\" rel=\"stylesheet\" /><title>Mit Vollgas in den Abgrund … - Austria Insiderinfo</title><meta name=\"description\" content=\"Viele sagen, dass wir in Bezug auf die Klimakrise sehenden Auges auf den Abgrund zufahren. Ein Abgrund, den mittlerweile auch fast alle sehen.\" /><link rel=\"canonical\" href=\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\" /><meta property=\"og:locale\" content=\"de_DE\" /><meta property=\"og:type\" content=\"article\" /><meta property=\"og:title\" content=\"Mit Vollgas in den Abgrund … - Austria Insiderinfo\" /><meta property=\"og:description\" content=\"Viele sagen, dass wir in Bezug auf die Klimakrise sehenden Auges auf den Abgrund zufahren. Ein Abgrund, den mittlerweile auch fast alle sehen.\" /><meta property=\"og:url\" content=\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\" /><meta property=\"og:site_name\" content=\"Austria Insiderinfo\" /><meta property=\"article:publisher\" content=\"https://www.facebook.com/WandernAustria/\" /><meta property=\"article:author\" content=\"https://www.facebook.com/DeepThought208\" /><meta property=\"article:published_time\" content=\"2023-01-07T09:45:13+00:00\" /><meta property=\"article:modified_time\" content=\"2023-01-07T09:49:46+00:00\" /><meta property=\"og:image\" content=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\" /><meta property=\"og:image:width\" content=\"1280\" /><meta property=\"og:image:height\" content=\"854\" /><meta property=\"og:image:type\" content=\"image/jpeg\" /><meta name=\"author\" content=\"Horst Gassner\" /><meta name=\"twitter:card\" content=\"summary_large_image\" /><meta name=\"twitter:creator\" content=\"@WandernAustria\" /><meta name=\"twitter:site\" content=\"@WandernAustria\" /><meta name=\"twitter:label1\" content=\"Verfasst von\" /><meta name=\"twitter:data1\" content=\"Horst Gassner\" /><meta name=\"twitter:label2\" content=\"Geschätzte Lesezeit\" /><meta name=\"twitter:data2\" content=\"5 Minuten\" /> <script type=\"application/ld+json\" class=\"yoast-schema-graph\">{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"Article\",\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#article\",\"isPartOf\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\"},\"author\":{\"name\":\"Horst Gassner\",\"@id\":\"https://blog.austria-insiderinfo.com/#/schema/person/d99ce56c2852365abf50d9e23d37be8c\"},\"headline\":\"Mit Vollgas in den Abgrund …\",\"datePublished\":\"2023-01-07T09:45:13+00:00\",\"dateModified\":\"2023-01-07T09:49:46+00:00\",\"mainEntityOfPage\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\"},\"wordCount\":771,\"commentCount\":0,\"publisher\":{\"@id\":\"https://blog.austria-insiderinfo.com/#organization\"},\"image\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#primaryimage\"},\"thumbnailUrl\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\",\"keywords\":[\"Klimakrise\"],\"articleSection\":[\"Nachhaltigkeit\",\"Natur- &amp; Umweltschutz\"],\"inLanguage\":\"de-DE\",\"potentialAction\":[{\"@type\":\"CommentAction\",\"name\":\"Comment\",\"target\":[\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#respond\"]}]},{\"@type\":\"WebPage\",\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\",\"url\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\",\"name\":\"Mit Vollgas in den Abgrund … - Austria Insiderinfo\",\"isPartOf\":{\"@id\":\"https://blog.austria-insiderinfo.com/#website\"},\"primaryImageOfPage\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#primaryimage\"},\"image\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#primaryimage\"},\"thumbnailUrl\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\",\"datePublished\":\"2023-01-07T09:45:13+00:00\",\"dateModified\":\"2023-01-07T09:49:46+00:00\",\"description\":\"Viele sagen, dass wir in Bezug auf die Klimakrise sehenden Auges auf den Abgrund zufahren. Ein Abgrund, den mittlerweile auch fast alle sehen.\",\"breadcrumb\":{\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#breadcrumb\"},\"inLanguage\":\"de-DE\",\"potentialAction\":[{\"@type\":\"ReadAction\",\"target\":[\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/\"]}]},{\"@type\":\"ImageObject\",\"inLanguage\":\"de-DE\",\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#primaryimage\",\"url\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\",\"contentUrl\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2023/01/Mit-Vollgas-in-den-Abgrund.jpg\",\"width\":1280,\"height\":854,\"caption\":\"Mit Vollgas in den Abgrund\"},{\"@type\":\"BreadcrumbList\",\"@id\":\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/#breadcrumb\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Startseite\",\"item\":\"https://blog.austria-insiderinfo.com/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Mit Vollgas in den Abgrund …\"}]},{\"@type\":\"WebSite\",\"@id\":\"https://blog.austria-insiderinfo.com/#website\",\"url\":\"https://blog.austria-insiderinfo.com/\",\"name\":\"Austria Insiderinfo\",\"description\":\"Wanderungen, Fotografie und Nachhaltigkeit\",\"publisher\":{\"@id\":\"https://blog.austria-insiderinfo.com/#organization\"},\"potentialAction\":[{\"@type\":\"SearchAction\",\"target\":{\"@type\":\"EntryPoint\",\"urlTemplate\":\"https://blog.austria-insiderinfo.com/?s={search_term_string}\"},\"query-input\":\"required name=search_term_string\"}],\"inLanguage\":\"de-DE\"},{\"@type\":\"Organization\",\"@id\":\"https://blog.austria-insiderinfo.com/#organization\",\"name\":\"Austria Insiderinfo\",\"url\":\"https://blog.austria-insiderinfo.com/\",\"logo\":{\"@type\":\"ImageObject\",\"inLanguage\":\"de-DE\",\"@id\":\"https://blog.austria-insiderinfo.com/#/schema/logo/image/\",\"url\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2015/12/Austria-Insider-Info-new-Square.png\",\"contentUrl\":\"https://blog.austria-insiderinfo.com/wp-content/uploads/2015/12/Austria-Insider-Info-new-Square.png\",\"width\":551,\"height\":551,\"caption\":\"Austria Insiderinfo\"},\"image\":{\"@id\":\"https://blog.austria-insiderinfo.com/#/schema/logo/image/\"},\"sameAs\":[\"https://www.linkedin.com/in/horst-gassner/\",\"https://www.pinterest.com/horstgassner/\",\"https://www.youtube.com/user/horstgassner\",\"https://www.facebook.com/WandernAustria/\",\"https://twitter.com/WandernAustria\"]},{\"@type\":\"Person\",\"@id\":\"https://blog.austria-insiderinfo.com/#/schema/person/d99ce56c2852365abf50d9e23d37be8c\",\"name\":\"Horst Gassner\",\"sameAs\":[\"https://austria-insiderinfo.com\",\"https://www.facebook.com/DeepThought208\",\"https://www.instagram.com/wandernaustria/\",\"https://www.pinterest.at/horstgassner/\",\"https://twitter.com/WandernAustria\",\"https://www.youtube.com/c/HorstGassner\"]}]}</script> <link rel=\"alternate\" type=\"application/rss+xml\" title=\"Austria Insiderinfo &raquo; Feed\" href=\"https://blog.austria-insiderinfo.com/feed/\" /><link rel=\"alternate\" type=\"application/rss+xml\" title=\"Austria Insiderinfo &raquo; Kommentar-Feed\" href=\"https://blog.austria-insiderinfo.com/comments/feed/\" /><link rel=\"shortcut icon\" href=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2020/07/favicon-32x32-1.png\" type=\"image/x-icon\" /><link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2020/07/apple-114x114-1.png\"><link rel=\"icon\" sizes=\"192x192\" href=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2020/07/apple-57x57-1.png\"><meta name=\"msapplication-TileImage\" content=\"https://blog.austria-insiderinfo.com/wp-content/uploads/2020/07/apple-72x72-1.png\"><link rel=\"alternate\" type=\"application/rss+xml\" title=\"Austria Insiderinfo &raquo; Mit Vollgas in den Abgrund … Kommentar-Feed\" href=\"https://blog.austria-insiderinfo.com/nachhaltigkeit/absturz-oder-unguenstiger-blickwinkel/feed/\" /><style id='avada-stylesheet-inline-css' type='text/css'>/********* Compiled CSS - Do not edit *********/ :root{--button_padding:11px 23px;}/* latin-ext */
 @font-face {
   font-family: 'Lato';
   font-style: italic;
@@ -1472,44 +1470,44 @@ Served from: blog.austria-insiderinfo.com @ 2023-01-07 10:50:10 by W3 Total Cach
 			],
 			'meta http-equiv content-type' => [
 				'expected' => 'utf-8',
-				'html' => '<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"></head><body></body></html>',
+				'html'     => '<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8"></head><body></body></html>',
 			],
 			'meta http-equiv Content-Type' => [
 				'expected' => 'utf-8',
-				'html' => '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body></body></html>',
+				'html'     => '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body></body></html>',
 			],
 			'meta http-equiv Content-Type no charset' => [
 				'expected' => null,
-				'html' => '<html><head><meta http-equiv="Content-Type" content="text/html"></head><body></body></html>',
+				'html'     => '<html><head><meta http-equiv="Content-Type" content="text/html"></head><body></body></html>',
 			],
 			'meta charset' => [
 				'expected' => 'utf-8',
-				'html' => '<html><head><meta charset="UTF-8"></head><body></body></html>',
+				'html'     => '<html><head><meta charset="UTF-8"></head><body></body></html>',
 			],
 			'meta charset no quotes' => [
 				'expected' => 'utf-8',
-				'html' => '<html><head><meta charset=utf-8></head><body></body></html>',
+				'html'     => '<html><head><meta charset=utf-8></head><body></body></html>',
 			],
 			'meta charSet' => [
 				'expected' => 'utf-8',
-				'html' => '<html><head><meta charSet="UTF-8"></head><body></body></html>',
+				'html'     => '<html><head><meta charSet="UTF-8"></head><body></body></html>',
 			],
-// Can't test in Woodpecker without tripping PHPUnit, even with the error-suppressing operator
-//			'invalid html' => [
-//				'expected' => null,
-//				'html' => '',
-//			]
+			// Can't test in Woodpecker without tripping PHPUnit, even with the error-suppressing operator
+			//			'invalid html' => [
+			//				'expected' => null,
+			//				'html' => '',
+			//			]
 		];
 	}
 
 	/**
-	 * @dataProvider dataExtractCharset
 	 *
 	 * @param string|null $expected
 	 * @param string      $html
 	 * @return void
 	 */
-	public function testExtractCharset(?string $expected, string $html)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataExtractCharset')]
+	public function testExtractCharset(?string $expected, string $html): void
 	{
 		$doc = new \DOMDocument();
 		@$doc->loadHTML($html, LIBXML_NOERROR);

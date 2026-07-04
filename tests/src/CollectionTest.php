@@ -16,7 +16,7 @@ class CollectionTest extends MockedTestCase
 	/**
 	 * Test if the BaseCollection::column() works as expected
 	 */
-	public function testGetArrayCopy()
+	public function testGetArrayCopy(): void
 	{
 		$collection = new CollectionDouble();
 		$collection->append(new EntityDouble('test', 23, new \DateTime('now', new \DateTimeZone('UTC')), 'privTest'));

@@ -20,13 +20,9 @@ final class CollectRoutesEvent extends Event
 {
 	public const COLLECT_ROUTES = 'friendica.collect_routes';
 
-	private RouteCollector $routeCollector;
-
-	public function __construct(string $name, RouteCollector $routeCollector)
+	public function __construct(string $name, private RouteCollector $routeCollector)
 	{
 		parent::__construct($name);
-
-		$this->routeCollector = $routeCollector;
 	}
 
 	public function getRouteCollector(): RouteCollector

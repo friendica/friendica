@@ -20,17 +20,9 @@ use Psr\Log\LoggerInterface;
 
 class PasswordTooLong extends \Friendica\BaseModule
 {
-	/** @var SystemMessages */
-	private $sysmsg;
-	/** @var IHandleUserSessions */
-	private $userSession;
-
-	public function __construct(SystemMessages $sysmsg, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $userSession, $server, array $parameters = [])
+	public function __construct(private readonly SystemMessages $sysmsg, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private readonly IHandleUserSessions $userSession, $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->sysmsg      = $sysmsg;
-		$this->userSession = $userSession;
 	}
 
 	protected function post(array $request = [])
@@ -66,8 +58,9 @@ class PasswordTooLong extends \Friendica\BaseModule
 
 	protected function content(array $request = []): string
 	{
-		// Nothing to do here
+		/** @phpstan-ignore notIdentical.alwaysFalse(value of PASSWORD_DEFAULT will be change in a future PHP version) */
 		if (PASSWORD_DEFAULT !== PASSWORD_BCRYPT) {
+			// Nothing to do here
 			$this->baseUrl->redirect();
 		}
 

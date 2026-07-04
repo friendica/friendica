@@ -23,8 +23,8 @@
 
 			{{* Switch between image and file mode *}}
 			<div class="fbswitcher btn-group pull-right" aria-label="{{$aria_mode_switch}}">
-				<button type="button" class="btn btn-default" data-mode="photo"><i class="fa fa-picture-o" aria-hidden="true"></i> {{$photos_text}}</button>
-				<button type="button" class="btn btn-default" data-mode="attachment"><i class="fa fa-file-o" aria-hidden="true"></i> {{$files_text}}</button>
+				<button type="button" class="btn btn-default" data-mode="photo"><i class="ri ri-image-line" aria-hidden="true"></i> {{$photos_text}}</button>
+				<button type="button" class="btn btn-default" data-mode="attachment"><i class="ri ri-file-line" aria-hidden="true"></i> {{$files_text}}</button>
 			</div>
 		</ol>
 
@@ -66,6 +66,6 @@
 
 	{{* This part contains the content loader icon which is visible when new content is loaded *}}
 	<div class="profile-rotator-wrapper" aria-hidden="true" style="display: none;">
-		<i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i>
+		<i class="ri ri-loader-4-line ri-spin" aria-hidden="true"></i>
 	</div>
 </div>

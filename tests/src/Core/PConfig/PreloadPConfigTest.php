@@ -17,19 +17,17 @@ class PreloadPConfigTest extends PConfigTestCase
 		return new PreloadPConfig($this->configCache, $this->configModel);
 	}
 
-	/**
-	 * @dataProvider dataConfigLoad
-	 */
-	public function testLoad(int $uid, array $data, array $possibleCats, array $load)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataConfigLoad')]
+	public function testLoad(int $uid, array $data, array $possibleCats, array $load): void
 	{
 		$this->configModel->shouldReceive('isConnected')
-		                  ->andReturn(true)
-		                  ->once();
+						  ->andReturn(true)
+						  ->once();
 
 		$this->configModel->shouldReceive('load')
-		                  ->with($uid)
-		                  ->andReturn($data)
-		                  ->once();
+						  ->with($uid)
+						  ->andReturn($data)
+						  ->once();
 
 		parent::testLoad($uid, $data, $possibleCats, $load);
 
@@ -39,19 +37,17 @@ class PreloadPConfigTest extends PConfigTestCase
 		}
 	}
 
-	/**
-	 * @dataProvider dataDoubleLoad
-	 */
-	public function testCacheLoadDouble(int $uid, array $data1, array $data2, array $expect)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataDoubleLoad')]
+	public function testCacheLoadDouble(int $uid, array $data1, array $data2, array $expect): void
 	{
 		$this->configModel->shouldReceive('isConnected')
-		                  ->andReturn(true)
-		                  ->once();
+						  ->andReturn(true)
+						  ->once();
 
 		$this->configModel->shouldReceive('load')
-		                  ->with($uid)
-		                  ->andReturn($data1)
-		                  ->once();
+						  ->with($uid)
+						  ->andReturn($data1)
+						  ->once();
 
 		parent::testCacheLoadDouble($uid, $data1, $data2, $expect);
 
@@ -61,82 +57,74 @@ class PreloadPConfigTest extends PConfigTestCase
 		}
 	}
 
-	/**
-	 * @dataProvider dataTests
-	 */
-	public function testSetGetWithoutDB(int $uid, $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testSetGetWithoutDB(int $uid, $data): void
 	{
 		$this->configModel->shouldReceive('isConnected')
-		                  ->andReturn(false)
-		                  ->times(3);
+						  ->andReturn(false)
+						  ->times(3);
 
 		parent::testSetGetWithoutDB($uid, $data);
 	}
 
-	/**
-	 * @dataProvider dataTests
-	 */
-	public function testSetGetWithDB(int $uid, $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testSetGetWithDB(int $uid, $data): void
 	{
 		$this->configModel->shouldReceive('isConnected')
-		                  ->andReturn(true)
-		                  ->twice();
+						  ->andReturn(true)
+						  ->twice();
 
 		$this->configModel->shouldReceive('load')
-		                  ->with($uid)
-		                  ->andReturn(['config' => []])
-		                  ->once();
+						  ->with($uid)
+						  ->andReturn(['config' => []])
+						  ->once();
 
 		parent::testSetGetWithDB($uid, $data);
 	}
 
-	/**
-	 * @dataProvider dataTests
-	 */
-	public function testGetWithRefresh(int $uid, $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testGetWithRefresh(int $uid, $data): void
 	{
 		$this->configModel->shouldReceive('isConnected')
-		                  ->andReturn(true)
-		                  ->times(2);
+						  ->andReturn(true)
+						  ->times(2);
 
 		// constructor loading
 		$this->configModel->shouldReceive('load')
-		                  ->with($uid)
-		                  ->andReturn(['config' => []])
-		                  ->once();
+						  ->with($uid)
+						  ->andReturn(['config' => []])
+						  ->once();
 
 		// mocking one get
 		$this->configModel->shouldReceive('get')
-		                  ->with($uid, 'test', 'it')
-		                  ->andReturn($data)
-		                  ->once();
+						  ->with($uid, 'test', 'it')
+						  ->andReturn($data)
+						  ->once();
 
 		parent::testGetWithRefresh($uid, $data);
 	}
 
-	/**
-	 * @dataProvider dataTests
-	 */
-	public function testDeleteWithoutDB(int $uid, $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testDeleteWithoutDB(int $uid, $data): void
 	{
 		$this->configModel->shouldReceive('isConnected')
-		                  ->andReturn(false)
-		                  ->times(4);
+						  ->andReturn(false)
+						  ->times(4);
 
 		parent::testDeleteWithoutDB($uid, $data);
 	}
 
-	public function testDeleteWithDB()
+	public function testDeleteWithDB(): void
 	{
 		$this->configModel->shouldReceive('isConnected')
-		                  ->andReturn(true)
-		                  ->times(5);
+						  ->andReturn(true)
+						  ->times(5);
 
 		// constructor loading
 		$this->configModel->shouldReceive('load')
-		                  ->with(42)
-		                  ->andReturn(['config' => []])
-		                  ->once();
+						  ->with(42)
+						  ->andReturn(['config' => []])
+						  ->once();
 
 		parent::testDeleteWithDB();
 	}

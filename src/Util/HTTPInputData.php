@@ -237,7 +237,7 @@ class HTTPInputData
 			return $values;
 		}
 
-		$name = rtrim(array_shift($names), ']');
+		$name = rtrim((string) array_shift($names), ']');
 		if ($name !== '') {
 			$name = $name . '=p';
 

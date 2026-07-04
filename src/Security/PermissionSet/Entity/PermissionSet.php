@@ -43,8 +43,14 @@ class PermissionSet extends BaseEntity
 	 *
 	 * @see \Friendica\Security\PermissionSet\Factory\PermissionSet
 	 */
-	public function __construct(int $uid, array $allow_cid = [], array $allow_gid = [], array $deny_cid = [], array $deny_gid = [], int $id = null)
-	{
+	public function __construct(
+		int $uid,
+		array $allow_cid = [],
+		array $allow_gid = [],
+		array $deny_cid = [],
+		array $deny_gid = [],
+		?int $id = null,
+	) {
 		$this->id        = $id;
 		$this->uid       = $uid;
 		$this->allow_cid = $allow_cid;

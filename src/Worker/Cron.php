@@ -1,7 +1,7 @@
 <?php
 
-// Copyright (C) 2010-2024, the Friendica project
-// SPDX-FileCopyrightText: 2010-2024 the Friendica project
+// Copyright (C) 2010-2026, the Friendica project
+// SPDX-FileCopyrightText: 2010-2026 the Friendica project
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -68,6 +68,9 @@ class Cron
 		// Call possible post update functions
 		Worker::add(Worker::PRIORITY_LOW, 'PostUpdate');
 
+		// Update tag relay subscriptions
+		Worker::add(Worker::PRIORITY_LOW, 'UpdateTagRelaySubscriptions');
+
 		// Hourly cron calls
 		if ((DI::keyValue()->get('last_cron_hourly') ?? 0) + 3600 < time()) {
 			// Update trending tags cache for the community page
@@ -103,6 +106,8 @@ class Cron
 			Worker::add(Worker::PRIORITY_LOW, 'UpdatePhotoAlbums');
 
 			Worker::add(Worker::PRIORITY_LOW, 'ExpirePosts');
+
+			Worker::add(Worker::PRIORITY_LOW, 'ExpireReports');
 
 			Worker::add(Worker::PRIORITY_LOW, 'ExpireActivities');
 

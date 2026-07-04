@@ -56,10 +56,10 @@ class BaseURL extends Uri implements UriInterface
 		if (!empty($relativeScriptPath)) {
 			// Module
 			if (!empty($server['QUERY_STRING'])) {
-				return trim(dirname($relativeScriptPath, substr_count(trim($server['QUERY_STRING'], '/'), '/') + 1), '/');
+				return trim(dirname((string) $relativeScriptPath, substr_count(trim((string) $server['QUERY_STRING'], '/'), '/') + 1), '/');
 			} else {
 				// Root page
-				$scriptPathParts = explode('?', $relativeScriptPath, 2);
+				$scriptPathParts = explode('?', (string) $relativeScriptPath, 2);
 				return trim($scriptPathParts[0], '/');
 			}
 		}

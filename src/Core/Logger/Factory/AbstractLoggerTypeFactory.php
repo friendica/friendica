@@ -44,27 +44,13 @@ abstract class AbstractLoggerTypeFactory
 	 */
 	protected static function mapLegacyConfigDebugLevel(string $level): string
 	{
-		switch ($level) {
-			// legacy WARNING
-			case "0":
-				return LogLevel::ERROR;
-				// legacy INFO
-			case "1":
-				return LogLevel::WARNING;
-				// legacy TRACE
-			case "2":
-				return LogLevel::NOTICE;
-				// legacy DEBUG
-			case "3":
-				return LogLevel::INFO;
-				// legacy DATA
-			case "4":
-				// legacy ALL
-			case "5":
-				return LogLevel::DEBUG;
-				// default if nothing set
-			default:
-				return $level;
-		}
+		return match ($level) {
+			"0" => LogLevel::ERROR,
+			"1" => LogLevel::WARNING,
+			"2" => LogLevel::NOTICE,
+			"3" => LogLevel::INFO,
+			"4", "5" => LogLevel::DEBUG,
+			default => $level,
+		};
 	}
 }

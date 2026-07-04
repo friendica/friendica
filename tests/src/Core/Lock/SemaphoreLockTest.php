@@ -24,7 +24,11 @@ class SemaphoreLockTest extends LockTestCase
 {
 	protected function setUp(): void
 	{
-		/** @var MockInterface|Dice $dice */
+		if (!function_exists('sem_get')) {
+			static::markTestSkipped('Semaphore lock is not supported');
+		}
+
+		/** @var Dice&MockInterface $dice */
 		$dice = Mockery::mock(Dice::class)->makePartial();
 
 		$app = Mockery::mock(App::class);
@@ -46,10 +50,8 @@ class SemaphoreLockTest extends LockTestCase
 		return new SemaphoreLock();
 	}
 
-	/**
-	 * @doesNotPerformAssertions
-	 */
-	public function testLockTTL()
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+	public function testLockTTL(): void
 	{
 		self::markTestSkipped("Semaphore doesn't work with TTL");
 	}
@@ -58,14 +60,14 @@ class SemaphoreLockTest extends LockTestCase
 	 * Test if semaphore locking works even when trying to release locks, where the file exists
 	 * but it shouldn't harm locking
 	 */
-	public function testMissingFileNotOverriding()
+	public function testMissingFileNotOverriding(): void
 	{
 		$file = System::getTempPath() . '/test.sem';
 		touch($file);
 
-		self::assertTrue(file_exists($file));
+		self::assertFileExists($file);
 		self::assertFalse($this->instance->release('test', false));
-		self::assertTrue(file_exists($file));
+		self::assertFileExists($file);
 	}
 
 	/**
@@ -76,25 +78,25 @@ class SemaphoreLockTest extends LockTestCase
 	 *
 	 * @see https://github.com/friendica/friendica/issues/7298#issuecomment-521996540
 	 */
-	public function testMissingFileOverriding()
+	public function testMissingFileOverriding(): void
 	{
 		$file = System::getTempPath() . '/test.sem';
 		touch($file);
 
-		self::assertTrue(file_exists($file));
+		self::assertFileExists($file);
 		self::assertFalse($this->instance->release('test', true));
-		self::assertTrue(file_exists($file));
+		self::assertFileExists($file);
 	}
 
 	/**
 	 * Test acquire lock even the semaphore file exists, but isn't used
 	 */
-	public function testOverrideSemFile()
+	public function testOverrideSemFile(): void
 	{
 		$file = System::getTempPath() . '/test.sem';
 		touch($file);
 
-		self::assertTrue(file_exists($file));
+		self::assertFileExists($file);
 		self::assertTrue($this->instance->acquire('test'));
 		self::assertTrue($this->instance->isLocked('test'));
 		self::assertTrue($this->instance->release('test'));

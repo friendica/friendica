@@ -32,40 +32,40 @@
             <div class="comment-edit-bb-{{$id}} btn-toolbar clearfix" role="toolbar">
                 <div class="btn-group">
                     <button type="button" class="btn btn-default bb-img" aria-label="{{$l10n.edimg}}" title="{{$l10n.edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}" tabindex="4">
-                        <i class="fa fa-picture-o"></i>
+                        <i class="ri ri-image-line"></i>
                     </button>
                     <button type="button" class="btn btn-default bb-attach" aria-label="{{$l10n.edattach}}" title="{{$l10n.edattach}}" ondragenter="return commentLinkDrop(event, {{$id}});" ondragover="return commentLinkDrop(event, {{$id}});" ondrop="commentLinkDropper(event);" onclick="commentGetLink({{$id}}, '{{$l10n.prompttext}}');" tabindex="5">
-                        <i class="fa fa-paperclip"></i>
+                        <i class="ri ri-attachment-2"></i>
                     </button>
                     <button type="button" id="button_emojipicker" class="btn btn-default emojis" aria-label="{{$l10n.edemojis}}" title="{{$l10n.edemojis}}" tabindex="6">
-                      <i class="fa fa-smile-o"></i>
+                      <i class="ri ri-emotion-line"></i>
                     </button>
                 </div>
 
                 <div class="pull-right">
                     <div class="btn-group">
                         <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.edurl}}" title="{{$l10n.edurl}}" onclick="insertFormatting('url',{{$id}});" tabindex="7">
-                            <i class="fa fa-link"></i>
+                            <i class="ri ri-link"></i>
                         </button>
                         <button type="button" class="btn btn-default underline" aria-label="{{$l10n.eduline}}" title="{{$l10n.eduline}}" onclick="insertFormatting('u',{{$id}});" tabindex="9">
-                            <i class="fa fa-underline"></i>
+                            <i class="ri ri-underline"></i>
                         </button>
                         <button type="button" class="btn btn-default italic" aria-label="{{$l10n.editalic}}" title="{{$l10n.editalic}}" onclick="insertFormatting('i',{{$id}});" tabindex="10">
-                            <i class="fa fa-italic"></i>
+                            <i class="ri ri-italic"></i>
                         </button>
                         <button type="button" class="btn btn-default bold" aria-label="{{$l10n.edbold}}" title="{{$l10n.edbold}}" onclick="insertFormatting('b',{{$id}});" tabindex="11">
-                            <i class="fa fa-bold"></i>
+                            <i class="ri ri-bold"></i>
                         </button>
                     </div>
                     <div class="btn-group">
                         <button type="button" class="btn btn-default quote" aria-label="{{$l10n.edquote}}" title="{{$l10n.edquote}}" onclick="insertFormatting('quote',{{$id}});" tabindex="12">
-                            <i class="fa fa-quote-left"></i>
+                            <i class="ri ri-double-quotes-l"></i>
                         </button>
                         <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.contentwarn}}" title="{{$l10n.contentwarn}}" onclick="insertFormatting('abstract',{{$id}});" tabindex="13">
-                            <i class="fa fa-eye"></i>
+                            <i class="ri ri-eye-line"></i>
                         </button>
                         <button type="button" class="btn btn-default code" aria-label="{{$l10n.edcode}}" title="{{$l10n.edcode}}" onclick="insertFormatting('code',{{$id}});" tabindex="14">
-                            <i class="fa fa-code"></i>
+                            <i class="ri ri-code-line"></i>
                         </button>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
                 {{if $type == 'post'}}
                     <div id="compose-additional-settings-location">
                         <button type="button" name="permissions" class="btn btn-default" id="toggle-permissions" title="{{$l10n.toggle_permissions_tooltip}}" onclick="togglePermissions()" tabindex="5">
-                            <i class="fa fa-ellipsis-h"></i> {{$l10n.toggle_permissions}}
+                            <i class="ri ri-more-line"></i> {{$l10n.toggle_permissions}}
                         </button>
                         <input type="text" name="location" class="form-control" id="jot-location" value="{{$location}}" placeholder="{{$l10n.location_set}}" tabindex="6" />
                         <button type="button" class="btn btn-default" id="profile-location"
@@ -90,7 +90,7 @@
                             data-title-clear="{{$l10n.location_clear}}"
                             title="{{$l10n.location_set}}"
                             tabindex="7">
-                            <i class="fa fa-map-marker" aria-hidden="true"></i>
+                            <i class="ri ri-map-pin-line" aria-hidden="true"></i>
                         </button>
                     </div>
                 {{/if}}
@@ -100,9 +100,12 @@
                     </span>
                     <span role="presentation" id="character-counter" class="grey text-info"></span>
                     <button type="button" class="btn btn-default" onclick="preview_comment_toggle({{$id}}, '{{$l10n.preview}}');" id="comment-edit-preview-link-{{$id}}" tabindex="8">
-                        <i class="fa fa-eye"></i> <span id="preview-btn-text-{{$id}}">{{$l10n.preview}}</span>
+                        <i class="ri ri-eye-line"></i> <span id="preview-btn-text-{{$id}}">{{$l10n.preview}}</span>
                     </button>
-                    <button type="submit" class="btn btn-primary" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="fa fa-paper-plane"></i> {{$l10n.submit}}</button>
+                    <button type="submit" class="btn btn-primary" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="ri ri-send-plane-line"></i> {{$l10n.submit}}</button>
+                </div>
+                <div class="jotplugins">
+                    {{$jotplugins nofilter}}
                 </div>
             </div>
 
@@ -112,10 +115,6 @@
                 {{if $type == 'post'}}
                     <h3>{{$l10n.visibility_title}}</h3>
                     {{$acl_selector nofilter}}
-
-                    <div class="jotplugins">
-                        {{$jotplugins nofilter}}
-                    </div>
 
         			{{include file="field_checkbox.tpl" field=$sensitive}}
                     {{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}

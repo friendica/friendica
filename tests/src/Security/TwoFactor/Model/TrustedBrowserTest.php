@@ -14,7 +14,7 @@ use Friendica\Util\Strings;
 
 class TrustedBrowserTest extends MockedTestCase
 {
-	public function test__construct()
+	public function test__construct(): void
 	{
 		$hash = Strings::getRandomHex();
 
@@ -23,7 +23,7 @@ class TrustedBrowserTest extends MockedTestCase
 			42,
 			'PHPUnit',
 			true,
-			DateTimeFormat::utcNow()
+			DateTimeFormat::utcNow(),
 		);
 
 		$this->assertEquals($hash, $trustedBrowser->cookie_hash);
@@ -33,7 +33,7 @@ class TrustedBrowserTest extends MockedTestCase
 		$this->assertNotEmpty($trustedBrowser->created);
 	}
 
-	public function testRecordUse()
+	public function testRecordUse(): void
 	{
 		$hash = Strings::getRandomHex();
 		$past = DateTimeFormat::utc('now - 5 minutes');
@@ -44,7 +44,7 @@ class TrustedBrowserTest extends MockedTestCase
 			'PHPUnit',
 			true,
 			$past,
-			$past
+			$past,
 		);
 
 		$trustedBrowser->recordUse();

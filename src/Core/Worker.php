@@ -55,8 +55,7 @@ class Worker
 	private static $lock_duration     = 0;
 	private static $last_update;
 	private static $state;
-	/** @var Process */
-	private static $process;
+	private static Process $process;
 
 	/**
 	 * Processes the tasks that are in the workerqueue table
@@ -151,7 +150,7 @@ class Worker
 			// Quit the worker once every cron interval
 			if (time() > ($starttime + (DI::config()->get('system', 'cron_interval') * 60)) && !self::systemLimitReached()) {
 				DI::logger()->info('Process lifetime reached, respawning.');
-				self::unclaimProcess($process);
+				self::unclaimProcess(self::$process);
 				if (Worker\Daemon::isMode()) {
 					Worker\IPC::SetJobState(true);
 				} else {
@@ -340,7 +339,7 @@ class Worker
 			return false;
 		}
 
-		$argv = json_decode($queue['parameter'], true);
+		$argv = json_decode((string) $queue['parameter'], true);
 		if (!is_array($argv)) {
 			$argv = [];
 		}
@@ -360,7 +359,7 @@ class Worker
 		if (method_exists(sprintf('Friendica\Worker\%s', $include), 'execute')) {
 			// We constantly update the "executed" date every minute to avoid being killed too soon
 			if (!isset(self::$last_update)) {
-				self::$last_update = strtotime($queue['executed']);
+				self::$last_update = strtotime((string) $queue['executed']);
 			}
 
 			$age               = (time() - self::$last_update) / 60;
@@ -399,12 +398,12 @@ class Worker
 
 		require_once $include;
 
-		$funcname = str_replace('.php', '', basename($argv[0])) . '_run';
+		$funcname = str_replace('.php', '', basename((string) $argv[0])) . '_run';
 
 		if (function_exists($funcname)) {
 			// We constantly update the "executed" date every minute to avoid being killed too soon
 			if (!isset(self::$last_update)) {
-				self::$last_update = strtotime($queue['executed']);
+				self::$last_update = strtotime((string) $queue['executed']);
 			}
 
 			$age               = (time() - self::$last_update) / 60;
@@ -653,8 +652,8 @@ class Worker
 			self::$db_duration += (microtime(true) - $stamp);
 			while ($grants = DBA::fetch($r)) {
 				$grant = array_pop($grants);
-				if (stristr($grant, "GRANT USAGE ON")) {
-					if (preg_match("/WITH MAX_USER_CONNECTIONS (\d*)/", $grant, $match)) {
+				if (stristr((string) $grant, "GRANT USAGE ON")) {
+					if (preg_match("/WITH MAX_USER_CONNECTIONS (\d*)/", (string) $grant, $match)) {
 						$max = $match[1];
 					}
 				}
@@ -750,7 +749,7 @@ class Worker
 			$processlist = '';
 
 			if (DI::config()->get('system', 'worker_jpm')) {
-				$intervals       = explode(',', DI::config()->get('system', 'worker_jpm_range'));
+				$intervals       = explode(',', (string) DI::config()->get('system', 'worker_jpm_range'));
 				$jobs_per_minute = [];
 				foreach ($intervals as $interval) {
 					if ($interval == 0) {
@@ -941,7 +940,7 @@ class Worker
 			if (!empty($task['command'])) {
 				$command = $task['command'];
 			} else {
-				$command = json_decode($task['parameter'])[0];
+				$command = json_decode((string) $task['parameter'])[0];
 			}
 
 			if (!in_array($command, self::FAST_COMMANDS)) {
@@ -1067,7 +1066,7 @@ class Worker
 				if (!empty($task['command'])) {
 					$command = $task['command'];
 				} else {
-					$command = json_decode($task['parameter'])[0];
+					$command = json_decode((string) $task['parameter'])[0];
 				}
 				if (!in_array($command, self::FAST_COMMANDS)) {
 					break;
@@ -1368,7 +1367,7 @@ class Worker
 	 */
 	private static function getNextRetrial(array $queue, int $max_level): int
 	{
-		$created      = strtotime($queue['created']);
+		$created      = strtotime((string) $queue['created']);
 		$retrial_time = time() - $created;
 
 		$new_retrial = $queue['retrial'] + 1;
@@ -1458,8 +1457,8 @@ class Worker
 	public static function isInMaintenanceWindow(bool $check_last_execution = false): bool
 	{
 		// Calculate the seconds of the start and end of the maintenance window
-		$start = strtotime(DI::config()->get('system', 'maintenance_start')) % 86400;
-		$end   = strtotime(DI::config()->get('system', 'maintenance_end')) % 86400;
+		$start = strtotime((string) DI::config()->get('system', 'maintenance_start')) % 86400;
+		$end   = strtotime((string) DI::config()->get('system', 'maintenance_end')) % 86400;
 
 		DI::logger()->info('Maintenance window', ['start' => date('H:i:s', $start), 'end' => date('H:i:s', $end)]);
 

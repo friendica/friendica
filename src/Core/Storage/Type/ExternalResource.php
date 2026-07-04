@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
  */
 class ExternalResource implements ICanReadFromStorage
 {
-	const NAME = 'ExternalResource';
+	public const NAME = 'ExternalResource';
 
 	/** @var LoggerInterface */
 	protected $logger;
@@ -43,7 +43,7 @@ class ExternalResource implements ICanReadFromStorage
 			throw new ReferenceStorageException(sprintf('Invalid reference %s, cannot retrieve URL', $reference));
 		}
 
-		$parts = parse_url($data->url);
+		$parts = parse_url((string) $data->url);
 		if (empty($parts['scheme']) || empty($parts['host'])) {
 			throw new ReferenceStorageException(sprintf('Invalid reference %s, cannot extract scheme and host', $reference));
 		}

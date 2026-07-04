@@ -63,8 +63,18 @@ class Notification extends BaseEntity
 	 * @param int|null      $id
 	 * @see \Friendica\Navigation\Notifications\Factory\Notification
 	 */
-	public function __construct(int $uid, string $verb, int $type, int $actorId, int $targetUriId = null, int $parentUriId = null, DateTime $created = null, bool $seen = false, bool $dismissed = false, int $id = null)
-	{
+	public function __construct(
+		int $uid,
+		string $verb,
+		int $type,
+		int $actorId,
+		?int $targetUriId = null,
+		?int $parentUriId = null,
+		?DateTime $created = null,
+		bool $seen = false,
+		bool $dismissed = false,
+		?int $id = null,
+	) {
 		$this->uid         = $uid;
 		$this->verb        = $verb;
 		$this->type        = $type;
@@ -75,7 +85,7 @@ class Notification extends BaseEntity
 		$this->seen        = $seen;
 		$this->dismissed   = $dismissed;
 
-		$this->id          = $id;
+		$this->id = $id;
 	}
 
 	public function setSeen()

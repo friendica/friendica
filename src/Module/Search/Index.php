@@ -8,7 +8,7 @@
 namespace Friendica\Module\Search;
 
 use Friendica\App;
-use Friendica\Content\Conversation;
+use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
@@ -35,7 +35,7 @@ class Index extends BaseSearch
 	/** @var string  */
 	private $remoteAddress;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Request $request, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Request $request, private readonly ConversationRenderer $conversationRenderer, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -44,7 +44,13 @@ class Index extends BaseSearch
 
 	protected function content(array $request = []): string
 	{
-		$search = (!empty($_GET['q']) ? trim(rawurldecode($_GET['q'])) : '');
+		if (isset($request['tag'])) {
+			$tag    = true;
+			$search = '#' . trim(rawurldecode($request['tag']));
+		} else {
+			$tag    = false;
+			$search = isset($request['q']) ? trim(rawurldecode($request['q'])) : '';
+		}
 
 		if (DI::config()->get('system', 'block_public') && !DI::userSession()->isAuthenticated()) {
 			throw new HTTPException\ForbiddenException(DI::l10n()->t('Public access denied.'));
@@ -87,12 +93,6 @@ class Index extends BaseSearch
 
 		Nav::setSelected('search');
 
-		$tag = false;
-		if (!empty($_GET['tag'])) {
-			$tag    = true;
-			$search = '#' . trim(rawurldecode($_GET['tag']));
-		}
-
 		// construct a wrapper for the search header
 		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('content_wrapper.tpl'), [
 			'name'        => 'search-header',
@@ -117,8 +117,8 @@ class Index extends BaseSearch
 
 			self::tryRedirectToProfile($search);
 
-			if (!empty($_GET['search-option'])) {
-				switch ($_GET['search-option']) {
+			if (isset($request['search-option'])) {
+				switch ($request['search-option']) {
 					case 'fulltext':
 						break;
 					case 'tags':
@@ -165,7 +165,7 @@ class Index extends BaseSearch
 			);
 		}
 
-		$last_uriid = isset($_GET['last_uriid']) ? intval($_GET['last_uriid']) : 0;
+		$last_uriid = isset($request['last_uriid']) ? intval($request['last_uriid']) : 0;
 
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
@@ -207,7 +207,7 @@ class Index extends BaseSearch
 
 		$this->logger->info('Start Conversation.', ['q' => $search]);
 
-		$o .= DI::conversation()->render($items, Conversation::MODE_SEARCH, false, false, 'commented', DI::userSession()->getLocalUserId());
+		$o .= $this->conversationRenderer->renderFlat($items, ConversationRenderer::MODE_SEARCH, false, DI::userSession()->getLocalUserId());
 
 		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader($request);

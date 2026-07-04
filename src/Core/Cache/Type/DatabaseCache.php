@@ -18,18 +18,11 @@ use Friendica\Util\DateTimeFormat;
  */
 class DatabaseCache extends AbstractCache implements ICanCache
 {
-	const NAME = 'database';
+	public const NAME = 'database';
 
-	/**
-	 * @var Database
-	 */
-	private $dba;
-
-	public function __construct(string $hostname, Database $dba)
+	public function __construct(string $hostname, private readonly Database $dba)
 	{
 		parent::__construct($hostname);
-
-		$this->dba = $dba;
 	}
 
 	/**
@@ -72,7 +65,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 	{
 		try {
 			$cache = $this->dba->selectFirst('cache', ['v'], [
-				'`k` = ? AND (`expires` >= ? OR `expires` = -1)', $key, DateTimeFormat::utcNow()
+				'`k` = ? AND (`expires` >= ? OR `expires` = -1)', $key, DateTimeFormat::utcNow(),
 			]);
 
 			if ($this->dba->isResult($cache)) {
@@ -103,13 +96,13 @@ class DatabaseCache extends AbstractCache implements ICanCache
 				$fields = [
 					'v'       => serialize($value),
 					'expires' => DateTimeFormat::utc('now + ' . $ttl . 'seconds'),
-					'updated' => DateTimeFormat::utcNow()
+					'updated' => DateTimeFormat::utcNow(),
 				];
 			} else {
 				$fields = [
 					'v'       => serialize($value),
 					'expires' => -1,
-					'updated' => DateTimeFormat::utcNow()
+					'updated' => DateTimeFormat::utcNow(),
 				];
 			}
 

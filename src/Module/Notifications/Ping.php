@@ -9,7 +9,6 @@ namespace Friendica\Module\Notifications;
 
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
-use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Contact\Introduction\Repository\Introduction;
 use Friendica\Content\GroupManager;
@@ -42,44 +41,27 @@ use Psr\Log\LoggerInterface;
 
 class Ping extends BaseModule
 {
-	/** @var SystemMessages */
-	private $systemMessages;
-	/** @var Repository\Notification */
-	private $notificationRepo;
-	/** @var Introduction */
-	private $introductionRepo;
-	/** @var Factory\FormattedNavNotification */
-	private $formattedNavNotification;
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var IManagePersonalConfigValues */
-	private $pconfig;
-	/** @var Database */
-	private $database;
-	/** @var ICanCache */
-	private $cache;
-	/** @var Repository\Notify */
-	private $notify;
-	/** @var AppHelper */
-	private $appHelper;
-
-	public function __construct(AppHelper $appHelper, Repository\Notify $notify, ICanCache $cache, Database $database, IManagePersonalConfigValues $pconfig, IManageConfigValues $config, IHandleUserSessions $session, SystemMessages $systemMessages, Repository\Notification $notificationRepo, Introduction $introductionRepo, Factory\FormattedNavNotification $formattedNavNotification, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly Repository\Notify $notify,
+		private readonly ICanCache $cache,
+		private readonly Database $database,
+		private readonly IManagePersonalConfigValues $pconfig,
+		private readonly IManageConfigValues $config,
+		private readonly IHandleUserSessions $session,
+		private readonly SystemMessages $systemMessages,
+		private readonly Repository\Notification $notificationRepo,
+		private readonly Introduction $introductionRepo,
+		private readonly Factory\FormattedNavNotification $formattedNavNotification,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->systemMessages           = $systemMessages;
-		$this->notificationRepo         = $notificationRepo;
-		$this->introductionRepo         = $introductionRepo;
-		$this->formattedNavNotification = $formattedNavNotification;
-		$this->session                  = $session;
-		$this->config                   = $config;
-		$this->pconfig                  = $pconfig;
-		$this->database                 = $database;
-		$this->cache                    = $cache;
-		$this->notify                   = $notify;
-		$this->appHelper                = $appHelper;
 	}
 
 	protected function rawContent(array $request = [])
@@ -257,8 +239,8 @@ class Ping extends BaseModule
 		$data['notifications'] = $navNotifications;
 
 		$data['sysmsgs'] = [
-			'notice' => array_map([Strings::class, 'escapeHtml'], $this->systemMessages->flushNotices()),
-			'info'   => array_map([Strings::class, 'escapeHtml'], $this->systemMessages->flushInfos()),
+			'notice' => array_map(Strings::escapeHtml(...), $this->systemMessages->flushNotices()),
+			'info'   => array_map(Strings::escapeHtml(...), $this->systemMessages->flushInfos()),
 		];
 
 		if (isset($_GET['callback'])) {

@@ -38,7 +38,7 @@ class Tag extends BaseDataTransferObject
 	public function __construct(BaseURL $baseUrl, array $tag, array $history = [], bool $following = false)
 	{
 		$this->name      = $tag['name'];
-		$this->url       = $baseUrl . '/search?tag=' . urlencode(strtolower($this->name));
+		$this->url       = $baseUrl . '/search?tag=' . urlencode(strtolower((string) $this->name));
 		$this->history   = $history;
 		$this->following = $following;
 	}

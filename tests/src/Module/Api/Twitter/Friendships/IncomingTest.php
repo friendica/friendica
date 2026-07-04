@@ -18,7 +18,7 @@ class IncomingTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiFriendshipsIncoming()
+	public function testApiFriendshipsIncoming(): void
 	{
 		$response = (new Incoming(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
@@ -31,9 +31,8 @@ class IncomingTest extends ApiTestCase
 	/**
 	 * Test the api_friendships_incoming() function an undefined cursor GET variable.
 	 *
-	 * @return void
 	 */
-	public function testApiFriendshipsIncomingWithUndefinedCursor()
+	public function testApiFriendshipsIncomingWithUndefinedCursor(): void
 	{
 		self::markTestIncomplete('Needs refactoring of Incoming - replace filter_input() with $request parameter checks');
 

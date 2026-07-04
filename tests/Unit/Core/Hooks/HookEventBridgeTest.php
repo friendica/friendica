@@ -17,6 +17,10 @@ use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\ModuleContentEvent;
+use Friendica\Event\ModuleInitEvent;
+use Friendica\Event\ModulePostEvent;
+use Friendica\Event\ModulePostRecipientEvent;
 use PHPUnit\Framework\TestCase;
 
 class HookEventBridgeTest extends TestCase
@@ -110,22 +114,26 @@ class HookEventBridgeTest extends TestCase
 			HtmlFilterEvent::MOD_PROFILE_CONTENT              => 'onHtmlFilterEvent',
 			HtmlFilterEvent::JOT_TOOL                         => 'onHtmlFilterEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END                => 'onHtmlFilterEvent',
+			ModuleInitEvent::MODULE_INIT                      => 'onModuleInitEvent',
+			ModulePostEvent::MODULE_POST                      => 'onModulePostEvent',
+			ModuleContentEvent::MODULE_CONTENT                => 'onModuleContentEvent',
+			ModulePostRecipientEvent::MODULE_POST_RECIPIENT   => 'onModulePostRecipientEvent',
 		];
 
 		$this->assertSame(
 			$expected,
-			HookEventBridge::getStaticSubscribedEvents()
+			HookEventBridge::getStaticSubscribedEvents(),
 		);
 
 		foreach ($expected as $methodName) {
 			$this->assertTrue(
 				method_exists(HookEventBridge::class, $methodName),
-				$methodName . '() is not defined'
+				$methodName . '() is not defined',
 			);
 
 			$this->assertTrue(
 				(new \ReflectionMethod(HookEventBridge::class, $methodName))->isStatic(),
-				$methodName . '() is not static'
+				$methodName . '() is not static',
 			);
 		}
 	}
@@ -139,15 +147,12 @@ class HookEventBridgeTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider getNamedEventData
-	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('getNamedEventData')]
 	public function testOnNamedEventCallsHook($name, $expected): void
 	{
 		$event = new Event($name);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected) {
 			$this->assertSame($expected, $name);
@@ -167,9 +172,7 @@ class HookEventBridgeTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider getConfigLoadedEventData
-	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('getConfigLoadedEventData')]
 	public function testOnConfigLoadedEventCallsHookWithCorrectValue($name, $expected): void
 	{
 		$config = $this->createStub(ConfigFileManager::class);
@@ -177,7 +180,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ConfigLoadedEvent($name, $config);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected, $config) {
 			$this->assertSame($expected, $name);
@@ -197,9 +199,7 @@ class HookEventBridgeTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider getCollectRoutesEventData
-	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('getCollectRoutesEventData')]
 	public function testOnCollectRoutesEventCallsHookWithCorrectValue($name, $expected): void
 	{
 		$routeCollector = $this->createStub(RouteCollector::class);
@@ -207,7 +207,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new CollectRoutesEvent($name, $routeCollector);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected, $routeCollector) {
 			$this->assertSame($expected, $name);
@@ -224,7 +223,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, ['model' => ['uid' => -1]]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, array $data): array {
 			$this->assertSame('lockview_content', $name);
@@ -246,7 +244,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, ['item' => ['id' => -1]]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, array $data): array {
 			$this->assertSame('post_local', $name);
@@ -268,7 +265,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, ['item' => ['id' => -1]]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, array $data): array {
 			$this->assertSame('post_local_end', $name);
@@ -290,7 +286,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_START, ['item' => ['id' => -1]]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, array $data): array {
 			$this->assertSame('prepare_body_init', $name);
@@ -312,7 +307,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_START, ['request' => ['album' => -1]]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, array $data): array {
 			$this->assertSame('photo_post_init', $name);
@@ -334,7 +328,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, int $data): int {
 			$this->assertSame('photo_post_end', $name);
@@ -351,7 +344,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, ['profile' => ['uid' => 0, 'name' => 'original']]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, array $data): array {
 			$this->assertSame('profile_sidebar_enter', $name);
@@ -373,7 +365,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_HTML_START, ['bbcode2html' => '[b]original[/b]']);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, string $data): string {
 			$this->assertSame('bbcode', $name);
@@ -395,7 +386,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::HTML_TO_BBCODE_END, ['html2bbcode' => '<b>original</b>']);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, string $data): string {
 			$this->assertSame('html2bbcode', $name);
@@ -417,7 +407,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_MARKDOWN_END, ['bbcode2markdown' => '[b]original[/b]']);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, string $data): string {
 			$this->assertSame('bb2diaspora', $name);
@@ -439,7 +428,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_CREATED, ['event' => ['id' => 123]]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, int $data): int {
 			$this->assertSame('event_created', $name);
@@ -456,7 +444,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER, ['uid' => 123]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, int $data): int {
 			$this->assertSame('register_account', $name);
@@ -473,7 +460,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REMOVE, ['user' => ['uid' => 123]]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, array $data): array {
 			$this->assertSame('remove_user', $name);
@@ -490,7 +476,6 @@ class HookEventBridgeTest extends TestCase
 		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => ['id' => 123]]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, int $data): int {
 			$this->assertSame('event_updated', $name);
@@ -571,15 +556,12 @@ class HookEventBridgeTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider getArrayFilterEventData
-	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('getArrayFilterEventData')]
 	public function testOnArrayFilterEventCallsHookWithCorrectValue($name, $expected): void
 	{
 		$event = new ArrayFilterEvent($name, ['original']);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected) {
 			$this->assertSame($expected, $name);
@@ -608,15 +590,12 @@ class HookEventBridgeTest extends TestCase
 		];
 	}
 
-	/**
-	 * @dataProvider getHtmlFilterEventData
-	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('getHtmlFilterEventData')]
 	public function testOnHtmlFilterEventCallsHookWithCorrectValue($name, $expected): void
 	{
 		$event = new HtmlFilterEvent($name, 'original');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
-		$reflectionProperty->setAccessible(true);
 
 		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected) {
 			$this->assertSame($expected, $name);
@@ -626,5 +605,109 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onHtmlFilterEvent($event);
+	}
+
+	public static function getModuleInitEventData(): array
+	{
+		return [
+			'Home'         => ['friendica.module_init', 'home_mod_init', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['friendica.module_init', 'photos_mod_init', 'photos', \Friendica\LegacyModule::class],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('getModuleInitEventData')]
+	public function testOnModuleInitEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	{
+		$event = new ModuleInitEvent($name, $moduleName, $moduleClass);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected) {
+			$this->assertSame($expected, $name);
+			$this->assertSame('', $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onModuleInitEvent($event);
+	}
+
+	public static function getModulePostEventData(): array
+	{
+		return [
+			'Home'         => ['friendica.module_post', 'home_mod_post', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['friendica.module_post', 'photos_mod_post', 'photos', \Friendica\LegacyModule::class],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('getModulePostEventData')]
+	public function testOnModulePostEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	{
+		$event = new ModulePostEvent($name, $moduleName, $moduleClass, ['original']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected) {
+			$this->assertSame($expected, $name);
+			$this->assertSame(['original'], $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onModulePostEvent($event);
+	}
+
+	public static function getModuleContentEventData(): array
+	{
+		return [
+			'Home'         => ['friendica.module_content', 'Friendica\Module\Home_mod_content', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['friendica.module_content', 'Friendica\LegacyModule_mod_content', 'photos', \Friendica\LegacyModule::class],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('getModuleContentEventData')]
+	public function testOnModuleContentEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	{
+		$event = new ModuleContentEvent($name, $moduleName, $moduleClass, 'original');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data) use ($expected) {
+			$this->assertSame($expected, $name);
+			$this->assertSame(['content' => 'original'], $data);
+
+			$data['content'] = 'changed';
+
+			return $data;
+		});
+
+		HookEventBridge::onModuleContentEvent($event);
+
+		$this->assertSame('changed', $event->getContent());
+	}
+
+	public static function getModulePostRecipientEventData(): array
+	{
+		return [
+			'Home'         => ['friendica.module_post_recipient', 'home_post_recipient', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['friendica.module_post_recipient', 'photos_post_recipient', 'photos', \Friendica\LegacyModule::class],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('getModulePostRecipientEventData')]
+	public function testOnModulePostRecipientEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	{
+		$event = new ModulePostRecipientEvent($name, $moduleName, $moduleClass, 'original');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, $data) use ($expected) {
+			$this->assertSame($expected, $name);
+			$this->assertSame('original', $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onModulePostRecipientEvent($event);
 	}
 }

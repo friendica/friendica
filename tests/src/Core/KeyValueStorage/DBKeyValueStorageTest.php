@@ -42,8 +42,8 @@ class DBKeyValueStorageTest extends MockedTestCase
 		return new DBKeyValueStorage($this->database);
 	}
 
-	/** @dataProvider dataTests */
-	public function testUpdatedAt($k, $v)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testUpdatedAt($k, $v): void
 	{
 		$instance = $this->getInstance();
 
@@ -70,14 +70,14 @@ class DBKeyValueStorageTest extends MockedTestCase
 		self::assertGreaterThanOrEqual($updateAt, $updateAtAfter);
 	}
 
-	public function testInstance()
+	public function testInstance(): void
 	{
 		$instance = $this->getInstance();
 
-		self::assertInstanceOf(IManageKeyValuePairs::class, $instance);
+		self::assertInstanceOf(IManageKeyValuePairs::class, $instance); // @phpstan-ignore staticMethod.alreadyNarrowedType
 	}
 
-	public function dataTests(): array
+	public static function dataTests(): array
 	{
 		return [
 			'string'       => ['k' => 'data', 'v' => 'it'],
@@ -91,10 +91,8 @@ class DBKeyValueStorageTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataTests
-	 */
-	public function testGetSetDelete($k, $v)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testGetSetDelete($k, $v): void
 	{
 		$instance = $this->getInstance();
 
@@ -109,10 +107,8 @@ class DBKeyValueStorageTest extends MockedTestCase
 		self::assertNull($instance[$k]);
 	}
 
-	/**
-	 * @dataProvider dataTests
-	 */
-	public function testSetOverride($k, $v)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testSetOverride($k, $v): void
 	{
 		$instance = $this->getInstance();
 
@@ -127,10 +123,8 @@ class DBKeyValueStorageTest extends MockedTestCase
 		self::assertEquals('another_value', $instance[$k]);
 	}
 
-	/**
-	 * @dataProvider dataTests
-	 */
-	public function testOffsetSetDelete($k, $v)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testOffsetSetDelete($k, $v): void
 	{
 		$instance = $this->getInstance();
 

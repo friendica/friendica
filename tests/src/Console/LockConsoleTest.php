@@ -27,24 +27,24 @@ class LockConsoleTest extends ConsoleTestCase
 	 */
 	private $lockMock;
 
-	protected function setUp() : void
+	protected function setUp(): void
 	{
 		parent::setUp();
 
 		Mockery::getConfiguration()->setConstantsMap([
 			Mode::class => [
-				'DBCONFIGAVAILABLE' => 0
-			]
+				'DBCONFIGAVAILABLE' => 0,
+			],
 		]);
 
 		$this->appMode = Mockery::mock(App\Mode::class);
 		$this->appMode->shouldReceive('has')
-		        ->andReturn(true);
+				->andReturn(true);
 
 		$this->lockMock = Mockery::mock(ICanLock::class);
 	}
 
-	public function testList()
+	public function testList(): void
 	{
 		$this->lockMock
 			->shouldReceive('getLocks')
@@ -57,7 +57,7 @@ class LockConsoleTest extends ConsoleTestCase
 		self::assertEquals("Listing all Locks:\ntest\ntest2\n2 locks found\n", $txt);
 	}
 
-	public function testListPrefix()
+	public function testListPrefix(): void
 	{
 		$this->lockMock
 			->shouldReceive('getLocks')
@@ -72,7 +72,7 @@ class LockConsoleTest extends ConsoleTestCase
 		self::assertEquals("Listing all Locks starting with \"test\":\ntest\ntest2\n2 locks found\n", $txt);
 	}
 
-	public function testDelLock()
+	public function testDelLock(): void
 	{
 		$this->lockMock
 			->shouldReceive('release')
@@ -87,7 +87,7 @@ class LockConsoleTest extends ConsoleTestCase
 		self::assertEquals("Lock 'test' released.\n", $txt);
 	}
 
-	public function testDelUnknownLock()
+	public function testDelUnknownLock(): void
 	{
 		$this->lockMock
 			->shouldReceive('release')
@@ -102,7 +102,7 @@ class LockConsoleTest extends ConsoleTestCase
 		self::assertEquals("Couldn't release Lock 'test'\n", $txt);
 	}
 
-	public function testSetLock()
+	public function testSetLock(): void
 	{
 		$this->lockMock
 			->shouldReceive('isLocked')
@@ -122,7 +122,7 @@ class LockConsoleTest extends ConsoleTestCase
 		self::assertEquals("Lock 'test' acquired.\n", $txt);
 	}
 
-	public function testSetLockIsLocked()
+	public function testSetLockIsLocked(): void
 	{
 		$this->lockMock
 			->shouldReceive('isLocked')
@@ -137,7 +137,7 @@ class LockConsoleTest extends ConsoleTestCase
 		self::assertEquals("[Error] 'test' is already set.\n", $txt);
 	}
 
-	public function testSetLockNotWorking()
+	public function testSetLockNotWorking(): void
 	{
 		$this->lockMock
 			->shouldReceive('isLocked')
@@ -157,7 +157,7 @@ class LockConsoleTest extends ConsoleTestCase
 		self::assertEquals("[Error] Unable to lock 'test'.\n", $txt);
 	}
 
-	public function testReleaseAll()
+	public function testReleaseAll(): void
 	{
 		$this->lockMock
 			->shouldReceive('releaseAll')
@@ -170,7 +170,7 @@ class LockConsoleTest extends ConsoleTestCase
 		self::assertEquals("Locks successfully cleared.\n", $txt);
 	}
 
-	public function testReleaseAllFailed()
+	public function testReleaseAllFailed(): void
 	{
 		$this->lockMock
 			->shouldReceive('releaseAll')
@@ -183,7 +183,7 @@ class LockConsoleTest extends ConsoleTestCase
 		self::assertEquals("[Error] Unable to clear the locks.\n", $txt);
 	}
 
-	public function testGetHelp()
+	public function testGetHelp(): void
 	{
 		// Usable to purposely fail if new commands are added without taking tests into account
 		$theHelp = <<<HELP

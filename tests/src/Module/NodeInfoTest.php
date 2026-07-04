@@ -29,7 +29,7 @@ class NodeInfoTest extends FixtureTestCase
 		$this->httpExceptionMock = \Mockery::mock(HTTPException::class);
 	}
 
-	public function testNodeInfo110()
+	public function testNodeInfo110(): void
 	{
 		$response = (new NodeInfo110(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
 			->run($this->httpExceptionMock);
@@ -50,7 +50,7 @@ class NodeInfoTest extends FixtureTestCase
 		self::assertIsArray($json->services->outbound);
 	}
 
-	public function testNodeInfo120()
+	public function testNodeInfo120(): void
 	{
 		$response = (new NodeInfo120(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
 			->run($this->httpExceptionMock);
@@ -70,7 +70,7 @@ class NodeInfoTest extends FixtureTestCase
 		self::assertIsArray($json->services->outbound);
 	}
 
-	public function testNodeInfo210()
+	public function testNodeInfo210(): void
 	{
 		$response = (new NodeInfo210(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
 			->run($this->httpExceptionMock);

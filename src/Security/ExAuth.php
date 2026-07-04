@@ -57,27 +57,6 @@ class ExAuth
 	private $host;
 
 	/**
-	 * @var App\Mode
-	 */
-	private $appMode;
-	/**
-	 * @var IManageConfigValues
-	 */
-	private $config;
-	/**
-	 * @var IManagePersonalConfigValues
-	 */
-	private $pConfig;
-	/**
-	 * @var Database
-	 */
-	private $dba;
-	/**
-	 * @var App\BaseURL
-	 */
-	private $baseURL;
-
-	/**
 	 * @param App\Mode                    $appMode
 	 * @param IManageConfigValues         $config
 	 * @param IManagePersonalConfigValues $pConfig
@@ -86,15 +65,9 @@ class ExAuth
 	 *
 	 * @throws Exception
 	 */
-	public function __construct(App\Mode $appMode, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Database $dba, App\BaseURL $baseURL)
+	public function __construct(private readonly App\Mode $appMode, private readonly IManageConfigValues $config, private readonly IManagePersonalConfigValues $pConfig, private readonly Database $dba, private readonly App\BaseURL $baseURL)
 	{
-		$this->appMode = $appMode;
-		$this->config  = $config;
-		$this->pConfig = $pConfig;
-		$this->dba     = $dba;
-		$this->baseURL = $baseURL;
-
-		$this->bDebug = (int) $config->get('jabber', 'debug');
+		$this->bDebug = (int) $this->config->get('jabber', 'debug');
 
 		openlog('auth_ejabberd', LOG_PID, LOG_USER);
 
@@ -140,30 +113,26 @@ class ExAuth
 			$sData = fgets(STDIN, $iLength + 1);
 			$this->writeLog(LOG_DEBUG, 'received data: ' . $sData);
 			$aCommand = explode(':', $sData);
-			if (is_array($aCommand)) {
-				switch ($aCommand[0]) {
-					case 'isuser':
-						// Check the existence of a given username
-						$this->isUser($aCommand);
-						break;
-					case 'auth':
-						// Check if the given password is correct
-						$this->auth($aCommand);
-						break;
-					case 'setpass':
-						// We don't accept the setting of passwords here
-						$this->writeLog(LOG_NOTICE, 'setpass command disabled');
-						fwrite(STDOUT, pack('nn', 2, 0));
-						break;
-					default:
-						// We don't know the given command
-						$this->writeLog(LOG_NOTICE, 'unknown command ' . $aCommand[0]);
-						fwrite(STDOUT, pack('nn', 2, 0));
-						break;
-				}
-			} else {
-				$this->writeLog(LOG_NOTICE, 'invalid command string ' . $sData);
-				fwrite(STDOUT, pack('nn', 2, 0));
+
+			switch ($aCommand[0]) {
+				case 'isuser':
+					// Check the existence of a given username
+					$this->isUser($aCommand);
+					break;
+				case 'auth':
+					// Check if the given password is correct
+					$this->auth($aCommand);
+					break;
+				case 'setpass':
+					// We don't accept the setting of passwords here
+					$this->writeLog(LOG_NOTICE, 'setpass command disabled');
+					fwrite(STDOUT, pack('nn', 2, 0));
+					break;
+				default:
+					// We don't know the given command
+					$this->writeLog(LOG_NOTICE, 'unknown command ' . $aCommand[0]);
+					fwrite(STDOUT, pack('nn', 2, 0));
+					break;
 			}
 		}
 	}

@@ -30,18 +30,9 @@ use Psr\Log\LoggerInterface;
  */
 class Statuses extends BaseApi
 {
-	/** @var TwitterStatus */
-	private $twitterStatus;
-
-	/** @var Database */
-	private $dba;
-
-	public function __construct(Database $dba, TwitterStatus $twitterStatus, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(private readonly Database $dba, private readonly TwitterStatus $twitterStatus, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->dba           = $dba;
-		$this->twitterStatus = $twitterStatus;
 	}
 
 	protected function rawContent(array $request = [])

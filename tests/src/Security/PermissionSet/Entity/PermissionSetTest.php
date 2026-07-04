@@ -12,7 +12,7 @@ use Friendica\Test\MockedTestCase;
 
 class PermissionSetTest extends MockedTestCase
 {
-	public function dateAllowedContacts()
+	public static function dateAllowedContacts()
 	{
 		return [
 			'default' => [
@@ -28,17 +28,16 @@ class PermissionSetTest extends MockedTestCase
 
 	/**
 	 * Test if the call "withAllowedContacts()" creates a clone
-	 *
-	 * @dataProvider dateAllowedContacts
 	 */
-	public function testWithAllowedContacts(int $id, array $allow_cid, array $allow_gid, array $deny_cid, array $deny_gid, array $update_cid)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dateAllowedContacts')]
+	public function testWithAllowedContacts(int $id, array $allow_cid, array $allow_gid, array $deny_cid, array $deny_gid, array $update_cid): void
 	{
 		$permissionSetOrig = new PermissionSet(
 			$id,
 			$allow_cid,
 			$allow_gid,
 			$deny_cid,
-			$deny_gid
+			$deny_gid,
 		);
 
 		$permissionSetNew = $permissionSetOrig->withAllowedContacts($update_cid);

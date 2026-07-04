@@ -31,7 +31,7 @@ class PermissionSetTest extends FixtureTestCase
 		$this->factory    = DI::permissionSetFactory();
 	}
 
-	public function testSelectOneByIdPublic()
+	public function testSelectOneByIdPublic(): void
 	{
 		$permissionSet = $this->repository->selectPublicForUser(1);
 
@@ -40,14 +40,14 @@ class PermissionSetTest extends FixtureTestCase
 		self::assertEmpty($permissionSet->allow_gid);
 		self::assertEmpty($permissionSet->deny_cid);
 		self::assertEmpty($permissionSet->deny_gid);
-		self::assertEmpty(PermissionSetRepository::PUBLIC, $permissionSet->id);
+		self::assertSame(PermissionSetRepository::PUBLIC, $permissionSet->id);
 		self::assertEquals(1, $permissionSet->uid);
 	}
 
 	/**
 	 * Test create/update PermissionSets
 	 */
-	public function testSaving()
+	public function testSaving(): void
 	{
 		$permissionSet = $this->factory->createFromString(42, '', '<~>');
 
@@ -84,17 +84,17 @@ class PermissionSetTest extends FixtureTestCase
 		foreach ($expected as $outputPermissionSet) {
 			self::assertCount(1, $actual->filter(function (PermissionSet $actualPermissionSet) use ($outputPermissionSet) {
 				return (
-					$actualPermissionSet->uid == $outputPermissionSet->uid &&
-					$actualPermissionSet->allow_cid == $outputPermissionSet->allow_cid &&
-					$actualPermissionSet->allow_gid == $outputPermissionSet->allow_gid &&
-					$actualPermissionSet->deny_cid == $outputPermissionSet->deny_cid &&
-					$actualPermissionSet->deny_gid == $outputPermissionSet->deny_gid
+					$actualPermissionSet->uid == $outputPermissionSet->uid
+					&& $actualPermissionSet->allow_cid == $outputPermissionSet->allow_cid
+					&& $actualPermissionSet->allow_gid == $outputPermissionSet->allow_gid
+					&& $actualPermissionSet->deny_cid == $outputPermissionSet->deny_cid
+					&& $actualPermissionSet->deny_gid == $outputPermissionSet->deny_gid
 				);
 			}), 'PermissionSet not found: ' . print_r($outputPermissionSet, true));
 		}
 	}
 
-	public function dataSet()
+	public static function dataSet()
 	{
 		return [
 			'standard' => [
@@ -193,7 +193,7 @@ class PermissionSetTest extends FixtureTestCase
 							new PermissionSet(42, [], [], [], []),
 						]),
 					],
-				]
+				],
 			],
 			'nothing' => [
 				'group_member'   => [],
@@ -221,7 +221,7 @@ class PermissionSetTest extends FixtureTestCase
 						],
 						'output' => new PermissionSets(),
 					],
-				]
+				],
 			],
 			'with_groups' => [
 				'group_member' => [
@@ -348,10 +348,8 @@ class PermissionSetTest extends FixtureTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataSet
-	 */
-	public function testSelectContactId(array $group_member, array $inputPermissionSets, array $assertions)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataSet')]
+	public function testSelectContactId(array $group_member, array $permissionSets, array $assertions): void
 	{
 		/** @var Database $db */
 		$db = $this->dice->create(Database::class);
@@ -360,7 +358,7 @@ class PermissionSetTest extends FixtureTestCase
 			$db->insert('group_member', $gmember, true);
 		}
 
-		foreach ($inputPermissionSets as $inputPermissionSet) {
+		foreach ($permissionSets as $inputPermissionSet) {
 			$db->insert('permissionset', $inputPermissionSet, true);
 		}
 
@@ -371,7 +369,7 @@ class PermissionSetTest extends FixtureTestCase
 		}
 	}
 
-	public function testSelectOneByIdInvalid()
+	public function testSelectOneByIdInvalid(): void
 	{
 		self::expectException(PermissionSetNotFoundException::class);
 		self::expectExceptionMessage('PermissionSet with id -1 for user 42 doesn\'t exist.');
@@ -379,19 +377,17 @@ class PermissionSetTest extends FixtureTestCase
 		$this->repository->selectOneById(-1, 42);
 	}
 
-	/**
-	 * @dataProvider dataSet
-	 */
-	public function testSelectOneById(array $group_member, array $inputPermissionSets, array $assertions)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataSet')]
+	public function testSelectOneById(array $group_member, array $permissionSets, array $assertions): void
 	{
-		if (count($inputPermissionSets) === 0) {
+		if (count($permissionSets) === 0) {
 			self::markTestSkipped('Nothing to assert.');
 		}
 
 		/** @var Database $db */
 		$db = $this->dice->create(Database::class);
 
-		foreach ($inputPermissionSets as $inputPermissionSet) {
+		foreach ($permissionSets as $inputPermissionSet) {
 			$db->insert('permissionset', $inputPermissionSet);
 			$id = $db->lastInsertId();
 

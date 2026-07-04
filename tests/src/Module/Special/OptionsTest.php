@@ -27,13 +27,13 @@ class OptionsTest extends FixtureTestCase
 		$this->httpExceptionMock = \Mockery::mock(HTTPException::class);
 	}
 
-	public function testOptionsAll()
+	public function testOptionsAll(): void
 	{
 		$this->useHttpMethod(Router::OPTIONS);
 
 		$response = (new Options(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock);
 
-		self::assertEmpty((string)$response->getBody());
+		self::assertEmpty((string) $response->getBody());
 		self::assertEquals(204, $response->getStatusCode());
 		self::assertEquals('No Content', $response->getReasonPhrase());
 		self::assertEquals([
@@ -43,7 +43,7 @@ class OptionsTest extends FixtureTestCase
 		self::assertEquals(implode(',', Router::ALLOWED_METHODS), $response->getHeaderLine('Allow'));
 	}
 
-	public function testOptionsSpecific()
+	public function testOptionsSpecific(): void
 	{
 		$this->useHttpMethod(Router::OPTIONS);
 
@@ -51,7 +51,7 @@ class OptionsTest extends FixtureTestCase
 			'AllowedMethods' => [Router::GET, Router::POST],
 		]))->run($this->httpExceptionMock);
 
-		self::assertEmpty((string)$response->getBody());
+		self::assertEmpty((string) $response->getBody());
 		self::assertEquals(204, $response->getStatusCode());
 		self::assertEquals('No Content', $response->getReasonPhrase());
 		self::assertEquals([

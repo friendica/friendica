@@ -28,7 +28,7 @@ class DiceContainerTest extends TestCase
 
 		$container = DiceContainer::fromBasePath($root->url());
 
-		$this->assertInstanceOf(Container::class, $container);
+		$this->assertInstanceOf(Container::class, $container); // @phpstan-ignore method.alreadyNarrowedType
 	}
 
 	public function testCreateReturnsObject(): void

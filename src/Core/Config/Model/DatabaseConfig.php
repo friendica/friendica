@@ -61,7 +61,7 @@ class DatabaseConfig implements IManageConfigValues
 	}
 
 	/** {@inheritDoc} */
-	public function get(string $cat, string $key = null, $default_value = null)
+	public function get(string $cat, ?string $key = null, $default_value = null)
 	{
 		return $this->cache->get($cat, $key) ?? $default_value;
 	}

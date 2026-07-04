@@ -8,7 +8,6 @@
 namespace Friendica\Console;
 
 use Friendica\App;
-use Friendica\Database\Database;
 use Friendica\Model\Contact;
 use RuntimeException;
 
@@ -23,15 +22,6 @@ use RuntimeException;
 class GlobalCommunitySilence extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
-
-	/**
-	 * @var App\Mode
-	 */
-	private $appMode;
-	/**
-	 * @var Database
-	 */
-	private $dba;
 
 	protected function getHelp()
 	{
@@ -53,12 +43,11 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(App\Mode $appMode, Database $dba, array $argv = null)
-	{
+	public function __construct(
+		private readonly App\Mode $appMode,
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->appMode = $appMode;
-		$this->dba     = $dba;
 	}
 
 	protected function doExecute(): int
@@ -83,8 +72,7 @@ HELP;
 		}
 
 		$contact_id = Contact::getIdForURL($this->getArgument(0));
-		if ($contact_id) {
-			Contact::update(['hidden' => true], ['id' => $contact_id]);
+		if (Contact::hide($contact_id)) {
 			$this->out('The account has been successfully silenced from the global community page.');
 		} else {
 			throw new RuntimeException('Could not find any public contact entry for this URL (' . $this->getArgument(0) . ')');

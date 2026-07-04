@@ -22,10 +22,9 @@ use Psr\Log\NullLogger;
 
 /**
  * Annotation necessary because of Hook calls
- *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
  */
+#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class EMailerTest extends MockedTestCase
 {
 	use VFSTrait;
@@ -46,7 +45,7 @@ class EMailerTest extends MockedTestCase
 
 		$this->setUpVfsDir();
 
-		$this->config  = \Mockery::mock(IManageConfigValues::class);
+		$this->config = \Mockery::mock(IManageConfigValues::class);
 		$this->config->shouldReceive('get')->withArgs(['config', 'sender_email'])->andReturn('test@friendica.local')->once();
 		$this->config->shouldReceive('get')->withArgs(['config', 'sitename', 'Friendica Social Network'])->andReturn('Friendica Social Network')->once();
 		$this->config->shouldReceive('get')->withArgs(['system', 'sendmail_params', true])->andReturn(true);
@@ -65,7 +64,7 @@ class EMailerTest extends MockedTestCase
 		parent::tearDown();
 	}
 
-	public function testEmail()
+	public function testEmail(): void
 	{
 		$this->pConfig->shouldReceive('get')->withArgs(['1', 'system', 'email_textonly'])->andReturn(false)->once();
 
@@ -98,13 +97,13 @@ class EMailerTest extends MockedTestCase
 		self::assertEquals("-f sender@friendica.local", EmailerSpy::$MAIL_DATA['parameters']);
 	}
 
-	public function testTwoMessageIds()
+	public function testTwoMessageIds(): void
 	{
 		$this->pConfig->shouldReceive('get')->withArgs(['1', 'system', 'email_textonly'])->andReturn(false)->once();
 
-		/** @var IEmail $preparedEmail */
+		/** @var IEmail|null $preparedEmail */
 		$preparedEmail = null;
-		/** @var IEmail $sentEMail */
+		/** @var IEmail|null $sentEMail */
 		$sentEMail = null;
 
 		$this->mockHookCallAll('emailer_send_prepare', $preparedEmail);

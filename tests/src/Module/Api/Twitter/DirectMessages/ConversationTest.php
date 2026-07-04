@@ -19,7 +19,7 @@ class ConversationTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiDirectMessagesBoxWithConversation()
+	public function testApiDirectMessagesBoxWithConversation(): void
 	{
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 

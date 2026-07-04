@@ -7,7 +7,7 @@
 
 <nav id="follow-sidebar" class="widget">
 	<h3>
-		<i class="fa fa-user-plus" aria-hidden="true"></i>
+		<i class="ri ri-user-add-line" aria-hidden="true"></i>
 		{{$connect}}
 	</h3>
 

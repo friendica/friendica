@@ -46,7 +46,7 @@ class BasicAuth
 		return (int) self::$current_user_id;
 	}
 
-	public static function setCurrentUserID(int $uid = null)
+	public static function setCurrentUserID(?int $uid = null)
 	{
 		self::$current_user_id = $uid;
 	}
@@ -70,7 +70,7 @@ class BasicAuth
 
 		// Support for known clients that doesn't send a source name
 		if (empty($source) && !empty($_SERVER['HTTP_USER_AGENT'])) {
-			if (str_contains($_SERVER['HTTP_USER_AGENT'], "Twidere")) {
+			if (str_contains((string) $_SERVER['HTTP_USER_AGENT'], "Twidere")) {
 				$source = 'Twidere';
 			}
 
@@ -110,7 +110,7 @@ class BasicAuth
 
 		// workaround for HTTP-auth in CGI mode
 		if (!empty($_SERVER['REDIRECT_REMOTE_USER'])) {
-			$userpass = base64_decode(substr($_SERVER["REDIRECT_REMOTE_USER"], 6));
+			$userpass = base64_decode(substr((string) $_SERVER["REDIRECT_REMOTE_USER"], 6));
 			if (!empty($userpass) && strpos($userpass, ':')) {
 				[$name, $password]        = explode(':', $userpass);
 				$_SERVER['PHP_AUTH_USER'] = $name;
@@ -122,7 +122,7 @@ class BasicAuth
 		$password = $_SERVER['PHP_AUTH_PW']   ?? '';
 
 		// allow "user@server" login (but ignore 'server' part)
-		$at = strstr($user, "@", true);
+		$at = strstr((string) $user, "@", true);
 		if ($at) {
 			$user = $at;
 		}
@@ -131,8 +131,8 @@ class BasicAuth
 		$record = null;
 
 		$addon_auth = [
-			'username'      => trim($user),
-			'password'      => trim($password),
+			'username'      => trim((string) $user),
+			'password'      => trim((string) $password),
 			'authenticated' => 0,
 			'user_record'   => null,
 		];
@@ -152,7 +152,7 @@ class BasicAuth
 			$record = $addon_auth['user_record'];
 		} else {
 			try {
-				$user_id = User::getIdFromPasswordAuthentication(trim($user), trim($password), true);
+				$user_id = User::getIdFromPasswordAuthentication(trim((string) $user), trim((string) $password), true);
 				$record  = DBA::selectFirst('user', [], ['uid' => $user_id]);
 			} catch (Exception) {
 				$record = [];

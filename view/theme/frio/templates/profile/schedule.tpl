@@ -5,7 +5,7 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <div class="generic-page-wrapper scheduled-posts-wrapper" style="background-color:transparent !important;box-shadow:none !important;border:none !important;">
-	<h1>{{$title}}</h1>
+<h2>{{$title}}</h2>
 {{foreach $schedule as $row}}
 <div id="tread-wapper-{{$row.item['uri-id']}}" class="tread-wrapper toplevel_item {{$row.item.network}} panel-default panel">
 	<div class="item-{{$row.item['uri-id']}} wall-item-container {{$row.item.network}} thread_level_1 panel-body h-entry" id="item-{{$row.item.guid}}">
@@ -33,13 +33,13 @@
 					</h4>
 					<div class="additional-info text-muted">
 						<div class="wall-item-ago" style="margin-left:0;">
-							<small> 
-							<span class="fa fa-clock"></span><time class="dt-scheduled" datetime="">{{$scheduled_at}} <span class="datetime">{{$row.scheduled_at}}</span></time>
+							<small>
+							<span class="ri ri-time-line"></span><time class="dt-scheduled" datetime="">{{$scheduled_at}} <span class="datetime">{{$row.scheduled_at}}</span></time>
 						{{** lockview() function will not work because post gets ID after going live **}}
 						{{if $row.item.private}}
 							<span class="navicon lock" title="{{$row.item.lock}}" data-toggle="tooltip">
 								<small>
-									<i class="fa fa-lock"></i>
+									<i class="ri ri-lock-line"></i>
 								</small>
 							</span>
 						{{/if}}
@@ -65,15 +65,15 @@
 			</div>
 			<div class="wall-item-bottom">
 				<div class="wall-item-links"></div>
-				<div class="wall-item-tags">
+				<div class="tags wall-item-tags">
 					{{foreach $row.item.hashtags as $tag}}
-						<span class="tag label btn-info sm">{{$tag nofilter}} <i class="fa fa-bolt" aria-hidden="true"></i></span>
+						<span class="tag hashtag label border border-default">{{$tag nofilter}}</span>
 					{{/foreach}}
 					{{foreach $row.item.mentions as $tag}}
-						<span class="mention label btn-warning sm">{{$tag nofilter}} <i class="fa fa-user" aria-hidden="true"></i></span>
+						<span class="tag mention label border border-primary">{{$tag nofilter}}</span>
 					{{/foreach}}
 					{{foreach $row.item.implicit_mentions as $tag}}
-						<span class="mention label label-default sm">{{$tag nofilter}} <i class="fa fa-eye-slash" aria-hidden="true"></i></span>
+						<span class="tag mention label border border-info">{{$tag nofilter}}</span>
 					{{/foreach}}
 				</div>
 			</div>
@@ -82,9 +82,9 @@
 							<span class="wall-item-actions-right">
 								<form action="{{$basefurl}}/profile/{{$nickname}}/schedule" method="post" style="width:100%;">
 									<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-									<button type="submit" name="delete" value="{{$row.id}}" title="{{$delete}}" class="btn-link navicon fa fa-trash" style="float:right;border:none!important;background:transparent!important;box-shadow:none;"></button>
+									<button type="submit" name="delete" value="{{$row.id}}" title="{{$delete}}" class="btn-link navicon ri ri-delete-bin-line" style="float:right;border:none!important;background:transparent!important;box-shadow:none;"></button>
 								</form>
-							</span>						
+							</span>
 						</div>
 					</div>
 		</div>
@@ -98,7 +98,7 @@
 		var target = $this.attr('data-aside');
 		var $canvas = $(target);
 		// only toggle aside if in mobile UI
-		if ( $(window).width() < 990){ 
+		if ( $(window).width() < 990){
 			var data = $canvas.data('bs.offcanvas');
 			var option = data ? 'close' : $this.data();
 			e.stopPropagation();
@@ -111,7 +111,7 @@
 	}
 	// build sidebar table of contents of scheduled posts
 	var posts = document.querySelectorAll('.tread-wrapper');
-	var toc_html  = '<div class="widget"><h3>{{$title}}</h3><ul role="menu">';
+	var toc_html  = '<div class="widget"><h3><i class="ri ri-time-line"></i> {{$title}}</h3><ul role="menu">';
 	for (var p=0; p < posts.length; p++){
 		toc_html += '<li class="menuitem"><a href="{{$baseurl}}/profile/{{$nickname}}/schedule#'+posts[p].id+'" onclick="closeAside(event,this);" data-close="offcanvas" data-aside="aside">'+posts[p].querySelector('.datetime').innerText+'</a></li>';
 	}

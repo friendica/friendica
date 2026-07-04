@@ -5,75 +5,163 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 
-<nav>
-	{{$langselector}}
-
+<header>
 	<div id="site-location">{{$sitelocation}}</div>
+	<div id="banner">{{$banner nofilter}}</div>
+</header>
+<nav id="topbar-first" role="menubar">
+	<ul>
+		<li class="mobile-aside-toggle" style="display:none;">
+			<a href="#">
+				<i class="icons icon-reorder"></i>
+			</a>
+		</li>
 
-	{{if $nav.logout}}<a id="nav-logout-link" class="nav-link {{$nav.logout.2}}" href="{{$nav.logout.0}}" title="{{$nav.logout.3}}">{{$nav.logout.1}}</a> {{/if}}
-	{{if $nav.login}}<a id="nav-login-link" class="nav-login-link {{$nav.login.2}}" href="{{$nav.login.0}}" title="{{$nav.login.3}}">{{$nav.login.1}}</a> {{/if}}
+		{{if $nav.back}}
+			<!-- Link back home to one's own instance, only visible to visitors -->
+			<li role="menuitem" id="nav-back-link" class="nav-menu">
+				<a accesskey="b" class="{{$nav.back.2}}" href="{{$nav.back.0}}" title="{{$nav.back.3}}">
+					<span class="desktop-view">{{$nav.back.1}}</span>
+					<i class="ri ri-xl ri-arrow-go-back-line ri-fw" aria-hidden="true"></i>
+					<span class="sr-only">{{$nav.back.1}}</span>
+				</a>
+			</li>
+		{{/if}}
+		{{if $nav.network}}
+			<li role="menuitem" id="nav-network-link" class="nav-menu {{$sel.network}}">
+				<a accesskey="n" class="{{$nav.network.2}}" href="{{$nav.network.0}}" title="{{$nav.network.3}}">
+					<span class="desktop-view">{{$nav.network.1}}</span>
+					<i class="icon s22 icon-th mobile-view"><span class="sr-only">{{$nav.network.1}}</span></i>
+					<span id="net-update" class="nav-notification"></span>
+				</a>
+			</li>
+		{{/if}}
+		{{if $nav.calendar}}
+			<li role="menuitem" id="nav-calendar-link" class="nav-menu {{$sel.calendar}}">
+				<a accesskey="e" class="{{$nav.calendar.2}} desktop-view" href="{{$nav.calendar.0}}" title="{{$nav.calendar.3}}">{{$nav.calendar.1}}</a>
+				<a class="{{$nav.calendar.2}} mobile-view" href="{{$nav.calendar.0}}" title="{{$nav.calendar.3}}"><i class="icon s22 icon-calendar"></i></a>
+			</li>
+		{{/if}}
+		{{if $nav.channel}}
+			<!-- Note: This is currently never displayed -->
+			<li role="menuitem" id="nav-channel-link" class="nav-menu {{$sel.channel}}">
+				<a accesskey="l" class="{{$nav.channel.2}} desktop-view" href="{{$nav.channel.0}}" title="{{$nav.channel.3}}">{{$nav.channel.1}}</a>
+				<a class="{{$nav.channel.2}} mobile-view" href="{{$nav.channel.0}}" title="{{$nav.channel.3}}"><i class="icon s22 icon-bullseye"></i></a>
+			</li>
+		{{/if}}
+		{{if $nav.community}}
+			<li role="menuitem" id="nav-community-link" class="nav-menu {{$sel.community}}">
+				<a accesskey="c" class="{{$nav.community.2}} desktop-view" href="{{$nav.community.0}}" title="{{$nav.community.3}}">{{$nav.community.1}}</a>
+				<a class="{{$nav.community.2}} mobile-view" href="{{$nav.community.0}}" title="{{$nav.community.3}}"><i class="icon s22 icon-bullseye"></i></a>
+			</li>
+		{{/if}}
 
-	<span id="nav-link-wrapper">
+		<li role="menu" aria-haspopup="true" id="nav-site-linkmenu" class="nav-menu-icon"><a><span class="icon s22 icon-question"><span class="sr-only">{{$nav.help.3}}</span></span></a>
+			<ul id="nav-site-menu" class="menu-popup">
+				{{if $nav.help}} <li role="menuitem"><a class="{{$nav.help.2}}" href="{{$nav.help.0}}" title="{{$nav.help.3}}">{{$nav.help.1}}</a></li>{{/if}}
+				<li role="menuitem"><a class="{{$nav.about.2}}" href="{{$nav.about.0}}" title="{{$nav.about.3}}">{{$nav.about.1}}</a></li>
+				{{if $nav.tos}}<li role="menuitem"><a class="{{$nav.tos.2}}" href="{{$nav.tos.0}}" title="{{$nav.tos.3}}">{{$nav.tos.1}}</a></li>{{/if}}
+				<li role="menuitem"><a class="{{$nav.directory.2}}" href="{{$nav.directory.0}}" title="{{$nav.directory.3}}">{{$nav.directory.1}}</a></li>
+			</ul>
+		</li>
 
-	{{if $nav.register}}<a id="nav-register-link" class="nav-commlink {{$nav.register.2}} {{$sel.register}}" href="{{$nav.register.0}}" title="{{$nav.register.3}}">{{$nav.register.1}}</a>{{/if}}
-
-	{{if $nav.help}} <a id="nav-help-link" class="nav-link {{$nav.help.2}}" target="friendica-help" href="{{$nav.help.0}}" title="{{$nav.help.3}}">{{$nav.help.1}}</a>{{/if}}
-
-	{{if $nav.tos}} <a id="nav-tos-link" class="nav-link {{$nav.tos.2}}" href="{{$nav.tos.0}}" title="{{$nav.tos.3}}">{{$nav.tos.1}}</a>{{/if}}
-
-	{{if $nav.apps}}<a id="nav-apps-link" class="nav-link {{$nav.apps.2}}" href="{{$nav.apps.0}}" title="{{$nav.apps.3}}">{{$nav.apps.1}}</a>{{/if}}
-
-	<a accesskey="s" id="nav-search-link" class="nav-link {{$nav.search.2}}" href="{{$nav.search.0}}" title="{{$nav.search.3}}">{{$nav.search.1}}</a>
-	<a id="nav-directory-link" class="nav-link {{$nav.directory.2}}" href="{{$nav.directory.0}}" title="{{$nav.directory.3}}">{{$nav.directory.1}}</a>
-
-	{{if $nav.admin}}<a accesskey="a" id="nav-admin-link" class="nav-link {{$nav.admin.2}}" href="{{$nav.admin.0}}" title="{{$nav.admin.3}}">{{$nav.admin.1}}</a>{{/if}}
-
-	{{if $nav.moderation}}<a accesskey="m" id="nav-moderation-link" class="nav-link {{$nav.moderation.2}}" href="{{$nav.moderation.0}}" title="{{$nav.moderation.3}}">{{$nav.moderation.1}}</a>{{/if}}
-
-	{{if $nav.network}}
-	<a accesskey="n" id="nav-network-link" class="nav-commlink {{$nav.network.2}} {{$sel.network}}" href="{{$nav.network.0}}" title="{{$nav.network.3}}">{{$nav.network.1}}</a>
-	<span id="net-update" class="nav-ajax-left"></span>
-	{{/if}}
-	{{if $nav.home}}
-	<a accesskey="p" id="nav-home-link" class="nav-commlink {{$nav.home.2}} {{$sel.home}}" href="{{$nav.home.0}}" title="{{$nav.home.3}}">{{$nav.home.1}}</a>
-	<span id="home-update" class="nav-ajax-left"></span>
-	{{/if}}
-	{{if $nav.channel}}
-	<a accesskey="l" id="nav-channel-link" class="nav-commlink {{$nav.channel.2}} {{$sel.channel}}" href="{{$nav.channel.0}}" title="{{$nav.channel.3}}">{{$nav.channel.1}}</a>
-	{{/if}}
-	{{if $nav.community}}
-	<a accesskey="c" id="nav-community-link" class="nav-commlink {{$nav.community.2}} {{$sel.community}}" href="{{$nav.community.0}}" title="{{$nav.community.3}}">{{$nav.community.1}}</a>
-	{{/if}}
-	{{if $nav.introductions}}
-	<a id="nav-notification-link" class="nav-commlink {{$nav.introductions.2}} {{$sel.introductions}}" href="{{$nav.introductions.0}}" title="{{$nav.introductions.3}}">{{$nav.introductions.1}}</a>
-	<span id="intro-update" class="nav-ajax-left"></span>
-	{{/if}}
-	{{if $nav.messages}}
-	<a id="nav-messages-link" class="nav-commlink {{$nav.messages.2}} {{$sel.messages}}" href="{{$nav.messages.0}}" title="{{$nav.messages.3}}">{{$nav.messages.1}}</a>
-	<span id="mail-update" class="nav-ajax-left"></span>
-	{{/if}}
+		{{if $nav.messages}}
+			<li role="menu" aria-haspopup="true" id="nav-messages-linkmenu" class="nav-menu-icon">
+				<a href="{{$nav.messages.0}}" title="{{$nav.messages.1}}">
+					<span class="icon s22 icon-envelope"><span class="sr-only">{{$nav.messages.1}}</span></span>
+					<span id="mail-update" class="nav-notification"></span>
+				</a>
+			</li>
+		{{/if}}
 
 
+		{{if $nav.notifications}}
+			<li role="menu" aria-haspopup="true" id="nav-notifications-linkmenu" class="nav-menu-icon">
+				<a title="{{$nav.notifications.1}}">
+					<span class="icon s22 icon-bell tilted-icon"><span class="sr-only">{{$nav.notifications.1}}</span></span>
+					<span id="notification-update" class="nav-notification"></span>
+				</a>
+				<ul id="nav-notifications-menu" class="menu-popup">
+					<li role="menuitem" id="nav-notifications-mark-all"><a onclick="notificationMarkAll(); return false;">{{$nav.notifications.mark.1}}</a></li>
+					<li role="menuitem" id="nav-notifications-see-all"><a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a></li>
+					<li role="menuitem" class="empty">{{$emptynotifications}}</li>
+				</ul>
+			</li>
+		{{/if}}
 
-	{{if $nav.delegation}}<a id="nav-delegation-link" class="nav-commlink {{$nav.delegation.2}} {{$sel.delegation}}" href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}">{{$nav.delegation.1}}</a>{{/if}}
+		{{if $userinfo}}
+			<li role="menu" aria-haspopup="true" id="nav-user-linkmenu" class="nav-menu">
+				<a accesskey="u" title="{{$sitelocation}}"><img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"><span id="nav-user-linklabel">{{$userinfo.name}}</span><span id="intro-update" class="nav-notification"></span></a>
+				<ul id="nav-user-menu" class="menu-popup">
+					<li role="menuitem"> <a  class="{{$nav.search.2}}" href="{{$nav.search.0}}" title="{{$nav.search.3}}">{{$nav.search.1}}</a> </li>
+					{{if $nav.introductions}}<li role="menuitem"><a class="{{$nav.introductions.2}}" href="{{$nav.introductions.0}}" title="{{$nav.introductions.3}}">{{$nav.introductions.1}}<span id="intro-update-li" class="nav-notification"></span></a></li>{{/if}}
+					{{if $nav.contacts}}<li role="menuitem"><a class="{{$nav.contacts.2}}" href="{{$nav.contacts.0}}" title="{{$nav.contacts.3}}">{{$nav.contacts.1}}</a></li>{{/if}}
+					{{if $nav.messages}}<li role="menuitem"><a class="{{$nav.messages.2}}" href="{{$nav.messages.0}}" title="{{$nav.messages.3}}">{{$nav.messages.1}} <span id="mail-update-li" class="nav-notification"></span></a></li>{{/if}}
+					{{if $nav.delegation}}<li role="menuitem"><a class="{{$nav.delegation.2}}" href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}">{{$nav.delegation.1}}</a></li>{{/if}}
+					{{if $nav.usermenu.1}}<li role="menuitem"><a class="{{$nav.usermenu.1.2}}" href="{{$nav.usermenu.1.0}}" title="{{$nav.usermenu.1.3}}">{{$nav.usermenu.1.1}}</a></li>{{/if}}
+					{{if $nav.settings}}<li role="menuitem"><a class="{{$nav.settings.2}}" href="{{$nav.settings.0}}" title="{{$nav.settings.3}}">{{$nav.settings.1}}</a></li>{{/if}}
+					{{if $nav.admin}}
+					<li role="menuitem">
+						<a accesskey="a" class="{{$nav.admin.2}}" href="{{$nav.admin.0}}" title="{{$nav.admin.3}}">{{$nav.admin.1}}</a>
+					</li>
+					{{/if}}
+					{{if $nav.moderation}}
+						<li role="menuitem">
+							<a accesskey="m" class="{{$nav.moderation.2}}" href="{{$nav.moderation.0}}" title="{{$nav.moderation.3}}">{{$nav.moderation.1}}</a>
+						</li>
+					{{/if}}
+					{{if $nav.logout}}<li role="menuitem"><a class="menu-sep {{$nav.logout.2}}" href="{{$nav.logout.0}}" title="{{$nav.logout.3}}">{{$nav.logout.1}}</a></li>{{/if}}
+				</ul>
+			</li>
+		{{/if}}
 
+		{{if $nav.login}}
+			<li role="menuitem" id="nav-login-link" class="nav-menu">
+				<a class="{{$nav.login.2}}" href="{{$nav.login.0}}" title="{{$nav.login.3}}">{{$nav.login.1}}</a>
+			</li>
+		{{/if}}
+		{{if $nav.logout}}
+			<li role="menuitem" id="nav-logout-link" class="nav-menu">
+				<a class="{{$nav.logout.2}}" href="{{$nav.logout.0}}" title="{{$nav.logout.3}}">{{$nav.logout.1}}</a>
+			</li>
+		{{/if}}
 
-	{{if $nav.notifications}}
-		<a accesskey="f" id="nav-notifications-linkmenu" class="nav-commlink" href="{{$nav.notifications.0}}" rel="#nav-notifications-menu" title="{{$nav.notifications.1}}">{{$nav.notifications.1}}</a>
-		<span id="notification-update" class="nav-ajax-left"></span>
-		<ul id="nav-notifications-menu" class="menu-popup">
-			<li id="nav-notifications-see-all"><a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a></li>
-			<li id="nav-notifications-mark-all"><a href="#" onclick="notificationMarkAll(); return false;">{{$nav.notifications.mark.3}}</a></li>
-			<li id="nav-notifications-loading" class="loading" style="font-weight: bold; color: #555; padding-left: 10px;"><i class="fa fa-spinner fa-spin" aria-hidden="true" style="vertical-align: middle;"></i> {{$loadingnotifications}}</li>
-			<li id="nav-notifications-empty" class="empty" style="display: none; text-align: center;"><i>{{$emptynotifications}}</i></li>
-		</ul>
-	{{/if}}
+		{{if $nav.search}}
+			<li role="search" id="nav-search-box">
+				<form method="get" action="{{$nav.search.0}}">
+					<input accesskey="s" id="nav-search-text" class="nav-menu-search" type="text" value="" name="q" placeholder=" {{$search_placeholder}}">
+					<select name="search-option">
+						<option value="fulltext">{{$nav.searchoption.0}}</option>
+						<option value="tags">{{$nav.searchoption.1}}</option>
+						<option value="contacts">{{$nav.searchoption.2}}</option>
+						{{if $nav.searchoption.3}}<option value="groups">{{$nav.searchoption.3}}</option>{{/if}}
+					</select>
+				</form>
+			</li>
+		{{/if}}
 
-	{{if $nav.settings}}<a id="nav-settings-link" class="nav-link {{$nav.settings.2}}" href="{{$nav.settings.0}}" title="{{$nav.settings.3}}">{{$nav.settings.1}}</a>{{/if}}
-	{{if $nav.profiles}}<a id="nav-profiles-link" class="nav-link {{$nav.profiles.2}}" href="{{$nav.profiles.0}}" title="{{$nav.profiles.3}}">{{$nav.profiles.1}}</a>{{/if}}
+		{{if $nav.admin}}
+			<li role="menuitem" id="nav-admin-link" class="nav-menu">
+				<a accesskey="a" class="{{$nav.admin.2}} icon-sliders" href="{{$nav.admin.0}}" title="{{$nav.admin.3}}"><span class="sr-only">{{$nav.admin.3}}</span></a>
+			</li>
+		{{/if}}
 
-	{{if $nav.contacts}}<a id="nav-contacts-link" class="nav-link {{$nav.contacts.2}}" href="{{$nav.contacts.0}}" title="{{$nav.contacts.3}}">{{$nav.contacts.1}}</a>{{/if}}
-	</span>
-	<span id="nav-end"></span>
-	<span id="banner">{{$banner nofilter}}</span>
+		{{if $nav.moderation}}
+			<li role="menuitem" id="nav-moderation-link" class="nav-menu">
+				<a accesskey="a" class="{{$nav.moderation.2}} icon-sliders" href="{{$nav.moderation.0}}" title="{{$nav.moderation.3}}"><span class="sr-only">{{$nav.moderation.3}}</span></a>
+			</li>
+		{{/if}}
+
+		{{if $nav.apps}}
+			<li role="menu" aria-haspopup="true" id="nav-apps-link" class="nav-menu {{$sel.apps}}">
+				<a class=" {{$nav.apps.2}}" title="{{$nav.apps.3}}">{{$nav.apps.1}}</a>
+				<ul id="nav-apps-menu" class="menu-popup">
+					{{foreach $apps as $ap}}
+					<li role="menuitem">{{$ap nofilter}}</li>
+					{{/foreach}}
+				</ul>
+			</li>
+		{{/if}}
+	</ul>
+
 </nav>

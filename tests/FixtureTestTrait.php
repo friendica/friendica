@@ -65,7 +65,7 @@ trait FixtureTestTrait
 		DBStructure::checkInitialValues();
 
 		// Load the API dataset for the whole API
-		$this->loadFixture(__DIR__ . '/datasets/api.fixture.php', $dba);
+		$this->loadFixture(__DIR__ . '/Fixtures/api.fixture.php', $dba);
 	}
 
 	protected function tearDownFixtures(): void

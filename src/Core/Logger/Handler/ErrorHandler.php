@@ -20,36 +20,31 @@ use Throwable;
  */
 class ErrorHandler
 {
-	/** @var LoggerInterface */
-	private $logger;
-
 	/** @var ?callable */
 	private $previousExceptionHandler = null;
+
 	/** @var array<class-string, LogLevel::*> an array of class name to LogLevel::* constant mapping */
-	private $uncaughtExceptionLevelMap = [];
+	private array $uncaughtExceptionLevelMap = [];
 
 	/** @var callable|true|null */
 	private $previousErrorHandler = null;
+
 	/** @var array<int, LogLevel::*> an array of E_* constant to LogLevel::* constant mapping */
-	private $errorLevelMap = [];
-	/** @var bool */
-	private $handleOnlyReportedErrors = true;
+	private array $errorLevelMap = [];
 
-	/** @var bool */
-	private $hasFatalErrorHandler = false;
+	private bool $handleOnlyReportedErrors = true;
+
+	private bool $hasFatalErrorHandler = false;
+
 	/** @var LogLevel::* */
-	private $fatalLevel = LogLevel::ALERT;
-	/** @var ?string */
-	private $reservedMemory = null;
-	/** @var ?mixed */
-	private $lastFatalTrace;
-	/** @var int[] */
-	private static $fatalErrors = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR];
+	private string $fatalLevel = LogLevel::ALERT;
 
-	public function __construct(LoggerInterface $logger)
-	{
-		$this->logger = $logger;
-	}
+	private mixed $lastFatalTrace;
+
+	/** @var int[] */
+	private static array $fatalErrors = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR];
+
+	public function __construct(private readonly LoggerInterface $logger) {}
 
 	/**
 	 * Registers a new ErrorHandler for a given Logger
@@ -136,7 +131,7 @@ class ErrorHandler
 	 */
 	public function registerErrorHandler(array $levelMap = [], bool $callPrevious = true, int $errorTypes = -1, bool $handleOnlyReportedErrors = true): self
 	{
-		$prev                = set_error_handler([$this, 'handleError'], $errorTypes);
+		$prev                = set_error_handler($this->handleError(...), $errorTypes);
 		$this->errorLevelMap = array_replace($this->defaultErrorLevelMap(), $levelMap);
 		if ($callPrevious) {
 			$this->previousErrorHandler = $prev ?: true;
@@ -159,7 +154,6 @@ class ErrorHandler
 	{
 		register_shutdown_function([$this, 'handleFatalError']);
 
-		$this->reservedMemory       = str_repeat(' ', 1024 * $reservedMemorySize);
 		$this->fatalLevel           = $level ?? LogLevel::ALERT;
 		$this->hasFatalErrorHandler = true;
 
@@ -256,7 +250,9 @@ class ErrorHandler
 
 		array_shift($trace); // Exclude handleError from trace
 
-		if ($code === E_USER_DEPRECATED && $trace[0]['function'] ?? '' === 'trigger_error') {
+		$functionName = $trace[0]['function'] ?? '';
+
+		if ($code === E_USER_DEPRECATED && $functionName === 'trigger_error') {
 			$calledPlace = $trace[1] ?? [];
 
 			$message .= sprintf(
@@ -288,8 +284,6 @@ class ErrorHandler
 	 */
 	public function handleFatalError(): void
 	{
-		$this->reservedMemory = '';
-
 		$lastError = error_get_last();
 		if ($lastError && in_array($lastError['type'], self::$fatalErrors, true)) {
 			$this->logger->log(
@@ -307,39 +301,23 @@ class ErrorHandler
 	 */
 	private static function codeToString($code): string
 	{
-		switch ($code) {
-			case E_ERROR:
-				return 'E_ERROR';
-			case E_WARNING:
-				return 'E_WARNING';
-			case E_PARSE:
-				return 'E_PARSE';
-			case E_NOTICE:
-				return 'E_NOTICE';
-			case E_CORE_ERROR:
-				return 'E_CORE_ERROR';
-			case E_CORE_WARNING:
-				return 'E_CORE_WARNING';
-			case E_COMPILE_ERROR:
-				return 'E_COMPILE_ERROR';
-			case E_COMPILE_WARNING:
-				return 'E_COMPILE_WARNING';
-			case E_USER_ERROR:
-				return 'E_USER_ERROR';
-			case E_USER_WARNING:
-				return 'E_USER_WARNING';
-			case E_USER_NOTICE:
-				return 'E_USER_NOTICE';
-			case E_STRICT:
-				return 'E_STRICT';
-			case E_RECOVERABLE_ERROR:
-				return 'E_RECOVERABLE_ERROR';
-			case E_DEPRECATED:
-				return 'E_DEPRECATED';
-			case E_USER_DEPRECATED:
-				return 'E_USER_DEPRECATED';
-		}
-
-		return 'Unknown PHP error';
+		return match ($code) {
+			E_ERROR             => 'E_ERROR',
+			E_WARNING           => 'E_WARNING',
+			E_PARSE             => 'E_PARSE',
+			E_NOTICE            => 'E_NOTICE',
+			E_CORE_ERROR        => 'E_CORE_ERROR',
+			E_CORE_WARNING      => 'E_CORE_WARNING',
+			E_COMPILE_ERROR     => 'E_COMPILE_ERROR',
+			E_COMPILE_WARNING   => 'E_COMPILE_WARNING',
+			E_USER_ERROR        => 'E_USER_ERROR',
+			E_USER_WARNING      => 'E_USER_WARNING',
+			E_USER_NOTICE       => 'E_USER_NOTICE',
+			E_STRICT            => 'E_STRICT',
+			E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+			E_DEPRECATED        => 'E_DEPRECATED',
+			E_USER_DEPRECATED   => 'E_USER_DEPRECATED',
+			default             => 'Unknown PHP error',
+		};
 	}
 }

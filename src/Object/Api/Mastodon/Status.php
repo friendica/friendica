@@ -95,8 +95,24 @@ class Status extends BaseDataTransferObject
 	 * @param array   $item
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(array $item, Account $account, Counts $counts, UserAttributes $userAttributes, bool $sensitive, Application $application, array $mentions, array $tags, Card $card, array $attachments, array $in_reply, array $reblog, FriendicaExtension $friendica, array $quote = null, array $poll = null, array $emojis = null)
-	{
+	public function __construct(
+		array $item,
+		Account $account,
+		Counts $counts,
+		UserAttributes $userAttributes,
+		bool $sensitive,
+		Application $application,
+		array $mentions,
+		array $tags,
+		Card $card,
+		array $attachments,
+		array $in_reply,
+		array $reblog,
+		FriendicaExtension $friendica,
+		?array $quote = null,
+		?array $poll = null,
+		?array $emojis = null,
+	) {
 		$reblogged        = !empty($reblog);
 		$this->id         = (string) $item['uri-id'];
 		$this->created_at = DateTimeFormat::utc($item['created'], DateTimeFormat::JSON);

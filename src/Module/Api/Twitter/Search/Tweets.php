@@ -46,7 +46,7 @@ class Tweets extends BaseApi
 		$start = max(0, ($page - 1) * $count);
 
 		$params = ['order' => ['uri-id' => true], 'limit' => [$start, $count]];
-		if (preg_match('/^#(\w+)$/', $searchTerm, $matches) === 1 && isset($matches[1])) {
+		if (preg_match('/^#(\w+)$/', $searchTerm, $matches) === 1) {
 			$searchTerm = $matches[1];
 			$condition  = ["`uri-id` > ? AND `name` = ? AND (NOT `private` OR (`private` AND `uid` = ?))", $since_id, $searchTerm, $uid];
 

@@ -39,41 +39,9 @@ use Psr\Log\LoggerInterface;
 
 class Compose extends BaseModule
 {
-	/** @var SystemMessages */
-	private $systemMessages;
-
-	/** @var ACLFormatter */
-	private $ACLFormatter;
-
-	/** @var Page */
-	private $page;
-
-	/** @var IManagePersonalConfigValues */
-	private $pConfig;
-
-	/** @var IManageConfigValues */
-	private $config;
-
-	/** @var UserSession */
-	private $session;
-
-	/** @var AppHelper */
-	private $appHelper;
-
-	private EventDispatcherInterface $eventDispatcher;
-
-	public function __construct(EventDispatcherInterface $eventDispatcher, AppHelper $appHelper, UserSession $session, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, Page $page, ACLFormatter $ACLFormatter, SystemMessages $systemMessages, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly EventDispatcherInterface $eventDispatcher, private readonly AppHelper $appHelper, private readonly UserSession $session, private readonly IManageConfigValues $config, private readonly IManagePersonalConfigValues $pConfig, private readonly Page $page, private readonly ACLFormatter $ACLFormatter, private readonly SystemMessages $systemMessages, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->systemMessages  = $systemMessages;
-		$this->ACLFormatter    = $ACLFormatter;
-		$this->page            = $page;
-		$this->pConfig         = $pConfig;
-		$this->config          = $config;
-		$this->session         = $session;
-		$this->appHelper       = $appHelper;
-		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -99,14 +67,10 @@ class Compose extends BaseModule
 
 		$posttype = $this->parameters['type'] ?? Item::PT_ARTICLE;
 		if (!in_array($posttype, [Item::PT_ARTICLE, Item::PT_PERSONAL_NOTE])) {
-			switch ($posttype) {
-				case 'note':
-					$posttype = Item::PT_PERSONAL_NOTE;
-					break;
-				default:
-					$posttype = Item::PT_ARTICLE;
-					break;
-			}
+			$posttype = match ($posttype) {
+				'note'  => Item::PT_PERSONAL_NOTE,
+				default => Item::PT_ARTICLE,
+			};
 		}
 
 		$user = User::getById($this->session->getLocalUserId(), ['allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'default-location']);

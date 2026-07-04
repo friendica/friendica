@@ -24,6 +24,7 @@ use Friendica\Navigation\Notifications\Entity\Notification as NotificationEntity
 use Friendica\Navigation\Notifications\Entity\Notify as NotifyEntity;
 use Friendica\Navigation\Notifications\Exception;
 use Friendica\Navigation\Notifications\Factory;
+use Friendica\Navigation\Notifications\Factory\Notify as NotifyFactory;
 use Friendica\Network\HTTPException;
 use Friendica\Object\Api\Mastodon\Notification;
 use Friendica\Protocol\Activity;
@@ -37,9 +38,6 @@ use Psr\Log\LoggerInterface;
  */
 class Notify extends BaseRepository
 {
-	/** @var Factory\Notify  */
-	protected $factory;
-
 	/** @var L10n  */
 	protected $l10n;
 
@@ -49,16 +47,11 @@ class Notify extends BaseRepository
 	/** @var IManageConfigValues */
 	protected $config;
 
-	/** @var IManagePersonalConfigValues */
-	private $pConfig;
-
 	/** @var Emailer */
 	protected $emailer;
 
 	/** @var Factory\Notification */
 	protected $notification;
-
-	private EventDispatcherInterface $eventDispatcher;
 
 	protected static $table_name = 'notify';
 
@@ -68,21 +61,23 @@ class Notify extends BaseRepository
 		L10n $l10n,
 		BaseURL $baseUrl,
 		IManageConfigValues $config,
-		IManagePersonalConfigValues $pConfig,
+		private readonly IManagePersonalConfigValues $pConfig,
 		Emailer $emailer,
 		Factory\Notification $notification,
-		EventDispatcherInterface $eventDispatcher,
-		Factory\Notify $factory = null,
+		private readonly EventDispatcherInterface $eventDispatcher,
+		private readonly NotifyFactory $entityFactory,
 	) {
-		$this->l10n            = $l10n;
-		$this->baseUrl         = $baseUrl;
-		$this->config          = $config;
-		$this->pConfig         = $pConfig;
-		$this->emailer         = $emailer;
-		$this->notification    = $notification;
-		$this->eventDispatcher = $eventDispatcher;
+		$this->l10n         = $l10n;
+		$this->baseUrl      = $baseUrl;
+		$this->config       = $config;
+		$this->emailer      = $emailer;
+		$this->notification = $notification;
+		parent::__construct($database, $logger, $this->entityFactory);
+	}
 
-		parent::__construct($database, $logger, $factory ?? new Factory\Notify($logger));
+	protected function getFactory(): NotifyFactory
+	{
+		return $this->entityFactory;
 	}
 
 	/**
@@ -92,7 +87,7 @@ class Notify extends BaseRepository
 	{
 		$fields = $this->_selectFirstRowAsArray($condition, $params);
 
-		return $this->factory->createFromTableRow($fields);
+		return $this->getFactory()->createFromTableRow($fields);
 	}
 
 	private function select(array $condition, array $params = []): Collection\Notifies
@@ -591,7 +586,7 @@ class Notify extends BaseRepository
 		$notify_id = 0;
 
 		if ($show_in_notification_page) {
-			$Notify = $this->factory->createFromParams($params, $itemlink, $item_id, $uri_id, $parent_id, $parent_uri_id);
+			$Notify = $this->getFactory()->createFromParams($params, $itemlink, $item_id, $uri_id, $parent_id, $parent_uri_id);
 			try {
 				$Notify = $this->save($Notify);
 			} catch (Exception\NotificationCreationInterceptedException) {
@@ -693,7 +688,7 @@ class Notify extends BaseRepository
 
 	public function shouldShowOnDesktop(NotificationEntity $Notification, string $type = ''): bool
 	{
-		if (is_null($type)) {
+		if ($type === '') {
 			$type = NotificationFactory::getType($Notification);
 		}
 
@@ -701,11 +696,11 @@ class Notify extends BaseRepository
 			return true;
 		}
 
-		if ($this->pConfig->get($Notification->uid, 'system', 'notify_like') && ($type == Notification::TYPE_LIKE)) {
+		if ($this->pConfig->get($Notification->uid, 'system', 'notify_like') && ($type === Notification::TYPE_LIKE)) {
 			return true;
 		}
 
-		if ($this->pConfig->get($Notification->uid, 'system', 'notify_announce') && ($type == Notification::TYPE_RESHARE)) {
+		if ($this->pConfig->get($Notification->uid, 'system', 'notify_announce') && ($type === Notification::TYPE_RESHARE)) {
 			return true;
 		}
 
@@ -775,7 +770,7 @@ class Notify extends BaseRepository
 
 		$params['item']   = $item;
 		$params['parent'] = $item['parent'];
-		$params['link']   = $this->baseUrl . '/display/' . urlencode($item['guid']);
+		$params['link']   = $this->baseUrl . '/display/' . urlencode((string) $item['guid']);
 
 		$subjectPrefix = $l10n->t('[Friendica:Notify]');
 

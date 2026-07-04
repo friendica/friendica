@@ -21,7 +21,7 @@ final class ACLFormatter
 	 *
 	 * @return array The array based on the IDs (empty in case there is no list)
 	 */
-	public function expand(string $acl_string = null): array
+	public function expand(?string $acl_string = null): array
 	{
 		// In case there is no ID list, return empty array (=> no ACL set)
 		if (empty($acl_string)) {
@@ -30,7 +30,7 @@ final class ACLFormatter
 
 		// turn string array of angle-bracketed elements into numeric array
 		// e.g. "<1><2><3>" => array(1,2,3);
-		preg_match_all('/<(' . Circle::FOLLOWERS . '|'. Circle::MUTUALS . '|[0-9]+)>/', $acl_string, $matches, PREG_PATTERN_ORDER);
+		preg_match_all('/<(' . Circle::FOLLOWERS . '|' . Circle::MUTUALS . '|[0-9]+)>/', $acl_string, $matches, PREG_PATTERN_ORDER);
 
 		return $matches[1];
 	}
@@ -41,7 +41,7 @@ final class ACLFormatter
 	 * @param string|null $acl_string
 	 * @return string
 	 */
-	public function sanitize(string $acl_string = null): string
+	public function sanitize(?string $acl_string = null): string
 	{
 		if (empty($acl_string)) {
 			return '';
@@ -57,7 +57,7 @@ final class ACLFormatter
 
 		sort($elements);
 
-		array_walk($elements, [$this, 'sanitizeItem']);
+		array_walk($elements, $this->sanitizeItem(...));
 
 		return implode('', $elements);
 	}
@@ -67,17 +67,18 @@ final class ACLFormatter
 	 *
 	 * @param string $item The item to sanitise
 	 */
-	private function sanitizeItem(string &$item) {
+	private function sanitizeItem(string &$item)
+	{
 		// The item is an ACL int value
 		if (intval($item)) {
 			$item = '<' . intval($item) . '>';
-		// The item is a allowed ACL character
+			// The item is a allowed ACL character
 		} elseif (in_array($item, [Circle::FOLLOWERS, Circle::MUTUALS])) {
 			$item = '<' . $item . '>';
-		// The item is already a ACL string
+			// The item is already a ACL string
 		} elseif (preg_match('/<\d+?>/', $item)) {
 			unset($item);
-		// The item is not supported, so remove it (cleanup)
+			// The item is not supported, so remove it (cleanup)
 		} else {
 			$item = '';
 		}
@@ -93,7 +94,7 @@ final class ACLFormatter
 	 *
 	 * @return string
 	 */
-	function toString($permissions): string
+	public function toString($permissions): string
 	{
 		$return = '';
 		if (is_array($permissions)) {
@@ -104,10 +105,8 @@ final class ACLFormatter
 			$item = explode(',', $permissions);
 		}
 
-		if (is_array($item)) {
-			array_walk($item, [$this, 'sanitizeItem']);
-			$return = implode('', $item);
-		}
-		return $return;
+		array_walk($item, $this->sanitizeItem(...));
+
+		return implode('', $item);
 	}
 }

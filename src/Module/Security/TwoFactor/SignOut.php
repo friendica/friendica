@@ -34,8 +34,19 @@ class SignOut extends BaseModule
 	/** @var TwoFactor\Repository\TrustedBrowser  */
 	protected $trustedBrowserRepository;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, IHandleUserSessions $session, Cookie $cookie, TwoFactor\Repository\TrustedBrowser $trustedBrowserRepository, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		IHandleUserSessions $session,
+		Cookie $cookie,
+		TwoFactor\Repository\TrustedBrowser $trustedBrowserRepository,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->session                  = $session;
@@ -60,18 +71,16 @@ class SignOut extends BaseModule
 					$this->cookie->reset(['2fa_cookie_hash' => $trusted]);
 					$this->session->clear();
 
-					$this->baseUrl->redirect();
 					break;
 				case 'sign_out':
 					$this->trustedBrowserRepository->removeForUser($this->session->getLocalUserId(), $this->cookie->get('2fa_cookie_hash'));
 					$this->cookie->clear();
 					$this->session->clear();
 
-					$this->baseUrl->redirect();
 					break;
-				default:
-					$this->baseUrl->redirect();
 			}
+
+			$this->baseUrl->redirect();
 		}
 	}
 

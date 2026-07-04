@@ -15,17 +15,10 @@ use Friendica\Factory\Api\Twitter\User as TwitterUser;
 
 class Circle extends BaseFactory
 {
-	/** @var twitterUser entity */
-	private $twitterUser;
-	/** @var Database */
-	private $dba;
-
-	public function __construct(LoggerInterface $logger, TwitterUser $twitteruser, Database $dba)
+	public function __construct(LoggerInterface $logger, /** @var twitterUser entity */
+		private readonly TwitterUser $twitterUser, private readonly Database $dba)
 	{
 		parent::__construct($logger);
-
-		$this->twitterUser = $twitteruser;
-		$this->dba         = $dba;
 	}
 
 	/**

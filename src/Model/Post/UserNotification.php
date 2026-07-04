@@ -405,7 +405,7 @@ class UserNotification
 
 		// Normalize the connector profiles
 		foreach ($notification_data['profiles'] as $profile) {
-			if (empty(parse_url($profile, PHP_URL_SCHEME)) || empty(parse_url($profile, PHP_URL_HOST)) || empty(parse_url($profile, PHP_URL_PATH))) {
+			if (empty(parse_url((string) $profile, PHP_URL_SCHEME)) || empty(parse_url((string) $profile, PHP_URL_HOST)) || empty(parse_url((string) $profile, PHP_URL_PATH))) {
 				$profiles[] = $profile;
 			} else {
 				$profiles[] = Strings::normaliseLink($profile);

@@ -37,26 +37,6 @@ use Psr\Log\LoggerInterface;
  */
 class Authentication
 {
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var Mode */
-	private $mode;
-	/** @var BaseURL */
-	private $baseUrl;
-	/** @var L10n */
-	private $l10n;
-	/** @var Database */
-	private $dba;
-	/** @var LoggerInterface */
-	private $logger;
-	/** @var Cookie */
-	private $cookie;
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var IManagePersonalConfigValues */
-	private $pConfig;
-	/** @var AppHelper */
-	private $appHelper;
 	/** @var string */
 	private $remoteAddress;
 
@@ -87,28 +67,18 @@ class Authentication
 	 * @param Request                     $request
 	 */
 	public function __construct(
-		IManageConfigValues $config,
-		Mode $mode,
-		BaseURL $baseUrl,
-		L10n $l10n,
-		Database $dba,
-		LoggerInterface $logger,
-		Cookie $cookie,
-		IHandleUserSessions $session,
-		IManagePersonalConfigValues $pConfig,
-		AppHelper $appHelper,
+		private readonly IManageConfigValues $config,
+		private readonly Mode $mode,
+		private readonly BaseURL $baseUrl,
+		private readonly L10n $l10n,
+		private readonly Database $dba,
+		private readonly LoggerInterface $logger,
+		private readonly Cookie $cookie,
+		private readonly IHandleUserSessions $session,
+		private readonly IManagePersonalConfigValues $pConfig,
+		private readonly AppHelper $appHelper,
 		Request $request,
 	) {
-		$this->config        = $config;
-		$this->mode          = $mode;
-		$this->baseUrl       = $baseUrl;
-		$this->l10n          = $l10n;
-		$this->dba           = $dba;
-		$this->logger        = $logger;
-		$this->cookie        = $cookie;
-		$this->session       = $session;
-		$this->pConfig       = $pConfig;
-		$this->appHelper     = $appHelper;
 		$this->remoteAddress = $request->getRemoteAddress();
 	}
 
@@ -293,6 +263,7 @@ class Authentication
 		/**
 		 * @see User::getPasswordRegExp()
 		 */
+		/** @phpstan-ignore identical.alwaysTrue(value of PASSWORD_DEFAULT will be change in a future PHP version) */
 		if (PASSWORD_DEFAULT === PASSWORD_BCRYPT && strlen($password) > 72) {
 			$return_path = '/security/password_too_long?' . http_build_query(['return_path' => $return_path]);
 		}
@@ -336,10 +307,10 @@ class Authentication
 
 		$this->session->setVisitorsContacts($my_url);
 
-		$member_since = strtotime($user_record['register_date']);
+		$member_since = strtotime((string) $user_record['register_date']);
 		$this->session->set('new_member', time() < ($member_since + (60 * 60 * 24 * 14)));
 
-		if (strlen($user_record['timezone'])) {
+		if (strlen((string) $user_record['timezone'])) {
 			$this->appHelper->setTimeZone($user_record['timezone']);
 			$this->session->set('timezone', $user_record['timezone']);
 		}

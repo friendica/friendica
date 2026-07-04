@@ -29,14 +29,9 @@ use Psr\Log\LoggerInterface;
 
 class Add extends BaseModeration
 {
-	/** @var DomainPatternBlocklist */
-	private $blocklist;
-
-	public function __construct(DomainPatternBlocklist $blocklist, Page $page, AppHelper $app, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly DomainPatternBlocklist $blocklist, Page $page, AppHelper $app, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($page, $app, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->blocklist = $blocklist;
 	}
 
 	/**
@@ -59,10 +54,10 @@ class Add extends BaseModeration
 
 		self::checkFormSecurityTokenRedirectOnError('/moderation/blocklist/server/add', 'moderation_blocklist_add');
 
-		$pattern = trim($request['pattern']);
+		$pattern = trim((string) $request['pattern']);
 
 		//  Add new item to blocklist
-		$this->blocklist->addPattern($pattern, trim($request['reason']));
+		$this->blocklist->addPattern($pattern, trim((string) $request['reason']));
 
 		Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
 
@@ -97,8 +92,8 @@ class Add extends BaseModeration
 			$gservers = GServer::listByDomainPattern($pattern);
 		}
 
-		array_walk($gservers, function (array &$gserver) {
-			$gserver['domain'] = (new Uri($gserver['url']))->getHost();
+		array_walk($gservers, function (array &$gserver): void {
+			$gserver['domain']       = (new Uri($gserver['url']))->getHost();
 			$gserver['network_svg']  = ContactSelector::networkToSVG($gserver['network']);
 			$gserver['network_name'] = ContactSelector::networkToName($gserver['network']);
 		});
@@ -127,7 +122,7 @@ class Add extends BaseModeration
 			'$newreason'           => ['reason', $this->t('Block reason'), $request['reason'] ?? '', $this->t('The reason why you blocked this server domain pattern. This reason will be shown publicly in the server information page.'), $this->t('Required'), '', ''],
 			'$pattern'             => $pattern,
 			'$gservers'            => $gservers,
-			'$form_security_token' => self::getFormSecurityToken('moderation_blocklist_add')
+			'$form_security_token' => self::getFormSecurityToken('moderation_blocklist_add'),
 		]);
 	}
 }

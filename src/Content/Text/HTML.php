@@ -101,7 +101,7 @@ class HTML
 					/** @var \DOMNode $child */
 					foreach ($node->childNodes as $key => $child) {
 						/* Remove empty text nodes at the start or at the end of the children list */
-						if ($key > 0 && $key < $node->childNodes->length - 1 || $child->nodeName != '#text' || trim($child->nodeValue) !== '') {
+						if ($key > 0 && $key < $node->childNodes->length - 1 || $child->nodeName != '#text' || trim((string) $child->nodeValue) !== '') {
 							$newNode = $child->cloneNode(true);
 							$node->parentNode->insertBefore($newNode, $node);
 						}
@@ -183,7 +183,7 @@ class HTML
 			$list  = $xpath->query("//pre");
 			foreach ($list as $node) {
 				// Ensure to escape unescaped & - they will otherwise raise a warning
-				$safe_value      = preg_replace('/&(?!\w+;)/', '&amp;', $node->nodeValue);
+				$safe_value      = preg_replace('/&(?!\w+;)/', '&amp;', (string) $node->nodeValue);
 				$node->nodeValue = str_replace("\n", "\r", $safe_value);
 			}
 
@@ -325,15 +325,15 @@ class HTML
 
 			$message = $message_data['html2bbcode'] ?? $message;
 
-			$message = strip_tags($message);
+			$message = strip_tags((string) $message);
 
 			$message = html_entity_decode($message, ENT_QUOTES, 'UTF-8');
 
 			// remove quotes if they don't make sense
 			$message = preg_replace('=\[/quote\][\s]*\[quote\]=i', "\n", $message);
 
-			$message = preg_replace('=\[quote\]\s*=i', "[quote]", $message);
-			$message = preg_replace('=\s*\[/quote\]=i', "[/quote]", $message);
+			$message = preg_replace('=\[quote\]\s*=i', "[quote]", (string) $message);
+			$message = preg_replace('=\s*\[/quote\]=i', "[/quote]", (string) $message);
 
 			do {
 				$oldmessage = $message;
@@ -370,7 +370,7 @@ class HTML
 			$message,
 		);
 
-		$message = trim($message);
+		$message = trim((string) $message);
 
 		if ($basepath != '') {
 			$message = self::qualifyURLs($message, $basepath);
@@ -397,11 +397,11 @@ class HTML
 		$link = $matches[0];
 		$url  = $matches[1];
 
-		if (empty($url) || empty(parse_url($url))) {
+		if (empty($url) || empty(parse_url((string) $url))) {
 			return $matches[0];
 		}
 
-		$parts = array_merge($base, parse_url($url));
+		$parts = array_merge($base, parse_url((string) $url));
 		$url2  = (string) Uri::fromParts((array) $parts);
 
 		return str_replace($url, $url2, $link);
@@ -436,7 +436,7 @@ class HTML
 				function ($match) use ($basepath) {
 					return self::qualifyURLsSub($match, $basepath);
 				},
-				$body,
+				(string) $body,
 			);
 		}
 		return $body;
@@ -714,13 +714,13 @@ class HTML
 		$s = preg_replace(
 			'#<iframe[^>](.*?)https?://www.youtube.com/embed/([A-Za-z0-9\-_=]+)(.*?)</iframe>#ism',
 			'[youtube]$2[/youtube]',
-			$s,
+			(string) $s,
 		);
 
 		$s = preg_replace(
 			'#<iframe[^>](.*?)https?://player.vimeo.com/video/([0-9]+)(.*?)</iframe>#ism',
 			'[vimeo]$2[/vimeo]',
-			$s,
+			(string) $s,
 		);
 
 		return $s;
@@ -750,16 +750,16 @@ class HTML
 
 		$pattern = "/<a([^>]*) href=\"(?!http|https)([^\"]*)\"/";
 		$replace = "<a\${1} href=\"" . $base . "\${2}\"";
-		$text    = preg_replace($pattern, $replace, $text);
+		$text    = preg_replace($pattern, $replace, (string) $text);
 
 		// Replace images
 		$pattern = "/<img([^>]*) src=\"(?!http|https|\/)([^\"]*)\"/";
 		$replace = "<img\${1} src=\"" . $base2 . "\${2}\"";
-		$text    = preg_replace($pattern, $replace, $text);
+		$text    = preg_replace($pattern, $replace, (string) $text);
 
 		$pattern = "/<img([^>]*) src=\"(?!http|https)([^\"]*)\"/";
 		$replace = "<img\${1} src=\"" . $base . "\${2}\"";
-		$text    = preg_replace($pattern, $replace, $text);
+		$text    = preg_replace($pattern, $replace, (string) $text);
 
 
 		// Done
@@ -943,7 +943,7 @@ class HTML
 
 		$config->set('HTML.SafeIframe', true);
 
-		array_walk($allowedIframeDomains, function (&$domain) {
+		array_walk($allowedIframeDomains, function (&$domain): void {
 			// Allow the domain and all its eventual sub-domains
 			$domain = '(?:(?!-)[A-Za-z0-9-]{1,63}(?<!-)\.)*' . preg_quote(trim($domain, '/'), '%');
 		});
@@ -1012,7 +1012,7 @@ class HTML
 		// the quotes, e.g.:
 		//
 		//    concat("'foo'", '"', "bar")
-		return 'concat(' . implode(', \'"\', ', array_map([self::class, 'xpathQuote'], explode('"', $value))) . ')';
+		return 'concat(' . implode(', \'"\', ', array_map(self::xpathQuote(...), explode('"', $value))) . ')';
 	}
 
 	/**
@@ -1047,7 +1047,7 @@ class HTML
 
 		$expression = "string(//meta[@charset]/@charset)";
 		if ($charset = $xpath->evaluate($expression)) {
-			return strtolower($charset);
+			return strtolower((string) $charset);
 		}
 
 		try {

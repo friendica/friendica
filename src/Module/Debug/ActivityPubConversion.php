@@ -31,10 +31,10 @@ class ActivityPubConversion extends BaseModule
 
 		if (!empty($_REQUEST['source'])) {
 			try {
-				$source = json_decode($_REQUEST['source'], true);
+				$source       = json_decode((string) $_REQUEST['source'], true);
 				$trust_source = true;
-				$uid = DI::userSession()->getLocalUserId();
-				$push = false;
+				$uid          = DI::userSession()->getLocalUserId();
+				$push         = false;
 
 				if (!$source) {
 					throw new \Exception('Failed to decode source JSON');
@@ -47,7 +47,7 @@ class ActivityPubConversion extends BaseModule
 				];
 				$results[] = [
 					'title'   => DI::l10n()->t('Source'),
-					'content' => $visible_whitespace(var_export($source, true))
+					'content' => $visible_whitespace(var_export($source, true)),
 				];
 				$activity = JsonLD::compact($source);
 				if (!$activity) {
@@ -55,7 +55,7 @@ class ActivityPubConversion extends BaseModule
 				}
 				$results[] = [
 					'title'   => DI::l10n()->t('Activity'),
-					'content' => $visible_whitespace(var_export($activity, true))
+					'content' => $visible_whitespace(var_export($activity, true)),
 				];
 
 				$type = JsonLD::fetchElement($activity, '@type');
@@ -73,10 +73,10 @@ class ActivityPubConversion extends BaseModule
 				}
 
 				// Don't trust the source if "actor" differs from "attributedTo". The content could be forged.
-				if ($trust_source && ($type == 'as:Create') && is_array($activity['as:object'])) {
-					$actor = JsonLD::fetchElement($activity, 'as:actor', '@id');
+				if ((strval($type) === 'as:Create') && is_array($activity['as:object'])) {
+					$actor         = JsonLD::fetchElement($activity, 'as:actor', '@id');
 					$attributed_to = JsonLD::fetchElement($activity['as:object'], 'as:attributedTo', '@id');
-					$trust_source = ($actor == $attributed_to);
+					$trust_source  = ($actor == $attributed_to);
 					if (!$trust_source) {
 						throw new \Exception('Not trusting actor: ' . $actor . '. It differs from attributedTo: ' . $attributed_to);
 					}
@@ -103,14 +103,14 @@ class ActivityPubConversion extends BaseModule
 
 				$results[] = [
 					'title'   => DI::l10n()->t('Object data'),
-					'content' => $visible_whitespace(var_export($object_data, true))
+					'content' => $visible_whitespace(var_export($object_data, true)),
 				];
 
 				$item = ActivityPub\Processor::createItem($object_data, true);
 
 				$results[] = [
 					'title'   => DI::l10n()->t('Result Item'),
-					'content' => $visible_whitespace(var_export($item, true))
+					'content' => $visible_whitespace(var_export($item, true)),
 				];
 			} catch (\Throwable $e) {
 				$results[] = [
@@ -121,11 +121,11 @@ class ActivityPubConversion extends BaseModule
 		}
 
 		$tpl = Renderer::getMarkupTemplate('debug/activitypubconversion.tpl');
-		$o = Renderer::replaceMacros($tpl, [
+		$o   = Renderer::replaceMacros($tpl, [
 			'$title'   => DI::l10n()->t('ActivityPub Conversion'),
 			'$source'  => ['source', DI::l10n()->t('Source activity'), $_REQUEST['source'] ?? '', ''],
 			'$results' => $results,
-			'$submit' => DI::l10n()->t('Submit'),
+			'$submit'  => DI::l10n()->t('Submit'),
 		]);
 
 		return $o;

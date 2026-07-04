@@ -46,11 +46,11 @@ class HCard extends BaseModule
 			$page['htmlhead'] .= '<link rel="openid.server" href="' . $profile['openidserver'] . '" />' . "\r\n";
 		}
 		if (!empty($profile['openid'])) {
-			$delegate         = ((strstr($profile['openid'], '://')) ? $profile['openid'] : 'http://' . $profile['openid']);
+			$delegate = ((strstr((string) $profile['openid'], '://')) ? $profile['openid'] : 'http://' . $profile['openid']);
 			$page['htmlhead'] .= '<link rel="openid.delegate" href="' . $delegate . '" />' . "\r\n";
 		}
 
-		$baseUrl = (string)DI::baseUrl();
+		$baseUrl = (string) DI::baseUrl();
 
 		$uri = urlencode('acct:' . $profile['nickname'] . '@' . DI::baseUrl()->getHost() . (DI::baseUrl()->getPath() ? '/' . DI::baseUrl()->getPath() : ''));
 

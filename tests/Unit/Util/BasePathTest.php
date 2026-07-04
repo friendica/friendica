@@ -59,14 +59,14 @@ class BasePathTest extends TestCase
 				],
 				'baseDir'  => '/noatgawe22fafa',
 				'expected' => $configPath,
-			]
+			],
 		];
 	}
 
 	/**
 	 * Test the basepath determination
-	 * @dataProvider getDataPaths
 	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('getDataPaths')]
 	public function testDetermineBasePath(array $server, string $baseDir, string $expected): void
 	{
 		$basepath = new BasePath($baseDir, $server);

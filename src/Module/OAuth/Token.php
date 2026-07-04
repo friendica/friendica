@@ -44,11 +44,11 @@ class Token extends BaseApi
 			$authorization = $_SERVER['REDIRECT_REMOTE_USER'] ?? '';
 		}
 
-		if ((empty($request['client_id']) || empty($request['client_secret'])) && str_starts_with($authorization, 'Basic ')) {
+		if ((empty($request['client_id']) || empty($request['client_secret'])) && str_starts_with((string) $authorization, 'Basic ')) {
 			// Per RFC2617, usernames can't contain a colon but password can,
 			// so we cut on the first colon to obtain the username and the password
 			// @see https://www.rfc-editor.org/rfc/rfc2617#section-2
-			$datapair = explode(':', base64_decode(trim(substr($authorization, 6))), 2);
+			$datapair = explode(':', base64_decode(trim(substr((string) $authorization, 6))), 2);
 			if (count($datapair) == 2) {
 				$request['client_id']     = $datapair[0];
 				$request['client_secret'] = $datapair[1];

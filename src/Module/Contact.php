@@ -44,7 +44,7 @@ class Contact extends BaseModule
 		}
 
 		$redirectUrl = $_POST['command'] ?? '';
-		if (!str_starts_with($redirectUrl, 'contact')) {
+		if (!str_starts_with((string) $redirectUrl, 'contact')) {
 			$redirectUrl = 'contact';
 		}
 		if (!empty($_POST['parameter'])) {
@@ -394,22 +394,13 @@ class Contact extends BaseModule
 		$tabs_tpl  = Renderer::getMarkupTemplate('common_tabs.tpl');
 		$tabs_html = Renderer::replaceMacros($tabs_tpl, ['$tabs' => $tabs, '$more' => DI::l10n()->t('More')]);
 
-		switch ($rel) {
-			case 'followers':
-				$header = DI::l10n()->t('Followers');
-				break;
-			case 'following':
-				$header = DI::l10n()->t('Following');
-				break;
-			case 'mutuals':
-				$header = DI::l10n()->t('Friends');
-				break;
-			case 'nothing':
-				$header = DI::l10n()->t('No relationship');
-				break;
-			default:
-				$header = DI::l10n()->t('Contacts');
-		}
+		$header = match ($rel) {
+			'followers' => DI::l10n()->t('Followers'),
+			'following' => DI::l10n()->t('Following'),
+			'mutuals'   => DI::l10n()->t('Friends'),
+			'nothing'   => DI::l10n()->t('No relationship'),
+			default     => DI::l10n()->t('Contacts'),
+		};
 
 		switch ($type) {
 			case 'pending':
@@ -494,10 +485,10 @@ class Contact extends BaseModule
 				'accesskey' => 'o',
 			],
 			[
-				'label'     => DI::l10n()->t('Conversations'),
+				'label'     => DI::l10n()->t('Posts'),
 				'url'       => 'contact/' . $pcid . '/conversations',
 				'sel'       => (($active_tab == self::TAB_CONVERSATIONS) ? 'active' : ''),
-				'title'     => DI::l10n()->t('Conversations started by this contact'),
+				'title'     => DI::l10n()->t('All posts'),
 				'id'        => 'status-tab',
 				'accesskey' => 'm',
 			],
@@ -510,10 +501,10 @@ class Contact extends BaseModule
 				'accesskey' => 'p',
 			],
 			[
-				'label'     => DI::l10n()->t('Media'),
+				'label'     => DI::l10n()->t('Media posts'),
 				'url'       => 'contact/' . $pcid . '/media',
 				'sel'       => (($active_tab == self::TAB_MEDIA) ? 'active' : ''),
-				'title'     => DI::l10n()->t('Posts containing media objects'),
+				'title'     => DI::l10n()->t('Posts containing media'),
 				'id'        => 'media-tab',
 				'accesskey' => 'd',
 			],
@@ -611,22 +602,31 @@ class Contact extends BaseModule
 			$sparkle  = '';
 		}
 
+		[$administrator, $moderator] = Model\Contact::getType($contact['id'], $contact['url']);
+
 		return [
-			'id'           => $contact['id'],
-			'url'          => $url,
-			'img_hover'    => DI::l10n()->t('Visit %s\'s profile [%s]', $contact['name'], $contact['url']),
-			'photo_menu'   => Model\Contact::photoMenu($contact, DI::userSession()->getLocalUserId()),
-			'thumb'        => Model\Contact::getThumb($contact, true),
-			'alt_text'     => $alt_text,
-			'name'         => $contact['name'],
-			'nick'         => $contact['nick'],
-			'details'      => $contact['location'],
-			'tags'         => $contact['keywords'],
-			'about'        => $contact['about'],
-			'account_type' => Model\Contact::getAccountType($contact['contact-type']),
-			'sparkle'      => $sparkle,
-			'itemurl'      => ($contact['addr'] ?? '') ?: $contact['url'],
-			'network'      => ContactSelector::networkToName($contact['network'], $contact['protocol'], $contact['gsid']),
+			'id'                => $contact['id'],
+			'is_admin'          => $administrator,
+			'adming_title'      => DI::l10n()->t('Administrator'),
+			'is_mod'            => $moderator,
+			'moderator_title'   => DI::l10n()->t('Moderator'),
+			'url'               => $url,
+			'img_hover'         => DI::l10n()->t('Visit %s\'s profile [%s]', $contact['name'], $contact['url']),
+			'photo_menu'        => Model\Contact::photoMenu($contact, DI::userSession()->getLocalUserId()),
+			'thumb'             => Model\Contact::getThumb($contact, true),
+			'alt_text'          => $alt_text,
+			'name'              => $contact['name'],
+			'nick'              => $contact['nick'],
+			'details'           => $contact['location'],
+			'tags'              => $contact['keywords'],
+			'about'             => $contact['about'],
+			'account_type_name' => Model\Contact::getAccountType($contact['contact-type']),
+			'account_type'      => $contact['contact-type'],
+			'manually_approve'  => $contact['manually-approve'],
+			'private'           => $contact['prv'],
+			'sparkle'           => $sparkle,
+			'itemurl'           => ($contact['addr'] ?? '') ?: $contact['url'],
+			'network'           => ContactSelector::networkToName($contact['network'], $contact['protocol'], $contact['gsid']),
 		];
 	}
 }

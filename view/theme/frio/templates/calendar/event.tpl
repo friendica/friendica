@@ -22,25 +22,25 @@
 		<div class="event-buttons">
 			{{if $event.edit}}
 				<a class="btn btn-primary" href="{{$event.edit.0}}">
-					<i class="fa fa-pencil" aria-hidden="true"></i>
+					<i class="ri ri-pencil-line" aria-hidden="true"></i>
 					{{$event.edit.1}}
 				</a>
 			{{/if}}
 			{{if $event.copy}}
 				<a class="btn btn-default" href="{{$event.copy.0}}">
-					<i class="fa fa-files-o" aria-hidden="true"></i>
+					<i class="ri ri-file-copy-line" aria-hidden="true"></i>
 					{{$event.copy.1}}
 				</a>
 				{{/if}}
 			{{if $event.drop}}
 				<a href="{{$event.drop.0}}" onclick="return confirmDelete();" class="drop-event-link btn btn-default">
-					<i class="fa fa-trash-o" aria-hidden="true"></i>
+					<i class="ri ri-delete-bin-line" aria-hidden="true"></i>
 					{{$event.drop.1}}
 				</a>
 			{{/if}}
 			{{if $event.plink.orig}}
 				<a href="{{$event.plink.orig}}" class="plink-event-link btn btn-primary pull-right" aria-label="{{$event.plink.1}}">
-					<i class="fa fa-external-link" aria-hidden="true"></i>
+					<i class="ri ri-external-link-line" aria-hidden="true"></i>
 					{{$event.plink.orig_title}}
 				</a>
 			{{/if}}

@@ -1,0 +1,36 @@
+{
+	"id": "222222222222222222-reblog",
+	"uri": "https://example.org/users/booster/statuses/444444444444444444",
+	"url": "https://example.org/@booster/444444444444444444",
+	"spoiler_text": "",
+	"content": "",
+	"language": null,
+	"account": {
+		"id": "3000",
+		"username": "booster",
+		"acct": "booster@example.org",
+		"url": "https://example.org/@booster"
+	},
+	"reblog": {
+		"id": "222222222222222222",
+		"uri": "https://remote.example/users/ben/statuses/222222222222222222",
+		"url": "https://remote.example/@ben/222222222222222222",
+		"spoiler_text": "",
+		"plain_content": "Repeated body",
+		"content": "<p>Repeated body</p>",
+		"language": null,
+		"reblog": null,
+		"account": {
+			"id": "2000",
+			"username": "ben",
+			"acct": "ben@remote.example",
+			"url": "https://remote.example/@ben"
+		},
+		"tags": [],
+		"mentions": [],
+		"emojis": [],
+		"card": null,
+		"poll": null
+	},
+	"tags": []
+}

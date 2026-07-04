@@ -9,7 +9,6 @@ namespace Friendica\Console;
 
 use Asika\SimpleConsole\CommandArgsException;
 use Friendica\App\Mode;
-use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\Model\Contact;
 use RuntimeException;
@@ -20,19 +19,6 @@ use RuntimeException;
 class FixAPDeliveryWorkerTaskParameters extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
-
-	/**
-	 * @var Mode
-	 */
-	private $appMode;
-	/**
-	 * @var Database
-	 */
-	private $dba;
-	/**
-	 * @var L10n
-	 */
-	private $l10n;
 	/**
 	 * @var int
 	 */
@@ -65,13 +51,12 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Mode $appMode, Database $dba, L10n $l10n, array $argv = null)
-	{
+	public function __construct(
+		private readonly Mode $appMode,
+		private readonly Database $dba,
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->appMode = $appMode;
-		$this->dba     = $dba;
-		$this->l10n    = $l10n;
 	}
 
 	protected function doExecute(): int
@@ -113,7 +98,7 @@ HELP;
 
 	private function processRow(array $workerqueueItem)
 	{
-		$parameters = json_decode($workerqueueItem['parameter'], true);
+		$parameters = json_decode((string) $workerqueueItem['parameter'], true);
 
 		if (!$parameters) {
 			$this->errored++;

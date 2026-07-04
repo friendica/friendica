@@ -29,38 +29,18 @@ use RuntimeException;
  */
 final class Daemon extends Console
 {
-	private Mode $mode;
-	private IManageConfigValues $config;
-	private IManageKeyValuePairs $keyValue;
-	private BasePath $basePath;
-	private System $system;
-	private LoggerInterface $logger;
-	private Database $dba;
-	private SysDaemon $daemon;
-
-	/**
-	 * @param Mode                 $mode
-	 * @param IManageConfigValues  $config
-	 * @param IManageKeyValuePairs $keyValue
-	 * @param BasePath             $basePath
-	 * @param System               $system
-	 * @param LoggerInterface      $logger
-	 * @param Database             $dba
-	 * @param SysDaemon            $daemon
-	 * @param array|null           $argv
-	 */
-	public function __construct(Mode $mode, IManageConfigValues $config, IManageKeyValuePairs $keyValue, BasePath $basePath, System $system, LoggerInterface $logger, Database $dba, SysDaemon $daemon, array $argv = null)
-	{
+	public function __construct(
+		private readonly Mode $mode,
+		private readonly IManageConfigValues $config,
+		private readonly IManageKeyValuePairs $keyValue,
+		private readonly BasePath $basePath,
+		private readonly System $system,
+		private readonly LoggerInterface $logger,
+		private readonly Database $dba,
+		private readonly SysDaemon $daemon,
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->mode     = $mode;
-		$this->config   = $config;
-		$this->keyValue = $keyValue;
-		$this->basePath = $basePath;
-		$this->system   = $system;
-		$this->logger   = $logger;
-		$this->dba      = $dba;
-		$this->daemon   = $daemon;
 	}
 
 	protected function getHelp(): string
@@ -107,14 +87,14 @@ HELP;
 						'system' => [
 							'pidfile' => '/path/to/daemon.pid',
 						],
-					TXT
+					TXT,
 			);
 		}
 
 		$pidfile = $this->config->get('system', 'pidfile');
 
 		$daemonMode = $this->getArgument(0);
-		$foreground = (bool) $this->getOption(['f', 'foreground']) ?? false;
+		$foreground = (bool) ($this->getOption(['f', 'foreground']) ?? false);
 
 		if (empty($daemonMode)) {
 			throw new CommandArgsException("Please use either 'start', 'stop' or 'status'");
@@ -154,7 +134,7 @@ HELP;
 		if ($daemonMode == "start") {
 			$this->out("Starting Friendica daemon");
 
-			$this->daemon->start(function () {
+			$this->daemon->start(function (): void {
 				$wait_interval = intval($this->config->get('system', 'cron_interval', 5)) * 60;
 
 				$do_cron   = true;
@@ -163,6 +143,7 @@ HELP;
 				$path = $this->basePath->getPath();
 
 				// Now running as a daemon.
+				/** @phpstan-ignore while.alwaysTrue */
 				while (true) {
 					// Check the database structure and possibly fixes it
 					Update::check($path, true);
@@ -199,7 +180,7 @@ HELP;
 						$arg   = (($seconds + 1) / ($wait_interval / 9)) + 1;
 						$sleep = min(1000000, round(log10($arg) * 1000000, 0));
 
-						$this->daemon->sleep((int)$sleep);
+						$this->daemon->sleep((int) $sleep);
 
 						$timeout = ($seconds >= $wait_interval);
 					} while (!$timeout && !Worker\IPC::JobsExists());

@@ -24,23 +24,9 @@ use Psr\Log\LoggerInterface;
  *
  * @internal
  */
-final class StreamLoggerFactory implements LoggerFactory
+final readonly class StreamLoggerFactory implements LoggerFactory
 {
-	private IManageConfigValues $config;
-
-	private IHaveCallIntrospections $introspection;
-
-	private FileSystemUtil $fileSystem;
-
-	public function __construct(
-		IManageConfigValues $config,
-		IHaveCallIntrospections $introspection,
-		FileSystemUtil $fileSystem
-	) {
-		$this->config        = $config;
-		$this->introspection = $introspection;
-		$this->fileSystem    = $fileSystem;
-	}
+	public function __construct(private IManageConfigValues $config, private IHaveCallIntrospections $introspection, private FileSystemUtil $fileSystem) {}
 
 	/**
 	 * Creates and returns a PSR-3 Logger instance.
@@ -70,7 +56,7 @@ final class StreamLoggerFactory implements LoggerFactory
 			$this->introspection,
 			$this->fileSystem->createStream($logfile),
 			StreamLogger::levelToInt[$logLevel],
-			getmypid()
+			getmypid(),
 		);
 	}
 }

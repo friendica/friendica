@@ -12,7 +12,7 @@ use Friendica\Test\FixtureTestCase;
 
 class NotifyTest extends FixtureTestCase
 {
-	public function dataFormatNotify(): array
+	public static function dataFormatNotify(): array
 	{
 		return [
 			'xss-notify' => [
@@ -23,10 +23,8 @@ class NotifyTest extends FixtureTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataFormatNotify
-	 */
-	public function testFormatNotify(string $name, string $message, string $assertion)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataFormatNotify')]
+	public function testFormatNotify(string $name, string $message, string $assertion): void
 	{
 		self::assertEquals($assertion, Notify::formatMessage($name, $message));
 	}

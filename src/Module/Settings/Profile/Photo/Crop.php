@@ -27,8 +27,8 @@ class Crop extends BaseSettings
 		$photo_prefix = $this->parameters['guid'];
 		$resource_id  = $photo_prefix;
 		$scale        = 0;
-		if (substr($photo_prefix, -2, 1) == '-') {
-			[$resource_id, $scale] = explode('-', $photo_prefix);
+		if (substr((string) $photo_prefix, -2, 1) == '-') {
+			[$resource_id, $scale] = explode('-', (string) $photo_prefix);
 		}
 
 		self::checkFormSecurityTokenRedirectOnError('settings/profile/photo/crop/' . $photo_prefix, 'settings_profile_photo_crop');
@@ -84,7 +84,7 @@ class Crop extends BaseSettings
 					$base_image['filename'],
 					DI::l10n()->t(Photo::PROFILE_PHOTOS),
 					4,
-					Photo::USER_AVATAR
+					Photo::USER_AVATAR,
 				);
 				if ($r === false) {
 					DI::sysmsg()->addNotice(DI::l10n()->t('Image size reduction [%s] failed.', '300'));
@@ -102,7 +102,7 @@ class Crop extends BaseSettings
 					$base_image['filename'],
 					DI::l10n()->t(Photo::PROFILE_PHOTOS),
 					5,
-					Photo::USER_AVATAR
+					Photo::USER_AVATAR,
 				);
 				if ($r === false) {
 					DI::sysmsg()->addNotice(DI::l10n()->t('Image size reduction [%s] failed.', '80'));
@@ -120,7 +120,7 @@ class Crop extends BaseSettings
 					$base_image['filename'],
 					DI::l10n()->t(Photo::PROFILE_PHOTOS),
 					6,
-					Photo::USER_AVATAR
+					Photo::USER_AVATAR,
 				);
 				if ($r === false) {
 					DI::sysmsg()->addNotice(DI::l10n()->t('Image size reduction [%s] failed.', '48'));

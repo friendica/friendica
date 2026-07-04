@@ -10,13 +10,11 @@ namespace Friendica\Core\Worker;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\Contact;
 use Friendica\Model\GServer;
 use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Strings;
 
 /**
  * Contains the class for jobs that are executed in an interval
@@ -67,7 +65,7 @@ class Cron
 			'workerqueue',
 			['id', 'pid', 'executed', 'priority', 'command', 'parameter'],
 			['NOT `done` AND `pid` != ? AND `executed` > ?', 0, DBA::NULL_DATETIME],
-			['order' => ['priority', 'retrial', 'created']]
+			['order' => ['priority', 'retrial', 'created']],
 		);
 
 		$max_duration_defaults = DI::config()->get('system', 'worker_max_duration');
@@ -84,7 +82,7 @@ class Cron
 					continue;
 				}
 
-				$argv = json_decode($entry['parameter'], true);
+				$argv = json_decode((string) $entry['parameter'], true);
 				if (!empty($entry['command'])) {
 					$command = $entry['command'];
 				} elseif (!empty($argv)) {
@@ -93,10 +91,10 @@ class Cron
 					return;
 				}
 
-				$command = basename($command);
+				$command = basename((string) $command);
 
 				// How long is the process already running?
-				$duration = (time() - strtotime($entry["executed"])) / 60;
+				$duration = (time() - strtotime((string) $entry["executed"])) / 60;
 				if ($duration > $max_duration) {
 					DI::logger()->warning('Worker process took too much time - killed', ['duration' => number_format($duration, 3), 'max' => $max_duration, 'id' => $entry["id"], 'pid' => $entry["pid"], 'command' => $command]);
 					posix_kill($entry["pid"], SIGTERM);
@@ -115,7 +113,7 @@ class Cron
 					DBA::update(
 						'workerqueue',
 						['executed' => DBA::NULL_DATETIME, 'created' => DateTimeFormat::utcNow(), 'priority' => $new_priority, 'pid' => 0],
-						['id'       => $entry["id"]]
+						['id'       => $entry["id"]],
 					);
 				} else {
 					DI::logger()->info('Process runtime is okay', ['duration' => number_format($duration, 3), 'max' => $max_duration, 'id' => $entry["id"], 'pid' => $entry["pid"], 'command' => $command]);
@@ -195,7 +193,7 @@ class Cron
 	 */
 	private static function deliverPosts()
 	{
-		foreach(DI::deliveryQueueItemRepo()->selectAggregateByServerId() as $delivery) {
+		foreach (DI::deliveryQueueItemRepo()->selectAggregateByServerId() as $delivery) {
 			if ($delivery->failed > 0) {
 				DI::logger()->info('Removing failed deliveries', ['gsid' => $delivery->targetServerId, 'failed' => $delivery->failed]);
 				DI::deliveryQueueItemRepo()->removeFailedByServerId($delivery->targetServerId, DI::config()->get('system', 'worker_defer_limit'));
@@ -221,26 +219,6 @@ class Cron
 			DI::logger()->info('Optimize start');
 			DI::deliveryQueueItemRepo()->optimizeStorage();
 			DI::logger()->info('Optimize end');
-		}
-	}
-
-	/**
-	 * Add missing "intro" records.
-	 *
-	 * @return void
-	 */
-	private static function addIntros()
-	{
-		$contacts = DBA::p("SELECT `uid`, `id`, `created` FROM `contact` WHERE `rel` = ? AND `pending` AND NOT `id` IN (SELECT `contact-id` FROM `intro`)", Contact::FOLLOWER);
-		while ($contact = DBA::fetch($contacts)) {
-			$fields = [
-				'uid'        => $contact['uid'],
-				'contact-id' => $contact['id'],
-				'datetime'   => $contact['created'],
-				'hash'       => Strings::getRandomHex()
-			];
-			DI::logger()->notice('Adding missing intro', ['fields' => $fields]);
-			DBA::insert('intro', $fields);
 		}
 	}
 }

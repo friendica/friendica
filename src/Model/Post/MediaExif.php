@@ -90,7 +90,7 @@ class MediaExif
 
 		$vals = [];
 		foreach ($exif['LensSpecification'] as $val) {
-			$parts = explode('/', $val);
+			$parts = explode('/', (string) $val);
 			if (count($parts) == 2 && is_numeric($parts[0]) && is_numeric($parts[1]) && $parts[1] != 0) {
 				$vals[] = (float) $parts[0] / (float) $parts[1];
 			} else {

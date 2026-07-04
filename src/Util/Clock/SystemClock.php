@@ -14,15 +14,9 @@ use DateTimeZone;
  * Inspired by lcobucci/clock
  * @see https://github.com/lcobucci/clock
  */
-final class SystemClock implements \Psr\Clock\ClockInterface
+final readonly class SystemClock implements \Psr\Clock\ClockInterface
 {
-	/** @var DateTimeZone */
-	private $timezone;
-
-	public function __construct(DateTimeZone $timezone = null)
-	{
-		$this->timezone = $timezone ?? new DateTimeZone('UTC');
-	}
+	public function __construct(private ?DateTimeZone $timezone = new DateTimeZone('UTC')) {}
 
 	/**
 	 * @inheritDoc

@@ -10,14 +10,17 @@ namespace Friendica;
 use Friendica\App\Router;
 use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Capabilities\ICanCreateResponses;
-use Friendica\Core\Hook;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\Event\ModuleContentEvent;
+use Friendica\Event\ModuleInitEvent;
+use Friendica\Event\ModulePostEvent;
 use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
@@ -48,17 +51,28 @@ abstract class BaseModule implements ICanHandleRequests
 	protected $server;
 	/** @var ICanCreateResponses */
 	protected $response;
+	private readonly EventDispatcherInterface $eventDispatcher;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
-		$this->parameters = $parameters;
-		$this->l10n       = $l10n;
-		$this->baseUrl    = $baseUrl;
-		$this->args       = $args;
-		$this->logger     = $logger;
-		$this->profiler   = $profiler;
-		$this->server     = $server;
-		$this->response   = $response;
+	public function __construct(
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+		?EventDispatcherInterface $eventDispatcher = null,
+	) {
+		$this->parameters      = $parameters;
+		$this->l10n            = $l10n;
+		$this->baseUrl         = $baseUrl;
+		$this->args            = $args;
+		$this->logger          = $logger;
+		$this->profiler        = $profiler;
+		$this->server          = $server;
+		$this->response        = $response;
+		$this->eventDispatcher = $eventDispatcher ?? DI::eventDispatcher();
 	}
 
 	/**
@@ -202,12 +216,12 @@ abstract class BaseModule implements ICanHandleRequests
 			$this->response->setHeader('false', 'Access-Control-Allow-Credentials');
 		}
 
-		$placeholder = '';
-
 		$this->profiler->set(microtime(true), 'ready');
 		$timestamp = microtime(true);
 
-		Core\Hook::callAll($this->args->getModuleName() . '_mod_init', $placeholder);
+		$this->eventDispatcher->dispatch(
+			new ModuleInitEvent(ModuleInitEvent::MODULE_INIT, $this->args->getModuleName(), static::class),
+		);
 
 		$this->profiler->set(microtime(true) - $timestamp, 'init');
 
@@ -219,7 +233,10 @@ abstract class BaseModule implements ICanHandleRequests
 				$this->patch($request);
 				break;
 			case Router::POST:
-				Core\Hook::callAll($this->args->getModuleName() . '_mod_post', $request);
+				$request = $this->eventDispatcher->dispatch(
+					new ModulePostEvent(ModulePostEvent::MODULE_POST, $this->args->getModuleName(), static::class, $request),
+				)->getPost();
+
 				$this->post($request);
 				break;
 			case Router::PUT:
@@ -237,9 +254,10 @@ abstract class BaseModule implements ICanHandleRequests
 		$this->rawContent($request);
 
 		try {
-			$arr = ['content' => ''];
-			Hook::callAll(static::class . '_mod_content', $arr);
-			$this->response->addContent($arr['content']);
+			$content = $this->eventDispatcher->dispatch(
+				new ModuleContentEvent(ModuleContentEvent::MODULE_CONTENT, $this->args->getModuleName(), static::class, ''),
+			)->getContent();
+			$this->response->addContent($content);
 			$this->response->addContent($this->content($request));
 		} catch (HTTPException $e) {
 			// In case of System::externalRedirects(), we don't want to prettyprint the exception
@@ -385,7 +403,7 @@ abstract class BaseModule implements ICanHandleRequests
 
 		$user = User::getById(DI::userSession()->getLocalUserId(), ['guid', 'prvkey']);
 
-		$x = explode('.', $hash);
+		$x = explode('.', (string) $hash);
 		if (time() > (intval($x[0]) + $max_livetime)) {
 			return false;
 		}

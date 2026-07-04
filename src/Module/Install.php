@@ -31,46 +31,43 @@ class Install extends BaseModule
 	/**
 	 * Step one - System check
 	 */
-	const SYSTEM_CHECK = 1;
+	public const SYSTEM_CHECK = 1;
 	/**
 	 * Step two - Base information
 	 */
-	const BASE_CONFIG = 2;
+	public const BASE_CONFIG = 2;
 	/**
 	 * Step three - Database configuration
 	 */
-	const DATABASE_CONFIG = 3;
+	public const DATABASE_CONFIG = 3;
 	/**
 	 * Step four - Adapt site settings
 	 */
-	const SITE_SETTINGS = 4;
+	public const SITE_SETTINGS = 4;
 	/**
 	 * Step five - All steps finished
 	 */
-	const FINISHED = 5;
+	public const FINISHED = 5;
 
 	/**
 	 * @var int The current step of the wizard
 	 */
 	private $currentWizardStep;
 
-	/**
-	 * @var Installer The installer
-	 */
-	private $installer;
-
 	/** @var Cache */
 	protected $configCache;
 	/** @var Mode */
 	protected $mode;
 
-	public function __construct(AppHelper $appHelper, BasePath $basePath, Mode $mode, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, Installer $installer, array $server, array $parameters = [])
+	public function __construct(AppHelper $appHelper, BasePath $basePath, Mode $mode, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, /**
+				 * @var Installer The installer
+				 */
+		private readonly Installer $installer, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->configCache = $appHelper->getConfigCache();
 		$this->mode        = $mode;
-		$this->installer   = $installer;
 
 		if (!$this->mode->isInstall()) {
 			throw new HTTPException\ForbiddenException();
@@ -197,9 +194,9 @@ class Install extends BaseModule
 				break;
 
 			case self::BASE_CONFIG:
-				$baseUrl = $this->configCache->get('system', 'url') ?
-					new Uri($this->configCache->get('system', 'url')) :
-					$this->baseUrl;
+				$baseUrl = $this->configCache->get('system', 'url')
+					? new Uri($this->configCache->get('system', 'url'))
+					: $this->baseUrl;
 
 				$tpl = Renderer::getMarkupTemplate('install/02_base_config.tpl');
 				$output .= Renderer::replaceMacros($tpl, [
@@ -212,7 +209,7 @@ class Install extends BaseModule
 						$this->t('Required')],
 					'$system_url' => ['system-url',
 						$this->t('The Friendica system URL'),
-						(string)$baseUrl,
+						(string) $baseUrl,
 						$this->t("Overwrite this field in case the system URL determination isn't right, otherwise leave it as is."),
 						$this->t('Required')],
 					'$php_path' => $this->configCache->get('config', 'php_path'),
@@ -256,7 +253,7 @@ class Install extends BaseModule
 						$this->t('Required')],
 					'$lbl_10'   => $this->t('Please select a default timezone for your website'),
 					'$php_path' => $this->configCache->get('config', 'php_path'),
-					'$submit'   => $this->t('Submit')
+					'$submit'   => $this->t('Submit'),
 				]);
 				break;
 
@@ -285,7 +282,7 @@ class Install extends BaseModule
 						'system-default_timezone',
 						$this->t('Please select a default timezone for your website'),
 						$this->configCache->get('system', 'default_timezone'),
-						''
+						'',
 					),
 					'$language' => ['system-language',
 						$this->t('System Language:'),
@@ -293,7 +290,7 @@ class Install extends BaseModule
 						$this->t('Set the default language for your Friendica installation interface and to send emails.'),
 						$lang_choices],
 					'$php_path' => $this->configCache->get('config', 'php_path'),
-					'$submit'   => $this->t('Submit')
+					'$submit'   => $this->t('Submit'),
 				]);
 				break;
 
@@ -330,7 +327,7 @@ class Install extends BaseModule
 	 */
 	private function whatNext(): string
 	{
-		$baseurl = (string)$this->baseUrl;
+		$baseurl = (string) $this->baseUrl;
 		return
 			$this->t('<h1>What next</h1>')
 			. "<p>" . $this->t('IMPORTANT: You will need to [manually] setup a scheduled task for the worker.')

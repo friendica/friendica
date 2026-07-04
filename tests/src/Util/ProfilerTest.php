@@ -30,74 +30,74 @@ class ProfilerTest extends MockedTestCase
 	/**
 	 * Test the Profiler setup
 	 */
-	public function testSetUp()
+	public function testSetUp(): void
 	{
 		$config = \Mockery::mock(IManageConfigValues::class);
 		$config->shouldReceive('get')
-		            ->withAnyArgs()
-		            ->andReturn(true)
-		            ->twice();
+					->withAnyArgs()
+					->andReturn(true)
+					->twice();
 		$profiler = new Profiler($config);
 
-		self::assertInstanceOf(Profiler::class, $profiler);
+		self::assertInstanceOf(Profiler::class, $profiler); // @phpstan-ignore staticMethod.alreadyNarrowedType
 	}
 
 	/**
 	 * A dataset for different profiling settings
 	 * @return array
 	 */
-	public function dataPerformance()
+	public static function dataPerformance()
 	{
 		return [
 			'database' => [
 				'timestamp' => time(),
-				'name' => 'database',
+				'name'      => 'database',
 				'functions' => ['test', 'it'],
 			],
 			'database_write' => [
 				'timestamp' => time(),
-				'name' => 'database_write',
+				'name'      => 'database_write',
 				'functions' => ['test', 'it2'],
 			],
 			'cache' => [
 				'timestamp' => time(),
-				'name' => 'cache',
+				'name'      => 'cache',
 				'functions' => ['test', 'it3'],
 			],
 			'cache_write' => [
 				'timestamp' => time(),
-				'name' => 'cache_write',
+				'name'      => 'cache_write',
 				'functions' => ['test', 'it4'],
 			],
 			'network' => [
 				'timestamp' => time(),
-				'name' => 'network',
+				'name'      => 'network',
 				'functions' => ['test', 'it5'],
 			],
 			'file' => [
 				'timestamp' => time(),
-				'name' => 'file',
+				'name'      => 'file',
 				'functions' => [],
 			],
 			'rendering' => [
 				'timestamp' => time(),
-				'name' => 'rendering',
+				'name'      => 'rendering',
 				'functions' => ['test', 'it7'],
 			],
 			'session' => [
 				'timestamp' => time(),
-				'name' => 'session',
+				'name'      => 'session',
 				'functions' => ['test', 'it8'],
 			],
 			'marktime' => [
 				'timestamp' => time(),
-				'name' => 'session',
+				'name'      => 'session',
 				'functions' => ['test'],
 			],
 			// This one isn't set during reset
 			'unknown' => [
 				'timestamp' => time(),
-				'name' => 'unknown',
+				'name'      => 'unknown',
 				'functions' => ['test'],
 			],
 		];
@@ -105,15 +105,15 @@ class ProfilerTest extends MockedTestCase
 
 	/**
 	 * Test the Profiler savetimestamp
-	 * @dataProvider dataPerformance
 	 */
-	public function testSaveTimestamp($timestamp, $name, array $functions)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataPerformance')]
+	public function testSaveTimestamp($timestamp, $name, array $functions): void
 	{
 		$config = \Mockery::mock(IManageConfigValues::class);
 		$config->shouldReceive('get')
-		            ->withAnyArgs()
-		            ->andReturn(true)
-		            ->twice();
+					->withAnyArgs()
+					->andReturn(true)
+					->twice();
 
 		$profiler = new Profiler($config);
 
@@ -126,15 +126,15 @@ class ProfilerTest extends MockedTestCase
 
 	/**
 	 * Test the Profiler reset
-	 * @dataProvider dataPerformance
 	 */
-	public function testReset($timestamp, $name)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataPerformance')]
+	public function testReset($timestamp, $name, array $functions): void
 	{
 		$config = \Mockery::mock(IManageConfigValues::class);
 		$config->shouldReceive('get')
-		            ->withAnyArgs()
-		            ->andReturn(true)
-		            ->twice();
+					->withAnyArgs()
+					->andReturn(true)
+					->twice();
 
 		$profiler = new Profiler($config);
 
@@ -144,46 +144,46 @@ class ProfilerTest extends MockedTestCase
 		self::assertEquals(0, $profiler->get($name));
 	}
 
-	public function dataBig()
+	public static function dataBig()
 	{
 		return [
 			'big' => [
 				'data' => [
 					'database' => [
 						'timestamp' => time(),
-						'name' => 'database',
+						'name'      => 'database',
 						'functions' => ['test', 'it'],
 					],
 					'database_write' => [
 						'timestamp' => time(),
-						'name' => 'database_write',
+						'name'      => 'database_write',
 						'functions' => ['test', 'it2'],
 					],
 					'cache' => [
 						'timestamp' => time(),
-						'name' => 'cache',
+						'name'      => 'cache',
 						'functions' => ['test', 'it3'],
 					],
 					'cache_write' => [
 						'timestamp' => time(),
-						'name' => 'cache_write',
+						'name'      => 'cache_write',
 						'functions' => ['test', 'it4'],
 					],
 					'network' => [
 						'timestamp' => time(),
-						'name' => 'network',
+						'name'      => 'network',
 						'functions' => ['test', 'it5'],
 					],
-				]
-			]
+				],
+			],
 		];
 	}
 
 	/**
 	 * Test the output of the Profiler
-	 * @dataProvider dataBig
 	 */
-	public function testSaveLog($data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataBig')]
+	public function testSaveLog($data): void
 	{
 		$this->logger
 			->shouldReceive('info')
@@ -195,9 +195,9 @@ class ProfilerTest extends MockedTestCase
 
 		$config = \Mockery::mock(IManageConfigValues::class);
 		$config->shouldReceive('get')
-		            ->withAnyArgs()
-		            ->andReturn(true)
-		            ->twice();
+					->withAnyArgs()
+					->andReturn(true)
+					->twice();
 
 		$profiler = new Profiler($config);
 

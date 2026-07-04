@@ -20,14 +20,18 @@ use Psr\Log\LoggerInterface;
 
 class Remove extends \Friendica\BaseModule
 {
-	/** @var IHandleUserSessions */
-	private $session;
-
-	public function __construct(IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly IHandleUserSessions $session,
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->session = $session;
 	}
 
 	protected function post(array $request = [])
@@ -41,10 +45,11 @@ class Remove extends \Friendica\BaseModule
 			$this->baseUrl->redirect($request['return'] ?? '');
 		}
 
-		$tags = [];
-		foreach ($request['tag'] ?? [] as $tag => $checked) {
+		$requestTags = array_key_exists('tag', $request) ? (array) $request['tag'] : [];
+		$tags        = [];
+		foreach ($requestTags as $tag => $checked) {
 			if ($checked) {
-				$tags[] = hex2bin(trim($tag));
+				$tags[] = hex2bin(trim((string) $tag));
 			}
 		}
 
@@ -119,7 +124,7 @@ class Remove extends \Friendica\BaseModule
 		}
 
 		foreach ($tags as $tag) {
-			if (preg_match('~([#@!])\[url=([^\[\]]*)]([^\[\]]*)\[/url]~im', $tag, $results)) {
+			if (preg_match('~([#@!])\[url=([^\[\]]*)]([^\[\]]*)\[/url]~im', (string) $tag, $results)) {
 				Tag::removeByHash($item['uri-id'], $results[1], $results[3], $results[2]);
 			}
 		}

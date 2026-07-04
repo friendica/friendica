@@ -32,38 +32,16 @@ use stdClass;
  */
 class Processor
 {
-	/** @var Database */
-	private $db;
-
-	/** @var LoggerInterface */
-	private $logger;
-
-	/** @var BaseURL */
-	private $baseURL;
-
-	/** @var ATProtocol */
-	private $atprotocol;
-
-	/** @var Actor */
-	private $actor;
-
 	/**
 	 * Processor constructor.
 	 *
-	 * @param Database $database
+	 * @param Database $db
 	 * @param LoggerInterface $logger
 	 * @param BaseURL $baseURL
 	 * @param ATProtocol $atprotocol
 	 * @param Actor $actor
 	 */
-	public function __construct(Database $database, LoggerInterface $logger, BaseURL $baseURL, ATProtocol $atprotocol, Actor $actor)
-	{
-		$this->db         = $database;
-		$this->logger     = $logger;
-		$this->baseURL    = $baseURL;
-		$this->atprotocol = $atprotocol;
-		$this->actor      = $actor;
-	}
+	public function __construct(private readonly Database $db, private readonly LoggerInterface $logger, private readonly BaseURL $baseURL, private readonly ATProtocol $atprotocol, private readonly Actor $actor) {}
 
 	/**
 	 * Process account events and update contact archive state.
@@ -633,9 +611,9 @@ class Processor
 		krsort($facets);
 
 		foreach ($facets as $facet) {
-			$prefix   = substr($text, 0, $facet->index->byteStart);
-			$linktext = substr($text, $facet->index->byteStart, $facet->index->byteEnd - $facet->index->byteStart);
-			$suffix   = substr($text, $facet->index->byteEnd);
+			$prefix   = substr((string) $text, 0, $facet->index->byteStart);
+			$linktext = substr((string) $text, $facet->index->byteStart, $facet->index->byteEnd - $facet->index->byteStart);
+			$suffix   = substr((string) $text, $facet->index->byteEnd);
 
 			$url  = '';
 			$type = '$type';
@@ -656,7 +634,7 @@ class Processor
 
 					case 'app.bsky.richtext.facet#tag':
 						Tag::store($uri_id, Tag::HASHTAG, $feature->tag);
-						$url      = $this->baseURL . '/search?tag=' . urlencode($feature->tag);
+						$url      = $this->baseURL . '/search?tag=' . urlencode((string) $feature->tag);
 						$linktext = '#' . $feature->tag;
 						break;
 
@@ -784,7 +762,7 @@ class Processor
 	private function addStarterpack(array $item, stdClass $record)
 	{
 		$this->logger->debug('Received starterpack', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'uri' => $record->uri]);
-		if (!preg_match('#^at://(.+)/app.bsky.graph.starterpack/(.+)#', $record->uri, $matches)) {
+		if (!preg_match('#^at://(.+)/app.bsky.graph.starterpack/(.+)#', (string) $record->uri, $matches)) {
 			return;
 		}
 
@@ -1042,7 +1020,7 @@ class Processor
 		$class->cid = array_pop($elements);
 		$class->uri = implode(':', $elements);
 
-		if ((substr_count($class->uri, '/') == 2) && (substr_count($class->cid, '/') == 2)) {
+		if ((substr_count($class->uri, '/') == 2) && (substr_count((string) $class->cid, '/') == 2)) {
 			$class->uri .= ':' . $class->cid;
 			$class->cid = '';
 		}

@@ -13,7 +13,8 @@ use Friendica\App\Mode;
 use Friendica\App\Page;
 use Friendica\AppHelper;
 use Friendica\BaseModule;
-use Friendica\Content\Conversation;
+use Friendica\Content\Conversation\ConversationRenderer;
+use Friendica\Content\Conversation\StatusEditor;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
@@ -37,40 +38,19 @@ use Psr\Log\LoggerInterface;
  */
 class Index extends BaseModule
 {
-	/** @var Database */
-	private $database;
-	/** @var AppHelper */
-	private $appHelper;
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var Page */
-	private $page;
-	/** @var ProfileField */
-	private $profileField;
-	/** @var DateTimeFormat */
-	private $dateTimeFormat;
-	/** @var Conversation */
-	private $conversation;
-	/** @var IManagePersonalConfigValues */
-	private $pConfig;
-	/** @var Mode */
-	private $mode;
-	private EventDispatcherInterface $eventDispatcher;
-
 	public function __construct(
-		Mode $mode,
-		IManagePersonalConfigValues $pConfig,
-		Conversation $conversation,
-		DateTimeFormat $dateTimeFormat,
-		ProfileField $profileField,
-		Page $page,
-		IManageConfigValues $config,
-		IHandleUserSessions $session,
-		AppHelper $appHelper,
-		Database $database,
-		EventDispatcherInterface $eventDispatcher,
+		private readonly Mode $mode,
+		private readonly IManagePersonalConfigValues $pConfig,
+		private readonly ConversationRenderer $conversationRenderer,
+		private readonly StatusEditor $statusEditor,
+		private readonly DateTimeFormat $dateTimeFormat,
+		private readonly ProfileField $profileField,
+		private readonly Page $page,
+		private readonly IManageConfigValues $config,
+		private readonly IHandleUserSessions $session,
+		private readonly AppHelper $appHelper,
+		private readonly Database $database,
+		private readonly EventDispatcherInterface $eventDispatcher,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -78,21 +58,9 @@ class Index extends BaseModule
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = []
+		array $parameters = [],
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->database        = $database;
-		$this->appHelper       = $appHelper;
-		$this->session         = $session;
-		$this->config          = $config;
-		$this->page            = $page;
-		$this->profileField    = $profileField;
-		$this->dateTimeFormat  = $dateTimeFormat;
-		$this->conversation    = $conversation;
-		$this->pConfig         = $pConfig;
-		$this->mode            = $mode;
-		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function rawContent(array $request = [])
@@ -102,6 +70,6 @@ class Index extends BaseModule
 
 	protected function content(array $request = []): string
 	{
-		return (new Conversations($this->mode, $this->pConfig, $this->conversation, $this->session, $this->config, $this->dateTimeFormat, $this->page, $this->appHelper, $this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters))->content();
+		return (new Conversations($this->mode, $this->pConfig, $this->conversationRenderer, $this->statusEditor, $this->session, $this->config, $this->dateTimeFormat, $this->page, $this->appHelper, $this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters))->content();
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 
-// Copyright (C) 2010-2024, the Friendica project
-// SPDX-FileCopyrightText: 2010-2024 the Friendica project
+// Copyright (C) 2010-2026, the Friendica project
+// SPDX-FileCopyrightText: 2010-2026 the Friendica project
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -50,7 +50,7 @@ class Import extends \Friendica\Module\BaseModeration
 				return;
 			}
 		} elseif (isset($request['page_contactblock_import'])) {
-			$this->contactlist = json_decode($request['contactlist'], true);
+			$this->contactlist = json_decode((string) $request['contactlist'], true);
 			if ($this->contactlist === null) {
 				$this->notices[] = $this->t('Error parsing contact data.');
 				return;
@@ -113,7 +113,7 @@ class Import extends \Friendica\Module\BaseModeration
 			'$listfile'            => ['listfile', $this->t('Contact blocklist CSV file'), '', '', $this->t('Required'), '', 'file'],
 			'$purge'               => ['purge', $this->t('Also purge contacts'), false, $this->t('Removes all content related to these contacts from the node. Keeps the contact records. This action cannot be undone.')],
 			'$contactlist'         => $this->contactlist,
-			'$form_security_token' => self::getFormSecurityToken('moderation_contactblock_import')
+			'$form_security_token' => self::getFormSecurityToken('moderation_contactblock_import'),
 		]);
 	}
 

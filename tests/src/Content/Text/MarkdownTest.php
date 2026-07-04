@@ -13,16 +13,16 @@ use Friendica\Test\FixtureTestCase;
 
 class MarkdownTest extends FixtureTestCase
 {
-	public function dataMarkdown()
+	public static function dataMarkdown()
 	{
-		$inputFiles = glob(__DIR__ . '/../../../datasets/content/text/markdown/*.md');
+		$inputFiles = glob(__DIR__ . '/../../../Fixtures/content/text/markdown/*.md');
 
 		$data = [];
 
 		foreach ($inputFiles as $file) {
 			$data[str_replace('.md', '', $file)] = [
 				'input'    => file_get_contents($file),
-				'expected' => file_get_contents(str_replace('.md', '.html', $file))
+				'expected' => file_get_contents(str_replace('.md', '.html', $file)),
 			];
 		}
 
@@ -32,21 +32,20 @@ class MarkdownTest extends FixtureTestCase
 	/**
 	 * Test convert different input Markdown text into HTML
 	 *
-	 * @dataProvider dataMarkdown
 	 *
 	 * @param string $input    The Markdown text to test
 	 * @param string $expected The expected HTML output
-	 *
 	 * @throws Exception
 	 */
-	public function testConvert(string $input, string $expected)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataMarkdown')]
+	public function testConvert(string $input, string $expected): void
 	{
 		$output = Markdown::convert($input);
 
 		self::assertEquals($expected, $output);
 	}
 
-	public function dataMarkdownText()
+	public static function dataMarkdownText()
 	{
 		return [
 			'bug-8358-double-decode' => [
@@ -59,14 +58,14 @@ class MarkdownTest extends FixtureTestCase
 	/**
 	 * Test convert Markdown to BBCode
 	 *
-	 * @dataProvider dataMarkdownText
 	 *
 	 * @param string $expectedBBCode Expected BBCode output
-	 * @param string $html           Markdown text
+	 * @param string $markdown       Markdown text
 	 */
-	public function testToBBCode(string $expectedBBCode, string $html)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataMarkdownText')]
+	public function testToBBCode(string $expectedBBCode, string $markdown): void
 	{
-		$actual = Markdown::toBBCode($html);
+		$actual = Markdown::toBBCode($markdown);
 
 		self::assertEquals($expectedBBCode, $actual);
 	}

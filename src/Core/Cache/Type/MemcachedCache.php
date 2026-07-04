@@ -23,17 +23,12 @@ class MemcachedCache extends AbstractCache implements ICanCacheInMemory
 	use CompareSetTrait;
 	use CompareDeleteTrait;
 	use MemcacheCommandTrait;
-	const NAME = 'memcached';
+	public const NAME = 'memcached';
 
 	/**
 	 * @var \Memcached
 	 */
 	private $memcached;
-
-	/**
-	 * @var LoggerInterface
-	 */
-	private $logger;
 
 	/**
 	 * Due to limitations of the INI format, the expected configuration for Memcached servers is the following:
@@ -49,7 +44,7 @@ class MemcachedCache extends AbstractCache implements ICanCacheInMemory
 	 * @throws InvalidCacheDriverException
 	 * @throws CachePersistenceException
 	 */
-	public function __construct(string $hostname, IManageConfigValues $config, LoggerInterface $logger)
+	public function __construct(string $hostname, IManageConfigValues $config, private LoggerInterface $logger)
 	{
 		if (!class_exists('Memcached', false)) {
 			throw new InvalidCacheDriverException('Memcached class isn\'t available');
@@ -57,15 +52,13 @@ class MemcachedCache extends AbstractCache implements ICanCacheInMemory
 
 		parent::__construct($hostname);
 
-		$this->logger = $logger;
-
 		$this->memcached = new Memcached();
 
 		$memcached_hosts = $config->get('system', 'memcached_hosts');
 
-		array_walk($memcached_hosts, function (&$value) {
+		array_walk($memcached_hosts, function (&$value): void {
 			if (is_string($value)) {
-				$value = array_map('trim', explode(',', $value));
+				$value = array_map(trim(...), explode(',', $value));
 			}
 		});
 
@@ -132,12 +125,12 @@ class MemcachedCache extends AbstractCache implements ICanCacheInMemory
 			return $this->memcached->set(
 				$cacheKey,
 				$value,
-				$ttl
+				$ttl,
 			);
 		} else {
 			return $this->memcached->set(
 				$cacheKey,
-				$value
+				$value,
 			);
 		}
 	}

@@ -44,7 +44,6 @@ abstract class PConfigTestCase extends MockedTestCase
 		}
 	}
 
-
 	protected function setUp(): void
 	{
 		parent::setUp();
@@ -59,7 +58,7 @@ abstract class PConfigTestCase extends MockedTestCase
 	 */
 	abstract public function getInstance();
 
-	public function dataTests()
+	public static function dataTests()
 	{
 		return [
 			'string'       => ['uid' => 1, 'data' => 'it'],
@@ -73,7 +72,7 @@ abstract class PConfigTestCase extends MockedTestCase
 		];
 	}
 
-	public function dataConfigLoad()
+	public static function dataConfigLoad()
 	{
 		$data = [
 			'system' => [
@@ -148,7 +147,7 @@ abstract class PConfigTestCase extends MockedTestCase
 	/**
 	 * Test the configuration initialization
 	 */
-	public function testSetUp()
+	public function testSetUp(): void
 	{
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
@@ -159,7 +158,7 @@ abstract class PConfigTestCase extends MockedTestCase
 	/**
 	 * Test the configuration load() method
 	 */
-	public function testLoad(int $uid, array $data, array $possibleCats, array $load)
+	public function testLoad(int $uid, array $data, array $possibleCats, array $load): void
 	{
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
@@ -174,7 +173,7 @@ abstract class PConfigTestCase extends MockedTestCase
 		}
 	}
 
-	public function dataDoubleLoad()
+	public static function dataDoubleLoad()
 	{
 		return [
 			'config' => [
@@ -242,7 +241,7 @@ abstract class PConfigTestCase extends MockedTestCase
 	/**
 	 * Test the configuration load() method with overwrite
 	 */
-	public function testCacheLoadDouble(int $uid, array $data1, array $data2, array $expect)
+	public function testCacheLoadDouble(int $uid, array $data1, array $data2, array $expect): void
 	{
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
@@ -263,10 +262,9 @@ abstract class PConfigTestCase extends MockedTestCase
 
 	/**
 	 * Test the configuration get() and set() methods without adapter
-	 *
-	 * @dataProvider dataTests
 	 */
-	public function testSetGetWithoutDB(int $uid, $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testSetGetWithoutDB(int $uid, $data): void
 	{
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
@@ -279,10 +277,9 @@ abstract class PConfigTestCase extends MockedTestCase
 
 	/**
 	 * Test the configuration get() and set() methods with a model/db
-	 *
-	 * @dataProvider dataTests
 	 */
-	public function testSetGetWithDB(int $uid, $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testSetGetWithDB(int $uid, $data): void
 	{
 		$this->configModel->shouldReceive('set')
 						  ->with($uid, 'test', 'it', $data)
@@ -301,7 +298,7 @@ abstract class PConfigTestCase extends MockedTestCase
 	/**
 	 * Test the configuration get() method with wrong value and no db
 	 */
-	public function testGetWrongWithoutDB()
+	public function testGetWrongWithoutDB(): void
 	{
 		$this->testedConfig = $this->getInstance();
 		self::assertInstanceOf(Cache::class, $this->testedConfig->getCache());
@@ -321,10 +318,9 @@ abstract class PConfigTestCase extends MockedTestCase
 
 	/**
 	 * Test the configuration get() method with refresh
-	 *
-	 * @dataProvider dataTests
 	 */
-	public function testGetWithRefresh(int $uid, $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testGetWithRefresh(int $uid, $data): void
 	{
 		$this->configCache->load($uid, ['test' => ['it' => 'now']]);
 
@@ -346,10 +342,9 @@ abstract class PConfigTestCase extends MockedTestCase
 
 	/**
 	 * Test the configuration delete() method without a model/db
-	 *
-	 * @dataProvider dataTests
 	 */
-	public function testDeleteWithoutDB(int $uid, $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataTests')]
+	public function testDeleteWithoutDB(int $uid, $data): void
 	{
 		$this->configCache->load($uid, ['test' => ['it' => $data]]);
 
@@ -369,7 +364,7 @@ abstract class PConfigTestCase extends MockedTestCase
 	/**
 	 * Test the configuration delete() method with a model/db
 	 */
-	public function testDeleteWithDB()
+	public function testDeleteWithDB(): void
 	{
 		$uid = 42;
 
@@ -413,7 +408,7 @@ abstract class PConfigTestCase extends MockedTestCase
 		self::assertEmpty($this->testedConfig->getCache()->getAll());
 	}
 
-	public function dataMultiUid()
+	public static function dataMultiUid()
 	{
 		return [
 			'normal' => [
@@ -445,9 +440,9 @@ abstract class PConfigTestCase extends MockedTestCase
 
 	/**
 	 * Test if multiple uids for caching are usable without errors
-	 * @dataProvider dataMultiUid
 	 */
-	public function testMultipleUidsWithCache(array $data1, array $data2)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataMultiUid')]
+	public function testMultipleUidsWithCache(array $data1, array $data2): void
 	{
 		$this->configCache->load($data1['uid'], $data1['data']);
 		$this->configCache->load($data2['uid'], $data2['data']);
@@ -465,7 +460,7 @@ abstract class PConfigTestCase extends MockedTestCase
 	 * Test when using an invalid UID
 	 * @todo check it the clean way before using the config class
 	 */
-	public function testInvalidUid()
+	public function testInvalidUid(): void
 	{
 		// bad UID!
 		$uid = 0;

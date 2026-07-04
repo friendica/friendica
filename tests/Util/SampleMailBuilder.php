@@ -11,12 +11,11 @@ use Friendica\Util\EMailer\MailBuilder;
 
 class SampleMailBuilder extends MailBuilder
 {
-	/** @var string */
-	protected $subject;
-	/** @var string */
-	protected $html;
-	/** @var string */
-	protected $text;
+	protected string $subject = '';
+
+	protected string $html = '';
+
+	protected string $text = '';
 
 	/**
 	 * Adds a test message

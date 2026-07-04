@@ -11,7 +11,6 @@ use Friendica\BaseFactory;
 use Friendica\Content\Item as ContentItem;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Database\Database;
 use Friendica\Factory\Api\Friendica\Activities;
 use Friendica\Factory\Api\Twitter\User as TwitterUser;
 use Friendica\Model\Item;
@@ -25,37 +24,18 @@ use Psr\Log\LoggerInterface;
 
 class Status extends BaseFactory
 {
-	/** @var Database */
-	private $dba;
-	/** @var twitterUser entity */
-	private $twitterUser;
-	/** @var Hashtag entity */
-	private $hashtag;
-	/** @var Media entity */
-	private $media;
-	/** @var Url entity */
-	private $url;
-	/** @var Mention entity */
-	private $mention;
-	/** @var Activities entity */
-	private $activities;
-	/** @var Attachment entity */
-	private $attachment;
-	/** @var ContentItem */
-	private $contentItem;
-
-	public function __construct(LoggerInterface $logger, Database $dba, TwitterUser $twitteruser, Hashtag $hashtag, Media $media, Url $url, Mention $mention, Activities $activities, Attachment $attachment, ContentItem $contentItem)
-	{
+	public function __construct(
+		LoggerInterface $logger,
+		private readonly TwitterUser $twitterUser,
+		private readonly Hashtag $hashtag,
+		private readonly Media $media,
+		private readonly Url $url,
+		private readonly Mention $mention,
+		private readonly Activities $activities,
+		private readonly Attachment $attachment,
+		private readonly ContentItem $contentItem,
+	) {
 		parent::__construct($logger);
-		$this->dba         = $dba;
-		$this->twitterUser = $twitteruser;
-		$this->hashtag     = $hashtag;
-		$this->media       = $media;
-		$this->url         = $url;
-		$this->mention     = $mention;
-		$this->activities  = $activities;
-		$this->attachment  = $attachment;
-		$this->contentItem = $contentItem;
 	}
 
 	/**
@@ -141,11 +121,11 @@ class Status extends BaseFactory
 		$geo = [];
 
 		if ($item['coord'] != '') {
-			$coords = explode(' ', $item["coord"]);
+			$coords = explode(' ', (string) $item["coord"]);
 			if (count($coords) == 2) {
 				$geo = [
 					'type'        => 'Point',
-					'coordinates' => [(float) $coords[0], (float) $coords[1]]
+					'coordinates' => [(float) $coords[0], (float) $coords[1]],
 				];
 			}
 		}
@@ -156,7 +136,7 @@ class Status extends BaseFactory
 			'origin'        => true,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'vid'           => Verb::getID(Activity::LIKE),
-			'deleted'       => false
+			'deleted'       => false,
 		]);
 
 		if ($include_entities) {

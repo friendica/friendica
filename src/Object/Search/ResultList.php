@@ -17,28 +17,6 @@ use Friendica\Model\Search;
 class ResultList
 {
 	/**
-	 * Page of the result list
-	 * @var int
-	 */
-	private $page;
-	/**
-	 * Total count of results
-	 * @var int
-	 */
-	private $total;
-	/**
-	 * items per page
-	 * @var int
-	 */
-	private $itemsPage;
-	/**
-	 * Array of results
-	 *
-	 * @var IResult[]
-	 */
-	private $results;
-
-	/**
 	 * @return int
 	 */
 	public function getPage()
@@ -76,14 +54,24 @@ class ResultList
 	 * @param int             $itemsPage
 	 * @param IResult[] $results
 	 */
-	public function __construct($page = 0, $total = 0, $itemsPage = 0, array $results = [])
-	{
-		$this->page      = $page;
-		$this->total     = $total;
-		$this->itemsPage = $itemsPage;
-
-		$this->results = $results;
-	}
+	public function __construct(
+		/**
+		 * Page of the result list
+		 */
+		private $page = 0,
+		/**
+		 * Total count of results
+		 */
+		private $total = 0,
+		/**
+		 * items per page
+		 */
+		private $itemsPage = 0,
+		/**
+		 * Array of results
+		 */
+		private array $results = [],
+	) {}
 
 	/**
 	 * Adds a result to the result list

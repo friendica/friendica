@@ -4,28 +4,19 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<nav>
-	<span id="sidebar-community-no-sharer-inflated" class="widget inflated fakelink">
-		<button class="fakelink" onclick="openCloseWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');" aria-expanded="false">
-			<h3>
-				<i class="fa fa-user-o" aria-hidden="true"></i>
-				{{$title}}
-			</h3>
-		</button>
-	</span>
-	<div id="sidebar-community-no-sharer" class="widget">
-		<button class="fakelink" onclick="openCloseWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');" aria-expanded="true">
-			<h3>
-				<i class="fa fa-user-o" aria-hidden="true"></i>
-				{{$title}}
-			</h3>
-		</button>
-		<ul class="sidebar-community-no-sharer-ul">
-			<li class="sidebar-community-no-sharer-li{{if !$no_sharer}} selected{{/if}}"><a href="{{$base}}/{{$path_all}}">{{$all}}</a></li>
-			<li class="sidebar-community-no-sharer-li{{if $no_sharer}} selected{{/if}}"><a href="{{$base}}/{{$path_no_sharer}}">{{$no_sharer_label}}</a></li>
-		</ul>
-	</div>
+<!-- NOTE: Place "sidebar-widget-list" only on one element: The one that should be expanded/collapsed -->
+<nav id="community-no-sharer-sidebar" class="widget fakelink">
+	<button class="widget-btn fakelink" onclick="openCloseWidget('community-no-sharer-sidebar');" aria-expanded="false">
+		<h3>
+			<i class="ri ri-user-line" aria-hidden="true"></i>
+			{{$title}}
+		</h3>
+	</button>
+	<ul class="sidebar-community-no-sharer-ul sidebar-widget-list">
+		<li class="sidebar-community-no-sharer-li{{if !$no_sharer}} selected{{/if}}"><a href="{{$base}}/{{$path_all}}">{{$all}}</a></li>
+		<li class="sidebar-community-no-sharer-li{{if $no_sharer}} selected{{/if}}"><a href="{{$base}}/{{$path_no_sharer}}">{{$no_sharer_label}}</a></li>
+	</ul>
 </nav>
 <script>
-	initWidget('sidebar-community-no-sharer', 'sidebar-community-no-sharer-inflated');
+	initWidget('community-no-sharer-sidebar');
 </script>

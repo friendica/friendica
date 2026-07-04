@@ -12,6 +12,7 @@ use Friendica\App\Page;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Circle;
 use Friendica\Model\User;
@@ -39,7 +40,7 @@ class ACL
 	 * @return string
 	 * @throws \Exception
 	 */
-	public static function getMessageContactSelectHTML(int $selected = null): string
+	public static function getMessageContactSelectHTML(?int $selected = null): string
 	{
 		$o = '';
 
@@ -59,7 +60,9 @@ class ACL
 			'$selected'      => $selected,
 		]);
 
-		Hook::callAll(DI::args()->getModuleName() . '_post_recipient', $o);
+		$o = DI::eventDispatcher()->dispatch(
+			new ModulePostRecipientEvent(ModulePostRecipientEvent::MODULE_POST_RECIPIENT, DI::args()->getModuleName(), DI::router()->getModuleClass(), $o),
+		)->getHtml();
 
 		return $o;
 	}
@@ -79,7 +82,7 @@ class ACL
 
 		return Contact::selectToArray(
 			['id', 'name', 'addr', 'micro', 'url', 'nick'],
-			DBA::mergeConditions($condition, ["`notify` != ''"])
+			DBA::mergeConditions($condition, ["`notify` != ''"]),
 		);
 	}
 
@@ -111,7 +114,7 @@ class ACL
 	 * @return array Hash of contact id lists
 	 * @throws \Exception
 	 */
-	public static function getDefaultUserPermissions(array $user = null)
+	public static function getDefaultUserPermissions(?array $user = null)
 	{
 		$aclFormatter = DI::aclFormatter();
 
@@ -145,9 +148,9 @@ class ACL
 				'deleted' => false,
 				'pending' => false,
 				'network' => Protocol::FEDERATED,
-				'rel'     => [Contact::FOLLOWER, Contact::FRIEND]
+				'rel'     => [Contact::FOLLOWER, Contact::FRIEND],
 			], $condition),
-			$params
+			$params,
 		);
 
 		$acl_yourself         = Contact::selectFirst($fields, ['uid' => $user_id, 'self' => true]);
@@ -159,12 +162,12 @@ class ACL
 			$fields,
 			['uid'     => $user_id, 'self' => false, 'blocked' => false, 'archive' => false, 'deleted' => false,
 				'network' => Protocol::FEDERATED, 'pending' => false, 'contact-type' => Contact::TYPE_COMMUNITY],
-			$params
+			$params,
 		);
 
 		$acl_contacts = array_merge($acl_groups, $acl_contacts);
 
-		array_walk($acl_contacts, function (&$value) {
+		array_walk($acl_contacts, function (&$value): void {
 			$value['type'] = 'contact';
 		});
 
@@ -193,7 +196,7 @@ class ACL
 				'addr'  => '',
 				'micro' => 'images/twopeople.png',
 				'type'  => 'circle',
-			]
+			],
 		];
 		foreach (Circle::getByUserId($user_id) as $circle) {
 			$acl_circles[] = [
@@ -228,11 +231,11 @@ class ACL
 	 */
 	public static function getFullSelectorHTML(
 		Page $page,
-		int $uid = null,
+		?int $uid = null,
 		bool $for_federation = false,
 		array $default_permissions = [],
 		array $condition = [],
-		$form_prefix = ''
+		$form_prefix = '',
 	) {
 		if (empty($uid)) {
 			return '';
@@ -282,8 +285,8 @@ class ACL
 						'field' => [
 							'pubmail_enable',
 							DI::l10n()->t('Post to Email'),
-							!empty($mailacct['pubmail'])
-						]
+							!empty($mailacct['pubmail']),
+						],
 					];
 
 				}

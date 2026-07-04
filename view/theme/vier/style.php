@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (C) 2010-2024, the Friendica project
  * SPDX-FileCopyrightText: 2010-2024 the Friendica project
@@ -28,7 +29,7 @@ $modified = '';
 $style = \Friendica\Util\Strings::sanitizeFilePathItem($style);
 
 foreach (['style', $style] as $file) {
-	$stylecssfile = $THEMEPATH . DIRECTORY_SEPARATOR . $file .'.css';
+	$stylecssfile = $THEMEPATH . DIRECTORY_SEPARATOR . $file . '.css';
 	if (file_exists($stylecssfile)) {
 		$stylecss .= file_get_contents($stylecssfile);
 		$stylemodified = filemtime($stylecssfile);
@@ -45,15 +46,15 @@ $etag = md5($stylecss);
 
 // Only send the CSS file if it was changed
 header('Cache-Control: public');
-header('ETag: "'.$etag.'"');
-header('Last-Modified: '.$modified);
+header('ETag: "' . $etag . '"');
+header('Last-Modified: ' . $modified);
 
 if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && isset($_SERVER['HTTP_IF_NONE_MATCH'])) {
-	$cached_modified = gmdate('r', strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']));
+	$cached_modified = gmdate('r', strtotime((string) $_SERVER['HTTP_IF_MODIFIED_SINCE']));
 	$cached_etag     = str_replace(
 		['"', "-gzip"],
 		['', ''],
-		stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])
+		stripslashes((string) $_SERVER['HTTP_IF_NONE_MATCH']),
 	);
 
 	if (($cached_modified == $modified) && ($cached_etag == $etag)) {

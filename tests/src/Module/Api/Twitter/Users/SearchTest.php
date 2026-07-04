@@ -21,7 +21,7 @@ class SearchTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiUsersSearch()
+	public function testApiUsersSearch(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
@@ -41,7 +41,7 @@ class SearchTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiUsersSearchWithXml()
+	public function testApiUsersSearchWithXml(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
@@ -60,7 +60,7 @@ class SearchTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiUsersSearchWithoutQuery()
+	public function testApiUsersSearchWithoutQuery(): void
 	{
 		$this->expectException(BadRequestException::class);
 

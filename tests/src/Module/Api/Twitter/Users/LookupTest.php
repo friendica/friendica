@@ -20,7 +20,7 @@ class LookupTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiUsersLookup()
+	public function testApiUsersLookup(): void
 	{
 		$this->expectException(NotFoundException::class);
 
@@ -33,7 +33,7 @@ class LookupTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiUsersLookupWithUserId()
+	public function testApiUsersLookupWithUserId(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);

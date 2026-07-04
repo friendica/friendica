@@ -23,32 +23,32 @@ use Psr\Http\Message\ResponseInterface;
 abstract class ApiTestCase extends FixtureTestCase
 {
 	// User data that the test database is populated with
-	const SELF_USER = [
+	public const SELF_USER = [
 		'id'   => 42,
 		'name' => 'Test user',
 		'nick' => 'selfcontact',
-		'nurl' => 'http://localhost/profile/selfcontact'
+		'nurl' => 'http://localhost/profile/selfcontact',
 	];
 
-	const FRIEND_USER = [
+	public const FRIEND_USER = [
 		'id'   => 44,
 		'name' => 'Friend contact',
 		'nick' => 'friendcontact',
-		'nurl' => 'http://localhost/profile/friendcontact'
+		'nurl' => 'http://localhost/profile/friendcontact',
 	];
 
-	const OTHER_USER = [
+	public const OTHER_USER = [
 		'id'   => 43,
 		'name' => 'othercontact',
 		'nick' => 'othercontact',
-		'nurl' => 'http://localhost/profile/othercontact'
+		'nurl' => 'http://localhost/profile/othercontact',
 	];
 
 	/** @var HTTPException */
 	protected $httpExceptionMock;
 
 	// User ID that we know is not in the database
-	const WRONG_USER_ID = 666;
+	public const WRONG_USER_ID = 666;
 
 	/**
 	 * Assert that the string is XML and contain the root element.
@@ -126,8 +126,8 @@ abstract class ApiTestCase extends FixtureTestCase
 			$tmpFile,
 			base64_decode(
 				// Empty 1x1 px PNG image
-				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=='
-			)
+				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
+			),
 		);
 
 		return $tmpFile;
@@ -144,7 +144,7 @@ abstract class ApiTestCase extends FixtureTestCase
 	{
 		self::assertEquals(ICanCreateResponses::TYPE_JSON, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 
-		$body = (string)$response->getBody();
+		$body = (string) $response->getBody();
 
 		self::assertJson($body);
 
@@ -199,7 +199,7 @@ abstract class ApiTestCase extends FixtureTestCase
 			$func();
 		}
 
-		/** @var $config IManageConfigValues */
+		/** @var IManageConfigValues $config */
 		$config = $this->dice->create(IManageConfigValues::class);
 
 		$config->set('addons', $addon, [

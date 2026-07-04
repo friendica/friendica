@@ -67,7 +67,7 @@ class JsonLD
 				$url = DI::basePath() . '/static/data-integrity-v2.jsonld';
 				break;
 			default:
-				switch (parse_url($url, PHP_URL_PATH)) {
+				switch (parse_url((string) $url, PHP_URL_PATH)) {
 					case '/schemas/litepub-0.1.jsonld':
 						$url = DI::basePath() . '/static/litepub-0.1.jsonld';
 						break;
@@ -119,7 +119,7 @@ class JsonLD
 	{
 		$valid = true;
 
-		array_walk_recursive($data, function (&$value, $key) use ($data, &$valid) {
+		array_walk_recursive($data, function (&$value, $key) use ($data, &$valid): void {
 			$suspicious = ['@graph', '@included', '@reverse'];
 			if (in_array((string) $key, $suspicious) || in_array((string) $value, $suspicious)) {
 				DI::logger()->warning('Document with suspicious commands.', ['key' => $key, 'value' => $value, 'document' => $data]);
@@ -140,7 +140,7 @@ class JsonLD
 	 */
 	public static function normalize($json)
 	{
-		if (!self::isValidObject($json)) {
+		if (!is_array($json) || !self::isValidObject($json)) {
 			return [];
 		}
 
@@ -218,13 +218,8 @@ class JsonLD
 		}
 
 		$json = json_decode(json_encode($compacted, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);
-		if (!self::isValidObject($json)) {
+		if (!is_array($json) || !self::isValidObject($json)) {
 			return [];
-		}
-
-		if ($json === false) {
-			DI::logger()->notice('JSON encode->decode failed', ['orig_json' => $orig_json, 'compacted' => $compacted]);
-			$json = [];
 		}
 
 		return $json;
@@ -237,11 +232,11 @@ class JsonLD
 		}
 
 		// Preparation for adding possibly missing content to the context
-		if (!empty($json['@context']) && is_string($json['@context'])) {
+		if (is_string($json['@context'])) {
 			$json['@context'] = [$json['@context']];
 		}
 
-		if (!empty($json['@context']) && is_array($json['@context'])) {
+		if (is_array($json['@context'])) {
 			// Remove empty entries from the context (a problem with WriteFreely)
 			$json['@context'] = array_filter($json['@context']);
 
@@ -254,7 +249,7 @@ class JsonLD
 		}
 
 		// Issue 14448: Peertube transmits an unexpected type and schema URL.
-		array_walk_recursive($json['@context'], function (&$value, $key) {
+		array_walk_recursive($json['@context'], function (&$value, $key): void {
 			if ($key == '@type' && $value == '@json') {
 				DI::logger()->debug('"@json" converted to "@id"');
 				$value = '@id';
@@ -271,7 +266,7 @@ class JsonLD
 		});
 
 		// Bookwyrm transmits "id" fields with "null", which isn't allowed.
-		array_walk_recursive($json, function (&$value, $key) {
+		array_walk_recursive($json, function (&$value, $key): void {
 			if ($key == 'id' && is_null($value)) {
 				DI::logger()->debug('Fixed null id');
 				$value = '';

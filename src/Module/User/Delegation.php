@@ -9,7 +9,6 @@ namespace Friendica\Module\User;
 
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
-use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Contact\Introduction\Repository\Introduction;
 use Friendica\Core\L10n;
@@ -33,34 +32,24 @@ use Psr\Log\LoggerInterface;
  */
 class Delegation extends BaseModule
 {
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var Database */
-	private $db;
-	/** @var Authentication */
-	private $auth;
-	/** @var SystemMessages */
-	private $systemMessages;
-	/** @var Notify */
-	private $notify;
-	/** @var Introduction */
-	private $intro;
-	/** @var AppHelper */
-	private $appHelper;
-	private EventDispatcherInterface $eventDispatcher;
-
-	public function __construct(EventDispatcherInterface $eventDispatcher, AppHelper $appHelper, Introduction $intro, Notify $notify, SystemMessages $systemMessages, Authentication $auth, Database $db, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Util\Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly EventDispatcherInterface $eventDispatcher,
+		private readonly Introduction $intro,
+		private readonly Notify $notify,
+		private readonly SystemMessages $systemMessages,
+		private readonly Authentication $auth,
+		private readonly Database $db,
+		private readonly IHandleUserSessions $session,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Util\Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->session         = $session;
-		$this->db              = $db;
-		$this->auth            = $auth;
-		$this->systemMessages  = $systemMessages;
-		$this->notify          = $notify;
-		$this->intro           = $intro;
-		$this->appHelper       = $appHelper;
-		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -111,8 +100,7 @@ class Delegation extends BaseModule
 			if (!$this->db->isResult($user)
 				&& (
 					$orig_record['parent-uid'] && $orig_record['parent-uid'] === $identity
-					||
-					$orig_record['uid'] && $orig_record['uid'] === $identity
+					|| $orig_record['uid'] && $orig_record['uid'] === $identity
 				)
 			) {
 				$user = User::getById($identity);
@@ -132,7 +120,7 @@ class Delegation extends BaseModule
 		}
 
 		$this->eventDispatcher->dispatch(
-			new Event(Event::HOME_INIT)
+			new Event(Event::HOME_INIT),
 		);
 
 		$this->systemMessages->addNotice($this->t('You are now logged in as %s', $user['username']));
@@ -157,13 +145,13 @@ class Delegation extends BaseModule
 			$notifications = $this->notify->countForUser(
 				$identity['uid'],
 				["`msg` != '' AND NOT (`type` IN (?, ?)) AND NOT `seen`", Notification\Type::INTRO, Notification\Type::MAIL],
-				['distinct' => true, 'expression' => 'parent']
+				['distinct' => true, 'expression' => 'parent'],
 			);
 
 			$notifications += $this->db->count(
 				'mail',
 				['uid'      => $identity['uid'], 'seen' => false],
-				['distinct' => true, 'expression' => 'convid']
+				['distinct' => true, 'expression' => 'convid'],
 			);
 
 			$notifications += $this->intro->countActiveForUser($identity['uid']);

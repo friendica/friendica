@@ -91,21 +91,21 @@
 					<div class="wall-item-bottom">
 						<div class="wall-item-links">
 						</div>
-						<div class="wall-item-tags">
-                            {{if !$item.suppress_tags}}
-                                {{foreach $item.hashtags as $tag}}
+						<div class="tags wall-item-tags">
+							{{if !$item.suppress_tags}}
+								{{foreach $item.hashtags as $tag}}
 									<span class="tag">{{$tag nofilter}}</span>
-                                {{/foreach}}
-                                {{foreach $item.mentions as $tag}}
+								{{/foreach}}
+								{{foreach $item.mentions as $tag}}
 									<span class="mention">{{$tag nofilter}}</span>
-                                {{/foreach}}
-                            {{/if}}
-                            {{foreach $item.folders as $cat}}
-								<span class="folder p-category">{{$cat.name}}{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
-                            {{/foreach}}
-                            {{foreach $item.categories as $cat}}
-								<span class="category p-category"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
-                            {{/foreach}}
+								{{/foreach}}
+							{{/if}}
+							{{foreach $item.folders as $cat}}
+								<span class="folder"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+							{{/foreach}}
+							{{foreach $item.categories as $cat}}
+								<span class="category"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+							{{/foreach}}
 						</div>
                         {{if $item.edited}}
 							<div class="itemedited text-muted">{{$item.edited['label']}} (<span title="{{$item.edited['date']}}">{{$item.edited['relative']}}</span>)</div>
@@ -218,6 +218,14 @@
                     {{/if}}{{/if}}
 				</div>
 
+
+                {{if $item.missing > 0}}
+				<div class="wall-item-bottom">
+					<div class="wall-item-links"></div>
+					<a id="load-more-comments-{{$item.id}}" class="fakelink" href="#" onclick="loadMoreComments('{{$item.uriid}}', {{$item.id}}, {{$item.existing_json}}); return false;">{{$item.load_more_comments}}</a>
+					<span id="load-more-loading-{{$item.id}}" class="loading-text" style="display: none;">{{$item.loading}} <img class="like-rotator" src="images/rotator.gif" alt="{{$item.loading}}" /></span>
+				</div>
+                {{/if}}
 
                 {{foreach $item.children as $child}}
                     {{if $item.type == tag}}

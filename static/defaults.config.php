@@ -804,8 +804,9 @@ return [
 			'https://bsky.app'           => ['Bluesky', 'https://bsky.app/profile/{did}', 'https://bsky.app/profile/{did}/post/{rkey}'],
 			'https://blacksky.community' => ['Blacksky', 'https://blacksky.community/profile/{did}', 'https://blacksky.community/profile/{did}/post/{rkey}'],
 			'https://deer.social'        => ['Deer', 'https://deer.social/profile/{did}', 'https://deer.social/profile/{did}/post/{rkey}'],
-			'https://reddwarf.app'       => ['Red Dwarf', 'https://reddwarf.app/profile/{did}', 'https://reddwarf.app/profile/{did}/post/{rkey}'],
 			'https://klearsky.pages.dev' => ['Klearsky', 'https://klearsky.pages.dev/?ref=blueskydirectory#/profile/feeds?account={did}', 'https://klearsky.pages.dev/#/post?uri=at://{did}/{collection}/{rkey}'],
+			'https://mu.social'          => ['mu', 'https://mu.social/profile/{did}', 'https://mu.social/profile/{did}/post/{rkey}'],
+			'https://reddwarf.app'       => ['Red Dwarf', 'https://reddwarf.app/profile/{did}', 'https://reddwarf.app/profile/{did}/post/{rkey}'],
 		],
 		// jetstream (URL)
 		// Path to the jetstream service. Available servers from Bluesky are:

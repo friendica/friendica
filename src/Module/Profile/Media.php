@@ -23,32 +23,19 @@ use Psr\Log\LoggerInterface;
 
 class Media extends BaseProfile
 {
-	/**
-	 * @var AppHelper
-	 */
-	private $appHelper;
-
-	/**
-	 * @var IHandleUserSessions
-	 */
-	private $userSession;
-
 	public function __construct(
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
-		AppHelper $appHelper,
+		private readonly AppHelper $appHelper,
 		LoggerInterface $logger,
 		Profiler $profiler,
 		Response $response,
-		IHandleUserSessions $userSession,
+		private readonly IHandleUserSessions $userSession,
 		$server,
-		array $parameters = []
+		array $parameters = [],
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->appHelper   = $appHelper;
-		$this->userSession = $userSession;
 	}
 
 	protected function content(array $request = []): string

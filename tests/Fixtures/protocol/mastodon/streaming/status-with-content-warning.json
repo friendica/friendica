@@ -1,0 +1,31 @@
+{
+	"id": "111111111111111111",
+	"uri": "https://example.org/users/ada/statuses/111111111111111111",
+	"url": "https://example.org/@ada/111111111111111111",
+	"spoiler_text": "Content warning",
+	"plain_content": "Plain body",
+	"content": "<p>Plain body</p>",
+	"language": "de",
+	"reblog": null,
+	"account": {
+		"id": "1000",
+		"username": "ada",
+		"acct": "ada@example.org",
+		"url": "https://example.org/@ada",
+		"uri": "https://example.org/users/ada"
+	},
+	"tags": [
+		{
+			"name": "friendica",
+			"url": "https://example.org/tags/friendica"
+		},
+		{
+			"name": 123,
+			"url": "https://example.org/tags/invalid"
+		}
+	],
+	"mentions": [],
+	"emojis": [],
+	"card": null,
+	"poll": null
+}

@@ -17,7 +17,7 @@ class CryptoTest extends TestCase
 {
 	use PHPMock;
 
-	public function testRandomDigitsRandomInt()
+	public function testRandomDigitsRandomInt(): void
 	{
 		$random_int = $this->getFunctionMock('Friendica\Util', 'random_int');
 		$random_int->expects($this->any())->willReturnCallback(function ($min, $max) {
@@ -28,7 +28,7 @@ class CryptoTest extends TestCase
 		self::assertSame('11111111', Crypto::randomDigits(8));
 	}
 
-	public function testDiasporaPubRsaToMe()
+	public function testDiasporaPubRsaToMe(): void
 	{
 		$key = 'LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tDQpNSUdKQW9HQkFORjVLTmJzN2k3aTByNVFZckNpRExEZ09pU1BWbmgvdlFnMXpnSk9VZVRheWVETk5yZTR6T1RVDQpSVDcyZGlLQ294OGpYOE5paElJTFJtcUtTOWxVYVNzd21QcVNFenVpdE5xeEhnQy8xS2ZuaXM1Qm96NnRwUUxjDQpsZDMwQjJSMWZIVWdFTHZWd0JkV29pRDhSRUt1dFNuRVBGd1RwVmV6aVlWYWtNY25pclRWQWdNQkFBRT0NCi0tLS0tRU5EIFJTQSBQVUJMSUMgS0VZLS0tLS0';
 
@@ -42,7 +42,7 @@ class CryptoTest extends TestCase
 			E6VXs4mFWpDHJ4q01QIDAQAB
 			-----END PUBLIC KEY-----
 			TXT),
-			Crypto::rsaToPem(base64_decode($key))
+			Crypto::rsaToPem(base64_decode($key)),
 		);
 	}
 }

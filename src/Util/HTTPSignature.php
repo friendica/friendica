@@ -62,8 +62,8 @@ class HTTPSignature
 		$headers['(request-target)'] = strtolower(DI::args()->getMethod()) . ' ' . $_SERVER['REQUEST_URI'];
 
 		foreach ($_SERVER as $k => $v) {
-			if (str_starts_with($k, 'HTTP_')) {
-				$field = str_replace('_', '-', strtolower(substr($k, 5)));
+			if (str_starts_with((string) $k, 'HTTP_')) {
+				$field = str_replace('_', '-', strtolower(substr((string) $k, 5)));
 
 				$headers[$field] = $v;
 			}
@@ -90,7 +90,7 @@ class HTTPSignature
 			if (array_key_exists($h, $headers)) {
 				$signed_data .= $h . ': ' . $headers[$h] . "\n";
 			}
-			if (strpos($h, '.')) {
+			if (strpos((string) $h, '.')) {
 				$spoofable = true;
 			}
 		}
@@ -170,11 +170,11 @@ class HTTPSignature
 			if (is_array($v)) {
 				$v = implode(', ', $v);
 			}
-			$headers .= strtolower($k) . ': ' . trim($v) . "\n";
+			$headers .= strtolower((string) $k) . ': ' . trim((string) $v) . "\n";
 			if ($fields) {
 				$fields .= ' ';
 			}
-			$fields .= strtolower($k);
+			$fields .= strtolower((string) $k);
 		}
 		// strip the trailing linefeed
 		$headers = rtrim($headers, "\n");
@@ -210,7 +210,7 @@ class HTTPSignature
 		$regex = "/($token+)=($quotedString|$token+)/ism";
 
 		$matches = [];
-		preg_match_all($regex, $header, $matches, PREG_SET_ORDER);
+		preg_match_all($regex, (string) $header, $matches, PREG_SET_ORDER);
 
 		$headers = [];
 		foreach ($matches as $match) {
@@ -229,7 +229,7 @@ class HTTPSignature
 			'created'   => $headers['created']   ?? null,
 			'expires'   => $headers['expires']   ?? null,
 			'headers'   => explode(' ', $headers['headers'] ?? ''),
-			'signature' => base64_decode(preg_replace('/\s+/', '', $headers['signature'] ?? '')),
+			'signature' => base64_decode((string) preg_replace('/\s+/', '', $headers['signature'] ?? '')),
 		];
 
 		if (!empty($return['signature']) && !empty($return['algorithm']) && empty($return['headers'])) {
@@ -275,7 +275,7 @@ class HTTPSignature
 		$host           = strtolower(parse_url($target, PHP_URL_HOST));
 		$path           = parse_url($target, PHP_URL_PATH);
 		$digest         = 'SHA-256=' . base64_encode(hash('sha256', $content, true));
-		$content_length = strlen($content);
+		$content_length = (string) strlen($content);
 		$date           = DateTimeFormat::utcNow(DateTimeFormat::HTTP);
 
 		$headers = [
@@ -391,7 +391,7 @@ class HTTPSignature
 	 * @param int     $gsid    Server ID
 	 * @throws \Exception
 	 */
-	public static function setInboxStatus(string $url, bool $success, bool $shared = false, int $gsid = null)
+	public static function setInboxStatus(string $url, bool $success, bool $shared = false, ?int $gsid = null)
 	{
 		$now = DateTimeFormat::utcNow();
 
@@ -421,8 +421,8 @@ class HTTPSignature
 		}
 
 		if ($status['failure'] > DBA::NULL_DATETIME) {
-			$new_previous_stamp = strtotime($status['failure']);
-			$old_previous_stamp = strtotime($status['previous']);
+			$new_previous_stamp = strtotime((string) $status['failure']);
+			$old_previous_stamp = strtotime((string) $status['previous']);
 
 			// Only set "previous" with at least one day difference.
 			// We use this to assure to not accidentally archive too soon.
@@ -433,13 +433,13 @@ class HTTPSignature
 
 		if (!$success) {
 			if ($status['success'] <= DBA::NULL_DATETIME) {
-				$stamp1 = strtotime($status['created']);
+				$stamp1 = strtotime((string) $status['created']);
 			} else {
-				$stamp1 = strtotime($status['success']);
+				$stamp1 = strtotime((string) $status['success']);
 			}
 
 			$stamp2         = strtotime($now);
-			$previous_stamp = strtotime($status['previous']);
+			$previous_stamp = strtotime((string) $status['previous']);
 
 			// Archive the inbox when there had been failures for five days.
 			// Additionally ensure that at least one previous attempt has to be in between.
@@ -599,7 +599,7 @@ class HTTPSignature
 			return [];
 		}
 
-		$url = (strpos($sig_block['keyId'], '#') ? substr($sig_block['keyId'], 0, strpos($sig_block['keyId'], '#')) : $sig_block['keyId']);
+		$url = (strpos((string) $sig_block['keyId'], '#') ? substr((string) $sig_block['keyId'], 0, strpos((string) $sig_block['keyId'], '#')) : $sig_block['keyId']);
 		return APContact::getByURL($url);
 	}
 
@@ -634,19 +634,19 @@ class HTTPSignature
 
 		$headers = [];
 
-		$headers['(request-target)'] = strtolower(DI::args()->getMethod()) . ' ' . parse_url($http_headers['REQUEST_URI'], PHP_URL_PATH);
+		$headers['(request-target)'] = strtolower(DI::args()->getMethod()) . ' ' . parse_url((string) $http_headers['REQUEST_URI'], PHP_URL_PATH);
 
 		// First take every header
 		foreach ($http_headers as $k => $v) {
-			$field = str_replace('_', '-', strtolower($k));
+			$field = str_replace('_', '-', strtolower((string) $k));
 
 			$headers[$field] = $v;
 		}
 
 		// Now add every http header
 		foreach ($http_headers as $k => $v) {
-			if (str_starts_with($k, 'HTTP_')) {
-				$field = str_replace('_', '-', strtolower(substr($k, 5)));
+			if (str_starts_with((string) $k, 'HTTP_')) {
+				$field = str_replace('_', '-', strtolower(substr((string) $k, 5)));
 
 				$headers[$field] = $v;
 			}
@@ -736,7 +736,7 @@ class HTTPSignature
 
 		// Check the digest when it is part of the signed data
 		if (!empty($content) && in_array('digest', $sig_block['headers'])) {
-			$digest = explode('=', $headers['digest'], 2);
+			$digest = explode('=', (string) $headers['digest'], 2);
 			if ($digest[0] === 'SHA-256') {
 				$hashalg = 'sha256';
 			}
@@ -755,7 +755,7 @@ class HTTPSignature
 		}
 
 		if (in_array('date', $sig_block['headers']) && !empty($headers['date'])) {
-			$created = strtotime($headers['date']);
+			$created = strtotime((string) $headers['date']);
 		} elseif (in_array('(created)', $sig_block['headers']) && !empty($sig_block['created'])) {
 			$created = $sig_block['created'];
 		} else {

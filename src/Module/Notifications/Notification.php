@@ -25,26 +25,22 @@ use Psr\Log\LoggerInterface;
 
 class Notification extends BaseModule
 {
-	/** @var Introduction */
-	private $introductionRepo;
-	/** @var Repository\Notification */
-	private $notificationRepo;
-	/** @var Repository\Notify */
-	private $notifyRepo;
-	/** @var IManagePersonalConfigValues */
-	private $pconfig;
-	/** @var Factory\Notification */
-	private $notificationFactory;
-
-	public function __construct(Introduction $introductionRepo, Repository\Notification $notificationRepo, Factory\Notification $notificationFactory, Repository\Notify $notifyRepo, IManagePersonalConfigValues $pconfig, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly Introduction $introductionRepo,
+		private readonly Repository\Notification $notificationRepo,
+		private readonly Factory\Notification $notificationFactory,
+		private readonly Repository\Notify $notifyRepo,
+		private readonly IManagePersonalConfigValues $pconfig,
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->introductionRepo    = $introductionRepo;
-		$this->notificationRepo    = $notificationRepo;
-		$this->notificationFactory = $notificationFactory;
-		$this->notifyRepo          = $notifyRepo;
-		$this->pconfig             = $pconfig;
 	}
 
 	/**
@@ -129,8 +125,6 @@ class Notification extends BaseModule
 		}
 
 		$this->baseUrl->redirect('notifications/system');
-
-		return '';
 	}
 
 	private function handleNotify(int $notifyId)
@@ -151,7 +145,7 @@ class Notification extends BaseModule
 			$this->notificationRepo->setAllSeenForUser($Notify->uid, ['target-uri-id' => $Notify->uriId]);
 		}
 
-		if ((string)$Notify->link) {
+		if ((string) $Notify->link) {
 			System::externalRedirect($Notify->link);
 		}
 

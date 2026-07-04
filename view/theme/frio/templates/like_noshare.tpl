@@ -10,7 +10,7 @@
 	        class="btn btn-default button-likes{{if $responses.like.self}} active" aria-pressed="true{{/if}}" id="like-{{$id}}"
 	        title="{{$like_title}}"
 	        onclick="doActivityItemAction({{$id}}, 'like'{{if $responses.like.self}}, true{{/if}});">
-		<i class="fa fa-thumbs-up" aria-hidden="true"></i>&nbsp;{{$like}}
+		<i class="ri ri-thumb-up-line" aria-hidden="true"></i>&nbsp;{{$like}}
 	</button>
 	{{if !$hide_dislike}}
 	<button type="button"
@@ -18,7 +18,7 @@
 	        id="dislike-{{$id}}"
 	        title="{{$dislike_title}}"
 	        onclick="doActivityItemAction({{$id}}, 'dislike'{{if $responses.dislike.self}}, true{{/if}});">
-                <i class="fa fa-thumbs-down" aria-hidden="true"></i>&nbsp;{{$dislike}}
+                <i class="ri ri-thumb-down-line" aria-hidden="true"></i>&nbsp;{{$dislike}}
 	</button>
 	{{/if}}
 </div>

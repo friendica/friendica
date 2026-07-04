@@ -10,9 +10,7 @@ namespace Friendica\Test\src\Core\Cache;
 use Friendica\Core\Cache\Type\APCuCache;
 use Friendica\Test\MemoryCacheTestCase;
 
-/**
- * @group APCU
- */
+#[\PHPUnit\Framework\Attributes\Group('APCU')]
 class APCuCacheTest extends MemoryCacheTestCase
 {
 	protected function setUp(): void
@@ -32,14 +30,13 @@ class APCuCacheTest extends MemoryCacheTestCase
 
 	protected function tearDown(): void
 	{
-		$this->cache->clear(false);
+		if ($this->cache !== null) {
+			$this->cache->clear(false);
+		}
 		parent::tearDown();
 	}
 
-	/**
-	 * @small
-	 */
-	public function testStats()
+	public function testStats(): void
 	{
 		$stats = $this->instance->getStats();
 

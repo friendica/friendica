@@ -125,10 +125,10 @@ class Request
 	protected function determineRemoteAddress(IManageConfigValues $config, array $server): string
 	{
 		$remoteAddress  = $server['REMOTE_ADDR'] ?? '0.0.0.0';
-		$trustedProxies = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', $config->get('proxy', 'trusted_proxies', ''));
+		$trustedProxies = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', (string) $config->get('proxy', 'trusted_proxies', ''));
 
 		if (\is_array($trustedProxies) && $this->isTrustedProxy($trustedProxies, $remoteAddress)) {
-			$forwardedForHeaders = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', $config->get('proxy', 'forwarded_for_headers', static::DEFAULT_FORWARD_FOR_HEADER));
+			$forwardedForHeaders = preg_split('/(\s*,*\s*)*,+(\s*,*\s*)*/', (string) $config->get('proxy', 'forwarded_for_headers', static::DEFAULT_FORWARD_FOR_HEADER));
 
 			foreach ($forwardedForHeaders as $header) {
 				if (isset($server[$header])) {

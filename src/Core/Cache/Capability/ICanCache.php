@@ -15,6 +15,7 @@ use Friendica\Core\Cache\Exception\CachePersistenceException;
  */
 interface ICanCache
 {
+	public const NAME = '';
 	/**
 	 * Lists all cache keys
 	 *

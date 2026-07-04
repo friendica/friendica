@@ -30,4 +30,5 @@ class HttpClientRequest
 	public const PUBSUB          = 'PubSub/1';
 	public const URLRESOLVER     = 'URLResolver/1';
 	public const URLVERIFIER     = 'URLVerifier/1';
+	public const STREAMING       = 'Streaming/1';
 }

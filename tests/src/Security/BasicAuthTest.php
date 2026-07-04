@@ -17,7 +17,7 @@ class BasicAuthTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiSource()
+	public function testApiSource(): void
 	{
 		self::assertEquals('api', BasicAuth::getCurrentApplicationToken()['name']);
 	}
@@ -27,7 +27,7 @@ class BasicAuthTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiSourceWithTwidere()
+	public function testApiSourceWithTwidere(): void
 	{
 		$_SERVER['HTTP_USER_AGENT'] = 'Twidere';
 		self::assertEquals('Twidere', BasicAuth::getCurrentApplicationToken()['name']);
@@ -38,7 +38,7 @@ class BasicAuthTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiSourceWithGet()
+	public function testApiSourceWithGet(): void
 	{
 		$_REQUEST['source'] = 'source_name';
 		self::assertEquals('source_name', BasicAuth::getCurrentApplicationToken()['name']);
@@ -47,7 +47,7 @@ class BasicAuthTest extends ApiTestCase
 	/**
 	 * Test the BasicAuth::getCurrentUserID() function without any login.
 	 */
-	public function testApiLoginWithoutLogin()
+	public function testApiLoginWithoutLogin(): void
 	{
 		self::markTestIncomplete('Needs Refactoring of BasicAuth first.');
 		/*
@@ -60,7 +60,7 @@ class BasicAuthTest extends ApiTestCase
 	/**
 	 * Test the BasicAuth::getCurrentUserID() function with a bad login.
 	 */
-	public function testApiLoginWithBadLogin()
+	public function testApiLoginWithBadLogin(): void
 	{
 		self::markTestIncomplete('Needs Refactoring of BasicAuth first.');
 		/*
@@ -74,7 +74,7 @@ class BasicAuthTest extends ApiTestCase
 	/**
 	 * Test the BasicAuth::getCurrentUserID() function with a correct login.
 	 */
-	public function testApiLoginWithCorrectLogin()
+	public function testApiLoginWithCorrectLogin(): void
 	{
 		BasicAuth::setCurrentUserID();
 		$_SERVER['PHP_AUTH_USER'] = 'Test user';
@@ -85,7 +85,7 @@ class BasicAuthTest extends ApiTestCase
 	/**
 	 * Test the BasicAuth::getCurrentUserID() function with a remote user.
 	 */
-	public function testApiLoginWithRemoteUser()
+	public function testApiLoginWithRemoteUser(): void
 	{
 		self::markTestIncomplete('Needs Refactoring of BasicAuth first.');
 		/*

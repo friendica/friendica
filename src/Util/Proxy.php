@@ -123,8 +123,8 @@ class Proxy
 		// if the picture seems to be from another picture cache then take the original source
 		$queryvar = self::parseQuery($matches[2]);
 
-		if (!empty($queryvar['url']) && str_starts_with($queryvar['url'], 'http')) {
-			$matches[2] = urldecode($queryvar['url']);
+		if (!empty($queryvar['url']) && str_starts_with((string) $queryvar['url'], 'http')) {
+			$matches[2] = urldecode((string) $queryvar['url']);
 		}
 
 		// Following line changed per bug #431
@@ -133,24 +133,18 @@ class Proxy
 		}
 
 		// Return proxified HTML
-		return $matches[1] . BBCode::proxyUrl(htmlspecialchars_decode($matches[2]), BBCode::INTERNAL, $uriid, Proxy::SIZE_MEDIUM) . $matches[3];
+		return $matches[1] . BBCode::proxyUrl(htmlspecialchars_decode((string) $matches[2]), BBCode::INTERNAL, $uriid, Proxy::SIZE_MEDIUM) . $matches[3];
 	}
 
 	public static function getPixelsFromSize(string $size): int
 	{
-		switch ($size) {
-			case Proxy::SIZE_MICRO:
-				return Proxy::PIXEL_MICRO;
-			case Proxy::SIZE_THUMB:
-				return Proxy::PIXEL_THUMB;
-			case Proxy::SIZE_SMALL:
-				return Proxy::PIXEL_SMALL;
-			case Proxy::SIZE_MEDIUM:
-				return Proxy::PIXEL_MEDIUM;
-			case Proxy::SIZE_LARGE:
-				return Proxy::PIXEL_LARGE;
-			default:
-				return 0;
-		}
+		return match ($size) {
+			Proxy::SIZE_MICRO  => Proxy::PIXEL_MICRO,
+			Proxy::SIZE_THUMB  => Proxy::PIXEL_THUMB,
+			Proxy::SIZE_SMALL  => Proxy::PIXEL_SMALL,
+			Proxy::SIZE_MEDIUM => Proxy::PIXEL_MEDIUM,
+			Proxy::SIZE_LARGE  => Proxy::PIXEL_LARGE,
+			default            => 0,
+		};
 	}
 }

@@ -76,7 +76,7 @@ class Search extends BaseApi
 			}
 		}
 
-		if ((empty($request['type']) || ($request['type'] == 'hashtags')) && (!str_contains($request['q'], '@'))) {
+		if ((empty($request['type']) || ($request['type'] == 'hashtags')) && (!str_contains((string) $request['q'], '@'))) {
 			$result['hashtags'] = $this->searchHashtags($request['q'], $request['exclude_unreviewed'], $limit, $request['offset'], $this->parameters['version']);
 		}
 
@@ -159,7 +159,7 @@ class Search extends BaseApi
 	 * @param int    $min_id
 	 * @param int    $limit
 	 * @param int    $offset
-	 * @return array|\Friendica\Object\Api\Mastodon\Status Object is result is absolute (exact post match), list if not
+	 * @return \Friendica\Object\Api\Mastodon\Status[] Object is result is absolute (exact post match), list if not
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \Friendica\Network\HTTPException\NotFoundException
 	 * @throws \ImagickException
@@ -178,6 +178,12 @@ class Search extends BaseApi
 			$condition = ["MATCH (`searchtext`) AGAINST (? IN BOOLEAN MODE) AND (NOT `restricted` OR `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `uid` = ?))", $q, $uid];
 			$table     = SearchIndex::getSearchTable();
 		}
+
+		$condition = DBA::mergeConditions($condition, ["NOT EXISTS(SELECT `post-thread-user`.`uri-id` FROM `post-thread-user`
+			INNER JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
+			INNER JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread-user`.`author-id`
+			WHERE `post-thread-user`.`uri-id` = `$table`.`uri-id`
+			AND (`ownercontact`.`unsearchable` OR `authorcontact`.`unsearchable`))"]);
 
 		if (!empty($account_id)) {
 			$condition = DBA::mergeConditions($condition, ["`author-id` = ?", $account_id]);

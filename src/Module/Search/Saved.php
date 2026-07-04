@@ -36,7 +36,7 @@ class Saved extends BaseModule
 		$search = trim(rawurldecode($_GET['term'] ?? ''));
 
 		if (!empty($_GET['return_url']) && Strings::isHex($_GET['return_url'])) {
-			$return_url = hex2bin($_GET['return_url']);
+			$return_url = hex2bin((string) $_GET['return_url']);
 		} else {
 			$return_url = Search::getSearchPath($search);
 		}

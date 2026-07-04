@@ -192,7 +192,7 @@ class Form extends BaseModule
 		$tpl           = Renderer::getMarkupTemplate('calendar/event_form.tpl');
 		$no_formatting = $this->t("Formatting is not supported for this field");
 
-		if (str_contains($_SERVER['REQUEST_URI'], "/calendar/event/edit")) {
+		if (str_contains((string) $_SERVER['REQUEST_URI'], "/calendar/event/edit")) {
 			$title = $this->t('Edit event');
 		} else {
 			$title = $this->t('New event'); // Used when creating or duplicating an event

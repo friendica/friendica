@@ -12,15 +12,12 @@ use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
-use Friendica\Core\Logger;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
-use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
@@ -34,23 +31,16 @@ use Psr\Log\LoggerInterface;
  */
 class RemoteFollow extends BaseModule
 {
-	/** @var SystemMessages */
-	private $systemMessages;
 	/** @var Page */
 	protected $page;
-	/** @var IHandleUserSessions */
-	private $userSession;
 
 	/** @var array */
 	protected $owner;
 
-	public function __construct(IHandleUserSessions $userSession, SystemMessages $systemMessages, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, App\Page $page, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly IHandleUserSessions $userSession, private readonly SystemMessages $systemMessages, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, App\Page $page, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->systemMessages = $systemMessages;
-		$this->page           = $page;
-		$this->userSession    = $userSession;
+		$this->page = $page;
 
 		$this->owner = User::getOwnerDataByNick($this->parameters['nickname']);
 		if (!$this->owner) {
@@ -93,9 +83,9 @@ class RemoteFollow extends BaseModule
 		// Send the subscriber home to subscribe
 		// Diaspora needs the uri in the format user@domain.tld
 		if ($data['network'] == Protocol::DIASPORA) {
-			$uri = urlencode($this->owner['addr']);
+			$uri = urlencode((string) $this->owner['addr']);
 		} else {
-			$uri = urlencode($this->owner['url']);
+			$uri = urlencode((string) $this->owner['url']);
 		}
 
 		$follow_link = str_replace('{uri}', $uri, $data['subscribe']);
@@ -111,17 +101,17 @@ class RemoteFollow extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('auto_request.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$header'        => $this->t('Friend/Connection Request'),
-			'$page_desc'     => $this->t('Enter your Webfinger address (user@domain.tld) or profile URL here. If this isn\'t supported by your system, you have to subscribe to <strong>%s</strong> or <strong>%s</strong> directly on your system.', $target_addr, $target_url),
-			'$invite_desc'   => $this->t('If you are not yet a member of the free social web, <a href="%s">follow this link to find a public Friendica node and join us today</a>.', Search::getGlobalDirectory() . '/servers'),
-			'$your_address'  => $this->t('Your Webfinger address or profile URL:'),
-			'$pls_answer'    => $this->t('Please answer the following:'),
-			'$submit'        => $this->t('Submit Request'),
-			'$cancel'        => $this->t('Cancel'),
+			'$header'       => $this->t('Friend/Connection Request'),
+			'$page_desc'    => $this->t('Enter your Webfinger address (user@domain.tld) or profile URL here. If this isn\'t supported by your system, you have to subscribe to <strong>%s</strong> or <strong>%s</strong> directly on your system.', $target_addr, $target_url),
+			'$invite_desc'  => $this->t('If you are not yet a member of the free social web, <a href="%s">follow this link to find a public Friendica node and join us today</a>.', Search::getGlobalDirectory() . '/servers'),
+			'$your_address' => $this->t('Your Webfinger address or profile URL:'),
+			'$pls_answer'   => $this->t('Please answer the following:'),
+			'$submit'       => $this->t('Submit Request'),
+			'$cancel'       => $this->t('Cancel'),
 
-			'$action'        => 'profile/' . $this->parameters['nickname'] . '/remote_follow',
-			'$name'          => $this->owner['name'],
-			'$myaddr'        => $this->userSession->getMyUrl(),
+			'$action' => 'profile/' . $this->parameters['nickname'] . '/remote_follow',
+			'$name'   => $this->owner['name'],
+			'$myaddr' => $this->userSession->getMyUrl(),
 		]);
 	}
 }

@@ -46,7 +46,7 @@ final class AddonInfo
 		foreach ($ll as $l) {
 			$l = trim($l, "\t\n\r */");
 			if ($l !== '') {
-				$addon_info = array_map('trim', explode(":", $l, 2));
+				$addon_info = array_map(trim(...), explode(":", $l, 2));
 				if (count($addon_info) < 2) {
 					continue;
 				}
@@ -149,9 +149,7 @@ final class AddonInfo
 
 	private string $status = '';
 
-	private function __construct()
-	{
-	}
+	private function __construct() {}
 
 	public function getId(): string
 	{

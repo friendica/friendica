@@ -33,7 +33,7 @@ class Owa extends BaseModule
 		$ret = [ 'success' => false ];
 
 		foreach (['REDIRECT_REMOTE_USER', 'HTTP_AUTHORIZATION'] as $head) {
-			if (array_key_exists($head, $_SERVER) && str_starts_with(trim($_SERVER[$head]), 'Signature')) {
+			if (array_key_exists($head, $_SERVER) && str_starts_with(trim((string) $_SERVER[$head]), 'Signature')) {
 				if ($head !== 'HTTP_AUTHORIZATION') {
 					$_SERVER['HTTP_AUTHORIZATION'] = $_SERVER[$head];
 					continue;

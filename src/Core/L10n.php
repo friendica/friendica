@@ -70,9 +70,10 @@ class L10n
 	 *
 	 * @var string
 	 */
-	private $lang = '';
-
-	private string $locale = '';
+	private string $lang     = '';
+	private array $languages = [];
+	private array $locales   = [];
+	private string $locale   = '';
 
 	/**
 	 * An array of translation strings whose key is the neutral english message.
@@ -81,26 +82,12 @@ class L10n
 	 */
 	private $strings = [];
 
-	/**
-	 * @var Database
-	 */
-	private $dba;
-	/**
-	 * @var IManageConfigValues
-	 */
-	private $config;
-	private IHandleSessions $session;
-
-	public function __construct(IManageConfigValues $config, Database $dba, IHandleSessions $session, array $server, array $get)
+	public function __construct(private IManageConfigValues $config, private Database $dba, private IHandleSessions $session, array $server, array $get)
 	{
-		$this->dba     = $dba;
-		$this->config  = $config;
-		$this->session = $session;
-
-		$this->loadTranslationTable(L10n::detectLanguage($server, $get, $config->get('system', 'language', self::DEFAULT)));
+		$this->loadTranslationTable(L10n::detectLanguage($server, $get, $this->config->get('system', 'language', self::DEFAULT)));
 		$this->setLocale($server);
-		$this->setSessionVariable($session);
-		$this->setLangFromSession($session);
+		$this->setSessionVariable($this->session);
+		$this->setLangFromSession($this->session);
 	}
 
 	/**
@@ -143,13 +130,13 @@ class L10n
 			if ($session->get('uid')) {
 				$user = $this->dba->selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
 				if ($this->dba->isResult($user)) {
-					$session->set('language', $user['language']);
+					$session->set('language', $this->normaliseLocale($user['language']));
 				}
 			}
 		}
 
 		if (isset($_GET['lang'])) {
-			$session->set('language', $_GET['lang']);
+			$session->set('language', $this->normaliseLocale($_GET['lang']));
 		}
 	}
 
@@ -223,7 +210,7 @@ class L10n
 		if (empty($lang_variable)) {
 			$acceptedLanguages = [];
 		} else {
-			$acceptedLanguages = preg_split('/,\s*/', $lang_variable);
+			$acceptedLanguages = preg_split('/,\s*/', (string) $lang_variable);
 		}
 
 		// Add get as absolute quality accepted language (except this language isn't valid)
@@ -246,7 +233,7 @@ class L10n
 		foreach ($acceptedLanguages as $acceptedLanguage) {
 			$res = preg_match(
 				'/^([a-z]{1,8}(?:-[a-z]{1,8})*)(?:;\s*q=(0(?:\.[0-9]{1,3})?|1(?:\.0{1,3})?))?$/i',
-				$acceptedLanguage,
+				(string) $acceptedLanguage,
 				$matches,
 			);
 
@@ -418,6 +405,10 @@ class L10n
 	 */
 	public function getAvailableLanguages(): array
 	{
+		if ($this->languages) {
+			return $this->languages;
+		}
+
 		$langs              = [];
 		$strings_file_paths = glob('view/lang/*/strings.php');
 
@@ -431,7 +422,78 @@ class L10n
 				$langs[$path_array[2]] = self::LANG_NAMES[$path_array[2]] ?? $path_array[2];
 			}
 		}
+		$this->languages = $langs;
 		return $langs;
+	}
+
+	/**
+	 * Return the available locales based on the available languages.
+	 *
+	 * This function derives the list of available locales from the list of available languages.
+	 * For each language code, it parses it as a locale and extracts both the language and region parts (if present).
+	 * It then constructs locale strings in the format "language" and "language-region" and collects them in a unique list.
+	 *
+	 * Ex: array('en', 'en-US', 'de', 'de-DE', ...)
+	 *
+	 * @return array
+	 */
+	private function getAvailableLocales(): array
+	{
+		if ($this->locales) {
+			return $this->locales;
+		}
+		$locales = [];
+		foreach (array_keys($this->getAvailableLanguages()) as $key) {
+			$locale = Locale::parseLocale($key);
+			if (isset($locale['language'])) {
+				$locales[] = $locale['language'];
+			}
+			if (isset($locale['language'], $locale['region'])) {
+				$locales[] = Locale::composeLocale($locale);
+			}
+		}
+		$locales = array_unique($locales);
+		sort($locales);
+
+		$this->locales = $locales;
+		return $locales;
+	}
+
+	/**
+	 * Normalise a locale string against the list of available locales.
+	 *
+	 * This function checks if the provided locale string matches any of the available locales using `Locale::lookup()`.
+	 * If a match is found, it returns the matched locale; otherwise, it returns a default locale.
+	 *
+	 * @param string|null $locale The locale string to normalise (e.g., 'en-US', 'de-DE')
+	 * @return string The normalised locale if found, or the detected locale, the system default or finally 'en-US' as a fallback
+	 */
+	public function normaliseLocale(?string $locale): string
+	{
+		if ($locale === null) {
+			return $this->locale ?: $this->config->get('system', 'language', 'en-US');
+		}
+
+		$normalised = Locale::lookup($this->getAvailableLocales(), $locale);
+		if ($normalised) {
+			return $normalised;
+		}
+
+		$default_locale = $this->locale ?: $this->config->get('system', 'language', 'en-US');
+
+		$locale_parts = Locale::parseLocale($locale);
+		if (!isset($locale_parts['language'])) {
+			return $default_locale;
+		}
+
+		$iso639 = new \Matriphe\ISO639\ISO639();
+
+		$languages = array_column($iso639->allLanguages(), 0);
+		if (in_array($locale_parts['language'], $languages)) {
+			return $locale_parts['language'];
+		}
+
+		return $default_locale;
 	}
 
 	/**
@@ -505,7 +567,7 @@ class L10n
 	 * */
 	public function langToLocaleCode($lang)
 	{
-		return preg_replace_callback("/([a-z]+)-([a-z]+)/", fn ($m) => $m[1] . "_" . strtoupper($m[2]), $lang);
+		return preg_replace_callback("/([a-z]+)-([a-z]+)/", fn ($m): string => $m[1] . "_" . strtoupper((string) $m[2]), $lang);
 	}
 
 	/**
@@ -669,7 +731,7 @@ class L10n
 	public function formatDateTime(string $datestring, int $dateType, int $timeType, ?string $pattern = null): string
 	{
 		$formatter = new IntlDateFormatter(
-			$this->session->get('language') ?? $this->locale ?: $this->config->get('system', 'language', 'en_US'),
+			$this->normaliseLocale($this->session->get('language')),
 			$dateType,
 			$timeType,
 			$this->session->get('timezone') ?? null,

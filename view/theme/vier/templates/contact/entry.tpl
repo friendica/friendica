@@ -39,7 +39,32 @@
 	<div class="contact-entry-desc">
 		<div class="contact-entry-name" id="contact-entry-name-{{$contact.id}}">
 			{{$contact.name}}
-			{{if $contact.account_type}} <span class="contact-entry-details" id="contact-entry-accounttype-{{$contact.id}}">({{$contact.account_type}})</span>{{/if}}
+			{{if $contact.account_type == 4}}
+				{{$acct_icon = "ri-broadcast-line"}}
+			{{else if $contact.account_type == 3}}
+				{{if $contact.private == 1}}
+					{{$acct_icon = "ri-spy-line"}}
+				{{else if $contact.manually_approve == 1}}
+					{{$acct_icon = "ri-group-3-line"}}
+				{{else}}
+					{{$acct_icon = "ri-team-line"}}
+				{{/if}}
+			{{else if $contact.account_type == 2}}
+				{{$acct_icon = "ri-newspaper-line"}}
+			{{else if $contact.account_type == 1}}
+				{{$acct_icon = "ri-building-4-line"}}
+			{{else if $contact.account_type == 0 && $contact.manually_approve == 0}}
+				{{$acct_icon = "ri-megaphone-line"}}
+			{{else}}
+				{{$acct_icon = ""}}
+			{{/if}}
+			{{if $contact.account_type_name}} <small class="contact-entry-details" id="contact-entry-accounttype-{{$contact.id}}">(<i class="ri {{$acct_icon}}" aria-hidden="true"></i> {{$contact.account_type_name}})</small>
+			{{else}}
+				<small class="contact-entry-details"><i class="ri {{$acct_icon}}" aria-hidden="true"></i></small>
+			{{/if}}
+			</h4>
+			{{if $contact.is_admin}}<span class="badge badge-admin"><i class="ri ri-medal-2-fill" aria-hidden="true"></i> {{$contact.admin_title}}</span>{{/if}}
+			{{if $contact.is_mod}}<span class="badge badge-mod"><i class="ri ri-shield-user-line" aria-hidden="true"></i> {{$contact.moderator_title}}</span>{{/if}}
 		</div>
 		{{if $contact.alt_text}}<div class="contact-entry-details" id="contact-entry-rel-{{$contact.id}}">{{$contact.alt_text}}</div>{{/if}}
 		<div class="contact-entry-details">

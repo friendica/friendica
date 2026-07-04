@@ -39,36 +39,23 @@ class PostMedia extends BaseRepository
 {
 	protected static $table_name = 'post-media';
 
-	/** @var PostMediaFactory */
-	protected $factory;
-	/** @var IManagePersonalConfigValues */
-	private $pConfig;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var BaseURL */
-	private $baseURL;
-	/** @var Item */
-	private $item;
-
 	/**
 	 * PostMedia repository constructor.
-	 *
-	 * @param Database $database Database connection wrapper
-	 * @param LoggerInterface $logger PSR-3 logger
-	 * @param PostMediaFactory $factory Factory for creating entities
-	 * @param IManagePersonalConfigValues $pConfig Personal configuration access
-	 * @param IManageConfigValues $config Global configuration access
-	 * @param BaseURL $baseURL Base URL helper
-	 * @param Item $item Item helper
 	 */
-	public function __construct(Database $database, LoggerInterface $logger, PostMediaFactory $factory, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, BaseURL $baseURL, Item $item)
-	{
-		parent::__construct($database, $logger, $factory);
+	public function __construct(
+		Database $database,
+		LoggerInterface $logger,
+		private readonly PostMediaFactory $entityFactory,
+		private readonly IManagePersonalConfigValues $pConfig,
+		private readonly IManageConfigValues $config,
+		private readonly BaseURL $baseURL,
+	) {
+		parent::__construct($database, $logger, $entityFactory);
+	}
 
-		$this->baseURL = $baseURL;
-		$this->pConfig = $pConfig;
-		$this->config  = $config;
-		$this->item    = $item;
+	protected function getFactory(): PostMediaFactory
+	{
+		return $this->entityFactory;
 	}
 
 	/**
@@ -88,7 +75,7 @@ class PostMedia extends BaseRepository
 		$Entities = new PostMediasCollection();
 		foreach ($rows as $fields) {
 			try {
-				$Entities[] = $this->factory->createFromTableRow($fields);
+				$Entities[] = $this->getFactory()->createFromTableRow($fields);
 			} catch (\Throwable $e) {
 				$this->logger->warning('Invalid media row', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'fields' => $fields]);
 			}
@@ -108,7 +95,7 @@ class PostMedia extends BaseRepository
 	{
 		$fields = $this->_selectFirstRowAsArray(['id' => $postMediaId]);
 
-		return $this->factory->createFromTableRow($fields);
+		return $this->getFactory()->createFromTableRow($fields);
 	}
 
 	/**
@@ -378,7 +365,7 @@ class PostMedia extends BaseRepository
 	public function createFromUrl(string $url): PostMediaEntity
 	{
 		$data  = ParseUrl::getSiteinfoCached($url);
-		$media = $this->factory->createFromParseUrl($data);
+		$media = $this->getFactory()->createFromParseUrl($data);
 		return $this->fetchAdditionalData($media);
 	}
 
@@ -392,7 +379,7 @@ class PostMedia extends BaseRepository
 	{
 		$data = $this->getFields($postMedia, true);
 		$data = Post\Media::fetchAdditionalData($data);
-		return $this->factory->createFromTableRow($data);
+		return $this->getFactory()->createFromTableRow($data);
 	}
 
 	/**
@@ -413,12 +400,12 @@ class PostMedia extends BaseRepository
 			$data['author-url'] = '';
 		}
 
-		$parts = parse_url($data['url']);
+		$parts = parse_url((string) $data['url']);
 		if (!empty($parts['scheme']) && !empty($parts['host'])) {
 			if (empty($data['publisher-name'])) {
 				$data['publisher-name'] = $parts['host'];
 			}
-			if (empty($data['publisher-url']) || empty(parse_url($data['publisher-url'], PHP_URL_SCHEME))) {
+			if (empty($data['publisher-url']) || empty(parse_url((string) $data['publisher-url'], PHP_URL_SCHEME))) {
 				$data['publisher-url'] = $parts['scheme'] . '://' . $parts['host'];
 
 				if (!empty($parts['port'])) {
@@ -434,7 +421,7 @@ class PostMedia extends BaseRepository
 		}
 		$data['name'] = str_replace(['http://', 'https://'], '', $data['name']);
 
-		return $this->factory->createFromTableRow($data);
+		return $this->getFactory()->createFromTableRow($data);
 	}
 
 	/**
@@ -648,7 +635,7 @@ class PostMedia extends BaseRepository
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate($postMedia->embedHeight ? 'content/embed-iframe.tpl' : 'content/embed-iframe-resize.tpl'), [
-			'id'           => 'iframe-' . hash('md5', $postMedia->embedHtml),
+			'id'           => 'iframe-' . hash('md5', (string) $postMedia->embedHtml),
 			'src'          => $postMedia->embedHtml,
 			'height'       => $height,
 			'width'        => $width,

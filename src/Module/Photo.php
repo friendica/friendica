@@ -90,7 +90,7 @@ class Photo extends BaseApi
 			}
 
 			if (!empty($this->parameters['nickname_ext'])) {
-				$nickname = pathinfo($this->parameters['nickname_ext'], PATHINFO_FILENAME);
+				$nickname = pathinfo((string) $this->parameters['nickname_ext'], PATHINFO_FILENAME);
 				$user     = User::getByNickname($nickname, ['uid']);
 				if (empty($user)) {
 					throw new HTTPException\NotFoundException();
@@ -110,7 +110,7 @@ class Photo extends BaseApi
 
 			$photo = $this->getPhotoById($id, $this->parameters['type'], $customsize ?: Proxy::PIXEL_SMALL);
 		} else {
-			$photoid = pathinfo($this->parameters['name'], PATHINFO_FILENAME);
+			$photoid = pathinfo((string) $this->parameters['name'], PATHINFO_FILENAME);
 			$scale   = 0;
 			if (substr($photoid, -2, 1) == '-') {
 				$scale   = intval(substr($photoid, -1, 1));
@@ -177,7 +177,7 @@ class Photo extends BaseApi
 		if (empty($imgdata)) {
 			$this->logger->warning('Invalid photo', ['id' => $photo['id']]);
 			if (in_array($photo['backend-class'], [ExternalResource::NAME])) {
-				$reference = json_decode($photo['backend-ref'], true);
+				$reference = json_decode((string) $photo['backend-ref'], true);
 				$error     = DI::l10n()->t('Invalid external resource with url %s.', $reference['url']);
 			} else {
 				$error = DI::l10n()->t('Invalid photo with id %s.', $photo['id']);
@@ -219,7 +219,7 @@ class Photo extends BaseApi
 			// and subsequently have permission to see it
 			header('Cache-Control: no-store, no-cache, must-revalidate');
 		} else {
-			$md5 = $photo['hash'] ?: md5($imgdata);
+			$md5 = $photo['hash'] ?: md5((string) $imgdata);
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
 			header("Etag: \"{$md5}\"");
 			header('Expires: ' . gmdate('D, d M Y H:i:s', time() + (31536000)) . ' GMT');
@@ -290,7 +290,7 @@ class Photo extends BaseApi
 					return false;
 				}
 
-				if (DI::baseUrl()->isLocalUrl($url) && preg_match('|.*?/photo/(.*[a-fA-F0-9])\-(.*[0-9])\..*[\w]|', $url, $matches)) {
+				if (DI::baseUrl()->isLocalUrl($url) && preg_match('|.*?/photo/(.*[a-fA-F0-9])\-(.*[0-9])\..*[\w]|', (string) $url, $matches)) {
 					return MPhoto::getPhoto($matches[1], $matches[2], self::getCurrentUserID());
 				}
 
@@ -301,7 +301,7 @@ class Photo extends BaseApi
 					return false;
 				}
 
-				if (DI::baseUrl()->isLocalUrl($media['url']) && preg_match('|.*?/photo/(.*[a-fA-F0-9])\-(.*[0-9])\..*[\w]|', $media['url'], $matches)) {
+				if (DI::baseUrl()->isLocalUrl($media['url']) && preg_match('|.*?/photo/(.*[a-fA-F0-9])\-(.*[0-9])\..*[\w]|', (string) $media['url'], $matches)) {
 					return MPhoto::getPhoto($matches[1], $matches[2], self::getCurrentUserID());
 				}
 
@@ -469,18 +469,11 @@ class Photo extends BaseApi
 		if (empty($photo)) {
 			$contact = DBA::selectFirst('contact', [], ['uid' => $id, 'self' => true]) ?: [];
 
-			switch ($type) {
-				case 'profile':
-				case 'custom':
-					$default = Contact::getDefaultAvatar($contact, Proxy::SIZE_SMALL);
-					break;
-				case 'micro':
-					$default = Contact::getDefaultAvatar($contact, Proxy::SIZE_MICRO);
-					break;
-				case 'avatar':
-				default:
-					$default = Contact::getDefaultAvatar($contact, Proxy::SIZE_THUMB);
-			}
+			$default = match ($type) {
+				'profile', 'custom' => Contact::getDefaultAvatar($contact, Proxy::SIZE_SMALL),
+				'micro' => Contact::getDefaultAvatar($contact, Proxy::SIZE_MICRO),
+				default => Contact::getDefaultAvatar($contact, Proxy::SIZE_THUMB),
+			};
 
 			if (DI::baseUrl()->isLocalUrl($default)) {
 				System::externalRedirect($default);

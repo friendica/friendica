@@ -53,27 +53,6 @@ use Psr\Log\LoggerInterface;
  */
 class Item
 {
-	/** @var Activity */
-	private $activity;
-	/** @var L10n */
-	private $l10n;
-	/** @var Profiler */
-	private $profiler;
-	/** @var IHandleUserSessions */
-	private $userSession;
-	/** @var Video */
-	private $bbCodeVideo;
-	/** @var ACLFormatter */
-	private $aclFormatter;
-	/** @var IManagePersonalConfigValues */
-	private $pConfig;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var BaseURL */
-	private $baseURL;
-	/** @var Emailer */
-	private $emailer;
-	private EventDispatcherInterface $eventDispatcher;
 	/** @var LoggerInterface */
 	protected $logger;
 	/** @var PostMediaRepository */
@@ -81,19 +60,8 @@ class Item
 	/** @var PostMediaFactory */
 	protected $postMediaFactory;
 
-	public function __construct(LoggerInterface $logger, Profiler $profiler, Activity $activity, L10n $l10n, IHandleUserSessions $userSession, Video $bbCodeVideo, ACLFormatter $aclFormatter, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, BaseURL $baseURL, Emailer $emailer, EventDispatcherInterface $eventDispatcher, PostMediaRepository $postMediaRepository, PostMediaFactory $postMediaFactory)
+	public function __construct(LoggerInterface $logger, private readonly Profiler $profiler, private readonly Activity $activity, private readonly L10n $l10n, private readonly IHandleUserSessions $userSession, private readonly Video $bbCodeVideo, private readonly ACLFormatter $aclFormatter, private readonly IManagePersonalConfigValues $pConfig, private readonly IManageConfigValues $config, private readonly BaseURL $baseURL, private readonly Emailer $emailer, private readonly EventDispatcherInterface $eventDispatcher, PostMediaRepository $postMediaRepository, PostMediaFactory $postMediaFactory)
 	{
-		$this->profiler            = $profiler;
-		$this->activity            = $activity;
-		$this->l10n                = $l10n;
-		$this->userSession         = $userSession;
-		$this->bbCodeVideo         = $bbCodeVideo;
-		$this->aclFormatter        = $aclFormatter;
-		$this->baseURL             = $baseURL;
-		$this->pConfig             = $pConfig;
-		$this->config              = $config;
-		$this->emailer             = $emailer;
-		$this->eventDispatcher     = $eventDispatcher;
 		$this->logger              = $logger;
 		$this->postMediaRepository = $postMediaRepository;
 		$this->postMediaFactory    = $postMediaFactory;
@@ -142,14 +110,14 @@ class Item
 
 		foreach (Post\Category::getArrayByURIId($item['uri-id'], $uid) as $savedFolderName) {
 			if (!empty($item['author-link'])) {
-				$url = $item['author-link'] . '/conversations?category=' . rawurlencode($savedFolderName);
+				$url = $item['author-link'] . '/conversations?category=' . rawurlencode((string) $savedFolderName);
 			} else {
 				$url = '#';
 			}
 			$categories[] = [
 				'name'      => $savedFolderName,
 				'url'       => $url,
-				'removeurl' => $this->userSession->getLocalUserId() == $uid ? 'filerm/' . $item['id'] . '?cat=' . rawurlencode($savedFolderName) : '',
+				'removeurl' => $this->userSession->getLocalUserId() == $uid ? 'filerm/' . $item['id'] . '?cat=' . rawurlencode((string) $savedFolderName) : '',
 				'first'     => $first,
 				'last'      => false,
 			];
@@ -164,8 +132,8 @@ class Item
 			foreach (Post\Category::getArrayByURIId($item['uri-id'], $uid, Post\Category::FILE) as $savedFolderName) {
 				$folders[] = [
 					'name'      => $savedFolderName,
-					'url'       => "#",
-					'removeurl' => $this->userSession->getLocalUserId() == $uid ? 'filerm/' . $item['id'] . '?term=' . rawurlencode($savedFolderName) : '',
+					'url'       => '/filed?file=' . $savedFolderName,
+					'removeurl' => $this->userSession->getLocalUserId() == $uid ? 'filerm/' . $item['id'] . '?term=' . rawurlencode((string) $savedFolderName) : '',
 					'first'     => $first,
 					'last'      => false,
 				];
@@ -331,19 +299,16 @@ class Item
 
 				switch ($obj['verb']) {
 					case Activity::POST:
-						switch ($obj['object-type']) {
-							case Activity\ObjectType::EVENT:
-								$post_type = $this->l10n->t('event');
-								break;
-							default:
-								$post_type = $this->l10n->t('status');
-						}
+						$post_type = match ($obj['object-type']) {
+							Activity\ObjectType::EVENT => $this->l10n->t('event'),
+							default                    => $this->l10n->t('status'),
+						};
 						break;
 
 					default:
 						if ($obj['resource-id']) {
 							$post_type = $this->l10n->t('photo');
-							preg_match("/\[url=([^]]*)\]/", $obj['body'], $matches);
+							preg_match("/\[url=([^]]*)\]/", (string) $obj['body'], $matches);
 							$rr['plink'] = $matches[1];
 						} else {
 							$post_type = $this->l10n->t('status');
@@ -437,7 +402,7 @@ class Item
 				$this->l10n->t('View Status')                                 => $status_link,
 				$this->l10n->t('View Profile')                                => $profile_link,
 				$this->l10n->t('View Photos')                                 => $photos_link,
-				$this->l10n->t('Network Posts')                               => $posts_link,
+				$this->l10n->t('Posts')                                       => $posts_link,
 				$this->l10n->t('View Contact')                                => $contact_url,
 				$this->l10n->t('Message')                                     => $pm_url,
 				$this->l10n->t('Collapse')                                    => $collapse_link,
@@ -455,7 +420,7 @@ class Item
 			if ((($cid == 0) || ($rel == Contact::FOLLOWER))
 				&& in_array($item['network'], Protocol::FEDERATED)
 			) {
-				$menu[$this->l10n->t('Connect/Follow')] = 'contact/follow?url=' . urlencode($item['author-link']) . '&auto=1';
+				$menu[$this->l10n->t('Connect/Follow')] = 'contact/follow?url=' . urlencode((string) $item['author-link']) . '&auto=1';
 			}
 		} else {
 			$menu = [$this->l10n->t('View Profile') => $item['author-link']];
@@ -471,8 +436,8 @@ class Item
 
 		$o = '';
 		foreach ($menu as $k => $v) {
-			if (str_starts_with($v, 'javascript:')) {
-				$v = substr($v, 11);
+			if (str_starts_with((string) $v, 'javascript:')) {
+				$v = substr((string) $v, 11);
 				$o .= '<li role="menuitem"><a onclick="' . $v . '">' . $k . '</a></li>' . PHP_EOL;
 			} elseif ($v) {
 				$o .= '<li role="menuitem"><a href="' . $v . '">' . $k . '</a></li>' . PHP_EOL;
@@ -713,7 +678,7 @@ class Item
 		if (!empty($shared)) {
 			if (($item['network'] != Protocol::ATPROTO) && !empty($shared['guid']) && ($encapsulated_share = $this->createSharedPostByGuid($shared['guid'], true))) {
 				if (!empty(BBCode::fetchShareAttributes($item['body']))) {
-					$item['body'] = preg_replace("/\[share.*?\](.*)\[\/share\]/ism", $encapsulated_share, $item['body']);
+					$item['body'] = preg_replace("/\[share.*?\](.*)\[\/share\]/ism", $encapsulated_share, (string) $item['body']);
 				} else {
 					$item['body'] .= $encapsulated_share;
 				}
@@ -857,6 +822,7 @@ class Item
 
 	public function addCategories(array $post, string $category): array
 	{
+		$filedas = [];
 		if (!empty($post['file'])) {
 			// get the "fileas" tags for this post
 			$filedas = FileTag::fileToArray($post['file']);
@@ -865,7 +831,7 @@ class Item
 		$list_array   = explode(',', trim($category));
 		$post['file'] = FileTag::arrayToFile($list_array, 'category');
 
-		if (!empty($filedas) && is_array($filedas)) {
+		if (!empty($filedas)) {
 			// append the fileas stuff to the new categories list
 			$post['file'] .= FileTag::arrayToFile($filedas);
 		}
@@ -924,7 +890,7 @@ class Item
 
 		// embedded bookmark or attachment in post? set bookmark flag
 		$data = BBCode::getAttachmentData($post['body']);
-		if ((preg_match_all("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", $post['body'], $match, PREG_SET_ORDER) || !empty($data['type']))
+		if ((preg_match_all("/\[bookmark\=([^\]]*)\](.*?)\[\/bookmark\]/ism", (string) $post['body'], $match, PREG_SET_ORDER) || !empty($data['type']))
 			&& ($post['post-type'] != ItemModel::PT_PERSONAL_NOTE)
 		) {
 			$post['post-type']   = ItemModel::PT_PAGE;
@@ -1002,12 +968,12 @@ class Item
 		} else {
 			Attach::setPermissionFromBody($post);
 		}
-		if (preg_match("/\[attachment\](.*?)\[\/attachment\]/ism", $post['body'], $matches)) {
-			$post['body'] = preg_replace("/\[attachment].*?\[\/attachment\]/ism", PageInfo::getFooterFromUrl($matches[1]), $post['body']);
+		if (preg_match("/\[attachment\](.*?)\[\/attachment\]/ism", (string) $post['body'], $matches)) {
+			$post['body'] = preg_replace("/\[attachment].*?\[\/attachment\]/ism", PageInfo::getFooterFromUrl($matches[1]), (string) $post['body']);
 		}
 
 		// Convert links with empty descriptions to links without an explicit description
-		$post['body'] = trim(preg_replace('#\[url=([^\]]*?)\]\[/url\]#ism', '[url]$1[/url]', $post['body']));
+		$post['body'] = trim((string) preg_replace('#\[url=([^\]]*?)\]\[/url\]#ism', '[url]$1[/url]', (string) $post['body']));
 		$post['body'] = $this->bbCodeVideo->transform($post['body']);
 		$post         = $this->setObjectType($post);
 
@@ -1088,7 +1054,7 @@ class Item
 		$author = DBA::selectFirst('contact', ['thumb'], ['uid' => $post['uid'], 'self' => true]);
 
 		foreach ($recipients as $recipient) {
-			$address = trim($recipient);
+			$address = trim((string) $recipient);
 			if (!$address) {
 				continue;
 			}
@@ -1127,11 +1093,11 @@ class Item
 			if ($receiver['url'] == $from_author['ap-followers']) {
 				if (!empty($followers)) {
 					$receiver['url']  = $followers;
-					$receiver['name'] = trim(parse_url($receiver['url'], PHP_URL_PATH), '/');
+					$receiver['name'] = trim(parse_url((string) $receiver['url'], PHP_URL_PATH), '/');
 					Tag::store($toUriId, $receiver['type'], $receiver['name'], $receiver['url']);
 				}
 				$receiver['url']  = $to_author['ap-followers'];
-				$receiver['name'] = trim(parse_url($receiver['url'], PHP_URL_PATH), '/');
+				$receiver['name'] = trim(parse_url((string) $receiver['url'], PHP_URL_PATH), '/');
 			}
 			if (in_array($receiver['url'], $existing)) {
 				continue;
@@ -1192,7 +1158,7 @@ class Item
 	public function guid(array $item, bool $notify): string
 	{
 		if (!empty($item['guid'])) {
-			return trim($item['guid']);
+			return trim((string) $item['guid']);
 		}
 
 		if ($notify) {
@@ -1204,29 +1170,29 @@ class Item
 
 			// We are only storing the post so we create a GUID from the original hostname.
 			if (!empty($item['author-link'])) {
-				$parsed = parse_url($item['author-link']);
+				$parsed = parse_url((string) $item['author-link']);
 				if (!empty($parsed['host'])) {
 					$prefix_host = $parsed['host'];
 				}
 			}
 
 			if (empty($prefix_host) && !empty($item['plink'])) {
-				$parsed = parse_url($item['plink']);
+				$parsed = parse_url((string) $item['plink']);
 				if (!empty($parsed['host'])) {
 					$prefix_host = $parsed['host'];
 				}
 			}
 
 			if (empty($prefix_host) && !empty($item['uri'])) {
-				$parsed = parse_url($item['uri']);
+				$parsed = parse_url((string) $item['uri']);
 				if (!empty($parsed['host'])) {
 					$prefix_host = $parsed['host'];
 				}
 			}
 
 			// Is it in the format data@host.tld? - Used for mail contacts
-			if (empty($prefix_host) && !empty($item['author-link']) && strstr($item['author-link'], '@')) {
-				$mailparts   = explode('@', $item['author-link']);
+			if (empty($prefix_host) && !empty($item['author-link']) && strstr((string) $item['author-link'], '@')) {
+				$mailparts   = explode('@', (string) $item['author-link']);
 				$prefix_host = array_pop($mailparts);
 			}
 		}
@@ -1290,7 +1256,7 @@ class Item
 			)->getArray();
 
 			foreach ($hook_data['detected'] as $language => $quality) {
-				$result[$language] = max($result[$language] ?? 0, $quality * (strlen($block) / strlen($searchtext)));
+				$result[$language] = max($result[$language] ?? 0, $quality * (strlen((string) $block) / strlen($searchtext)));
 			}
 		}
 
@@ -1404,7 +1370,7 @@ class Item
 		$iso639 = new \Matriphe\ISO639\ISO639();
 
 		$used_languages = '';
-		foreach (json_decode($item['language'], true) as $language => $reliability) {
+		foreach (json_decode((string) $item['language'], true) as $language => $reliability) {
 			$code = $this->l10n->toISO6391($language);
 
 			if ($code == L10n::UNDETERMINED_LANGUAGE) {
@@ -1443,4 +1409,41 @@ class Item
 		$this->logger->debug('Marking item as viewed.', ['uri-id' => $uri_id, 'uid' => $uid]);
 		ItemModel::performActivity($item['id'], 'view', $uid, '<' . $self['id'] . '>', '', '', '');
 	}
+
+	/**
+	 * Check if the summary is redundant to the body
+	 *
+	 * @param string $body
+	 * @param string $summary
+	 * @return boolean summary is redundant
+	 */
+	public function redundantSummary(?string $body, ?string $summary): bool
+	{
+		$normalize = function (string $text): string {
+			$text = mb_strtolower($text);
+			$text = str_replace(["\n", "\r", "\t"], ' ', $text);
+			$text = preg_replace('/\s+/', ' ', $text);
+			return trim($text);
+		};
+
+		$summary_norm = $normalize($summary ?? '');
+		if ($summary_norm === '') {
+			return false;
+		}
+
+		$body_norm = $normalize(BBCode::toPlaintext($body ?? '', false));
+
+		$len        = mb_strlen($summary_norm);
+		$body_start = mb_substr($body_norm, 0, $len);
+
+		$distance = levenshtein($body_start, $summary_norm);
+		$max_len  = max($len, mb_strlen($body_start));
+
+		if ($max_len == 0) {
+			return false;
+		}
+
+		return ($distance / $max_len) <= 0.1;
+	}
+
 }

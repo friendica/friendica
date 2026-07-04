@@ -15,12 +15,6 @@ use Psr\Log\LoggerInterface;
  */
 class Database extends AbstractSessionHandler
 {
-	/** @var DBA */
-	private $dba;
-	/** @var LoggerInterface */
-	private $logger;
-	/** @var array The $_SERVER variable */
-	private $server;
 	/** @var bool global check, if the current Session exists */
 	private $sessionExists = false;
 
@@ -31,12 +25,7 @@ class Database extends AbstractSessionHandler
 	 * @param LoggerInterface $logger
 	 * @param array           $server
 	 */
-	public function __construct(DBA $dba, LoggerInterface $logger, array $server)
-	{
-		$this->dba    = $dba;
-		$this->logger = $logger;
-		$this->server = $server;
-	}
+	public function __construct(private readonly DBA $dba, private readonly LoggerInterface $logger, private array $server) {}
 
 	public function open($path, $name): bool
 	{

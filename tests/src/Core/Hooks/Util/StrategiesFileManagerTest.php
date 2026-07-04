@@ -28,7 +28,7 @@ class StrategiesFileManagerTest extends MockedTestCase
 		$this->setUpVfsDir();
 	}
 
-	public function dataHooks(): array
+	public static function dataHooks(): array
 	{
 		return [
 			'normal' => [
@@ -145,10 +145,8 @@ class StrategiesFileManagerTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataHooks
-	 */
-	public function testSetupHooks(string $content, string $addonContent, array $assertStrategies)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataHooks')]
+	public function testSetupHooks(string $content, string $addonContent, array $assertStrategies): void
 	{
 		vfsStream::newFile(StrategiesFileManager::STATIC_DIR . '/' . StrategiesFileManager::CONFIG_NAME . '.config.php')
 			->withContent($content)
@@ -177,7 +175,7 @@ class StrategiesFileManagerTest extends MockedTestCase
 	/**
 	 * Test the exception in case the strategies.config.php file is missing
 	 */
-	public function testMissingStrategiesFile()
+	public function testMissingStrategiesFile(): void
 	{
 		$config          = \Mockery::mock(IManageConfigValues::class);
 		$instanceManager = \Mockery::mock(ICanRegisterStrategies::class);
@@ -186,7 +184,7 @@ class StrategiesFileManagerTest extends MockedTestCase
 		self::expectException(HookConfigException::class);
 		self::expectExceptionMessage(sprintf(
 			'config file %s does not exist.',
-			$this->root->url() . '/' . StrategiesFileManager::STATIC_DIR . '/' . StrategiesFileManager::CONFIG_NAME . '.config.php'
+			$this->root->url() . '/' . StrategiesFileManager::STATIC_DIR . '/' . StrategiesFileManager::CONFIG_NAME . '.config.php',
 		));
 
 		$hookFileManager->loadConfig();
@@ -195,7 +193,7 @@ class StrategiesFileManagerTest extends MockedTestCase
 	/**
 	 * Test the exception in case the strategies.config.php file is wrong
 	 */
-	public function testWrongStrategiesFile()
+	public function testWrongStrategiesFile(): void
 	{
 		$config          = \Mockery::mock(IManageConfigValues::class);
 		$instanceManager = \Mockery::mock(ICanRegisterStrategies::class);
@@ -208,7 +206,7 @@ class StrategiesFileManagerTest extends MockedTestCase
 		self::expectException(HookConfigException::class);
 		self::expectExceptionMessage(sprintf(
 			'Error loading config file %s.',
-			$this->root->url() . '/' . StrategiesFileManager::STATIC_DIR . '/' . StrategiesFileManager::CONFIG_NAME . '.config.php'
+			$this->root->url() . '/' . StrategiesFileManager::STATIC_DIR . '/' . StrategiesFileManager::CONFIG_NAME . '.config.php',
 		));
 
 		$hookFileManager->loadConfig();

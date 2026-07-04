@@ -23,11 +23,21 @@ use Psr\Log\LoggerInterface;
 
 abstract class ContactEndpoint extends BaseApi
 {
-	const DEFAULT_COUNT = 20;
-	const MAX_COUNT = 200;
+	public const DEFAULT_COUNT = 20;
+	public const MAX_COUNT     = 200;
 
-	public function __construct(\Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		\Friendica\Factory\Api\Mastodon\Error $errorFactory,
+		AppHelper $appHelper,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		ApiResponse $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->checkAllowedScope(self::SCOPE_READ);
@@ -41,7 +51,7 @@ abstract class ContactEndpoint extends BaseApi
 	 * @return int
 	 * @throws HTTPException\NotFoundException
 	 */
-	protected static function getUid(int $contact_id = null, string $screen_name = null)
+	protected static function getUid(?int $contact_id = null, ?string $screen_name = null)
 	{
 		$uid = self::getCurrentUserID();
 
@@ -62,7 +72,7 @@ abstract class ContactEndpoint extends BaseApi
 				throw new HTTPException\NotFoundException(DI::l10n()->t('User not found'));
 			}
 
-			$uid = (int)$user['uid'];
+			$uid = (int) $user['uid'];
 		}
 
 		return $uid;
@@ -96,12 +106,12 @@ abstract class ContactEndpoint extends BaseApi
 		$return['users'] = $users;
 
 		$return = [
-			'users' => $users,
-			'next_cursor' => $return['next_cursor'],
-			'next_cursor_str' => $return['next_cursor_str'],
-			'previous_cursor' => $return['previous_cursor'],
+			'users'               => $users,
+			'next_cursor'         => $return['next_cursor'],
+			'next_cursor_str'     => $return['next_cursor_str'],
+			'previous_cursor'     => $return['previous_cursor'],
 			'previous_cursor_str' => $return['previous_cursor_str'],
-			'total_count' => $return['total_count'],
+			'total_count'         => $return['total_count'],
 		];
 
 		return $return;
@@ -118,13 +128,13 @@ abstract class ContactEndpoint extends BaseApi
 	 */
 	protected static function ids(array $ids, int $total_count, int $cursor = -1, int $count = self::DEFAULT_COUNT, bool $stringify_ids = false): array
 	{
-		$next_cursor = 0;
+		$next_cursor     = 0;
 		$previous_cursor = 0;
 
 		// Cursor is on the user-specific contact id since it's the sort field
 		if (count($ids)) {
 			$previous_cursor = -$ids[0];
-			$next_cursor = (int)$ids[count($ids) -1];
+			$next_cursor     = (int) $ids[count($ids) - 1];
 		}
 
 		// No next page
@@ -150,18 +160,18 @@ abstract class ContactEndpoint extends BaseApi
 		}
 
 		if ($stringify_ids) {
-			array_walk($ids, function (&$contactId) {
-				$contactId = (string)$contactId;
+			array_walk($ids, function (&$contactId): void {
+				$contactId = (string) $contactId;
 			});
 		}
 
 		$return = [
-			'ids' => $ids,
-			'next_cursor' => $next_cursor,
-			'next_cursor_str' => (string)$next_cursor,
-			'previous_cursor' => $previous_cursor,
-			'previous_cursor_str' => (string)$previous_cursor,
-			'total_count' => $total_count,
+			'ids'                 => $ids,
+			'next_cursor'         => $next_cursor,
+			'next_cursor_str'     => (string) $next_cursor,
+			'previous_cursor'     => $previous_cursor,
+			'previous_cursor_str' => (string) $previous_cursor,
+			'total_count'         => $total_count,
 		];
 
 		return $return;

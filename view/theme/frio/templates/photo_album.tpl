@@ -12,20 +12,20 @@
 	<div class="photo-album-actions pull-right">
 		{{if $can_post}}
 		<a class="btn btn-primary photos-upload-link page-action" href="{{$upload.1}}">
-			<i class="fa fa-plus"></i>
+			<i class="ri ri-add-line"></i>
 			{{$upload.0}}
 		</a>
 		{{/if}}
 
 		{{if $edit}}
 		<button id="album-edit-link" class="btn btn-primary page-action" type="button" data-modal-url="{{$edit.1}}">
-			<i class="fa fa-pencil"></i>
+			<i class="ri ri-pencil-line"></i>
 			{{$edit.0}}
 		</button>
 		{{/if}}
 		{{if $drop}}
 		<button id="album-drop-link" class="btn btn-primary page-action" type="button" data-modal-url="{{$drop.1}}">
-			<i class="fa fa-trash"></i>
+			<i class="ri ri-delete-bin-line"></i>
 			{{$drop.0}}
 		</button>
 		{{/if}}
@@ -33,9 +33,9 @@
 		{{if ! $noorder}}
 		<a class="photos-order-link page-action" href="{{$order.1}}" title="{{$order.0}}" data-toggle="tooltip">
 			{{if $order.2 == "newest"}}
-			<i class="fa fa-sort-numeric-desc"></i>
+			<i class="ri ri-sort-desc"></i>
 			{{else}}
-			<i class="fa fa-sort-numeric-asc"></i>
+			<i class="ri ri-sort-asc"></i>
 			{{/if}}
 		</a>
 		{{/if}}

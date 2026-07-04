@@ -31,7 +31,7 @@ class FilesystemStorageConfigTest extends StorageConfigTestCase
 
 	protected function getInstance()
 	{
-		/** @var MockInterface|L10n $l10n */
+		/** @var L10n&MockInterface $l10n */
 		$l10n   = \Mockery::mock(L10n::class)->makePartial();
 		$config = \Mockery::mock(IManageConfigValues::class);
 		$config->shouldReceive('get')
@@ -47,8 +47,8 @@ class FilesystemStorageConfigTest extends StorageConfigTestCase
 			'storagepath' => [
 				'input', 'Storage base path',
 				$this->root->getChild('storage')->url(),
-				'Folder where uploaded files are saved. For maximum security, This should be a path outside web server folder tree'
-			]
+				'Folder where uploaded files are saved. For maximum security, This should be a path outside web server folder tree',
+			],
 		], $storage->getOptions());
 	}
 }

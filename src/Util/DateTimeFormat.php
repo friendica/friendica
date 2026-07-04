@@ -195,7 +195,7 @@ class DateTimeFormat
 		];
 
 		foreach ($pregPatterns as $pattern) {
-			$dateString = preg_replace($pattern[0], $pattern[1], $dateString);
+			$dateString = preg_replace($pattern[0], $pattern[1], (string) $dateString);
 		}
 
 		return $dateString;
@@ -221,13 +221,7 @@ class DateTimeFormat
 			return false;
 		}
 
-		try {
-			$now = new DateTime();
-		} catch (\Throwable) {
-			return false;
-		}
-
-		if ($date > $now) {
+		if ($date > new DateTime()) {
 			return false;
 		}
 

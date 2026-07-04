@@ -7,7 +7,7 @@
 
 <nav id="peoplefind-sidebar" class="widget">
 	<h3>
-		<i class="fa fa-search" aria-hidden="true"></i>
+		<i class="ri ri-search-line" aria-hidden="true"></i>
 		{{$nv.findpeople}}
 	</h3>
 	<div id="peoplefind-desc">{{$nv.desc}}</div>

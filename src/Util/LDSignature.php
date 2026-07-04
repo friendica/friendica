@@ -54,8 +54,8 @@ class LDSignature
 		$ohash = self::hash(self::signableOptions($data['signature']));
 		$dhash = self::hash(self::signableData($data));
 
-		$x = Crypto::rsaVerify($ohash . $dhash, base64_decode($data['signature']['signatureValue']), $pubkey);
-		DI::logger()->info('LD-verify', ['verified' => (int)$x, 'actor' => $profile['url']]);
+		$x = Crypto::rsaVerify($ohash . $dhash, base64_decode((string) $data['signature']['signatureValue']), $pubkey);
+		DI::logger()->info('LD-verify', ['verified' => (int) $x, 'actor' => $profile['url']]);
 
 		if (empty($x)) {
 			return false;
@@ -124,6 +124,6 @@ class LDSignature
 	 */
 	private static function hash($obj): string
 	{
-		return hash('sha256', JsonLD::normalize($obj));
+		return hash('sha256', (string) JsonLD::normalize($obj));
 	}
 }

@@ -21,14 +21,9 @@ use stdClass;
 
 class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 {
-	/** @var MimeTypeFactory */
-	private $mimeTypeFactory;
-
-	public function __construct(MimeTypeFactory $mimeTypeFactory, LoggerInterface $logger)
+	public function __construct(private readonly MimeTypeFactory $mimeTypeFactory, LoggerInterface $logger)
 	{
 		parent::__construct($logger);
-
-		$this->mimeTypeFactory = $mimeTypeFactory;
 	}
 
 	/**
@@ -70,7 +65,7 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 			$row['embed-width'],
 			$row['embed-height'],
 			$row['page-type'],
-			$row['schematypes'] ? json_decode($row['schematypes'], true) : null,
+			$row['schematypes'] ? json_decode((string) $row['schematypes'], true) : null,
 		);
 	}
 

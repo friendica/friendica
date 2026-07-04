@@ -40,24 +40,17 @@ final class LoggerManager
 	 */
 	private static string $logChannel = LogChannel::DEFAULT;
 
-	private IManageConfigValues $config;
+	private readonly bool $debug;
 
-	private LoggerFactory $factory;
+	private readonly string $logLevel;
 
-	private bool $debug;
+	private readonly bool $profiling;
 
-	private string $logLevel;
-
-	private bool $profiling;
-
-	public function __construct(IManageConfigValues $config, LoggerFactory $factory)
+	public function __construct(private readonly IManageConfigValues $config, private readonly LoggerFactory $factory)
 	{
-		$this->config  = $config;
-		$this->factory = $factory;
-
-		$this->debug     = (bool) $config->get('system', 'debugging')  ?? false;
-		$this->logLevel  = (string) $config->get('system', 'loglevel') ?? LogLevel::NOTICE;
-		$this->profiling = (bool) $config->get('system', 'profiling')  ?? false;
+		$this->debug     = (bool) $this->config->get('system', 'debugging', false);
+		$this->logLevel  = (string) $this->config->get('system', 'loglevel', LogLevel::NOTICE);
+		$this->profiling = (bool) $this->config->get('system', 'profiling', false);
 	}
 
 	public function changeLogChannel(string $logChannel): void

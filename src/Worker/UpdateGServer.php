@@ -14,6 +14,7 @@ use Friendica\Model\GServer;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
+use GuzzleHttp\Psr7\Uri;
 
 class UpdateGServer
 {
@@ -37,14 +38,16 @@ class UpdateGServer
 			return;
 		}
 
-		// Silently dropping the worker task if the server domain is blocked
-		if (Network::isUrlBlocked($filtered)) {
-			GServer::setBlockedByUrl($filtered);
+		try {
+			$uri = new Uri($server_url);
+		} catch (\Throwable) {
+			DI::logger()->warning('Invalid URL', ['url' => $server_url]);
 			return;
 		}
 
 		// Silently dropping the worker task if the server domain is blocked
-		if (Network::isUrlBlocked($filtered)) {
+		if (Network::isUriBlocked($uri)) {
+			GServer::setBlockedByUrl($filtered);
 			return;
 		}
 
@@ -53,8 +56,9 @@ class UpdateGServer
 			return;
 		}
 
-		$cleaned = GServer::cleanURL($server_url);
-		if (($cleaned != $server_url) && DBA::exists('gserver', ['nurl' => Strings::normaliseLink($server_url)])) {
+		$cleanedUri = GServer::cleanUri($uri);
+
+		if (((string) $cleanedUri !== $server_url) && DBA::exists('gserver', ['nurl' => Strings::normaliseLink($server_url)])) {
 			GServer::setFailureByUrl($server_url);
 			return;
 		}

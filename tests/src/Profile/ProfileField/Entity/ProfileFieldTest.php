@@ -37,7 +37,7 @@ class ProfileFieldTest extends MockedTestCase
 		$this->profileFieldFactory     = new ProfileFieldFactory(new NullLogger(), $this->permissionSetFactory);
 	}
 
-	public function dataEntity()
+	public static function dataEntity()
 	{
 		return [
 			'default' => [
@@ -55,7 +55,7 @@ class ProfileFieldTest extends MockedTestCase
 					'deny_cid'  => '<2>',
 					'deny_gid'  => '<3>',
 					'id'        => 2,
-				]
+				],
 			],
 			'withId' => [
 				'uid'           => 23,
@@ -78,10 +78,8 @@ class ProfileFieldTest extends MockedTestCase
 		];
 	}
 
-	/**
-	 * @dataProvider dataEntity
-	 */
-	public function testEntity(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataEntity')]
+	public function testEntity(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null): void
 	{
 		$entity = new ProfileField($uid, $order, $label, $value, $created, $edited, $this->permissionSetFactory->createFromTableRow($permissionSet), $id);
 
@@ -95,10 +93,8 @@ class ProfileFieldTest extends MockedTestCase
 		self::assertEquals($id, $entity->id);
 	}
 
-	/**
-	 * @dataProvider dataEntity
-	 */
-	public function testUpdate(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet,  $id = null)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataEntity')]
+	public function testUpdate(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null): void
 	{
 		$permissionSet = $this->permissionSetFactory->createFromTableRow(['uid' => 2, 'id' => $psid]);
 
@@ -116,7 +112,7 @@ class ProfileFieldTest extends MockedTestCase
 		$permissionSetNew = $this->permissionSetFactory->createFromTableRow([
 			'uid'       => 2,
 			'allow_cid' => '<1>',
-			'id'        => 23
+			'id'        => 23,
 		]);
 
 		$entity->update('updatedValue', 2345, $permissionSetNew);
@@ -131,10 +127,8 @@ class ProfileFieldTest extends MockedTestCase
 		self::assertEquals($id, $entity->id);
 	}
 
-	/**
-	 * @dataProvider dataEntity
-	 */
-	public function testSetOrder(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataEntity')]
+	public function testSetOrder(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null): void
 	{
 		$permissionSet = $this->permissionSetFactory->createFromTableRow(['uid' => 2, 'id' => $psid]);
 
@@ -163,23 +157,21 @@ class ProfileFieldTest extends MockedTestCase
 
 	/**
 	 * Test the exception because of a wrong property
-	 *
-	 * @dataProvider dataEntity
 	 */
-	public function testWrongGet(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataEntity')]
+	public function testWrongGet(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null): void
 	{
 		$entity = new ProfileField($uid, $order, $label, $value, $created, $edited, $this->permissionSetFactory->createFromTableRow($permissionSet), $id);
 
 		self::expectException(ProfileFieldNotFoundException::class);
-		$entity->wrong;
+		$entity->wrong; // @phpstan-ignore property.notFound, expr.resultUnused
 	}
 
 	/**
 	 * Test gathering the permissionset
-	 *
-	 * @dataProvider dataEntity
 	 */
-	public function testPermissionSet(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataEntity')]
+	public function testPermissionSet(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null): void
 	{
 		$entity = new ProfileField($uid, $order, $label, $value, $created, $edited, $this->permissionSetFactory->createFromTableRow($permissionSet), $id);
 
@@ -192,10 +184,9 @@ class ProfileFieldTest extends MockedTestCase
 
 	/**
 	 * Test the exception because the factory cannot find a permissionSet ID, nor the permissionSet itself
-	 *
-	 * @dataProvider dataEntity
 	 */
-	public function testMissingPermissionFactory(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataEntity')]
+	public function testMissingPermissionFactory(int $uid, int $order, int $psid, string $label, string $value, \DateTime $created, \DateTime $edited, array $permissionSet, $id = null): void
 	{
 		self::expectException(UnexpectedPermissionSetException::class);
 		self::expectExceptionMessage('Either set the PermissionSet fields (join) or the PermissionSet itself');

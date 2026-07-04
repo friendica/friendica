@@ -20,7 +20,7 @@ class NetworkPublicTimelineTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesNetworkpublicTimeline()
+	public function testApiStatusesNetworkpublicTimeline(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
@@ -45,7 +45,7 @@ class NetworkPublicTimelineTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesNetworkpublicTimelineWithNegativePage()
+	public function testApiStatusesNetworkpublicTimelineWithNegativePage(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
@@ -68,9 +68,8 @@ class NetworkPublicTimelineTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_networkpublic_timeline() function with an unallowed user.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesNetworkpublicTimelineWithUnallowedUser()
+	public function testApiStatusesNetworkpublicTimelineWithUnallowedUser(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 
@@ -84,7 +83,7 @@ class NetworkPublicTimelineTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesNetworkpublicTimelineWithRss()
+	public function testApiStatusesNetworkpublicTimelineWithRss(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);

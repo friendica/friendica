@@ -42,7 +42,6 @@ class Stats extends BaseModule
 	protected $logger;
 	/** @var IManageKeyValuePairs */
 	protected $keyValue;
-	private AddonHelper $addonHelper;
 
 	public function __construct(
 		L10n $l10n,
@@ -53,17 +52,16 @@ class Stats extends BaseModule
 		IManageConfigValues $config,
 		IManageKeyValuePairs $keyValue,
 		Database $dba,
-		AddonHelper $addonHelper,
+		private readonly AddonHelper $addonHelper,
 		Response $response,
 		array $server,
-		array $parameters = []
+		array $parameters = [],
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->config      = $config;
-		$this->keyValue    = $keyValue;
-		$this->dba         = $dba;
-		$this->addonHelper = $addonHelper;
+		$this->config   = $config;
+		$this->keyValue = $keyValue;
+		$this->dba      = $dba;
 	}
 
 	protected function content(array $request = []): string
@@ -83,7 +81,7 @@ class Stats extends BaseModule
 		$report = $this->dba->selectFirst('report', ['created'], [], ['order' => ['created' => true]]);
 		if (!empty($report)) {
 			$report_datetime  = DateTimeFormat::utc($report['created'], DateTimeFormat::JSON);
-			$report_timestamp = strtotime($report['created']);
+			$report_timestamp = strtotime((string) $report['created']);
 		} else {
 			$report_datetime  = '';
 			$report_timestamp = 0;
@@ -99,7 +97,7 @@ class Stats extends BaseModule
 			'worker' => [
 				'lastExecution' => [
 					'datetime'  => DateTimeFormat::utc($this->keyValue->get('last_worker_execution'), DateTimeFormat::JSON),
-					'timestamp' => strtotime($this->keyValue->get('last_worker_execution')),
+					'timestamp' => strtotime((string) $this->keyValue->get('last_worker_execution')),
 				],
 				'jpm' => [
 					1 => $this->dba->count('workerqueue', ["`done` AND `executed` > ?", DateTimeFormat::utc('now - 1 minute')]),

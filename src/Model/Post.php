@@ -480,7 +480,7 @@ class Post
 				0, $uid, $uid, $uid],
 		);
 
-		$select_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], $selected));
+		$select_string = implode(', ', array_map(DBA::quoteIdentifier(...), $selected));
 
 		$condition_string = DBA::buildCondition($condition);
 		$param_string     = DBA::buildParameter($params);

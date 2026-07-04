@@ -14,10 +14,8 @@ use Friendica\Test\MemoryCacheTestCase;
 use Mockery;
 use Psr\Log\NullLogger;
 
-/**
- * @requires extension memcached
- * @group MEMCACHED
- */
+#[\PHPUnit\Framework\Attributes\RequiresPhpExtension('memcached')]
+#[\PHPUnit\Framework\Attributes\Group('MEMCACHED')]
 class MemcachedCacheTest extends MemoryCacheTestCase
 {
 	protected function getInstance()
@@ -48,21 +46,14 @@ class MemcachedCacheTest extends MemoryCacheTestCase
 		parent::tearDown();
 	}
 
-	/**
-	 * @small
-	 *
-	 * @dataProvider dataSimple
-	 * @doesNotPerformAssertions
-	 */
-	public function testGetAllKeys($value1, $value2, $value3)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataSimple')]
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+	public function testGetAllKeys($value1, $value2, $value3, $value4): void
 	{
 		static::markTestIncomplete('Race condition because of too fast getAllKeys() which uses a workaround');
 	}
 
-	/**
-	 * @small
-	 */
-	public function testStats()
+	public function testStats(): void
 	{
 		$stats = $this->instance->getStats();
 

@@ -8,7 +8,6 @@
 namespace Friendica\Test;
 
 use Friendica\Core\Storage\Capability\ICanConfigureStorage;
-use Friendica\Test\MockedTestCase;
 
 abstract class StorageConfigTestCase extends MockedTestCase
 {
@@ -20,7 +19,7 @@ abstract class StorageConfigTestCase extends MockedTestCase
 	/**
 	 * Test if the "getOption" is asserted
 	 */
-	public function testGetOptions()
+	public function testGetOptions(): void
 	{
 		$instance = $this->getInstance();
 

@@ -28,19 +28,13 @@ require_once __DIR__ . '/../../../../static/dbstructure.config.php';
 
 class HttpClient extends BaseFactory
 {
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var Profiler */
-	private $profiler;
-	/** @var App\BaseURL */
-	private $baseUrl;
-
-	public function __construct(LoggerInterface $logger, IManageConfigValues $config, Profiler $profiler, App\BaseURL $baseUrl)
-	{
+	public function __construct(
+		LoggerInterface $logger,
+		private readonly IManageConfigValues $config,
+		private readonly Profiler $profiler,
+		private readonly App\BaseURL $baseUrl,
+	) {
 		parent::__construct($logger);
-		$this->config   = $config;
-		$this->profiler = $profiler;
-		$this->baseUrl  = $baseUrl;
 	}
 
 	/**
@@ -50,7 +44,7 @@ class HttpClient extends BaseFactory
 	 *
 	 * @return ICanSendHttpRequests
 	 */
-	public function createClient(HandlerStack $handlerStack = null): ICanSendHttpRequests
+	public function createClient(?HandlerStack $handlerStack = null): ICanSendHttpRequests
 	{
 		$proxy = $this->config->get('system', 'proxy');
 
@@ -67,8 +61,8 @@ class HttpClient extends BaseFactory
 		$onRedirect = function (
 			RequestInterface $request,
 			ResponseInterface $response,
-			UriInterface $uri
-		) use ($logger) {
+			UriInterface $uri,
+		) use ($logger): void {
 			$logger->info('Curl redirect.', ['url' => $request->getUri(), 'to' => $uri, 'method' => $request->getMethod()]);
 		};
 
@@ -92,10 +86,10 @@ class HttpClient extends BaseFactory
 			RequestOptions::TIMEOUT          => $this->config->get('system', 'curl_timeout', 60),
 			// by default, we will allow self-signed certs,
 			// but it can be overridden
-			RequestOptions::VERIFY  => (bool)$this->config->get('system', 'verifyssl'),
+			RequestOptions::VERIFY  => (bool) $this->config->get('system', 'verifyssl'),
 			RequestOptions::PROXY   => $proxy,
 			RequestOptions::HEADERS => [],
-			'handler' => $handlerStack ?? HandlerStack::create(),
+			'handler'               => $handlerStack ?? HandlerStack::create(),
 		]);
 
 		$resolver = new URLResolver();

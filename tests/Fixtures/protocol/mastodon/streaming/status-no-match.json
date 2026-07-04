@@ -1,0 +1,22 @@
+{
+	"id": "666666666666666666",
+	"uri": "https://other.example/users/eve/statuses/666666666666666666",
+	"url": "https://other.example/@eve/666666666666666666",
+	"spoiler_text": "",
+	"plain_content": "Uninteresting post",
+	"content": "<p>Uninteresting post</p>",
+	"language": null,
+	"reblog": null,
+	"account": {
+		"id": "6000",
+		"username": "eve",
+		"acct": "eve@other.example",
+		"url": "https://other.example/@eve",
+		"uri": "https://other.example/users/eve"
+	},
+	"tags": [],
+	"mentions": [],
+	"emojis": [],
+	"card": null,
+	"poll": null
+}

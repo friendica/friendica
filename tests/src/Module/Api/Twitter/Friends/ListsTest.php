@@ -18,7 +18,7 @@ class ListsTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesFWithFriends()
+	public function testApiStatusesFWithFriends(): void
 	{
 		$response = (new Lists(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
@@ -31,9 +31,8 @@ class ListsTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_f() function an undefined cursor GET variable.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesFWithUndefinedCursor()
+	public function testApiStatusesFWithUndefinedCursor(): void
 	{
 		self::markTestIncomplete('Needs refactoring of Lists - replace filter_input() with $request parameter checks');
 

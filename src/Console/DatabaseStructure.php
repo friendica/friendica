@@ -26,18 +26,6 @@ class DatabaseStructure extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/** @var Database */
-	private $dba;
-
-	/** @var IManageConfigValues */
-	private $config;
-
-	/** @var DbaDefinition */
-	private $dbaDefinition;
-
-	/** @var ViewDefinition */
-	private $viewDefinition;
-
 	/** @var string */
 	private $basePath;
 
@@ -69,15 +57,10 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Database $dba, DbaDefinition $dbaDefinition, ViewDefinition $viewDefinition, BasePath $basePath, IManageConfigValues $config, $argv = null)
+	public function __construct(private readonly Database $dba, private readonly DbaDefinition $dbaDefinition, private readonly ViewDefinition $viewDefinition, BasePath $basePath, private readonly IManageConfigValues $config, $argv = null)
 	{
 		parent::__construct($argv);
-
-		$this->dba            = $dba;
-		$this->dbaDefinition  = $dbaDefinition;
-		$this->viewDefinition = $viewDefinition;
-		$this->config         = $config;
-		$this->basePath       = $basePath->getPath();
+		$this->basePath = $basePath->getPath();
 	}
 
 	protected function doExecute(): int

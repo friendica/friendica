@@ -24,17 +24,9 @@ use Psr\Log\LoggerInterface;
  */
 class Language extends BaseModule
 {
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var ContentItem */
-	private $item;
-
-	public function __construct(ContentItem $item, IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(private readonly ContentItem $item, private readonly IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->session = $session;
-		$this->item    = $item;
 	}
 
 	protected function rawContent(array $request = [])

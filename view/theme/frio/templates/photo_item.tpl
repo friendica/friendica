@@ -14,11 +14,11 @@
 		{{* Dropdown menu with actions (e.g. delete comment) *}}
 		{{if $drop.dropping }}
 		<li class="dropdown">
-			<a class="dropdown-toggle" data-toggle="dropdown" id="dropdownMenuTools-{{$id}}" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
+			<a class="dropdown-toggle" data-toggle="dropdown" id="dropdownMenuTools-{{$id}}" role="button" aria-haspopup="true" aria-expanded="false"><i class="ri ri-arrow-down-s-line" aria-hidden="true"></i></a>
 
 			<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenuTools-{{$id}}">
 				<li role="menuitem">
-					<a onclick="dropItem('item/drop/{{$id}}', '#wall-item-outside-wrapper-{{$id}}'); return false;" class="delete" title="{{$drop.delete}}"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{$drop.delete}}</a>
+					<a onclick="dropItem('item/drop/{{$id}}', '#wall-item-outside-wrapper-{{$id}}'); return false;" class="delete" title="{{$drop.delete}}"><i class="ri ri-delete-bin-line" aria-hidden="true"></i>&nbsp;{{$drop.delete}}</a>
 				</li>
 			</ul>
 		</li>

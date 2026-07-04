@@ -22,19 +22,9 @@ use Psr\Log\LoggerInterface;
  *
  * @internal
  */
-final class SyslogLoggerFactory implements LoggerFactory
+final readonly class SyslogLoggerFactory implements LoggerFactory
 {
-	private IManageConfigValues $config;
-
-	private IHaveCallIntrospections $introspection;
-
-	public function __construct(
-		IManageConfigValues $config,
-		IHaveCallIntrospections $introspection
-	) {
-		$this->config        = $config;
-		$this->introspection = $introspection;
-	}
+	public function __construct(private IManageConfigValues $config, private IHaveCallIntrospections $introspection) {}
 
 	/**
 	 * Creates and returns a PSR-3 Logger instance.
@@ -48,8 +38,8 @@ final class SyslogLoggerFactory implements LoggerFactory
 	 */
 	public function createLogger(string $logLevel, string $logChannel): LoggerInterface
 	{
-		$logOpts     = (int) $this->config->get('system', 'syslog_flags')    ?? SyslogLogger::DEFAULT_FLAGS;
-		$logFacility = (int) $this->config->get('system', 'syslog_facility') ?? SyslogLogger::DEFAULT_FACILITY;
+		$logOpts     = (int) $this->config->get('system', 'syslog_flags', SyslogLogger::DEFAULT_FLAGS);
+		$logFacility = (int) $this->config->get('system', 'syslog_facility', SyslogLogger::DEFAULT_FACILITY);
 
 		if (!array_key_exists($logLevel, SyslogLogger::logLevels)) {
 			throw new LogLevelException(sprintf('The log level "%s" is not supported by "%s".', $logLevel, SyslogLogger::class));
@@ -60,7 +50,7 @@ final class SyslogLoggerFactory implements LoggerFactory
 			$this->introspection,
 			SyslogLogger::logLevels[$logLevel],
 			$logOpts,
-			$logFacility
+			$logFacility,
 		);
 	}
 }

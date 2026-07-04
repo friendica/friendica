@@ -9,92 +9,6 @@ $a->strings['Unable to locate original post.'] = 'Unable to locate original post
 $a->strings['Empty post discarded.'] = 'Empty post discarded.';
 $a->strings['Item not found.'] = 'Item not found.';
 $a->strings['Permission denied.'] = 'Permission denied.';
-$a->strings['No valid account found.'] = 'No valid account found.';
-$a->strings['Password reset request issued. Check your email.'] = 'Password reset request issued. Please check your email.';
-$a->strings['
-		Dear %1$s,
-			A request was recently received at "%2$s" to reset your account
-		password. In order to confirm this request, please select the verification link
-		below or paste it into your web browser address bar.
-
-		If you did NOT request this change, please DO NOT follow the link
-		provided and ignore and/or delete this email, the request will expire shortly.
-
-		Your password will not be changed unless we can verify that you
-		issued this request.'] = '
-		Dear %1$s,
-			A request was received at "%2$s" to reset your account password
-		To confirm this request, please select the verification link
-		below or paste it into your web browser\'s address bar.
-
-		If you did NOT request this change, please DO NOT follow the link
-		provided; ignore or delete this email, as the request will expire shortly.
-
-		Your password will not be changed unless we can verify that you
-		issued this request.';
-$a->strings['
-		Follow this link soon to verify your identity:
-
-		%1$s
-
-		You will then receive a follow-up message containing the new password.
-		You may change that password from your account settings page after logging in.
-
-		The login details are as follows:
-
-		Site Location:	%2$s
-		Login Name:	%3$s'] = '
-		Follow this link soon to verify your identity:
-
-		%1$s
-
-		You will then receive a follow-up message containing the new password.
-		You may change that password from your account settings page after logging in.
-
-		The login details are as follows:
-
-		Site Location:	%2$s
-		Login Name:	%3$s';
-$a->strings['Password reset requested at %s'] = 'Password reset requested at %s';
-$a->strings['Request could not be verified. (You may have previously submitted it.) Password reset failed.'] = 'Request could not be verified. (You may have previously submitted it.) Password reset failed.';
-$a->strings['Request has expired, please make a new one.'] = 'Request has expired, please make a new one.';
-$a->strings['Forgot your Password?'] = 'Reset My Password';
-$a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Enter email address or nickname to reset your password. You will receive further instruction via email.';
-$a->strings['Password Reset'] = 'Forgotten password?';
-$a->strings['Your password has been reset as requested.'] = 'Your password has been reset as requested.';
-$a->strings['Your new password is'] = 'Your new password is';
-$a->strings['Save or copy your new password - and then'] = 'Save or copy your new password - and then';
-$a->strings['click here to login'] = 'click here to login';
-$a->strings['Your password may be changed from the <em>Settings</em> page after successful login.'] = 'Your password may be changed from the <em>Settings</em> page after successful login.';
-$a->strings['
-			Dear %1$s,
-				Your password has been changed as requested. Please retain this
-			information for your records (or change your password immediately to
-			something that you will remember).
-		'] = '
-			Dear %1$s,
-				Your password has been changed as requested. Please retain this
-			information for your records (or change your password immediately to
-			something that you will remember).
-		';
-$a->strings['
-			Your login details are as follows:
-
-			Site Location:	%1$s
-			Login Name:	%2$s
-			Password:	%3$s
-
-			You may change that password from your account settings page after logging in.
-		'] = '
-			Your login details are as follows:
-
-			Site Location:	%1$s
-			Login Name:	%2$s
-			Password:	%3$s
-
-			You may change that password from your account settings page after logging in.
-		';
-$a->strings['Your password has been changed at %s'] = 'Your password has been changed at %s';
 $a->strings['Messages'] = 'Messages';
 $a->strings['New Message'] = 'New Message';
 $a->strings['No recipient selected.'] = 'No recipient selected.';
@@ -106,8 +20,6 @@ $a->strings['Conversation not found.'] = 'Conversation not found.';
 $a->strings['Please enter a link URL:'] = 'Please enter a link URL:';
 $a->strings['Send Private Message'] = 'Send private message';
 $a->strings['To:'] = 'To:';
-$a->strings['Subject:'] = 'Subject:';
-$a->strings['Your message:'] = 'Your message:';
 $a->strings['Upload photo'] = 'Upload photo';
 $a->strings['Insert web link'] = 'Insert web link';
 $a->strings['Please wait'] = 'Please wait';
@@ -117,6 +29,8 @@ $a->strings['D, d M Y - g:i A'] = 'D, d M Y - g:i A';
 $a->strings['Delete conversation'] = 'Delete conversation';
 $a->strings['No secure communications available. You <strong>may</strong> be able to respond from the sender\'s profile page.'] = 'No secure communications available. You <strong>may</strong> be able to respond from the sender\'s profile page.';
 $a->strings['Send Reply'] = 'Send reply';
+$a->strings['Subject:'] = 'Subject:';
+$a->strings['Your message:'] = 'Your message:';
 $a->strings['Unknown sender - %s'] = 'Unknown sender - %s';
 $a->strings['You and %s'] = 'Me and %s';
 $a->strings['%s and You'] = '%s and me';
@@ -124,29 +38,21 @@ $a->strings['%d message'] = [
 	0 => '%d message',
 	1 => '%d messages',
 ];
-$a->strings['Personal Notes'] = 'Personal notes';
-$a->strings['Personal notes are visible only by yourself.'] = 'Personal notes are only visible to you.';
-$a->strings['Save'] = 'Save';
 $a->strings['User not found.'] = 'User not found.';
 $a->strings['Photo Albums'] = 'Photo Albums';
 $a->strings['Recent Photos'] = 'Recent photos';
-$a->strings['Upload Photos'] = 'Upload photos';
 $a->strings['everybody'] = 'everybody';
 $a->strings['Contact information unavailable'] = 'Contact information unavailable';
 $a->strings['Album not found.'] = 'Album not found.';
 $a->strings['Album successfully deleted'] = 'Album successfully deleted';
 $a->strings['Album was empty.'] = 'Album was empty.';
-$a->strings['a photo'] = 'a photo';
-$a->strings['%1$s was tagged in %2$s by %3$s'] = '%1$s was tagged in %2$s by %3$s';
 $a->strings['Public access denied.'] = 'Public access denied.';
 $a->strings['No photos selected'] = 'No photos selected';
-$a->strings['New album name: '] = 'New album name: ';
-$a->strings['or select existing album:'] = 'or select existing album:';
-$a->strings['Do not show a status post for this upload'] = 'Do not show a status post for this upload';
 $a->strings['Permissions'] = 'Permissions';
 $a->strings['Do you really want to delete this photo album and all its photos?'] = 'Do you really want to delete this photo album and all its photos?';
 $a->strings['Delete Album'] = 'Delete album';
 $a->strings['Cancel'] = 'Cancel';
+$a->strings['New album name: '] = 'New album name: ';
 $a->strings['Edit Album'] = 'Edit album';
 $a->strings['Show Newest First'] = 'Show newest first';
 $a->strings['Show Oldest First'] = 'Show oldest first';
@@ -160,25 +66,13 @@ $a->strings['Edit photo'] = 'Edit photo';
 $a->strings['Delete photo'] = 'Delete photo';
 $a->strings['Private Photo'] = 'Private photo';
 $a->strings['View Full Size'] = 'View full size';
-$a->strings['Tags'] = 'Tags';
-$a->strings['[Select tags to remove]'] = '[Select tags to remove]';
 $a->strings['New album name'] = 'New album name';
 $a->strings['Caption'] = 'Caption';
-$a->strings['Add a Tag'] = 'Add Tag';
-$a->strings['Example: @bob, @Barbara_Jensen, @jim@example.com, #California, #camping'] = 'Example: @bob, @jojo@example.com, #California, #camping';
 $a->strings['Do not rotate'] = 'Do not rotate';
 $a->strings['Rotate CW (right)'] = 'Rotate right (CW)';
 $a->strings['Rotate CCW (left)'] = 'Rotate left (CCW)';
-$a->strings['This is you'] = 'This is me';
-$a->strings['Comment'] = 'Comment';
-$a->strings['Preview'] = 'Preview';
-$a->strings['Select'] = 'Select';
-$a->strings['Delete'] = 'Delete';
-$a->strings['Like'] = 'Like';
-$a->strings['I like this (toggle)'] = 'I like this (toggle)';
-$a->strings['I don\'t like this (toggle)'] = 'I don\'t like this (toggle)';
 $a->strings['Edit'] = 'Edit';
-$a->strings['Map'] = 'Map';
+$a->strings['Delete'] = 'Delete';
 $a->strings['Delete this item?'] = 'Delete this item?';
 $a->strings['toggle mobile'] = 'Toggle mobile';
 $a->strings['Method not allowed for this module. Allowed method(s): %s'] = 'Method not allowed for this module. Allowed method(s): %s';
@@ -236,7 +130,6 @@ $a->strings['Tag term:'] = 'Tag term:';
 $a->strings['Where are you right now?'] = 'Where are you right now?';
 $a->strings['Delete item(s)?'] = 'Delete item(s)?';
 $a->strings['New Post'] = 'New post';
-$a->strings['Share'] = 'Share';
 $a->strings['upload photo'] = 'upload photo';
 $a->strings['Attach file'] = 'Attach file';
 $a->strings['attach file'] = 'attach file';
@@ -256,12 +149,14 @@ $a->strings['Set title'] = 'Set title';
 $a->strings['Categories (comma-separated list)'] = 'Categories (comma-separated list)';
 $a->strings['Permission settings'] = 'Permission settings';
 $a->strings['Public post'] = 'Public post';
+$a->strings['Preview'] = 'Preview';
 $a->strings['Message'] = 'Message';
 $a->strings['Open Compose page'] = 'Open compose page';
 $a->strings['remove'] = 'Remove';
 $a->strings['Delete Selected Items'] = 'Delete selected items';
 $a->strings['You had been addressed (%s).'] = 'You have been addressed (%s).';
 $a->strings['%s reshared this.'] = '%s reshared this.';
+$a->strings['Select'] = 'Select';
 $a->strings['View %s\'s profile @ %s'] = 'View %s\'s profile @ %s';
 $a->strings['Categories:'] = 'Categories:';
 $a->strings['Filed under:'] = 'Filed under:';
@@ -277,17 +172,15 @@ $a->strings['Latest Posts'] = 'Latest posts';
 $a->strings['Sort by post received date'] = 'Sort by post received date';
 $a->strings['Personal'] = 'Personal';
 $a->strings['Posts that mention or involve you'] = 'Posts mentioning or involving me';
-$a->strings['Starred'] = 'Starred';
 $a->strings['Favourite Posts'] = 'My favorite posts';
 $a->strings['General Features'] = 'General';
-$a->strings['Photo Location'] = 'Photo location';
-$a->strings['Photo metadata is normally stripped. This extracts the location (if present) prior to stripping metadata and links it to a map.'] = 'Photo metadata is normally removed. This saves the geo tag (if present) and links it to a map prior to removing other metadata.';
 $a->strings['Post Composition Features'] = 'Post composition';
 $a->strings['Explicit Mentions'] = 'Explicit Mentions';
 $a->strings['Add explicit mentions to comment box for manual control over who gets mentioned in replies.'] = 'Add explicit mentions to comment box for manual control over who gets mentioned in replies.';
 $a->strings['Post/Comment Tools'] = 'Post/Comment tools';
 $a->strings['Post Categories'] = 'Post categories';
 $a->strings['Add categories to your posts'] = 'Add categories to your posts';
+$a->strings['Summary'] = 'Summary';
 $a->strings['Archives'] = 'Archives';
 $a->strings['Protocols'] = 'Protocols';
 $a->strings['Account Types'] = 'Account types';
@@ -304,14 +197,11 @@ $a->strings['event'] = 'event';
 $a->strings['status'] = 'status';
 $a->strings['photo'] = 'photo';
 $a->strings['%1$s tagged %2$s\'s %3$s with %4$s'] = '%1$s tagged %2$s\'s %3$s with %4$s';
-$a->strings['Follow Thread'] = 'Follow thread';
 $a->strings['View Status'] = 'View status';
 $a->strings['View Profile'] = 'View profile';
 $a->strings['View Photos'] = 'View photos';
 $a->strings['Network Posts'] = 'Network posts';
 $a->strings['View Contact'] = 'View contact';
-$a->strings['Block'] = 'Block';
-$a->strings['Ignore'] = 'Ignore';
 $a->strings['Connect/Follow'] = 'Connect/Follow';
 $a->strings['Nothing new here'] = 'Nothing new here';
 $a->strings['Home'] = 'Home';
@@ -335,6 +225,7 @@ $a->strings['Addon applications, utilities, games'] = 'Addon applications, utili
 $a->strings['Search'] = 'Search';
 $a->strings['Search site content'] = 'Search site content';
 $a->strings['Full Text'] = 'Full text';
+$a->strings['Tags'] = 'Tags';
 $a->strings['Contacts'] = 'Contacts';
 $a->strings['Community'] = 'Community';
 $a->strings['Conversations on this and other servers'] = 'Conversations on this and other servers';
@@ -481,43 +372,6 @@ $a->strings['ImageMagick PHP extension is not installed'] = 'ImageMagick PHP ext
 $a->strings['ImageMagick PHP extension is installed'] = 'ImageMagick PHP extension is installed';
 $a->strings['Database already in use.'] = 'Database already in use.';
 $a->strings['Could not connect to database.'] = 'Could not connect to database.';
-$a->strings['Monday'] = 'Monday';
-$a->strings['Tuesday'] = 'Tuesday';
-$a->strings['Wednesday'] = 'Wednesday';
-$a->strings['Thursday'] = 'Thursday';
-$a->strings['Friday'] = 'Friday';
-$a->strings['Saturday'] = 'Saturday';
-$a->strings['Sunday'] = 'Sunday';
-$a->strings['January'] = 'January';
-$a->strings['February'] = 'February';
-$a->strings['March'] = 'March';
-$a->strings['April'] = 'April';
-$a->strings['May'] = 'May';
-$a->strings['June'] = 'June';
-$a->strings['July'] = 'July';
-$a->strings['August'] = 'August';
-$a->strings['September'] = 'September';
-$a->strings['October'] = 'October';
-$a->strings['November'] = 'November';
-$a->strings['December'] = 'December';
-$a->strings['Mon'] = 'Mon';
-$a->strings['Tue'] = 'Tue';
-$a->strings['Wed'] = 'Wed';
-$a->strings['Thu'] = 'Thu';
-$a->strings['Fri'] = 'Fri';
-$a->strings['Sat'] = 'Sat';
-$a->strings['Sun'] = 'Sun';
-$a->strings['Jan'] = 'Jan';
-$a->strings['Feb'] = 'Feb';
-$a->strings['Mar'] = 'Mar';
-$a->strings['Apr'] = 'Apr';
-$a->strings['Jun'] = 'Jun';
-$a->strings['Jul'] = 'Jul';
-$a->strings['Aug'] = 'Aug';
-$a->strings['Sep'] = 'Sep';
-$a->strings['Oct'] = 'Oct';
-$a->strings['Nov'] = 'Nov';
-$a->strings['Dec'] = 'Dec';
 $a->strings['The logfile \'%s\' is not usable. No logging possible (error: \'%s\')'] = 'The logfile \'%s\' is not usable. No logging is possible (error: \'%s\')';
 $a->strings['The debug logfile \'%s\' is not usable. No logging possible (error: \'%s\')'] = 'The debug logfile \'%s\' is not usable. No logging is possible (error: \'%s\')';
 $a->strings['Storage base path'] = 'Storage base path';
@@ -567,9 +421,44 @@ $a->strings['Use mailto: in front of address to force email check.'] = 'Use mail
 $a->strings['Limited profile. This person will be unable to receive direct/personal notifications from you.'] = 'Limited profile: This person will be unable to receive direct/private messages from you.';
 $a->strings['Unable to retrieve contact information.'] = 'Unable to retrieve contact information.';
 $a->strings['Starts:'] = 'Starts:';
-$a->strings['Finishes:'] = 'Finishes:';
 $a->strings['all-day'] = 'All-day';
+$a->strings['Sun'] = 'Sun';
+$a->strings['Mon'] = 'Mon';
+$a->strings['Tue'] = 'Tue';
+$a->strings['Wed'] = 'Wed';
+$a->strings['Thu'] = 'Thu';
+$a->strings['Fri'] = 'Fri';
+$a->strings['Sat'] = 'Sat';
+$a->strings['Sunday'] = 'Sunday';
+$a->strings['Monday'] = 'Monday';
+$a->strings['Tuesday'] = 'Tuesday';
+$a->strings['Wednesday'] = 'Wednesday';
+$a->strings['Thursday'] = 'Thursday';
+$a->strings['Friday'] = 'Friday';
+$a->strings['Saturday'] = 'Saturday';
+$a->strings['Jan'] = 'Jan';
+$a->strings['Feb'] = 'Feb';
+$a->strings['Mar'] = 'Mar';
+$a->strings['Apr'] = 'Apr';
+$a->strings['May'] = 'May';
+$a->strings['Jun'] = 'Jun';
+$a->strings['Jul'] = 'Jul';
+$a->strings['Aug'] = 'Aug';
 $a->strings['Sept'] = 'Sep';
+$a->strings['Oct'] = 'Oct';
+$a->strings['Nov'] = 'Nov';
+$a->strings['Dec'] = 'Dec';
+$a->strings['January'] = 'January';
+$a->strings['February'] = 'February';
+$a->strings['March'] = 'March';
+$a->strings['April'] = 'April';
+$a->strings['June'] = 'June';
+$a->strings['July'] = 'July';
+$a->strings['August'] = 'August';
+$a->strings['September'] = 'September';
+$a->strings['October'] = 'October';
+$a->strings['November'] = 'November';
+$a->strings['December'] = 'December';
 $a->strings['today'] = 'today';
 $a->strings['month'] = 'month';
 $a->strings['week'] = 'week';
@@ -577,12 +466,6 @@ $a->strings['day'] = 'day';
 $a->strings['No events to display'] = 'No events to display';
 $a->strings['Access to this profile has been restricted.'] = 'Access to this profile has been restricted.';
 $a->strings['l, F j'] = 'l, F j';
-$a->strings['Edit event'] = 'Edit event';
-$a->strings['Duplicate event'] = 'Duplicate event';
-$a->strings['Delete event'] = 'Delete event';
-$a->strings['l F d, Y \@ g:i A'] = 'l F d, Y \@ g:i A';
-$a->strings['D g:i A'] = 'D g:i A';
-$a->strings['g:i A'] = 'g:i A';
 $a->strings['Show map'] = 'Show map';
 $a->strings['Hide map'] = 'Hide map';
 $a->strings['%s\'s birthday'] = '%s\'s birthday';
@@ -590,17 +473,15 @@ $a->strings['Happy Birthday %s'] = 'Happy Birthday, %s!';
 $a->strings['activity'] = 'activity';
 $a->strings['post'] = 'post';
 $a->strings['bytes'] = 'bytes';
-$a->strings['View on separate page'] = 'View on separate page';
 $a->strings['[no subject]'] = '[no subject]';
 $a->strings['Wall Photos'] = 'Wall photos';
 $a->strings['Homepage:'] = 'Homepage:';
 $a->strings['About:'] = 'About:';
+$a->strings['Edit profile'] = 'Edit profile';
 $a->strings['Atom feed'] = 'Atom feed';
-$a->strings['F d'] = 'F d';
 $a->strings['[today]'] = '[today]';
 $a->strings['Birthday Reminders'] = 'Birthday reminders';
 $a->strings['Birthdays this week:'] = 'Birthdays this week:';
-$a->strings['g A l F d'] = 'g A l F d';
 $a->strings['[No description]'] = '[No description]';
 $a->strings['Event Reminders'] = 'Event reminders';
 $a->strings['Upcoming events the next 7 days:'] = 'Upcoming events the next 7 days:';
@@ -611,7 +492,6 @@ $a->strings['Religious Views:'] = 'Religious views:';
 $a->strings['Likes:'] = 'Likes:';
 $a->strings['Dislikes:'] = 'Dislikes:';
 $a->strings['Title/Description:'] = 'Title/Description:';
-$a->strings['Summary'] = 'Summary';
 $a->strings['Musical interests'] = 'Music:';
 $a->strings['Books, literature'] = 'Books, literature, poetry:';
 $a->strings['Television'] = 'Television:';
@@ -718,7 +598,6 @@ $a->strings['Federation Statistics'] = 'Federation statistics';
 $a->strings['The logfile \'%s\' is not writable. No logging possible'] = 'The logfile \'%s\' is not writable. No logging is possible';
 $a->strings['PHP log currently enabled.'] = 'PHP log currently enabled.';
 $a->strings['PHP log currently disabled.'] = 'PHP log currently disabled.';
-$a->strings['Logs'] = 'Logs';
 $a->strings['Clear'] = 'Clear';
 $a->strings['Enable Debugging'] = 'Enable debugging';
 $a->strings['Log file'] = 'Log file';
@@ -870,6 +749,7 @@ $a->strings['Allow user tags'] = 'Allow user tags';
 $a->strings['If enabled, the tags from the saved searches will used for the "tags" subscription in addition to the "relay_server_tags".'] = 'If enabled, the tags from the saved searches will used for the "tags" subscription in addition to the "relay_server_tags".';
 $a->strings['Start Relocation'] = 'Start relocation';
 $a->strings['Invalid storage backend setting value.'] = 'Invalid storage backend setting.';
+$a->strings['Save'] = 'Save';
 $a->strings['Database (legacy)'] = 'Database (legacy)';
 $a->strings['Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />'] = 'Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB-only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />';
 $a->strings['There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s'] = 'A new Friendica version is available now. Your current version is %1$s, upstream version is %2$s';
@@ -915,12 +795,13 @@ $a->strings['Database'] = 'Database';
 $a->strings['DB updates'] = 'DB updates';
 $a->strings['Inspect Deferred Workers'] = 'Inspect deferred workers';
 $a->strings['Inspect worker Queue'] = 'Inspect worker queue';
+$a->strings['Logs'] = 'Logs';
+$a->strings['View'] = 'View';
 $a->strings['Diagnostics'] = 'Diagnostics';
 $a->strings['PHP Info'] = 'PHP info';
 $a->strings['probe address'] = 'Probe address';
 $a->strings['check webfinger'] = 'check WebFinger';
 $a->strings['Babel'] = 'Babel';
-$a->strings['Addon Features'] = 'Addon features';
 $a->strings['User registrations waiting for confirmation'] = 'User registrations awaiting confirmation';
 $a->strings['Daily posting limit of %d post reached. The post was rejected.'] = [
 	0 => 'Daily posting limit of %d post reached. The post was rejected.',
@@ -954,19 +835,16 @@ $a->strings['The post was created'] = 'The post was created';
 $a->strings['Failed to remove event'] = 'Failed to remove event';
 $a->strings['Event can not end before it has started.'] = 'Event cannot end before it has started.';
 $a->strings['Event title and start time are required.'] = 'Event title and starting time are required.';
+$a->strings['Edit event'] = 'Edit event';
 $a->strings['Starting date and Title are required.'] = 'Starting date and title are required.';
-$a->strings['Event Starts:'] = 'Event starts:';
 $a->strings['Required'] = 'Required';
-$a->strings['Finish date/time is not known or not relevant'] = 'Finish date/time is not known or not relevant';
-$a->strings['Event Finishes:'] = 'Event finishes:';
+$a->strings['Location'] = 'Location';
+$a->strings['Description'] = 'Description';
 $a->strings['Share this event'] = 'Share this event';
-$a->strings['Submit'] = 'Submit';
 $a->strings['Basic'] = 'Basic';
 $a->strings['This calendar format is not supported'] = 'This calendar format is not supported';
 $a->strings['No exportable data found'] = 'No exportable data found';
 $a->strings['calendar'] = 'calendar';
-$a->strings['Events'] = 'Events';
-$a->strings['View'] = 'View';
 $a->strings['list'] = 'List';
 $a->strings['Contact not found.'] = 'Contact not found.';
 $a->strings['Invalid contact.'] = 'Invalid contact.';
@@ -993,7 +871,9 @@ $a->strings['Only show hidden contacts'] = 'Only show hidden contacts';
 $a->strings['Search your contacts'] = 'Search your contacts';
 $a->strings['Results for: %s'] = 'Results for: %s';
 $a->strings['Update'] = 'Update';
+$a->strings['Block'] = 'Block';
 $a->strings['Unblock'] = 'Unblock';
+$a->strings['Ignore'] = 'Ignore';
 $a->strings['Unignore'] = 'Unignore';
 $a->strings['Batch Actions'] = 'Batch actions';
 $a->strings['Conversations started by this contact'] = 'Conversations started by this contact';
@@ -1002,9 +882,11 @@ $a->strings['Advanced Contact Settings'] = 'Advanced contact settings';
 $a->strings['Friend'] = 'Friend';
 $a->strings['Pending outgoing contact request'] = 'Pending outgoing contact request.';
 $a->strings['Pending incoming contact request'] = 'Pending incoming contact request.';
+$a->strings['This is you'] = 'This is me';
 $a->strings['Visit %s\'s profile [%s]'] = 'Visit %s\'s profile [%s]';
 $a->strings['Contact update failed.'] = 'Contact update failed.';
 $a->strings['Return to contact editor'] = 'Return to contact editor';
+$a->strings['Submit'] = 'Submit';
 $a->strings['Name'] = 'Name:';
 $a->strings['Account Nickname'] = 'Account nickname:';
 $a->strings['Account URL'] = 'Account URL:';
@@ -1098,6 +980,7 @@ $a->strings['Error'] = [
 ];
 $a->strings['You must be logged in to use this module'] = 'You must be logged in to use this module';
 $a->strings['Source URL'] = 'Source URL';
+$a->strings['l F d, Y \@ g:i A'] = 'l F d, Y \@ g:i A';
 $a->strings['Time Conversion'] = 'Time conversion';
 $a->strings['Friendica provides this service for sharing events with other networks and friends in unknown timezones.'] = 'Friendica provides this service for sharing events with other networks and friends in unknown time zones.';
 $a->strings['UTC time: %s'] = 'UTC time: %s';
@@ -1106,7 +989,6 @@ $a->strings['Converted localtime: %s'] = 'Converted local time: %s';
 $a->strings['Please select your timezone:'] = 'Please select your time zone:';
 $a->strings['Only logged in users are permitted to perform a probing.'] = 'Only logged in users are permitted to use the Probe feature.';
 $a->strings['Lookup address'] = 'Lookup address';
-$a->strings['No entries (some entries may be hidden).'] = 'No entries (entries may be hidden).';
 $a->strings['Find on this site'] = 'Find on this site';
 $a->strings['Results for:'] = 'Results for:';
 $a->strings['Site Directory'] = 'Site directory';
@@ -1187,6 +1069,20 @@ $a->strings['Clear the location'] = 'Clear location';
 $a->strings['Location services are unavailable on your device'] = 'Location services are unavailable on your device';
 $a->strings['Location services are disabled. Please check the website\'s permissions on your device'] = 'Location services are disabled. Please check the website\'s permissions on your device';
 $a->strings['The feed for this item is unavailable.'] = 'The feed for this item is unavailable.';
+$a->strings['No valid account found.'] = 'No valid account found.';
+$a->strings['Password reset request issued. Check your email.'] = 'Password reset request issued. Please check your email.';
+$a->strings['Password reset requested at %s'] = 'Password reset requested at %s';
+$a->strings['Request could not be verified. (You may have previously submitted it.) Password reset failed.'] = 'Request could not be verified. (You may have previously submitted it.) Password reset failed.';
+$a->strings['Request has expired, please make a new one.'] = 'Request has expired, please make a new one.';
+$a->strings['Forgot your Password?'] = 'Reset My Password';
+$a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Enter email address or nickname to reset your password. You will receive further instruction via email.';
+$a->strings['Password Reset'] = 'Forgotten password?';
+$a->strings['Your password has been reset as requested.'] = 'Your password has been reset as requested.';
+$a->strings['Your new password is'] = 'Your new password is';
+$a->strings['Save or copy your new password - and then'] = 'Save or copy your new password - and then';
+$a->strings['click here to login'] = 'click here to login';
+$a->strings['Your password may be changed from the <em>Settings</em> page after successful login.'] = 'Your password may be changed from the <em>Settings</em> page after successful login.';
+$a->strings['Your password has been changed at %s'] = 'Your password has been changed at %s';
 $a->strings['System down for maintenance'] = 'Sorry, the system is currently down for maintenance.';
 $a->strings['Files'] = 'Files';
 $a->strings['Upload'] = 'Upload';
@@ -1240,6 +1136,7 @@ $a->strings['The GUID of the item you want to delete.'] = 'GUID of item to be de
 $a->strings['Type'] = 'Type';
 $a->strings['Item not found'] = 'Item not found';
 $a->strings['Item Guid'] = 'Item Guid';
+$a->strings['Comment'] = 'Comment';
 $a->strings['Registered users'] = 'Signed up users';
 $a->strings['Pending registrations'] = 'Pending registrations';
 $a->strings['%s user blocked'] = [
@@ -1288,14 +1185,6 @@ $a->strings['Show unread'] = 'Show unread';
 $a->strings['{0} requested registration'] = '{0} requested registration';
 $a->strings['Authorize application connection'] = 'Authorize application connection';
 $a->strings['Do you want to authorize this application to access your posts and contacts, and/or create new posts for you?'] = 'Do you want to authorize this application to access your posts and contacts and create new posts for you?';
-$a->strings['No contact provided.'] = 'No contact provided.';
-$a->strings['Couldn\'t fetch information for contact.'] = 'Couldn\'t fetch information for contact.';
-$a->strings['Couldn\'t fetch friends for contact.'] = 'Couldn\'t fetch friends for contact.';
-$a->strings['Done'] = 'Done';
-$a->strings['success'] = 'success';
-$a->strings['failed'] = 'failed';
-$a->strings['ignored'] = 'Ignored';
-$a->strings['Keep this window open until done.'] = 'Keep this window open until done.';
 $a->strings['Invalid photo with id %s.'] = 'Invalid photo with id %s.';
 $a->strings['Edit post'] = 'Edit post';
 $a->strings['web link'] = 'web link';
@@ -1311,6 +1200,7 @@ $a->strings['No contacts.'] = 'No contacts.';
 $a->strings['%s\'s posts'] = '%s\'s posts';
 $a->strings['%s\'s comments'] = '%s\'s comments';
 $a->strings['%s\'s timeline'] = '%s\'s timeline';
+$a->strings['Personal notes are visible only by yourself.'] = 'Personal notes are only visible to you.';
 $a->strings['Image exceeds size limit of %s'] = 'Image exceeds size limit of %s';
 $a->strings['Image upload didn\'t complete, please try again'] = 'Image upload didn\'t complete. Please try again.';
 $a->strings['Image file is missing'] = 'Image file is missing';
@@ -1318,13 +1208,9 @@ $a->strings['Server can\'t accept new file upload at this time, please contact y
 $a->strings['Image file is empty.'] = 'Image file is empty.';
 $a->strings['View Album'] = 'View album';
 $a->strings['Profile not found.'] = 'Profile not found.';
-$a->strings['Member since:'] = 'Member since:';
-$a->strings['j F, Y'] = 'j F, Y';
-$a->strings['j F'] = 'j F';
 $a->strings['Birthday:'] = 'Birthday:';
 $a->strings['Age: '] = 'Age: ';
 $a->strings['Description:'] = 'Description:';
-$a->strings['Edit profile'] = 'Edit profile';
 $a->strings['Profile unavailable.'] = 'Profile unavailable.';
 $a->strings['Invalid locator'] = 'Invalid locator';
 $a->strings['Remote subscription can\'t be done for your network. Please subscribe directly on your system.'] = 'Remote subscription can\'t be done for your network. Please subscribe directly on your system.';
@@ -1435,11 +1321,8 @@ $a->strings['When activated, posts and comments will be expired.'] = 'If activat
 $a->strings['Expire personal notes'] = 'Expire personal notes';
 $a->strings['When activated, the personal notes on your profile page will be expired.'] = 'If activated, the personal notes on your profile page will expire.';
 $a->strings['When activated, your own posts never expire. Then the settings above are only valid for posts you received.'] = 'If activated, your own posts never expire. The settings above are only valid for posts you received.';
-$a->strings['Notification Settings'] = 'Notification';
-$a->strings['Send a notification email when:'] = 'Send notification email when:';
 $a->strings['You receive an introduction'] = 'Receiving an introduction';
 $a->strings['Your introductions are confirmed'] = 'My introductions are confirmed';
-$a->strings['Someone writes on your profile wall'] = 'Someone writes on my wall';
 $a->strings['Someone writes a followup comment'] = 'A follow up comment is posted';
 $a->strings['You receive a private message'] = 'receiving a private message';
 $a->strings['You receive a friend suggestion'] = 'Receiving a friend suggestion';
@@ -1456,7 +1339,6 @@ $a->strings['Relocate'] = 'Recent relocation';
 $a->strings['If you have moved this profile from another server, and some of your contacts don\'t receive your updates, try pushing this button.'] = 'If you have moved this profile from another server and some of your contacts don\'t receive your updates:';
 $a->strings['Resend relocate message to contacts'] = 'Resend relocation message to contacts';
 $a->strings['Addon Settings'] = 'Addon Settings';
-$a->strings['Description'] = 'Description';
 $a->strings['Add'] = 'Add';
 $a->strings['Failed to connect with email account using the settings provided.'] = 'Failed to connect with email account using the settings provided.';
 $a->strings['Diaspora (Socialhome, Hubzilla)'] = 'diaspora* (Socialhome, Hubzilla)';
@@ -1478,9 +1360,8 @@ $a->strings['Send public posts to all email contacts:'] = 'Send public posts to 
 $a->strings['Action after import:'] = 'Action after import:';
 $a->strings['Move to folder'] = 'Move to folder';
 $a->strings['Move to folder:'] = 'Move to folder:';
-$a->strings['Contact CSV file upload error'] = 'Contact CSV file upload error';
 $a->strings['Importing Contacts done'] = 'Importing contacts done';
-$a->strings['Upload a CSV file that contains the handle of your followed accounts in the first column you exported from the old account.'] = 'Upload a CSV file that contains the handle of your followed accounts in the first column you exported from the old account.';
+$a->strings['Contact CSV file upload error'] = 'Contact CSV file upload error';
 $a->strings['Upload File'] = 'Upload file';
 $a->strings['Delegation successfully granted.'] = 'Delegation successfully granted.';
 $a->strings['Parent user not found, unavailable or password doesn\'t match.'] = 'Parent user not found, unavailable or password doesn\'t match.';
@@ -1513,7 +1394,6 @@ $a->strings['(click to open/close)'] = '(reveal/hide)';
 $a->strings['Profile Actions'] = 'Profile actions';
 $a->strings['Edit Profile Details'] = 'Edit Profile Details';
 $a->strings['Profile picture'] = 'Profile picture';
-$a->strings['Location'] = 'Location';
 $a->strings['Miscellaneous'] = 'Miscellaneous';
 $a->strings['Street Address:'] = 'Street address:';
 $a->strings['Locality/City:'] = 'Locality/City:';
@@ -1523,9 +1403,7 @@ $a->strings['Country:'] = 'Country:';
 $a->strings['XMPP (Jabber) address:'] = 'XMPP (Jabber) address:';
 $a->strings['Homepage URL:'] = 'Homepage URL:';
 $a->strings['Public Keywords:'] = 'Public keywords:';
-$a->strings['(Used for suggesting potential friends, can be seen by others)'] = 'Used for suggesting potential friends, can be seen by others.';
 $a->strings['Private Keywords:'] = 'Private keywords:';
-$a->strings['(Used for searching profiles, never shown to others)'] = 'Used for searching profiles, never shown to others.';
 $a->strings['Image size reduction [%s] failed.'] = 'Image size reduction [%s] failed.';
 $a->strings['Shift-reload the page or clear browser cache if the new photo does not display immediately.'] = 'Shift-reload the page or clear browser cache if the new photo does not display immediately.';
 $a->strings['Unable to process image'] = 'Unable to process image';
@@ -1719,6 +1597,10 @@ $a->strings['Remove locally'] = 'Remove locally';
 $a->strings['I will attend'] = 'I will attend';
 $a->strings['I will not attend'] = 'I will not attend';
 $a->strings['I might attend'] = 'I might attend';
+$a->strings['Starred'] = 'Starred';
+$a->strings['I like this (toggle)'] = 'I like this (toggle)';
+$a->strings['Like'] = 'Like';
+$a->strings['I don\'t like this (toggle)'] = 'I don\'t like this (toggle)';
 $a->strings['%s (Received %s)'] = '%s (Received %s)';
 $a->strings['to'] = 'to';
 $a->strings['Wall-to-Wall'] = 'Wall-to-wall';

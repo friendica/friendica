@@ -23,9 +23,18 @@
 		<a href="{{$baseurl}}/moderation/blocklist/contact/import" class="btn btn-primary">{{$import_csv}}</a>
 		<a href="{{$baseurl}}/moderation/blocklist/contact/export" class="btn btn-default">{{$export_csv}}</a>
 	</p>
+	<form action="{{$baseurl}}/moderation/blocklist/contact" method="get" class="form-inline" style="margin-bottom: 1em;">
+		<div class="form-group">
+			<label for="contactblock_search">{{$search_label}}</label>
+			<input id="contactblock_search" class="form-control" type="text" name="search" value="{{$search}}">
+		</div>
+		<button type="submit" class="btn btn-primary">{{$search_submit}}</button>
+		{{if $search}}<a href="{{$baseurl}}/moderation/blocklist/contact" class="btn btn-default">{{$search_reset}}</a>{{/if}}
+	</form>
 
 	<form action="{{$baseurl}}/moderation/blocklist/contact" method="post">
         <input type="hidden" name="form_security_token" value="{{$form_security_token}}">
+		<input type="hidden" name="search" value="{{$search}}">
 
 		<h3>{{$h_contacts}}</h3>
 	{{if $contacts}}
@@ -58,13 +67,14 @@
 		{{$paginate nofilter}}
 		<div class="submit"><input type="submit" name="page_contactblock_unblock" value="{{$unblock}}" /></div>
 	{{else}}
-		<p>{{$no_data}}</p>
+		<p>{{if $search}}{{$no_data_filtered}}{{else}}{{$no_data}}{{/if}}</p>
 	{{/if}}
 	</form>
 
 	<h3>{{$h_newblock}}</h3>
 	<form action="{{$baseurl}}/moderation/blocklist/contact" method="post">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
+		<input type="hidden" name="search" value="{{$search}}">
 		<table id="contactblock">
 			<tbody>
 				<tr>

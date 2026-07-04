@@ -7,6 +7,7 @@ const EmojiPicker = function(options) {
     let categoriesHTML = '';
     let emojiList = undefined;
     let moseMove = false;
+    let activeInsertTarget = null;
     const pickerWidth = this.options.closeButton ? 370 : 350;
     const pickerHeight = 400;
 
@@ -7718,6 +7719,27 @@ const EmojiPicker = function(options) {
             const index = this.options.trigger.findIndex(item => item.selector === attr);
             this.insertInto = this.options.trigger[index].insertInto;
 
+            const insertSelector = Array.isArray(this.insertInto) ? this.insertInto.join(',') : this.insertInto;
+            const triggerElement = e.target && e.target.closest(attr);
+
+            if (triggerElement) {
+                const targetCandidates = Array.from(document.querySelectorAll(insertSelector))
+                    .filter(field => (field.tagName === 'TEXTAREA') && !field.closest('.fg-emoji-container'));
+
+                if (targetCandidates.length) {
+                    const triggerForm = triggerElement.closest('form');
+                    const formMatch = triggerForm && targetCandidates.find(field => triggerForm.contains(field));
+
+                    if (formMatch) {
+                        activeInsertTarget = formMatch;
+                    } else {
+                        // Fall back to the currently focused textarea or the first candidate.
+                        const focusedMatch = targetCandidates.find(field => field === document.activeElement);
+                        activeInsertTarget = focusedMatch || targetCandidates[0];
+                    }
+                }
+            }
+
             const position = functions.position();
 
             if (!emojiesHTML.length) {
@@ -7835,11 +7857,18 @@ const EmojiPicker = function(options) {
             e.preventDefault();
             
             const emoji = e.target.innerText.trim();
-            const myField = document.querySelectorAll(this.insertInto);
+            const insertSelector = Array.isArray(this.insertInto) ? this.insertInto.join(',') : this.insertInto;
+            const myFields = Array.from(document.querySelectorAll(insertSelector));
             const myValue = emoji;
+            const focusedField = myFields.find(field => field === document.activeElement);
+            const targetFields = (activeInsertTarget && myFields.includes(activeInsertTarget)) ? [activeInsertTarget] : (focusedField ? [focusedField] : myFields.slice(0, 1));
+
+            if (!targetFields.length) {
+                return;
+            }
 
             // Check if selector is an array
-            myField.forEach(myField => {
+            targetFields.forEach(myField => {
 
                 if (document.selection) {
                     myField.focus();
@@ -7850,7 +7879,7 @@ const EmojiPicker = function(options) {
                     const endPos = myField.selectionEnd;
                     myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
                     
-                    functions.setCaretPosition(myField, startPos + 2)
+                    functions.setCaretPosition(myField, startPos + myValue.length)
                     
                 } else {
                     myField.value += myValue;
@@ -7926,6 +7955,16 @@ const EmojiPicker = function(options) {
         this.lib(document.body).on('click', functions.closePicker, '#fg-emoji-picker-close-button');
         this.lib(document.body).on('click', functions.checkPickerExist);
         this.lib(document.body).on('click', functions.render, this.trigger);
+        this.lib(document).on('focusin', e => {
+            // Ignore focus changes inside the emoji picker (e.g. search input).
+            if (!e.target || e.target.closest('.fg-emoji-container')) {
+                return;
+            }
+
+            if (e.target.matches('textarea')) {
+                activeInsertTarget = e.target;
+            }
+        });
         this.lib(document.body).on('click', functions.insert, '.fg-emoji-list a');
         this.lib(document.body).on('click', functions.categoryNav, '.fg-emoji-nav a');
         this.lib(document.body).on('input', functions.search, '.fg-emoji-picker-search input');

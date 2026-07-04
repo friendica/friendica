@@ -8,9 +8,7 @@ right_aside {
   display: block;
 }
 
-aside #group-list-sidebar-frame,
-aside #group-list-sidebar,
-#group-list-sidebar-inflated {
+aside #group-sidebar {
   display: none;
 }
 

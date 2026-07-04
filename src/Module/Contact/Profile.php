@@ -46,50 +46,25 @@ use Psr\Log\LoggerInterface;
  */
 class Profile extends BaseModule
 {
-	/** @var LocalRelationshipRepository */
-	private $localRelationship;
-	/** @var Page */
-	private $page;
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var IHandleUserSessions */
-	private $session;
-	/** @var SystemMessages */
-	private $systemMessages;
-	/** @var Database */
-	private $db;
-	/** @var UserGServerRepository */
-	private $userGServer;
-	private EventDispatcherInterface $eventDispatcher;
-
 	public function __construct(
-		UserGServerRepository $userGServer,
-		EventDispatcherInterface $eventDispatcher,
-		Database $db,
-		SystemMessages $systemMessages,
-		IHandleUserSessions $session,
+		private readonly UserGServerRepository $userGServer,
+		private readonly EventDispatcherInterface $eventDispatcher,
+		private readonly Database $db,
+		private readonly SystemMessages $systemMessages,
+		private readonly IHandleUserSessions $session,
 		L10n $l10n,
-		LocalRelationshipRepository $localRelationship,
+		private readonly LocalRelationshipRepository $localRelationship,
 		BaseURL $baseUrl,
 		Arguments $args,
 		LoggerInterface $logger,
 		Profiler $profiler,
 		Response $response,
-		Page $page,
-		IManageConfigValues $config,
+		private Page $page,
+		private readonly IManageConfigValues $config,
 		array $server,
 		array $parameters = [],
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->localRelationship = $localRelationship;
-		$this->page              = $page;
-		$this->config            = $config;
-		$this->session           = $session;
-		$this->systemMessages    = $systemMessages;
-		$this->db                = $db;
-		$this->userGServer       = $userGServer;
-		$this->eventDispatcher   = $eventDispatcher;
 	}
 
 	protected function post(array $request = [])
@@ -287,20 +262,13 @@ class Profile extends BaseModule
 		$this->page['htmlhead'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('contact_head.tpl'), [
 		]);
 
-		$con = $this->t('Connection:');
-		switch ($localRelationship->rel) {
-			case ContactModel::FRIEND:
-				$relation_text = $this->t('Friend');
-				break;
-			case ContactModel::FOLLOWER:
-				$relation_text = $this->t('Follows you');
-				break;
-			case ContactModel::SHARING:
-				$relation_text = $this->t('You follow');
-				break;
-			default:
-				$relation_text = '';
-		}
+		$con           = $this->t('Connection:');
+		$relation_text = match ($localRelationship->rel) {
+			ContactModel::FRIEND   => $this->t('Friend'),
+			ContactModel::FOLLOWER => $this->t('Follows you'),
+			ContactModel::SHARING  => $this->t('You follow'),
+			default                => '',
+		};
 
 		if (!Protocol::supportsFollow($contact['network'])) {
 			$relation_text = '';
@@ -519,7 +487,7 @@ class Profile extends BaseModule
 		if ($localRelationship->rel & ContactModel::SHARING) {
 			$contact_actions['unfollow'] = [
 				'label' => $this->t('Unfollow'),
-				'url'   => 'contact/unfollow?url=' . urlencode($contact['url']) . '&auto=1',
+				'url'   => 'contact/unfollow?url=' . urlencode((string) $contact['url']) . '&auto=1',
 				'title' => '',
 				'sel'   => '',
 				'id'    => 'unfollow',
@@ -527,7 +495,7 @@ class Profile extends BaseModule
 		} else {
 			$contact_actions['follow'] = [
 				'label' => $this->t('Follow'),
-				'url'   => 'contact/follow?binurl=' . bin2hex($contact['url']) . '&auto=1',
+				'url'   => 'contact/follow?binurl=' . bin2hex((string) $contact['url']) . '&auto=1',
 				'title' => '',
 				'sel'   => '',
 				'id'    => 'follow',

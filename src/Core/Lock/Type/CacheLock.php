@@ -22,19 +22,11 @@ class CacheLock extends AbstractLock
 	public const CACHE_PREFIX = 'lock:';
 
 	/**
-	 * @var ICanCacheInMemory
-	 */
-	private $cache;
-
-	/**
 	 * CacheLock constructor.
 	 *
 	 * @param ICanCacheInMemory $cache The CacheDriver for this type of lock
 	 */
-	public function __construct(ICanCacheInMemory $cache)
-	{
-		$this->cache = $cache;
-	}
+	public function __construct(private readonly ICanCacheInMemory $cache) {}
 
 	/**
 	 * (@inheritdoc)
@@ -130,7 +122,7 @@ class CacheLock extends AbstractLock
 			throw new LockPersistenceException(sprintf('Cannot get locks with prefix %s', $prefix), $exception);
 		}
 
-		array_walk($locks, function (&$lock) {
+		array_walk($locks, function (&$lock): void {
 			$lock = substr($lock, strlen(self::CACHE_PREFIX));
 		});
 

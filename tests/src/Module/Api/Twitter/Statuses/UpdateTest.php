@@ -26,7 +26,7 @@ class UpdateTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesUpdate()
+	public function testApiStatusesUpdate(): void
 	{
 		$_FILES = [
 			'media' => [
@@ -36,8 +36,8 @@ class UpdateTest extends ApiTestCase
 				'height'   => 666,
 				'tmp_name' => $this->getTempImage(),
 				'name'     => 'spacer.png',
-				'type'     => 'image/png'
-			]
+				'type'     => 'image/png',
+			],
 		];
 
 		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
@@ -60,7 +60,7 @@ class UpdateTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesUpdateWithHtml()
+	public function testApiStatusesUpdateWithHtml(): void
 	{
 		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
@@ -75,9 +75,8 @@ class UpdateTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_update() function without an authenticated user.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesUpdateWithoutAuthenticatedUser()
+	public function testApiStatusesUpdateWithoutAuthenticatedUser(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 
@@ -92,9 +91,8 @@ class UpdateTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_update() function with a parent status.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesUpdateWithParent()
+	public function testApiStatusesUpdateWithParent(): void
 	{
 		$this->markTestIncomplete('This triggers an exit() somewhere and kills PHPUnit.');
 	}
@@ -102,9 +100,8 @@ class UpdateTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_update() function with a media_ids parameter.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesUpdateWithMediaIds()
+	public function testApiStatusesUpdateWithMediaIds(): void
 	{
 		$this->markTestIncomplete();
 	}
@@ -112,9 +109,8 @@ class UpdateTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_update() function with the throttle limit reached.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesUpdateWithDayThrottleReached()
+	public function testApiStatusesUpdateWithDayThrottleReached(): void
 	{
 		$this->markTestIncomplete();
 	}

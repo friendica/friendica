@@ -43,7 +43,7 @@ class StatsCachingTest extends FixtureTestCase
 		$this->lock              = new CacheLock($this->cache);
 	}
 
-	public function testStatsCachingNotAllowed()
+	public function testStatsCachingNotAllowed(): void
 	{
 		$this->httpExceptionMock->shouldReceive('content')->andReturn('failed')->once();
 
@@ -55,7 +55,7 @@ class StatsCachingTest extends FixtureTestCase
 		self::assertEquals('failed', $response->getBody());
 	}
 
-	public function testStatsCachingWitMinimumCache()
+	public function testStatsCachingWitMinimumCache(): void
 	{
 		$request = [
 			'key' => '12345',
@@ -81,7 +81,7 @@ class StatsCachingTest extends FixtureTestCase
 		], $json['lock']);
 	}
 
-	public function testStatsCachingWithDatabase()
+	public function testStatsCachingWithDatabase(): void
 	{
 		$request = [
 			'key' => '12345',
@@ -105,7 +105,7 @@ class StatsCachingTest extends FixtureTestCase
 		self::assertEquals(['type' => 'database'], $json['lock']);
 	}
 
-	public function testStatsCachingWithCache()
+	public function testStatsCachingWithCache(): void
 	{
 		$request = [
 			'key' => '12345',
@@ -129,7 +129,7 @@ class StatsCachingTest extends FixtureTestCase
 		self::assertEquals(['type' => 'database'], $json['lock']);
 	}
 
-	public function testStatsCachingWithOpcacheAndNull()
+	public function testStatsCachingWithOpcacheAndNull(): void
 	{
 		$request = [
 			'key' => '12345',
@@ -160,7 +160,7 @@ class StatsCachingTest extends FixtureTestCase
 		self::assertEquals(['type' => 'database'], $json['lock']);
 	}
 
-	public function testStatsCachingWithOpcacheAndValues()
+	public function testStatsCachingWithOpcacheAndValues(): void
 	{
 		$request = [
 			'key' => '12345',
@@ -179,7 +179,7 @@ class StatsCachingTest extends FixtureTestCase
 			'memory_usage' => [
 				'used_memory' => 3,
 				'free_memory' => 4,
-			]
+			],
 		]);
 
 		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))

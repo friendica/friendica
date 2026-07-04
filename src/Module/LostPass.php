@@ -29,10 +29,6 @@ use Psr\Log\LoggerInterface;
  */
 final class LostPass extends BaseModule
 {
-	private SystemMessages $sysMessages;
-	private IManageConfigValues $config;
-	private Emailer $emailer;
-
 	/**
 	 * Initialize the module
 	 *
@@ -48,13 +44,9 @@ final class LostPass extends BaseModule
 	 * @param array $server
 	 * @param array $parameters
 	 */
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, SystemMessages $sysMessages, IManageConfigValues $config, Emailer $emailer, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private readonly SystemMessages $sysMessages, private readonly IManageConfigValues $config, private readonly Emailer $emailer, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->sysMessages = $sysMessages;
-		$this->config      = $config;
-		$this->emailer     = $emailer;
 	}
 
 	/**

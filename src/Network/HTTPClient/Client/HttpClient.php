@@ -31,31 +31,14 @@ use Psr\Log\LoggerInterface;
  */
 class HttpClient implements ICanSendHttpRequests
 {
-	/** @var LoggerInterface */
-	private $logger;
-	/** @var Profiler */
-	private $profiler;
-	/** @var Client */
-	private $client;
-	/** @var URLResolver */
-	private $resolver;
-	/** @var App\BaseURL */
-	private $baseUrl;
-
-	public function __construct(LoggerInterface $logger, Profiler $profiler, Client $client, URLResolver $resolver, App\BaseURL $baseUrl)
-	{
-		$this->logger   = $logger;
-		$this->profiler = $profiler;
-		$this->client   = $client;
-		$this->resolver = $resolver;
-		$this->baseUrl  = $baseUrl;
-	}
+	public function __construct(private readonly LoggerInterface $logger, private readonly Profiler $profiler, private readonly Client $client, private readonly URLResolver $resolver, private readonly App\BaseURL $baseUrl) {}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public function request(string $method, string $url, array $opts = []): ICanHandleHttpResponses
 	{
+		$method = strtoupper($method);
 		$this->profiler->startRecording('network');
 		$this->logger->debug('Request start.', ['url' => $url, 'method' => $method]);
 
@@ -145,7 +128,7 @@ class HttpClient implements ICanSendHttpRequests
 			$conf[RequestOptions::AUTH] = $opts[HttpClientOptions::AUTH];
 		}
 
-		$conf[RequestOptions::ON_HEADERS] = function (ResponseInterface $response) use ($opts) {
+		$conf[RequestOptions::ON_HEADERS] = function (ResponseInterface $response) use ($opts): void {
 			if (
 				!empty($opts[HttpClientOptions::CONTENT_LENGTH])
 				&& (int) $response->getHeaderLine('Content-Length') > $opts[HttpClientOptions::CONTENT_LENGTH]
@@ -154,12 +137,17 @@ class HttpClient implements ICanSendHttpRequests
 			}
 		};
 
-		if (empty($conf[HttpClientOptions::HEADERS]['Accept']) && in_array($method, ['get', 'head'])) {
+		if (empty($conf[HttpClientOptions::HEADERS]['Accept']) && in_array($method, ['GET', 'HEAD'])) {
 			$this->logger->info('Accept header was missing, using default.', ['url' => $url]);
 			$conf[HttpClientOptions::HEADERS]['Accept'] = HttpClientAccept::DEFAULT;
 		}
 
-		$conf['sink'] = tempnam(System::getTempPath(), 'http-');
+		// Handle streaming requests - don't use sink for streaming
+		if (empty($opts[HttpClientOptions::STREAM])) {
+			$conf['sink'] = tempnam(System::getTempPath(), 'http-');
+		} else {
+			$conf[RequestOptions::STREAM] = true;
+		}
 
 		try {
 			$this->logger->debug('http request config.', ['url' => $url, 'method' => $method, 'options' => $conf]);
@@ -179,7 +167,9 @@ class HttpClient implements ICanSendHttpRequests
 			$this->logger->info('Invalid Argument for HTTP call.', ['url' => $url, 'method' => $method, 'exception' => $argumentException]);
 			return new CurlResult($this->logger, $url, '', ['http_code' => 500], $argumentException->getCode(), $argumentException->getMessage());
 		} finally {
-			unlink($conf['sink']);
+			if (!empty($conf['sink']) && file_exists($conf['sink'])) {
+				unlink($conf['sink']);
+			}
 			$this->logger->debug('Request stop.', ['url' => $url, 'method' => $method]);
 			$this->profiler->stopRecording();
 		}
@@ -189,7 +179,7 @@ class HttpClient implements ICanSendHttpRequests
 	 */
 	public function head(string $url, array $opts = []): ICanHandleHttpResponses
 	{
-		return $this->request('head', $url, $opts);
+		return $this->request('HEAD', $url, $opts);
 	}
 
 	/**
@@ -200,7 +190,7 @@ class HttpClient implements ICanSendHttpRequests
 		// In case there is no
 		$opts[HttpClientOptions::ACCEPT_CONTENT] ??= $accept_content;
 
-		return $this->request('get', $url, $opts);
+		return $this->request('GET', $url, $opts);
 	}
 
 	/**
@@ -228,7 +218,7 @@ class HttpClient implements ICanSendHttpRequests
 			$opts[HttpClientOptions::REQUEST] = $request;
 		}
 
-		return $this->request('post', $url, $opts);
+		return $this->request('POST', $url, $opts);
 	}
 
 	/**

@@ -226,7 +226,7 @@ class OnePoll
 		if (DBA::isResult($user) && DBA::isResult($mailconf)) {
 			$mailbox  = Email::constructMailboxName($mailconf);
 			$password = '';
-			openssl_private_decrypt(hex2bin($mailconf['pass']), $password, $user['prvkey']);
+			openssl_private_decrypt(hex2bin((string) $mailconf['pass']), $password, $user['prvkey']);
 			$mbox = Email::connect($mailbox, $mailconf['user'], $password);
 			unset($password);
 			DI::logger()->notice('Connect', ['user' => $mailconf['user']]);
@@ -273,7 +273,7 @@ class OnePoll
 						'protocol'    => Conversation::PARCEL_IMAP,
 						'direction'   => Conversation::PULL,
 					];
-					$datarray['thr-parent'] = $datarray['uri'] = Email::msgid2iri(trim($meta->message_id, '<>'));
+					$datarray['thr-parent'] = $datarray['uri'] = Email::msgid2iri(trim((string) $meta->message_id, '<>'));
 
 					// $meta = Email::messageMeta($mbox, $msg_uid);
 
@@ -327,11 +327,11 @@ class OnePoll
 
 					if ($raw_refs) {
 						$refs_arr = explode(' ', $raw_refs);
-						if (count($refs_arr)) {
-							for ($x = 0; $x < count($refs_arr); $x++) {
-								$refs_arr[$x] = Email::msgid2iri(str_replace(['<', '>', ' '], ['', '', ''], $refs_arr[$x]));
-							}
+
+						for ($x = 0; $x < count($refs_arr); $x++) {
+							$refs_arr[$x] = Email::msgid2iri(str_replace(['<', '>', ' '], ['', '', ''], $refs_arr[$x]));
 						}
+
 						$condition = ['uri' => $refs_arr, 'uid' => $importer_uid];
 						$parent    = Post::selectFirst(['uri'], $condition);
 						if (DBA::isResult($parent)) {
@@ -344,7 +344,7 @@ class OnePoll
 					$datarray['title'] = "";
 					foreach ($subject as $subpart) {
 						if ($subpart->charset != "default") {
-							$datarray['title'] .= iconv($subpart->charset, 'UTF-8//IGNORE', $subpart->text);
+							$datarray['title'] .= iconv((string) $subpart->charset, 'UTF-8//IGNORE', (string) $subpart->text);
 						} else {
 							$datarray['title'] .= $subpart->text;
 						}
@@ -489,11 +489,11 @@ class OnePoll
 		// Use a single verify token, even if multiple hubs
 		$verify_token = $contact['hub-verify'] ?: Strings::getRandomHex();
 
-		$params = 'hub.mode=' . $hubmode . '&hub.callback=' . urlencode($push_url) . '&hub.topic=' . urlencode($contact['poll']) . '&hub.verify=async&hub.verify_token=' . $verify_token;
+		$params = 'hub.mode=' . $hubmode . '&hub.callback=' . urlencode($push_url) . '&hub.topic=' . urlencode((string) $contact['poll']) . '&hub.verify=async&hub.verify_token=' . $verify_token;
 
 		DI::logger()->info('Hub subscription start', ['mode' => $hubmode, 'name' => $contact['name'], 'hub' => $url, 'endpoint' => $push_url, 'verifier' => $verify_token]);
 
-		if (!strlen($contact['hub-verify']) || ($contact['hub-verify'] != $verify_token)) {
+		if (!strlen((string) $contact['hub-verify']) || ($contact['hub-verify'] != $verify_token)) {
 			Contact::update(['hub-verify' => $verify_token], ['id' => $contact['id']]);
 		}
 

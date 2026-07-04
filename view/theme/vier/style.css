@@ -9,9 +9,8 @@
  * Additional Changes: Michael Vogel <icarus@dabo.de>
  **/
 
-/* @import "css/font-awesome.css"; */
-@import url("css/font-awesome.css") all;
-@import url("css/font2.css") all;
+@import url("../../asset/remixicon/fonts/remixicon.css") all;
+@import url("css/remixicon-vier.css") all;
 
 img {
 	border: 0px;
@@ -111,6 +110,14 @@ img {
 #adminpage table#users img { width: 16px; height: 16px; }
 #adminpage table tr:hover { background-color: #eeeeee; }
 #adminpage .selectall { text-align: right; }
+#adminpage table#users tr { box-shadow: 0 0 1px rgb(128,128,128); }
+#adminpage table#users td.acct-type-col {
+	white-space: normal !important;
+	word-break: break-word !important;
+}
+#adminpage table#users span.acct-type {
+	display: block;
+}
 /* icons */
 
 /*
@@ -384,6 +391,23 @@ pre code {
 	border-radius: 4px;
 	opacity: 0.3;
 }
+.vcard .badge-admin,
+.badge-admin {
+	margin: 10px 0;
+	background-color: #eebc1d;
+	opacity: 1;
+}
+.vcard .badge-mod,
+.badge-mod {
+	margin: 10px 0;
+	background-color: #32cd32;
+	opacity: 1;
+}
+	/* icon is slightly larger on vcard */
+	.vcard .badge-admin i,
+	.vcard .badge-mod i {
+		vertical-align: middle;
+	}
 #panel {
 	position: absolute;
 	width: 10em;
@@ -419,37 +443,19 @@ pre code {
 	background-color: #737373;
 	opacity: 0.4;
 }
-#saved-search-ul .tool:hover,
-#nets-sidebar .tool:hover,
-#sidebar-circle-list .tool:hover {
+#sidebar-widget-list .tool:hover {
 	background: #EEE;
 }
-/*#sidebar-circle-list .notify {
-	min-width: 10px;
-	text-align: center;
-	color: #FFF;
-	background-color: #CB4437;
-	font: bold 10px Arial;
-	padding: 3px;
-	border-radius: 10px;
-	display: none;
-}*/
 #sidebar-circle-list .notify {
 	display: none;
 }
 #sidebar-circle-list .notify.show {
 	display: inline-block;
 }
-.tool .label {
-	/* float: left; */
-}
 .tool .action {
 	float: right;
 }
-.tool a {
-	/* color: #000; */
-}
-.tool a:hover, .widget a:hover, #nets-sidebar a:hover, #group-widget-collapse:hover, .admin.link a:hover, aside h4 a:hover, right_aside h4 a:hover {
+.tool a:hover, .widget a:hover, #group-widget-collapse:hover, .admin.link a:hover, aside h4 a:hover, right_aside h4 a:hover {
 	/* text-decoration: underline; */
 	text-decoration: none;
 	color: black;
@@ -474,10 +480,6 @@ pre code {
 
 #message-new a {
 	color: black;
-}
-
-.sidebar-circle-element {
-	/* color: #000; */
 }
 
 .widget .selected, .group-selected {
@@ -848,7 +850,7 @@ nav#topbar-first #nav-apps-link.selected {
 }
 
 nav#topbar-first #nav-notifications-linkmenu.on .icon-bell:before {
-	content: "\f0f3";
+	content: "\ef93";
 }
 
 /* nav#topbar-first #nav-community-link {*/
@@ -1633,7 +1635,7 @@ section.minimal {
 
 .wall-item-container .wall-item-actions-tools {
 	float: right;
-	width: 80px;
+	width: 90px;
 }
 .wall-item-container .wall-item-actions-tools a {
 	float: right;
@@ -1883,6 +1885,13 @@ profile-jot-form #jot-title, #profile-jot-form #jot-category {
 .tag a {
 	/* padding-right: 8px; */
 	color: rgb(153,153,153);
+}
+
+.tagblock .tag-cloud .tag {
+	display: unset;
+}
+.tagblock .tag-cloud .tag:hover {
+	color: black;
 }
 .wwto {
 	position: absolute !important;

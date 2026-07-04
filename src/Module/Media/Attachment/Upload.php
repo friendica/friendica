@@ -28,29 +28,23 @@ use Psr\Log\LoggerInterface;
  */
 class Upload extends \Friendica\BaseModule
 {
-	/** @var IHandleUserSessions */
-	private $userSession;
-
-	/** @var IManageConfigValues */
-	private $config;
-
-	/** @var SystemMessages */
-	private $systemMessages;
-
 	/** @var bool */
 	private $isJson;
 
-	/** @var App\Page */
-	private $page;
-
-	public function __construct(App\Page $page, SystemMessages $systemMessages, IManageConfigValues $config, IHandleUserSessions $userSession, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly SystemMessages $systemMessages,
+		private readonly IManageConfigValues $config,
+		private readonly IHandleUserSessions $userSession,
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->userSession    = $userSession;
-		$this->config         = $config;
-		$this->systemMessages = $systemMessages;
-		$this->page           = $page;
 	}
 
 	protected function post(array $request = [])
@@ -69,7 +63,7 @@ class Upload extends \Friendica\BaseModule
 		}
 
 		$tempFileName = $_FILES['userfile']['tmp_name'];
-		$fileName     = basename($_FILES['userfile']['name']);
+		$fileName     = basename((string) $_FILES['userfile']['name']);
 		$fileSize     = intval($_FILES['userfile']['size']);
 		$maxFileSize  = Strings::getBytesFromShorthand($this->config->get('system', 'maxfilesize'));
 

@@ -23,7 +23,7 @@ steps:
     settings:
       backend: "filesystem"
       restore: true
-      cache_key: "{{ .Repo.Name }}_php{{PHP_MAJOR_VERSION}}_{{ arch }}_{{ os }}"
+      cache_key: "{{ .Repo.Name }}_php${PHP_MAJOR_VERSION}_{{ arch }}_{{ os }}"
       archive_format: "gzip"
       mount:
         - '.composer'

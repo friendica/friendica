@@ -34,8 +34,21 @@ class Trusted extends BaseSettings
 	/** @var SystemMessages */
 	protected $systemMessages;
 
-	public function __construct(SystemMessages $systemMessages, IManagePersonalConfigValues $pConfig, TwoFactor\Repository\TrustedBrowser $trustedBrowserRepo, IHandleUserSessions $session, App\Page $page, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		SystemMessages $systemMessages,
+		IManagePersonalConfigValues $pConfig,
+		TwoFactor\Repository\TrustedBrowser $trustedBrowserRepo,
+		IHandleUserSessions $session,
+		App\Page $page,
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->pConfig            = $pConfig;
@@ -71,8 +84,8 @@ class Trusted extends BaseSettings
 				case 'remove_all':
 					$this->trustedBrowserRepo->removeAllForUser($this->session->getLocalUserId());
 					$this->systemMessages->addInfo($this->t('Trusted browsers successfully removed.'));
+
 					$this->baseUrl->redirect('settings/2fa/trusted?t=' . self::getFormSecurityToken('settings_2fa_password'));
-					break;
 			}
 		}
 

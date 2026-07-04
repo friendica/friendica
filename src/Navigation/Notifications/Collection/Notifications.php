@@ -19,7 +19,7 @@ class Notifications extends BaseCollection
 
 	public function setSeen(): Notifications
 	{
-		$notifications = $this->map(function (NotificationEntity $notification) {
+		$notifications = $this->map(function (NotificationEntity $notification): void {
 			$notification->setSeen();
 		});
 
@@ -37,7 +37,7 @@ class Notifications extends BaseCollection
 
 	public function setDismissed(): Notifications
 	{
-		$notifications = $this->map(function (NotificationEntity $notification) {
+		$notifications = $this->map(function (NotificationEntity $notification): void {
 			$notification->setDismissed();
 		});
 

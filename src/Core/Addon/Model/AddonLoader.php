@@ -44,7 +44,7 @@ class AddonLoader implements ICanLoadAddons
 		$returnConfig = [];
 
 		foreach ($addons as $addon) {
-			$addonName = Strings::sanitizeFilePathItem(trim($addon));
+			$addonName = Strings::sanitizeFilePathItem(trim((string) $addon));
 
 			$configFile = $this->basePath . '/addon/' . $addonName . '/' . static::STATIC_PATH . '/' . $configName . '.config.php';
 

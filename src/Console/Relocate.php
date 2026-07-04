@@ -17,19 +17,6 @@ class Relocate extends Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
 
-	/**
-	 * @var IManageConfigValues
-	 */
-	private $config;
-	/**
-	 * @var \Friendica\App\BaseURL
-	 */
-	private $baseUrl;
-	/**
-	 * @var \Friendica\Database\Database
-	 */
-	private $database;
-
 	protected function getHelp()
 	{
 		$help = <<<HELP
@@ -51,13 +38,9 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(\Friendica\App\BaseURL $baseUrl, \Friendica\Database\Database $database, IManageConfigValues $config, $argv = null)
+	public function __construct(private readonly \Friendica\App\BaseURL $baseUrl, private readonly \Friendica\Database\Database $database, private readonly IManageConfigValues $config, $argv = null)
 	{
 		parent::__construct($argv);
-
-		$this->baseUrl  = $baseUrl;
-		$this->database = $database;
-		$this->config   = $config;
 	}
 
 	protected function doExecute(): int
@@ -71,7 +54,7 @@ HELP;
 			throw new \Asika\SimpleConsole\CommandArgsException('Too many arguments');
 		}
 
-		$new_url = rtrim($this->getArgument(0), '/');
+		$new_url = rtrim((string) $this->getArgument(0), '/');
 
 		$parsed = @parse_url($new_url);
 		if (!is_array($parsed) || empty($parsed['host']) || empty($parsed['scheme'])) {
@@ -80,7 +63,7 @@ HELP;
 
 		$this->out(sprintf('Relocation started from %s to %s. Could take a while to complete.', $this->baseUrl, $this->getArgument(0)));
 
-		$old_url = (string)$this->baseUrl;
+		$old_url = (string) $this->baseUrl;
 
 		// Generate host names for relocation the addresses in the format user@address.tld
 		$new_host = str_replace('http://', '@', Strings::normaliseLink($new_url));

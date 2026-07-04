@@ -30,7 +30,7 @@ class XML
 	 * @return string
 	 * @throws \Exception
 	 */
-	public static function fromArray(array $array, object &$xml = null, bool $remove_header = false, array $namespaces = [], bool $root = true): string
+	public static function fromArray(array $array, ?object &$xml = null, bool $remove_header = false, array $namespaces = [], bool $root = true): string
 	{
 		if ($root) {
 			foreach ($array as $key => $value) {
@@ -96,7 +96,7 @@ class XML
 				}
 
 				foreach ($value as $attr_key => $attr_value) {
-					$element_parts = explode(':', $attr_key);
+					$element_parts = explode(':', (string) $attr_key);
 					if ((count($element_parts) > 1) && isset($namespaces[$element_parts[0]])) {
 						$namespace = $namespaces[$element_parts[0]];
 					} else {
@@ -167,11 +167,11 @@ class XML
 	 * @param DOMDocument $doc        XML root
 	 * @param DOMElement  $parent     parent object
 	 * @param string      $element    XML element name
-	 * @param string      $value      XML value
+	 * @param ?string      $value      XML value
 	 * @param array       $attributes Array containing the attributes
 	 * @return void
 	 */
-	public static function addElement(DOMDocument $doc, DOMElement &$parent, string $element, string $value = null, array $attributes = [])
+	public static function addElement(DOMDocument $doc, DOMElement &$parent, string $element, ?string $value = null, array $attributes = [])
 	{
 		$element = self::createElement($doc, $element, $value ?? '', $attributes);
 		$parent->appendChild($element);
@@ -180,13 +180,13 @@ class XML
 	/**
 	 * Convert an XML document to a normalised, case-corrected array used by webfinger
 	 *
-	 * @param object  $xml_element     The XML document
-	 * @param integer $recursion_depth recursion counter for internal use - default 0
-	 *                                 internal use, recursion counter
+	 * @param SimpleXMLElement|mixed   $xml_element     The XML document or other data on recursive use
+	 * @param integer                  $recursion_depth recursion counter for internal use - default 0
+	 *                                                  internal use, recursion counter
 	 *
 	 * @return array|string|null The array from the xml element or the string
 	 */
-	public static function elementToArray($xml_element, int &$recursion_depth = 0)
+	public static function elementToArray(mixed $xml_element, int &$recursion_depth = 0)
 	{
 		// If we're getting too deep, bail out
 		if ($recursion_depth > 512) {
@@ -194,10 +194,7 @@ class XML
 		}
 
 		$xml_element_copy = '';
-		if (!is_string($xml_element)
-			&& !is_array($xml_element)
-			&& ($xml_element instanceof SimpleXMLElement)
-		) {
+		if ($xml_element instanceof SimpleXMLElement) {
 			$xml_element_copy = $xml_element;
 			$xml_element      = get_object_vars($xml_element);
 		}
@@ -210,7 +207,7 @@ class XML
 
 			foreach ($xml_element as $key => $value) {
 				$recursion_depth++;
-				$result_array[strtolower($key)] = self::elementToArray($value, $recursion_depth);
+				$result_array[strtolower((string) $key)] = self::elementToArray($value, $recursion_depth);
 				$recursion_depth--;
 			}
 
@@ -266,14 +263,9 @@ class XML
 		libxml_clear_errors();
 
 		if ($namespaces) {
-			$parser = @xml_parser_create_ns("UTF-8", ':');
+			$parser = xml_parser_create_ns("UTF-8", ':');
 		} else {
-			$parser = @xml_parser_create();
-		}
-
-		if (!$parser) {
-			DI::logger()->warning('Xml::toArray: xml_parser_create: no resource');
-			return [];
+			$parser = xml_parser_create();
 		}
 
 		xml_parser_set_option($parser, XML_OPTION_TARGET_ENCODING, 'UTF-8');
@@ -329,12 +321,12 @@ class XML
 			}
 
 			// See tag status and do the needed.
-			if ($namespaces && strpos($tag, ':')) {
-				$namespc              = substr($tag, 0, strrpos($tag, ':'));
-				$tag                  = strtolower(substr($tag, strlen($namespc) + 1));
+			if ($namespaces && strpos((string) $tag, ':')) {
+				$namespc              = substr((string) $tag, 0, strrpos((string) $tag, ':'));
+				$tag                  = strtolower(substr((string) $tag, strlen($namespc) + 1));
 				$result['@namespace'] = $namespc;
 			}
-			$tag = strtolower($tag);
+			$tag = strtolower((string) $tag);
 
 			if ($type == 'open') {   // The starting of the tag '<tag>'
 				$parent[$level - 1] = &$current;
@@ -452,10 +444,10 @@ class XML
 	 *
 	 * @param DOMXPath $xpath XPath object
 	 * @param string $element Element name
-	 * @param DOMNode $context Context object or NULL
+	 * @param ?DOMNode $context Context object or NULL
 	 * @return string XML node value or empty string on failure
 	 */
-	public static function getFirstNodeValue(DOMXPath $xpath, string $element, DOMNode $context = null)
+	public static function getFirstNodeValue(DOMXPath $xpath, string $element, ?DOMNode $context = null)
 	{
 		$result = @$xpath->evaluate($element, $context);
 		if (!is_object($result)) {
@@ -475,10 +467,10 @@ class XML
 	 *
 	 * @param DOMXPath $xpath XPath object
 	 * @param string $element Element name
-	 * @param DOMNode $context Context object or NULL
+	 * @param ?DOMNode $context Context object or NULL
 	 * @return mixed|bool First element's attributes field or false on failure
 	 */
-	public static function getFirstAttributes(DOMXPath $xpath, string $element, DOMNode $context = null)
+	public static function getFirstAttributes(DOMXPath $xpath, string $element, ?DOMNode $context = null)
 	{
 		$result = @$xpath->query($element, $context);
 		if (!is_object($result)) {
@@ -498,10 +490,10 @@ class XML
 	 *
 	 * @param DOMXPath $xpath XPath object
 	 * @param string $element Element name
-	 * @param DOMNode $context Context object or NULL
+	 * @param ?DOMNode $context Context object or NULL
 	 * @return string First value or empty string on failure
 	 */
-	public static function getFirstValue(DOMXPath $xpath, string $element, DOMNode $context = null): string
+	public static function getFirstValue(DOMXPath $xpath, string $element, ?DOMNode $context = null): string
 	{
 		$result = @$xpath->query($element, $context);
 		if (!is_object($result)) {
@@ -552,7 +544,7 @@ class XML
 		if (is_bool($val)) {
 			return $val ? 'true' : 'false';
 		} elseif (is_array($val)) {
-			return array_map('XML::arrayEscape', $val);
+			return array_map(XML::arrayEscape(...), $val);
 		}
 
 		return self::escape((string) $val);

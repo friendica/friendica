@@ -20,15 +20,10 @@ use Psr\Log\NullLogger;
  */
 final class DelegatingLoggerFactory implements LoggerFactory
 {
-	private IManageConfigValues $config;
-
 	/** @var array<string,LoggerFactory> */
 	private array $factories = [];
 
-	public function __construct(IManageConfigValues $config)
-	{
-		$this->config = $config;
-	}
+	public function __construct(private readonly IManageConfigValues $config) {}
 
 	public function registerFactory(string $name, LoggerFactory $factory): void
 	{

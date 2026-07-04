@@ -349,6 +349,19 @@ input[type="submit"],
 	color: inherit;
 }
 
+.tag.label a {
+	background: $background_color;
+	color: $font_color;
+}
+
+.tag.border-primary {
+	--border-color: color-mix(in oklab, var(--success), white 30%);
+}
+
+.tag.border-primary a {
+	color: color-mix(in oklab, var(--success), white 30%);
+}
+
 code {
 	color: $font_color;
 	background-color: rgba(255, 255, 255, 0.2);

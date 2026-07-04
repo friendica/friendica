@@ -12,7 +12,7 @@ use Friendica\Database\Database;
 use Friendica\Profile\ProfileField\Exception\ProfileFieldNotFoundException;
 use Friendica\Profile\ProfileField\Exception\ProfileFieldPersistenceException;
 use Friendica\Profile\ProfileField\Exception\UnexpectedPermissionSetException;
-use Friendica\Profile\ProfileField\Factory;
+use Friendica\Profile\ProfileField\Factory\ProfileField as ProfileFieldFactory;
 use Friendica\Profile\ProfileField\Entity;
 use Friendica\Profile\ProfileField\Collection;
 use Friendica\Security\PermissionSet\Repository\PermissionSet as PermissionSetRepository;
@@ -21,9 +21,6 @@ use Psr\Log\LoggerInterface;
 
 class ProfileField extends BaseRepository
 {
-	/** @var  Factory\ProfileField */
-	protected $factory;
-
 	protected static $table_name = 'profile_field';
 
 	protected static $view_name = 'profile_field-view';
@@ -31,11 +28,20 @@ class ProfileField extends BaseRepository
 	/** @var PermissionSetRepository */
 	protected $permissionSetRepository;
 
-	public function __construct(Database $database, LoggerInterface $logger, Factory\ProfileField $factory, PermissionSetRepository $permissionSetRepository)
-	{
-		parent::__construct($database, $logger, $factory);
+	public function __construct(
+		Database $database,
+		LoggerInterface $logger,
+		private readonly ProfileFieldFactory $entityFactory,
+		PermissionSetRepository $permissionSetRepository,
+	) {
+		parent::__construct($database, $logger, $entityFactory);
 
 		$this->permissionSetRepository = $permissionSetRepository;
+	}
+
+	protected function getFactory(): ProfileFieldFactory
+	{
+		return $this->entityFactory;
 	}
 
 	/**
@@ -54,7 +60,7 @@ class ProfileField extends BaseRepository
 			throw new ProfileFieldNotFoundException();
 		}
 
-		return $this->factory->createFromTableRow($fields);
+		return $this->getFactory()->createFromTableRow($fields);
 	}
 
 	/**
@@ -72,7 +78,7 @@ class ProfileField extends BaseRepository
 
 		$Entities = new Collection\ProfileFields();
 		foreach ($rows as $fields) {
-			$Entities[] = $this->factory->createFromTableRow($fields);
+			$Entities[] = $this->getFactory()->createFromTableRow($fields);
 		}
 
 		return $Entities;
@@ -94,7 +100,7 @@ class ProfileField extends BaseRepository
 			'order'   => $profileField->order,
 			'created' => $profileField->created->format(DateTimeFormat::MYSQL),
 			'edited'  => $profileField->edited->format(DateTimeFormat::MYSQL),
-			'psid'    => $profileField->permissionSet->id
+			'psid'    => $profileField->permissionSet->id,
 		];
 	}
 
@@ -114,7 +120,7 @@ class ProfileField extends BaseRepository
 
 			return $this->select([
 				'uid'  => $uid,
-				'psid' => $publicPermissionSet->id
+				'psid' => $publicPermissionSet->id,
 			]);
 		} catch (\Exception $exception) {
 			throw new ProfileFieldPersistenceException(sprintf('Cannot select public ProfileField for user "%d"', $uid), $exception);
@@ -131,7 +137,7 @@ class ProfileField extends BaseRepository
 		try {
 			return $this->select(
 				['uid' => $uid],
-				['order' => ['order']]
+				['order' => ['order']],
 			);
 		} catch (\Exception $exception) {
 			throw new ProfileFieldPersistenceException(sprintf('Cannot select ProfileField for user "%d"', $uid), $exception);
@@ -157,7 +163,7 @@ class ProfileField extends BaseRepository
 
 		return $this->select(
 			['uid' => $uid, 'psid' => $permissionSetIds],
-			['order' => ['order']]
+			['order' => ['order']],
 		);
 	}
 
@@ -249,7 +255,7 @@ class ProfileField extends BaseRepository
 				$foundProfileFieldOld->update(
 					$profileField->value,
 					$order,
-					$profileField->permissionSet
+					$profileField->permissionSet,
 				);
 
 				$savedProfileFields->append($this->save($foundProfileFieldOld));

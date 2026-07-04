@@ -17,11 +17,11 @@ use SessionHandlerInterface;
  */
 class Native extends AbstractSession implements IHandleSessions
 {
-	public function __construct(BaseURL $baseURL, SessionHandlerInterface $handler = null)
+	public function __construct(BaseURL $baseURL, ?SessionHandlerInterface $handler = null)
 	{
 		ini_set('session.gc_probability', 50);
 		ini_set('session.use_only_cookies', 1);
-		ini_set('session.cookie_httponly', (int)Cookie::HTTPONLY);
+		ini_set('session.cookie_httponly', (int) Cookie::HTTPONLY);
 
 		if ($baseURL->getScheme() === 'https') {
 			ini_set('session.cookie_secure', 1);

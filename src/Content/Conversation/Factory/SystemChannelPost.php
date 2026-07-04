@@ -33,31 +33,18 @@ use Psr\Log\LoggerInterface;
  *
  * @package Friendica\Content\Conversation\Factory
  */
-final class SystemChannelPost
+final readonly class SystemChannelPost
 {
-	private LoggerInterface $logger;
-	private UserDefinedChannel $channelRepository;
-	private Database $dba;
-	private IManageConfigValues $config;
-	private ActivityFactory $activityFactory;
-
 	/**
 	 * SystemChannelPost constructor.
 	 *
 	 * @param Database $dba Database access object.
-	 * @param UserDefinedChannel $channel Channel repository.
+	 * @param UserDefinedChannel $channelRepository Channel repository.
 	 * @param LoggerInterface $logger Logger instance.
 	 * @param IManageConfigValues $config Configuration manager.
 	 * @param ActivityFactory $activityFactory Activity factory.
 	 */
-	public function __construct(Database $dba, UserDefinedChannel $channel, LoggerInterface $logger, IManageConfigValues $config, ActivityFactory $activityFactory)
-	{
-		$this->dba               = $dba;
-		$this->logger            = $logger;
-		$this->channelRepository = $channel;
-		$this->config            = $config;
-		$this->activityFactory   = $activityFactory;
-	}
+	public function __construct(private Database $dba, private UserDefinedChannel $channelRepository, private LoggerInterface $logger, private IManageConfigValues $config, private ActivityFactory $activityFactory) {}
 
 	/**
 	 * Add a post to matching system channels for one or many users.
@@ -136,7 +123,7 @@ final class SystemChannelPost
 			$activity_time += (microtime(true) - $timestamp2);
 
 			$isSharer   = in_array($relationState[$uid] ?? null, [Contact::SHARING, Contact::FRIEND]);
-			$isFollower = ($relationState[$uid] ?? null) == Contact::FOLLOWER;
+			$isFollower = ($relationState[$uid] ?? null) === Contact::FOLLOWER;
 
 			foreach ($channels as $channel) {
 				if (isset($existing[$uid]) && in_array($channel, $existing[$uid])) {
@@ -150,7 +137,7 @@ final class SystemChannelPost
 				$store = false;
 				switch ($channel) {
 					case Channel::WHATSHOT:
-						$store = ($engagement['comments'] > $activities->medianComments || $engagement['activities'] > $activities->medianActivities || $engagement['views'] > $activities->medianViews) && $engagement['contact-type'] != Contact::TYPE_COMMUNITY;
+						$store = ($engagement['comments'] > $activities->medianComments || $engagement['activities'] > $activities->medianActivities || $engagement['views'] > $activities->medianViews) && $engagement['contact-type'] !== Contact::TYPE_COMMUNITY;
 						break;
 
 					case Channel::FORYOU:
@@ -162,7 +149,7 @@ final class SystemChannelPost
 						}
 
 						if (!$store && isset($forYouuserContacts[$uid])) {
-							$store = $forYouuserContacts[$uid]['channel-frequency'] == Contact\User::FREQUENCY_ALWAYS || $forYouuserContacts[$uid]['notify_new_posts'];
+							$store = $forYouuserContacts[$uid]['channel-frequency'] === Contact\User::FREQUENCY_ALWAYS || $forYouuserContacts[$uid]['notify_new_posts'];
 						}
 						break;
 

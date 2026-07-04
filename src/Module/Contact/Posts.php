@@ -29,26 +29,9 @@ use Psr\Log\LoggerInterface;
  */
 class Posts extends BaseModule
 {
-	/**
-	 * @var LocalRelationship
-	 */
-	private $localRelationship;
-	/**
-	 * @var App\Page
-	 */
-	private $page;
-	/**
-	 * @var IHandleUserSessions
-	 */
-	private $userSession;
-
-	public function __construct(L10n $l10n, LocalRelationship $localRelationship, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Page $page, IHandleUserSessions $userSession, $server, array $parameters = [])
+	public function __construct(L10n $l10n, private readonly LocalRelationship $localRelationship, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private App\Page $page, private readonly IHandleUserSessions $userSession, $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->localRelationship = $localRelationship;
-		$this->page              = $page;
-		$this->userSession       = $userSession;
 	}
 
 	protected function content(array $request = []): string

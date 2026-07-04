@@ -18,7 +18,7 @@ class VerifyCredentialsTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiAccountVerifyCredentials()
+	public function testApiAccountVerifyCredentials(): void
 	{
 		$response = (new VerifyCredentials(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
@@ -33,9 +33,8 @@ class VerifyCredentialsTest extends ApiTestCase
 	/**
 	 * Test the api_account_verify_credentials() function without an authenticated user.
 	 *
-	 * @return void
 	 */
-	public function testApiAccountVerifyCredentialsWithoutAuthenticatedUser()
+	public function testApiAccountVerifyCredentialsWithoutAuthenticatedUser(): void
 	{
 		self::markTestIncomplete('Needs dynamic BasicAuth first');
 

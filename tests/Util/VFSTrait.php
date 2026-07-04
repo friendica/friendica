@@ -7,7 +7,6 @@
 
 namespace Friendica\Test\Util;
 
-
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
@@ -21,14 +20,15 @@ trait VFSTrait
 	/**
 	 * Sets up the Virtual File System for Friendica with common files (config, dbstructure)
 	 */
-	protected function setUpVfsDir() {
+	protected function setUpVfsDir()
+	{
 		// the used directories inside the App class
 		$structure = [
-			'config' => [],
-			'bin' => [],
-			'static' => [],
-			'test' => [],
-			'logs' => [],
+			'config'  => [],
+			'bin'     => [],
+			'static'  => [],
+			'test'    => [],
+			'logs'    => [],
 			'config2' => [],
 		];
 
@@ -41,7 +41,8 @@ trait VFSTrait
 		$this->setConfigFile('static' . DIRECTORY_SEPARATOR . 'settings.config.php', true);
 		$this->setConfigFile(
 			'mods' . DIRECTORY_SEPARATOR . 'local.config.ci.php',
-			false, 'local.config.php'
+			false,
+			'local.config.php',
 		);
 	}
 
@@ -51,15 +52,15 @@ trait VFSTrait
 	 * @param string $sourceFilePath The filename of the config file
 	 * @param bool   $static         True, if the folder `static` instead of `config` should be used
 	 */
-	public function setConfigFile(string $sourceFilePath, bool $static = false, string $targetFileName = null)
+	public function setConfigFile(string $sourceFilePath, bool $static = false, ?string $targetFileName = null)
 	{
-		$file = dirname(__DIR__) . DIRECTORY_SEPARATOR .
-			'..' . DIRECTORY_SEPARATOR .
-				$sourceFilePath;
+		$file = dirname(__DIR__) . DIRECTORY_SEPARATOR
+			. '..' . DIRECTORY_SEPARATOR
+				. $sourceFilePath;
 
 		if (file_exists($file)) {
 			if (empty($targetFileName)) {
-				$tmpArray = preg_split('/\\' . DIRECTORY_SEPARATOR . '/', $sourceFilePath);
+				$tmpArray       = preg_split('/\\' . DIRECTORY_SEPARATOR . '/', $sourceFilePath);
 				$targetFileName = array_pop($tmpArray);
 			}
 			vfsStream::newFile($targetFileName)
@@ -79,7 +80,10 @@ trait VFSTrait
 	protected function delConfigFile(string $filename, bool $static = false)
 	{
 		if ($this->root->hasChild(($static ? 'static' : 'config') . '/' . $filename)) {
-			$this->root->getChild(($static ? 'static' : 'config'))->removeChild($filename);
+			$dir = $this->root->getChild(($static ? 'static' : 'config'));
+			if ($dir instanceof vfsStreamDirectory) {
+				$dir->removeChild($filename);
+			}
 		}
 	}
 }

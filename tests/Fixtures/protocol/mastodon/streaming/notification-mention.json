@@ -1,0 +1,30 @@
+{
+	"id": "68739215",
+	"type": "mention",
+	"account": {
+		"id": "5000",
+		"username": "notifier",
+		"acct": "notifier@example.org",
+		"url": "https://example.org/@notifier"
+	},
+	"status": {
+		"id": "555555555555555555",
+		"uri": "https://example.org/users/notifier/statuses/555555555555555555",
+		"url": "https://example.org/@notifier/555555555555555555",
+		"spoiler_text": "",
+		"content": "<p>ignored notification payload</p>",
+		"language": null,
+		"reblog": null,
+		"account": {
+			"id": "5000",
+			"username": "notifier",
+			"acct": "notifier@example.org",
+			"url": "https://example.org/@notifier"
+		},
+		"tags": [],
+		"mentions": [],
+		"emojis": [],
+		"card": null,
+		"poll": null
+	}
+}

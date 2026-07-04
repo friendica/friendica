@@ -3,10 +3,14 @@
 # SPDX-License-Identifier: CC0-1.0
 
 includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon
     - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - .phpstan-baseline.neon
 
 parameters:
-    level: 3
+    level: 4
+
+    phpVersion: 80200 # PHP 8.2
 
     paths:
         - bin/auth_ejabberd.php
@@ -16,6 +20,8 @@ parameters:
         - bin/worker.php
         - index.php
         - src/
+        - static/
+        - tests/
 
     scanDirectories:
         - mod
@@ -23,8 +29,13 @@ parameters:
         - vendor
         - view
 
+    excludePaths:
+        - vendor/rector/
+
     dynamicConstantNames:
         - DB_UPDATE_VERSION
+
+    treatPhpDocTypesAsCertain: false
 
     # See all rules at https://github.com/phpstan/phpstan-strict-rules/blob/2.0.x/rules.neon
     strictRules:
@@ -32,15 +43,7 @@ parameters:
 
     ignoreErrors:
         -
-            # #Fixme: Ignore type mismatch of BaseRepository::$factory in child classes
-            message: '#^PHPDoc type Friendica\\.+ of property Friendica\\.+\:\:\$factory is not the same as PHPDoc type Friendica\\Capabilities\\ICanCreateFromTableRow of overridden property Friendica\\BaseRepository\:\:\$factory\.$#'
-            identifier: property.phpDocType
-            count: 13
-            path: src
-
-        -
-            # #Fixme: Ignore type mismatch of BaseModule::$response in BaseApi module
-            message: '#^PHPDoc type Friendica\\Module\\Api\\ApiResponse of property Friendica\\Module\\BaseApi\:\:\$response is not the same as PHPDoc type Friendica\\Capabilities\\ICanCreateResponses of overridden property Friendica\\BaseModule\:\:\$response\.$#'
-            identifier: property.phpDocType
-            count: 1
-            path: src/Module/BaseApi.php
+            message: '#^Call to an undefined method Mockery[\\\\](?:ExpectationInterface(?:[|]Mockery[\\\\]HigherOrderMessage)?|LegacyMockInterface)::(?:with|once|times|twice|withAnyArgs|andReturnUsing|addRules)\(\)\.$#'
+            identifier: method.notFound
+            path: tests/
+            count: 247

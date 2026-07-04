@@ -16,7 +16,7 @@ class PostMedias extends BaseCollection
 	 * @param Entity\PostMedia[] $entities
 	 * @param int|null                   $totalCount
 	 */
-	public function __construct(array $entities = [], int $totalCount = null)
+	public function __construct(array $entities = [], ?int $totalCount = null)
 	{
 		parent::__construct($entities, $totalCount);
 	}

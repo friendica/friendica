@@ -65,7 +65,7 @@ class Browser extends BaseModule
 			$path[$album] = $album;
 		}
 
-		$photosArray = array_map([$this, 'map_files'], $photos);
+		$photosArray = array_map($this->map_files(...), $photos);
 
 		$tpl    = Renderer::getMarkupTemplate('media/browser.tpl');
 		$output = Renderer::replaceMacros($tpl, [
@@ -104,9 +104,9 @@ class Browser extends BaseModule
 				"`resource-id` = ? AND `height` <= ? AND `width` <= ?",
 				$record['resource-id'],
 				Proxy::PIXEL_MEDIUM,
-				Proxy::PIXEL_MEDIUM
+				Proxy::PIXEL_MEDIUM,
 			],
-			['order' => ['scale']]
+			['order' => ['scale']],
 		);
 		$scale = $photo['scale'] ?? $record['loq'];
 

@@ -24,7 +24,7 @@ class Acctlink extends BaseModule
 			throw new NotFoundException('Parameter "addr" is missing or empty');
 		}
 
-		$contact = Contact::getByURL($addr, null, ['url']) ?? '';
+		$contact = Contact::getByURL($addr, null, ['url']);
 		if (!$contact) {
 			throw new NotFoundException('Contact not found');
 		}

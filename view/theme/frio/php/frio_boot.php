@@ -18,7 +18,7 @@ use Friendica\DI;
  *
  * @todo Check if this is really needed.
  */
-function load_page(AppHelper $appHelper)
+function load_page(AppHelper $appHelper): void
 {
 	if (isset($_GET['mode']) && ($_GET['mode'] == 'minimal')) {
 		require 'view/theme/frio/minimal.php';
@@ -49,7 +49,7 @@ function is_modal()
 	$modalpages = get_modalpage_list();
 
 	foreach ($modalpages as $r => $value) {
-		if (str_contains($_REQUEST['pagename'], (string) $value)) {
+		if (str_contains((string) $_REQUEST['pagename'], (string) $value)) {
 			$is_modal = true;
 		}
 	}

@@ -53,7 +53,7 @@ class Browser extends BaseModule
 
 		$files = Attach::selectToArray(['id', 'filename', 'filetype'], ['uid' => $this->session->getLocalUserId()]);
 
-		$fileArray = array_map([$this, 'map_files'], $files);
+		$fileArray = array_map($this->map_files(...), $files);
 
 		$tpl    = Renderer::getMarkupTemplate('media/browser.tpl');
 		$output = Renderer::replaceMacros($tpl, [
@@ -82,7 +82,7 @@ class Browser extends BaseModule
 
 	protected function map_files(array $record): array
 	{
-		[$m1, $m2] = explode('/', $record['filetype']);
+		[$m1, $m2] = explode('/', (string) $record['filetype']);
 		$filetype  = file_exists(sprintf('images/icons/%s.png', $m1)) ? $m1 : 'text';
 
 		return [

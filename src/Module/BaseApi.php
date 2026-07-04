@@ -1,7 +1,7 @@
 <?php
 
-// Copyright (C) 2010-2024, the Friendica project
-// SPDX-FileCopyrightText: 2010-2024 the Friendica project
+// Copyright (C) 2010-2026, the Friendica project
+// SPDX-FileCopyrightText: 2010-2026 the Friendica project
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -62,8 +62,18 @@ class BaseApi extends BaseModule
 	/** @var \Friendica\Factory\Api\Mastodon\Error */
 	protected $errorFactory;
 
-	public function __construct(\Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
-	{
+	public function __construct(
+		\Friendica\Factory\Api\Mastodon\Error $errorFactory,
+		AppHelper $appHelper,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		ApiResponse $response,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->appHelper    = $appHelper;
@@ -121,17 +131,10 @@ class BaseApi extends BaseModule
 				$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", intval($request['min_id'])]);
 			}
 		} else {
-			switch ($requested_order) {
-				case TimelineOrderByTypes::RECEIVED:
-				case TimelineOrderByTypes::CHANGED:
-				case TimelineOrderByTypes::EDITED:
-				case TimelineOrderByTypes::CREATED:
-				case TimelineOrderByTypes::COMMENTED:
-					$order_field = $requested_order;
-					break;
-				default:
-					throw new \Exception("Unrecognized request order: $requested_order");
-			}
+			$order_field = match ($requested_order) {
+				TimelineOrderByTypes::RECEIVED, TimelineOrderByTypes::CHANGED, TimelineOrderByTypes::EDITED, TimelineOrderByTypes::CREATED, TimelineOrderByTypes::COMMENTED => $requested_order,
+				default => throw new \Exception("Unrecognized request order: $requested_order"),
+			};
 
 			if (!empty($request['max_id'])) {
 				$condition = DBA::mergeConditions($condition, ["`$order_field` < ?", DateTimeFormat::convert($request['max_id'], DateTimeFormat::MYSQL)]);
@@ -160,18 +163,10 @@ class BaseApi extends BaseModule
 	protected function buildOrderAndLimitParams(array $request, array $params = []): array
 	{
 		$requested_order = $request['friendica_order'];
-		switch ($requested_order) {
-			case TimelineOrderByTypes::CHANGED:
-			case TimelineOrderByTypes::CREATED:
-			case TimelineOrderByTypes::COMMENTED:
-			case TimelineOrderByTypes::EDITED:
-			case TimelineOrderByTypes::RECEIVED:
-				$order_field = $requested_order;
-				break;
-			case TimelineOrderByTypes::ID:
-			default:
-				$order_field = 'uri-id';
-		}
+		$order_field     = match ($requested_order) {
+			TimelineOrderByTypes::CHANGED, TimelineOrderByTypes::CREATED, TimelineOrderByTypes::COMMENTED, TimelineOrderByTypes::EDITED, TimelineOrderByTypes::RECEIVED => $requested_order,
+			default => 'uri-id',
+		};
 
 		if (!empty($request['min_id'])) {
 			$params['order'] = [$order_field];
@@ -387,6 +382,22 @@ class BaseApi extends BaseModule
 		}
 
 		return (int) $uid;
+	}
+
+	/**
+	 * Check whether the current API user has moderator privileges.
+	 * Halts execution with a 403 JSON error when access is missing.
+	 */
+	protected function checkModeratorAccess(): void
+	{
+		$uid = self::getCurrentUserID();
+		if (empty($uid) || !User::isModerator($uid)) {
+			$this->logger->warning('Denied access to moderation API endpoint', [
+				'uid'     => $uid,
+				'command' => $this->args->getCommand(),
+			]);
+			$this->logAndJsonError(403, $this->errorFactory->Forbidden());
+		}
 	}
 
 	/**

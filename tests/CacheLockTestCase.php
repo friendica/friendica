@@ -8,19 +8,19 @@
 namespace Friendica\Test;
 
 use Friendica\Core\Cache\Capability\ICanCacheInMemory;
-use Friendica\Core\Lock\Capability\ICanLock;
+use Friendica\Core\Lock\Type\CacheLock;
 
 abstract class CacheLockTestCase extends LockTestCase
 {
 	abstract protected function getCache(): ICanCacheInMemory;
 
-	abstract protected function getInstance(): ICanLock;
+	abstract protected function getInstance(): CacheLock;
 
 	/**
 	 * Test if the getStats() result is identically to the getCacheStats()
 	 */
-	public function testGetStats()
+	public function testGetStats(): void
 	{
-		self::assertSame(array_keys($this->getCache()->getStats()), array_keys($this->instance->getCacheStats()));
+		self::assertSame(array_keys($this->getCache()->getStats()), array_keys($this->getInstance()->getCacheStats()));
 	}
 }

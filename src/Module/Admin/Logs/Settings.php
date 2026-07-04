@@ -24,12 +24,12 @@ class Settings extends BaseAdmin
 
 		self::checkFormSecurityTokenRedirectOnError('/admin/logs', 'admin_logs');
 
-		$logfile   = (!empty($_POST['logfile']) ? trim($_POST['logfile']) : '');
+		$logfile   = (!empty($_POST['logfile']) ? trim((string) $_POST['logfile']) : '');
 		$debugging = !empty($_POST['debugging']);
 		$loglevel  = ($_POST['loglevel'] ?? '') ?: LogLevel::ERROR;
 
-		if (is_file($logfile) &&
-		!is_writeable($logfile)) {
+		if (is_file($logfile)
+		&& !is_writeable($logfile)) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('The logfile \'%s\' is not writable. No logging possible', $logfile));
 			return;
 		}

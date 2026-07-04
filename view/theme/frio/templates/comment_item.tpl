@@ -20,36 +20,36 @@
 		<p class="comment-edit-bb-{{$id}} comment-icon-list">
 			<span class="btn-group">
 				<button type="button" class="btn btn-default bb-img" style="cursor: pointer;" aria-label="{{$edimg}}" title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}">
-					<i class="fa fa-picture-o"></i>
+					<i class="ri ri-image-line"></i>
 				</button>
 				<button type="button" class="btn btn-default bb-attach" style="cursor: pointer;" aria-label="{{$edattach}}" title="{{$edattach}}" ondragenter="return commentLinkDrop(event, {{$id}});" ondragover="return commentLinkDrop(event, {{$id}});" ondrop="commentLinkDropper(event);" onclick="commentGetLink({{$id}}, '{{$prompttext}}');">
-					<i class="fa fa-paperclip"></i>
+					<i class="ri ri-attachment-2"></i>
 				</button>
 			</span>
 			<span class="btn-group">
 				<button type="button" class="btn btn-default bb-url" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormatting('url',{{$id}});">
-					<i class="fa fa-link"></i>
+					<i class="ri ri-link"></i>
 				</button>
 				<button type="button" class="btn btn-default underline" style="cursor: pointer;" aria-label="{{$eduline}}" title="{{$eduline}}" onclick="insertFormatting('u',{{$id}});">
-					<i class="fa fa-underline"></i>
+					<i class="ri ri-underline"></i>
 				</button>
 				<button type="button" class="btn btn-default italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormatting('i',{{$id}});">
-					<i class="fa fa-italic"></i>
+					<i class="ri ri-italic"></i>
 				</button>
 				<button type="button" class="btn btn-default bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormatting('b',{{$id}});">
-					<i class="fa fa-bold"></i>
+					<i class="ri ri-bold"></i>
 				</button>
 				<button type="button" class="btn btn-default quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormatting('quote',{{$id}});">
-					<i class="fa fa-quote-left"></i>
+					<i class="ri ri-double-quotes-l"></i>
 				</button>
 				<button type="button" class="btn btn-default emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}">
-					<i class="fa fa-smile-o"></i>
+					<i class="ri ri-emotion-line"></i>
 				</button>
 				<button type="button" class="btn btn-default eye" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormatting('abstract',{{$id}});">
-					<i class="fa fa-eye"></i>
+					<i class="ri ri-eye-line"></i>
 				</button>
 				<button type="button" class="btn btn-default code" style="cursor: pointer;" aria-label="{{$edcode}}" title="{{$edcode}}" onclick="insertFormatting('code',{{$id}});">
-					<i class="fa fa-code"></i>
+					<i class="ri ri-code-line"></i>
 				</button>
 			</span>
 			</p>
@@ -70,9 +70,9 @@
 {{/if}}
 		<p class="comment-edit-submit-wrapper">
 {{if $preview}}
-			<button type="button" class="btn btn-default comment-edit-preview" onclick="preview_comment({{$id}});" id="comment-edit-preview-link-{{$id}}"><i class="fa fa-eye"></i> {{$preview}}</button>
+			<button type="button" class="btn btn-default comment-edit-preview" onclick="preview_comment({{$id}});" id="comment-edit-preview-link-{{$id}}"><i class="ri ri-eye-line"></i> {{$preview}}</button>
 {{/if}}
-			<button type="submit" class="btn btn-primary comment-edit-submit" id="comment-edit-submit-{{$id}}" name="submit" data-loading-text="{{$loading}}"><i class="fa fa-paper-plane"></i> {{$submit}}</button>
+			<button type="submit" class="btn btn-primary comment-edit-submit" id="comment-edit-submit-{{$id}}" name="submit" data-loading-text="{{$loading}}"><i class="ri ri-send-plane-line"></i> {{$submit}}</button>
 		</p>
 
 		<div class="comment-edit-end clear"></div>

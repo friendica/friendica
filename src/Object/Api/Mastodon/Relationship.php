@@ -69,7 +69,7 @@ class Relationship extends BaseDataTransferObject
 	 */
 	public function __construct(int $contactId, array $contactRecord, bool $blocked = false, bool $muted = false, bool $isBlocked = false)
 	{
-		$this->id                   = (string)$contactId;
+		$this->id                   = (string) $contactId;
 		$this->following            = false;
 		$this->requested            = false;
 		$this->endorsed             = false;
@@ -85,11 +85,11 @@ class Relationship extends BaseDataTransferObject
 
 		if ($contactRecord['uid'] != 0) {
 			$this->following   = !$contactRecord['pending'] && in_array($contactRecord['rel'] ?? 0, [Contact::SHARING, Contact::FRIEND]);
-			$this->requested   = (bool)($contactRecord['pending'] ?? false);
+			$this->requested   = (bool) ($contactRecord['pending'] ?? false);
 			$this->followed_by = !$contactRecord['pending'] && in_array($contactRecord['rel'] ?? 0, [Contact::FOLLOWER, Contact::FRIEND]);
-			$this->muting      = (bool)($contactRecord['readonly'] ?? false) || $muted;
-			$this->notifying   = (bool)$contactRecord['notify_new_posts'] ?? false;
-			$this->blocking    = (bool)($contactRecord['blocked'] ?? false) || $blocked;
+			$this->muting      = (bool) ($contactRecord['readonly'] ?? false) || $muted;
+			$this->notifying   = (bool) $contactRecord['notify_new_posts'];
+			$this->blocking    = (bool) ($contactRecord['blocked'] ?? false) || $blocked;
 			$this->blocked_by  = $isBlocked;
 			$this->note        = $contactRecord['info'];
 		}

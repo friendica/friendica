@@ -88,7 +88,7 @@ class ParsedLogLine
 			$this->tryfixjson();
 		}
 
-		$this->message = trim($this->message);
+		$this->message = trim((string) $this->message);
 	}
 
 	/**
@@ -129,7 +129,7 @@ class ParsedLogLine
 	 */
 	public function getData()
 	{
-		$data = json_decode($this->data, true);
+		$data = json_decode((string) $this->data, true);
 		if ($data) {
 			foreach ($data as $k => $v) {
 				$data[$k] = print_r($v, true);

@@ -24,35 +24,18 @@ use Psr\Log\LoggerInterface;
  */
 class Emailer
 {
-	/** @var IManageConfigValues */
-	private $config;
-	/** @var IManagePersonalConfigValues */
-	private $pConfig;
-	/** @var LoggerInterface */
-	private $logger;
-	/** @var BaseURL */
-	private $baseUrl;
-	/** @var L10n */
-	private $l10n;
-
 	/** @var string */
 	private $siteEmailAddress;
 	/** @var string */
 	private $siteEmailName;
 
 	public function __construct(
-		IManageConfigValues $config,
-		IManagePersonalConfigValues $pConfig,
-		BaseURL $baseURL,
-		LoggerInterface $logger,
-		L10n $defaultLang
+		private readonly IManageConfigValues $config,
+		private readonly IManagePersonalConfigValues $pConfig,
+		private readonly BaseURL $baseUrl,
+		private readonly LoggerInterface $logger,
+		private readonly L10n $l10n,
 	) {
-		$this->config  = $config;
-		$this->pConfig = $pConfig;
-		$this->logger  = $logger;
-		$this->baseUrl = $baseURL;
-		$this->l10n    = $defaultLang;
-
 		$this->siteEmailAddress = $this->config->get('config', 'sender_email');
 		if (empty($this->siteEmailAddress)) {
 			$hostname = $this->baseUrl->getHost();
@@ -132,14 +115,14 @@ class Emailer
 	{
 		Hook::callAll('emailer_send_prepare', $email);
 
-		if (! $email instanceof IEmail) {
+		if (! ($email instanceof IEmail)) {
 			return true;
 		}
 
 		// @see https://github.com/friendica/friendica/issues/9142
 		$countMessageId = 0;
 		foreach ($email->getAdditionalMailHeader() as $name => $value) {
-			if (strtolower($name) == 'message-id') {
+			if (strtolower((string) $name) == 'message-id') {
 				$countMessageId += count($value);
 			}
 		}
@@ -183,7 +166,7 @@ class Emailer
 								. "Content-Transfer-Encoding: base64\n\n"
 								. $textBody . "\n";
 
-		if (!$email_textonly && !is_null($email->getMessage())) {
+		if (!$email_textonly && $email->getMessage() !== '') {
 			$multipartMessageBody
 				.= "--" . $mimeBoundary . "\n"                // text/html section
 				. "Content-Type: text/html; charset=UTF-8\n"

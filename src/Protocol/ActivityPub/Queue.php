@@ -220,7 +220,7 @@ class Queue
 
 		DI::logger()->debug('Processing queue entry', ['id' => $entry['id'], 'type' => $entry['type'], 'object-type' => $entry['object-type'], 'uri' => $entry['object-id'], 'in-reply-to' => $entry['in-reply-to-id']]);
 
-		$activity = json_decode($entry['activity'], true);
+		$activity = json_decode((string) $entry['activity'], true);
 		$type     = $entry['type'];
 		$push     = $entry['push'];
 
@@ -336,7 +336,7 @@ class Queue
 					return false;
 				}
 				Fetch::add($entry['in-reply-to-id']);
-				$activity = json_decode($entry['activity'], true);
+				$activity = json_decode((string) $entry['activity'], true);
 				if (in_array($entry['in-reply-to-id'], $activity['children'] ?? [])) {
 					DI::logger()->notice('reply-to-id is already in the list of children', ['id' => $entry['in-reply-to-id'], 'children' => $activity['children'], 'depth' => count($activity['children'])]);
 					self::retrial($id);
@@ -409,13 +409,13 @@ class Queue
 
 		$trust_source = $entry['trust'];
 
-		$data     = json_decode($entry['activity'], true);
-		$activity = json_decode($data['raw'], true);
+		$data     = json_decode((string) $entry['activity'], true);
+		$activity = json_decode((string) $data['raw'], true);
 
 		$ldactivity = JsonLD::compact($activity);
 		return [
 			'data'  => Receiver::prepareObjectData($ldactivity, $uid, $entry['push'], $trust_source),
-			'trust' => $trust_source
+			'trust' => $trust_source,
 		];
 	}
 

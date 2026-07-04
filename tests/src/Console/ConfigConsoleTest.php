@@ -7,7 +7,6 @@
 
 namespace Friendica\Test\src\Console;
 
-use Friendica\App;
 use Friendica\App\Mode;
 use Friendica\Console\Config;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -18,14 +17,10 @@ use Mockery\MockInterface;
 
 class ConfigConsoleTest extends ConsoleTestCase
 {
-	/**
-	 * @var App\Mode|MockInterface $appMode
-	 */
-	private $appMode;
 	/** @var IManageConfigValues|LegacyMockInterface|MockInterface */
 	private $configMock;
 
-	protected function setUp() : void
+	protected function setUp(): void
 	{
 		parent::setUp();
 
@@ -35,14 +30,10 @@ class ConfigConsoleTest extends ConsoleTestCase
 			],
 		]);
 
-		$this->appMode = Mockery::mock(App\Mode::class);
-		$this->appMode->shouldReceive('has')
-					  ->andReturn(true);
-
 		$this->configMock = Mockery::mock(IManageConfigValues::class);
 	}
 
-	public function testSetGetKeyValue()
+	public function testSetGetKeyValue(): void
 	{
 		$this->configMock
 			->shouldReceive('set')
@@ -60,7 +51,7 @@ class ConfigConsoleTest extends ConsoleTestCase
 			->andReturn('now')
 			->once();
 
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$console->setArgument(2, 'now');
@@ -73,7 +64,7 @@ class ConfigConsoleTest extends ConsoleTestCase
 			->andReturn('now')
 			->once();
 
-		$console = new Config($this->appMode, $this->configMock, [$this->consoleArgv]);
+		$console = new Config($this->configMock, [$this->consoleArgv]);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$txt = $this->dumpExecute($console);
@@ -85,14 +76,14 @@ class ConfigConsoleTest extends ConsoleTestCase
 			->andReturn(null)
 			->once();
 
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$txt = $this->dumpExecute($console);
 		self::assertEquals("config.test => NULL\n", $txt);
 	}
 
-	public function testSetArrayValue()
+	public function testSetArrayValue(): void
 	{
 		$testArray = [1, 2, 3];
 		$this->configMock
@@ -101,7 +92,7 @@ class ConfigConsoleTest extends ConsoleTestCase
 			->andReturn($testArray)
 			->once();
 
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$console->setArgument(2, 'now');
@@ -110,7 +101,7 @@ class ConfigConsoleTest extends ConsoleTestCase
 		self::assertEquals("[Error] config.test is an array and can't be set using this command.\n", $txt);
 	}
 
-	public function testSetExistingValue()
+	public function testSetExistingValue(): void
 	{
 		$this->configMock
 			->shouldReceive('get')
@@ -118,7 +109,7 @@ class ConfigConsoleTest extends ConsoleTestCase
 			->andReturn('now')
 			->twice();
 
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$console->setArgument(2, 'now');
@@ -127,9 +118,9 @@ class ConfigConsoleTest extends ConsoleTestCase
 		self::assertEquals("[Error] config.test already set to now.\n", $txt);
 	}
 
-	public function testTooManyArguments()
+	public function testTooManyArguments(): void
 	{
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'config');
 		$console->setArgument(1, 'test');
 		$console->setArgument(2, 'it');
@@ -140,14 +131,14 @@ class ConfigConsoleTest extends ConsoleTestCase
 		self::assertEquals($assertion, $firstline);
 	}
 
-	public function testVerbose()
+	public function testVerbose(): void
 	{
 		$this->configMock
 			->shouldReceive('get')
 			->with('test', 'it')
 			->andReturn('now')
 			->once();
-		$console = new Config($this->appMode, $this->configMock, $this->consoleArgv);
+		$console = new Config($this->configMock, $this->consoleArgv);
 		$console->setArgument(0, 'test');
 		$console->setArgument(1, 'it');
 		$console->setOption('v', 1);
@@ -165,11 +156,11 @@ Options: array (
 test.it => now
 
 CONF;
-		$txt        = $this->dumpExecute($console);
+		$txt = $this->dumpExecute($console);
 		self::assertEquals($assertion, $txt);
 	}
 
-	public function testUnableToSet()
+	public function testUnableToSet(): void
 	{
 		$this->configMock
 			->shouldReceive('set')
@@ -181,7 +172,7 @@ CONF;
 			->with('test', 'it')
 			->andReturn(null)
 			->twice();
-		$console = new Config($this->appMode, $this->configMock, [$this->consoleArgv]);
+		$console = new Config($this->configMock, [$this->consoleArgv]);
 		$console->setArgument(0, 'test');
 		$console->setArgument(1, 'it');
 		$console->setArgument(2, 'now');
@@ -189,7 +180,7 @@ CONF;
 		self::assertSame("Unable to set test.it\n", $txt);
 	}
 
-	public function testGetHelp()
+	public function testGetHelp(): void
 	{
 		// Usable to purposely fail if new commands are added without taking tests into account
 		$theHelp = <<<HELP
@@ -222,7 +213,7 @@ Options
     -v           Show more debug information.
 
 HELP;
-		$console = new Config($this->appMode, $this->configMock, [$this->consoleArgv]);
+		$console = new Config($this->configMock, [$this->consoleArgv]);
 		$console->setOption('help', true);
 
 		$txt = $this->dumpExecute($console);

@@ -12,29 +12,19 @@ use Friendica\Network\HTTPClient\Capability\ICanHandleHttpResponses;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RedirectMiddleware;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * A content wrapper class for Guzzle call results
  */
 class GuzzleResponse extends Response implements ICanHandleHttpResponses, ResponseInterface
 {
-	/** @var string The URL */
-	private $url;
 	/** @var boolean */
 	private $isTimeout;
 	/** @var boolean */
 	private $isSuccess;
 	/** @var boolean */
 	private $isGone;
-	/**
-	 * @var int the error number or 0 (zero) if no error
-	 */
-	private $errorNumber;
-
-	/**
-	 * @var string the error message or '' (the empty string) if no
-	 */
-	private $error;
 
 	/** @var string  */
 	private $redirectUrl = '';
@@ -43,12 +33,20 @@ class GuzzleResponse extends Response implements ICanHandleHttpResponses, Respon
 	/** @var bool */
 	private $redirectIsPermanent = false;
 
-	public function __construct(ResponseInterface $response, string $url, $errorNumber = 0, $error = '')
+	/**
+	 * @param int $errorNumber
+	 * @param string $error
+	 */
+	public function __construct(ResponseInterface $response, /** @var string The URL */
+		private readonly string $url, /**
+				 * @var int the error number or 0 (zero) if no error
+				 */
+		private $errorNumber = 0, /**
+				 * @var string the error message or '' (the empty string) if no
+				 */
+		private $error = '')
 	{
 		parent::__construct($response->getStatusCode(), $response->getHeaders(), $response->getBody(), $response->getProtocolVersion(), $response->getReasonPhrase());
-		$this->url         = $url;
-		$this->error       = $error;
-		$this->errorNumber = $errorNumber;
 
 		$this->checkSuccess();
 		$this->checkGone();
@@ -82,14 +80,14 @@ class GuzzleResponse extends Response implements ICanHandleHttpResponses, Respon
 
 	private function checkRedirect(ResponseInterface $response)
 	{
-		$headersRedirect = $response->getHeader(RedirectMiddleware::HISTORY_HEADER) ?? [];
+		$headersRedirect = $response->getHeader(RedirectMiddleware::HISTORY_HEADER);
 
 		if (count($headersRedirect) > 0) {
 			$this->redirectUrl   = end($headersRedirect);
 			$this->isRedirectUrl = true;
 
 			$this->redirectIsPermanent = true;
-			foreach (($response->getHeader(RedirectMiddleware::STATUS_HISTORY_HEADER) ?? []) as $history) {
+			foreach (($response->getHeader(RedirectMiddleware::STATUS_HISTORY_HEADER)) as $history) {
 				if (preg_match('/30(2|3|4|7)/', $history)) {
 					$this->redirectIsPermanent = false;
 				}
@@ -106,7 +104,7 @@ class GuzzleResponse extends Response implements ICanHandleHttpResponses, Respon
 	/** {@inheritDoc} */
 	public function getContentType(): string
 	{
-		$contentTypes = $this->getHeader('Content-Type') ?? [];
+		$contentTypes = $this->getHeader('Content-Type');
 
 		return array_pop($contentTypes) ?? '';
 	}
@@ -181,5 +179,15 @@ class GuzzleResponse extends Response implements ICanHandleHttpResponses, Respon
 	public function getBodyString(): string
 	{
 		return (string) parent::getBody();
+	}
+
+	/**
+	 * Get the response body as a stream
+	 *
+	 * @return StreamInterface
+	 */
+	public function getBodyStream(): StreamInterface
+	{
+		return parent::getBody();
 	}
 }

@@ -123,7 +123,7 @@ class PageInfo
 
 		foreach (['type', 'url', 'title', 'alternative_title', 'publisher_name', 'publisher_url', 'publisher_img', 'author_name', 'author_url', 'author_img'] as $field) {
 			if (!empty($data[$field])) {
-				$text .= " " . $field . "='" . str_replace(['[', ']'], ['&#91;', '&#93;'], htmlentities($data[$field], ENT_QUOTES, 'UTF-8', false)) . "'";
+				$text .= " " . $field . "='" . str_replace(['[', ']'], ['&#91;', '&#93;'], htmlentities((string) $data[$field], ENT_QUOTES, 'UTF-8', false)) . "'";
 			}
 		}
 
@@ -133,7 +133,7 @@ class PageInfo
 
 		// Only embed a picture link when it seems to be a valid picture ("width" is set)
 		if (!empty($data['images']) && !empty($data['images'][0]['width'])) {
-			$preview = str_replace(['[', ']'], ['&#91;', '&#93;'], htmlentities($data['images'][0]['src'], ENT_QUOTES, 'UTF-8', false));
+			$preview = str_replace(['[', ']'], ['&#91;', '&#93;'], htmlentities((string) $data['images'][0]['src'], ENT_QUOTES, 'UTF-8', false));
 			// if the preview picture is larger than 500 pixels then show it in a larger mode
 			// But only, if the picture isn't higher than large (To prevent huge posts)
 			if (!DI::config()->get('system', 'always_show_preview') && ($data['images'][0]['width'] >= 500)
@@ -247,18 +247,18 @@ class PageInfo
 		$body = preg_replace("~\[url=($URLSearchString)]([#!@])(.*?)\[/url]~is", '$2[url=$1]$3[/url]', $body);
 
 		// Remove all hashtags and mentions
-		$body = preg_replace("/([#@!])\[url\=(.*?)\](.*?)\[\/url\]/ism", '', $body);
+		$body = preg_replace("/([#@!])\[url\=(.*?)\](.*?)\[\/url\]/ism", '', (string) $body);
 
 		// Search for pure links
-		preg_match("/\[url\](https?:.*?)\[\/url\]/ism", $body, $matches);
+		preg_match("/\[url\](https?:.*?)\[\/url\]/ism", (string) $body, $matches);
 
 		if (!$matches) {
 			// Search for links with descriptions
-			preg_match("/\[url\=(https?:.*?)\].*?\[\/url\]/ism", $body, $matches);
+			preg_match("/\[url\=(https?:.*?)\].*?\[\/url\]/ism", (string) $body, $matches);
 		}
 
 		if (!$matches && $searchNakedUrls) {
-			preg_match(Strings::autoLinkRegEx(), $body, $matches);
+			preg_match(Strings::autoLinkRegEx(), (string) $body, $matches);
 			if ($matches && !Strings::endsWith($body, $matches[1])) {
 				unset($matches);
 			}
@@ -299,6 +299,6 @@ class PageInfo
 			return $match[1];
 		}, $body);
 
-		return rtrim($body);
+		return rtrim((string) $body);
 	}
 }

@@ -95,7 +95,7 @@ class Account extends BaseSettings
 					$err .= DI::l10n()->t('Invalid email.');
 				}
 				//  ensure new email is not the admin mail
-				if (in_array(strtolower($email), User::getAdminEmailList())) {
+				if (in_array(strtolower((string) $email), User::getAdminEmailList())) {
 					$err .= DI::l10n()->t('Cannot change to that email.');
 					$email = $user['email'];
 				}
@@ -152,6 +152,7 @@ class Account extends BaseSettings
 			$str_circle_deny   = !empty($request['circle_deny'])   ? $aclFormatter->toString($request['circle_deny'])   : '';
 
 			DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'system', 'unlisted', !empty($request['unlisted']));
+			DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'system', 'prevent-relay', !empty($request['prevent_relay']));
 			DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'system', 'accessible-photos', !empty($request['accessible-photos']));
 			DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'system', 'default-group-gid', intval($request['circle-selection-group'] ?? $def_gid));
 
@@ -361,7 +362,7 @@ class Account extends BaseSettings
 		$expire_starred      = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'expire', 'starred', true);
 		$expire_network_only = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'expire', 'network_only', false);
 
-		if (!strlen($user['timezone'])) {
+		if (!strlen((string) $user['timezone'])) {
 			$timezone = DI::appHelper()->getTimeZone();
 		}
 
@@ -496,8 +497,12 @@ class Account extends BaseSettings
 
 		$notify_type = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'notify_type');
 
-		$passwordRules = DI::l10n()->t('Allowed characters are a-z, A-Z, 0-9 and special characters except white spaces and accentuated letters.')
-			. (PASSWORD_DEFAULT === PASSWORD_BCRYPT ? ' ' . DI::l10n()->t('Password length is limited to 72 characters.') : '');
+		$passwordRules = DI::l10n()->t('Allowed characters are a-z, A-Z, 0-9 and special characters except white spaces and accentuated letters.');
+
+		/** @phpstan-ignore identical.alwaysTrue(value of PASSWORD_DEFAULT will be change in a future PHP version) */
+		if (PASSWORD_DEFAULT === PASSWORD_BCRYPT) {
+			$passwordRules .= ' ' . DI::l10n()->t('Password length is limited to 72 characters.');
+		}
 
 		$tpl = Renderer::getMarkupTemplate('settings/account.tpl');
 		$o   = Renderer::replaceMacros($tpl, [
@@ -534,6 +539,7 @@ class Account extends BaseSettings
 			'$hide_friends'        => ['hide-friends', DI::l10n()->t('Hide your contact/friend list from viewers of your profile?'), $profile['hide-friends'], DI::l10n()->t('A list of your contacts is displayed on your profile page. Activate this option to disable the display of your contact list.')],
 			'$hide_wall'           => ['hidewall', $this->t('Hide your public content from anonymous viewers'), $user['hidewall'], $this->t('Anonymous visitors will only see your basic profile details. Your public posts and replies will still be freely accessible on the remote servers of your followers and through relays.')],
 			'$unlisted'            => ['unlisted', DI::l10n()->t('Make public posts unlisted'), DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'unlisted'), DI::l10n()->t('Your public posts will not appear on the community pages or in search results, nor be sent to relay servers. However they can still appear on public feeds on remote servers.')],
+			'$prevent_relay'       => ['prevent_relay', DI::l10n()->t('Do not send public posts to relay servers'), DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'prevent-relay'), DI::l10n()->t('Your public posts will not be forwarded to relay servers.')],
 			'$accessiblephotos'    => ['accessible-photos', DI::l10n()->t('Make all posted pictures accessible'), DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'accessible-photos'), DI::l10n()->t("This option makes every posted picture accessible via the direct link. This is a workaround for the problem that most other networks can't handle permissions on pictures. Non public pictures still won't be visible for the public on your photo albums though.")],
 			'$blockwall'           => ['blockwall', DI::l10n()->t('Allow friends to post to your profile page?'), (intval($user['blockwall']) ? '0' : '1'), DI::l10n()->t('Your contacts may write posts on your profile wall. These posts will be distributed to your contacts')],
 			'$blocktags'           => ['blocktags', DI::l10n()->t('Allow friends to tag your posts?'), (intval($user['blocktags']) ? '0' : '1'), DI::l10n()->t('Your contacts can add additional tags to your posts.')],

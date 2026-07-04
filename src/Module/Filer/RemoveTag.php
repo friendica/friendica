@@ -24,22 +24,26 @@ use Psr\Log\LoggerInterface;
  */
 class RemoveTag extends BaseModule
 {
-	/** @var SystemMessages */
-	private $systemMessages;
-	/** @var IHandleUserSessions */
-	private $userSession;
-
-	public function __construct(SystemMessages $systemMessages, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $userSession, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly SystemMessages $systemMessages,
+		L10n $l10n,
+		App\BaseURL $baseUrl,
+		App\Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		private readonly IHandleUserSessions $userSession,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->systemMessages = $systemMessages;
-		$this->userSession    = $userSession;
 	}
 
 	protected function post(array $request = [])
 	{
-		$this->httpError($this->removeTag($request));
+		$type = 0;
+		$term = '';
+		$this->httpError($this->removeTag($request, $type, $term));
 	}
 
 	protected function content(array $request = []): string
@@ -48,25 +52,27 @@ class RemoveTag extends BaseModule
 			throw new HTTPException\ForbiddenException();
 		}
 
+		$type = 0;
+		$term = '';
 		$this->removeTag($request, $type, $term);
 
 		if ($type == Post\Category::FILE) {
-			$this->baseUrl->redirect('filed?file=' . rawurlencode($term));
+			$this->baseUrl->redirect('filed?file=' . rawurlencode((string) $term));
 		}
 
 		return '';
 	}
 
 	/**
-	 * @param array           $request The $_REQUEST array
-	 * @param string|int|null $type    Output parameter with the computed type
-	 * @param string|null     $term    Output parameter with the computed term
+	 * @param array  $request The $_REQUEST array
+	 * @param int    $type    Output parameter with the computed type
+	 * @param string $term    Output parameter with the computed term
 	 *
 	 * @return int The relevant HTTP code
 	 *
 	 * @throws \Exception
 	 */
-	private function removeTag(array $request, &$type = null, string &$term = null): int
+	private function removeTag(array $request, int &$type, string &$term): int
 	{
 		$item_id = $this->parameters['id'] ?? 0;
 
@@ -83,7 +89,7 @@ class RemoveTag extends BaseModule
 		$this->logger->info('Filer - Remove Tag', [
 			'term' => $term,
 			'item' => $item_id,
-			'type' => $type
+			'type' => $type,
 		]);
 
 		if (!$item_id || !strlen($term)) {

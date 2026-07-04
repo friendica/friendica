@@ -75,8 +75,26 @@ class Notify extends BaseEntity
 	/** @var int|null */
 	protected $id;
 
-	public function __construct(int $type, string $name, UriInterface $url, UriInterface $photo, DateTime $date, int $uid, UriInterface $link, bool $seen, string $verb, string $otype, string $name_cache = null, string $msg = null, string $msg_cache = null, int $itemId = null, int $uriId = null, int $parent = null, ?int $parentUriId = null, ?int $id = null)
-	{
+	public function __construct(
+		int $type,
+		string $name,
+		UriInterface $url,
+		UriInterface $photo,
+		DateTime $date,
+		int $uid,
+		UriInterface $link,
+		bool $seen,
+		string $verb,
+		string $otype,
+		?string $name_cache = null,
+		?string $msg = null,
+		?string $msg_cache = null,
+		?int $itemId = null,
+		?int $uriId = null,
+		?int $parent = null,
+		?int $parentUriId = null,
+		?int $id = null,
+	) {
 		$this->type        = $type;
 		$this->name        = $name;
 		$this->url         = $url;

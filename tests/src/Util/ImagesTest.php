@@ -31,7 +31,7 @@ class ImagesTest extends MockedTestCase
 		parent::tearDown();
 	}
 
-	public function dataImages()
+	public static function dataImages()
 	{
 		return [
 			'image' => [
@@ -47,7 +47,7 @@ class ImagesTest extends MockedTestCase
 					'Date'                          => 'Mon,23Aug202112:39:00GMT',
 					'Connection'                    => 'keep-alive',
 				],
-				'data'      => file_get_contents(__DIR__ . '/../../datasets/curl/image.content'),
+				'data'      => file_get_contents(__DIR__ . '/../../Fixtures/curl/image.content'),
 				'assertion' => [
 					'0'    => '400',
 					'1'    => '400',
@@ -69,10 +69,9 @@ class ImagesTest extends MockedTestCase
 
 	/**
 	 * Test the Images::getInfoFromURL() method (only remote images, not local/relative!)
-	 *
-	 * @dataProvider dataImages
 	 */
-	public function testGetInfoFromRemoteURL(string $url, array $headers, string $data, array $assertion)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataImages')]
+	public function testGetInfoFromRemoteURL(string $url, array $headers, string $data, array $assertion): void
 	{
 		$this->httpRequestHandler->setHandler(new MockHandler([
 			new Response(200, $headers, $data),
@@ -88,7 +87,7 @@ class ImagesTest extends MockedTestCase
 		}
 	}
 
-	public function dataScalingDimensions()
+	public static function dataScalingDimensions()
 	{
 		return [
 			'landscape' => [
@@ -180,10 +179,9 @@ class ImagesTest extends MockedTestCase
 
 	/**
 	 * Test the Images::getScalingDimensions() method
-	 *
-	 * @dataProvider dataScalingDimensions
 	 */
-	public function testGetScalingDimensions(int $width, int $height, int $max, array $assertion)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataScalingDimensions')]
+	public function testGetScalingDimensions(int $width, int $height, int $max, array $assertion): void
 	{
 		$result = Images::getScalingDimensions($width, $height, $max);
 

@@ -19,19 +19,6 @@ use Friendica\DI;
 class PostUpdate extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
-
-	/**
-	 * @var Mode
-	 */
-	private $appMode;
-	/**
-	 * @var IManageKeyValuePairs
-	 */
-	private $keyValue;
-	/**
-	 * @var L10n
-	 */
-	private $l10n;
 	/**
 	 * @var string
 	 */
@@ -51,13 +38,13 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Mode $appMode, IManageKeyValuePairs $keyValue, L10n $l10n, array $argv = null)
-	{
+	public function __construct(
+		private readonly Mode $appMode,
+		private readonly IManageKeyValuePairs $keyValue,
+		private readonly L10n $l10n,
+		?array $argv = null,
+	) {
 		parent::__construct($argv);
-
-		$this->appMode  = $appMode;
-		$this->keyValue = $keyValue;
-		$this->l10n     = $l10n;
 		$this->basePath = DI::appHelper()->getBasePath();
 	}
 

@@ -25,14 +25,14 @@ class ServerBlockConsoleTest extends ConsoleTestCase
 		[
 			'domain' => 'pod.ordoevangelistarum.com',
 			'reason' => 'Illegal content',
-		]
+		],
 	];
 	/**
 	 * @var DomainPatternBlocklist|Mockery\LegacyMockInterface|Mockery\MockInterface
 	 */
 	private $blocklistMock;
 
-	protected function setUp() : void
+	protected function setUp(): void
 	{
 		parent::setUp();
 
@@ -51,7 +51,7 @@ class ServerBlockConsoleTest extends ConsoleTestCase
 	/**
 	 * Test to list the default blocked servers
 	 */
-	public function testBlockedServersList()
+	public function testBlockedServersList(): void
 	{
 		$this->blocklistMock
 			->shouldReceive('get')
@@ -59,7 +59,7 @@ class ServerBlockConsoleTest extends ConsoleTestCase
 			->once();
 
 		$console = new ServerBlock($this->blocklistMock, $this->consoleArgv);
-		$txt = $this->dumpExecute($console);
+		$txt     = $this->dumpExecute($console);
 
 		$php_eol = PHP_EOL;
 
@@ -74,7 +74,7 @@ CONS;
 	/**
 	 * Test blockedservers add command
 	 */
-	public function testAddBlockedServer()
+	public function testAddBlockedServer(): void
 	{
 		$this->blocklistMock
 			->shouldReceive('addPattern')
@@ -94,7 +94,7 @@ CONS;
 	/**
 	 * Test blockedservers add command on existed domain
 	 */
-	public function testUpdateBlockedServer()
+	public function testUpdateBlockedServer(): void
 	{
 		$this->blocklistMock
 			->shouldReceive('addPattern')
@@ -114,7 +114,7 @@ CONS;
 	/**
 	 * Test blockedservers remove command
 	 */
-	public function testRemoveBlockedServer()
+	public function testRemoveBlockedServer(): void
 	{
 		$this->blocklistMock
 			->shouldReceive('removePattern')
@@ -133,7 +133,7 @@ CONS;
 	/**
 	 * Test blockedservers with a wrong command
 	 */
-	public function testBlockedServersWrongCommand()
+	public function testBlockedServersWrongCommand(): void
 	{
 		$console = new ServerBlock($this->blocklistMock, $this->consoleArgv);
 		$console->setArgument(0, 'wrongcommand');
@@ -145,7 +145,7 @@ CONS;
 	/**
 	 * Test blockedservers remove with not existing domain
 	 */
-	public function testRemoveBlockedServerNotExist()
+	public function testRemoveBlockedServerNotExist(): void
 	{
 		$this->blocklistMock
 			->shouldReceive('removePattern')
@@ -164,7 +164,7 @@ CONS;
 	/**
 	 * Test blockedservers add command without argument
 	 */
-	public function testAddBlockedServerMissingArgument()
+	public function testAddBlockedServerMissingArgument(): void
 	{
 		$console = new ServerBlock($this->blocklistMock, $this->consoleArgv);
 		$console->setArgument(0, 'add');
@@ -183,7 +183,7 @@ CONS;
 	/**
 	 * Test blockedservers add command without save
 	 */
-	public function testAddBlockedServerNoSave()
+	public function testAddBlockedServerNoSave(): void
 	{
 		$this->blocklistMock
 			->shouldReceive('addPattern')
@@ -203,7 +203,7 @@ CONS;
 	/**
 	 * Test blockedservers remove command without save
 	 */
-	public function testRemoveBlockedServerNoSave()
+	public function testRemoveBlockedServerNoSave(): void
 	{
 		$this->blocklistMock
 			->shouldReceive('removePattern')
@@ -222,7 +222,7 @@ CONS;
 	/**
 	 * Test blockedservers remove command without argument
 	 */
-	public function testRemoveBlockedServerMissingArgument()
+	public function testRemoveBlockedServerMissingArgument(): void
 	{
 		$console = new ServerBlock($this->blocklistMock, $this->consoleArgv);
 		$console->setArgument(0, 'remove');
@@ -234,7 +234,7 @@ CONS;
 	/**
 	 * Test the blockedservers help
 	 */
-	public function testBlockedServersHelp()
+	public function testBlockedServersHelp(): void
 	{
 		$console = new ServerBlock($this->blocklistMock, $this->consoleArgv);
 		$console->setOption('help', true);

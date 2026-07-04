@@ -19,9 +19,9 @@ class DirectMessageTest extends FixtureTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiFormatMessages()
+	public function testApiFormatMessages(): void
 	{
-		$this->loadFixture(__DIR__ . '/../../../../datasets/mail/mail.fixture.php', DI::dba());
+		$this->loadFixture(__DIR__ . '/../../../../Fixtures/mail/mail.fixture.php', DI::dba());
 		$ids = DI::dba()->selectToArray('mail', ['id']);
 		$id  = $ids[0]['id'];
 
@@ -42,9 +42,9 @@ class DirectMessageTest extends FixtureTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiFormatMessagesWithHtmlText()
+	public function testApiFormatMessagesWithHtmlText(): void
 	{
-		$this->loadFixture(__DIR__ . '/../../../../datasets/mail/mail.fixture.php', DI::dba());
+		$this->loadFixture(__DIR__ . '/../../../../Fixtures/mail/mail.fixture.php', DI::dba());
 		$ids = DI::dba()->selectToArray('mail', ['id']);
 		$id  = $ids[0]['id'];
 
@@ -61,9 +61,9 @@ class DirectMessageTest extends FixtureTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiFormatMessagesWithPlainText()
+	public function testApiFormatMessagesWithPlainText(): void
 	{
-		$this->loadFixture(__DIR__ . '/../../../../datasets/mail/mail.fixture.php', DI::dba());
+		$this->loadFixture(__DIR__ . '/../../../../Fixtures/mail/mail.fixture.php', DI::dba());
 		$ids = DI::dba()->selectToArray('mail', ['id']);
 		$id  = $ids[0]['id'];
 
@@ -78,14 +78,13 @@ class DirectMessageTest extends FixtureTestCase
 	/**
 	 * Test the api_format_messages() function with the getUserObjects GET parameter set to false.
 	 *
-	 * @return void
 	 */
-	public function testApiFormatMessagesWithoutUserObjects()
+	public function testApiFormatMessagesWithoutUserObjects(): void
 	{
 		self::markTestIncomplete('Needs processing of "getUserObjects" first');
 
 		/*
-		 $this->loadFixture(__DIR__ . '/../../../../datasets/mail/mail.fixture.php', DI::dba());
+		 $this->loadFixture(__DIR__ . '/../../../../Fixtures/mail/mail.fixture.php', DI::dba());
 		$ids = DI::dba()->selectToArray('mail', ['id']);
 		$id  = $ids[0]['id'];
 

@@ -42,7 +42,7 @@ class FileSystem implements FileSystemUtil
 		}
 
 		if (isset($dirname) && !is_dir($dirname)) {
-			set_error_handler([$this, 'customErrorHandler']);
+			set_error_handler($this->customErrorHandler(...));
 			$status = mkdir($dirname, 0777, true);
 			restore_error_handler();
 
@@ -70,7 +70,7 @@ class FileSystem implements FileSystemUtil
 	public function createStream(string $url)
 	{
 		$directory = $this->createDir($url);
-		set_error_handler([$this, 'customErrorHandler']);
+		set_error_handler($this->customErrorHandler(...));
 		if (!empty($directory)) {
 			$url = $directory . DIRECTORY_SEPARATOR . pathinfo($url, PATHINFO_BASENAME);
 		}
@@ -87,6 +87,6 @@ class FileSystem implements FileSystemUtil
 
 	private function customErrorHandler($code, $msg)
 	{
-		$this->errorMessage = preg_replace('{^(fopen|mkdir)\(.*?\): }', '', $msg);
+		$this->errorMessage = preg_replace('{^(fopen|mkdir)\(.*?\): }', '', (string) $msg);
 	}
 }

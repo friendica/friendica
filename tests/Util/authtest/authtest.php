@@ -14,12 +14,12 @@
 use Friendica\Core\Hook;
 use Friendica\Model\User;
 
-function authtest_install()
+function authtest_install(): void
 {
 	Hook::register('authenticate', 'tests/Util/authtest/authtest.php', 'authtest_authenticate');
 }
 
-function authtest_authenticate(&$b)
+function authtest_authenticate(&$b): void
 {
 	$b['authenticated'] = \Friendica\Test\Util\AuthTestConfig::$authenticated;
 	$b['user_record']   = User::getById(\Friendica\Test\Util\AuthTestConfig::$user_id);

@@ -24,17 +24,12 @@ use Psr\Log\LoggerInterface;
 
 class Import extends \Friendica\Module\BaseModeration
 {
-	/** @var DomainPatternBlocklist */
-	private $localBlocklist;
-
 	/** @var array of blocked server domain patterns */
 	private $blocklist = [];
 
-	public function __construct(DomainPatternBlocklist $localBlocklist, Page $page, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(private readonly DomainPatternBlocklist $localBlocklist, Page $page, AppHelper $appHelper, SystemMessages $systemMessages, IHandleUserSessions $session, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->localBlocklist = $localBlocklist;
 	}
 
 	/**
@@ -64,7 +59,7 @@ class Import extends \Friendica\Module\BaseModeration
 				return;
 			}
 		} elseif (isset($request['page_blocklist_import'])) {
-			$this->blocklist = json_decode($request['blocklist'], true);
+			$this->blocklist = json_decode((string) $request['blocklist'], true);
 			if ($this->blocklist === null) {
 				$this->systemMessages->addNotice($this->t('Error importing pattern file'));
 				return;

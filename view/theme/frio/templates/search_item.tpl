@@ -57,10 +57,10 @@
 				{{/if}}
 				{{if $item.lock}}
 					<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.lock}}">
-						&nbsp;<small><i class="fa fa-lock" aria-hidden="true"></i></small>
+						&nbsp;<small><i class="ri ri-lock-line" aria-hidden="true"></i></small>
 					</span>
 				{{elseif $item.connector}}
-					<span class="fa fa-lock" title="{{$item.connector}}"></span>
+					<span class="ri ri-lock-line" title="{{$item.connector}}"></span>
 				{{/if}}
 					<div class="additional-info text-muted">
 						<div id="wall-item-ago-{{$item.id}}" class="wall-item-ago">
@@ -69,7 +69,7 @@
 									<time class="time" title="{{$item.localtime}}" data-toggle="tooltip" datetime="{{$item.utc}}">{{$item.ago}}</time>
 								</a>
 								{{if $item.pinned}}
-									<span aria-hidden="true">&bull;</span> <i class="fa fa-thumb-tack" aria-hidden="true" title="{{$item.pinned}}"></i>
+									<span aria-hidden="true">&bull;</span> <i class="ri ri-pushpin-line" aria-hidden="true" title="{{$item.pinned}}"></i>
 									<span class="sr-only">{{$item.pinned}}</span>
 								{{/if}}
 							</small>
@@ -122,23 +122,25 @@
 			<!-- TODO -->
 			<div class="wall-item-bottom">
 				<div class="wall-item-links"></div>
-				<div class="wall-item-tags">
+				<div class="tags wall-item-tags">
 			{{if !$item.suppress_tags}}
 				{{foreach $item.hashtags as $tag}}
-					<span class="tag label btn-info sm">{{$tag nofilter}} <i class="fa fa-bolt" aria-hidden="true"></i></span>
+					<span class="tag hashtag label border border-default">{{$tag nofilter}}</span>
 				{{/foreach}}
 
 				{{foreach $item.mentions as $tag}}
-					<span class="mention label btn-warning sm">{{$tag nofilter}} <i class="fa fa-user" aria-hidden="true"></i></span>
+					<span class="tag mention label border border-primary">{{$tag nofilter}}</span>
 				{{/foreach}}
 			{{/if}}
 
+      {{* No implicit mentions unlike wall_thread? *}}
+
 				{{foreach $item.folders as $cat}}
-					<span class="folder label btn-danger sm">{{$cat.name}}{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+					<span class="tag folder label border border-success">{{$cat.name}}{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}"></a>) {{/if}} </span>
 				{{/foreach}}
 
 				{{foreach $item.categories as $cat}}
-					<span class="category label btn-success sm">{{$cat.name}}{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+					<span class="tag category label border border-danger">{{$cat.name}}{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}"></a>) {{/if}} </span>
 				{{/foreach}}
 				</div>
 				{{if $item.edited}}<div class="itemedited text-muted">{{$item.edited['label']}} (<span title="{{$item.edited['date']}}">{{$item.edited['relative']}}</span>)</div>{{/if}}
@@ -152,14 +154,14 @@
 					{{* Buttons for like and dislike *}}
 					{{if $item.vote}}
 						{{if $item.vote.like}}
-					<button type="button" class="btn btn-defaultbutton-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="like-{{$item.id}}" title="{{$item.vote.like.0}}" onclick="doActivityItemAction({{$item.id}}, 'like'{{if $item.responses.like.self}}, true{{/if}});"></button>
+					<button type="button" class="btn btn-default button-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="like-{{$item.id}}" title="{{$item.vote.like.0}}" onclick="doActivityItemAction({{$item.id}}, 'like'{{if $item.responses.like.self}}, true{{/if}});"></button>
 						{{/if}}
 						{{if $item.vote.like AND $item.vote.dislike}}
 					<span class="separator"aria-hidden="true">•</span>
 						{{/if}}
 
 						{{if $item.vote.dislike}}
-					<button type="button" class="btn btn-defaultbutton-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="doActivityItemAction({{$item.id}}, 'dislike'{{if $item.responses.dislike.self}}, true{{/if}});"></button>
+					<button type="button" class="btn btn-default button-likes{{if $item.responses.like.self}} active" aria-pressed="true{{/if}}" id="dislike-{{$item.id}}" title="{{$item.vote.dislike.0}}" onclick="doActivityItemAction({{$item.id}}, 'dislike'{{if $item.responses.dislike.self}}, true{{/if}});"></button>
 						{{/if}}
 						{{if ($item.vote.like OR $item.vote.dislike) AND $item.comment_html}}
 					<span class="separator"aria-hidden="true">•</span>
@@ -177,7 +179,7 @@
 							{{if $item.vote.like OR $item.vote.dislike OR $item.comment_html}}
 					<span class="separator"aria-hidden="true">•</span>
 							{{/if}}
-					<button type="button" class="btn btn-default" id="share-{{$item.id}}" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}});"><i class="fa fa-retweet" aria-hidden="true"></i></button>
+					<button type="button" class="btn btn-default" id="share-{{$item.id}}" title="{{$item.vote.share.0}}" onclick="jotShare({{$item.id}});"><i class="ri ri-repeat-line" aria-hidden="true"></i></button>
 						{{/if}}
 					{{/if}}
 
@@ -185,65 +187,65 @@
 				{{if $item.menu && ($item.edpost || $item.tagger || $item.filer || $item.pin || $item.star || $item.follow_thread || $item.ignore || $item.drop.dropping || $item.browsershare)}}
 					<span class="separator"></span>
 					<span class="more-links btn-group{{if $item.thread_level> 1}} dropup{{/if}}">
-						<button type="button" class="btn-link dropdown-toggle" data-toggle="dropdown" id="dropdownMenuOptions-{{$item.id}}" aria-haspopup="true" aria-expanded="false" title="{{$item.menu}}"><i class="fa fa-ellipsis-h" aria-hidden="true"></i>&nbsp;{{$item.menu}}</button>
+						<button type="button" class="btn-link dropdown-toggle" data-toggle="dropdown" id="dropdownMenuOptions-{{$item.id}}" aria-haspopup="true" aria-expanded="false" title="{{$item.menu}}"><i class="ri ri-more-line" aria-hidden="true"></i>&nbsp;{{$item.menu}}</button>
 						<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenuOptions-{{$item.id}}">
 						{{if $item.edpost}} {{* edit the posting *}}
 							<li role="menuitem">
-								<a href="javascript:editpost('{{$item.edpost.0}}?mode=none');" title="{{$item.edpost.1}}" class="btn-link navicon pencil"><i class="fa fa-pencil" aria-hidden="true"></i> {{$item.edpost.1}}</a>
+								<a href="javascript:editpost('{{$item.edpost.0}}?mode=none');" title="{{$item.edpost.1}}" class="btn-link navicon pencil"><i class="ri ri-pencil-line" aria-hidden="true"></i> {{$item.edpost.1}}</a>
 							</li>
 						{{/if}}
 
 						{{if $item.tagger}} {{* tag the post *}}
 							<li role="menuitem">
-								<a id="tagger-{{$item.id}}" href="javascript:itemTag({{$item.id}});" class="btn-link {{$item.tagger.class}}" title="{{$item.tagger.add}}"><i class="fa fa-tag" aria-hidden="true"></i> {{$item.tagger.add}}</a>
+								<a id="tagger-{{$item.id}}" href="javascript:itemTag({{$item.id}});" class="btn-link {{$item.tagger.class}}" title="{{$item.tagger.add}}"><i class="ri ri-hashtag" aria-hidden="true"></i> {{$item.tagger.add}}</a>
 							</li>
 						{{/if}}
 
 						{{if $item.filer}}
 							<li role="menuitem">
-								<a id="filer-{{$item.id}}" href="javascript:itemFiler({{$item.id}});" class="btn-link filer-item filer-icon" title="{{$item.filer}}"><i class="fa fa-folder" aria-hidden="true"></i>&nbsp;{{$item.filer}}</a>
+								<a id="filer-{{$item.id}}" href="javascript:itemFiler({{$item.id}});" class="btn-link filer-item filer-icon" title="{{$item.filer}}"><i class="ri ri-folder-line" aria-hidden="true"></i>&nbsp;{{$item.filer}}</a>
 							</li>
 						{{/if}}
 
 						{{if $item.pin}}
 							<li role="menuitem">
-								<a id="pin-{{$item.id}}" href="javascript:doPin({{$item.id}});" class="btn-link {{$item.pin.classdo}}" title="{{$item.pin.do}}"><i class="fa fa-circle-o" aria-hidden="true"></i>&nbsp;{{$item.pin.do}}</a>
-								<a id="unpin-{{$item.id}}" href="javascript:doPin({{$item.id}});" class="btn-link {{$item.pin.classundo}}" title="{{$item.pin.undo}}"><i class="fa fa-dot-circle-o" aria-hidden="true"></i>&nbsp;{{$item.pin.undo}}</a>
+								<a id="pin-{{$item.id}}" href="javascript:doPin({{$item.id}});" class="btn-link {{$item.pin.classdo}}" title="{{$item.pin.do}}"><i class="ri ri-circle-line" aria-hidden="true"></i>&nbsp;{{$item.pin.do}}</a>
+								<a id="unpin-{{$item.id}}" href="javascript:doPin({{$item.id}});" class="btn-link {{$item.pin.classundo}}" title="{{$item.pin.undo}}"><i class="ri ri-record-circle-line" aria-hidden="true"></i>&nbsp;{{$item.pin.undo}}</a>
 							</li>
 						{{/if}}
 
 						{{if $item.star}}
 							<li role="menuitem">
-								<a id="star-{{$item.id}}" href="javascript:doStar({{$item.id}});" class="btn-link {{$item.star.classdo}}" title="{{$item.star.do}}"><i class="fa fa-bookmark-o" aria-hidden="true"></i>&nbsp;{{$item.star.do}}</a>
-								<a id="unstar-{{$item.id}}" href="javascript:doStar({{$item.id}});" class="btn-link {{$item.star.classundo}}" title="{{$item.star.undo}}"><i class="fa fa-bookmark" aria-hidden="true"></i>&nbsp;{{$item.star.undo}}</a>
+								<a id="star-{{$item.id}}" href="javascript:doStar({{$item.id}});" class="btn-link {{$item.star.classdo}}" title="{{$item.star.do}}"><i class="ri ri-bookmark-line" aria-hidden="true"></i>&nbsp;{{$item.star.do}}</a>
+								<a id="unstar-{{$item.id}}" href="javascript:doStar({{$item.id}});" class="btn-link {{$item.star.classundo}}" title="{{$item.star.undo}}"><i class="ri ri-bookmark-fill" aria-hidden="true"></i>&nbsp;{{$item.star.undo}}</a>
 							</li>
 						{{/if}}
 
 						{{if $item.follow_thread}}
 							<li role="menuitem">
-								<a id="follow_thread-{{$item.id}}" href="javascript:{{$item.follow_thread.action}}" class="btn-link" title="{{$item.follow_thread.title}}"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;{{$item.follow_thread.title}}</a>
+								<a id="follow_thread-{{$item.id}}" href="javascript:{{$item.follow_thread.action}}" class="btn-link" title="{{$item.follow_thread.title}}"><i class="ri ri-add-line" aria-hidden="true"></i>&nbsp;{{$item.follow_thread.title}}</a>
 							</li>
 						{{/if}}
 
 						{{if $item.complete_thread}}
 							<li role="menuitem">
-								<a id="complete_thread-{{$item.id}}" href="javascript:{{$item.complete_thread.action}}" class="btn-link" title="{{$item.complete_thread.title}}"><i class="fa fa-download" aria-hidden="true"></i>&nbsp;{{$item.complete_thread.title}}</a>
+								<a id="complete_thread-{{$item.id}}" href="javascript:{{$item.complete_thread.action}}" class="btn-link" title="{{$item.complete_thread.title}}"><i class="ri ri-download-line" aria-hidden="true"></i>&nbsp;{{$item.complete_thread.title}}</a>
 							</li>
 						{{/if}}
 
 						{{if $item.language}}
 						<li role="menuitem">
-							<a id="language-{{$item.id}}" href="javascript:displayLanguage({{$item.uriid}});" class="btn-link filer-item" title="{{$item.language}}"><i class="fa fa-language" aria-hidden="true"></i>&nbsp;{{$item.language}}</a>
+							<a id="language-{{$item.id}}" href="javascript:displayLanguage({{$item.uriid}});" class="btn-link filer-item" title="{{$item.language}}"><i class="ri ri-translate-2" aria-hidden="true"></i>&nbsp;{{$item.language}}</a>
 						</li>
 						{{/if}}
 
 						<li role="menuitem">
-							<a id="searchtext-{{$item.id}}" href="javascript:displaySearchText({{$item.uriid}});" class="btn-link filer-item" title="{{$item.searchtext}}"><i class="fa fa-file-text" aria-hidden="true"></i>&nbsp;{{$item.searchtext}}</a>
+							<a id="searchtext-{{$item.id}}" href="javascript:displaySearchText({{$item.uriid}});" class="btn-link filer-item" title="{{$item.searchtext}}"><i class="ri ri-file-text-line" aria-hidden="true"></i>&nbsp;{{$item.searchtext}}</a>
 						</li>
 
 						{{if $item.browsershare}}
 							<li role="menuitem" class="button-browser-share">
-								<a id="browser-share-{{$item.id}}" href="javascript:navigator.share({url: '{{$item.plink.orig}}'});" class="btn-link button-browser-share" title="{{$item.browsershare.1}}"><i class="fa fa-share-alt" aria-hidden="true"></i>&nbsp;{{$item.browsershare.0}}</a>
+								<a id="browser-share-{{$item.id}}" href="javascript:navigator.share({url: '{{$item.plink.orig}}'});" class="btn-link button-browser-share" title="{{$item.browsershare.1}}"><i class="ri ri-share-line" aria-hidden="true"></i>&nbsp;{{$item.browsershare.0}}</a>
 							</li>
 						{{/if}}
 
@@ -253,16 +255,16 @@
 
 						{{if $item.ignore}}
 							<li role="menuitem">
-								<a id="ignore-{{$item.id}}" href="javascript:doIgnoreThread({{$item.id}});" class="btn-link {{$item.ignore.classdo}}" title="{{$item.ignore.do}}"><i class="fa fa-bell-slash" aria-hidden="true"></i> {{$item.ignore.do}}</a>
+								<a id="ignore-{{$item.id}}" href="javascript:doIgnoreThread({{$item.id}});" class="btn-link {{$item.ignore.classdo}}" title="{{$item.ignore.do}}"><i class="ri ri-notification-off-line" aria-hidden="true"></i> {{$item.ignore.do}}</a>
 							</li>
 							<li role="menuitem">
-								<a id="unignore-{{$item.id}}" href="javascript:doIgnoreThread({{$item.id}});" class="btn-link {{$item.ignore.classundo}}"  title="{{$item.ignore.undo}}"><i class="fa fa-bell" aria-hidden="true"></i> {{$item.ignore.undo}}</a>
+								<a id="unignore-{{$item.id}}" href="javascript:doIgnoreThread({{$item.id}});" class="btn-link {{$item.ignore.classundo}}"  title="{{$item.ignore.undo}}"><i class="ri ri-notification-3-line" aria-hidden="true"></i> {{$item.ignore.undo}}</a>
 							</li>
 						{{/if}}
 
 						{{if $item.drop && $item.drop.dropping}}
 							<li role="menuitem">
-								<a class="btn-link navicon delete" href="javascript:dropItem('item/drop/{{$item.id}}', 'item-{{$item.guid}}');" title="{{$item.drop.label}}"><i class="fa fa-trash" aria-hidden="true"></i> {{$item.drop.label}}</a>
+								<a class="btn-link navicon delete" href="javascript:dropItem('item/drop/{{$item.id}}', 'item-{{$item.guid}}');" title="{{$item.drop.label}}"><i class="ri ri-delete-bin-line" aria-hidden="true"></i> {{$item.drop.label}}</a>
 							</li>
 							{{/if}}
 						</ul>
@@ -277,9 +279,9 @@
 					{{* Event attendance buttons *}}
 				{{if $item.isevent}}
 					<span class="vote-event">
-						<button type="button" class="btn btn-defaultbutton-event{{if $item.responses.attendyes.self}} active" aria-pressed="true{{/if}}" id="attendyes-{{$item.id}}" title="{{$item.attend.0}}" onclick="doActivityItemAction({{$item.id}}, 'attendyes'{{if $item.responses.attendyes.self}}, true{{/if}});"><i class="fa fa-check" aria-hidden="true"><span class="sr-only">{{$item.attend.0}}</span></i></button>
-						<button type="button" class="btn btn-defaultbutton-event{{if $item.responses.attendno.self}} active" aria-pressed="true{{/if}}" id="attendno-{{$item.id}}" title="{{$item.attend.1}}" onclick="doActivityItemAction({{$item.id}}, 'attendno'{{if $item.responses.attendno.self}}, true{{/if}});"><i class="fa fa-times" aria-hidden="true"><span class="sr-only">{{$item.attend.1}}</span></i></button>
-						<button type="button" class="btn btn-defaultbutton-event{{if $item.responses.attendmaybe.self}} active" aria-pressed="true{{/if}}" id="attendmaybe-{{$item.id}}" title="{{$item.attend.2}}" onclick="doActivityItemAction({{$item.id}}, 'attendmaybe'{{if $item.responses.attendmaybe.self}}, true{{/if}});"><i class="fa fa-question" aria-hidden="true"><span class="sr-only">{{$item.attend.2}}</span></i></button>
+						<button type="button" class="btn btn-default button-event{{if $item.responses.attendyes.self}} active" aria-pressed="true{{/if}}" id="attendyes-{{$item.id}}" title="{{$item.attend.0}}" onclick="doActivityItemAction({{$item.id}}, 'attendyes'{{if $item.responses.attendyes.self}}, true{{/if}});"><i class="ri ri-check-line" aria-hidden="true"><span class="sr-only">{{$item.attend.0}}</span></i></button>
+						<button type="button" class="btn btn-default button-event{{if $item.responses.attendno.self}} active" aria-pressed="true{{/if}}" id="attendno-{{$item.id}}" title="{{$item.attend.1}}" onclick="doActivityItemAction({{$item.id}}, 'attendno'{{if $item.responses.attendno.self}}, true{{/if}});"><i class="ri ri-close-line" aria-hidden="true"><span class="sr-only">{{$item.attend.1}}</span></i></button>
+						<button type="button" class="btn btn-default button-event{{if $item.responses.attendmaybe.self}} active" aria-pressed="true{{/if}}" id="attendmaybe-{{$item.id}}" title="{{$item.attend.2}}" onclick="doActivityItemAction({{$item.id}}, 'attendmaybe'{{if $item.responses.attendmaybe.self}}, true{{/if}});"><i class="ri ri-question-line" aria-hidden="true"><span class="sr-only">{{$item.attend.2}}</span></i></button>
 					</span>
 				{{/if}}
 
@@ -296,7 +298,7 @@
 			{{if $item.emojis}}
 				{{foreach $item.emojis as $emoji}}
 					{{if $emoji.icon.fa}}
-						<span class="wall-item-emoji" title="{{$emoji.title}}"><i class="fa {{$emoji.icon.fa}}" aria-hidden="true"></i> {{$emoji.total}}</span>
+						<span class="wall-item-emoji" title="{{$emoji.title}}"><i class="ri {{$emoji.icon.fa}}" aria-hidden="true"></i> {{$emoji.total}}</span>
 					{{else}}
 						<span class="wall-item-emoji" title="{{$emoji.title}}">{{$emoji.emoji}} {{$emoji.total}}</span>
 					{{/if}}

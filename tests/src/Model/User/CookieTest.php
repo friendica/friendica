@@ -22,7 +22,7 @@ class CookieTest extends MockedTestCase
 	/** @var MockInterface|BaseURL */
 	private $baseUrl;
 
-	const SERVER_ARRAY = ['REMOTE_ADDR' => '1.2.3.4'];
+	public const SERVER_ARRAY = ['REMOTE_ADDR' => '1.2.3.4'];
 
 	protected function setUp(): void
 	{
@@ -44,74 +44,73 @@ class CookieTest extends MockedTestCase
 	/**
 	 * Test if we can create a basic cookie instance
 	 */
-	public function testInstance()
+	public function testInstance(): void
 	{
 		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn('1235')->once();
 		$this->config->shouldReceive('get')->with('system', 'auth_cookie_lifetime', Cookie::DEFAULT_EXPIRE)->andReturn('7')->once();
 		$this->config->shouldReceive('get')->with('proxy', 'trusted_proxies', '')->andReturn('')->once();
 
-		$request = new Request($this->config,static::SERVER_ARRAY);
+		$request = new Request($this->config, static::SERVER_ARRAY);
 
 		$cookie = new Cookie($request, $this->config, $this->baseUrl);
-		self::assertInstanceOf(Cookie::class, $cookie);
+		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
 	}
 
-	public function dataGet()
+	public static function dataGet()
 	{
 		return [
-			'default'    => [
+			'default' => [
 				'cookieData' => [
 					Cookie::NAME => json_encode([
 						'uid'  => -1,
 						'hash' => 12345,
 						'ip'   => '127.0.0.1',
-					])
+					]),
 				],
-				'hasValues'  => true,
-				'uid'        => -1,
-				'hash'       => 12345,
-				'ip'         => '127.0.0.1',
+				'hasValues' => true,
+				'uid'       => -1,
+				'hash'      => 12345,
+				'ip'        => '127.0.0.1',
 			],
-			'missing'    => [
+			'missing' => [
 				'cookieData' => [
 
 				],
-				'hasValues'  => false,
-				'uid'        => null,
-				'hash'       => null,
-				'ip'         => null,
+				'hasValues' => false,
+				'uid'       => null,
+				'hash'      => null,
+				'ip'        => null,
 			],
-			'invalid'    => [
+			'invalid' => [
 				'cookieData' => [
 					Cookie::NAME => 'test',
 				],
-				'hasValues'  => false,
-				'uid'        => null,
-				'hash'       => null,
-				'ip'         => null,
+				'hasValues' => false,
+				'uid'       => null,
+				'hash'      => null,
+				'ip'        => null,
 			],
 			'incomplete' => [
 				'cookieData' => [
 					Cookie::NAME => json_encode([
 						'uid'  => -1,
 						'hash' => 12345,
-					])
+					]),
 				],
-				'hasValues'  => true,
-				'uid'        => -1,
-				'hash'       => 12345,
-				'ip'         => null,
+				'hasValues' => true,
+				'uid'       => -1,
+				'hash'      => 12345,
+				'ip'        => null,
 			],
 		];
 	}
 
 	/**
 	 * Test the get() method of the cookie class
-	 *
-	 * @dataProvider dataGet
 	 */
-	public function testGet(array $cookieData, bool $hasValues, $uid, $hash, $ip)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataGet')]
+	public function testGet(array $cookieData, bool $hasValues, $uid, $hash, $ip): void
 	{
 		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn('1235')->once();
@@ -121,7 +120,7 @@ class CookieTest extends MockedTestCase
 		$request = new Request($this->config, static::SERVER_ARRAY);
 
 		$cookie = new Cookie($request, $this->config, $this->baseUrl, $cookieData);
-		self::assertInstanceOf(Cookie::class, $cookie);
+		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
 
 		if (isset($uid)) {
 			self::assertEquals($uid, $cookie->get('uid'));
@@ -140,10 +139,10 @@ class CookieTest extends MockedTestCase
 		}
 	}
 
-	public function dataCheck()
+	public static function dataCheck()
 	{
 		return [
-			'default'   => [
+			'default' => [
 				'serverPrivateKey' => 'serverkey',
 				'userPrivateKey'   => 'userkey',
 				'password'         => 'test',
@@ -157,22 +156,21 @@ class CookieTest extends MockedTestCase
 				'assertHash'       => '',
 				'assertTrue'       => false,
 			],
-			'invalid'   => [
+			'invalid' => [
 				'serverPrivateKey' => 'serverkey',
 				'userPrivateKey'   => 'bla',
 				'password'         => 'nope',
 				'assertHash'       => 'real wrong!',
 				'assertTrue'       => false,
-			]
+			],
 		];
 	}
 
 	/**
 	 * Test the check() method of the cookie class
-	 *
-	 * @dataProvider dataCheck
 	 */
-	public function testCheck(string $serverPrivateKey, string $userPrivateKey, string $password, string $assertHash, bool $assertTrue)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataCheck')]
+	public function testCheck(string $serverPrivateKey, string $userPrivateKey, string $password, string $assertHash, bool $assertTrue): void
 	{
 		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn($serverPrivateKey)->once();
@@ -182,15 +180,15 @@ class CookieTest extends MockedTestCase
 		$request = new Request($this->config, static::SERVER_ARRAY);
 
 		$cookie = new Cookie($request, $this->config, $this->baseUrl);
-		self::assertInstanceOf(Cookie::class, $cookie);
+		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
 
 		self::assertEquals($assertTrue, $cookie->comparePrivateDataHash($assertHash, $password, $userPrivateKey));
 	}
 
-	public function dataSet()
+	public static function dataSet()
 	{
 		return [
-			'default'         => [
+			'default' => [
 				'serverKey'   => 23,
 				'uid'         => 0,
 				'password'    => '234',
@@ -215,7 +213,7 @@ class CookieTest extends MockedTestCase
 	{
 		self::assertArrayHasKey(Cookie::NAME, StaticCookie::$_COOKIE);
 
-		$data = json_decode(StaticCookie::$_COOKIE[Cookie::NAME]);
+		$data = json_decode((string) StaticCookie::$_COOKIE[Cookie::NAME]);
 
 		self::assertIsObject($data);
 		self::assertTrue(property_exists($data, 'uid'));
@@ -230,10 +228,9 @@ class CookieTest extends MockedTestCase
 
 	/**
 	 * Test the set() method of the cookie class
-	 *
-	 * @dataProvider dataSet
 	 */
-	public function testSet($serverKey, $uid, $password, $privateKey, $assertHash, $remoteIp, $serverArray)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataSet')]
+	public function testSet($serverKey, $uid, $password, $privateKey, $assertHash, $remoteIp, $serverArray): void
 	{
 		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn($serverKey)->once();
@@ -245,10 +242,10 @@ class CookieTest extends MockedTestCase
 		$request = new Request($this->config, $serverArray);
 
 		$cookie = new StaticCookie($request, $this->config, $this->baseUrl);
-		self::assertInstanceOf(Cookie::class, $cookie);
+		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
 
 		$cookie->setMultiple([
-			'uid' => $uid,
+			'uid'  => $uid,
 			'hash' => $assertHash,
 		]);
 
@@ -257,10 +254,9 @@ class CookieTest extends MockedTestCase
 
 	/**
 	 * Test the set() method of the cookie class
-	 *
-	 * @dataProvider dataSet
 	 */
-	public function testDoubleSet($serverKey, $uid, $password, $privateKey, $assertHash, $remoteIp, $serverArray)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataSet')]
+	public function testDoubleSet($serverKey, $uid, $password, $privateKey, $assertHash, $remoteIp, $serverArray): void
 	{
 		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
 		$this->config->shouldReceive('get')->with('system', 'site_prvkey')->andReturn($serverKey)->once();
@@ -271,7 +267,7 @@ class CookieTest extends MockedTestCase
 		$request = new Request($this->config, $serverArray);
 
 		$cookie = new StaticCookie($request, $this->config, $this->baseUrl, $serverArray);
-		self::assertInstanceOf(Cookie::class, $cookie);
+		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
 
 		$cookie->set('uid', $uid);
 		$cookie->set('hash', $assertHash);
@@ -282,10 +278,10 @@ class CookieTest extends MockedTestCase
 	/**
 	 * Test the clear() method of the cookie class
 	 */
-	public function testClear()
+	public function testClear(): void
 	{
 		StaticCookie::$_COOKIE = [
-			Cookie::NAME => 'test'
+			Cookie::NAME => 'test',
 		];
 
 		$this->baseUrl->shouldReceive('getScheme')->andReturn('https')->once();
@@ -296,14 +292,14 @@ class CookieTest extends MockedTestCase
 		$request = new Request($this->config, static::SERVER_ARRAY);
 
 		$cookie = new StaticCookie($request, $this->config, $this->baseUrl);
-		self::assertInstanceOf(Cookie::class, $cookie);
+		self::assertInstanceOf(Cookie::class, $cookie); // @phpstan-ignore staticMethod.alreadyNarrowedType
 
 		self::assertEquals('test', StaticCookie::$_COOKIE[Cookie::NAME]);
 		self::assertEquals(null, StaticCookie::$_EXPIRE);
 
 		$cookie->clear();
 
-		self::assertEmpty(StaticCookie::$_COOKIE[Cookie::NAME]);
+		self::assertSame('', StaticCookie::$_COOKIE[Cookie::NAME]); // @phpstan-ignore staticMethod.impossibleType
 		self::assertEquals(-3600, StaticCookie::$_EXPIRE);
 	}
 }

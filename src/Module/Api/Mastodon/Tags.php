@@ -7,9 +7,7 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Module\BaseApi;
 
 /**
@@ -29,7 +27,7 @@ class Tags extends BaseApi
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		$tag       = ltrim($this->parameters['hashtag'], '#');
+		$tag       = ltrim((string) $this->parameters['hashtag'], '#');
 		$following = DBA::exists('search', ['uid' => $uid, 'term' => '#' . $tag]);
 
 		$hashtag = new \Friendica\Object\Api\Mastodon\Tag($this->baseUrl, ['name' => $tag], [], $following);

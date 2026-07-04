@@ -20,7 +20,7 @@ class FavoritesTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiFavorites()
+	public function testApiFavorites(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
@@ -43,7 +43,7 @@ class FavoritesTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiFavoritesWithRss()
+	public function testApiFavoritesWithRss(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
@@ -60,9 +60,8 @@ class FavoritesTest extends ApiTestCase
 	/**
 	 * Test the api_favorites() function with an unallowed user.
 	 *
-	 * @return void
 	 */
-	public function testApiFavoritesWithUnallowedUser()
+	public function testApiFavoritesWithUnallowedUser(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 

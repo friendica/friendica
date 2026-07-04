@@ -58,7 +58,7 @@ class StreamLoggerTest extends LoggerTestCase
 	/**
 	 * Test when a file isn't set
 	 */
-	public function testNoUrl()
+	public function testNoUrl(): void
 	{
 		$this->expectException(LoggerArgumentException::class);
 		$this->expectExceptionMessage(' is not a valid logfile');
@@ -66,7 +66,7 @@ class StreamLoggerTest extends LoggerTestCase
 		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn('')->once();
 
 		$loggerFactory = new \Friendica\Core\Logger\Factory\StreamLogger($this->introspection, 'test');
-		$logger = $loggerFactory->create($this->config);
+		$logger        = $loggerFactory->create($this->config);
 
 		$logger->emergency('not working');
 	}
@@ -74,7 +74,7 @@ class StreamLoggerTest extends LoggerTestCase
 	/**
 	 * Test when a file cannot be opened
 	 */
-	public function testWrongUrl()
+	public function testWrongUrl(): void
 	{
 		$this->expectException(LoggerArgumentException::class);
 
@@ -84,7 +84,7 @@ class StreamLoggerTest extends LoggerTestCase
 		$this->config->shouldReceive('get')->with('system', 'logfile')->andReturn($logfile->url())->once();
 
 		$loggerFactory = new \Friendica\Core\Logger\Factory\StreamLogger($this->introspection, 'test');
-		$logger = $loggerFactory->create($this->config);
+		$logger        = $loggerFactory->create($this->config);
 
 		$logger->emergency('not working');
 	}
@@ -92,15 +92,15 @@ class StreamLoggerTest extends LoggerTestCase
 	/**
 	 * Test when the directory cannot get created
 	 */
-	public function testWrongDir()
+	public function testWrongDir(): void
 	{
 		$this->expectException(\UnexpectedValueException::class);
 		$this->expectExceptionMessageMatches("/Directory .* cannot get created: .* /");
 
 		static::markTestIncomplete('We need a platform independent way to set directory to readonly');
 
-		$loggerFactory = new \Friendica\Core\Logger\Factory\StreamLogger($this->introspection, 'test');
-		$logger = $loggerFactory->create($this->config);
+		$loggerFactory = new \Friendica\Core\Logger\Factory\StreamLogger($this->introspection, 'test'); // @phpstan-ignore deadCode.unreachable (skipped test)
+		$logger        = $loggerFactory->create($this->config);
 
 		$logger->emergency('not working');
 	}
@@ -108,7 +108,7 @@ class StreamLoggerTest extends LoggerTestCase
 	/**
 	 * Test when the minimum level is not valid
 	 */
-	public function testWrongMinimumLevel()
+	public function testWrongMinimumLevel(): void
 	{
 		$this->expectException(LogLevelException::class);
 		$this->expectExceptionMessageMatches("/The level \".*\" is not valid./");
@@ -119,7 +119,7 @@ class StreamLoggerTest extends LoggerTestCase
 	/**
 	 * Test when the minimum level is not valid
 	 */
-	public function testWrongLogLevel()
+	public function testWrongLogLevel(): void
 	{
 		$this->expectException(LogLevelException::class);
 		$this->expectExceptionMessageMatches("/The level \".*\" is not valid./");
@@ -131,14 +131,14 @@ class StreamLoggerTest extends LoggerTestCase
 
 	/**
 	 * Test a relative path
-	 * @doesNotPerformAssertions
 	 */
-	public function testRealPath()
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
+	public function testRealPath(): void
 	{
 		static::markTestSkipped('vfsStream isn\'t compatible with chdir, so not testable.');
 
-		$logfile = vfsStream::newFile('friendica.log')
-		                    ->at($this->root);
+		$logfile = vfsStream::newFile('friendica.log') // @phpstan-ignore deadCode.unreachable (skipped test)
+							->at($this->root);
 
 		chdir($this->root->getChild('logs')->url());
 

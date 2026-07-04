@@ -1,7 +1,7 @@
 <?php
 
-// Copyright (C) 2010-2024, the Friendica project
-// SPDX-FileCopyrightText: 2010-2024 the Friendica project
+// Copyright (C) 2010-2026, the Friendica project
+// SPDX-FileCopyrightText: 2010-2026 the Friendica project
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -23,20 +23,24 @@ final class Report extends \Friendica\BaseRepository
 {
 	protected static $table_name = 'report';
 
-	/** @var ReportFactory */
-	protected $factory;
-	/** @var PostFactory */
-	protected $postFactory;
-	/** @var RuleFactory */
-	protected $ruleFactory;
+	private const ALLOWED_STATUSES = [
+		ReportEntity::STATUS_OPEN,
+		ReportEntity::STATUS_CLOSED,
+	];
 
-	public function __construct(Database $database, LoggerInterface $logger, ReportFactory $factory, PostFactory $postFactory, RuleFactory $ruleFactory)
-	{
-		parent::__construct($database, $logger, $factory);
+	private const ALLOWED_RESOLUTIONS = [
+		ReportEntity::RESOLUTION_ACCEPTED,
+		ReportEntity::RESOLUTION_REJECTED,
+	];
 
-		$this->factory     = $factory;
-		$this->postFactory = $postFactory;
-		$this->ruleFactory = $ruleFactory;
+	public function __construct(
+		Database $database,
+		LoggerInterface $logger,
+		private readonly ReportFactory $entityFactory,
+		protected PostFactory $postFactory,
+		protected RuleFactory $ruleFactory,
+	) {
+		parent::__construct($database, $logger, $entityFactory);
 	}
 
 	public function selectOneById(int $lastInsertId): ReportEntity
@@ -89,6 +93,11 @@ final class Report extends \Friendica\BaseRepository
 		return $Report;
 	}
 
+	protected function getFactory(): ReportFactory
+	{
+		return $this->entityFactory;
+	}
+
 	/**
 	 * @throws NotFoundException
 	 */
@@ -99,10 +108,10 @@ final class Report extends \Friendica\BaseRepository
 			throw new NotFoundException();
 		}
 
-		$reportPosts = new PostsCollection(array_map([$this->postFactory, 'createFromTableRow'], $this->db->selectToArray('report-post', ['uri-id', 'status'], ['rid' => $condition['id'] ?? 0])));
-		$reportRules = new RulesCollection(array_map([$this->ruleFactory, 'createFromTableRow'], $this->db->selectToArray('report-rule', ['line-id', 'text'], ['rid' => $condition['id'] ?? 0])));
+		$reportPosts = new PostsCollection(array_map($this->postFactory->createFromTableRow(...), $this->db->selectToArray('report-post', ['uri-id', 'status'], ['rid' => $condition['id'] ?? 0])));
+		$reportRules = new RulesCollection(array_map($this->ruleFactory->createFromTableRow(...), $this->db->selectToArray('report-rule', ['line-id', 'text'], ['rid' => $condition['id'] ?? 0])));
 
-		return $this->factory->createFromTableRow($fields, $reportPosts, $reportRules);
+		return $this->getFactory()->createFromTableRow($fields, $reportPosts, $reportRules);
 	}
 
 	/**
@@ -114,6 +123,82 @@ final class Report extends \Friendica\BaseRepository
 	 */
 	public function setStatus(int $reportId, int $status): bool
 	{
-		return $this->db->update(self::$table_name, ['status' => $status], ['id' => $reportId]);
+		$this->assertStatus($status);
+
+		return $this->updateModerationFields($reportId, ['status' => $status]);
+	}
+
+	public function setAssignment(int $reportId, ?int $assignedUid, ?int $lastEditorUid = null): bool
+	{
+		$fields = ['assigned-uid' => $assignedUid];
+
+		if ($lastEditorUid !== null) {
+			$fields['last-editor-uid'] = $lastEditorUid;
+		}
+
+		return $this->updateModerationFields($reportId, $fields);
+	}
+
+	public function setRemarks(int $reportId, string $publicRemarks = '', string $privateRemarks = '', ?int $lastEditorUid = null): bool
+	{
+		$fields = [
+			'public-remarks'  => $publicRemarks,
+			'private-remarks' => $privateRemarks,
+		];
+
+		if ($lastEditorUid !== null) {
+			$fields['last-editor-uid'] = $lastEditorUid;
+		}
+
+		return $this->updateModerationFields($reportId, $fields);
+	}
+
+	public function setResolution(int $reportId, ?int $resolution, ?int $lastEditorUid = null): bool
+	{
+		if ($resolution !== null) {
+			$this->assertResolution($resolution);
+		}
+
+		$fields = ['resolution' => $resolution];
+
+		if ($lastEditorUid !== null) {
+			$fields['last-editor-uid'] = $lastEditorUid;
+		}
+
+		return $this->updateModerationFields($reportId, $fields);
+	}
+
+	public function updateModerationState(int $reportId, array $fields): bool
+	{
+		if (array_key_exists('status', $fields)) {
+			$this->assertStatus((int) $fields['status']);
+		}
+
+		if (array_key_exists('resolution', $fields) && $fields['resolution'] !== null) {
+			$this->assertResolution((int) $fields['resolution']);
+		}
+
+		return $this->updateModerationFields($reportId, $fields);
+	}
+
+	private function updateModerationFields(int $reportId, array $fields): bool
+	{
+		$fields['edited'] = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format(DateTimeFormat::MYSQL);
+
+		return $this->db->update(self::$table_name, $fields, ['id' => $reportId]);
+	}
+
+	private function assertStatus(int $status): void
+	{
+		if (!in_array($status, self::ALLOWED_STATUSES, true)) {
+			throw new \InvalidArgumentException('Invalid report status: ' . $status);
+		}
+	}
+
+	private function assertResolution(int $resolution): void
+	{
+		if (!in_array($resolution, self::ALLOWED_RESOLUTIONS, true)) {
+			throw new \InvalidArgumentException('Invalid report resolution: ' . $resolution);
+		}
 	}
 }

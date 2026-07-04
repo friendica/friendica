@@ -25,7 +25,7 @@ use kornrunner\Blurhash\Blurhash;
  */
 class Image implements \Stringable
 {
-	/** @var GdImage|Imagick|resource */
+	/** @var GdImage|Imagick */
 	private $image;
 
 	/*
@@ -34,10 +34,9 @@ class Image implements \Stringable
 	private $imagick;
 	private $width;
 	private $height;
-	private $valid;
+	private $valid = false;
 	private $outputType;
 	private $originType;
-	private $filename;
 
 	/**
 	 * Constructor
@@ -49,20 +48,19 @@ class Image implements \Stringable
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public function __construct(string $data, string $type = '', string $filename = '', bool $imagick = true)
+	public function __construct(string $data, string $type = '', private readonly string $filename = '', bool $imagick = true)
 	{
-		$this->filename = $filename;
-		$type           = Images::addMimeTypeByDataIfInvalid($type, $data);
-		$type           = Images::addMimeTypeByExtensionIfInvalid($type, $filename);
+		$type = Images::addMimeTypeByDataIfInvalid($type, $data);
+		$type = Images::addMimeTypeByExtensionIfInvalid($type, $this->filename);
 
 		if (Images::isSupportedMimeType($type)) {
 			$this->originType = $this->outputType = Images::getImageTypeByMimeType($type);
 		} elseif (($type == '') || str_starts_with($type, 'image/') || substr($type, 0, 12) == ' application/') {
 			$this->originType = IMAGETYPE_UNKNOWN;
 			$this->outputType = IMAGETYPE_WEBP;
-			DI::logger()->debug('Unhandled image mime type, use WebP instead', ['type' => $type, 'filename' => $filename, 'size' => strlen($data)]);
+			DI::logger()->debug('Unhandled image mime type, use WebP instead', ['type' => $type, 'filename' => $this->filename, 'size' => strlen($data)]);
 		} else {
-			DI::logger()->debug('Unhandled mime type', ['type' => $type, 'filename' => $filename, 'size' => strlen($data)]);
+			DI::logger()->debug('Unhandled mime type', ['type' => $type, 'filename' => $this->filename, 'size' => strlen($data)]);
 			$this->valid = false;
 			return;
 		}
@@ -72,10 +70,11 @@ class Image implements \Stringable
 		if ($this->isImagick() && (empty($data) || $this->loadData($data))) {
 			$this->valid = !empty($data);
 			return;
-		} else {
-			// Failed to load with Imagick, fallback
-			$this->imagick = false;
 		}
+
+		// Failed to load with Imagick, fallback
+		$this->imagick = false;
+
 		$this->loadData($data);
 	}
 
@@ -124,7 +123,7 @@ class Image implements \Stringable
 			return false;
 		}
 
-		return str_contains(strtoupper($header['Chunk']), 'ANIM') || str_contains(strtoupper($header['Chunk']), 'ANMF');
+		return str_contains(strtoupper((string) $header['Chunk']), 'ANIM') || str_contains(strtoupper((string) $header['Chunk']), 'ANMF');
 	}
 
 	/**
@@ -209,7 +208,7 @@ class Image implements \Stringable
 
 			$this->width  = $this->image->getImageWidth();
 			$this->height = $this->image->getImageHeight();
-			$this->valid  = !empty($this->image);
+			$this->valid  = true;
 
 			return $this->valid;
 		}
@@ -250,9 +249,6 @@ class Image implements \Stringable
 	 */
 	public function isValid(): bool
 	{
-		if ($this->isImagick()) {
-			return !empty($this->image);
-		}
 		return $this->valid;
 	}
 
@@ -850,7 +846,7 @@ class Image implements \Stringable
 			$this->height = imagesy($this->image);
 		}
 
-		$this->valid = !empty($this->image);
+		$this->valid = true;
 
 		$this->scaleUp(min($width, $height));
 	}
@@ -876,7 +872,7 @@ class Image implements \Stringable
 
 			DI::cache()->set($cacheKey, base64_encode($preview), Duration::DAY);
 		} else {
-			$preview = base64_decode($preview);
+			$preview = base64_decode((string) $preview);
 		}
 
 		return $preview;

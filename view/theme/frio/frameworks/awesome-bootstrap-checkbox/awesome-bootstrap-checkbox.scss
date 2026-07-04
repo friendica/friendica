@@ -3,8 +3,8 @@
 // --------------------------------------------------
 
 
-$font-family-icon: 'ForkAwesome' !default;
-$fa-var-check: "\f00c" !default;
+$font-family-icon: 'remixicon' !default;
+$fa-var-check: "\eb7b" !default;
 $check-icon: $fa-var-check !default;
 
 @mixin checkbox-variant($parent, $color) {

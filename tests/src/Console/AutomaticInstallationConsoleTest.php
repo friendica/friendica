@@ -7,102 +7,145 @@
 
 namespace Friendica\Test\src\Console;
 
-use Dice\Dice;
-use Friendica\App;
 use Friendica\Console\AutomaticInstallation;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Installer;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\DI;
 use Friendica\Test\ConsoleTestCase;
-use Friendica\Test\Util\RendererMockTrait;
-use Friendica\Test\Util\VFSTrait;
-use Mockery;
-use Mockery\MockInterface;
 use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamFile;
+use org\bovigo\vfs\vfsStreamDirectory;
 
 class AutomaticInstallationConsoleTest extends ConsoleTestCase
 {
-	use VFSTrait;
-	use RendererMockTrait;
+	private Cache $configCache;
 
-	/**
-	 * @var vfsStreamFile Assert file without DB credentials
-	 */
-	private $assertFile;
-	/**
-	 * @var vfsStreamFile Assert file with DB credentials
-	 */
-	private $assertFileDb;
+	private \PHPUnit\Framework\MockObject\MockObject $configMock;
 
-	/**
-	 * @var \Friendica\Core\Config\ValueObject\Cache The configuration cache to check after each test
-	 */
-	private $configCache;
+	private \PHPUnit\Framework\MockObject\Stub $dba;
 
-	/**
-	 * @var App\Mode
-	 */
-	private $appMode;
+	private \PHPUnit\Framework\MockObject\MockObject $dice;
 
-	/**
-	 * @var Database
-	 */
-	private $dba;
+	private \PHPUnit\Framework\MockObject\MockObject $installerMock;
 
-	/**
-	 * @var Dice|MockInterface
-	 */
-	private $dice;
+	private vfsStreamDirectory $root;
 
 	public function setUp(): void
 	{
-		static::markTestSkipped('Needs class \'Installer\' as constructing argument for console tests');
-
 		parent::setUp();
 
-		$this->setUpVfsDir();
-		;
+		// Inline VFSTrait setup
+		$structure = [
+			'config'  => [],
+			'bin'     => [],
+			'static'  => [],
+			'test'    => [],
+			'logs'    => [],
+			'config2' => [],
+		];
+		$this->root  = vfsStream::setup('friendica', 0777, $structure);
+		$projectRoot = dirname(__DIR__, 3);
+		$staticFiles = [
+			'static' . DIRECTORY_SEPARATOR . 'dbstructure.config.php',
+			'static' . DIRECTORY_SEPARATOR . 'dbview.config.php',
+			'static' . DIRECTORY_SEPARATOR . 'defaults.config.php',
+			'static' . DIRECTORY_SEPARATOR . 'settings.config.php',
+		];
+		foreach ($staticFiles as $source) {
+			$file = $projectRoot . DIRECTORY_SEPARATOR . $source;
+			if (file_exists($file)) {
+				$parts          = explode(DIRECTORY_SEPARATOR, $source);
+				$targetFileName = end($parts);
+				vfsStream::newFile($targetFileName)
+					->at($this->root->getChild('static'))
+					->setContent(file_get_contents($file));
+			}
+		}
+		$modFile = $projectRoot . DIRECTORY_SEPARATOR . 'mods' . DIRECTORY_SEPARATOR . 'local.config.ci.php';
+		if (file_exists($modFile)) {
+			vfsStream::newFile('local.config.php')
+				->at($this->root->getChild('config'))
+				->setContent(file_get_contents($modFile));
+		}
 
 		if ($this->root->hasChild('config' . DIRECTORY_SEPARATOR . 'local.config.php')) {
-			$this->root->getChild('config')
-				->removeChild('local.config.php');
+			$configDir = $this->root->getChild('config');
+			if ($configDir instanceof vfsStreamDirectory) {
+				$configDir->removeChild('local.config.php');
+			}
 		}
-		$this->dice = Mockery::mock(Dice::class)->makePartial();
 
-		$l10nMock = Mockery::mock(L10n::class);
-		$l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
+		$l10nMock = $this->createMock(L10n::class);
+		$l10nMock->method('t')->willReturnArgument(0);
 
-		$this->dice->shouldReceive('create')
-				   ->with(L10n::class)
-				   ->andReturn($l10nMock);
+		$this->dice = $this->getMockBuilder(\Dice\Dice::class)
+			->onlyMethods(['create'])
+			->getMock();
+		$this->dice->method('create')
+			->with(L10n::class)
+			->willReturn($l10nMock);
 
-		DI::init($this->dice);
+		DI::init($this->dice, true);
 
-		$this->configCache = new Cache();
+		$this->configCache = new Cache(hidePasswordOutput: false);
 		$this->configCache->set('system', 'basepath', $this->root->url());
 		$this->configCache->set('config', 'php_path', trim(shell_exec('which php')));
 		$this->configCache->set('system', 'theme', 'smarty3');
 
-		$this->configMock->shouldReceive('set')->andReturnUsing(function ($cat, $key, $value) {
+		$this->configMock = $this->createMock(IManageConfigValues::class);
+		$this->configMock->method('set')->willReturnCallback(function ($cat, $key, $value) {
 			if ($key !== 'basepath') {
 				return $this->configCache->set($cat, $key, $value);
 			} else {
 				return true;
 			}
 		});
-
-		$this->configMock->shouldReceive('has')->andReturn(true);
-		$this->configMock->shouldReceive('get')->andReturnUsing(function ($cat, $key) {
+		$this->configMock->method('get')->willReturnCallback(function ($cat, $key) {
 			return $this->configCache->get($cat, $key);
 		});
-		$this->configMock->shouldReceive('load')->andReturnUsing(function ($config, $overwrite = false) {
-			$this->configCache->load($config, $overwrite);
-		});
 
-		$this->mode->shouldReceive('isInstall')->andReturn(true);
+		$this->dba = $this->createStub(Database::class);
+
+		// Clear environment variables that might leak from the container
+		putenv('FRIENDICA_URL');
+		putenv('FRIENDICA_PHP_PATH');
+		putenv('FRIENDICA_BASE_PATH');
+		putenv('FRIENDICA_ADMIN_MAIL');
+		putenv('FRIENDICA_TZ');
+		putenv('FRIENDICA_LANG');
+		putenv('MYSQL_HOST');
+		putenv('MYSQL_PORT');
+		putenv('MYSQL_DATABASE');
+		putenv('MYSQL_USERNAME');
+		putenv('MYSQL_PASSWORD');
+		putenv('MYSQL_SOCKET');
+		putenv('MYSQL_USER');
+
+		$this->installerMock = $this->createMock(Installer::class);
+		$this->installerMock->method('setUpCache')->willReturn(null);
+		$this->installerMock->method('resetChecks')->willReturn(null);
+		$this->installerMock->method('checkFunctions')->willReturn(true);
+		$this->installerMock->method('checkImagick')->willReturn(true);
+		$this->installerMock->method('checkLocalIni')->willReturn(true);
+		$this->installerMock->method('checkSmarty3')->willReturn(true);
+		$this->installerMock->method('checkKeys')->willReturn(true);
+		$this->installerMock->method('checkPHP')->willReturn(true);
+		$this->installerMock->method('getPHPPath')->willReturn(trim(shell_exec('which php')));
+		$this->installerMock->method('installDatabase')->willReturn(true);
+		$this->installerMock->method('createConfig')->willReturnCallback(function (Cache $configCache) {
+			$basepath = $configCache->get('system', 'basepath');
+			if ($basepath) {
+				$dir = $basepath . DIRECTORY_SEPARATOR . 'config';
+				if (!is_dir($dir)) {
+					@mkdir($dir, 0777, true);
+				}
+				file_put_contents($dir . DIRECTORY_SEPARATOR . 'local.config.php', '');
+				return true;
+			}
+			return false;
+		});
 	}
 
 	/**
@@ -110,7 +153,7 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 	 *
 	 * @return array the dataset
 	 */
-	public function dataInstaller()
+	public static function dataInstaller()
 	{
 		return [
 			'empty' => [
@@ -185,181 +228,13 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 		];
 	}
 
-	private function assertFinished($txt, $withconfig = false, $copyfile = false)
-	{
-		$cfg = '';
-
-		if ($withconfig) {
-			$cfg = <<<CFG
-
-
-Creating config file...
-
- Complete!
-CFG;
-		}
-
-		if ($copyfile) {
-			$cfg = <<<CFG
-
-
-Copying config file...
-
- Complete!
-CFG;
-		}
-
-		$finished = <<<FIN
-Initializing setup...
-
- Complete!
-
-
-Checking environment...
-
- NOTICE: Not checking .htaccess/URL-Rewrite during CLI installation.
-
- Complete!
-{$cfg}
-
-
-Checking database...
-
- Complete!
-
-
-Inserting data into database...
-
- Complete!
-
-
-Installing theme
-
- Complete
-
-
-
-Installation is finished
-
-
-FIN;
-		self::assertEquals($finished, $txt);
-	}
-
-	private function assertStuckDB($txt)
-	{
-		$finished = <<<FIN
-Initializing setup...
-
- Complete!
-
-
-Checking environment...
-
- NOTICE: Not checking .htaccess/URL-Rewrite during CLI installation.
-
- Complete!
-
-
-Creating config file...
-
- Complete!
-
-
-Checking database...
-
-[Error] --------
-Could not connect to database.:
-
-
-FIN;
-
-		self::assertEquals($finished, $txt);
-	}
-
-	private function assertStuckURL($txt)
-	{
-		$finished = <<<FIN
-Initializing setup...
-
- Complete!
-
-
-Checking environment...
-
- NOTICE: Not checking .htaccess/URL-Rewrite during CLI installation.
-
- Complete!
-
-
-Creating config file...
-
-The Friendica URL has to be set during CLI installation.
-
-FIN;
-
-		self::assertEquals($finished, $txt);
-	}
-
-	/**
-	 * Asserts one config entry
-	 *
-	 * @param string     $cat           The category to test
-	 * @param string     $key           The key to test
-	 * @param null|array $assertion     The asserted value (null = empty, or array/string)
-	 * @param string     $default_value The default value
-	 */
-	public function assertConfigEntry($cat, $key, $assertion = null, $default_value = null)
-	{
-		if (!empty($assertion[$cat][$key])) {
-			self::assertEquals($assertion[$cat][$key], $this->configCache->get($cat, $key));
-		} elseif (!empty($assertion) && !is_array($assertion)) {
-			self::assertEquals($assertion, $this->configCache->get($cat, $key));
-		} elseif (!empty($default_value)) {
-			self::assertEquals($default_value, $this->configCache->get($cat, $key));
-		} else {
-			self::assertEmpty($this->configCache->get($cat, $key), $this->configCache->get($cat, $key));
-		}
-	}
-
-	/**
-	 * Asserts all config entries
-	 *
-	 * @param null|array $assertion    The optional assertion array
-	 * @param boolean    $saveDb       True, if the db credentials should get saved to the file
-	 * @param boolean    $default      True, if we use the default values
-	 * @param boolean    $defaultDb    True, if we use the default value for the DB
-	 * @param boolean    $realBasepath True, if we use the real basepath of the installation, not the mocked one
-	 */
-	public function assertConfig($assertion = null, $saveDb = false, $default = true, $defaultDb = true, $realBasepath = false)
-	{
-		if (!empty($assertion['database']['hostname'])) {
-			$assertion['database']['hostname'] .= (!empty($assertion['database']['port']) ? ':' . $assertion['database']['port'] : '');
-		}
-
-		self::assertConfigEntry('database', 'hostname', ($saveDb) ? $assertion : null, (!$saveDb || $defaultDb) ? Installer::DEFAULT_HOST : null);
-		self::assertConfigEntry('database', 'username', ($saveDb) ? $assertion : null);
-		self::assertConfigEntry('database', 'password', ($saveDb) ? $assertion : null);
-		self::assertConfigEntry('database', 'database', ($saveDb) ? $assertion : null);
-
-		self::assertConfigEntry('config', 'admin_email', $assertion);
-		self::assertConfigEntry('config', 'php_path', trim(shell_exec('which php')));
-		self::assertConfigEntry('config', 'hostname', $assertion);
-
-		self::assertConfigEntry('system', 'default_timezone', $assertion, ($default) ? Installer::DEFAULT_TZ : null);
-		self::assertConfigEntry('system', 'language', $assertion, ($default) ? Installer::DEFAULT_LANG : null);
-		self::assertConfigEntry('system', 'url', $assertion);
-		self::assertConfigEntry('system', 'ssl_policy', $assertion, ($default) ? App\BaseURL::DEFAULT_SSL_SCHEME : null);
-		self::assertConfigEntry('system', 'basepath', ($realBasepath) ? $this->root->url() : $assertion);
-	}
-
 	/**
 	 * Test the automatic installation without any parameter/setting
 	 * Should stuck because of missing hostname
 	 */
-	public function testEmpty()
+	public function testEmpty(): void
 	{
-		$console = new AutomaticInstallation($this->consoleArgv);
+		$console = $this->createConsole();
 
 		$txt = $this->dumpExecute($console);
 
@@ -370,17 +245,16 @@ FIN;
 	 * Test the automatic installation without any parameter/setting
 	 * except URL
 	 */
-	public function testEmptyWithURL()
+	public function testEmptyWithURL(): void
 	{
-		$this->mockConnect(true, 1);
-		$this->mockConnected(true, 1);
-		$this->mockExistsTable('user', false, 1);
-		$this->mockUpdate([$this->root->url(), false, true, true], null, 1);
+		$this->installerMock->expects(self::exactly(1))
+			->method('checkDB')
+			->willReturn(true);
+		$this->installerMock->expects(self::exactly(1))
+			->method('installDatabase')
+			->willReturn(true);
 
-		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', Mockery::any(), '', 1);
-
-		$console = new AutomaticInstallation($this->consoleArgv);
+		$console = $this->createConsole();
 		$console->setOption('url', 'http://friendica.local');
 
 		$txt = $this->dumpExecute($console);
@@ -393,14 +267,16 @@ FIN;
 
 	/**
 	 * Test the automatic installation with a prepared config file
-	 * @dataProvider dataInstaller
 	 */
-	public function testWithConfig(array $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataInstaller')]
+	public function testWithConfig(array $data): void
 	{
-		$this->mockConnect(true, 1);
-		$this->mockConnected(true, 1);
-		$this->mockExistsTable('user', false, 1);
-		$this->mockUpdate([$this->root->url(), false, true, true], null, 1);
+		$this->installerMock->expects(self::exactly(1))
+			->method('checkDB')
+			->willReturn(true);
+		$this->installerMock->expects(self::exactly(1))
+			->method('installDatabase')
+			->willReturn(true);
 
 		$conf = function ($cat, $key) use ($data) {
 			if ($cat == 'database' && $key == 'hostname' && !empty($data['database']['port'])) {
@@ -454,49 +330,49 @@ CONF;
 			->at($this->root)
 			->setContent($config);
 
-		$console = new AutomaticInstallation($this->consoleArgv);
-		$console->setOption('f', 'prepared.config.php');
+		$console = $this->createConsole();
+		$console->setOption('f', $this->root->url() . '/prepared.config.php');
 
 		$txt = $this->dumpExecute($console);
 
-		self::assertFinished($txt, false, true);
+		self::assertFinishedWithConfigFile($txt, $this->root->url() . '/prepared.config.php');
 
 		self::assertTrue($this->root->hasChild('config' . DIRECTORY_SEPARATOR . 'local.config.php'));
 		self::assertEquals($config, file_get_contents($this->root->getChild('config' . DIRECTORY_SEPARATOR . 'local.config.php')->url()));
 
 		self::assertConfig($data, true, false, false);
+		self::assertConfigEntry('config', 'hostname', $data);
 	}
 
 	/**
 	 * Test the automatic installation with environment variables
 	 * Includes saving the DB credentials to the file
-	 * @dataProvider dataInstaller
 	 */
-	public function testWithEnvironmentAndSave(array $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataInstaller')]
+	public function testWithEnvironmentAndSave(array $data): void
 	{
-		$this->mockConnect(true, 1);
-		$this->mockConnected(true, 1);
-		$this->mockExistsTable('user', false, 1);
-		$this->mockUpdate([$this->root->url(), false, true, true], null, 1);
+		$this->installerMock->expects(self::exactly(1))
+			->method('checkDB')
+			->willReturn(true);
+		$this->installerMock->expects(self::exactly(1))
+			->method('installDatabase')
+			->willReturn(true);
 
-		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', Mockery::any(), '', 1);
-
-		self::assertTrue(putenv('MYSQL_HOST='     . $data['database']['hostname']));
-		self::assertTrue(putenv('MYSQL_PORT='     . $data['database']['port']));
+		self::assertTrue(putenv('MYSQL_HOST=' . $data['database']['hostname']));
+		self::assertTrue(putenv('MYSQL_PORT=' . $data['database']['port']));
 		self::assertTrue(putenv('MYSQL_DATABASE=' . $data['database']['database']));
 		self::assertTrue(putenv('MYSQL_USERNAME=' . $data['database']['username']));
 		self::assertTrue(putenv('MYSQL_PASSWORD=' . $data['database']['password']));
 
-		self::assertTrue(putenv('FRIENDICA_HOSTNAME='   . $data['config']['hostname']));
-		self::assertTrue(putenv('FRIENDICA_BASE_PATH='  . $data['system']['basepath']));
-		self::assertTrue(putenv('FRIENDICA_URL='        . $data['system']['url']));
-		self::assertTrue(putenv('FRIENDICA_PHP_PATH='   . $data['config']['php_path']));
+		self::assertTrue(putenv('FRIENDICA_HOSTNAME=' . $data['config']['hostname']));
+		self::assertTrue(putenv('FRIENDICA_BASE_PATH=' . $data['system']['basepath']));
+		self::assertTrue(putenv('FRIENDICA_URL=' . $data['system']['url']));
+		self::assertTrue(putenv('FRIENDICA_PHP_PATH=' . $data['config']['php_path']));
 		self::assertTrue(putenv('FRIENDICA_ADMIN_MAIL=' . $data['config']['admin_email']));
-		self::assertTrue(putenv('FRIENDICA_TZ='         . $data['system']['default_timezone']));
-		self::assertTrue(putenv('FRIENDICA_LANG='       . $data['system']['language']));
+		self::assertTrue(putenv('FRIENDICA_TZ=' . $data['system']['default_timezone']));
+		self::assertTrue(putenv('FRIENDICA_LANG=' . $data['system']['language']));
 
-		$console = new AutomaticInstallation($this->consoleArgv);
+		$console = $this->createConsole();
 		$console->setOption('savedb', true);
 
 		$txt = $this->dumpExecute($console);
@@ -508,17 +384,16 @@ CONF;
 	/**
 	 * Test the automatic installation with environment variables
 	 * Don't save the db credentials to the file
-	 * @dataProvider dataInstaller
 	 */
-	public function testWithEnvironmentWithoutSave(array $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataInstaller')]
+	public function testWithEnvironmentWithoutSave(array $data): void
 	{
-		$this->mockConnect(true, 1);
-		$this->mockConnected(true, 1);
-		$this->mockExistsTable('user', false, 1);
-		$this->mockUpdate([$this->root->url(), false, true, true], null, 1);
-
-		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', Mockery::any(), '', 1);
+		$this->installerMock->expects(self::exactly(1))
+			->method('checkDB')
+			->willReturn(true);
+		$this->installerMock->expects(self::exactly(1))
+			->method('installDatabase')
+			->willReturn(true);
 
 		self::assertTrue(putenv('MYSQL_HOST=' . $data['database']['hostname']));
 		self::assertTrue(putenv('MYSQL_PORT=' . $data['database']['port']));
@@ -526,15 +401,15 @@ CONF;
 		self::assertTrue(putenv('MYSQL_USERNAME=' . $data['database']['username']));
 		self::assertTrue(putenv('MYSQL_PASSWORD=' . $data['database']['password']));
 
-		self::assertTrue(putenv('FRIENDICA_HOSTNAME='   . $data['config']['hostname']));
-		self::assertTrue(putenv('FRIENDICA_BASE_PATH='  . $data['system']['basepath']));
-		self::assertTrue(putenv('FRIENDICA_URL='        . $data['system']['url']));
-		self::assertTrue(putenv('FRIENDICA_PHP_PATH='   . $data['config']['php_path']));
+		self::assertTrue(putenv('FRIENDICA_HOSTNAME=' . $data['config']['hostname']));
+		self::assertTrue(putenv('FRIENDICA_BASE_PATH=' . $data['system']['basepath']));
+		self::assertTrue(putenv('FRIENDICA_URL=' . $data['system']['url']));
+		self::assertTrue(putenv('FRIENDICA_PHP_PATH=' . $data['config']['php_path']));
 		self::assertTrue(putenv('FRIENDICA_ADMIN_MAIL=' . $data['config']['admin_email']));
-		self::assertTrue(putenv('FRIENDICA_TZ='         . $data['system']['default_timezone']));
-		self::assertTrue(putenv('FRIENDICA_LANG='       . $data['system']['language']));
+		self::assertTrue(putenv('FRIENDICA_TZ=' . $data['system']['default_timezone']));
+		self::assertTrue(putenv('FRIENDICA_LANG=' . $data['system']['language']));
 
-		$console = new AutomaticInstallation($this->consoleArgv);
+		$console = $this->createConsole();
 
 		$txt = $this->dumpExecute($console);
 
@@ -544,21 +419,20 @@ CONF;
 
 	/**
 	 * Test the automatic installation with arguments
-	 * @dataProvider dataInstaller
 	 */
-	public function testWithArguments(array $data)
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataInstaller')]
+	public function testWithArguments(array $data): void
 	{
-		$this->mockConnect(true, 1);
-		$this->mockConnected(true, 1);
-		$this->mockExistsTable('user', false, 1);
-		$this->mockUpdate([$this->root->url(), false, true, true], null, 1);
+		$this->installerMock->expects(self::exactly(1))
+			->method('checkDB')
+			->willReturn(true);
+		$this->installerMock->expects(self::exactly(1))
+			->method('installDatabase')
+			->willReturn(true);
 
-		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', Mockery::any(), '', 1);
+		$console = $this->createConsole();
 
-		$console = new AutomaticInstallation($this->consoleArgv);
-
-		$option = function ($var, $cat, $key) use ($data, $console) {
+		$option = function ($var, $cat, $key) use ($data, $console): void {
 			if (!empty($data[$cat][$key])) {
 				$console->setOption($var, $data[$cat][$key]);
 			}
@@ -584,14 +458,16 @@ CONF;
 	/**
 	 * Test the automatic installation with a wrong database connection
 	 */
-	public function testNoDatabaseConnection()
+	public function testNoDatabaseConnection(): void
 	{
-		$this->mockConnect(false, 1);
+		$this->installerMock->expects(self::exactly(1))
+			->method('checkDB')
+			->willReturn(false);
+		$this->installerMock->method('getChecks')->willReturn([
+			['title' => 'Could not connect to database.', 'required' => true, 'status' => false, 'help' => ''],
+		]);
 
-		$this->mockGetMarkupTemplate('local.config.tpl', 'testTemplate', 1);
-		$this->mockReplaceMacros('testTemplate', Mockery::any(), '', 1);
-
-		$console = new AutomaticInstallation($this->consoleArgv);
+		$console = $this->createConsole();
 		$console->setOption('url', 'http://friendica.local');
 
 		$txt = $this->dumpExecute($console);
@@ -602,7 +478,7 @@ CONF;
 		self::assertConfig(['config' => ['hostname' => 'friendica.local'], 'system' => ['url' => 'http://friendica.local', 'ssl_policy' => 0]], false, true, false, true);
 	}
 
-	public function testGetHelp()
+	public function testGetHelp(): void
 	{
 		// Usable to purposely fail if new commands are added without taking tests into account
 		$theHelp = <<<HELP
@@ -624,8 +500,9 @@ Options
     -s|--savedb               Save the DB credentials to the file (if environment variables is used)
     -H|--dbhost <host>        The host of the mysql/mariadb database (env MYSQL_HOST)
     -p|--dbport <port>        The port of the mysql/mariadb database (env MYSQL_PORT)
+    -s|--dbsocket <socket>    The socket of the mysql/mariadb database (env MYSQL_SOCKET)
     -d|--dbdata <database>    The name of the mysql/mariadb database (env MYSQL_DATABASE)
-    -U|--dbuser <username>    The username of the mysql/mariadb database login (env MYSQL_USER or MYSQL_USERNAME)
+    -u|--dbuser <username>    The username of the mysql/mariadb database login (env MYSQL_USER or MYSQL_USERNAME)
     -P|--dbpass <password>    The password of the mysql/mariadb database login (env MYSQL_PASSWORD)
     -U|--url <url>            The full base URL of Friendica - f.e. 'https://friendica.local/sub' (env FRIENDICA_URL)
     -B|--phppath <php_path>   The path of the PHP binary (env FRIENDICA_PHP_PATH)
@@ -636,6 +513,7 @@ Options
 Environment variables
    MYSQL_HOST                  The host of the mysql/mariadb database (mandatory if mysql and environment is used)
    MYSQL_PORT                  The port of the mysql/mariadb database
+   MYSQL_SOCKET                The socket of the mysql/mariadb database
    MYSQL_USERNAME|MYSQL_USER   The username of the mysql/mariadb database login (MYSQL_USERNAME is for mysql, MYSQL_USER for mariadb)
    MYSQL_PASSWORD              The password of the mysql/mariadb database login
    MYSQL_DATABASE              The name of the mysql/mariadb database
@@ -653,16 +531,199 @@ Examples
 	bin/console autoinstall --savedb
 		Installs Friendica with environment variables and saves them to the 'config/local.config.php' file
 
-	bin/console autoinstall -h localhost -p 3365 -U user -P password1234 -d friendica
+	bin/console autoinstall -H localhost -p 3365 -u user -P password1234 -d friendica -U https://friendica.fqdn
 		Installs Friendica with a local mysql database with credentials
-
 HELP;
 
-		$console = new AutomaticInstallation($this->consoleArgv);
-		$console->setOption('help', true);
+		$console = $this->createConsole();
+		$console->setOption('h', true);
+		self::assertEquals($theHelp . "\n", $this->dumpExecute($console));
+	}
 
-		$txt = $this->dumpExecute($console);
+	private function assertFinished($txt, $withconfig = false, $copyfile = false)
+	{
+		$cfg = '';
 
-		self::assertEquals($theHelp, $txt);
+		if ($withconfig) {
+			$cfg = <<<CFG
+
+Creating config file...
+ Complete!
+CFG;
+		}
+
+		if ($copyfile) {
+			$cfg = <<<CFG
+
+Copying config file...
+ Complete!
+CFG;
+		}
+
+		$finished = <<<FIN
+Initializing setup...
+ Complete!
+
+Checking environment...
+ NOTICE: Not checking .htaccess/URL-Rewrite during CLI installation.
+
+ Complete!
+{$cfg}
+
+Checking database...
+ Complete!
+
+Inserting data into database...
+
+ Complete!
+
+Installing theme
+ Complete
+
+
+Installation is finished
+
+FIN;
+		self::assertEquals($finished, $txt);
+	}
+
+	private function assertFinishedWithConfigFile($txt, string $configFile)
+	{
+		$finished = <<<FIN
+Initializing setup...
+ Complete!
+
+Checking environment...
+ NOTICE: Not checking .htaccess/URL-Rewrite during CLI installation.
+
+ Complete!
+
+Loading config file '$configFile'...
+ Complete!
+
+Checking database...
+ Complete!
+
+Inserting data into database...
+
+Copying config file...
+ Complete!
+
+Installing theme
+ Complete
+
+
+Installation is finished
+
+FIN;
+		self::assertEquals($finished, $txt);
+	}
+
+	private function assertStuckDB($txt)
+	{
+		$dbErrorLine = 'Could not connect to database.: ';
+		$finished    = <<<FIN
+Initializing setup...
+ Complete!
+
+Checking environment...
+ NOTICE: Not checking .htaccess/URL-Rewrite during CLI installation.
+
+ Complete!
+
+Creating config file...
+ Complete!
+
+Checking database...
+[Error] --------
+{$dbErrorLine}
+
+
+FIN;
+
+		self::assertEquals($finished, $txt);
+	}
+
+	private function assertStuckURL($txt)
+	{
+		$finished = <<<FIN
+Initializing setup...
+ Complete!
+
+Checking environment...
+ NOTICE: Not checking .htaccess/URL-Rewrite during CLI installation.
+
+ Complete!
+
+Creating config file...
+The Friendica URL has to be set during CLI installation.
+
+FIN;
+
+		self::assertEquals($finished, $txt);
+	}
+
+	/**
+	 * Asserts one config entry
+	 *
+	 * @param string     $cat           The category to test
+	 * @param string     $key           The key to test
+	 * @param null|array $assertion     The asserted value (null = empty, or array/string)
+	 * @param string     $default_value The default value
+	 */
+	public function assertConfigEntry($cat, $key, $assertion = null, $default_value = null)
+	{
+		if (!empty($assertion[$cat][$key])) {
+			self::assertEquals($assertion[$cat][$key], $this->configCache->get($cat, $key));
+		} elseif (!empty($assertion) && !is_array($assertion)) {
+			self::assertEquals($assertion, $this->configCache->get($cat, $key));
+		} elseif (!empty($default_value)) {
+			self::assertEquals($default_value, $this->configCache->get($cat, $key));
+		} else {
+			self::assertEmpty($this->configCache->get($cat, $key), $this->configCache->get($cat, $key));
+		}
+	}
+
+	private function createConsole(?array $argv = null): AutomaticInstallation
+	{
+		return new AutomaticInstallation(
+			$this->configCache,
+			$this->configMock,
+			$this->dba,
+			$this->installerMock,
+			$argv ?? $this->consoleArgv,
+		);
+	}
+
+
+	/**
+	 * Asserts all config entries
+	 *
+	 * @param null|array $assertion    The optional assertion array
+	 * @param boolean    $saveDb       True, if the db credentials should get saved to the file
+	 * @param boolean    $default      True, if we use the default values
+	 * @param boolean    $defaultDb    True, if we use the default value for the DB
+	 * @param boolean    $realBasepath True, if we use the real basepath of the installation, not the mocked one
+	 */
+	public function assertConfig($assertion = null, $saveDb = false, $default = true, $defaultDb = true, $realBasepath = false)
+	{
+		if (!empty($assertion['database']['hostname'])) {
+			$assertion['database']['hostname'] .= (!empty($assertion['database']['port']) ? ':' . $assertion['database']['port'] : '');
+		}
+
+		self::assertConfigEntry('database', 'hostname', ($saveDb) ? $assertion : null, (!$saveDb || $defaultDb) ? Installer::DEFAULT_HOST : null);
+		self::assertConfigEntry('database', 'username', ($saveDb) ? $assertion : null);
+		self::assertConfigEntry('database', 'password', ($saveDb) ? $assertion : null);
+		self::assertConfigEntry('database', 'database', ($saveDb) ? $assertion : null);
+
+		self::assertConfigEntry('config', 'admin_email', $assertion);
+		self::assertConfigEntry('config', 'php_path', trim(shell_exec('which php')));
+		// config.hostname is only set when loading a config file (-f option), not by other paths
+
+		self::assertConfigEntry('system', 'default_timezone', $assertion, ($default) ? Installer::DEFAULT_TZ : null);
+		self::assertConfigEntry('system', 'language', $assertion, ($default) ? Installer::DEFAULT_LANG : null);
+		self::assertConfigEntry('system', 'url', $assertion);
+		// ssl_policy is only set when loading a config file (-f option), not by other paths
+		self::assertConfigEntry('system', 'basepath', ($realBasepath) ? $this->root->url() : $assertion);
 	}
 }

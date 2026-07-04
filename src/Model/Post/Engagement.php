@@ -78,7 +78,7 @@ class Engagement
 		if (!$store) {
 			$tagList = Relay::getSubscribedTags();
 			foreach (array_column(Tag::getByURIId($item['parent-uri-id'], [Tag::HASHTAG]), 'name') as $tag) {
-				if (in_array(mb_strtolower($tag), $tagList)) {
+				if (in_array(mb_strtolower((string) $tag), $tagList)) {
 					$store = true;
 					break;
 				}
@@ -92,7 +92,7 @@ class Engagement
 		}
 
 		$searchtext = self::getSearchTextForItem($parent, $mediatype);
-		$language   = !empty($parent['language']) ? (array_key_first(json_decode($parent['language'], true)) ?? L10n::UNDETERMINED_LANGUAGE) : L10n::UNDETERMINED_LANGUAGE;
+		$language   = !empty($parent['language']) ? (array_key_first(json_decode((string) $parent['language'], true)) ?? L10n::UNDETERMINED_LANGUAGE) : L10n::UNDETERMINED_LANGUAGE;
 		if (!$store) {
 			$store = DI::userDefinedChannel()->match($searchtext, $language);
 		}
@@ -212,7 +212,7 @@ class Engagement
 			if (!empty($platform)) {
 				$body .= ' platform_' . $platform;
 			}
-			$body .= ' server_' . parse_url($gserver['nurl'], PHP_URL_HOST);
+			$body .= ' server_' . parse_url((string) $gserver['nurl'], PHP_URL_HOST);
 		}
 
 		if (($item['owner-contact-type'] == Contact::TYPE_COMMUNITY) && !empty($item['owner-gsid']) && ($item['owner-gsid'] != ($item['author-gsid'] ?? 0))) {
@@ -221,7 +221,7 @@ class Engagement
 			if (!empty($platform) && !strpos($body, 'platform_' . $platform)) {
 				$body .= ' platform_' . $platform;
 			}
-			$body .= ' server_' . parse_url($gserver['nurl'], PHP_URL_HOST);
+			$body .= ' server_' . parse_url((string) $gserver['nurl'], PHP_URL_HOST);
 		}
 
 		switch ($item['private']) {
@@ -287,7 +287,7 @@ class Engagement
 		}
 
 		if (!empty($item['language'])) {
-			$languages = json_decode($item['language'], true);
+			$languages = json_decode((string) $item['language'], true);
 			$body .= ' language_' . array_key_first($languages);
 		}
 
@@ -345,7 +345,7 @@ class Engagement
 		return $text;
 	}
 
-	public static function getMediaType(int $uri_id, int $quote_uri_id = null): int
+	public static function getMediaType(int $uri_id, ?int $quote_uri_id = null): int
 	{
 		$media = Post\Media::getByURIId($uri_id);
 		$type  = !empty($quote_uri_id) ? self::MEDIA_POST : self::MEDIA_NONE;
@@ -399,7 +399,7 @@ class Engagement
 	public static function escapeKeywords(string $fullTextSearch): string
 	{
 		foreach (self::SHORTCUTS as $search => $replace) {
-			$fullTextSearch = preg_replace('~' . $search . ':(.[\w\*@\.-]+)~', $replace . ':$1', $fullTextSearch);
+			$fullTextSearch = preg_replace('~' . $search . ':(.[\w\*@\.-]+)~', $replace . ':$1', (string) $fullTextSearch);
 		}
 
 		foreach (self::ALTERNATIVES as $search => $replace) {
@@ -407,7 +407,7 @@ class Engagement
 		}
 
 		foreach (self::KEYWORDS as $keyword) {
-			$fullTextSearch = preg_replace('~(' . $keyword . '):(.[\w\*@\.-]+)~', '"$1_$2"', $fullTextSearch);
+			$fullTextSearch = preg_replace('~(' . $keyword . '):(.[\w\*@\.-]+)~', '"$1_$2"', (string) $fullTextSearch);
 		}
 		return $fullTextSearch;
 	}
@@ -415,7 +415,7 @@ class Engagement
 	public static function unescapeKeywords(string $fullTextSearch): string
 	{
 		foreach (self::KEYWORDS as $keyword) {
-			$fullTextSearch = preg_replace('~(' . $keyword . ')_(.[\w\*@\.-]+)~', '$1:$2', $fullTextSearch);
+			$fullTextSearch = preg_replace('~(' . $keyword . ')_(.[\w\*@\.-]+)~', '$1:$2', (string) $fullTextSearch);
 		}
 		return $fullTextSearch;
 	}

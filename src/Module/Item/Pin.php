@@ -8,7 +8,6 @@
 namespace Friendica\Module\Item;
 
 use Friendica\BaseModule;
-use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Post;
@@ -54,7 +53,7 @@ class Pin extends BaseModule
 		$return_path = $_REQUEST['return'] ?? '';
 		if (!empty($return_path)) {
 			$rand = '_=' . time();
-			if (strpos($return_path, '?')) {
+			if (strpos((string) $return_path, '?')) {
 				$rand = "&$rand";
 			} else {
 				$rand = "?$rand";
@@ -67,7 +66,7 @@ class Pin extends BaseModule
 			'status'  => 'ok',
 			'item_id' => $itemId,
 			'verb'    => 'pin',
-			'state'   => (int)$pinned,
+			'state'   => (int) $pinned,
 		];
 
 		$this->jsonExit($return);

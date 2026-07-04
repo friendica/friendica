@@ -28,7 +28,7 @@ class RetweetTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesRepeat()
+	public function testApiStatusesRepeat(): void
 	{
 		$this->expectException(BadRequestException::class);
 
@@ -39,9 +39,8 @@ class RetweetTest extends ApiTestCase
 	/**
 	 * Test the api_statuses_repeat() function without an authenticated user.
 	 *
-	 * @return void
 	 */
-	public function testApiStatusesRepeatWithoutAuthenticatedUser()
+	public function testApiStatusesRepeatWithoutAuthenticatedUser(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 
@@ -56,7 +55,7 @@ class RetweetTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesRepeatWithId()
+	public function testApiStatusesRepeatWithId(): void
 	{
 		$response = (new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
@@ -73,7 +72,7 @@ class RetweetTest extends ApiTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiStatusesRepeatWithSharedId()
+	public function testApiStatusesRepeatWithSharedId(): void
 	{
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);

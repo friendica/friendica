@@ -159,7 +159,7 @@ class Delivery
 			 *
 			 */
 
-			if (!$top_level && ($parent['wall'] == 0) && stristr($target_item['uri'], $localhost)) {
+			if (!$top_level && ($parent['wall'] == 0) && stristr((string) $target_item['uri'], $localhost)) {
 				DI::logger()->info('Followup ' . $target_item["guid"]);
 				// local followup to remote post
 				$followup = true;
@@ -213,23 +213,12 @@ class Delivery
 
 		DI::logger()->notice('Delivering', ['cmd' => $cmd, 'uri-id' => $post_uriid, 'followup' => $followup, 'network' => $contact['network']]);
 
-		switch ($contact['network']) {
-			case Protocol::DFRN:
-				$success = self::deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup, $protocol);
-				break;
-
-			case Protocol::DIASPORA:
-				$success = self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup);
-				break;
-
-			case Protocol::MAIL:
-				$success = self::deliverMail($cmd, $contact, $owner, $target_item, $thr_parent);
-				break;
-
-			default:
-				$success = true;
-				break;
-		}
+		$success = match ($contact['network']) {
+			Protocol::DFRN     => self::deliverDFRN($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup, $protocol),
+			Protocol::DIASPORA => self::deliverDiaspora($cmd, $contact, $owner, $items, $target_item, $public_message, $top_level, $followup),
+			Protocol::MAIL     => self::deliverMail($cmd, $contact, $owner, $target_item, $thr_parent),
+			default            => true,
+		};
 
 		return $success;
 	}
@@ -268,7 +257,7 @@ class Delivery
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function deliverDFRN(string $cmd, array $contact, array $owner, array $items, array $target_item, bool $public_message, bool $top_level, bool $followup, int $server_protocol = null): bool
+	private static function deliverDFRN(string $cmd, array $contact, array $owner, array $items, array $target_item, bool $public_message, bool $top_level, bool $followup, ?int $server_protocol = null): bool
 	{
 		$target_item_id = $target_item['guid'] ?? '' ?: $target_item['id'] ?? null;
 
@@ -493,7 +482,7 @@ class Delivery
 		}
 
 		$addr = $contact['addr'];
-		if (!strlen($addr)) {
+		if (!strlen((string) $addr)) {
 			return true;
 		}
 
@@ -506,7 +495,7 @@ class Delivery
 		}
 
 		if (!empty($thr_parent['object'])) {
-			$data = json_decode($thr_parent['object'], true);
+			$data = json_decode((string) $thr_parent['object'], true);
 			if (!empty($data['reply_to'])) {
 				$addr = $data['reply_to'][0]['mailbox'] . '@' . $data['reply_to'][0]['host'];
 				DI::logger()->info('Use "reply-to" address of the thread parent', ['addr' => $addr]);
@@ -573,7 +562,7 @@ class Delivery
 				}
 			}
 
-			if (strncasecmp($subject, 'RE:', 3)) {
+			if (strncasecmp((string) $subject, 'RE:', 3)) {
 				$subject = 'Re: ' . $subject;
 			}
 		}

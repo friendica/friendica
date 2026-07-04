@@ -12,7 +12,7 @@ use Friendica\App\BaseURL;
 use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Contact\LocalRelationship\Repository\LocalRelationship;
-use Friendica\Content\Conversation;
+use Friendica\Content\Conversation\StatusEditor;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget\VCard;
 use Friendica\Core\ACL;
@@ -33,31 +33,9 @@ use Psr\Log\LoggerInterface;
  */
 class Conversations extends BaseModule
 {
-	/**
-	 * @var Page
-	 */
-	private $page;
-	/**
-	 * @var Conversation
-	 */
-	private $conversation;
-	/**
-	 * @var LocalRelationship
-	 */
-	private $localRelationship;
-	/**
-	 * @var IHandleUserSessions
-	 */
-	private $userSession;
-
-	public function __construct(L10n $l10n, LocalRelationship $localRelationship, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, Page $page, Conversation $conversation, IHandleUserSessions $userSession, $server, array $parameters = [])
+	public function __construct(L10n $l10n, private readonly LocalRelationship $localRelationship, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private Page $page, private readonly StatusEditor $statusEditor, private readonly IHandleUserSessions $userSession, $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->page              = $page;
-		$this->conversation      = $conversation;
-		$this->localRelationship = $localRelationship;
-		$this->userSession       = $userSession;
 	}
 
 	protected function content(array $request = []): string
@@ -106,12 +84,13 @@ class Conversations extends BaseModule
 
 		if (!$contact['ap-posting-restricted'] && !$raw) {
 			$options = [
-				'lockstate' => ACL::getLockstateForUserId($this->userSession->getLocalUserId()) ? 'lock' : 'unlock',
-				'acl'       => ACL::getFullSelectorHTML($this->page, $this->userSession->getLocalUserId(), true, []),
-				'bang'      => '',
-				'content'   => ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY ? '!' : '@') . ($contact['addr'] ?: $contact['url']),
+				'lockstate'            => ACL::getLockstateForUserId($this->userSession->getLocalUserId()) ? 'lock' : 'unlock',
+				'acl'                  => ACL::getFullSelectorHTML($this->page, $this->userSession->getLocalUserId(), true, []),
+				'bang'                 => '',
+				'content'              => ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY ? '!' : '@') . ($contact['addr'] ?: $contact['url']),
+				'contact_account_type' => $contact['contact-type'],
 			];
-			$output = $this->conversation->statusEditor($options);
+			$output = $this->statusEditor->renderEditor($options);
 		}
 
 		Contact::setPageTitle($contact);

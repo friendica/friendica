@@ -9,7 +9,6 @@ namespace Friendica\Console;
 
 use Console_Table;
 use Friendica\App\Mode;
-use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\DI;
 use Friendica\Model\Contact as ContactModel;
 use Friendica\Model\User as UserModel;
@@ -24,15 +23,6 @@ use Seld\CliPrompt\CliPrompt;
 class Contact extends \Asika\SimpleConsole\Console
 {
 	protected $helpOptions = ['h', 'help', '?'];
-
-	/**
-	 * @var Mode
-	 */
-	private $appMode;
-	/**
-	 * @var IManagePersonalConfigValues
-	 */
-	private $pConfig;
 
 	protected function getHelp()
 	{
@@ -56,11 +46,9 @@ HELP;
 		return $help;
 	}
 
-	public function __construct(Mode $appMode, ?array $argv = null)
+	public function __construct(private readonly Mode $appMode, ?array $argv = null)
 	{
 		parent::__construct($argv);
-
-		$this->appMode = $appMode;
 	}
 
 	protected function doExecute(): int
@@ -82,18 +70,13 @@ HELP;
 
 		$command = $this->getArgument(0);
 
-		switch ($command) {
-			case 'add':
-				return ($this->addContact()) ? 0 : 1;
-			case 'remove':
-				return ($this->removeContact()) ? 0 : 1;
-			case 'search':
-				return ($this->searchContact()) ? 0 : 1;
-			case 'terminate':
-				return ($this->terminateContact()) ? 0 : 1;
-			default:
-				throw new \Asika\SimpleConsole\CommandArgsException('Wrong command.');
-		}
+		return match ($command) {
+			'add'       => ($this->addContact()) ? 0 : 1,
+			'remove'    => ($this->removeContact()) ? 0 : 1,
+			'search'    => ($this->searchContact()) ? 0 : 1,
+			'terminate' => ($this->terminateContact()) ? 0 : 1,
+			default     => throw new \Asika\SimpleConsole\CommandArgsException('Wrong command.'),
+		};
 	}
 
 	/**
@@ -248,7 +231,7 @@ HELP;
 		$table = new Console_Table();
 		$table->setHeaders(['ID', 'UID', 'Network', 'Name', 'Nick', 'URL', 'E-Mail', 'Created', 'Updated', 'Blocked', 'Deleted']);
 
-		$addRow = function ($row) use (&$table) {
+		$addRow = function ($row) use (&$table): void {
 			$table->addRow([
 				$row['id'],
 				$row['uid'],

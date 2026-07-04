@@ -21,42 +21,42 @@ interface IEmail extends JsonSerializable
 	 *
 	 * @return string
 	 */
-	function getFromName();
+	public function getFromName();
 
 	/**
 	 * Gets the senders email address for this email
 	 *
 	 * @return string
 	 */
-	function getFromAddress();
+	public function getFromAddress();
 
 	/**
 	 * Gets the UID of the sender of this email
 	 *
 	 * @return int|null
 	 */
-	function getRecipientUid();
+	public function getRecipientUid();
 
 	/**
 	 * Gets the reply-to address for this email
 	 *
 	 * @return string
 	 */
-	function getReplyTo();
+	public function getReplyTo();
 
 	/**
 	 * Gets the senders email address
 	 *
 	 * @return string
 	 */
-	function getToAddress();
+	public function getToAddress();
 
 	/**
 	 * Gets the subject of this email
 	 *
 	 * @return string
 	 */
-	function getSubject();
+	public function getSubject();
 
 	/**
 	 * Gets the message body of this email (either html or plaintext)
@@ -65,21 +65,21 @@ interface IEmail extends JsonSerializable
 	 *
 	 * @return string
 	 */
-	function getMessage(bool $plain = false): string;
+	public function getMessage(bool $plain = false): string;
 
 	/**
 	 * Gets the additional mail header array
 	 *
 	 * @return string[][]
 	 */
-	function getAdditionalMailHeader();
+	public function getAdditionalMailHeader();
 
 	/**
 	 * Gets the additional mail header as string - EOL separated
 	 *
 	 * @return string
 	 */
-	function getAdditionalMailHeaderString();
+	public function getAdditionalMailHeaderString();
 
 	/**
 	 * Returns the current email with a new recipient
@@ -89,7 +89,7 @@ interface IEmail extends JsonSerializable
 	 *
 	 * @return static
 	 */
-	function withRecipient(string $address, int $uid);
+	public function withRecipient(string $address, int $uid);
 
 	/**
 	 * @param string $plaintext a new plaintext message for this email
@@ -97,10 +97,10 @@ interface IEmail extends JsonSerializable
 	 *
 	 * @return static
 	 */
-	function withMessage(string $plaintext, string $html = null);
+	public function withMessage(string $plaintext, ?string $html = null);
 
 	/**
 	 * @return string
 	 */
-	function __toString();
+	public function __toString();
 }

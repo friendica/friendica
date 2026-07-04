@@ -36,14 +36,14 @@ class DatabaseTest extends FixtureTestCase
 			$this->root->url(),
 			$this->root->url() . '/addon',
 			$this->root->url() . '/config',
-			$this->root->url() . '/static'
+			$this->root->url() . '/static',
 		);
 	}
 
 	/**
 	 * Test, if directly updating a field is possible
 	 */
-	public function testUpdateIncrease()
+	public function testUpdateIncrease(): void
 	{
 		$db = $this->getDbInstance();
 
@@ -55,7 +55,7 @@ class DatabaseTest extends FixtureTestCase
 	/**
 	 * Test if combining directly field updates with normal updates is working
 	 */
-	public function testUpdateWithField()
+	public function testUpdateWithField(): void
 	{
 		$db = $this->getDbInstance();
 
@@ -64,29 +64,29 @@ class DatabaseTest extends FixtureTestCase
 		self::assertTrue($db->update('gserver', [
 			'site_name' => 'test', "`registered-users` = `registered-users` + 1",
 			'info'      => 'another test',
-			"`active-week-users` = `active-week-users` + 2"
+			"`active-week-users` = `active-week-users` + 2",
 		], [
-			'nurl' => 'http://friendica.local'
+			'nurl' => 'http://friendica.local',
 		]));
 		self::assertEquals(1, $db->selectFirst('gserver', ['registered-users'], ['nurl' => 'http://friendica.local'])['registered-users']);
 		self::assertEquals(2, $db->selectFirst('gserver', ['active-week-users'], ['nurl' => 'http://friendica.local'])['active-week-users']);
 		self::assertTrue($db->update('gserver', [
 			'site_name' => 'test', "`registered-users` = `registered-users` + 1",
-			'info'      => 'another test'
+			'info'      => 'another test',
 		], [
-			'nurl' => 'http://friendica.local'
+			'nurl' => 'http://friendica.local',
 		]));
 		self::assertEquals(2, $db->selectFirst('gserver', ['registered-users'], ['nurl' => 'http://friendica.local'])['registered-users']);
 		self::assertTrue($db->update('gserver', [
 			'site_name' => 'test', "`registered-users` = `registered-users` - 1",
-			'info'      => 'another test'
+			'info'      => 'another test',
 		], [
-			'nurl' => 'http://friendica.local'
+			'nurl' => 'http://friendica.local',
 		]));
 		self::assertEquals(1, $db->selectFirst('gserver', ['registered-users'], ['nurl' => 'http://friendica.local'])['registered-users']);
 	}
 
-	public function testUpdateWithArray()
+	public function testUpdateWithArray(): void
 	{
 		$db = $this->getDbInstance();
 

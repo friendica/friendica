@@ -66,9 +66,9 @@ class ListTimeline extends BaseApi
 			'friendica_order' => TimelineOrderByTypes::ID, // Sort order options (defaults to ID)
 		], $request);
 
-		if (str_starts_with($this->parameters['id'], 'group:')) {
+		if (str_starts_with((string) $this->parameters['id'], 'group:')) {
 			$items = $this->getStatusesForGroup($uid, $request);
-		} elseif (str_starts_with($this->parameters['id'], 'channel:')) {
+		} elseif (str_starts_with((string) $this->parameters['id'], 'channel:')) {
 			$items = $this->getStatusesForChannel($uid, $request);
 		} else {
 			$items = $this->getStatusesForCircle($uid, $request);
@@ -95,7 +95,7 @@ class ListTimeline extends BaseApi
 
 	private function getStatusesForGroup(int $uid, array $request): array
 	{
-		$cid = Contact::getPublicContactId((int) substr($this->parameters['id'], 6), $uid);
+		$cid = Contact::getPublicContactId((int) substr((string) $this->parameters['id'], 6), $uid);
 
 		$condition = ["(`uid` = ? OR (`uid` = ? AND NOT `global`))", 0, $uid];
 
@@ -122,7 +122,7 @@ class ListTimeline extends BaseApi
 	{
 		$request['friendica_order'] = TimelineOrderByTypes::ID;
 
-		return $this->timeline->getChannelItemsForAPI(substr($this->parameters['id'], 8), $uid, $request['limit'], $request['min_id'], $request['max_id']);
+		return $this->timeline->getChannelItemsForAPI(substr((string) $this->parameters['id'], 8), $uid, $request['limit'], $request['min_id'], $request['max_id']);
 	}
 
 	private function getStatusesForCircle(int $uid, array $request): array

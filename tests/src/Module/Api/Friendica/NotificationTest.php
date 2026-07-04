@@ -16,7 +16,7 @@ use Friendica\Util\Temporal;
 
 class NotificationTest extends ApiTestCase
 {
-	public function testEmpty()
+	public function testEmpty(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 
@@ -28,7 +28,7 @@ class NotificationTest extends ApiTestCase
 		*/
 	}
 
-	public function testWithoutAuthenticatedUser()
+	public function testWithoutAuthenticatedUser(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 
@@ -40,7 +40,7 @@ class NotificationTest extends ApiTestCase
 		*/
 	}
 
-	public function testWithXmlResult()
+	public function testWithXmlResult(): void
 	{
 		$date    = DateTimeFormat::local('2020-01-01 12:12:02');
 		$dateRel = Temporal::getRelativeDate('2020-01-01 12:12:02');
@@ -55,14 +55,14 @@ XML;
 		$response = (new Notification(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'xml']))
 			->run($this->httpExceptionMock);
 
-		self::assertXmlStringEqualsXmlString($assertXml, (string)$response->getBody());
+		self::assertXmlStringEqualsXmlString($assertXml, (string) $response->getBody());
 		self::assertEquals([
 			'Content-type'                => ['text/xml'],
-			ICanCreateResponses::X_HEADER => ['xml']
+			ICanCreateResponses::X_HEADER => ['xml'],
 		], $response->getHeaders());
 	}
 
-	public function testWithJsonResult()
+	public function testWithJsonResult(): void
 	{
 		$response = (new Notification(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock);
@@ -79,7 +79,7 @@ XML;
 
 		self::assertEquals([
 			'Content-type'                => ['application/json'],
-			ICanCreateResponses::X_HEADER => ['json']
+			ICanCreateResponses::X_HEADER => ['json'],
 		], $response->getHeaders());
 	}
 }

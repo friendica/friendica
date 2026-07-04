@@ -70,7 +70,6 @@ class Database
 	protected $in_transaction       = false;
 	protected $in_retrial           = false;
 	protected $testmode             = false;
-	private $relation               = [];
 	/** @var DbaDefinition */
 	protected $dbaDefinition;
 	/** @var ViewDefinition */
@@ -135,11 +134,11 @@ class Database
 			$port = trim($this->config->get('database', 'port') ?? 0);
 		}
 
-		$user     = trim($this->config->get('database', 'username'));
-		$pass     = trim($this->config->get('database', 'password'));
-		$database = trim($this->config->get('database', 'database'));
-		$charset  = trim($this->config->get('database', 'charset'));
-		$socket   = trim($this->config->get('database', 'socket'));
+		$user     = trim((string) $this->config->get('database', 'username'));
+		$pass     = trim((string) $this->config->get('database', 'password'));
+		$database = trim((string) $this->config->get('database', 'database'));
+		$charset  = trim((string) $this->config->get('database', 'charset'));
+		$socket   = trim((string) $this->config->get('database', 'socket'));
 
 		if (!$host && !$socket || !$user) {
 			return false;
@@ -306,81 +305,6 @@ class Database
 		return $data[0]['db'];
 	}
 
-	/**
-	 * Analyze a database query and log this if some conditions are met.
-	 *
-	 * @param string $query The database query that will be analyzed
-	 * @return void
-	 * @throws \Exception
-	 */
-	private function logIndex(string $query)
-	{
-
-		if (!$this->config->get('system', 'db_log_index')) {
-			return;
-		}
-
-		// Don't explain an explain statement
-		if (strtolower(substr($query, 0, 7)) == "explain") {
-			return;
-		}
-
-		// Only do the explain on "select", "update" and "delete"
-		if (!in_array(strtolower(substr($query, 0, 6)), ["select", "update", "delete"])) {
-			return;
-		}
-
-		$r = $this->p("EXPLAIN " . $query);
-		if (!$this->isResult($r)) {
-			return;
-		}
-
-		$watchlist = explode(',', $this->config->get('system', 'db_log_index_watch'));
-		$denylist  = explode(',', $this->config->get('system', 'db_log_index_denylist'));
-
-		while ($row = $this->fetch($r)) {
-			if ((intval($this->config->get('system', 'db_loglimit_index')) > 0)) {
-				$log = (in_array($row['key'], $watchlist)
-					&& ($row['rows'] >= intval($this->config->get('system', 'db_loglimit_index'))));
-			} else {
-				$log = false;
-			}
-
-			if ((intval($this->config->get('system', 'db_loglimit_index_high')) > 0) && ($row['rows'] >= intval($this->config->get('system', 'db_loglimit_index_high')))) {
-				$log = true;
-			}
-
-			if (in_array($row['key'], $denylist) || ($row['key'] == "")) {
-				$log = false;
-			}
-
-			if ($log) {
-				$backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-				@file_put_contents(
-					$this->config->get('system', 'db_log_index'),
-					DateTimeFormat::utcNow() . "\t"
-					. $row['key'] . "\t" . $row['rows'] . "\t" . $row['Extra'] . "\t"
-					. basename($backtrace[1]["file"]) . "\t"
-					. $backtrace[1]["line"] . "\t" . $backtrace[2]["function"] . "\t"
-					. substr($query, 0, 4000) . "\n",
-					FILE_APPEND,
-				);
-			}
-		}
-	}
-
-	/**
-	 * Removes every not allowlisted character from the identifier string
-	 *
-	 * @param string $identifier
-	 * @return string sanitized identifier
-	 * @throws \Exception
-	 */
-	private function sanitizeIdentifier(string $identifier): string
-	{
-		return preg_replace('/[^A-Za-z0-9_\-]+/', '', $identifier);
-	}
-
 	public function escape($str)
 	{
 		if ($this->connected) {
@@ -459,7 +383,7 @@ class Database
 			if ($pos !== false) {
 				$sql = substr_replace($sql, $replace, $pos, 1);
 			}
-			$offset = $pos + strlen($replace);
+			$offset = $pos + strlen((string) $replace);
 		}
 		return $sql;
 	}
@@ -640,7 +564,7 @@ class Database
 
 				if (count($values) > 0) {
 					array_unshift($values, $param_types);
-					call_user_func_array([$stmt, 'bind_param'], $values);
+					call_user_func_array($stmt->bind_param(...), $values);
 				}
 
 				if (!$stmt->execute()) {
@@ -728,7 +652,7 @@ class Database
 				@file_put_contents(
 					$this->config->get('system', 'db_log'),
 					DateTimeFormat::utcNow() . "\t" . $duration . "\t"
-					. basename($backtrace[0]['file']) . "\t"
+					. basename((string) $backtrace[0]['file']) . "\t"
 					. $backtrace[0]['line'] . "\t" . $backtrace[0]['function'] . "\t"
 					. substr($this->replaceParameters($sql, $args), 0, 4000) . "\n",
 					FILE_APPEND,
@@ -982,6 +906,7 @@ class Database
 				$result = $stmt->result_metadata();
 				$fields = $result->fetch_fields();
 
+				/** @phpstan-ignore foreach.emptyArray($cols_num holds references) */
 				foreach ($cols_num as $param => $col) {
 					$columns[$fields[$param]->name] = $col;
 				}
@@ -1013,7 +938,7 @@ class Database
 
 		$table_string = DBA::buildTableString([$table]);
 
-		$fields_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], array_keys($param)));
+		$fields_string = implode(', ', array_map(DBA::quoteIdentifier(...), array_keys($param)));
 
 		$values_string = substr(str_repeat("?, ", count($param)), 0, -2);
 
@@ -1026,7 +951,7 @@ class Database
 		$sql .= "INTO " . $table_string . " (" . $fields_string . ") VALUES (" . $values_string . ")";
 
 		if ($duplicate_mode == self::INSERT_UPDATE) {
-			$fields_string = implode(' = ?, ', array_map([DBA::class, 'quoteIdentifier'], array_keys($param)));
+			$fields_string = implode(' = ?, ', array_map(DBA::quoteIdentifier(...), array_keys($param)));
 
 			$sql .= " ON DUPLICATE KEY UPDATE " . $fields_string . " = ?";
 
@@ -1071,7 +996,7 @@ class Database
 			return false;
 		}
 
-		$fields_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], $fields));
+		$fields_string = implode(', ', array_map(DBA::quoteIdentifier(...), $fields));
 		$table_string  = DBA::buildTableString([$table]);
 
 		$values_list = [];
@@ -1130,7 +1055,7 @@ class Database
 
 		$table_string = DBA::buildTableString([$table]);
 
-		$fields_string = implode(', ', array_map([DBA::class, 'quoteIdentifier'], array_keys($param)));
+		$fields_string = implode(', ', array_map(DBA::quoteIdentifier(...), array_keys($param)));
 
 		$values_string = substr(str_repeat("?, ", count($param)), 0, -2);
 
@@ -1425,7 +1350,7 @@ class Database
 		}
 
 		$sql = "UPDATE " . $ignore . $table_string . " SET "
-			. ((count($fields) > 0) ? implode(" = ?, ", array_map([DBA::class, 'quoteIdentifier'], array_keys($fields))) . " = ?" : "")
+			. ((count($fields) > 0) ? implode(" = ?, ", array_map(DBA::quoteIdentifier(...), array_keys($fields))) . " = ?" : "")
 			. ((count($direct_fields) > 0) ? ((count($fields) > 0) ? " , " : "") . implode(" , ", $direct_fields) : "")
 			. $condition_string;
 
@@ -1503,7 +1428,7 @@ class Database
 			}
 		}
 
-		array_walk($fields, function (&$value, $key) use ($options) {
+		array_walk($fields, function (&$value, $key) use ($options): void {
 			$field = $value;
 			$value = DBA::quoteIdentifier($field);
 
@@ -1711,12 +1636,12 @@ class Database
 				continue;
 			}
 
-			if ((str_starts_with($types[$field], 'tinyint')) || (str_starts_with($types[$field], 'smallint'))
-				|| (str_starts_with($types[$field], 'mediumint')) || (str_starts_with($types[$field], 'int'))
-				|| (str_starts_with($types[$field], 'bigint')) || (str_starts_with($types[$field], 'boolean'))) {
+			if ((str_starts_with((string) $types[$field], 'tinyint')) || (str_starts_with((string) $types[$field], 'smallint'))
+				|| (str_starts_with((string) $types[$field], 'mediumint')) || (str_starts_with((string) $types[$field], 'int'))
+				|| (str_starts_with((string) $types[$field], 'bigint')) || (str_starts_with((string) $types[$field], 'boolean'))) {
 				$fields[$field] = (int) $content;
 			}
-			if ((str_starts_with($types[$field], 'float')) || (str_starts_with($types[$field], 'double'))) {
+			if ((str_starts_with((string) $types[$field], 'float')) || (str_starts_with((string) $types[$field], 'double'))) {
 				$fields[$field] = (float) $content;
 			}
 		}
@@ -1795,7 +1720,7 @@ class Database
 	 */
 	public function processlist(): array
 	{
-		$database = trim($this->config->get('database', 'database'));
+		$database = trim((string) $this->config->get('database', 'database'));
 
 		$ret  = $this->p('SHOW PROCESSLIST');
 		$data = $this->toArray($ret);
@@ -1810,7 +1735,7 @@ class Database
 			}
 
 			// Filter out all non blocking processes
-			$state = trim($process['State']);
+			$state = trim((string) $process['State']);
 			if (in_array($state, ['', 'init', 'statistics', 'updating'])) {
 				continue;
 			}
@@ -1972,7 +1897,7 @@ class Database
 	 */
 	public function escapeArray(&$arr, bool $add_quotation = false)
 	{
-		array_walk($arr, [$this, 'escapeArrayCallback'], $add_quotation);
+		array_walk($arr, $this->escapeArrayCallback(...), $add_quotation);
 	}
 
 	/**

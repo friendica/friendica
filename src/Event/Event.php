@@ -23,12 +23,7 @@ class Event implements NamedEvent
 
 	public const HOME_INIT = 'friendica.home_init';
 
-	private string $name;
-
-	public function __construct(string $name)
-	{
-		$this->name = $name;
-	}
+	public function __construct(private readonly string $name) {}
 
 	public function getName(): string
 	{

@@ -27,15 +27,9 @@ use Psr\Log\LoggerInterface;
  */
 class Lists extends BaseApi
 {
-	/** @var FriendicaPhoto */
-	private $friendicaPhoto;
-
-
-	public function __construct(FriendicaPhoto $friendicaPhoto, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(private readonly FriendicaPhoto $friendicaPhoto, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
 		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
-
-		$this->friendicaPhoto = $friendicaPhoto;
 	}
 
 	protected function rawContent(array $request = [])
@@ -44,8 +38,11 @@ class Lists extends BaseApi
 		$uid  = BaseApi::getCurrentUserID();
 		$type = $this->getRequestValue($this->parameters, 'extension', 'json');
 
-		$photos = Photo::selectToArray(['resource-id'], ["`uid` = ? AND NOT `photo-type` IN (?, ?)", $uid, Photo::CONTACT_AVATAR, Photo::CONTACT_BANNER],
-			['order' => ['id'], 'group_by' => ['resource-id']]);
+		$photos = Photo::selectToArray(
+			['resource-id'],
+			["`uid` = ? AND NOT `photo-type` IN (?, ?)", $uid, Photo::CONTACT_AVATAR, Photo::CONTACT_BANNER],
+			['order' => ['id'], 'group_by' => ['resource-id']],
+		);
 
 		$data = ['photo' => []];
 		if (DBA::isResult($photos)) {

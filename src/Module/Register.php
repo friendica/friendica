@@ -39,19 +39,22 @@ class Register extends BaseModule
 	/** @var Tos */
 	protected $tos;
 
-	/** @var IHandleUserSessions */
-	private $session;
-
-	private EventDispatcherInterface $eventDispatcher;
-
-	public function __construct(IHandleUserSessions $session, EventDispatcherInterface $eventDispatcher, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, array $server, array $parameters = [])
-	{
+	public function __construct(
+		private readonly IHandleUserSessions $session,
+		private readonly EventDispatcherInterface $eventDispatcher,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		IManageConfigValues $config,
+		array $server,
+		array $parameters = [],
+	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
 		$this->tos = new Tos($l10n, $baseUrl, $args, $logger, $profiler, $response, $config, $server, $parameters);
-
-		$this->session         = $session;
-		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -182,9 +185,9 @@ class Register extends BaseModule
 		/* build Select array */
 		$acct_type = [
 			'register_type', // id
-			DI::l10n()->t('Account type:'),	//label
+			DI::l10n()->t('Account type:'), //label
 			$selected,
-			DI::l10n()->t('You can change the account type later. (<a href="' . DI::baseUrl() . '/help/user/accounts-groups-pages" target="_blank">Account type help</a>)'), // tip
+			DI::l10n()->t('You can change the account type later.') . ' <a href="' . DI::baseUrl() . '/help/user/accounts-groups-pages" target="_blank">' . DI::l10n()->t('(Account type help)') . '</a>',
 			$acct_list,
 		];
 
@@ -262,31 +265,28 @@ class Register extends BaseModule
 	{
 		BaseModule::checkFormSecurityTokenRedirectOnError('/register', 'register');
 
-		$arr = [
-			'post' => $_POST,
-		];
-
-		$arr = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER_POST, $arr),
+		$eventData = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER_POST, ['post' => $_POST]),
 		)->getArray();
 
-		$additional_account = false;
+		$post = $eventData['post'];
 
-		if (!DI::userSession()->getLocalUserId() && !empty($arr['post']['parent_password'])) {
+		$additional_account = false;
+		$regdata            = ['type' => $post['register_type'], 'nickname' => $post['nickname'], 'username' => $post['username']];
+
+		if (!DI::userSession()->getLocalUserId() && !empty($post['parent_password'])) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Permission denied.'));
 			return;
-		} elseif (DI::userSession()->getLocalUserId() && !empty($arr['post']['parent_password'])) {
+		} elseif (DI::userSession()->getLocalUserId() && !empty($post['parent_password'])) {
 			try {
-				Model\User::getIdFromPasswordAuthentication(DI::userSession()->getLocalUserId(), $arr['post']['parent_password']);
+				Model\User::getIdFromPasswordAuthentication(DI::userSession()->getLocalUserId(), $post['parent_password']);
 			} catch (\Exception) {
 				DI::sysmsg()->addNotice(DI::l10n()->t("Password doesn't match."));
-				$regdata = ['nickname' => $arr['post']['nickname'], 'username' => $arr['post']['username']];
 				DI::baseUrl()->redirect('register?' . http_build_query($regdata));
 			}
 			$additional_account = true;
 		} elseif (DI::userSession()->getLocalUserId()) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Please enter your password.'));
-			$regdata = ['nickname' => $arr['post']['nickname'], 'username' => $arr['post']['username']];
 			DI::baseUrl()->redirect('register?' . http_build_query($regdata));
 		}
 
@@ -322,12 +322,11 @@ class Register extends BaseModule
 
 		$netpublish = !empty($_POST['profile_publish_reg']);
 
-		$arr = $_POST;
-
 		// Is there text in the tar pit?
-		if (!empty($arr['email'])) {
-			$this->logger->info('Tar pit', $arr);
+		if (!empty($post['email'])) {
+			$this->logger->info('Tar pit', $post);
 			DI::sysmsg()->addNotice(DI::l10n()->t('You have entered too much information.'));
+
 			DI::baseUrl()->redirect('register/');
 		}
 
@@ -335,44 +334,44 @@ class Register extends BaseModule
 			$user = DBA::selectFirst('user', ['email'], ['uid' => DI::userSession()->getLocalUserId()]);
 			if (!DBA::isResult($user)) {
 				DI::sysmsg()->addNotice(DI::l10n()->t('User not found.'));
+
 				DI::baseUrl()->redirect('register');
 			}
 
 			$blocked  = 0;
 			$verified = 1;
 
-			$arr['password1'] = $arr['confirm'] = $arr['parent_password'];
-			$arr['repeat']    = $arr['email'] = $user['email'];
+			$post['password1'] = $post['confirm'] = $post['parent_password'];
+			$post['repeat']    = $post['email'] = $user['email'];
 		} else {
 			// Overwriting the "tar pit" field with the real one
-			$arr['email'] = $arr['field1'];
+			$post['email'] = $post['field1'];
 		}
 
-		if ($arr['email'] != $arr['repeat']) {
-			$this->logger->info('Mail mismatch', $arr);
+		if ($post['email'] != $post['repeat']) {
+			$this->logger->info('Mail mismatch', $post);
 			DI::sysmsg()->addNotice(DI::l10n()->t('Please enter the identical mail address in the second field.'));
-			$regdata = ['email' => $arr['email'], 'nickname' => $arr['nickname'], 'username' => $arr['username']];
+
 			DI::baseUrl()->redirect('register?' . http_build_query($regdata));
 		}
 
 		//Check if nickname contains only US-ASCII and do not start with a digit
-		if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $arr['nickname'])) {
-			if (is_numeric(substr($arr['nickname'], 0, 1))) {
+		if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', (string) $post['nickname'])) {
+			if (is_numeric(substr((string) $post['nickname'], 0, 1))) {
 				DI::sysmsg()->addNotice(DI::l10n()->t("Nickname cannot start with a digit."));
 			} else {
 				DI::sysmsg()->addNotice(DI::l10n()->t("Nickname can only contain US-ASCII characters."));
 			}
-			$regdata = ['email' => $arr['email'], 'nickname' => $arr['nickname'], 'username' => $arr['username']];
+
 			DI::baseUrl()->redirect('register?' . http_build_query($regdata));
-			return;
 		}
 
-		$arr['blocked']  = $blocked;
-		$arr['verified'] = $verified;
-		$arr['language'] = L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language'));
+		$post['blocked']  = $blocked;
+		$post['verified'] = $verified;
+		$post['language'] = L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language'));
 
 		try {
-			$result = Model\User::create($arr);
+			$result = Model\User::create($post);
 		} catch (\Exception $e) {
 			DI::sysmsg()->addNotice($e->getMessage());
 			return;
@@ -388,8 +387,8 @@ class Register extends BaseModule
 		}
 
 		if ($additional_account) {
-			if (!empty($arr['register_type'])) {
-				switch ($arr['register_type']) {
+			if (!empty($post['register_type'])) {
+				switch ($post['register_type']) {
 					case User::PERSONAL:
 						$acct_type = User::ACCOUNT_TYPE_PERSON;
 						$acct_flag = User::PAGE_FLAGS_NORMAL;
@@ -438,7 +437,7 @@ class Register extends BaseModule
 
 		$using_invites = DI::config()->get('system', 'invitation_only');
 		$num_invites   = DI::config()->get('system', 'number_invites');
-		$invite_id     = (!empty($_POST['invite_id']) ? trim($_POST['invite_id']) : '');
+		$invite_id     = (!empty($_POST['invite_id']) ? trim((string) $_POST['invite_id']) : '');
 
 		if (self::getPolicy() === self::OPEN) {
 			if ($using_invites && $invite_id) {
@@ -449,7 +448,7 @@ class Register extends BaseModule
 			// Only send a password mail when the password wasn't manually provided
 			if (empty($_POST['password1']) || empty($_POST['confirm'])) {
 				$res = Model\User::sendRegisterOpenEmail(
-					DI::l10n()->withLang($arr['language']),
+					DI::l10n()->withLang($post['language']),
 					$user,
 					DI::config()->get('config', 'sitename'),
 					$base_url,
@@ -551,7 +550,7 @@ class Register extends BaseModule
 
 		$inactive_since = DateTimeFormat::utc('now - ' . $days . ' day');
 		foreach ($admins as $admin) {
-			if (strtotime($admin['login_date']) > strtotime($inactive_since)) {
+			if (strtotime((string) $admin['login_date']) > strtotime($inactive_since)) {
 				return intval(DI::config()->get('config', 'register_policy'));
 			}
 		}

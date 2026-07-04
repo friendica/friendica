@@ -93,7 +93,7 @@ class Federation extends BaseAdmin
 			'',
 			GServer::DETECT_MANUAL,
 			Protocol::PHANTOM,
-			Protocol::FEED
+			Protocol::FEED,
 		);
 		while ($gserver = DBA::fetch($gservers)) {
 			$total += $gserver['total'];
@@ -123,7 +123,7 @@ class Federation extends BaseAdmin
 			}
 			DBA::close($versions);
 
-			$platform = $gserver['platform'] = strtolower($gserver['platform']);
+			$platform = $gserver['platform'] = strtolower((string) $gserver['platform']);
 
 			if ($platform == 'friendika') {
 				$platform = 'friendica';
@@ -133,17 +133,17 @@ class Federation extends BaseAdmin
 				$platform = 'hubzilla';
 			} elseif (in_array($platform, ['osada', 'mistpark', 'roadhouse', 'streams', 'zap'])) {
 				$platform = 'nomad';
-			} elseif(stristr($platform, 'pleroma')) {
+			} elseif (stristr($platform, 'pleroma')) {
 				$platform = 'pleroma';
-			} elseif(stristr($platform, 'glitchsoc')) {
+			} elseif (stristr($platform, 'glitchsoc')) {
 				$platform = 'glitchsoc';
-			} elseif(stristr($platform, 'iceshrimp.net')) {
+			} elseif (stristr($platform, 'iceshrimp.net')) {
 				$platform = 'iceshrimp';
-			} elseif(stristr($platform, 'statusnet')) {
+			} elseif (stristr($platform, 'statusnet')) {
 				$platform = 'gnusocial';
-			} elseif(stristr($platform, 'nextcloud')) {
+			} elseif (stristr($platform, 'nextcloud')) {
 				$platform = 'nextcloud';
-			} elseif(stristr($platform, 'wordpress')) {
+			} elseif (stristr($platform, 'wordpress')) {
 				$platform = 'wordpress';
 			} elseif (in_array($platform, ['activityrelay', 'pub-relay', 'selective-relay', 'aoderelay'])) {
 				$platform = 'relay';
@@ -237,11 +237,11 @@ class Federation extends BaseAdmin
 		foreach ($versionCounts as $vv) {
 			$newVC     = $vv['total'];
 			$newVV     = $vv['version'];
-			$lastDot   = strrpos($newVV, '.');
-			$firstDash = strpos($newVV, '-');
-			$len       = strlen($newVV) - 1;
-			if (($lastDot == $len - 4) && (!strrpos($newVV, '-rc') == $len - 3) && (!$firstDash == $len - 1)) {
-				$newVV = substr($newVV, 0, $lastDot);
+			$lastDot   = strrpos((string) $newVV, '.');
+			$firstDash = strpos((string) $newVV, '-');
+			$len       = strlen((string) $newVV) - 1;
+			if (($lastDot == $len - 4) && (!strrpos((string) $newVV, '-rc') == $len - 3) && (!$firstDash == $len - 1)) {
+				$newVV = substr((string) $newVV, 0, $lastDot);
 			}
 			if (isset($newV[$newVV])) {
 				$newV[$newVV] += $newVC;
@@ -272,9 +272,9 @@ class Federation extends BaseAdmin
 		foreach ($versionCounts as $vv) {
 			$newVC   = $vv['total'];
 			$newVV   = $vv['version'];
-			$posDash = strpos($newVV, '-');
+			$posDash = strpos((string) $newVV, '-');
 			if ($posDash) {
-				$newVV = substr($newVV, 0, $posDash);
+				$newVV = substr((string) $newVV, 0, $posDash);
 			}
 			if (isset($newV[$newVV])) {
 				$newV[$newVV] += $newVC;
@@ -301,7 +301,7 @@ class Federation extends BaseAdmin
 		$compacted = [];
 		foreach ($versionCounts as $key => $value) {
 			$version = $versionCounts[$key]['version'];
-			$parts   = explode(' ', trim($version));
+			$parts   = explode(' ', trim((string) $version));
 			do {
 				$part = array_pop($parts);
 			} while (!empty($parts) && ((strlen($part) >= 40) || (strlen($part) <= 3)));
@@ -339,7 +339,7 @@ class Federation extends BaseAdmin
 			$version = $versionCounts[$key]['version'];
 
 			foreach ([' ', '+', '-', '#', '_', '~'] as $delimiter) {
-				$parts   = explode($delimiter, trim($version));
+				$parts   = explode($delimiter, trim((string) $version));
 				$version = array_shift($parts);
 			}
 
@@ -370,7 +370,7 @@ class Federation extends BaseAdmin
 		foreach ($versionCounts as $key => $value) {
 			$version = $versionCounts[$key]['version'];
 
-			$parts   = explode(' ', trim($version));
+			$parts   = explode(' ', trim((string) $version));
 			$version = array_shift($parts);
 
 			if (empty($compacted[$version])) {
@@ -411,12 +411,12 @@ class Federation extends BaseAdmin
 		$v2       = [];
 		$versions = [];
 		foreach ($versionCounts as $vv) {
-			$version      = trim(strip_tags($vv["version"]));
+			$version      = trim(strip_tags((string) $vv["version"]));
 			$v2[$version] = $vv;
 			$versions[]   = $version;
 		}
 
-		usort($versions, 'version_compare');
+		usort($versions, version_compare(...));
 
 		$versionCounts = [];
 		foreach ($versions as $version) {

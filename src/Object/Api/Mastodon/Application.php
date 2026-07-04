@@ -36,11 +36,18 @@ class Application extends BaseDataTransferObject
 	 *
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(string $name, string $client_id = null, string $client_secret = null, int $id = null, string $redirect_uri = null, string $website = null, string $vapid_key = null)
-	{
+	public function __construct(
+		string $name,
+		?string $client_id = null,
+		?string $client_secret = null,
+		?int $id = null,
+		?string $redirect_uri = null,
+		?string $website = null,
+		?string $vapid_key = null,
+	) {
 		$this->client_id     = $client_id;
 		$this->client_secret = $client_secret;
-		$this->id            = (string)$id;
+		$this->id            = (string) $id;
 		$this->name          = $name;
 		$this->redirect_uri  = $redirect_uri;
 		$this->website       = $website;

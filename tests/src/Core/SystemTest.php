@@ -27,32 +27,32 @@ class SystemTest extends TestCase
 
 	private function assertGuid($guid, $length, $prefix = '')
 	{
-		$length -= strlen($prefix);
+		$length -= strlen((string) $prefix);
 		self::assertMatchesRegularExpression("/^" . $prefix . "[a-z0-9]{" . $length . "}?$/", $guid);
 	}
 
-	public function testGuidWithoutParameter()
+	public function testGuidWithoutParameter(): void
 	{
 		$this->useBaseUrl();
 		$guid = System::createGUID();
 		self::assertGuid($guid, 16);
 	}
 
-	public function testGuidWithSize32()
+	public function testGuidWithSize32(): void
 	{
 		$this->useBaseUrl();
 		$guid = System::createGUID(32);
 		self::assertGuid($guid, 32);
 	}
 
-	public function testGuidWithSize64()
+	public function testGuidWithSize64(): void
 	{
 		$this->useBaseUrl();
 		$guid = System::createGUID(64);
 		self::assertGuid($guid, 64);
 	}
 
-	public function testGuidWithPrefix()
+	public function testGuidWithPrefix(): void
 	{
 		$guid = System::createGUID(23, 'test');
 		self::assertGuid($guid, 23, 'test');

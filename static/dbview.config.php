@@ -53,6 +53,7 @@ return [
 			"uid"          => ["channel-post", "uid"],
 			"uri-id"       => ["channel-post", "uri-id"],
 			"in-timeline"  => ["channel-post", "in-timeline"],
+			"author-id"    => ["post-thread", "author-id"],
 			"contact-id"   => ["post-engagement", "owner-id"],
 			"owner-id"     => ["post-engagement", "owner-id"],
 			"media-type"   => ["post-engagement", "media-type"],
@@ -82,6 +83,7 @@ return [
 			"uid"          => ["system-channel-post", "uid"],
 			"uri-id"       => ["system-channel-post", "uri-id"],
 			"in-timeline"  => ["system-channel-post", "in-timeline"],
+			"author-id"    => ["post-thread", "author-id"],
 			"contact-id"   => ["post-engagement", "owner-id"],
 			"owner-id"     => ["post-engagement", "owner-id"],
 			"media-type"   => ["post-engagement", "media-type"],
@@ -127,6 +129,7 @@ return [
 			"contact-contact-type" => ["contact", "contact-type"],
 			"circle-id"            => ["group_member", "gid"],
 			"circle-visible"       => ["group", "visible"],
+			"circle-public"        => ["group", "public"],
 			"circle-deleted"       => ["group", "deleted"],
 			"circle-name"          => ["group", "name"],
 		],
@@ -175,6 +178,7 @@ return [
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
 			AND NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`
+			AND NOT `authorcontact`.`unsearchable` AND NOT `ownercontact`.`unsearchable`
 			AND NOT EXISTS(SELECT `cid`  FROM `user-contact` WHERE `uid` = `post-thread-user`.`uid` AND `cid` IN (`authorcontact`.`id`, `ownercontact`.`id`) AND (`blocked` OR `ignored` OR `is-blocked`))
 			AND NOT EXISTS(SELECT `gsid` FROM `user-gserver` WHERE `uid` = `post-thread-user`.`uid` AND `gsid` IN (`authorcontact`.`gsid`, `ownercontact`.`gsid`) AND `ignored`)",
 	],
@@ -343,6 +347,7 @@ return [
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
 			AND NOT `authorcontact`.`blocked` AND NOT `ownercontact`.`blocked`
+			AND NOT `authorcontact`.`unsearchable` AND NOT `ownercontact`.`unsearchable`
 			AND NOT EXISTS(SELECT `cid`  FROM `user-contact` WHERE `uid` = `post-thread-user`.`uid` AND `cid` IN (`authorcontact`.`id`, `ownercontact`.`id`) AND (`blocked` OR `ignored` OR `is-blocked`))
 			AND NOT EXISTS(SELECT `gsid` FROM `user-gserver` WHERE `uid` = `post-thread-user`.`uid` AND `gsid` IN (`authorcontact`.`gsid`, `ownercontact`.`gsid`) AND `ignored`)",
 	],
@@ -1502,6 +1507,7 @@ return [
 			"mention"      => ["post-thread-user", "mention"],
 			"network"      => ["post-thread-user", "network"],
 			"protocol"     => ["post-user", "protocol"],
+			"author-id"    => ["post-thread-user", "author-id"],
 			"contact-id"   => ["post-thread-user", "contact-id"],
 			"contact-type" => ["ownercontact", "contact-type"],
 		],
@@ -1530,6 +1536,7 @@ return [
 			"mention"      => ["post-thread-user", "mention"],
 			"network"      => ["post-thread-user", "network"],
 			"protocol"     => ["post-user", "protocol"],
+			"author-id"    => ["post-thread-user", "author-id"],
 			"contact-id"   => ["post-thread-user", "contact-id"],
 			"contact-type" => ["ownercontact", "contact-type"],
 		],

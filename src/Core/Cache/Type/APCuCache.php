@@ -18,7 +18,7 @@ class APCuCache extends AbstractCache implements ICanCacheInMemory
 {
 	use CompareSetTrait;
 	use CompareDeleteTrait;
-	const NAME = 'apcu';
+	public const NAME = 'apcu';
 
 	/**
 	 * @throws InvalidCacheDriverException
@@ -87,12 +87,12 @@ class APCuCache extends AbstractCache implements ICanCacheInMemory
 			return apcu_store(
 				$cacheKey,
 				$cached,
-				$ttl
+				$ttl,
 			);
 		} else {
 			return apcu_store(
 				$cacheKey,
-				$cached
+				$cached,
 			);
 		}
 	}
@@ -138,7 +138,9 @@ class APCuCache extends AbstractCache implements ICanCacheInMemory
 	{
 		if (!extension_loaded('apcu')) {
 			return false;
-		} elseif (!ini_get('apc.enabled') && !ini_get('apc.enable_cli')) {
+		} elseif (!ini_get('apc.enabled')) {
+			return false;
+		} elseif (PHP_SAPI === 'cli' && !ini_get('apc.enable_cli')) {
 			return false;
 		} elseif (version_compare(phpversion('apcu') ?: '0.0.0', '5.1.0', '<')) {
 			return false;

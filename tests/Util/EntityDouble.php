@@ -19,13 +19,11 @@ class EntityDouble extends BaseEntity
 	protected $protString;
 	protected $protInt;
 	protected $protDateTime;
-	private $privString;
 
-	public function __construct(string $protString, int $protInt, \DateTime $protDateTime, string $privString)
+	public function __construct(string $protString, int $protInt, \DateTime $protDateTime, private readonly string $privString) // @phpstan-ignore property.onlyWritten
 	{
 		$this->protString   = $protString;
 		$this->protInt      = $protInt;
 		$this->protDateTime = $protDateTime;
-		$this->privString   = $privString;
 	}
 }

@@ -5,7 +5,7 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <div class="generic-page-wrapper scheduled-posts-wrapper">
-	<h1>{{$title}}</h1>
+<h2>{{$title}}</h2>
 {{foreach $schedule as $row}}
 <div id="tread-wapper-{{$row.item['uri-id']}}" class="tread-wrapper h-entry {{$row.item.network}}">
 	<div class="wall-item-container {{$row.item.network}} thread_level_0" id="item-{{$row.item.guid}}">
@@ -32,7 +32,7 @@
 					{{if $row.item['owner-link'] && $row.item['owner-link'] != $row.item['author-link']}}{{$row.via}}<a aria-haspopup="dialog" href="{{$row.item['owner-link']}}" target="redir" title="{{$row.item['owner-name']}}" class="userinfo click-card wall-item-name-link"><span class="wall-item-name sparkle">{{$row.item['owner-name']}}</span></a>{{/if}}
 				</span>
 				<div class="wall-postinfo">
-					<span class="wall-item-ago" style="margin-left:0;"> 
+					<span class="wall-item-ago" style="margin-left:0;">
 						<span class="icon icon-time"></span><time class="dt-scheduled" datetime="">{{$scheduled_at}} <span class="datetime">{{$row.scheduled_at}}</span></time>
 					</span>
 					{{** lockview() function will not work because post gets ID after going live **}}
@@ -51,7 +51,7 @@
 				<div class="wall-item-body e-content {{if !$row.item.title}}p-name{{/if}}" dir="auto">{{$row.item['rendered-html'] nofilter}}</div>
 				<div class="wall-item-bottom">
 					<div class="wall-item-links"></div>
-					<div class="wall-item-tags">
+					<div class="tags wall-item-tags">
 						{{foreach $row.item.hashtags as $tag}}
 							<span class="tag hashtag">{{$tag nofilter}}</span>
 						{{/foreach}}
@@ -71,7 +71,7 @@
 									<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 									<button type="submit" name="delete" value="{{$row.id}}" title="{{$delete}}" class="icon-trash icon-large" style="float:right;border:none;background:transparent;"></button>
 								</form>
-							</span>						
+							</span>
 						</div>
 					</div>
 				</div>

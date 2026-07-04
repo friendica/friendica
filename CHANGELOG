@@ -1,9 +1,90 @@
-Version 2026.04 (unreleased)
+Version 2026-08 (unrelease)
   Friendica Core
+    This release of Friendica will require PHP 8.2 or higher
 
   Friendica Addons
 
   Closed Issues
+
+Version 2026.05-1 (2026-05-21)
+  Friendica Core
+    Fixed the releaser* steps in the CI to generate archives [tobiasd]
+
+Version 2026.05 (2026-05-20)
+  Friendica Core
+    Updated the documentation [Alkarex]
+    Updated the translations [ar bg ca cs da-dk de en-gb en-us eo es et fi-fi fr gd hu is it ga hb-no nl pl pt-br ru sv zh-cn zh-tw]
+    Updated the themes [annando, loma-one, marcusxss, Raroun, Tealk, tobiasd]
+    General code cleanup [annando, Art4, Espionage724, mohanedsherif, Raroun]
+    Added additional feature for Summary field during post creation (PR 14019) [annando]
+    Added possibility to embed system channels into user channels (PR 15448) [annando]
+    Added federation of event participation to Mobilizon and Soapbox (PR 15488) [samuel-asleep]
+    Added handling of robots.txt for server detection (PR 15500) [annando]
+    Added mark all as read button to circles (PR 15436) [annando]
+    Added storage of EXIF data (PR 15585) [annando]
+    Added partial support of FEP-3b86 Activity Intents (#14829, PR 15683) [annando]
+    Fixed returned format of API errors (#14840, PR 15664) [annando]
+    Fixed issues with the API handling of albums (#14595, PR 15702) [annando]
+    Fixed issue causing empty trending links in the API (#14583, PR 15493) [annando]
+    Fixed notification filtering (#14427, #14582, PR 15700, PR 15701) [annando]
+    Fixed issue leading to empty circles (#15475, PR 15491) [annando]
+    Fixed display of comments from blocked contacts (#15478, PR 15495) [annando]
+    Fixed pagination of system channels (#15470, PR 15507) [Raroun]
+    Fixed handling of sort-able lists (PR 15541, PR 15542) [randompenguin1]
+    Fixed handling of system actor (#15607, PR 15617) [annando]
+    Fixed contact import (PR 15644) [annando]
+    Fixed a bug that prevented API postings in the past (#15545, PR 15731) [annando]
+    Improved performance of channels (PR 15446) [annando]
+    Improved database performance (PR 15499) [annando]
+    Improved API (PR 15621, PR 15621) [annando]
+    Improved CI of addons and core [Art4, nupplaphil]
+    Improved DB structure (PR 15684) [annando]
+    Improved display of moderation reports (#14489, PR 15648, PR 15368) [marcusxss]
+    Improved API handling of quoted postings (#15395, PR 15449, PR 15673) [annando]
+    Improved handling of view activity (PR 15489) [annando]
+    Improved interaction with Bridgy Fed (#15456, PR 15494) [annando]
+    Improved handling of quoted posts (PR 15496, PR 15522) [annando]
+    Improved handling of global contact directory (PR 15451) [marcusxss]
+    Improved registration form (PR 15532) [Raroun]
+    Improved display of date/time in local format (#15553, PR 15556, PR 15560, PR 15620, PR 15641) [annando]
+    Improved account listing on server (PR 15563) [Raroun]
+    Improved image link generation BBCode (PR 15582) [loma-one]
+    Improved atproto handling (PR 15596, PR 15611, PR 15612, PR 15619, PR 15629, PR 15632, PR 15637, PR 15646, PR 15663, PR 15699, PR 15741) [annando]
+    Removed support of salmon (PR 15558) [annando]
+    Improved handling of deleted posts (#14721, PR 15665) [annando]
+    Improved federation with misskey (#15688, PR 15691) [annando]
+    Improved handling of web-finger (#15686, PR 15693, PR 15758, PR 15766) [annando]
+    Improved handling of Json-LD documents (PR 15698) [annando]
+    Improved expiration of posts (#15720, PR 15729) [annando]
+    Removed deprecated themes duepuntozero, quattro, smoothly (PR 15651) [marcusxss]
+
+    This is the last release of Friendica with support for PHP version before 8.2
+
+  Friendica Addons
+    Updated the translations
+    bluesky
+      Fixed handling of expiration date (#14439) [annando]
+      Fixed issue with fetching missing postings [annando]
+    IRC
+      Enhanced nickname suggestion [marcusxss]
+    invidious
+      Added support for YouTube Shorts, Music and Embed links [loma-one]
+      Improved link detection [loma-one]
+      Improved performance [loma-one]
+    js_upload
+      Fixed failing image upload (#14836) [annando]
+    Mailstream
+      Fixed handling of postings from blocked etc. contacts [mexon]
+      Improved cookie handling [mexon]
+    QuickPhoto
+      Added addon simplifying BBCode for images [loma-one]
+
+  Closed Issues
+    12536, 12840, 14427, 14439, 14489, 14554, 14560, 14582, 14583,
+    14595, 14721, 14771, 14827, 14829, 14836, 14840, 14850, 14917,
+    14947, 15301, 15395, 15456, 15460, 15464, 15470, 15473, 15475,
+    15478, 15483, 15516, 15520, 15553, 15588, 15600, 15686, 15688,
+    15704, 15750
 
 Version 2026.01 (2026-01-27)
   Friendica Core

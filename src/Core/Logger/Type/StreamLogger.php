@@ -18,23 +18,7 @@ use Psr\Log\LogLevel;
  */
 class StreamLogger extends AbstractLogger
 {
-	const NAME = 'stream';
-
-	/**
-	 * The minimum loglevel at which this logger will be triggered
-	 */
-	private int $logLevel;
-
-	/**
-	 * The stream, where the current logger is writing into
-	 * @var resource|null
-	 */
-	private $stream;
-
-	/**
-	 * The current process ID
-	 */
-	private int $pid;
+	public const NAME = 'stream';
 
 	/**
 	 * Translates LogLevel log levels to integer values
@@ -56,14 +40,17 @@ class StreamLogger extends AbstractLogger
 	 * @param int $logLevel The minimum loglevel at which this logger will be triggered
 	 *
 	 * @throws LoggerException
+	 * @param resource|null $stream
 	 */
-	public function __construct(string $channel, IHaveCallIntrospections $introspection, $stream, int $logLevel, int $pid)
+	public function __construct(string $channel, IHaveCallIntrospections $introspection, /**
+				 * The stream, where the current logger is writing into
+				 */
+		private $stream, private readonly int $logLevel, /**
+				 * The current process ID
+				 */
+		private readonly int $pid)
 	{
 		parent::__construct($channel, $introspection);
-
-		$this->stream   = $stream;
-		$this->pid      = $pid;
-		$this->logLevel = $logLevel;
 	}
 
 	public function close()
@@ -125,7 +112,7 @@ class StreamLogger extends AbstractLogger
 			throw new LoggerException('Cannot get current datetime.', $exception);
 		}
 		$logMessage .= $this->channel . ' ';
-		$logMessage .= '[' . strtoupper($level) . ']: ';
+		$logMessage .= '[' . strtoupper((string) $level) . ']: ';
 		$logMessage .= $this->psrInterpolate($message, $context) . ' ';
 		$logMessage .= $this->jsonEncodeArray($context) . ' - ';
 		$logMessage .= $this->jsonEncodeArray($record);

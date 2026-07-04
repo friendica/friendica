@@ -35,7 +35,7 @@ class UserTest extends FixtureTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiGetUser()
+	public function testApiGetUser(): void
 	{
 		$user = (new User(DI::logger(), DI::twitterStatus()))
 			->createFromUserId(ApiTestCase::SELF_USER['id'])
@@ -47,9 +47,8 @@ class UserTest extends FixtureTestCase
 	/**
 	 * Test the api_get_user() function with a Frio schema.
 	 *
-	 * @return void
 	 */
-	public function testApiGetUserWithFrioSchema()
+	public function testApiGetUserWithFrioSchema(): void
 	{
 		$this->markTestIncomplete('Needs missing fields for profile colors at API User object first.');
 
@@ -69,9 +68,8 @@ class UserTest extends FixtureTestCase
 	/**
 	 * Test the api_get_user() function with an empty Frio schema.
 	 *
-	 * @return void
 	 */
-	public function testApiGetUserWithEmptyFrioSchema()
+	public function testApiGetUserWithEmptyFrioSchema(): void
 	{
 		$this->markTestIncomplete('Needs missing fields for profile colors at API User object first.');
 
@@ -91,9 +89,8 @@ class UserTest extends FixtureTestCase
 	/**
 	 * Test the api_get_user() function with a custom Frio schema.
 	 *
-	 * @return void
 	 */
-	public function testApiGetUserWithCustomFrioSchema()
+	public function testApiGetUserWithCustomFrioSchema(): void
 	{
 		$this->markTestIncomplete('Needs missing fields for profile colors at API User object first.');
 
@@ -118,7 +115,7 @@ class UserTest extends FixtureTestCase
 	 *
 	 * @return void
 	 */
-	public function testApiGetUserWithWrongGetId()
+	public function testApiGetUserWithWrongGetId(): void
 	{
 		$this->expectException(NotFoundException::class);
 
@@ -130,9 +127,8 @@ class UserTest extends FixtureTestCase
 	/**
 	 * Test the api_user() function with an unallowed user.
 	 *
-	 * @return void
 	 */
-	public function testApiUserWithUnallowedUser()
+	public function testApiUserWithUnallowedUser(): void
 	{
 		self::markTestIncomplete('Needs BasicAuth as dynamic method for overriding first');
 

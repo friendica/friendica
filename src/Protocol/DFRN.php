@@ -408,7 +408,7 @@ class DFRN
 
 		$profile = DBA::selectFirst('profile', ['dob'], ['uid' => $uid]);
 		if (DBA::isResult($profile)) {
-			$tmp_dob = substr($profile['dob'], 5);
+			$tmp_dob = substr((string) $profile['dob'], 5);
 			if (intval($tmp_dob)) {
 				$y     = DateTimeFormat::timezoneNow($tz, 'Y');
 				$bd    = $y . '-' . $tmp_dob . ' 00:00';
@@ -497,8 +497,8 @@ class DFRN
 			XML::addElement($doc, $author, 'poco:displayName', $profile['name']);
 			XML::addElement($doc, $author, 'poco:updated', $namdate);
 
-			if (trim($profile['dob']) > DBA::NULL_DATE) {
-				XML::addElement($doc, $author, 'poco:birthday', '0000-' . date('m-d', strtotime($profile['dob'])));
+			if (trim((string) $profile['dob']) > DBA::NULL_DATE) {
+				XML::addElement($doc, $author, 'poco:birthday', '0000-' . date('m-d', strtotime((string) $profile['dob'])));
 			}
 
 			XML::addElement($doc, $author, 'poco:note', $profile['about']);
@@ -506,7 +506,7 @@ class DFRN
 
 			XML::addElement($doc, $author, 'poco:utcOffset', DateTimeFormat::timezoneNow($profile['timezone'], 'P'));
 
-			if (trim($profile['homepage'])) {
+			if (trim((string) $profile['homepage'])) {
 				$urls = $doc->createElement('poco:urls');
 				XML::addElement($doc, $urls, 'poco:type', 'homepage');
 				XML::addElement($doc, $urls, 'poco:value', $profile['homepage']);
@@ -515,14 +515,14 @@ class DFRN
 			}
 
 			if (trim($profile['pub_keywords'] ?? '')) {
-				$keywords = explode(',', $profile['pub_keywords']);
+				$keywords = explode(',', (string) $profile['pub_keywords']);
 
 				foreach ($keywords as $keyword) {
 					XML::addElement($doc, $author, 'poco:tags', trim($keyword));
 				}
 			}
 
-			if (trim($profile['xmpp'])) {
+			if (trim((string) $profile['xmpp'])) {
 				$ims = $doc->createElement('poco:ims');
 				XML::addElement($doc, $ims, 'poco:type', 'xmpp');
 				XML::addElement($doc, $ims, 'poco:value', $profile['xmpp']);
@@ -535,15 +535,15 @@ class DFRN
 
 				XML::addElement($doc, $element, 'poco:formatted', Profile::formatLocation($profile));
 
-				if (trim($profile['locality']) != '') {
+				if (trim((string) $profile['locality']) != '') {
 					XML::addElement($doc, $element, 'poco:locality', $profile['locality']);
 				}
 
-				if (trim($profile['region']) != '') {
+				if (trim((string) $profile['region']) != '') {
 					XML::addElement($doc, $element, 'poco:region', $profile['region']);
 				}
 
-				if (trim($profile['country-name']) != '') {
+				if (trim((string) $profile['country-name']) != '') {
 					XML::addElement($doc, $element, 'poco:country', $profile['country-name']);
 				}
 
@@ -964,7 +964,7 @@ class DFRN
 
 		// Create the endpoint for public posts. This is some WIP and should later be added to the probing
 		if ($public_batch && empty($contact['batch'])) {
-			$parts      = parse_url($contact['notify']);
+			$parts      = parse_url((string) $contact['notify']);
 			$path_parts = explode('/', $parts['path']);
 			array_pop($path_parts);
 			$parts['path']    = implode('/', $path_parts);
@@ -1446,7 +1446,7 @@ class DFRN
 		}
 
 		if ($relocate['addr'] == '') {
-			$relocate['addr'] = preg_replace("=(https?://)(.*)/profile/(.*)=ism", '$3@$2', $relocate['url']);
+			$relocate['addr'] = preg_replace("=(https?://)(.*)/profile/(.*)=ism", '$3@$2', (string) $relocate['url']);
 		}
 
 		// update contact

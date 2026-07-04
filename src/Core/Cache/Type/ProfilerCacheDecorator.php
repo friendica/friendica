@@ -19,21 +19,16 @@ use Friendica\Util\Profiler;
  */
 class ProfilerCacheDecorator implements ICanCache, ICanCacheInMemory
 {
-	/**
-	 * @var ICanCache The original cache driver
-	 */
-	private $cache;
-
-	/**
-	 * @var Profiler The profiler of Friendica
-	 */
-	private $profiler;
-
-	public function __construct(ICanCache $cache, Profiler $profiler)
-	{
-		$this->cache    = $cache;
-		$this->profiler = $profiler;
-	}
+	public function __construct(
+		/**
+		 * @var ICanCache The original cache driver
+		 */
+		private readonly ICanCache $cache,
+		/**
+		 * @var Profiler The profiler of Friendica
+		 */
+		private readonly Profiler $profiler,
+	) {}
 
 	/**
 	 * {@inheritDoc}

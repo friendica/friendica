@@ -30,11 +30,6 @@ class Console extends \Asika\SimpleConsole\Console
 	protected $helpOptions             = [];
 	protected array $customHelpOptions = ['h', 'help', '?'];
 
-	/**
-	 * @var Container The Container
-	 */
-	protected Container $container;
-
 	protected function getHelp()
 	{
 		$help = <<<HELP
@@ -45,6 +40,7 @@ Commands:
 	help                   Show help about a command, e.g (bin/console help config)
 	jetstream              Interact with the Jetstream daemon
 	worker                 Start worker process
+	fedibuzzrelay          Interact with the FediBuzz relay daemon
 
 	node management
 		archivecontact         Archive a contact when you know that it isn't existing anymore
@@ -100,6 +96,7 @@ HELP;
 		'docbloxerrorchecker'               => Friendica\Console\DocBloxErrorChecker::class,
 		'dbstructure'                       => Friendica\Console\DatabaseStructure::class,
 		'extract'                           => Friendica\Console\Extract::class,
+		'fedibuzzrelay'                     => Friendica\Console\FediBuzzRelay::class,
 		'fixapdeliveryworkertaskparameters' => Friendica\Console\FixAPDeliveryWorkerTaskParameters::class,
 		'globalcommunityblock'              => Friendica\Console\GlobalCommunityBlock::class,
 		'globalcommunitysilence'            => Friendica\Console\GlobalCommunitySilence::class,
@@ -124,14 +121,12 @@ HELP;
 	 *
 	 * @param Container $container The Friendica container
 	 */
-	public function __construct(Container $container, array $argv = null)
+	public function __construct(protected Container $container, ?array $argv = null)
 	{
 		parent::__construct($argv);
-
-		$this->container = $container;
 	}
 
-	public static function create(Container $container, array $argv = null): Console
+	public static function create(Container $container, ?array $argv = null): Console
 	{
 		return new self($container, $argv);
 	}

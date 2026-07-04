@@ -44,7 +44,7 @@ class TagCloud
 			foreach ($r as $rr) {
 				$tags[] = [
 					'level' => $rr[2],
-					'url'   => $url . '/conversations?tag=' . urlencode($rr[0]),
+					'url'   => $url . '/conversations?tag=' . urlencode((string) $rr[0]),
 					'name'  => $rr[0],
 				];
 			}
@@ -131,7 +131,7 @@ class TagCloud
 			$x++;
 		}
 
-		usort($tags, [self::class, 'tagsSort']);
+		usort($tags, self::tagsSort(...));
 		$range = max(0.01, $max - $min) * 1.0001;
 
 		for ($x = 0; $x < count($tags); $x++) {

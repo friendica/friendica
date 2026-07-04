@@ -77,8 +77,6 @@ class Introduction
 		];
 		Contact::update($fields, ['id' => $contact['id']]);
 
-		array_merge($contact, $fields);
-
 		if ($newRelation == Contact::FRIEND) {
 			if ($protocol == Protocol::DIASPORA) {
 				$ret = Diaspora::sendShare(User::getById($contact['uid']), $contact);

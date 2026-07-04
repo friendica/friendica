@@ -11,6 +11,7 @@ use Friendica\App\BaseURL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Test\MockedTestCase;
+use Mockery\MockInterface;
 use Friendica\Test\Util\VFSTrait;
 use Friendica\Util\EMailer\MailBuilder;
 use Friendica\Util\EMailer\SystemMailBuilder;
@@ -20,11 +21,11 @@ class SystemMailBuilderTest extends MockedTestCase
 {
 	use VFSTrait;
 
-	/** @var IManageConfigValues */
+	/** @var IManageConfigValues|MockInterface */
 	private $config;
-	/** @var L10n */
+	/** @var L10n|MockInterface */
 	private $l10n;
-	/** @var BaseURL */
+	/** @var BaseURL|MockInterface */
 	private $baseUrl;
 
 	protected function setUp(): void
@@ -33,9 +34,9 @@ class SystemMailBuilderTest extends MockedTestCase
 
 		$this->setUpVfsDir();
 
-		$this->config  = \Mockery::mock(IManageConfigValues::class);
+		$this->config = \Mockery::mock(IManageConfigValues::class);
 		$this->config->shouldReceive('get')->with('config', 'admin_name')->andReturn('Admin');
-		$this->l10n    = \Mockery::mock(L10n::class);
+		$this->l10n = \Mockery::mock(L10n::class);
 		$this->l10n->shouldReceive('t')->andReturnUsing(function ($msg) {
 			return $msg;
 		});
@@ -47,11 +48,11 @@ class SystemMailBuilderTest extends MockedTestCase
 	/**
 	 * Test if the builder instance can get created
 	 */
-	public function testBuilderInstance()
+	public function testBuilderInstance(): void
 	{
 		$builder = new SystemMailBuilder($this->l10n, $this->baseUrl, $this->config, new NullLogger(), 'moreply@friendica.local', 'FriendicaSite');
 
-		self::assertInstanceOf(MailBuilder::class, $builder);
-		self::assertInstanceOf(SystemMailBuilder::class, $builder);
+		self::assertInstanceOf(MailBuilder::class, $builder); // @phpstan-ignore staticMethod.alreadyNarrowedType
+		self::assertInstanceOf(SystemMailBuilder::class, $builder); // @phpstan-ignore staticMethod.alreadyNarrowedType
 	}
 }

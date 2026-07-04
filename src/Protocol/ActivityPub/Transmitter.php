@@ -1,7 +1,7 @@
 <?php
 
-// Copyright (C) 2010-2024, the Friendica project
-// SPDX-FileCopyrightText: 2010-2024 the Friendica project
+// Copyright (C) 2010-2026, the Friendica project
+// SPDX-FileCopyrightText: 2010-2026 the Friendica project
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
@@ -56,6 +56,10 @@ class Transmitter
 	{
 		foreach (Relay::getList(['inbox']) as $contact) {
 			$inboxes[$contact['inbox']] = $contact['inbox'];
+		}
+
+		if (DI::config()->get('system', 'relay_auto_subscribe_tags')) {
+			$inboxes['https://tags.pub/user/_____relay_____/inbox'] = 'https://tags.pub/user/_____relay_____/inbox';
 		}
 
 		return $inboxes;
@@ -143,7 +147,7 @@ class Transmitter
 	 * @return array of owners
 	 * @throws \Exception
 	 */
-	public static function getContacts(array $owner, array $rel, string $module, int $page = null, string $requester = null, bool $nocache = false): array
+	public static function getContacts(array $owner, array $rel, string $module, ?int $page = null, ?string $requester = null, bool $nocache = false): array
 	{
 		if (empty($page)) {
 			$cachekey = self::CACHEKEY_CONTACTS . $module . ':' . $owner['uid'];
@@ -234,7 +238,7 @@ class Transmitter
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function getFeatured(array $owner, int $page = null, bool $nocache = false): array
+	public static function getFeatured(array $owner, ?int $page = null, bool $nocache = false): array
 	{
 		if (empty($page)) {
 			$cachekey = self::CACHEKEY_FEATURED . $owner['uid'];
@@ -387,6 +391,7 @@ class Transmitter
 		$data['url']                       = $owner['url'];
 		$data['manuallyApprovesFollowers'] = in_array($owner['page-flags'], [User::PAGE_FLAGS_NORMAL, User::PAGE_FLAGS_PRVGROUP]);
 		$data['discoverable']              = (bool) $owner['net-publish'] && $full;
+		$data['indexable']                 = (bool) $owner['net-publish'] && $full;
 		$data['publicKey']                 = [
 			'id'           => $owner['url'] . '#main-key',
 			'owner'        => $owner['url'],
@@ -456,6 +461,7 @@ class Transmitter
 			'image'                     => ['type' => 'Image', 'url' => Contact::getHeaderUrlForId($cid, '', $contact['updated'])],
 			'manuallyApprovesFollowers' => (bool) $contact['manually-approve'],
 			'discoverable'              => !$contact['unsearchable'],
+			'indexable'                 => !$contact['unsearchable'],
 		];
 
 		if (empty($data['url'])) {
@@ -531,21 +537,6 @@ class Transmitter
 		}
 
 		return $permissions;
-	}
-
-	/**
-	 * Check if the given item id is from ActivityPub
-	 *
-	 * @param integer $item_id
-	 * @return boolean "true" if the post is from ActivityPub
-	 */
-	private static function isAPPost(int $item_id): bool
-	{
-		if (empty($item_id)) {
-			return false;
-		}
-
-		return Post::exists(['id' => $item_id, 'network' => Protocol::ACTIVITYPUB]);
 	}
 
 	/**
@@ -906,7 +897,7 @@ class Transmitter
 					if ($receiver == ActivityPub::PUBLIC_COLLECTION) {
 						$name = Receiver::PUBLIC_COLLECTION;
 					} else {
-						$name = trim(parse_url($receiver, PHP_URL_PATH), '/');
+						$name = trim(parse_url((string) $receiver, PHP_URL_PATH), '/');
 					}
 					Tag::store($item['uri-id'], $type, $name, $receiver);
 				}
@@ -1093,21 +1084,24 @@ class Transmitter
 					continue;
 				}
 
-				if ($item_profile && ($receiver == $item_profile['followers']) && ($uid == $profile_uid)) {
+				if ($receiver == $item_profile['followers'] && ($uid == $profile_uid)) {
 					$inboxes = array_merge_recursive($inboxes, self::fetchTargetInboxesforUser($uid));
-				} else {
-					$profile = APContact::getByURL($receiver, false);
-					if (!empty($profile)) {
-						$contact = Contact::getByURLForUser($receiver, $uid, false, ['id']);
 
-						if (empty($profile['sharedinbox']) || $blindcopy || Contact::isLocal($receiver)) {
-							$target = $profile['inbox'];
-						} else {
-							$target = $profile['sharedinbox'];
-						}
-						if (!self::archivedInbox($target) && !in_array($contact['id'], $inboxes[$target] ?? [])) {
-							$inboxes[$target][] = $contact['id'] ?? 0;
-						}
+					continue;
+				}
+
+				$profile = APContact::getByURL($receiver, false);
+
+				if (!empty($profile)) {
+					$contact = Contact::getByURLForUser($receiver, $uid, false, ['id']);
+
+					if (empty($profile['sharedinbox']) || $blindcopy || Contact::isLocal($receiver)) {
+						$target = $profile['inbox'];
+					} else {
+						$target = $profile['sharedinbox'];
+					}
+					if (!self::archivedInbox($target) && !in_array($contact['id'], $inboxes[$target] ?? [])) {
+						$inboxes[$target][] = $contact['id'] ?? 0;
 					}
 				}
 			}
@@ -1263,7 +1257,7 @@ class Transmitter
 		$reshared = false;
 
 		// Only check for a reshare, if it is a real reshare and no quoted reshare
-		if (str_starts_with($item['body'], '[share')) {
+		if (str_starts_with((string) $item['body'], '[share')) {
 			$announce = self::getAnnounceArray($item);
 			$reshared = !empty($announce);
 		}
@@ -1514,7 +1508,7 @@ class Transmitter
 		if (empty($item['coord'])) {
 			$coord = Map::getCoordinates($item['location']);
 		} else {
-			$coords = explode(' ', $item['coord']);
+			$coords = explode(' ', (string) $item['coord']);
 			if (count($coords) == 2) {
 				$coord = ['lat' => $coords[0], 'lon' => $coords[1]];
 			}
@@ -1566,7 +1560,7 @@ class Transmitter
 		$terms = Tag::getByURIId($item['uri-id'], [Tag::HASHTAG, Tag::MENTION, Tag::IMPLICIT_MENTION, Tag::EXCLUSIVE_MENTION]);
 		foreach ($terms as $term) {
 			if ($term['type'] == Tag::HASHTAG) {
-				$url    = DI::baseUrl() . '/search?tag=' . urlencode($term['name']);
+				$url    = DI::baseUrl() . '/search?tag=' . urlencode((string) $term['name']);
 				$tags[] = ['type' => 'Hashtag', 'href' => $url, 'name' => '#' . $term['name']];
 			} else {
 				$contact = Contact::getByURL($term['url'], false, ['addr']);
@@ -1654,27 +1648,6 @@ class Transmitter
 		}
 
 		return $attachments;
-	}
-
-	/**
-	 * Callback function to replace a Friendica style mention in a mention for a summary
-	 *
-	 * @param array $match Matching values for the callback
-	 * @return string Replaced mention
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	private static function mentionAddrCallback(array $match): string
-	{
-		if (empty($match[1])) {
-			return '';
-		}
-
-		$data = Contact::getByURL($match[1], false, ['addr']);
-		if (empty($data['addr'])) {
-			return $match[0];
-		}
-
-		return '@' . $data['addr'];
 	}
 
 	/**
@@ -1865,19 +1838,6 @@ class Transmitter
 		}
 		$body = self::addEmojiTags($emojis, $body);
 
-		/**
-		 * @todo Improve the automated summary
-		 * This part is currently deactivated. The automated summary seems to be more
-		 * confusing than helping. But possibly we will find a better way.
-		 * So the code is left here for now as a reminder
-		 *
-		 * } elseif (($type == 'Article') && empty($data['summary'])) {
-		 * 		$regexp = "/[@!]\[url\=([^\[\]]*)\].*?\[\/url\]/ism";
-		 * 		$summary = preg_replace_callback($regexp, [self::class, 'mentionAddrCallback'], $body);
-		 * 		$data['summary'] = BBCode::toPlaintext(Plaintext::shorten(self::removePictures($summary), 1000));
-		 * }
-		 */
-
 		if (empty($item['uid']) || !Feature::isEnabled($item['uid'], Feature::EXPLICIT_MENTIONS)) {
 			$body = self::prependMentions($body, $item['uri-id'], $item['author-link']);
 		}
@@ -1889,7 +1849,7 @@ class Transmitter
 				// For community posts we remove the visible "!user@domain.tld".
 				// This improves the look at systems like Lemmy.
 				// Also in the future we should control the community delivery via other methods.
-				$body = preg_replace("/!\[url\=[^\[\]]*\][^\[\]]*\[\/url\]/ism", '', $body);
+				$body = preg_replace("/!\[url\=[^\[\]]*\][^\[\]]*\[\/url\]/ism", '', (string) $body);
 			}
 
 			if ($type == 'Page') {
@@ -1902,11 +1862,12 @@ class Transmitter
 
 			if (!empty($item['quote-uri-id']) && ($item['quote-uri-id'] != $item['uri-id'])) {
 				if (Post::exists(['uri-id' => $item['quote-uri-id'], 'network' => [Protocol::ACTIVITYPUB, Protocol::DFRN]])) {
-					$real_quote               = true;
-					$data['_misskey_content'] = BBCode::convertForUriId($item['uri-id'], BBCode::removeSharedData($body), BBCode::ACTIVITYPUB);
-					$data['quoteUrl']         = $item['quote-uri'];
-					$data['quoteUri']         = $item['quote-uri'];
-					$body                     = DI::contentItem()->addShareLink($body, $item['quote-uri-id']);
+					$real_quote = true;
+					// Currently deactivated until we now the format, see https://github.com/friendica/friendica/issues/15688#issuecomment-4470527471
+					// $data['_misskey_content'] = BBCode::convertForUriId($item['uri-id'], BBCode::removeSharedData($body), BBCode::ACTIVITYPUB);
+					$data['quoteUrl'] = $item['quote-uri'];
+					$data['quoteUri'] = $item['quote-uri'];
+					$body             = DI::contentItem()->addShareLink($body, $item['quote-uri-id']);
 				} else {
 					$body = DI::contentItem()->addSharedPost($item, $body);
 				}
@@ -1992,7 +1953,7 @@ class Transmitter
 	{
 		// Try to fetch the language from the post itself
 		if (!empty($item['language'])) {
-			$languages = array_keys(json_decode($item['language'], true));
+			$languages = array_keys(json_decode((string) $item['language'], true));
 			if (!empty($languages[0])) {
 				return DI::l10n()->toISO6391($languages[0]);
 			}
@@ -2132,7 +2093,7 @@ class Transmitter
 			return false;
 		}
 
-		$hash = hash('ripemd128', $uid ?: $contact['uid'] . '-' . $contact['id'] . '-' . $contact['created']);
+		$hash = hash('ripemd128', (string) $uid ?: $contact['uid'] . '-' . $contact['id'] . '-' . $contact['created']);
 		$uuid = substr($hash, 0, 8) . '-' . substr($hash, 8, 4) . '-' . substr($hash, 12, 4) . '-' . substr($hash, 16, 4) . '-' . substr($hash, 20, 12);
 		return DI::baseUrl() . '/activity/' . $uuid;
 	}
@@ -2305,6 +2266,85 @@ class Transmitter
 
 		$signed = LDSignature::sign($data, $owner);
 		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
+	}
+
+	/**
+	 * Forwards a moderation report to the remote server of the reported account via ActivityPub Flag.
+	 *
+	 * @param int $reportId Moderation report id
+	 * @return bool success
+	 * @throws HTTPException\InternalServerErrorException
+	 * @throws \Exception
+	 */
+	public static function sendModerationReport(int $reportId): bool
+	{
+		try {
+			$report = DI::report()->selectOneById($reportId);
+		} catch (\Throwable $e) {
+			DI::logger()->notice('Cannot forward report, report not found', ['report_id' => $reportId, 'exception' => $e]);
+			return false;
+		}
+
+		if (!$report->forward) {
+			DI::logger()->debug('Skipping report forwarding, forwarding disabled', ['report_id' => $reportId]);
+			return false;
+		}
+
+		if (empty($report->reporterUid)) {
+			DI::logger()->debug('Skipping report forwarding, no local reporter user', ['report_id' => $reportId]);
+			return false;
+		}
+
+		$target = Contact::getById($report->cid, ['url', 'addr']);
+		if (empty($target['url']) || DI::baseUrl()->isLocalUrl($target['url'])) {
+			DI::logger()->debug('Skipping report forwarding, target is local or missing URL', ['report_id' => $reportId, 'target' => $target]);
+			return false;
+		}
+
+		$profile = APContact::getByURL($target['url']);
+		if (empty($profile['inbox'])) {
+			DI::logger()->warning('Skipping report forwarding, no remote inbox found', ['report_id' => $reportId, 'target_url' => $target['url']]);
+			return false;
+		}
+
+		$owner = User::getOwnerDataById((int) $report->reporterUid);
+		if (empty($owner['url'])) {
+			DI::logger()->warning('Skipping report forwarding, owner data not found', ['report_id' => $reportId, 'uid' => $report->reporterUid]);
+			return false;
+		}
+
+		$objects = [['id' => $target['url']]];
+		foreach ($report->posts as $post) {
+			$postRow = Post::selectFirst(['uri'], ['uri-id' => $post->uriId]);
+			if (!empty($postRow['uri'])) {
+				$objects[] = ['id' => $postRow['uri']];
+			}
+		}
+
+		$data = [
+			'@context'   => ActivityPub::CONTEXT,
+			'id'         => DI::baseUrl() . '/activity/' . System::createGUID(),
+			'type'       => 'Flag',
+			'actor'      => $owner['url'],
+			'object'     => $objects,
+			'content'    => $report->comment,
+			'published'  => DateTimeFormat::utcNow(DateTimeFormat::ATOM),
+			'instrument' => self::getService(),
+			'to'         => [$profile['url'] ?? $target['url']],
+		];
+
+		DI::logger()->info('Sending moderation report via ActivityPub', ['report_id' => $reportId, 'target' => $target['url'], 'inbox' => $profile['inbox']]);
+
+		$signed  = LDSignature::sign($data, $owner);
+		$success = HTTPSignature::transmit($signed, $profile['inbox'], $owner);
+
+		if ($success) {
+			DI::logger()->info('Forwarded moderation report to remote server', ['report_id' => $reportId, 'target' => $target['url'], 'inbox' => $profile['inbox']]);
+		} else {
+			DI::logger()->warning('Failed forwarding moderation report to remote server', ['report_id' => $reportId, 'target' => $target['url'], 'inbox' => $profile['inbox']]);
+		}
+
+		return $success;
 	}
 
 	/**

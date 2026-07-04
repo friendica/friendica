@@ -31,14 +31,10 @@ class ValueConversion
 			return null;
 		}
 
-		switch (true) {
-			// manage array value
-			case preg_match("|^a:[0-9]+:{.*}$|s", $value):
-				return unserialize($value);
-
-			default:
-				return $value;
-		}
+		return match (true) {
+			preg_match("|^a:[0-9]+:{.*}$|s", $value) === 1 => unserialize($value),
+			default                                        => $value,
+		};
 	}
 
 	/**
@@ -55,13 +51,9 @@ class ValueConversion
 			return '';
 		}
 
-		switch (true) {
-			// manage arrays
-			case is_array($value):
-				return serialize($value);
-
-			default:
-				return (string)$value;
-		}
+		return match (true) {
+			is_array($value) => serialize($value),
+			default          => (string) $value,
+		};
 	}
 }

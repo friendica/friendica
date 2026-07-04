@@ -28,7 +28,7 @@ use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Images;
 use Friendica\Util\Strings;
 
-function photos_init()
+function photos_init(): void
 {
 	if (DI::config()->get('system', 'block_public') && !DI::userSession()->isAuthenticated()) {
 		return;
@@ -59,9 +59,9 @@ function photos_init()
 				$entry = [
 					'text'      => $album['album'],
 					'total'     => $album['total'],
-					'url'       => 'photos/' . $owner['nickname'] . '/album/' . bin2hex($album['album']),
-					'urlencode' => urlencode($album['album']),
-					'bin2hex'   => bin2hex($album['album']),
+					'url'       => 'photos/' . $owner['nickname'] . '/album/' . bin2hex((string) $album['album']),
+					'urlencode' => urlencode((string) $album['album']),
+					'bin2hex'   => bin2hex((string) $album['album']),
 				];
 				$ret['albums'][] = $entry;
 			}
@@ -92,7 +92,7 @@ function photos_init()
 	return;
 }
 
-function photos_post()
+function photos_post(): void
 {
 	$user = User::getByNickname(DI::args()->getArgv()[1]);
 	if (!DBA::isResult($user)) {
@@ -147,7 +147,7 @@ function photos_post()
 		if (!Strings::isHex(DI::args()->getArgv()[3] ?? '')) {
 			DI::baseUrl()->redirect('profile/' . $user['nickname'] . '/photos');
 		}
-		$album = hex2bin(DI::args()->getArgv()[3]);
+		$album = hex2bin((string) DI::args()->getArgv()[3]);
 
 		if (!DBA::exists('photo', ['album' => $album, 'uid' => $page_owner_uid, 'photo-type' => Photo::DEFAULT])) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Album not found.'));
@@ -243,9 +243,9 @@ function photos_post()
 	}
 
 	if (DI::args()->getArgc() > 2 && (!empty($_POST['desc']) || !empty($_POST['newtag']) || isset($_POST['albname']))) {
-		$desc      = !empty($_POST['desc'])      ? trim($_POST['desc'])      : '';
-		$albname   = !empty($_POST['albname'])   ? trim($_POST['albname'])   : '';
-		$origaname = !empty($_POST['origaname']) ? trim($_POST['origaname']) : '';
+		$desc      = !empty($_POST['desc'])      ? trim((string) $_POST['desc'])      : '';
+		$albname   = !empty($_POST['albname'])   ? trim((string) $_POST['albname'])   : '';
+		$origaname = !empty($_POST['origaname']) ? trim((string) $_POST['origaname']) : '';
 
 		$resource_id = DI::args()->getArgv()[3];
 
@@ -742,7 +742,7 @@ function photos_content()
 			}
 		}
 
-		$album_link = 'photos/' . $user['nickname'] . '/album/' . bin2hex($ph[0]['album']);
+		$album_link = 'photos/' . $user['nickname'] . '/album/' . bin2hex((string) $ph[0]['album']);
 
 		$tools = null;
 
@@ -758,7 +758,7 @@ function photos_content()
 
 			if (
 				$ph[0]['uid'] == DI::userSession()->getLocalUserId()
-				&& (strlen($ph[0]['allow_cid']) || strlen($ph[0]['allow_gid']) || strlen($ph[0]['deny_cid']) || strlen($ph[0]['deny_gid']))
+				&& (strlen((string) $ph[0]['allow_cid']) || strlen((string) $ph[0]['allow_gid']) || strlen((string) $ph[0]['deny_cid']) || strlen((string) $ph[0]['deny_gid']))
 			) {
 				$tools['lock'] = DI::l10n()->t('Private Photo');
 			}

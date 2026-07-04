@@ -32,11 +32,9 @@ abstract class BaseUsers extends BaseModeration
 	/** @var Database */
 	protected $database;
 
-	private EventDispatcherInterface $eventDispatcher;
-
 	public function __construct(
 		Database $database,
-		EventDispatcherInterface $eventDispatcher,
+		private readonly EventDispatcherInterface $eventDispatcher,
 		Page $page,
 		AppHelper $appHelper,
 		SystemMessages $systemMessages,
@@ -48,12 +46,11 @@ abstract class BaseUsers extends BaseModeration
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = []
+		array $parameters = [],
 	) {
 		parent::__construct($page, $appHelper, $systemMessages, $session, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->database        = $database;
-		$this->eventDispatcher = $eventDispatcher;
+		$this->database = $database;
 	}
 
 	/**
@@ -132,15 +129,14 @@ abstract class BaseUsers extends BaseModeration
 
 	protected function setupUserCallback(): \Closure
 	{
-		$adminlist = User::getAdminEmailList();
-		return function ($user) use ($adminlist) {
+		return function ($user) {
 			$page_types = [
 				User::PAGE_FLAGS_NORMAL    => $this->t('Normal Account Page'),
 				User::PAGE_FLAGS_SOAPBOX   => $this->t('Soapbox Page'),
 				User::PAGE_FLAGS_COMMUNITY => $this->t('Public Group'),
 				User::PAGE_FLAGS_COMM_MAN  => $this->t('Public Group - Restricted'),
 				User::PAGE_FLAGS_FREELOVE  => $this->t('Automatic Friend Page'),
-				User::PAGE_FLAGS_PRVGROUP  => $this->t('Private Group')
+				User::PAGE_FLAGS_PRVGROUP  => $this->t('Private Group'),
 			];
 			$account_types = [
 				User::ACCOUNT_TYPE_PERSON       => $this->t('Personal Page'),
@@ -150,16 +146,31 @@ abstract class BaseUsers extends BaseModeration
 				User::ACCOUNT_TYPE_RELAY        => $this->t('Relay'),
 			];
 
+			$moderator     = false;
+			$administrator = false;
+			if (User::isModerator($user['uid'])) {
+				$moderator = true;
+			}
+			if (User::isSiteAdmin($user['uid'])) {
+				$administrator = true;
+				$moderator     = false;
+				// do not show admin for sub-accounts of admin
+				if ($user['parent-uid']) {
+					$administrator = false;
+				}
+			}
+			$user['is_mod']   = $moderator;
+			$user['is_admin'] = $administrator;
+
 			$user['page_flags_raw'] = $user['page-flags'];
 			$user['page_flags']     = $page_types[$user['page-flags']];
 
-			$user['account_type_raw'] = ($user['page_flags_raw'] == 0) ? $user['account-type'] : -1;
-			$user['account_type']     = ($user['page_flags_raw'] == 0) ? $account_types[$user['account-type']] : '';
+			$user['account_type_raw'] = $user['account-type'];
+			$user['account_type']     = $account_types[$user['account-type']];
 
 			$user['register_date'] = Temporal::getRelativeDate($user['register_date']);
 			$user['login_date']    = Temporal::getRelativeDate($user['last-activity'], false);
 			$user['lastitem_date'] = Temporal::getRelativeDate($user['last-item']);
-			$user['is_admin']      = in_array($user['email'], $adminlist);
 			$user['is_deletable']  = !$user['account_removed'] && intval($user['uid']) != $this->session->getLocalUserId();
 			$user['deleted']       = $user['account_removed'] ? Temporal::getRelativeDate($user['account_expires_on']) : false;
 

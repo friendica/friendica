@@ -7,7 +7,7 @@
 
 namespace Friendica\Module\Search;
 
-use Friendica\Content\Conversation;
+use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
@@ -22,6 +22,8 @@ use Friendica\Module\Security\Login;
 
 class Filed extends BaseSearch
 {
+	public function __construct(private readonly ConversationRenderer $conversationRenderer) {}
+
 	protected function content(array $request = []): string
 	{
 		if (!DI::userSession()->getLocalUserId()) {
@@ -85,7 +87,7 @@ class Filed extends BaseSearch
 
 		$items = Post::toArray(Post::selectForUser(DI::userSession()->getLocalUserId(), Item::DISPLAY_FIELDLIST, $item_condition, $item_params));
 
-		$o = DI::conversation()->render($items, Conversation::MODE_FILED, false, false, '', DI::userSession()->getLocalUserId());
+		$o = $this->conversationRenderer->renderFlat($items, ConversationRenderer::MODE_FILED, false, DI::userSession()->getLocalUserId());
 
 		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader($request);

@@ -19,6 +19,8 @@ class HTTPInputDataDouble extends HTTPInputData
 	protected $injectedStream = false;
 	/** @var false|string */
 	protected $injectedContent = false;
+	/** @var false|string */
+	protected $injectedContentType = false;
 
 	/**
 	 * injects the PHP input stream for a test

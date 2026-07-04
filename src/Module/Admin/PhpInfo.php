@@ -12,7 +12,7 @@ use Friendica\Module\BaseAdmin;
 
 class PhpInfo extends BaseAdmin
 {
-	protected function rawContent(array $request = [])
+	protected function rawContent(array $request = []): never
 	{
 		self::checkAdminAccess();
 

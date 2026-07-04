@@ -20,12 +20,12 @@ class LocalRelationship extends BaseRepository
 {
 	protected static $table_name = 'user-contact';
 
-	/** @var LocalRelationshipFactory */
-	protected $factory;
-
-	public function __construct(Database $database, LoggerInterface $logger, LocalRelationshipFactory $factory)
-	{
-		parent::__construct($database, $logger, $factory);
+	public function __construct(
+		Database $database,
+		LoggerInterface $logger,
+		private readonly LocalRelationshipFactory $entityFactory,
+	) {
+		parent::__construct($database, $logger, $entityFactory);
 	}
 
 	/**
@@ -35,7 +35,7 @@ class LocalRelationship extends BaseRepository
 	{
 		$fields = $this->_selectFirstRowAsArray(['uid' => $uid, 'cid' => $cid]);
 
-		return $this->factory->createFromTableRow($fields);
+		return $this->getFactory()->createFromTableRow($fields);
 	}
 
 	/**
@@ -49,7 +49,7 @@ class LocalRelationship extends BaseRepository
 		try {
 			return $this->selectForUserContact($uid, $cid);
 		} catch (NotFoundException) {
-			return $this->factory->createFromTableRow(['uid' => $uid, 'cid' => $cid]);
+			return $this->getFactory()->createFromTableRow(['uid' => $uid, 'cid' => $cid]);
 		}
 	}
 
@@ -59,6 +59,11 @@ class LocalRelationship extends BaseRepository
 	public function existsForUserContact(int $uid, int $cid): bool
 	{
 		return $this->exists(['uid' => $uid, 'cid' => $cid]);
+	}
+
+	protected function getFactory(): LocalRelationshipFactory
+	{
+		return $this->entityFactory;
 	}
 
 	/**
