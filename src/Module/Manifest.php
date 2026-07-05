@@ -57,7 +57,7 @@ class Manifest extends BaseModule
 		/// There should be a mechanism to allow the admin to provide all of the 6
 		/// different images that are required for a fully valid web app manifest.
 		$touch_icon = $config->get('system', 'touch_icon');
-		if($touch_icon) {
+		if ($touch_icon) {
 			$manifest['icons'] = [
 				[
 					'src'   => DI::baseUrl() . '/' . $touch_icon,
@@ -68,6 +68,34 @@ class Manifest extends BaseModule
 					'src'   => DI::baseUrl() . '/' . $touch_icon,
 					'sizes' => '512x512',
 					'type'  => 'image/png',
+				],
+			];
+		} elseif (in_array($theme, ['larpnet', 'larpnet_notifications'])) {
+			$base = DI::baseUrl() . '/view/theme/' . $theme . '/img/';
+			$manifest['icons'] = [
+				[
+					'src'     => $base . 'larpnet-192.png',
+					'sizes'   => '192x192',
+					'type'    => 'image/png',
+					'purpose' => 'any',
+				],
+				[
+					'src'     => $base . 'larpnet-512.png',
+					'sizes'   => '512x512',
+					'type'    => 'image/png',
+					'purpose' => 'any',
+				],
+				[
+					'src'     => $base . 'larpnet-maskable-192.png',
+					'sizes'   => '192x192',
+					'type'    => 'image/png',
+					'purpose' => 'maskable',
+				],
+				[
+					'src'     => $base . 'larpnet-maskable-512.png',
+					'sizes'   => '512x512',
+					'type'    => 'image/png',
+					'purpose' => 'maskable',
 				],
 			];
 		} else {

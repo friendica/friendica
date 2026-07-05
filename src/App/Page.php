@@ -219,7 +219,12 @@ class Page implements ArrayAccess
 
 		$touch_icon = $config->get('system', 'touch_icon');
 		if ($touch_icon == '') {
-			$touch_icon = 'images/friendica-192.png';
+			$currentTheme = $appHelper->getCurrentTheme();
+			if (in_array($currentTheme, ['larpnet', 'larpnet_notifications'])) {
+				$touch_icon = 'view/theme/' . $currentTheme . '/img/larpnet-192.png';
+			} else {
+				$touch_icon = 'images/friendica-192.png';
+			}
 		}
 
 		$this->page['htmlhead'] = $this->eventDispatcher->dispatch(

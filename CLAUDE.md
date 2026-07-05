@@ -96,6 +96,8 @@ All files below are larpnet additions or patches. When rebasing onto a new Frien
 | `src/Module/Item/Display.php` | Patched to allow logged-in users to view `SERVER_ONLY` posts |
 | `src/Module/Post/Share.php` | Patched to block sharing of `SERVER_ONLY` posts |
 | `src/Module/Privacy/PermissionTooltip.php` | Patched to label `SERVER_ONLY` posts |
+| `src/Module/Manifest.php` | Patched to serve larpnet-branded PWA icons for larpnet/larpnet_notifications themes |
+| `src/App/Page.php` | Patched to use larpnet icon as apple-touch-icon default for larpnet themes |
 
 ## Building and deploying
 
