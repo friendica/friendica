@@ -4323,3 +4323,11 @@ div.login-form, .login-content-wrapper,
 		padding-left: 3px;
 	}
 }
+
+#nav-notification-enable {
+	padding: 4px 16px 8px;
+	border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+#nav-notification-enable-btn {
+	width: 100%;
+}

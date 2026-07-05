@@ -130,6 +130,40 @@ function larpnet_notifications_head(string &$b)
 		return;
 	}
 
+	$b .= <<<'JS'
+<script>
+(function() {
+	function isPwa() {
+		return window.matchMedia('(display-mode: standalone)').matches
+			|| !!navigator.standalone;
+	}
+	function initEnableBtn() {
+		var li  = document.getElementById('nav-notification-enable');
+		var btn = document.getElementById('nav-notification-enable-btn');
+		if (!li || !btn || typeof Notification === 'undefined') return;
+		if (Notification.permission !== 'default') return;
+		btn.textContent = isPwa()
+			? btn.dataset.labelMobile
+			: btn.dataset.labelDesktop;
+		li.style.display = '';
+		btn.addEventListener('click', function() {
+			Notification.requestPermission().then(function(result) {
+				if (result === 'granted') {
+					li.style.display = 'none';
+					if (window.LarpnetPush) { window.location.reload(); }
+				}
+			});
+		});
+	}
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initEnableBtn);
+	} else {
+		initEnableBtn();
+	}
+})();
+</script>
+JS;
+
 	$ntfyUrl          = DI::config()->get('larpnet_notifications', 'ntfy_url');
 	$ntfyVapidKey     = DI::config()->get('larpnet_notifications', 'ntfy_vapid_public_key');
 	// Use read-only token for the browser — never expose the write token client-side
