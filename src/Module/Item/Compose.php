@@ -93,11 +93,6 @@ class Compose extends BaseModule
 			return Login::form('compose');
 		}
 
-		$currentTheme = $this->appHelper->getCurrentTheme();
-		if (!$this->themeExtendsFrio($currentTheme)) {
-			throw new NotImplementedException($this->l10n->t('This feature is only available with the frio theme.'));
-		}
-
 		$posttype = $this->parameters['type'] ?? Item::PT_ARTICLE;
 		if (!in_array($posttype, [Item::PT_ARTICLE, Item::PT_PERSONAL_NOTE])) {
 			switch ($posttype) {
@@ -257,22 +252,4 @@ class Compose extends BaseModule
 		]);
 	}
 
-	/**
-	 * Check whether a theme is frio or has frio as its parent.
-	 * Cannot use getThemeInfoValue('extends') here because theme init runs after content().
-	 */
-	private function themeExtendsFrio(string $theme): bool
-	{
-		if ($theme === 'frio') {
-			return true;
-		}
-		$themeFile = "view/theme/$theme/theme.php";
-		if (!file_exists($themeFile)) {
-			return false;
-		}
-		if (preg_match("/setThemeInfoValue\s*\(\s*['\"]extends['\"]\s*,\s*['\"]([^'\"]+)['\"]/", file_get_contents($themeFile), $matches)) {
-			return $matches[1] === 'frio';
-		}
-		return false;
-	}
 }
