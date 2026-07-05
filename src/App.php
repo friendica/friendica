@@ -15,7 +15,6 @@ use Friendica\App\Page;
 use Friendica\App\Request;
 use Friendica\App\Router;
 use Friendica\Capabilities\ICanCreateResponses;
-use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Capabilities\RequestHandler;
 use Friendica\Content\Nav;
 use Friendica\Core\Addon\AddonHelper;
@@ -139,6 +138,20 @@ class App
 		$request = $this->mergeRequestInput($request);
 
 		$appRequest = new Request($request, $this->container->create(IManageConfigValues::class));
+
+		// Register backward-compatible DICE resolution for Request
+		$this->container->addRule(Request::class, [
+			'shared' => true,
+			'constructParams' => [
+				[\Dice\Dice::INSTANCE => function () use ($request) {
+					@trigger_error('Constructing \Friendica\App\Request via DICE is deprecated since 2026.08, use handleRequest() or inject ServerRequestInterface instead.', E_USER_DEPRECATED);
+					return $request;
+				}],
+				[\Dice\Dice::INSTANCE => function (\Dice\Dice $dice) {
+					return $dice->create(IManageConfigValues::class);
+				}, 'params' => [[\Dice\Dice::INSTANCE => \Dice\Dice::SELF]]],
+			],
+		]);
 
 		$this->container->addRule(Mode::class, [
 			'call' => [
@@ -575,12 +588,7 @@ class App
 
 			// Let the module run its internal process (init, get, post, ...)
 			$timestamp = microtime(true);
-			if ($module instanceof RequestHandler) {
-				$response = $module->handleRequest($request);
-			} else {
-				trigger_error('Implement RequestHandler instead of ICanHandleRequests');
-				$response = $module->run($httpException, $request->getAllInput());
-			}
+			$response  = $module->handleRequest($request);
 			$this->profiler->set(microtime(true) - $timestamp, 'content');
 
 			// Wrapping HTML responses in the theme template
@@ -599,7 +607,7 @@ class App
 		$page->logRuntime($this->config, 'runFrontend');
 	}
 
-	private function createModuleInstance(?string $moduleClass = null): ICanHandleRequests
+	private function createModuleInstance(?string $moduleClass = null): RequestHandler
 	{
 		/** @var Router $router */
 		$router = $this->container->create(Router::class);
@@ -611,7 +619,7 @@ class App
 
 		$stamp = microtime(true);
 
-		/** @var ICanHandleRequests $module */
+		/** @var RequestHandler $module */
 		$module = $this->container->create($moduleClass, $parameters);
 
 		if ($dice_profiler_threshold > 0) {

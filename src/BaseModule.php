@@ -200,6 +200,16 @@ abstract class BaseModule implements ICanHandleRequests, RequestHandler
 	public function handleRequest(Request $request): ResponseInterface
 	{
 		$this->appRequest = $request;
+
+		// BC: If a child class overrides run(), route through the legacy path with deprecation warning
+		$refMethod = new \ReflectionMethod($this, 'run');
+		if ($refMethod->getDeclaringClass()->getName() !== self::class) {
+			@trigger_error(sprintf('%s::run() is deprecated since 2026.08, override handleRequest() instead.', static::class), E_USER_DEPRECATED);
+
+			$httpException = DI::getDice()->create(ModuleHTTPException::class);
+			return $this->run($httpException, $request->getAllInput());
+		}
+
 		try {
 			$this->dispatchRequestBase($request->getAllInput());
 			$this->dispatchRequestContent($request->getAllInput());
@@ -224,6 +234,8 @@ abstract class BaseModule implements ICanHandleRequests, RequestHandler
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * @deprecated 2026.08 Use handleRequest() instead
 	 */
 	public function run(ModuleHTTPException $httpException, array $request = []): ResponseInterface
 	{
