@@ -261,7 +261,11 @@ class ACL
 			'deny_gid'  => $default_permissions['deny_gid']  ?? [],
 		];
 
-		if (count($default_permissions['allow_cid'])
+		if (($default_permissions['private'] ?? null) === \Friendica\Model\Item::SERVER_ONLY) {
+			// larpnet: server-only post
+			$visibility = 'local';
+			$default_permissions['allow_gid'] = [Circle::FOLLOWERS];
+		} elseif (count($default_permissions['allow_cid'])
 			+ count($default_permissions['allow_gid'])
 			+ count($default_permissions['deny_cid'])
 			+ count($default_permissions['deny_gid'])) {
@@ -315,6 +319,8 @@ class ACL
 		$o   = Renderer::replaceMacros($tpl, [
 			'$public_title'    => DI::l10n()->t('Public'),
 			'$public_desc'     => DI::l10n()->t('This content will be shown to all your followers and can be seen in the community pages and by anyone with its link.'),
+			'$local_title'     => DI::l10n()->t('Tylko serwer'),
+			'$local_desc'      => DI::l10n()->t('Widoczne tylko dla zalogowanych użytkowników tego serwera. Nigdy nie jest udostępniane w federacji.'),
 			'$custom_title'    => DI::l10n()->t('Limited/Private'),
 			'$custom_desc'     => DI::l10n()->t('This content will be shown only to the people in the first box, to the exception of the people mentioned in the second box. It won\'t appear anywhere public.') . DI::l10n()->t('Start typing the name of a contact or a circle to show a filtered list. You can also mention the special circles "Followers" and "Mutuals".'),
 			'$allow_label'     => DI::l10n()->t('Show to:'),

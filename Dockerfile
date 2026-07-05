@@ -17,6 +17,8 @@ COPY addon/larpnet_calendar  /usr/src/friendica/addon/larpnet_calendar
 COPY addon/larpnet_wifi      /usr/src/friendica/addon/larpnet_wifi
 
 # Core patches
+COPY src/Content/Item.php                         /usr/src/friendica/src/Content/Item.php
+COPY src/Core/ACL.php                             /usr/src/friendica/src/Core/ACL.php
 COPY src/Worker/NtfyPush.php                      /usr/src/friendica/src/Worker/NtfyPush.php
 COPY src/Model/Subscription.php                   /usr/src/friendica/src/Model/Subscription.php
 COPY src/Model/Item.php                           /usr/src/friendica/src/Model/Item.php

@@ -90,6 +90,8 @@ All files below are larpnet additions or patches. When rebasing onto a new Frien
 | `src/Model/Subscription.php` | One-line patch: dispatches `NtfyPush` worker on push subscription notification |
 | `view/theme/larpnet/` | Main custom theme (based on Frio) |
 | `view/theme/larpnet_notifications/` | Stripped-down theme for notification emails |
+| `src/Content/Item.php` | Patched `getACL()` to handle `visibility=local` → `private = SERVER_ONLY` |
+| `src/Core/ACL.php` | Patched `getFullSelectorHTML()` to pass local option labels and detect existing SERVER_ONLY posts |
 | `src/Model/Item.php` | Patched to add `SERVER_ONLY = 3` privacy constant |
 | `src/Object/Post.php` | Patched `fetchPrivacy()` to handle `SERVER_ONLY` |
 | `src/Module/Item/Compose.php` | Patched to allow the compose page with themes that extend Frio (not just Frio itself) |

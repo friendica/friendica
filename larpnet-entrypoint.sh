@@ -7,6 +7,8 @@ set -e
 # unconditionally copies our patched files on every container start.
 if [ -f /var/www/html/index.php ]; then
   for f in \
+    src/Content/Item.php \
+    src/Core/ACL.php \
     src/Model/Item.php \
     src/Object/Post.php \
     src/Module/Item/Compose.php \
