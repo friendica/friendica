@@ -138,14 +138,6 @@
 
 									</li>
 
-						<li id="nav-notification-enable" style="display:none;">
-							<button id="nav-notification-enable-btn" type="button"
-								class="btn btn-primary btn-sm"
-								data-label-desktop="Włącz powiadomienia na pulpicie"
-								data-label-mobile="Aktywuj powiadomienia z aplikacji">
-							</button>
-						</li>
-
 						<li id="nav-notifications-loading" class="loading" style="font-weight: bold; color: #555; padding-left: 10px;">
 								<i class="fa fa-spinner fa-spin" aria-hidden="true" style="vertical-align: middle;"></i> {{$loadingnotifications}}
 							</li>

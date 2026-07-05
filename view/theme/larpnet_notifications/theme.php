@@ -137,28 +137,50 @@ function larpnet_notifications_head(string &$b)
 		return window.matchMedia('(display-mode: standalone)').matches
 			|| !!navigator.standalone;
 	}
-	function initEnableBtn() {
-		var li  = document.getElementById('nav-notification-enable');
-		var btn = document.getElementById('nav-notification-enable-btn');
-		if (!li || !btn || typeof Notification === 'undefined') return;
-		if (Notification.permission !== 'default') return;
+
+	function injectEnableBtn(menu) {
+		if (typeof Notification === 'undefined' || Notification.permission !== 'default') return;
+		if (document.getElementById('nav-notification-enable')) return;
+		var markAll = menu.querySelector('#nav-notifications-mark-all');
+		if (!markAll) return;
+
+		var li = document.createElement('li');
+		li.id = 'nav-notification-enable';
+
+		var btn = document.createElement('button');
+		btn.id = 'nav-notification-enable-btn';
+		btn.type = 'button';
+		btn.className = 'btn btn-primary btn-sm';
 		btn.textContent = isPwa()
-			? btn.dataset.labelMobile
-			: btn.dataset.labelDesktop;
-		li.style.display = '';
+			? 'Aktywuj powiadomienia z aplikacji'
+			: 'Włącz powiadomienia na pulpicie';
+
 		btn.addEventListener('click', function() {
 			Notification.requestPermission().then(function(result) {
 				if (result === 'granted') {
-					li.style.display = 'none';
+					li.remove();
 					if (window.LarpnetPush) { window.location.reload(); }
 				}
 			});
 		});
+
+		li.appendChild(btn);
+		markAll.insertAdjacentElement('afterend', li);
 	}
+
+	function setup() {
+		var menu = document.getElementById('nav-notifications-menu');
+		if (!menu) return;
+		injectEnableBtn(menu);
+		new MutationObserver(function() {
+			injectEnableBtn(menu);
+		}).observe(menu, { childList: true });
+	}
+
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initEnableBtn);
+		document.addEventListener('DOMContentLoaded', setup);
 	} else {
-		initEnableBtn();
+		setup();
 	}
 })();
 </script>
