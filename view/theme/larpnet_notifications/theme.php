@@ -38,6 +38,7 @@ function larpnet_notifications_init(AppHelper $appHelper)
 	global $larpnet;
 	$larpnet = 'view/theme/larpnet_notifications';
 
+	$appHelper->setThemeInfoValue('extends', 'frio');
 	Renderer::setActiveTemplateEngine('smarty3');
 
 	if (DI::mode()->isMobile() || DI::mode()->isMobile()) {
