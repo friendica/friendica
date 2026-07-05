@@ -138,8 +138,21 @@ function larpnet_notifications_head(string &$b)
 			|| !!navigator.standalone;
 	}
 
+	function needsEnable() {
+		if (typeof Notification === 'undefined') return false;
+		// Need to request browser permission
+		if (Notification.permission === 'default') return true;
+		// Browser granted permission but app-level disabled:
+		// getNotificationPermission() (main.js) returns 'denied' when localStorage
+		// is null or 'denied', even though the browser already granted permission.
+		if (Notification.permission === 'granted'
+			&& typeof getNotificationPermission === 'function'
+			&& getNotificationPermission() !== 'granted') return true;
+		return false;
+	}
+
 	function injectEnableBtn(menu) {
-		if (typeof Notification === 'undefined' || Notification.permission !== 'default') return;
+		if (!needsEnable()) return;
 		if (document.getElementById('nav-notification-enable')) return;
 		var markAll = menu.querySelector('#nav-notifications-mark-all');
 		if (!markAll) return;
@@ -156,12 +169,21 @@ function larpnet_notifications_head(string &$b)
 			: 'Włącz powiadomienia na pulpicie';
 
 		btn.addEventListener('click', function() {
-			Notification.requestPermission().then(function(result) {
-				if (result === 'granted') {
-					li.remove();
-					if (window.LarpnetPush) { window.location.reload(); }
-				}
-			});
+			if (Notification.permission === 'granted') {
+				// Permission already granted — just set localStorage and reload
+				// so push.js can complete the ntfy subscription
+				localStorage.setItem('notification-permissions', 'granted');
+				li.remove();
+				window.location.reload();
+			} else {
+				Notification.requestPermission().then(function(result) {
+					if (result === 'granted') {
+						localStorage.setItem('notification-permissions', 'granted');
+						li.remove();
+						if (window.LarpnetPush) { window.location.reload(); }
+					}
+				});
+			}
 		});
 
 		li.appendChild(btn);
