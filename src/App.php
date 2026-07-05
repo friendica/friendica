@@ -43,6 +43,8 @@ use Friendica\Protocol\ATProtocol\DID;
 use Friendica\Security\Authentication;
 use Friendica\Security\ExAuth;
 use Friendica\Security\OpenWebAuth;
+use Friendica\Service\Addon\AddonContainer;
+use Friendica\Service\Addon\AddonManager;
 use Friendica\Util\BasePath;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPInputData;
@@ -128,6 +130,8 @@ class App
 	 */
 	private $appHelper;
 
+	private AddonManager $addonManager;
+
 	private function __construct(private readonly Container $container) {}
 
 	/**
@@ -141,7 +145,7 @@ class App
 			],
 		]);
 
-		$this->setupContainerForAddons();
+		$this->setupAddons();
 
 		$this->setupLogChannel(LogChannel::APP);
 
@@ -198,7 +202,7 @@ class App
 	{
 		$argv = $serverParams['argv'] ?? [];
 
-		$this->setupContainerForAddons();
+		$this->setupAddons();
 
 		$this->setupLogChannel($this->determineLogChannel($argv));
 
@@ -230,7 +234,7 @@ class App
 	 */
 	public function processEjabberd(array $serverParams): void
 	{
-		$this->setupContainerForAddons();
+		$this->setupAddons();
 
 		$this->setupLogChannel(LogChannel::AUTH_JABBERED);
 
@@ -267,7 +271,7 @@ class App
 		}
 	}
 
-	private function setupContainerForAddons(): void
+	private function setupAddons(): void
 	{
 		/** @var AddonHelper $addonHelper */
 		$addonHelper = $this->container->create(AddonHelper::class);
@@ -279,6 +283,27 @@ class App
 				$this->container->addRule($name, $rule);
 			}
 		}
+
+		$config = $this->container->create(IManageConfigValues::class);
+
+		$this->addonManager = $this->container->create(AddonManager::class);
+
+		$this->addonManager->bootstrapAddons($config->get('addons') ?? []);
+
+		// At this place we should be careful because addons can change the container
+		// Maybe we should create a new container especially for the addons
+		foreach ($this->addonManager->getProvidedDependencyRules() as $name => $rule) {
+			$this->container->addRule($name, $rule);
+		}
+
+		$containers = [];
+
+		foreach ($this->addonManager->getRequiredDependencies() as $addonId => $dependencies) {
+			// @TODO At this point we can filter or restrict the dependencies of addons
+			$containers[$addonId] = AddonContainer::fromContainer($this->container, $dependencies);
+		}
+
+		$this->addonManager->initAddons($containers);
 	}
 
 	private function determineLogChannel(array $argv): string
@@ -326,6 +351,10 @@ class App
 
 		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
 			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
+		}
+
+		foreach ($this->addonManager->getAllSubscribedEvents() as $listener) {
+			$eventDispatcher->addListener($listener[0], $listener[1]);
 		}
 	}
 
