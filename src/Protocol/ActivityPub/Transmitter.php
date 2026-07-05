@@ -646,7 +646,7 @@ class Transmitter
 
 		$terms = Tag::getByURIId($item['uri-id'], [Tag::MENTION, Tag::IMPLICIT_MENTION, Tag::EXCLUSIVE_MENTION, Tag::AUDIENCE]);
 
-		if ($item['private'] != Item::PRIVATE) {
+		if (!in_array($item['private'], [Item::PRIVATE, Item::SERVER_ONLY])) {
 			// Directly mention the original author upon a quoted reshare.
 			// Else just ensure that the original author receives the reshare.
 			$announce = self::getAnnounceArray($item);
@@ -772,13 +772,13 @@ class Transmitter
 								} else {
 									$data['cc'][] = $profile['url'];
 								}
-								if (($item['private'] != Item::PRIVATE) && !empty($actor_profile['followers']) && (!$exclusive || !$is_group_thread)) {
+								if (!in_array($item['private'], [Item::PRIVATE, Item::SERVER_ONLY]) && !empty($actor_profile['followers']) && (!$exclusive || !$is_group_thread)) {
 									$data['cc'][] = $actor_profile['followers'];
 								}
 							}
 						} elseif (!$exclusive && !$is_group_thread) {
 							// Public thread parent post always are directed to the followers.
-							if ($item['private'] != Item::PRIVATE) {
+							if (!in_array($item['private'], [Item::PRIVATE, Item::SERVER_ONLY])) {
 								$data['cc'][] = $actor_profile['followers'];
 							}
 						}

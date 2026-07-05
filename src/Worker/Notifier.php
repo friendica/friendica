@@ -696,6 +696,12 @@ class Notifier
 			return ['count' => 0, 'contacts' => []];
 		}
 
+		// larpnet: SERVER_ONLY posts must never be federated
+		if ($target_item['private'] === Item::SERVER_ONLY) {
+			DI::logger()->info('Not delivering server-only post via AP', ['uri-id' => $target_item['uri-id']]);
+			return ['count' => 0, 'contacts' => []];
+		}
+
 		$inboxes       = [];
 		$relay_inboxes = [];
 
