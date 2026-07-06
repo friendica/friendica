@@ -75,10 +75,10 @@ class FriendSuggest extends BaseModule
 		$suggest = $this->friendSuggestRepo->save($this->friendSuggestFac->createNew(
 			DI::userSession()->getLocalUserId(),
 			$cid,
-			$contact['name'],
-			$contact['url'],
-			$contact['request'],
-			$contact['avatar'],
+			$contact['name'] ?? '',
+			$contact['url'] ?? '',
+			$contact['request'] ?? '',
+			$contact['avatar'] ?? '',
 			$note
 		));
 
