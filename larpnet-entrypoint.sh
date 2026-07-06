@@ -20,7 +20,8 @@ if [ -f /var/www/html/index.php ]; then
     src/Module/Manifest.php \
     src/App/Page.php \
     src/Worker/NtfyPush.php \
-    src/Model/Subscription.php
+    src/Model/Subscription.php \
+    src/Module/FriendSuggest.php
   do
     cp "/usr/src/friendica/$f" "/var/www/html/$f"
   done

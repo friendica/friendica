@@ -31,3 +31,4 @@ COPY src/Module/Post/Share.php                    /usr/src/friendica/src/Module/
 COPY src/Module/Privacy/PermissionTooltip.php     /usr/src/friendica/src/Module/Privacy/PermissionTooltip.php
 COPY src/Module/Manifest.php                      /usr/src/friendica/src/Module/Manifest.php
 COPY src/App/Page.php                             /usr/src/friendica/src/App/Page.php
+COPY src/Module/FriendSuggest.php                 /usr/src/friendica/src/Module/FriendSuggest.php

@@ -102,6 +102,7 @@ All files below are larpnet additions or patches. When rebasing onto a new Frien
 | `src/Module/Privacy/PermissionTooltip.php` | Patched to label `SERVER_ONLY` posts |
 | `src/Module/Manifest.php` | Patched to serve larpnet-branded PWA icons for larpnet/larpnet_notifications themes |
 | `src/App/Page.php` | Patched to use larpnet icon as apple-touch-icon default for larpnet themes |
+| `src/Module/FriendSuggest.php` | Upstream bugfix: use the resolved user-contact id instead of the public contact id, fixing a "Contact not found" error when suggesting friends |
 
 ## Building and deploying
 
