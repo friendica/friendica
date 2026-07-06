@@ -114,7 +114,7 @@ class FriendSuggest extends BaseModule
 			AND NOT `deleted`
 			AND `notify` != ""',
 			DI::userSession()->getLocalUserId(),
-			$cid,
+			$ucid,
 			Protocol::DFRN,
 		]);
 
@@ -126,7 +126,7 @@ class FriendSuggest extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('fsuggest.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$contact_id'      => $cid,
+			'$contact_id'      => $ucid,
 			'$fsuggest_title'  => $this->t('Suggest Friends'),
 			'$fsuggest_select' => [
 				'suggest',
