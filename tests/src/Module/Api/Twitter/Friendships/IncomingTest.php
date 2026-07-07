@@ -20,7 +20,7 @@ class IncomingTest extends ApiTestCase
 	 */
 	public function testApiFriendshipsIncoming(): void
 	{
-		$response = (new Incoming(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Incoming(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 
 		$json = $this->toJson($response);
@@ -38,5 +38,25 @@ class IncomingTest extends ApiTestCase
 
 		// $_GET['cursor'] = 'undefined';
 		// self::assertFalse(api_friendships_incoming('json'));
+	}
+
+	/**
+	 * Test the handleRequest() function.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestFriendshipsIncomingReturnsIdList(): void
+	{
+		$module = new Incoming(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertIsArray($json->ids);
 	}
 }

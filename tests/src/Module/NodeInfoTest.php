@@ -8,6 +8,7 @@
 namespace Friendica\Test\src\Module;
 
 use Friendica\App;
+use Friendica\App\Request;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\NodeInfo110;
@@ -31,7 +32,7 @@ class NodeInfoTest extends FixtureTestCase
 
 	public function testNodeInfo110(): void
 	{
-		$response = (new NodeInfo110(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
+		$response = (new NodeInfo110(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 
 		self::assertJson($response->getBody());
@@ -52,7 +53,7 @@ class NodeInfoTest extends FixtureTestCase
 
 	public function testNodeInfo120(): void
 	{
-		$response = (new NodeInfo120(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
+		$response = (new NodeInfo120(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 
 		self::assertJson($response->getBody());
@@ -72,7 +73,7 @@ class NodeInfoTest extends FixtureTestCase
 
 	public function testNodeInfo210(): void
 	{
-		$response = (new NodeInfo210(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
+		$response = (new NodeInfo210(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 
 		self::assertJson($response->getBody());
@@ -85,6 +86,70 @@ class NodeInfoTest extends FixtureTestCase
 		self::assertEquals('friendica', $json->server->software);
 		self::assertEquals(App::VERSION . '-' . DB_UPDATE_VERSION, $json->server->version);
 
+		self::assertIsArray($json->protocols);
+		self::assertIsArray($json->services->inbound);
+		self::assertIsArray($json->services->outbound);
+	}
+
+	public function testHandleRequestNodeInfo110ReturnsJson(): void
+	{
+		$request = $this->createMock(Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$response = (new NodeInfo110(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
+			->handleRequest($request);
+
+		self::assertJson($response->getBody());
+		self::assertEquals(['Content-type' => ['application/json'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
+
+		$json = json_decode($response->getBody());
+
+		self::assertEquals('1.0', $json->version);
+		self::assertEquals('friendica', $json->software->name);
+		self::assertEquals(App::VERSION . '-' . DB_UPDATE_VERSION, $json->software->version);
+		self::assertIsArray($json->protocols->inbound);
+		self::assertIsArray($json->protocols->outbound);
+		self::assertIsArray($json->services->inbound);
+		self::assertIsArray($json->services->outbound);
+	}
+
+	public function testHandleRequestNodeInfo120ReturnsJson(): void
+	{
+		$request = $this->createMock(Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$response = (new NodeInfo120(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
+			->handleRequest($request);
+
+		self::assertJson($response->getBody());
+		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
+
+		$json = json_decode($response->getBody());
+
+		self::assertEquals('2.0', $json->version);
+		self::assertEquals('friendica', $json->software->name);
+		self::assertEquals(App::VERSION . '-' . DB_UPDATE_VERSION, $json->software->version);
+		self::assertIsArray($json->protocols);
+		self::assertIsArray($json->services->inbound);
+		self::assertIsArray($json->services->outbound);
+	}
+
+	public function testHandleRequestNodeInfo210ReturnsJson(): void
+	{
+		$request = $this->createMock(Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$response = (new NodeInfo210(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
+			->handleRequest($request);
+
+		self::assertJson($response->getBody());
+		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
+
+		$json = json_decode($response->getBody());
+
+		self::assertEquals('1.0', $json->version);
+		self::assertEquals('friendica', $json->server->software);
+		self::assertEquals(App::VERSION . '-' . DB_UPDATE_VERSION, $json->server->version);
 		self::assertIsArray($json->protocols);
 		self::assertIsArray($json->services->inbound);
 		self::assertIsArray($json->services->outbound);

@@ -32,7 +32,7 @@ class CreateTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
-		(new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
@@ -43,7 +43,7 @@ class CreateTest extends ApiTestCase
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateAction(): void
 	{
-		$response = (new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id' => 3,
 			]);
@@ -60,7 +60,7 @@ class CreateTest extends ApiTestCase
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateActionAndRss(): void
 	{
-		$response = (new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => ICanCreateResponses::TYPE_RSS]))
+		$response = (new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => ICanCreateResponses::TYPE_RSS])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id' => 3,
 			]);
@@ -85,5 +85,63 @@ class CreateTest extends ApiTestCase
 		$_SESSION['authenticated'] = false;
 		api_favorites_create_destroy('json');
 		*/
+	}
+
+	/**
+	 * Test the handleRequest() function with an invalid ID.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestFavoritesCreateWithInvalidIdThrowsBadRequestException(): void
+	{
+		$this->expectException(BadRequestException::class);
+
+		$module = new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$module->handleRequest($request);
+	}
+
+	/**
+	 * Test the handleRequest() function with an ID.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestFavoritesCreateWithIdReturnsStatus(): void
+	{
+		$module = new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['id' => 3]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertStatus($json);
+	}
+
+	/**
+	 * Test the handleRequest() function with an ID and an RSS result.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestFavoritesCreateWithIdAndRssReturnsXml(): void
+	{
+		$module = new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => ICanCreateResponses::TYPE_RSS]);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['id' => 3]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
+
+		self::assertXml((string) $response->getBody(), 'statuses');
 	}
 }

@@ -25,7 +25,7 @@ class NetworkPublicTimelineTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
-		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'max_id' => 10,
 			]);
@@ -50,7 +50,7 @@ class NetworkPublicTimelineTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
-		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'page' => -2,
 			]);
@@ -88,11 +88,74 @@ class NetworkPublicTimelineTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
-		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
+		$response = (new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [ // @phpstan-ignore method.deprecated
 			'extension' => ICanCreateResponses::TYPE_RSS,
 		]))->run($this->httpExceptionMock, [
 			'page' => -2,
 		]);
+
+		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
+
+		self::assertXml((string) $response->getBody(), 'statuses');
+	}
+
+	public function testHandleRequestNetworkPublicTimelineReturnsStatusList(): void
+	{
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$module = new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['max_id' => 10]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertIsArray($json);
+		self::assertNotEmpty($json);
+		foreach ($json as $status) {
+			self::assertIsString($status->text);
+			self::assertIsInt($status->id);
+		}
+	}
+
+	public function testHandleRequestNetworkPublicTimelineWithNegativePageReturnsStatusList(): void
+	{
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$module = new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['page' => -2]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertIsArray($json);
+		self::assertNotEmpty($json);
+		foreach ($json as $status) {
+			self::assertIsString($status->text);
+			self::assertIsInt($status->id);
+		}
+	}
+
+	public function testHandleRequestNetworkPublicTimelineWithRssReturnsXml(): void
+	{
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$module = new NetworkPublicTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
+			'extension' => ICanCreateResponses::TYPE_RSS,
+		]);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['page' => -2]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
 
 		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 

@@ -7,6 +7,7 @@
 
 namespace Friendica\Test\src\Module\Special;
 
+use Friendica\App\Request;
 use Friendica\App\Router;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\DI;
@@ -31,7 +32,7 @@ class OptionsTest extends FixtureTestCase
 	{
 		$this->useHttpMethod(Router::OPTIONS);
 
-		$response = (new Options(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock);
+		$response = (new Options(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock); // @phpstan-ignore method.deprecated
 
 		self::assertEmpty((string) $response->getBody());
 		self::assertEquals(204, $response->getStatusCode());
@@ -47,9 +48,52 @@ class OptionsTest extends FixtureTestCase
 	{
 		$this->useHttpMethod(Router::OPTIONS);
 
-		$response = (new Options(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
+		$response = (new Options(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [ // @phpstan-ignore method.deprecated
 			'AllowedMethods' => [Router::GET, Router::POST],
 		]))->run($this->httpExceptionMock);
+
+		self::assertEmpty((string) $response->getBody());
+		self::assertEquals(204, $response->getStatusCode());
+		self::assertEquals('No Content', $response->getReasonPhrase());
+		self::assertEquals([
+			'Allow'                       => [implode(',', [Router::GET, Router::POST])],
+			ICanCreateResponses::X_HEADER => ['blank'],
+		], $response->getHeaders());
+		self::assertEquals(implode(',', [Router::GET, Router::POST]), $response->getHeaderLine('Allow'));
+	}
+
+	public function testHandleRequestOptionsAllReturns204(): void
+	{
+		$this->useHttpMethod(Router::OPTIONS);
+
+		$request = $this->createMock(Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = (new Options(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+			->handleRequest($request);
+
+		self::assertEmpty((string) $response->getBody());
+		self::assertEquals(204, $response->getStatusCode());
+		self::assertEquals('No Content', $response->getReasonPhrase());
+		self::assertEquals([
+			'Allow'                       => [implode(',', Router::ALLOWED_METHODS)],
+			ICanCreateResponses::X_HEADER => ['blank'],
+		], $response->getHeaders());
+		self::assertEquals(implode(',', Router::ALLOWED_METHODS), $response->getHeaderLine('Allow'));
+	}
+
+	public function testHandleRequestOptionsSpecificReturns204(): void
+	{
+		$this->useHttpMethod(Router::OPTIONS);
+
+		$request = $this->createMock(Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = (new Options(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
+			'AllowedMethods' => [Router::GET, Router::POST],
+		]))->handleRequest($request);
 
 		self::assertEmpty((string) $response->getBody());
 		self::assertEquals(204, $response->getStatusCode());

@@ -32,7 +32,7 @@ class RetweetTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
-		(new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
@@ -57,7 +57,7 @@ class RetweetTest extends ApiTestCase
 	 */
 	public function testApiStatusesRepeatWithId(): void
 	{
-		$response = (new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id' => 1,
 			]);
@@ -77,10 +77,61 @@ class RetweetTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
-		$response = (new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id' => 5,
 			]);
+
+		$json = $this->toJson($response);
+
+		self::assertStatus($json);
+	}
+
+	public function testHandleRequestRetweetThrowsBadRequestException(): void
+	{
+		$this->useHttpMethod(Router::POST);
+
+		$this->expectException(BadRequestException::class);
+
+		$module = new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$module->handleRequest($request);
+	}
+
+	public function testHandleRequestRetweetWithIdReturnsStatus(): void
+	{
+		$this->useHttpMethod(Router::POST);
+
+		$module = new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['id' => 1]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertStatus($json);
+	}
+
+	public function testHandleRequestRetweetWithSharedIdReturnsStatus(): void
+	{
+		$this->useHttpMethod(Router::POST);
+
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$module = new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['id' => 5]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
 
 		$json = $this->toJson($response);
 

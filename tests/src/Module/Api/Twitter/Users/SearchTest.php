@@ -26,7 +26,7 @@ class SearchTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
-		$response = (new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'q' => static::OTHER_USER['name'],
 			]);
@@ -46,7 +46,7 @@ class SearchTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
-		$response = (new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
+		$response = (new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [ // @phpstan-ignore method.deprecated
 			'extension' => ICanCreateResponses::TYPE_XML,
 		]))->run($this->httpExceptionMock, [
 			'q' => static::OTHER_USER['name'],
@@ -64,7 +64,69 @@ class SearchTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
-		(new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
+	}
+
+	/**
+	 * Test the handleRequest() function with a query.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestUsersSearchWithQueryReturnsUserList(): void
+	{
+		// @todo: This call is needed for this test
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$module = new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['q' => static::OTHER_USER['name']]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertOtherUser($json[0]);
+	}
+
+	/**
+	 * Test the handleRequest() function with a query and an XML result.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestUsersSearchWithQueryAndXmlReturnsXml(): void
+	{
+		// @todo: This call is needed for this test
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$module = new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => ICanCreateResponses::TYPE_XML]);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['q' => static::OTHER_USER['name']]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		self::assertXml((string) $response->getBody(), 'users');
+	}
+
+	/**
+	 * Test the handleRequest() function without a query parameter.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestUsersSearchWithoutQueryThrowsBadRequestException(): void
+	{
+		$this->expectException(BadRequestException::class);
+
+		$module = new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$module->handleRequest($request);
 	}
 }

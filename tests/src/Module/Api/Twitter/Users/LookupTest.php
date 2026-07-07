@@ -24,7 +24,7 @@ class LookupTest extends ApiTestCase
 	{
 		$this->expectException(NotFoundException::class);
 
-		(new Lookup(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Lookup(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
@@ -38,10 +38,51 @@ class LookupTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
-		$response = (new Lookup(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Lookup(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'user_id' => static::OTHER_USER['id'],
 			]);
+
+		$json = $this->toJson($response);
+
+		self::assertOtherUser($json[0]);
+	}
+
+	/**
+	 * Test the handleRequest() function.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestUsersLookupThrowsNotFoundException(): void
+	{
+		$this->expectException(NotFoundException::class);
+
+		$module = new Lookup(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$module->handleRequest($request);
+	}
+
+	/**
+	 * Test the handleRequest() function with an user ID.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestUsersLookupWithUserIdReturnsOtherUser(): void
+	{
+		// @todo: This call is needed for this test
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$module = new Lookup(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['user_id' => static::OTHER_USER['id']]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
 
 		$json = $this->toJson($response);
 

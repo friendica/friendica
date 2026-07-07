@@ -25,7 +25,7 @@ class ShowTest extends ApiTestCase
 		$this->expectException(BadRequestException::class);
 
 
-		(new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
@@ -36,7 +36,7 @@ class ShowTest extends ApiTestCase
 	 */
 	public function testApiStatusesShowWithId(): void
 	{
-		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id' => 1,
 			]);
@@ -57,7 +57,7 @@ class ShowTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
-		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id'           => 1,
 				'conversation' => 1,
@@ -84,5 +84,56 @@ class ShowTest extends ApiTestCase
 		// $this->expectException(\Friendica\Network\HTTPException\UnauthorizedException::class);
 		// BasicAuth::setCurrentUserID();
 		// api_statuses_show('json');
+	}
+
+	public function testHandleRequestShowThrowsBadRequestException(): void
+	{
+		$this->expectException(BadRequestException::class);
+
+		$module = new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$module->handleRequest($request);
+	}
+
+	public function testHandleRequestShowWithIdReturnsStatus(): void
+	{
+		$module = new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['id' => 1]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertIsInt($json->id);
+		self::assertIsString($json->text);
+	}
+
+	public function testHandleRequestShowWithConversationReturnsStatusList(): void
+	{
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$module = new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['id' => 1, 'conversation' => 1]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertIsArray($json);
+
+		foreach ($json as $status) {
+			self::assertIsInt($status->id);
+			self::assertIsString($status->text);
+		}
 	}
 }

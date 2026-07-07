@@ -7,6 +7,7 @@
 
 namespace Friendica\Test\src\Module;
 
+use Friendica\App\Request;
 use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Type\ArrayCache;
@@ -47,7 +48,7 @@ class StatsCachingTest extends FixtureTestCase
 	{
 		$this->httpExceptionMock->shouldReceive('content')->andReturn('failed')->once();
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
+		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 
 		self::assertEquals('404', $response->getStatusCode());
@@ -63,7 +64,7 @@ class StatsCachingTest extends FixtureTestCase
 		$this->config->shouldReceive('get')->with('system', 'stats_key')->twice()->andReturn('12345');
 		PHPMockery::mock("Friendica\\Module", "function_exists")->with('opcache_get_status')->once()->andReturn(false);
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
+		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
@@ -92,7 +93,7 @@ class StatsCachingTest extends FixtureTestCase
 		$this->lock  = new DatabaseLock(DI::dba());
 		PHPMockery::mock("Friendica\\Module", "function_exists")->with('opcache_get_status')->once()->andReturn(false);
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
+		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
@@ -116,7 +117,7 @@ class StatsCachingTest extends FixtureTestCase
 		$this->lock  = new DatabaseLock(DI::dba());
 		PHPMockery::mock("Friendica\\Module", "function_exists")->with('opcache_get_status')->once()->andReturn(false);
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
+		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
@@ -141,7 +142,7 @@ class StatsCachingTest extends FixtureTestCase
 		PHPMockery::mock("Friendica\\Module", "function_exists")->with('opcache_get_status')->once()->andReturn(true);
 		PHPMockery::mock("Friendica\\Module", "opcache_get_status")->with(false)->once()->andReturn(false);
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
+		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
@@ -182,7 +183,7 @@ class StatsCachingTest extends FixtureTestCase
 			],
 		]);
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
+		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
@@ -199,5 +200,42 @@ class StatsCachingTest extends FixtureTestCase
 		], $json['opcache']);
 		self::assertEquals(['type' => 'database'], $json['cache']);
 		self::assertEquals(['type' => 'database'], $json['lock']);
+	}
+
+	public function testHandleRequestStatsCachingNotAllowedReturns404(): void
+	{
+		$config = $this->createMock(IManageConfigValues::class);
+		$request = $this->createMock(Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $config, $this->cache, $this->lock, []))
+			->handleRequest($request);
+
+		self::assertEquals(404, $response->getStatusCode());
+	}
+
+	public function testHandleRequestStatsCachingWithMinimumReturnsJson(): void
+	{
+		$config = $this->createMock(IManageConfigValues::class);
+		$config->method('get')->with('system', 'stats_key')->willReturn('12345');
+		$request = $this->createMock(Request::class);
+		$request->method('getAllInput')->willReturn(['key' => '12345']);
+		$request->method('getQueryString')->willReturn('');
+		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $config, $this->cache, $this->lock, []))
+			->handleRequest($request);
+
+		self::assertJson($response->getBody());
+		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
+
+		$json = json_decode($response->getBody(), true);
+
+		self::assertEquals([
+			'type'  => 'array',
+			'stats' => [],
+		], $json['cache']);
+		self::assertEquals([
+			'type'  => 'array',
+			'stats' => [],
+		], $json['lock']);
 	}
 }

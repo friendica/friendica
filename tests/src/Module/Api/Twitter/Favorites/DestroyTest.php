@@ -31,7 +31,7 @@ class DestroyTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
-		(new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
@@ -42,7 +42,7 @@ class DestroyTest extends ApiTestCase
 	 */
 	public function testApiFavoritesCreateDestroyWithDestroyAction(): void
 	{
-		$response = (new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id' => 3,
 			]);
@@ -67,5 +67,43 @@ class DestroyTest extends ApiTestCase
 		$_SESSION['authenticated'] = false;
 		api_favorites_create_destroy('json');
 		*/
+	}
+
+	/**
+	 * Test the handleRequest() function with an invalid ID.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestFavoritesDestroyWithInvalidIdThrowsBadRequestException(): void
+	{
+		$this->expectException(BadRequestException::class);
+
+		$module = new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$module->handleRequest($request);
+	}
+
+	/**
+	 * Test the handleRequest() function with an ID.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestFavoritesDestroyWithIdReturnsStatus(): void
+	{
+		$module = new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['id' => 3]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertStatus($json);
 	}
 }

@@ -31,7 +31,7 @@ class DestroyTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
-		(new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
@@ -56,10 +56,44 @@ class DestroyTest extends ApiTestCase
 	 */
 	public function testApiStatusesDestroyWithId(): void
 	{
-		$response = (new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id' => 1,
 			]);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals(1, $json->id);
+		self::assertIsObject($json->user);
+		self::assertIsObject($json->friendica_author);
+	}
+
+	public function testHandleRequestDestroyThrowsBadRequestException(): void
+	{
+		$this->useHttpMethod(Router::POST);
+
+		$this->expectException(BadRequestException::class);
+
+		$module = new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$module->handleRequest($request);
+	}
+
+	public function testHandleRequestDestroyWithIdReturnsDestroyedStatus(): void
+	{
+		$this->useHttpMethod(Router::POST);
+
+		$module = new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['id' => 1]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
 
 		$json = $this->toJson($response);
 

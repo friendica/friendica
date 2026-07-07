@@ -40,7 +40,7 @@ class UpdateTest extends ApiTestCase
 			],
 		];
 
-		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'status'                => 'Status content #friendica',
 				'in_reply_to_status_id' => 0,
@@ -62,7 +62,7 @@ class UpdateTest extends ApiTestCase
 	 */
 	public function testApiStatusesUpdateWithHtml(): void
 	{
-		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'htmlstatus' => '<b>Status content</b>',
 			]);
@@ -113,5 +113,48 @@ class UpdateTest extends ApiTestCase
 	public function testApiStatusesUpdateWithDayThrottleReached(): void
 	{
 		$this->markTestIncomplete();
+	}
+
+	public function testHandleRequestUpdateReturnsStatus(): void
+	{
+		$this->useHttpMethod(Router::POST);
+
+		$module = new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([
+			'status'                => 'Status content #friendica',
+			'in_reply_to_status_id' => 0,
+			'lat'                   => 48,
+			'long'                  => 7,
+		]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertStatus($json);
+		self::assertStringContainsString('Status content #friendica', $json->text);
+		self::assertStringContainsString('Status content #', $json->statusnet_html);
+	}
+
+	public function testHandleRequestUpdateWithHtmlReturnsStatus(): void
+	{
+		$this->useHttpMethod(Router::POST);
+
+		$module = new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([
+			'htmlstatus' => '<b>Status content</b>',
+		]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertStatus($json);
 	}
 }

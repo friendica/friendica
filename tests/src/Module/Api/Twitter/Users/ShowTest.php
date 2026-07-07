@@ -21,7 +21,7 @@ class ShowTest extends ApiTestCase
 	 */
 	public function testApiUsersShow(): void
 	{
-		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 
 		$json = $this->toJson($response);
@@ -41,9 +41,53 @@ class ShowTest extends ApiTestCase
 	 */
 	public function testApiUsersShowWithXml(): void
 	{
-		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
+		$response = (new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [ // @phpstan-ignore method.deprecated
 			'extension' => ICanCreateResponses::TYPE_XML,
 		]))->run($this->httpExceptionMock);
+
+		self::assertEquals(ICanCreateResponses::TYPE_XML, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
+
+		self::assertXml((string) $response->getBody(), 'statuses');
+	}
+
+	/**
+	 * Test the handleRequest() function.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestUsersShowReturnsSelfUser(): void
+	{
+		$module = new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals(static::SELF_USER['id'], $json->cid);
+		self::assertEquals('DFRN', $json->location);
+		self::assertEquals(static::SELF_USER['name'], $json->name);
+		self::assertEquals(static::SELF_USER['nick'], $json->screen_name);
+		self::assertTrue($json->verified);
+	}
+
+	/**
+	 * Test the handleRequest() function with an XML result.
+	 *
+	 * @return void
+	 */
+	public function testHandleRequestUsersShowWithXmlReturnsXml(): void
+	{
+		$module = new Show(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => ICanCreateResponses::TYPE_XML]);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+
+		$response = $module->handleRequest($request);
 
 		self::assertEquals(ICanCreateResponses::TYPE_XML, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 
