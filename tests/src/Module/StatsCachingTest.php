@@ -204,7 +204,7 @@ class StatsCachingTest extends FixtureTestCase
 
 	public function testHandleRequestStatsCachingNotAllowedReturns404(): void
 	{
-		$config = $this->createMock(IManageConfigValues::class);
+		$config = $this->createStub(IManageConfigValues::class);
 		$request = $this->createMock(Request::class);
 		$request->method('getAllInput')->willReturn([]);
 		$request->method('getQueryString')->willReturn('');
