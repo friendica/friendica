@@ -234,6 +234,41 @@ This section contains deprecation notices. This changes will become mandatory in
    }
    ```
 
+- Remove usage of `\Friendica\Capabilities\ICanHandleRequests` interface. Implement `\Friendica\Capabilities\IRequestHandler` instead.
+
+   The legacy `ICanHandleRequests` interface is deprecated. The `IRequestHandler` interface provides the same capability
+   through `handleRequest(\Friendica\App\Request)`.
+
+   *Before*
+   ```php
+   use Friendica\Capabilities\ICanHandleRequests;
+   use Friendica\Module\Special\HTTPException as ModuleHTTPException;
+
+   class MyModule extends BaseModule implements ICanHandleRequests
+   {
+       public function run(ModuleHTTPException $httpException, array $request = []): ResponseInterface
+       {
+           // custom logic
+           return parent::run($httpException, $request);
+       }
+   }
+   ```
+
+   *After*
+   ```php
+   use Friendica\App\Request;
+   use Friendica\Capabilities\IRequestHandler;
+
+   class MyModule extends BaseModule implements IRequestHandler
+   {
+       public function handleRequest(Request $request): ResponseInterface
+       {
+           // custom logic — use $this->getServerRequest() for typed getters
+           return parent::handleRequest($request);
+       }
+   }
+   ```
+
 - Remove constructor injection of `\Friendica\App\Request`. Use `$this->getServerRequest()` inside modules or inject `Psr\Http\Message\ServerRequestInterface` instead.
 
    Constructor injection of `App\Request` via DICE is deprecated. If your addon service depends on the current request, receive the value directly (e.g. `string $remoteAddress`) or use the PSR-7 `ServerRequestInterface`.
