@@ -15,7 +15,7 @@ use Friendica\App\Page;
 use Friendica\App\Request;
 use Friendica\App\Router;
 use Friendica\Capabilities\ICanCreateResponses;
-use Friendica\Capabilities\RequestHandler;
+use Friendica\Capabilities\IRequestHandler;
 use Friendica\Content\Nav;
 use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Config\Factory\Config;
@@ -607,7 +607,7 @@ class App
 		$page->logRuntime($this->config, 'runFrontend');
 	}
 
-	private function createModuleInstance(?string $moduleClass = null): RequestHandler
+	private function createModuleInstance(?string $moduleClass = null): IRequestHandler
 	{
 		/** @var Router $router */
 		$router = $this->container->create(Router::class);
@@ -619,7 +619,7 @@ class App
 
 		$stamp = microtime(true);
 
-		/** @var RequestHandler $module */
+		/** @var IRequestHandler $module */
 		$module = $this->container->create($moduleClass, $parameters);
 
 		if ($dice_profiler_threshold > 0) {

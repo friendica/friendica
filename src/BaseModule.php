@@ -11,7 +11,7 @@ use Friendica\App\Request;
 use Friendica\App\Router;
 use Friendica\Capabilities\ICanHandleRequests;
 use Friendica\Capabilities\ICanCreateResponses;
-use Friendica\Capabilities\RequestHandler;
+use Friendica\Capabilities\IRequestHandler;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
 use Friendica\Event\ModuleContentEvent;
@@ -35,7 +35,7 @@ use Psr\Log\LoggerInterface;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-abstract class BaseModule implements ICanHandleRequests, RequestHandler
+abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 {
 	/** @var array */
 	protected $parameters = [];

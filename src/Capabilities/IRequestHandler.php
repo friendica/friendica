@@ -10,7 +10,7 @@ namespace Friendica\Capabilities;
 use Friendica\App\Request;
 use Psr\Http\Message\ResponseInterface;
 
-interface RequestHandler
+interface IRequestHandler
 {
 	public function handleRequest(Request $request): ResponseInterface;
 }
