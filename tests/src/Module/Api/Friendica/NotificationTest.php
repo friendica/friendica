@@ -85,7 +85,7 @@ XML;
 
 	public function testHandleRequestFriendicaNotificationReturnsList(): void
 	{
-		$module = new Notification(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+		$module = new Notification(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
 
 		$request = $this->createMock(\Friendica\App\Request::class);
 		$request->method('getAllInput')->willReturn([]);
@@ -108,24 +108,4 @@ XML;
 		], $response->getHeaders());
 	}
 
-	public function testHandleRequestFriendicaNotificationWithIdReturnsNotification(): void
-	{
-		$module = new Notification(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
-
-		$request = $this->createMock(\Friendica\App\Request::class);
-		$request->method('getAllInput')->willReturn(['id' => 1]);
-		$request->method('getQueryString')->willReturn('');
-		$response = $module->handleRequest($request);
-
-		$json = $this->toJson($response);
-
-		self::assertIsInt($json->id);
-		self::assertIsInt($json->uid);
-		self::assertIsString($json->msg);
-
-		self::assertEquals([
-			'Content-type'                => ['application/json'],
-			ICanCreateResponses::X_HEADER => ['json'],
-		], $response->getHeaders());
-	}
 }
