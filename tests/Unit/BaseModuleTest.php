@@ -88,7 +88,7 @@ class BaseModuleTest extends TestCase
 		$httpException = $this->createStub(\Friendica\Module\Special\HTTPException::class);
 
 		$requestArray = ['key' => 'value'];
-		$module->run($httpException, $requestArray);
+		$module->run($httpException, $requestArray); // @phpstan-ignore method.deprecated
 
 		$this->assertSame($requestArray, $module->receivedInput);
 	}
@@ -98,7 +98,7 @@ class BaseModuleTest extends TestCase
 		$module = $this->createModuleWithMocks();
 
 		$httpException = $this->createStub(\Friendica\Module\Special\HTTPException::class);
-		$module->run($httpException, ['key' => 'value']);
+		$module->run($httpException, ['key' => 'value']); // @phpstan-ignore method.deprecated
 
 		$method = new \ReflectionMethod(BaseModule::class, 'getServerRequest');
 
