@@ -25,14 +25,14 @@ class UpdateTest extends ApiTestCase
 	public function testEmpty(): void
 	{
 		$this->expectException(BadRequestException::class);
-		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
 	public function testTooFewArgs(): void
 	{
 		$this->expectException(BadRequestException::class);
-		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'album' => 'album_name',
 			]);
@@ -41,7 +41,7 @@ class UpdateTest extends ApiTestCase
 	public function testWrongUpdate(): void
 	{
 		$this->expectException(BadRequestException::class);
-		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'album'     => 'album_name',
 				'album_new' => 'album_name',
@@ -57,7 +57,7 @@ class UpdateTest extends ApiTestCase
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
 
-		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'album'     => 'test_album',
 				'album_new' => 'test_album_2',
@@ -67,5 +67,71 @@ class UpdateTest extends ApiTestCase
 
 		self::assertEquals('updated', $json->result);
 		self::assertEquals('album `test_album` with all containing photos has been renamed to `test_album_2`.', $json->message);
+	}
+
+	public function testHandleRequestPhotoalbumUpdateThrowsBadRequestException(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->expectException(BadRequestException::class);
+
+		$module = new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$module->handleRequest($request);
+	}
+
+	public function testHandleRequestPhotoalbumUpdateWithAlbumReturnsUpdatedAlbum(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
+
+		$module = new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['album' => 'test_album', 'album_new' => 'test_album_2']);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals('updated', $json->result);
+		self::assertEquals('album `test_album` with all containing photos has been renamed to `test_album_2`.', $json->message);
+	}
+
+	public function testHandleRequestPhotoalbumUpdateWithAlbumAndJsonReturnsUpdatedAlbum(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
+
+		$module = new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['album' => 'test_album', 'album_new' => 'test_album_2']);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$responseText = (string) $response->getBody();
+
+		self::assertJson($responseText);
+
+		$json = json_decode($responseText);
+
+		self::assertEquals('updated', $json->result);
+		self::assertEquals('album `test_album` with all containing photos has been renamed to `test_album_2`.', $json->message);
+	}
+
+	public function testHandleRequestPhotoalbumUpdateOtherUserThrowsBadRequestException(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->expectException(BadRequestException::class);
+
+		$module = new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['album' => 'album_name', 'album_new' => 'album_name']);
+		$request->method('getQueryString')->willReturn('');
+		$module->handleRequest($request);
 	}
 }

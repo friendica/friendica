@@ -16,8 +16,24 @@ class VersionTest extends ApiTestCase
 {
 	public function test(): void
 	{
-		$response = (new Version(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new Version(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
+
+		self::assertEquals([
+			'Content-type'                => ['application/json'],
+			ICanCreateResponses::X_HEADER => ['json'],
+		], $response->getHeaders());
+		self::assertEquals('"0.9.7"', $response->getBody());
+	}
+
+	public function testHandleRequestGnusocialVersionReturnsVersion(): void
+	{
+		$module = new Version(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
 
 		self::assertEquals([
 			'Content-type'                => ['application/json'],

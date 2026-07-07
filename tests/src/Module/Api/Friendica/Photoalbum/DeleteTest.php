@@ -25,7 +25,7 @@ class DeleteTest extends ApiTestCase
 	public function testEmpty(): void
 	{
 		$this->expectException(BadRequestException::class);
-		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 
 	}
@@ -33,7 +33,7 @@ class DeleteTest extends ApiTestCase
 	public function testWrong(): void
 	{
 		$this->expectException(BadRequestException::class);
-		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'album' => 'album_name',
 			]);
@@ -43,13 +43,66 @@ class DeleteTest extends ApiTestCase
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
 
-		$response = (new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run(
 				$this->httpExceptionMock,
 				['album' => 'test_album'],
 			);
 
 		$json = $this->toJson($response);
+
+		self::assertEquals('deleted', $json->result);
+		self::assertEquals('album `test_album` with all containing photos has been deleted.', $json->message);
+	}
+
+	public function testHandleRequestPhotoalbumDeleteThrowsBadRequestException(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->expectException(BadRequestException::class);
+
+		$module = new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$module->handleRequest($request);
+	}
+
+	public function testHandleRequestPhotoalbumDeleteWithAlbumReturnsResult(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
+
+		$module = new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['album' => 'test_album']);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals('deleted', $json->result);
+		self::assertEquals('album `test_album` with all containing photos has been deleted.', $json->message);
+	}
+
+	public function testHandleRequestPhotoalbumDeleteWithAlbumAndJsonReturnsResult(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
+
+		$module = new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['album' => 'test_album']);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$responseText = (string) $response->getBody();
+
+		self::assertJson($responseText);
+
+		$json = json_decode($responseText);
 
 		self::assertEquals('deleted', $json->result);
 		self::assertEquals('album `test_album` with all containing photos has been deleted.', $json->message);

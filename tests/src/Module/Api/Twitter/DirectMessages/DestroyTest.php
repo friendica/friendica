@@ -31,7 +31,7 @@ class DestroyTest extends ApiTestCase
 	{
 		$this->expectException(\Friendica\Network\HTTPException\BadRequestException::class);
 
-		(new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		(new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
@@ -42,7 +42,7 @@ class DestroyTest extends ApiTestCase
 	 */
 	public function testApiDirectMessagesDestroyWithVerbose(): void
 	{
-		$response = (new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'friendica_verbose' => true,
 			]);
@@ -77,7 +77,7 @@ class DestroyTest extends ApiTestCase
 	public function testApiDirectMessagesDestroyWithId(): void
 	{
 		$this->expectException(\Friendica\Network\HTTPException\BadRequestException::class);
-		(new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		(new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id' => 1,
 			]);
@@ -90,7 +90,7 @@ class DestroyTest extends ApiTestCase
 	 */
 	public function testApiDirectMessagesDestroyWithIdAndVerbose(): void
 	{
-		$response = (new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id'                  => 1,
 				'friendica_parenturi' => 'parent_uri',
@@ -114,11 +114,91 @@ class DestroyTest extends ApiTestCase
 		$ids = DBA::selectToArray('mail', ['id']);
 		$id  = $ids[0]['id'];
 
-		$response = (new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'id'                => $id,
 				'friendica_verbose' => true,
 			]);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals('ok', $json->result);
+		self::assertEquals('message deleted', $json->message);
+	}
+
+	public function testHandleRequestDirectMessagesDestroyThrowsBadRequestException(): void
+	{
+		$this->expectException(\Friendica\Network\HTTPException\BadRequestException::class);
+
+		$module = new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$module->handleRequest($request);
+	}
+
+	public function testHandleRequestDirectMessagesDestroyWithVerboseReturnsError(): void
+	{
+		$module = new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['friendica_verbose' => true]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals('error', $json->result);
+		self::assertEquals('message id or parenturi not specified', $json->message);
+	}
+
+	public function testHandleRequestDirectMessagesDestroyWithIdThrowsBadRequestException(): void
+	{
+		$this->expectException(\Friendica\Network\HTTPException\BadRequestException::class);
+
+		$module = new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['id' => 1]);
+		$request->method('getQueryString')->willReturn('');
+		$module->handleRequest($request);
+	}
+
+	public function testHandleRequestDirectMessagesDestroyWithIdAndVerboseReturnsError(): void
+	{
+		$module = new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([
+			'id'                  => 1,
+			'friendica_parenturi' => 'parent_uri',
+			'friendica_verbose'   => true,
+		]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals('error', $json->result);
+		self::assertEquals('message id not in database', $json->message);
+	}
+
+	public function testHandleRequestDirectMessagesDestroyWithCorrectIdReturnsOk(): void
+	{
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/mail/mail.fixture.php', DI::dba());
+		$ids = DBA::selectToArray('mail', ['id']);
+		$id  = $ids[0]['id'];
+
+		$module = new Destroy(DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([
+			'id'                => $id,
+			'friendica_verbose' => true,
+		]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
 
 		$json = $this->toJson($response);
 

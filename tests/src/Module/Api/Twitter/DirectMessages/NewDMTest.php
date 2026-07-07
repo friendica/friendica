@@ -31,7 +31,7 @@ class NewDMTest extends ApiTestCase
 	{
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
-		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 
 		self::assertEmpty((string) $response->getBody());
@@ -62,7 +62,7 @@ class NewDMTest extends ApiTestCase
 	{
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
-		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
 				'user_id' => 43,
@@ -84,7 +84,7 @@ class NewDMTest extends ApiTestCase
 
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
-		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
 				'user_id' => 44,
@@ -108,7 +108,7 @@ class NewDMTest extends ApiTestCase
 
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
-		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
 				'user_id' => 44,
@@ -134,7 +134,7 @@ class NewDMTest extends ApiTestCase
 
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
-		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'rss']))
+		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'rss'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
 				'user_id' => 44,
@@ -142,5 +142,61 @@ class NewDMTest extends ApiTestCase
 			]);
 
 		self::assertXml((string) $response->getBody(), 'direct-messages');
+	}
+
+	public function testHandleRequestDirectMessagesNewReturnsEmptyBody(): void
+	{
+		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
+
+		$module = new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		self::assertEmpty((string) $response->getBody());
+	}
+
+	public function testHandleRequestDirectMessagesNewWithUserIdReturnsError(): void
+	{
+		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
+
+		$module = new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([
+			'text'    => 'message_text',
+			'user_id' => 43,
+		]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals(-1, $json->error);
+	}
+
+	public function testHandleRequestDirectMessagesNewWithScreenNameReturnsMessage(): void
+	{
+		DI::session()->set('nickname', 'selfcontact');
+
+		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
+
+		$module = new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([
+			'text'    => 'message_text',
+			'user_id' => 44,
+		]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertStringContainsString('message_text', $json->text);
+		self::assertEquals('selfcontact', $json->sender_screen_name);
+		self::assertEquals(1, $json->friendica_seen);
 	}
 }

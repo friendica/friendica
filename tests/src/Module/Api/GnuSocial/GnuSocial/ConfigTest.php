@@ -18,8 +18,30 @@ class ConfigTest extends ApiTestCase
 	 */
 	public function testApiStatusnetConfig(): void
 	{
-		$response = (new Config(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Config(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
+		$json = $this->toJson($response);
+
+		self::assertEquals(DI::baseUrl()->getHost(), $json->site->server);
+		self::assertEquals(DI::config()->get('system', 'theme'), $json->site->theme);
+		self::assertEquals(DI::baseUrl() . '/images/friendica-64.png', $json->site->logo);
+		self::assertTrue($json->site->fancy);
+		self::assertEquals(DI::config()->get('system', 'language'), $json->site->language);
+		self::assertEquals(DI::config()->get('system', 'default_timezone'), $json->site->timezone);
+		self::assertEquals(200000, $json->site->textlimit);
+		self::assertFalse($json->site->private);
+		self::assertEquals('always', $json->site->ssl);
+	}
+
+	public function testHandleRequestGnusocialConfigReturnsConfig(): void
+	{
+		$module = new Config(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
 		$json = $this->toJson($response);
 
 		self::assertEquals(DI::baseUrl()->getHost(), $json->site->server);

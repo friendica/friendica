@@ -20,8 +20,24 @@ class VerifyCredentialsTest extends ApiTestCase
 	 */
 	public function testApiAccountVerifyCredentials(): void
 	{
-		$response = (new VerifyCredentials(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new VerifyCredentials(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals(48, $json->id);
+		self::assertIsArray($json->emojis);
+		self::assertIsArray($json->fields);
+	}
+
+	public function testHandleRequestVerifyCredentialsReturnsAccount(): void
+	{
+		$module = new VerifyCredentials(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
 
 		$json = $this->toJson($response);
 

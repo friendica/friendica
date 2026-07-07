@@ -25,8 +25,31 @@ class InboxTest extends ApiTestCase
 
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
-		$response = (new Inbox($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
+		$response = (new Inbox($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json'])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
+
+		$json = $this->toJson($response);
+
+		self::assertGreaterThan(0, count($json));
+
+		foreach ($json as $item) {
+			self::assertIsInt($item->id);
+			self::assertIsString($item->text);
+		}
+	}
+
+	public function testHandleRequestDirectMessagesInboxReturnsMessageList(): void
+	{
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/mail/mail.fixture.php', DI::dba());
+
+		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
+
+		$module = new Inbox($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
 
 		$json = $this->toJson($response);
 

@@ -38,7 +38,7 @@ class UploadTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
-		(new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
@@ -52,7 +52,7 @@ class UploadTest extends ApiTestCase
 		$this->expectException(UnauthorizedException::class);
 		AuthTestConfig::$authenticated = false;
 
-		(new class (DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []) extends Upload {
+		(new class (DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []) extends Upload { // @phpstan-ignore method.deprecated
 			public function jsonError(int $httpCode, $content, string $content_type = 'application/json')
 			{
 				if ($httpCode === 401) {
@@ -79,7 +79,7 @@ class UploadTest extends ApiTestCase
 			],
 		];
 
-		(new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		(new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
 	}
 
@@ -102,8 +102,107 @@ class UploadTest extends ApiTestCase
 			],
 		];
 
-		$response = (new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock);
+
+		$media = $this->toJson($response);
+
+		self::assertEquals('image/png', $media->image->image_type);
+		self::assertEquals(1, $media->image->w);
+		self::assertEquals(1, $media->image->h);
+		self::assertNotEmpty($media->image->friendica_preview_url);
+	}
+
+	public function testHandleRequestMediaUploadThrowsBadRequestException(): void
+	{
+		$this->expectException(\Friendica\Network\HTTPException\BadRequestException::class);
+
+		$module = new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$module->handleRequest($request);
+	}
+
+	public function testHandleRequestMediaUploadWithImageReturnsMedia(): void
+	{
+		$_FILES = [
+			'media' => [
+				'id'       => 666,
+				'size'     => 666,
+				'width'    => 666,
+				'height'   => 666,
+				'tmp_name' => $this->getTempImage(),
+				'name'     => 'spacer.png',
+				'type'     => 'image/png',
+			],
+		];
+
+		$module = new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['media' => $this->getTempImage()]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$media = $this->toJson($response);
+
+		self::assertEquals('image/png', $media->image->image_type);
+		self::assertEquals(1, $media->image->w);
+		self::assertEquals(1, $media->image->h);
+		self::assertNotEmpty($media->image->friendica_preview_url);
+	}
+
+	public function testHandleRequestMediaUploadWithOtherImageReturnsMedia(): void
+	{
+		$_FILES = [
+			'media' => [
+				'id'       => 667,
+				'size'     => 667,
+				'width'    => 667,
+				'height'   => 667,
+				'tmp_name' => $this->getTempImage(),
+				'name'     => 'spacer2.png',
+				'type'     => 'image/png',
+			],
+		];
+
+		$module = new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['media' => $this->getTempImage()]);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$media = $this->toJson($response);
+
+		self::assertEquals('image/png', $media->image->image_type);
+		self::assertEquals(1, $media->image->w);
+		self::assertEquals(1, $media->image->h);
+		self::assertNotEmpty($media->image->friendica_preview_url);
+	}
+
+	public function testHandleRequestMediaUploadWithUrlReturnsMedia(): void
+	{
+		$_FILES = [
+			'media' => [
+				'id'       => 668,
+				'size'     => 668,
+				'width'    => 668,
+				'height'   => 668,
+				'tmp_name' => $this->getTempImage(),
+				'name'     => 'spacer3.png',
+				'type'     => 'image/png',
+			],
+		];
+
+		$module = new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['media_url' => 'http://example.com/image.jpg']);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
 
 		$media = $this->toJson($response);
 

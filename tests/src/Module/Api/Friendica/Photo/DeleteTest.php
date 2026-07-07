@@ -25,7 +25,7 @@ class DeleteTest extends ApiTestCase
 	public function testEmpty(): void
 	{
 		$this->expectException(BadRequestException::class);
-		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock);
+		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock); // @phpstan-ignore method.deprecated
 	}
 
 	public function testWithoutAuthenticatedUser(): void
@@ -36,14 +36,14 @@ class DeleteTest extends ApiTestCase
 	public function testWrong(): void
 	{
 		$this->expectException(BadRequestException::class);
-		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock, ['photo_id' => 1]);
+		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock, ['photo_id' => 1]); // @phpstan-ignore method.deprecated
 	}
 
 	public function testValidWithPost(): void
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
 
-		$response = (new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'photo_id' => '709057080661a283a6aa598501504178',
 			]);
@@ -58,7 +58,7 @@ class DeleteTest extends ApiTestCase
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
 
-		$response = (new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
+		$response = (new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [])) // @phpstan-ignore method.deprecated
 			->run($this->httpExceptionMock, [
 				'photo_id' => '709057080661a283a6aa598501504178',
 			]);
@@ -71,5 +71,71 @@ class DeleteTest extends ApiTestCase
 
 		self::assertEquals('deleted', $json->result);
 		self::assertEquals('photo with id `709057080661a283a6aa598501504178` has been deleted from server.', $json->message);
+	}
+
+	public function testHandleRequestPhotoDeleteThrowsBadRequestException(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->expectException(BadRequestException::class);
+
+		$module = new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn([]);
+		$request->method('getQueryString')->willReturn('');
+		$module->handleRequest($request);
+	}
+
+	public function testHandleRequestPhotoDeleteWithIdReturnsDeletedPhoto(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
+
+		$module = new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['photo_id' => '709057080661a283a6aa598501504178']);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$json = $this->toJson($response);
+
+		self::assertEquals('deleted', $json->result);
+		self::assertEquals('photo with id `709057080661a283a6aa598501504178` has been deleted from server.', $json->message);
+	}
+
+	public function testHandleRequestPhotoDeleteWithIdAndJsonReturnsDeletedPhoto(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
+
+		$module = new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['photo_id' => '709057080661a283a6aa598501504178']);
+		$request->method('getQueryString')->willReturn('');
+		$response = $module->handleRequest($request);
+
+		$responseText = (string) $response->getBody();
+
+		self::assertJson($responseText);
+
+		$json = json_decode($responseText);
+
+		self::assertEquals('deleted', $json->result);
+		self::assertEquals('photo with id `709057080661a283a6aa598501504178` has been deleted from server.', $json->message);
+	}
+
+	public function testHandleRequestPhotoDeleteWithWrongUserThrowsBadRequestException(): void
+	{
+		$this->useHttpMethod(Router::POST);
+		$this->expectException(BadRequestException::class);
+
+		$module = new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = $this->createMock(\Friendica\App\Request::class);
+		$request->method('getAllInput')->willReturn(['photo_id' => 1]);
+		$request->method('getQueryString')->willReturn('');
+		$module->handleRequest($request);
 	}
 }
