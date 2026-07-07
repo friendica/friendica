@@ -141,7 +141,7 @@ class App
 
 		// Register backward-compatible DICE resolution for Request
 		$this->container->addRule(Request::class, [
-			'shared' => true,
+			'shared'          => true,
 			'constructParams' => [
 				[\Dice\Dice::INSTANCE => function () use ($request) {
 					@trigger_error('Constructing \Friendica\App\Request via DICE is deprecated since 2026.08, use handleRequest() or inject ServerRequestInterface instead.', E_USER_DEPRECATED);

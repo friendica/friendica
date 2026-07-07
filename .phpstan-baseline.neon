@@ -57,6 +57,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\BaseModule\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/BaseModule.php
+
+		-
+			message: '''
 				#^Call to deprecated method getFactory\(\) of class Friendica\\BaseRepository\:
 				2026\.08 This method will become abstract in a future release, implement it in your child class instead\.$#
 			'''
@@ -777,3 +786,372 @@ parameters:
 			identifier: method.deprecatedClass
 			count: 1
 			path: src/Protocol/DFRN.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\BaseModule\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/Unit/BaseModuleTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Friendica/DirectMessages/SearchTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/Friendica/NotificationTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 4
+			path: tests/src/Module/Api/Friendica/Photo/DeleteTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Friendica/Photoalbum/DeleteTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 4
+			path: tests/src/Module/Api/Friendica/Photoalbum/UpdateTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/GnuSocial/GnuSocial/ConfigTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/GnuSocial/GnuSocial/VersionTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/GnuSocial/Help/TestTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Mastodon/Accounts/VerifyCredentialsTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/Twitter/Account/RateLimitStatusTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Twitter/Account/UpdateProfileTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Twitter/Blocks/ListsTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Twitter/DirectMessages/AllTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Twitter/DirectMessages/ConversationTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 5
+			path: tests/src/Module/Api/Twitter/DirectMessages/DestroyTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Twitter/DirectMessages/InboxTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 5
+			path: tests/src/Module/Api/Twitter/DirectMessages/NewDMTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/Twitter/DirectMessages/SentTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Twitter/Favorites/CreateTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/Twitter/Favorites/DestroyTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/Twitter/FavoritesTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Twitter/Followers/ListsTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Twitter/Friends/ListsTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Twitter/Friendships/IncomingTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Twitter/Lists/StatusesTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 4
+			path: tests/src/Module/Api/Twitter/Media/UploadTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: tests/src/Module/Api/Twitter/SavedSearchesTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/Twitter/Statuses/DestroyTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Twitter/Statuses/MentionsTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Twitter/Statuses/NetworkPublicTimelineTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Twitter/Statuses/RetweetTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Twitter/Statuses/ShowTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/Twitter/Statuses/UpdateTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Twitter/Statuses/UserTimelineTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/Twitter/Users/LookupTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/Api/Twitter/Users/SearchTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\Module\\BaseApi\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Api/Twitter/Users/ShowTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\BaseModule\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 3
+			path: tests/src/Module/NodeInfoTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\BaseModule\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: tests/src/Module/Special/OptionsTest.php
+
+		-
+			message: '''
+				#^Call to deprecated method run\(\) of class Friendica\\BaseModule\:
+				2026\.08 Use handleRequest\(\) instead$#
+			'''
+			identifier: method.deprecated
+			count: 6
+			path: tests/src/Module/StatsCachingTest.php
