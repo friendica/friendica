@@ -35,7 +35,7 @@ use Psr\Log\LoggerInterface;
  *
  * @author Hypolite Petovan <hypolite@mrpetovan.com>
  */
-abstract class BaseModule implements ICanHandleRequests, IRequestHandler
+abstract class BaseModule implements ICanHandleRequests, IRequestHandler // @phpstan-ignore class.implementsDeprecatedInterface (BC: this class provides both old and new interface)
 {
 	/** @var array */
 	protected $parameters = [];
@@ -207,6 +207,7 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 			@trigger_error(sprintf('%s::run() is deprecated since 2026.08, override handleRequest() instead.', static::class), E_USER_DEPRECATED);
 
 			$httpException = DI::getDice()->create(ModuleHTTPException::class);
+			// @phpstan-ignore method.deprecated (BC bridge: delegate to run() if child class overrides it)
 			return $this->run($httpException, $request->getAllInput());
 		}
 

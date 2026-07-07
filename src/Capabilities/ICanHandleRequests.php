@@ -13,6 +13,8 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * This interface provides the capability to handle requests from clients and returns the desired outcome
+ *
+ * @deprecated 2026.08 Use IRequestHandler::handleRequest() instead
  */
 interface ICanHandleRequests
 {
