@@ -28,7 +28,7 @@
 		<h3>{{$openid_title}}</h3>
 
 		<div id="register-openid-wrapper" class="form-group">
-			<span class="help-block" id="openid_url_tip">{{$fillwith}}&nbsp;{{$fillext}}</span>
+			<p id="openid_url_tip">{{$fillwith}}&nbsp;{{$fillext}}</p>
 			<input type="text" placeholder="{{$oidlabel}}"maxlength="60" name="openid_url" class="openid form-control" id="register-openid" value="{{$openid}}">
 		</div>
 		<div id="register-openid-end"></div>
@@ -88,8 +88,6 @@
 		{{if $permonly}}
 		{{include file="field_textarea.tpl" field=$permonlybox}}
 		{{/if}}
-
-		<hr>
 
 		{{if $showtoslink}}
 		<p><a href="{{$baseurl}}/tos">{{$tostext}}</a></p>

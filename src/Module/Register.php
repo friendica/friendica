@@ -208,7 +208,7 @@ class Register extends BaseModule
 			'$notices'               => $notices,
 			'$invitations'           => DI::config()->get('system', 'invitation_only'),
 			'$permonly'              => self::getPolicy() === self::APPROVE,
-			'$permonlybox'           => ['permonlybox', DI::l10n()->t('Note for the admin'), '', DI::l10n()->t('Leave a message for the admin, why you want to join this node'), DI::l10n()->t('Required')],
+			'$permonlybox'           => ['permonlybox', '', '', DI::l10n()->t('Leave a message for the admin, why you want to join this node'), DI::l10n()->t('Required'), '', DI::l10n()->t('Note for the admin')],
 			'$invite_desc'           => DI::l10n()->t('Membership on this site is by invitation only.'),
 			'$invite_label'          => DI::l10n()->t('Your invitation code: '),
 			'$invite_id'             => $invite_id,

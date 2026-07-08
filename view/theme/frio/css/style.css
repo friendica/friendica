@@ -2716,8 +2716,8 @@ p.wall-item-announce,
 	color: $font_color_darker;
 }
 
-/* Make these fields match the rest of the register form */
-#register_type_tip, #parent_password_tip {
+/* Make the fields that use generic field templates match the rest of the register form */
+.mod-register .help-block {
 	font-size: 85%;
 }
 

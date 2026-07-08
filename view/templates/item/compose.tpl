@@ -30,6 +30,7 @@
             {{/if}}
 
             <div class="comment-edit-bb-{{$id}} btn-toolbar clearfix" role="toolbar">
+                {{* TODO: Replace with field_textarea bbcode btns, which vier first needs support for *}}
                 <div class="btn-group">
                     <button type="button" class="btn btn-default bb-img" aria-label="{{$l10n.edimg}}" title="{{$l10n.edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}" tabindex="4">
                         <i class="ri ri-image-line"></i>

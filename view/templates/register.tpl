@@ -101,8 +101,6 @@
 		{{/for}}
 	{{/if}}
 
-	<hr>
-
 	{{$publish nofilter}}
 
 	<div id="register-submit-wrapper">

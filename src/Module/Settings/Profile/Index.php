@@ -243,7 +243,8 @@ class Index extends BaseSettings
 		}
 
 		// Title text for the BBCode buttons
-		$bb_l10n = [
+		$bb = [
+			'enable'   => true,
 			'edbold'   => $this->t('Bold'),
 			'editalic' => $this->t('Italic'),
 			'eduline'  => $this->t('Underline'),
@@ -294,7 +295,7 @@ class Index extends BaseSettings
 
 			'$nickname'      => $owner['nickname'],
 			'$username'      => ['username', $this->t('Display name:'), $owner['name']],
-			'$about'         => ['about', $this->t('Description:'), $owner['about'], '', '', 'rows="8"', true, $bb_l10n],
+			'$about'         => ['about', $this->t('Description:'), $owner['about'], '', '', 'rows="8"', '', $bb],
 			'$dob'           => Temporal::getDateofBirthField($owner['dob'], $owner['timezone']),
 			'$address'       => ['address', $this->t('Street Address:'), $owner['address']],
 			'$locality'      => ['locality', $this->t('Locality/City:'), $owner['locality']],
