@@ -14,6 +14,7 @@ use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
 use Friendica\Security\EJabberdAuth;
 use Friendica\Test\FixtureTestCase;
 use Mockery;
+use Mockery\MockInterface;
 
 /**
  * End-to-end integration test for the ejabberd external auth daemon.
@@ -40,7 +41,7 @@ class EJabberdAuthDaemonIntegrationTest extends FixtureTestCase
 	private $inputStream;
 	private $outputStream;
 
-	/** @var Mode */
+	/** @var Mode|MockInterface */
 	private $mode;
 
 	protected function setUp(): void
