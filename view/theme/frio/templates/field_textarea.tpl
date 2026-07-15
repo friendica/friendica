@@ -9,7 +9,7 @@
 		<label for="id_{{$field.0}}">{{$field.1}}{{if $field.4}} <span class="required" title="{{$field.4}}">*</span>{{/if}}</label>
 	{{/if}}
 
-	{{if $field.6}} {{* BBCode buttons *}}
+	{{if $field.7.enable}} {{* BBCode buttons *}}
 		<div class="comment-icon-list">
 			<div class="btn-group">
 				<button type="button" class="btn btn-default icon bb-img" style="cursor: pointer;" title="{{$field.7.edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="id_{{$field.0}}">
@@ -42,7 +42,7 @@
 			</div>
 		</div>
 	{{/if}}
-	<textarea class="form-control text-autosize emojis-target" name="{{$field.0}}" id="id_{{$field.0}}" {{if $field.4}}required{{/if}} {{$field.5 nofilter}} aria-describedby="{{$field.0}}_tip">{{$field.2}}</textarea>
+	<textarea class="form-control text-autosize emojis-target" name="{{$field.0}}" id="id_{{$field.0}}" {{if $field.4}}required{{/if}} {{$field.5 nofilter}}  placeholder="{{$field.6}}" aria-describedby="{{$field.0}}_tip">{{$field.2}}</textarea>
 	{{if $field.3}}
 		<span class="help-block" id="{{$field.0}}_tip" role="tooltip">{{$field.3 nofilter}}</span>
 	{{/if}}

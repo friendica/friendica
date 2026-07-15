@@ -23,6 +23,7 @@
 	</div>
 
 	<div id="prvmail-text-edit-bb" class="comment-edit-bb comment-icon-list">
+		{{* TODO: Replace with field_textarea bbcode btns *}}
 		<div class="btn-group">
 			<button type="button" class="btn btn-default icon bb-img" style="cursor: pointer;" title="{{$edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="imgprv" data-id="input">
 					<i class="ri ri-image-line" aria-hidden="true"></i>

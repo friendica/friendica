@@ -2446,9 +2446,12 @@ aside #id_password {
 
 #register-name-end,
 #register-email-end,
-#register-repeat-end,
 #register-nickname-end {
 	clear: both;
+}
+
+#register-submit-wrapper {
+	margin-top: 50px;
 }
 
 .required {

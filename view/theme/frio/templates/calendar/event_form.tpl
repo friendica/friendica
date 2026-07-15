@@ -84,6 +84,7 @@
 			<div class="form-group">
 				<div id="event-desc-text"><b>{{$d_text}}</b></div>
 				<div id="event-desc-text-edit-bb" class="comment-edit-bb comment-icon-list">
+					{{* TODO: Replace with field_textarea bbcode btns *}}
 					<div class="btn-group">
 						<button type="button" class="btn btn-default icon bb-img" style="cursor: pointer;" title="{{$edimg}}" data-role="insert-formatting" data-comment=" " data-bbcode="img" data-id="desc">
 							<i class="ri ri-image-line"></i>

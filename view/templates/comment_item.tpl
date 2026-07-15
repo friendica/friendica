@@ -34,6 +34,7 @@
 				<div class="comment-edit-submit-wrapper" id="comment-edit-submit-wrapper-{{$id}}" style="display: none;">
 
 				<div class="comment-edit-bb">
+					{{* TODO: Replace with field_textarea bbcode btns *}}
 					<a title="{{$edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}"><i class="icon-picture"></i></a>
 					<a title="{{$edurl}}" data-role="insert-formatting" data-bbcode="url" data-id="{{$id}}"><i class="icon-link"></i></a>
 

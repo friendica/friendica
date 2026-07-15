@@ -2716,6 +2716,11 @@ p.wall-item-announce,
 	color: $font_color_darker;
 }
 
+/* Make the fields that use generic field templates match the rest of the register form */
+.mod-register .help-block {
+	font-size: 85%;
+}
+
 input[type="range"].form-control {
 	padding-left: 0;
 	padding-right: 0;
@@ -3888,14 +3893,31 @@ li.addon {
 }
 
 /* Register Page */
-#register-openid-wrapper,
 #register-name-wrapper,
-#register-invite-wrapper,
-#profile-publish-wrapper {
-	margin-top: 20px;
+#register-email-wrapper,
+#register-nickname-wrapper,
+#profile-publish-wrapper,
+#register-invite-wrapper {
+	margin-top: 25px;
 }
-#register-openid-end {
-	margin-top: 40px;
+
+#openid_url_tip {
+	padding-top: 10px;
+	padding-bottom: 15px;
+}
+
+#register-form h2 {
+	margin-top: 0;
+}
+
+#register-form h3, #register-form hr {
+	margin-top: 25px;
+}
+
+#register-submit-button {
+	margin-top: 20px;
+	padding: 15px;
+	width: 100%;
 }
 
 /*
