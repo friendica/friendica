@@ -72,10 +72,10 @@ class User
 	 * ACCOUNT_TYPE_ORGANISATION - the account belongs to an organisation
 	 *	Associated page type: PAGE_FLAGS_SOAPBOX
 	 *
-	 * ACCOUNT_TYPE_NEWS - the account is a news reflector
+	 * ACCOUNT_TYPE_NEWS - the account is a news page
 	 *	Associated page type: PAGE_FLAGS_SOAPBOX
 	 *
-	 * ACCOUNT_TYPE_COMMUNITY - the account is community group
+	 * ACCOUNT_TYPE_COMMUNITY - the account is a group
 	 *	Associated page types: PAGE_COMMUNITY, PAGE_FLAGS_PRVGROUP
 	 *
 	 * ACCOUNT_TYPE_RELAY - the account is a relay

@@ -67,10 +67,10 @@ class Contact
 	 * TYPE_ORGANISATION - the account belongs to an organisation
 	 *	Associated page type: PAGE_SOAPBOX
 	 *
-	 * TYPE_NEWS - the account is a news reflector
+	 * TYPE_NEWS - the account is a news page
 	 *	Associated page type: PAGE_SOAPBOX
 	 *
-	 * TYPE_COMMUNITY - the account is community group
+	 * TYPE_COMMUNITY - the account is a group
 	 *	Associated page types: PAGE_COMMUNITY, PAGE_PRVGROUP
 	 *
 	 * TYPE_RELAY - the account is a relay

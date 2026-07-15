@@ -17,7 +17,7 @@ You'll also see a link to a **Global Directory**.
 There are several global directories across the globe that regularly exchange information with each other.
 The specific global directory that you see usually depends on where your server is located.
 If you click through to the global directory, you will be presented with a list of everybody who choses to be listed across all instances of Friendica.
-You will also see a "Show Community Groups" link, which will direct you to Groups.
+You will also see a "Groups" link, which will direct you to Groups.
 You connect to people and groups the same way, public groups will automatically accept your introduction, whereas private groups and some individual users will need to manually approve it.
 
 ## Connect to other Friendica users

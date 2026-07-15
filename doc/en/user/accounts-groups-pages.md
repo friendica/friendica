@@ -1,6 +1,6 @@
 # Account types: Groups and pages
 
-Friendica also lets you create accounts that can function as discussion groups, celebrity accounts, announcement channels, news reflectors, or organization pages, depending on how you want to interact with others.
+Friendica also lets you create accounts that can function as discussion groups, celebrity accounts, announcement channels, news pages, or organisations, depending on how you want to interact with others.
 Management of these accounts can be delegated to other accounts, or a parent account can be designated to easily toggle multiple identities.
 
 Every account in Friendica has a nickname and these must all be unique.
@@ -24,26 +24,43 @@ If your primary account is designated as the parent user, you will be able to ea
 ## Types of Accounts
 
 On the new account, visit the Settings > Account page.
-Towards the end of the page is a section for "Advanced account types".
-Typically, you would use "Personal Page - Standard" for a normal personal account with manual approval of “friends” and “followers.”
+Towards the end of the page is a section for "Account types".
+
+### Overview
+
+There are three categories of accounts:
+
+1. Personal accounts
+2. Pages
+3. Groups
+
+Under each category there are different account types. The available account types are:
+
+| Account category | Account type | Description |
+|------------------|--------------|-------------|
+| Personal account | Standard | Manual approval of "Friends" and "Followers". |
+| Personal account | Soapbox  | Automatically accepts contact requests as "Followers". |
+| Personal account | Love-all | Automatically accepts contact requests as "Friends". |
+| Page | Organisation | Automatically accepts "Followers". |
+| Page | News page | Automatically accepts "Followers". |
+| Group | Public Group | Automatically accepts members. |
+| Group | Public Group - Restricted | Manual approval of members. |
+| Group | Private Group [Experimental] | Manual approval of members. |
+
+### Further information
+
+Typically, you would use "Personal account - Standard" for a normal personal account with manual approval of “friends” and “followers.”
 This is the default selection.
 On this page you can change the type of account if desired.
 
-The other subtypes of a Personal Page are “Soapbox” and “Love-all.”
+The other subtypes of a Personal account are “Soapbox” and “Love-all.”
 A Soapbox account is an announcement channel that automatically approvals follower requests.
 Everything posted by the account will go out to the followers, but there will be no opportunity for interaction.
 This setting would typically be used for announcements or corporate communications.
-“Love-all” automatically approves contacts as friends.
 
-In addition to Personal Page, there are options for Organization Page, News Page, and Community Group.
-Organization and New Pages automatically approve contact requests as followers.
+## Posting to groups
 
-Community Group provide the ability for people to join the group without requiring approval.
-This creates a group where all members can freely interact.
-
-## Posting to Community groups
-
-If you are a member of a community group, you may post to the group by including an @-mention in the post mentioning the group.
+If you are a member of a group, you may post to the group by including an @-mention in the post mentioning the group.
 For example @bicycle would send my post to all members of the group "bicycle" in addition to the normal recipients.
 If you mention a group (you are a member of) in a new posting, the posting will be distributed to all members of the group, regardless of your privacy settings for the posting.
 Also, if the group is public, your posting will be public for the all internet users.
@@ -55,7 +72,7 @@ In the example above this means that you can address the bicycle group via !bicy
 The difference with the @-mention is that the post will only be sent to the addressed group.
 This also means that you shouldn't address multiple groups in a single post in that way since it will only be distributed by one the groups.
 
-You may also post to a community group by posting a "wall-to-wall" post using secure cross-site authentication.
+You may also post to a group by posting a "wall-to-wall" post using secure cross-site authentication.
 
-Comments which are relayed to community groups will be relayed back to the original post creator.
+Comments which are relayed to groups will be relayed back to the original post creator.
 Mentioning the group with an @-mention in a comment does not relay the message, as distribution is controlled entirely by the original post creator.

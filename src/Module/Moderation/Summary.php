@@ -34,10 +34,10 @@ class Summary extends BaseModeration
 		parent::content();
 
 		$accounts = [
-			[$this->t('Personal Page'), 0],
-			[$this->t('Organisation Page'), 0],
+			[$this->t('Personal account'), 0],
+			[$this->t('Organisation'), 0],
 			[$this->t('News Page'), 0],
-			[$this->t('Community Group'), 0],
+			[$this->t('Group'), 0],
 			[$this->t('Channel Relay'), 0],
 		];
 

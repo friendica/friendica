@@ -595,7 +595,7 @@ class Circle
 			'$new_circle'          => $editmode == 'extended' || $editmode == 'full' ? 1 : '',
 			'$circle_page'         => 'circle/',
 			'$edittext'            => DI::l10n()->t('Edit circle'),
-			'$uncircled'           => $every === 'contact' ? DI::l10n()->t('Contacts not in any circle') : '',
+			'$uncircled'           => $every === 'contact' ? DI::l10n()->t('Outside circles') : '',
 			'$uncircled_selected'  => (($circle_id === 'none') ? 'circle-selected' : ''),
 			'$createtext'          => DI::l10n()->t('Create a new circle'),
 			'$create_circle'       => DI::l10n()->t('Circle Name: '),
