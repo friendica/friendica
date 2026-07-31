@@ -262,6 +262,7 @@ class Page implements ArrayAccess
 			'$touch_icon'     => $touch_icon,
 			'$block_public'   => intval($config->get('system', 'block_public')),
 			'$stylesheets'    => $this->stylesheets,
+			'$htmx_poc'       => (int) ($this->page['htmx_poc'] ?? false),
 			'$loading'        => [
 				'fetching'            => $l10n->t('Fetching...'),
 				'receiving'           => $l10n->t('Receiving data...'),
@@ -443,6 +444,12 @@ class Page implements ArrayAccess
 
 		$this->command = $moduleName;
 		$this->method  = $args->getMethod();
+
+		// htmx hx-boost PoC toggle, ?htmx_poc=1 sticks via cookie. Not a real feature flag.
+		if (isset($_GET['htmx_poc'])) {
+			setcookie('htmx_poc', $_GET['htmx_poc'] === '1' ? '1' : '0', time() + 86400, '/');
+		}
+		$this->page['htmx_poc'] = ($_GET['htmx_poc'] ?? $_COOKIE['htmx_poc'] ?? '0') === '1';
 
 		/* Create the page content.
 		 * Calls all hooks which are including content operations

@@ -67,7 +67,7 @@ echo '<meta name="theme-color" content="' . $nav_bg . '" />';
 ?>
 	</head>
 
-	<body id="top" class="mod-<?php echo $page['module'] . " " . $is_singleuser_class . " " . $view_mode_class;?>">
+	<body id="top" <?php if (!empty($page['htmx_poc'])): ?>hx-boost="true" hx-target="#content" hx-select="#content" hx-swap="innerHTML" hx-push-url="true" <?php endif; ?>class="mod-<?php echo $page['module'] . " " . $is_singleuser_class . " " . $view_mode_class;?>">
 <?php
 	if (!empty($page['nav']) && !$minimal) {
 		echo str_replace(

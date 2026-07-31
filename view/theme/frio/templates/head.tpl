@@ -117,6 +117,10 @@
 	</script>
 	<script type="text/javascript" src="view/js/loading-indicator.js?v={{$VERSION}}"></script>
 	<script type="text/javascript" src="view/js/main.js?v={{$VERSION}}"></script>
+	{{if $htmx_poc}}
+		<script type="text/javascript" src="view/js/htmx.min.js?v={{$VERSION}}"></script>
+		<script type="text/javascript" src="view/js/htmx-poc-adapter.js?v={{$VERSION}}"></script>
+	{{/if}}
 	<script>
 	// Loading indicator translations with delay messages
 	window.spaLoadingTexts = {
