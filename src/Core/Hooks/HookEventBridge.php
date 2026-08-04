@@ -444,7 +444,7 @@ final class HookEventBridge
 
 		$addon_auth = static::callHook($event->getName(), $addon_auth);
 
-		$event->setAuthenticated(($addon_auth['authenticated'] ?? 0) !== 0);
+		$event->setAuthenticated(!empty($addon_auth['authenticated']));
 		$event->setUserRecordArray($addon_auth['user_record'] ?? null);
 	}
 
