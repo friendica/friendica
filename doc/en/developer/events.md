@@ -18,6 +18,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
+| `register_form` | `\Friendica\Event\AccountRegisterFormEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -51,6 +52,16 @@ Fired when a user attempts to login.
 - `isAuthenticated(): bool` — set to true to authenticate the user
 - `getUserRecordArray(): ?array` — successful authentication must also return a valid user record
 
-**Anpassbar:**
+**Modifiable:**
 - `setAuthenticated(bool $authenticated): void` — set to true to authenticate
 - `setUserRecordArray(?array $userRecord): void` — set the user record on success
+
+### `\Friendica\Event\AccountRegisterFormEvent`
+
+Fired when the registration form is displayed.
+
+**Contained data:**
+- `getMarkupTemplate(): string` — the template markup (before macro replacement)
+
+**Modifiable:**
+- `setMarkupTemplate(string $template): void` — change the template markup

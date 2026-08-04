@@ -18,6 +18,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model;
 use Friendica\Model\User;
@@ -198,15 +199,10 @@ class Register extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('register.tpl');
 
-		$hook_data = [
-			'template' => $tpl,
-		];
-
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER_FORM, $hook_data),
-		)->getArray();
-
-		$tpl = $hook_data['template'] ?? $tpl;
+		$event = $this->eventDispatcher->dispatch(
+			new AccountRegisterFormEvent($tpl),
+		);
+		$tpl = $event->getMarkupTemplate();
 
 		$o = Renderer::replaceMacros($tpl, [
 			'$notices'               => $notices,

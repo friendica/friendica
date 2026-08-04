@@ -11,6 +11,7 @@ namespace Friendica\Core\Hooks;
 
 use Friendica\Core\Hook;
 use Friendica\Event\AccountAuthenticateEvent;
+use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
@@ -45,7 +46,7 @@ final class HookEventBridge
 		CollectRoutesEvent::NAME                          => 'route_collection',
 		AccountAuthenticateEvent::NAME                    => 'authenticate',
 		ArrayFilterEvent::ACCOUNT_REGISTER                => 'register_account',
-		ArrayFilterEvent::ACCOUNT_REGISTER_FORM           => 'register_form',
+		AccountRegisterFormEvent::NAME                    => 'register_form',
 		ArrayFilterEvent::ACCOUNT_REGISTER_POST           => 'register_post',
 		ArrayFilterEvent::ACCOUNT_REMOVE                  => 'remove_user',
 		ArrayFilterEvent::ACL_LOOKUP_END                  => 'acl_lookup_end',
@@ -163,7 +164,7 @@ final class HookEventBridge
 			CollectRoutesEvent::NAME                          => 'onCollectRoutesEvent',
 			AccountAuthenticateEvent::NAME                    => 'onAccountAuthenticateEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
-			ArrayFilterEvent::ACCOUNT_REGISTER_FORM           => 'onArrayFilterEvent',
+			AccountRegisterFormEvent::NAME                    => 'onAccountRegisterFormEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER_POST           => 'onArrayFilterEvent',
 			ArrayFilterEvent::ACCOUNT_REMOVE                  => 'onAccountRemoveEvent',
 			ArrayFilterEvent::ACL_LOOKUP_END                  => 'onArrayFilterEvent',
@@ -445,6 +446,18 @@ final class HookEventBridge
 
 		$event->setAuthenticated(($addon_auth['authenticated'] ?? 0) !== 0);
 		$event->setUserRecordArray($addon_auth['user_record'] ?? null);
+	}
+
+	/**
+	 * Map the ACCOUNT_REGISTER_FORM event to `register_form` hook
+	 */
+	public static function onAccountRegisterFormEvent(AccountRegisterFormEvent $event): void
+	{
+		$template = $event->getMarkupTemplate();
+
+		$template = static::callHook($event->getName(), $template);
+
+		$event->setMarkupTemplate((string) $template);
 	}
 
 	/**
