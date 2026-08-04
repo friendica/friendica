@@ -15,6 +15,7 @@ use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\HomeInitEvent;
 use Friendica\Event\InitEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
@@ -37,7 +38,7 @@ final class HookEventBridge
 	 */
 	private static array $eventMapper = [
 		InitEvent::NAME                                   => 'init_1',
-		Event::HOME_INIT                                  => 'home_init',
+		HomeInitEvent::NAME                               => 'home_init',
 		Event::LOGGING_OUT                                => 'logging_out',
 		ConfigLoadedEvent::CONFIG_LOADED                  => 'load_config',
 		CollectRoutesEvent::COLLECT_ROUTES                => 'route_collection',
@@ -155,7 +156,7 @@ final class HookEventBridge
 	{
 		return [
 			InitEvent::NAME                                   => 'onNamedEvent',
-			Event::HOME_INIT                                  => 'onNamedEvent',
+			HomeInitEvent::NAME                               => 'onNamedEvent',
 			Event::LOGGING_OUT                                => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED                  => 'onConfigLoadedEvent',
 			CollectRoutesEvent::COLLECT_ROUTES                => 'onCollectRoutesEvent',

@@ -10,7 +10,7 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Core\Renderer;
 use Friendica\DI;
-use Friendica\Event\Event;
+use Friendica\Event\HomeInitEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
@@ -38,7 +38,7 @@ class Home extends BaseModule
 		$eventDispatcher = DI::eventDispatcher();
 
 		$eventDispatcher->dispatch(
-			new Event(Event::HOME_INIT),
+			new HomeInitEvent(),
 		);
 
 		if (DI::userSession()->getLocalUserId() && (DI::userSession()->getLocalUserNickname())) {
