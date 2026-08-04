@@ -11,6 +11,7 @@ namespace Friendica\Core\Hooks;
 
 use Friendica\Core\Hook;
 use Friendica\Event\AccountAuthenticateEvent;
+use Friendica\Event\AccountRegisterEvent;
 use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\ArrayFilterEvent;
@@ -46,7 +47,7 @@ final class HookEventBridge
 		ConfigLoadedEvent::NAME                           => 'load_config',
 		CollectRoutesEvent::NAME                          => 'route_collection',
 		AccountAuthenticateEvent::NAME                    => 'authenticate',
-		ArrayFilterEvent::ACCOUNT_REGISTER                => 'register_account',
+		AccountRegisterEvent::NAME                        => 'register_account',
 		AccountRegisterFormEvent::NAME                    => 'register_form',
 		AccountRegisterPostEvent::NAME                    => 'register_post',
 		ArrayFilterEvent::ACCOUNT_REMOVE                  => 'remove_user',
@@ -164,7 +165,7 @@ final class HookEventBridge
 			ConfigLoadedEvent::NAME                           => 'onConfigLoadedEvent',
 			CollectRoutesEvent::NAME                          => 'onCollectRoutesEvent',
 			AccountAuthenticateEvent::NAME                    => 'onAccountAuthenticateEvent',
-			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
+			AccountRegisterEvent::NAME                        => 'onAccountRegisterEvent',
 			AccountRegisterFormEvent::NAME                    => 'onAccountRegisterFormEvent',
 			AccountRegisterPostEvent::NAME                    => 'onAccountRegisterPostEvent',
 			ArrayFilterEvent::ACCOUNT_REMOVE                  => 'onAccountRemoveEvent',
@@ -474,15 +475,9 @@ final class HookEventBridge
 	/**
 	 * Map the ACCOUNT_REGISTER event to `register_account` hook
 	 */
-	public static function onAccountRegisterEvent(ArrayFilterEvent $event): void
+	public static function onAccountRegisterEvent(AccountRegisterEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$uid = $data['uid'] ?? 0;
-
-		$data['uid'] = static::callHook($event->getName(), (int) $uid);
-
-		$event->setArray($data);
+		$event->setUserId((int) static::callHook($event->getName(), $event->getUserId()));
 	}
 
 	/**

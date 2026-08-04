@@ -20,6 +20,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
 | `register_form` | `\Friendica\Event\AccountRegisterFormEvent` |
 | `register_post` | `\Friendica\Event\AccountRegisterPostEvent` |
+| `register_account` | `\Friendica\Event\AccountRegisterEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -76,3 +77,13 @@ Fired when the registration form is submitted.
 
 **Modifiable:**
 - `setPostArray(array $post): void` — change the POST data
+
+### `\Friendica\Event\AccountRegisterEvent`
+
+Fired when a new user account has been registered.
+
+**Contained data:**
+- `getUserId(): int` — the user ID
+
+**Modifiable:**
+- `setUserId(int $uid): void` — change the user ID

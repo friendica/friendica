@@ -19,6 +19,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\AccountAuthenticateEvent;
+use Friendica\Event\AccountRegisterEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Module;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -1479,14 +1480,8 @@ class User
 			Contact::updateSelfFromUserID($uid, true);
 		}
 
-		$eventDispatcher = DI::eventDispatcher();
-
-		$hook_data = [
-			'uid' => $uid,
-		];
-
-		$eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER, $hook_data),
+		DI::eventDispatcher()->dispatch(
+			new AccountRegisterEvent($uid),
 		);
 
 		self::setRegisterMethodByUserCount();

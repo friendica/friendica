@@ -13,6 +13,7 @@ use FastRoute\RouteCollector;
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\Event\AccountAuthenticateEvent;
+use Friendica\Event\AccountRegisterEvent;
 use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\ArrayFilterEvent;
@@ -48,7 +49,7 @@ class HookEventBridgeTest extends TestCase
 			ConfigLoadedEvent::NAME                           => 'onConfigLoadedEvent',
 			CollectRoutesEvent::NAME                          => 'onCollectRoutesEvent',
 			AccountAuthenticateEvent::NAME                    => 'onAccountAuthenticateEvent',
-			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
+			AccountRegisterEvent::NAME                        => 'onAccountRegisterEvent',
 			AccountRegisterFormEvent::NAME                    => 'onAccountRegisterFormEvent',
 			AccountRegisterPostEvent::NAME                    => 'onAccountRegisterPostEvent',
 			ArrayFilterEvent::ACCOUNT_REMOVE                  => 'onAccountRemoveEvent',
@@ -481,7 +482,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnAccountRegisterEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER, ['uid' => 123]);
+		$event = new AccountRegisterEvent(123);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -584,7 +585,7 @@ class HookEventBridgeTest extends TestCase
 			[AccountAuthenticateEvent::NAME, 'authenticate'],
 			[AccountRegisterFormEvent::NAME, 'register_form'],
 			[AccountRegisterPostEvent::NAME, 'register_post'],
-			[ArrayFilterEvent::ACCOUNT_REGISTER, 'register_account'],
+			[AccountRegisterEvent::NAME, 'register_account'],
 			[ArrayFilterEvent::ACCOUNT_REMOVE, 'remove_user'],
 			[ArrayFilterEvent::EVENT_CREATED, 'event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'event_updated'],
