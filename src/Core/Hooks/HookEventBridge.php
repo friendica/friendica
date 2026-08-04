@@ -15,6 +15,7 @@ use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\InitEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -35,7 +36,7 @@ final class HookEventBridge
 	 * This maps the new event names to the legacy Hook names.
 	 */
 	private static array $eventMapper = [
-		Event::INIT                                       => 'init_1',
+		InitEvent::NAME                                   => 'init_1',
 		Event::HOME_INIT                                  => 'home_init',
 		Event::LOGGING_OUT                                => 'logging_out',
 		ConfigLoadedEvent::CONFIG_LOADED                  => 'load_config',
@@ -153,7 +154,7 @@ final class HookEventBridge
 	public static function getStaticSubscribedEvents(): array
 	{
 		return [
-			Event::INIT                                       => 'onNamedEvent',
+			InitEvent::NAME                                   => 'onNamedEvent',
 			Event::HOME_INIT                                  => 'onNamedEvent',
 			Event::LOGGING_OUT                                => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED                  => 'onConfigLoadedEvent',

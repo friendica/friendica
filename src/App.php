@@ -37,7 +37,7 @@ use Friendica\Core\Update;
 use Friendica\Database\Definition\DbaDefinition;
 use Friendica\Database\Definition\ViewDefinition;
 use Friendica\Event\ConfigLoadedEvent;
-use Friendica\Event\Event;
+use Friendica\Event\InitEvent;
 use Friendica\Module\Maintenance;
 use Friendica\Module\Response;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
@@ -475,7 +475,7 @@ class App
 					System::externalRedirect($this->baseURL . '/' . $this->args->getQueryString());
 				}
 
-				$eventDispatcher->dispatch(new Event(Event::INIT));
+				$eventDispatcher->dispatch(new InitEvent());
 			}
 
 			DID::routeRequest($this->args->getCommand(), $serverVars);

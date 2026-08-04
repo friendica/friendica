@@ -8,6 +8,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 
 | Legacy Hook | Event Class |
 |-------------|-------------|
+| `init_1` | `\Friendica\Event\InitEvent` |
 | `display_item` | `\Friendica\Event\DisplayItemEvent` |
 | `post_local` | `\Friendica\Event\InsertPostLocalEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
@@ -19,4 +20,8 @@ See the individual event documentation below for the full list.
 
 ## Current Events
 
-<!-- NEW EVENTS WILL BE DOCUMENTED HERE -->
+### `\Friendica\Event\InitEvent`
+
+Fired when Friendica is initialized.
+
+**Contained data:** None (notification-only event).
