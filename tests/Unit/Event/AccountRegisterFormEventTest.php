@@ -32,7 +32,7 @@ class AccountRegisterFormEventTest extends TestCase
 	public function testGettersAndSetters(): void
 	{
 		$markup = '<form>{{$notices}}</form>';
-		$event = new AccountRegisterFormEvent($markup);
+		$event  = new AccountRegisterFormEvent($markup);
 
 		$this->assertSame($markup, $event->getMarkupTemplate());
 

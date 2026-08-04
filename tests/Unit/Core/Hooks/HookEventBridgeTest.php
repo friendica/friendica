@@ -14,6 +14,7 @@ use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\AccountRegisterFormEvent;
+use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
@@ -49,7 +50,7 @@ class HookEventBridgeTest extends TestCase
 			AccountAuthenticateEvent::NAME                    => 'onAccountAuthenticateEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
 			AccountRegisterFormEvent::NAME                    => 'onAccountRegisterFormEvent',
-			ArrayFilterEvent::ACCOUNT_REGISTER_POST           => 'onArrayFilterEvent',
+			AccountRegisterPostEvent::NAME                    => 'onAccountRegisterPostEvent',
 			ArrayFilterEvent::ACCOUNT_REMOVE                  => 'onAccountRemoveEvent',
 			ArrayFilterEvent::ACL_LOOKUP_END                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
@@ -582,7 +583,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::AVATAR_LOOKUP, 'avatar_lookup'],
 			[AccountAuthenticateEvent::NAME, 'authenticate'],
 			[AccountRegisterFormEvent::NAME, 'register_form'],
-			[ArrayFilterEvent::ACCOUNT_REGISTER_POST, 'register_post'],
+			[AccountRegisterPostEvent::NAME, 'register_post'],
 			[ArrayFilterEvent::ACCOUNT_REGISTER, 'register_account'],
 			[ArrayFilterEvent::ACCOUNT_REMOVE, 'remove_user'],
 			[ArrayFilterEvent::EVENT_CREATED, 'event_created'],

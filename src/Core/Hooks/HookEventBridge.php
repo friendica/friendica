@@ -12,6 +12,7 @@ namespace Friendica\Core\Hooks;
 use Friendica\Core\Hook;
 use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\AccountRegisterFormEvent;
+use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
@@ -47,7 +48,7 @@ final class HookEventBridge
 		AccountAuthenticateEvent::NAME                    => 'authenticate',
 		ArrayFilterEvent::ACCOUNT_REGISTER                => 'register_account',
 		AccountRegisterFormEvent::NAME                    => 'register_form',
-		ArrayFilterEvent::ACCOUNT_REGISTER_POST           => 'register_post',
+		AccountRegisterPostEvent::NAME                    => 'register_post',
 		ArrayFilterEvent::ACCOUNT_REMOVE                  => 'remove_user',
 		ArrayFilterEvent::ACL_LOOKUP_END                  => 'acl_lookup_end',
 		ArrayFilterEvent::ADD_WORKER_TASK                 => 'proc_run',
@@ -165,7 +166,7 @@ final class HookEventBridge
 			AccountAuthenticateEvent::NAME                    => 'onAccountAuthenticateEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
 			AccountRegisterFormEvent::NAME                    => 'onAccountRegisterFormEvent',
-			ArrayFilterEvent::ACCOUNT_REGISTER_POST           => 'onArrayFilterEvent',
+			AccountRegisterPostEvent::NAME                    => 'onAccountRegisterPostEvent',
 			ArrayFilterEvent::ACCOUNT_REMOVE                  => 'onAccountRemoveEvent',
 			ArrayFilterEvent::ACL_LOOKUP_END                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
@@ -458,6 +459,16 @@ final class HookEventBridge
 		$template = static::callHook($event->getName(), $template);
 
 		$event->setMarkupTemplate((string) $template);
+	}
+
+	/**
+	 * Map the ACCOUNT_REGISTER_POST event to `register_post` hook
+	 */
+	public static function onAccountRegisterPostEvent(AccountRegisterPostEvent $event): void
+	{
+		$data = ['post' => $event->getPostArray()];
+		$data = static::callHook($event->getName(), $data);
+		$event->setPostArray($data['post'] ?? []);
 	}
 
 	/**

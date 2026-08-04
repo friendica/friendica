@@ -19,6 +19,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
 | `register_form` | `\Friendica\Event\AccountRegisterFormEvent` |
+| `register_post` | `\Friendica\Event\AccountRegisterPostEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -65,3 +66,13 @@ Fired when the registration form is displayed.
 
 **Modifiable:**
 - `setMarkupTemplate(string $template): void` — change the template markup
+
+### `\Friendica\Event\AccountRegisterPostEvent`
+
+Fired when the registration form is submitted.
+
+**Contained data:**
+- `getPostArray(): array` — the submitted POST data
+
+**Modifiable:**
+- `setPostArray(array $post): void` — change the POST data
