@@ -20,7 +20,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\AccountRegisterEvent;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\AccountRemoveEvent;
 use Friendica\Module;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
@@ -1812,17 +1812,11 @@ class User
 			throw new \RuntimeException(DI::l10n()->t("User with delegates can't be removed, please remove delegate users first"));
 		}
 
-		$eventDispatcher = DI::eventDispatcher();
+		$event = DI::eventDispatcher()->dispatch(
+			new AccountRemoveEvent($user),
+		);
 
-		$hook_data = [
-			'user' => $user,
-		];
-
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REMOVE, $hook_data),
-		)->getArray();
-
-		$user = $hook_data['user'] ?? $user;
+		$user = $event->getUserArray();
 
 		// save username (actually the nickname as it is guaranteed
 		// unique), so it cannot be re-registered in the future.

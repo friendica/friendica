@@ -21,6 +21,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `register_form` | `\Friendica\Event\AccountRegisterFormEvent` |
 | `register_post` | `\Friendica\Event\AccountRegisterPostEvent` |
 | `register_account` | `\Friendica\Event\AccountRegisterEvent` |
+| `remove_user` | `\Friendica\Event\AccountRemoveEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -87,3 +88,13 @@ Fired when a new user account has been registered.
 
 **Modifiable:**
 - `setUserId(int $uid): void` — change the user ID
+
+### `\Friendica\Event\AccountRemoveEvent`
+
+Fired when a user account is being removed.
+
+**Contained data:**
+- `getUserArray(): array` — the user record array
+
+**Modifiable:**
+- `setUserArray(array $user): void` — change the user record

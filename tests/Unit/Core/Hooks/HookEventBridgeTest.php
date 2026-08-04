@@ -16,6 +16,7 @@ use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\AccountRegisterEvent;
 use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
+use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
@@ -52,7 +53,7 @@ class HookEventBridgeTest extends TestCase
 			AccountRegisterEvent::NAME                        => 'onAccountRegisterEvent',
 			AccountRegisterFormEvent::NAME                    => 'onAccountRegisterFormEvent',
 			AccountRegisterPostEvent::NAME                    => 'onAccountRegisterPostEvent',
-			ArrayFilterEvent::ACCOUNT_REMOVE                  => 'onAccountRemoveEvent',
+			AccountRemoveEvent::NAME                          => 'onAccountRemoveEvent',
 			ArrayFilterEvent::ACL_LOOKUP_END                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADDON_SETTINGS_POST             => 'onArrayFilterEvent',
@@ -498,7 +499,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnAccountRemoveEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REMOVE, ['user' => ['uid' => 123]]);
+		$event = new AccountRemoveEvent(['uid' => 123]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -586,7 +587,6 @@ class HookEventBridgeTest extends TestCase
 			[AccountRegisterFormEvent::NAME, 'register_form'],
 			[AccountRegisterPostEvent::NAME, 'register_post'],
 			[AccountRegisterEvent::NAME, 'register_account'],
-			[ArrayFilterEvent::ACCOUNT_REMOVE, 'remove_user'],
 			[ArrayFilterEvent::EVENT_CREATED, 'event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'event_updated'],
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'proc_run'],
