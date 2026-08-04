@@ -16,7 +16,9 @@ use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
+use Friendica\Event\HomeInitEvent;
 use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\InitEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -37,8 +39,8 @@ class HookEventBridgeTest extends TestCase
 	public function testGetStaticSubscribedEventsReturnsStaticMethods(): void
 	{
 		$expected = [
-			Event::INIT                                       => 'onNamedEvent',
-			Event::HOME_INIT                                  => 'onNamedEvent',
+			InitEvent::NAME                                   => 'onNamedEvent',
+			HomeInitEvent::NAME                               => 'onNamedEvent',
 			Event::LOGGING_OUT                                => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED                  => 'onConfigLoadedEvent',
 			CollectRoutesEvent::COLLECT_ROUTES                => 'onCollectRoutesEvent',
@@ -175,8 +177,8 @@ class HookEventBridgeTest extends TestCase
 	{
 		return [
 			['test', 'test'],
-			[Event::INIT, 'init_1'],
-			[Event::HOME_INIT, 'home_init'],
+			[InitEvent::NAME, 'init_1'],
+			[HomeInitEvent::NAME, 'home_init'],
 		];
 	}
 

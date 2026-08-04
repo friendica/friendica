@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Friendica\Test\Unit\Event;
 
 use Friendica\Event\Event;
+use Friendica\Event\InitEvent;
 use Friendica\Core\Event\NamedEvent;
 use PHPUnit\Framework\TestCase;
 
@@ -25,7 +26,7 @@ class EventTest extends TestCase
 	public static function getPublicConstants(): array
 	{
 		return [
-			[Event::INIT, 'friendica.init'],
+			[InitEvent::NAME, 'friendica.init'],
 		];
 	}
 

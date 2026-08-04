@@ -26,6 +26,6 @@ class InitEventTest extends TestCase
 	{
 		$event = new InitEvent();
 
-		$this->assertSame('friendica.init', $event->getName());
+		$this->assertSame(InitEvent::NAME, $event->getName());
 	}
 }

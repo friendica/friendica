@@ -26,6 +26,6 @@ class HomeInitEventTest extends TestCase
 	{
 		$event = new HomeInitEvent();
 
-		$this->assertSame('friendica.home_init', $event->getName());
+		$this->assertSame(HomeInitEvent::NAME, $event->getName());
 	}
 }
