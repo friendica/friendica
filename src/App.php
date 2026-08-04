@@ -378,7 +378,7 @@ class App
 			Core\Hook::loadHooks();
 			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $addonHelper->getAddonPath(), $serverParams);
 
-			$eventDispatcher->dispatch(new ConfigLoadedEvent(ConfigLoadedEvent::CONFIG_LOADED, $loader));
+			$eventDispatcher->dispatch(new ConfigLoadedEvent($loader));
 
 			// Hooks are now working, reload the whole definitions with hook enabled
 			$dbaDefinition->load(true);

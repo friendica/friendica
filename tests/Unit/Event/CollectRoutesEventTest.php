@@ -18,7 +18,7 @@ class CollectRoutesEventTest extends TestCase
 {
 	public function testImplementationOfInstances(): void
 	{
-		$event = new CollectRoutesEvent('test', $this->createStub(RouteCollector::class));
+		$event = new CollectRoutesEvent($this->createStub(RouteCollector::class));
 
 		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
 	}
@@ -26,7 +26,7 @@ class CollectRoutesEventTest extends TestCase
 	public static function getPublicConstants(): array
 	{
 		return [
-			[CollectRoutesEvent::COLLECT_ROUTES, 'friendica.collect_routes'],
+			[CollectRoutesEvent::NAME, 'friendica.collect_routes'],
 		];
 	}
 
@@ -38,23 +38,23 @@ class CollectRoutesEventTest extends TestCase
 
 	public function testGetNameReturnsName(): void
 	{
-		$event = new CollectRoutesEvent('test', $this->createStub(RouteCollector::class));
+		$event = new CollectRoutesEvent($this->createStub(RouteCollector::class));
 
-		$this->assertSame('test', $event->getName());
+		$this->assertSame('friendica.collect_routes', $event->getName());
 	}
 
 	public function testGetRouteCollectorReturnsCorrectString(): void
 	{
 		$routeCollector = $this->createStub(RouteCollector::class);
 
-		$event = new CollectRoutesEvent('test', $routeCollector);
+		$event = new CollectRoutesEvent($routeCollector);
 
 		$this->assertSame($routeCollector, $event->getRouteCollector());
 	}
 
 	public function testSetRouteCollector(): void
 	{
-		$event = new CollectRoutesEvent('test', $this->createStub(RouteCollector::class));
+		$event = new CollectRoutesEvent($this->createStub(RouteCollector::class));
 
 		$routeCollector = $this->createStub(RouteCollector::class);
 

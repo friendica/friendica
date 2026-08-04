@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Friendica\Event;
 
+use Friendica\Core\Event\AbstractEvent;
+
 /**
  * Event is emitted once the home page is visited.
  */
-final class HomeInitEvent extends Event
+final class HomeInitEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.home_init';
 

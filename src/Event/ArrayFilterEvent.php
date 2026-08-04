@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace Friendica\Event;
 
+use Friendica\Core\Event\AbstractEvent;
+
 /**
  * Allow Event listener to modify an array.
  *
  * @internal
  */
-final class ArrayFilterEvent extends Event
+final class ArrayFilterEvent extends AbstractEvent
 {
 	public const APP_MENU = 'friendica.data.app_menu';
 

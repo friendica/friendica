@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Unit\Core\Event;
 
-use Friendica\Event\Event;
 use Friendica\Core\Event\EventDispatcher;
 use Friendica\Core\Event\NamedEvent;
+use Friendica\Event\InitEvent;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -28,10 +28,10 @@ class EventDispatcherTest extends TestCase
 	{
 		$eventDispatcher = new EventDispatcher();
 
-		$eventDispatcher->addListener('test', function (NamedEvent $event): void {
-			$this->assertSame('test', $event->getName());
+		$eventDispatcher->addListener('friendica.init', function (NamedEvent $event): void {
+			$this->assertSame(InitEvent::NAME, $event->getName());
 		});
 
-		$eventDispatcher->dispatch(new Event('test'));
+		$eventDispatcher->dispatch(new InitEvent());
 	}
 }

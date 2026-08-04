@@ -15,7 +15,6 @@ use Friendica\Core\Hooks\HookEventBridge;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
-use Friendica\Event\Event;
 use Friendica\Event\HomeInitEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\InitEvent;
@@ -43,8 +42,8 @@ class HookEventBridgeTest extends TestCase
 			InitEvent::NAME                                   => 'onNamedEvent',
 			HomeInitEvent::NAME                               => 'onNamedEvent',
 			LoggingOutEvent::NAME                             => 'onNamedEvent',
-			ConfigLoadedEvent::CONFIG_LOADED                  => 'onConfigLoadedEvent',
-			CollectRoutesEvent::COLLECT_ROUTES                => 'onCollectRoutesEvent',
+			ConfigLoadedEvent::NAME                           => 'onConfigLoadedEvent',
+			CollectRoutesEvent::NAME                          => 'onCollectRoutesEvent',
 			ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'onArrayFilterEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER_FORM           => 'onArrayFilterEvent',
@@ -150,10 +149,10 @@ class HookEventBridgeTest extends TestCase
 			HtmlFilterEvent::PAGE_CONTENT_TOP                 => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_END                         => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
-			ModuleContentEvent::MODULE_CONTENT                => 'onModuleContentEvent',
-			ModuleInitEvent::MODULE_INIT                      => 'onModuleInitEvent',
-			ModulePostEvent::MODULE_POST                      => 'onModulePostEvent',
-			ModulePostRecipientEvent::MODULE_POST_RECIPIENT   => 'onModulePostRecipientEvent',
+			ModuleContentEvent::NAME                          => 'onModuleContentEvent',
+			ModuleInitEvent::NAME                             => 'onModuleInitEvent',
+			ModulePostEvent::NAME                             => 'onModulePostEvent',
+			ModulePostRecipientEvent::NAME                    => 'onModulePostRecipientEvent',
 		];
 
 		$this->assertSame(
@@ -177,7 +176,6 @@ class HookEventBridgeTest extends TestCase
 	public static function getNamedEventData(): array
 	{
 		return [
-			['test', 'test'],
 			[InitEvent::NAME, 'init_1'],
 			[HomeInitEvent::NAME, 'home_init'],
 		];
@@ -186,7 +184,12 @@ class HookEventBridgeTest extends TestCase
 	#[\PHPUnit\Framework\Attributes\DataProvider('getNamedEventData')]
 	public function testOnNamedEventCallsHook($name, $expected): void
 	{
-		$event = new Event($name);
+		$event = new class ($name) extends \Friendica\Core\Event\AbstractEvent {
+			public function __construct(string $name)
+			{
+				parent::__construct($name);
+			}
+		};
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -203,17 +206,16 @@ class HookEventBridgeTest extends TestCase
 	public static function getConfigLoadedEventData(): array
 	{
 		return [
-			['test', 'test'],
-			[ConfigLoadedEvent::CONFIG_LOADED, 'load_config'],
+			['load_config'],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getConfigLoadedEventData')]
-	public function testOnConfigLoadedEventCallsHookWithCorrectValue($name, $expected): void
+	public function testOnConfigLoadedEventCallsHookWithCorrectValue(string $expected): void
 	{
 		$config = $this->createStub(ConfigFileManager::class);
 
-		$event = new ConfigLoadedEvent($name, $config);
+		$event = new ConfigLoadedEvent($config);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -230,17 +232,16 @@ class HookEventBridgeTest extends TestCase
 	public static function getCollectRoutesEventData(): array
 	{
 		return [
-			['test', 'test'],
-			[CollectRoutesEvent::COLLECT_ROUTES, 'route_collection'],
+			['route_collection'],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getCollectRoutesEventData')]
-	public function testOnCollectRoutesEventCallsHookWithCorrectValue($name, $expected): void
+	public function testOnCollectRoutesEventCallsHookWithCorrectValue(string $expected): void
 	{
 		$routeCollector = $this->createStub(RouteCollector::class);
 
-		$event = new CollectRoutesEvent($name, $routeCollector);
+		$event = new CollectRoutesEvent($routeCollector);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -646,15 +647,15 @@ class HookEventBridgeTest extends TestCase
 	public static function getModuleInitEventData(): array
 	{
 		return [
-			'Home'         => ['friendica.module_init', 'home_mod_init', 'home', \Friendica\Module\Home::class],
-			'LegacyModule' => ['friendica.module_init', 'photos_mod_init', 'photos', \Friendica\LegacyModule::class],
+			'Home'         => ['home_mod_init', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['photos_mod_init', 'photos', \Friendica\LegacyModule::class],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getModuleInitEventData')]
-	public function testOnModuleInitEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	public function testOnModuleInitEventCallsHookWithCorrectValue($expected, $moduleName, $moduleClass): void
 	{
-		$event = new ModuleInitEvent($name, $moduleName, $moduleClass);
+		$event = new ModuleInitEvent($moduleName, $moduleClass);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -671,15 +672,15 @@ class HookEventBridgeTest extends TestCase
 	public static function getModulePostEventData(): array
 	{
 		return [
-			'Home'         => ['friendica.module_post', 'home_mod_post', 'home', \Friendica\Module\Home::class],
-			'LegacyModule' => ['friendica.module_post', 'photos_mod_post', 'photos', \Friendica\LegacyModule::class],
+			'Home'         => ['home_mod_post', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['photos_mod_post', 'photos', \Friendica\LegacyModule::class],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getModulePostEventData')]
-	public function testOnModulePostEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	public function testOnModulePostEventCallsHookWithCorrectValue($expected, $moduleName, $moduleClass): void
 	{
-		$event = new ModulePostEvent($name, $moduleName, $moduleClass, ['original']);
+		$event = new ModulePostEvent($moduleName, $moduleClass, ['original']);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -696,15 +697,15 @@ class HookEventBridgeTest extends TestCase
 	public static function getModuleContentEventData(): array
 	{
 		return [
-			'Home'         => ['friendica.module_content', 'Friendica\Module\Home_mod_content', 'home', \Friendica\Module\Home::class],
-			'LegacyModule' => ['friendica.module_content', 'Friendica\LegacyModule_mod_content', 'photos', \Friendica\LegacyModule::class],
+			'Home'         => ['Friendica\Module\Home_mod_content', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['Friendica\LegacyModule_mod_content', 'photos', \Friendica\LegacyModule::class],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getModuleContentEventData')]
-	public function testOnModuleContentEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	public function testOnModuleContentEventCallsHookWithCorrectValue($expected, $moduleName, $moduleClass): void
 	{
-		$event = new ModuleContentEvent($name, $moduleName, $moduleClass, 'original');
+		$event = new ModuleContentEvent($moduleName, $moduleClass, 'original');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -725,15 +726,15 @@ class HookEventBridgeTest extends TestCase
 	public static function getModulePostRecipientEventData(): array
 	{
 		return [
-			'Home'         => ['friendica.module_post_recipient', 'home_post_recipient', 'home', \Friendica\Module\Home::class],
-			'LegacyModule' => ['friendica.module_post_recipient', 'photos_post_recipient', 'photos', \Friendica\LegacyModule::class],
+			'Home'         => ['home_post_recipient', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['photos_post_recipient', 'photos', \Friendica\LegacyModule::class],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getModulePostRecipientEventData')]
-	public function testOnModulePostRecipientEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	public function testOnModulePostRecipientEventCallsHookWithCorrectValue($expected, $moduleName, $moduleClass): void
 	{
-		$event = new ModulePostRecipientEvent($name, $moduleName, $moduleClass, 'original');
+		$event = new ModulePostRecipientEvent($moduleName, $moduleClass, 'original');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 

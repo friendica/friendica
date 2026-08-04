@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Friendica\Event;
 
+use Friendica\Core\Event\AbstractEvent;
+
 /**
  * Event is emitted when a user is logging out.
  */
-final class LoggingOutEvent extends Event
+final class LoggingOutEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.logging_out';
 

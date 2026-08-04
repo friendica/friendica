@@ -18,7 +18,7 @@ class ModuleInitEventTest extends TestCase
 {
 	public function testImplementationOfInstances(): void
 	{
-		$event = new ModuleInitEvent('test', 'moduleName', Smilies::class);
+		$event = new ModuleInitEvent('moduleName', Smilies::class);
 
 		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
 	}
@@ -26,7 +26,7 @@ class ModuleInitEventTest extends TestCase
 	public static function getPublicConstants(): array
 	{
 		return [
-			[ModuleInitEvent::MODULE_INIT, 'friendica.module_init'],
+			[ModuleInitEvent::NAME, 'friendica.module_init'],
 		];
 	}
 
@@ -38,21 +38,21 @@ class ModuleInitEventTest extends TestCase
 
 	public function testGetNameReturnsName(): void
 	{
-		$event = new ModuleInitEvent('test', 'moduleName', Smilies::class);
+		$event = new ModuleInitEvent('moduleName', Smilies::class);
 
-		$this->assertSame('test', $event->getName());
+		$this->assertSame('friendica.module_init', $event->getName());
 	}
 
 	public function testGetModuleNameReturnsModuleName(): void
 	{
-		$event = new ModuleInitEvent('test', 'moduleName', Smilies::class);
+		$event = new ModuleInitEvent('moduleName', Smilies::class);
 
 		$this->assertSame('moduleName', $event->getModuleName());
 	}
 
 	public function testGetModuleClassReturnsModuleClass(): void
 	{
-		$event = new ModuleInitEvent('test', 'moduleName', Smilies::class);
+		$event = new ModuleInitEvent('moduleName', Smilies::class);
 
 		$this->assertSame(Smilies::class, $event->getModuleClass());
 	}

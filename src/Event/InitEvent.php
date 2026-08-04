@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Friendica\Event;
 
+use Friendica\Core\Event\AbstractEvent;
+
 /**
  * Friendica is initialized.
  */
-final class InitEvent extends Event
+final class InitEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.init';
 

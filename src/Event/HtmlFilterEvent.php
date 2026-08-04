@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace Friendica\Event;
 
+use Friendica\Core\Event\AbstractEvent;
+
 /**
  * Allow Event listener to modify HTML.
  *
  * @internal
  */
-final class HtmlFilterEvent extends Event
+final class HtmlFilterEvent extends AbstractEvent
 {
 	public const HEAD = 'friendica.html.head';
 

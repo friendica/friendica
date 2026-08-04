@@ -56,7 +56,7 @@ class ACL
 		]);
 
 		$o = DI::eventDispatcher()->dispatch(
-			new ModulePostRecipientEvent(ModulePostRecipientEvent::MODULE_POST_RECIPIENT, DI::args()->getModuleName(), DI::router()->getModuleClass(), $o),
+			new ModulePostRecipientEvent(DI::args()->getModuleName(), DI::router()->getModuleClass(), $o),
 		)->getHtml();
 
 		return $o;

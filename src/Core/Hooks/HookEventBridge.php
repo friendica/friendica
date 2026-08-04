@@ -13,7 +13,6 @@ use Friendica\Core\Hook;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
-use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\HomeInitEvent;
 use Friendica\Event\InitEvent;
@@ -41,8 +40,8 @@ final class HookEventBridge
 		InitEvent::NAME                                   => 'init_1',
 		HomeInitEvent::NAME                               => 'home_init',
 		LoggingOutEvent::NAME                             => 'logging_out',
-		ConfigLoadedEvent::CONFIG_LOADED                  => 'load_config',
-		CollectRoutesEvent::COLLECT_ROUTES                => 'route_collection',
+		ConfigLoadedEvent::NAME                           => 'load_config',
+		CollectRoutesEvent::NAME                          => 'route_collection',
 		ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'authenticate',
 		ArrayFilterEvent::ACCOUNT_REGISTER                => 'register_account',
 		ArrayFilterEvent::ACCOUNT_REGISTER_FORM           => 'register_form',
@@ -159,8 +158,8 @@ final class HookEventBridge
 			InitEvent::NAME                                   => 'onNamedEvent',
 			HomeInitEvent::NAME                               => 'onNamedEvent',
 			LoggingOutEvent::NAME                             => 'onNamedEvent',
-			ConfigLoadedEvent::CONFIG_LOADED                  => 'onConfigLoadedEvent',
-			CollectRoutesEvent::COLLECT_ROUTES                => 'onCollectRoutesEvent',
+			ConfigLoadedEvent::NAME                           => 'onConfigLoadedEvent',
+			CollectRoutesEvent::NAME                          => 'onCollectRoutesEvent',
 			ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'onArrayFilterEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER_FORM           => 'onArrayFilterEvent',
@@ -266,10 +265,10 @@ final class HookEventBridge
 			HtmlFilterEvent::PAGE_CONTENT_TOP                 => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_END                         => 'onHtmlFilterEvent',
 			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
-			ModuleContentEvent::MODULE_CONTENT                => 'onModuleContentEvent',
-			ModuleInitEvent::MODULE_INIT                      => 'onModuleInitEvent',
-			ModulePostEvent::MODULE_POST                      => 'onModulePostEvent',
-			ModulePostRecipientEvent::MODULE_POST_RECIPIENT   => 'onModulePostRecipientEvent',
+			ModuleContentEvent::NAME                          => 'onModuleContentEvent',
+			ModuleInitEvent::NAME                             => 'onModuleInitEvent',
+			ModulePostEvent::NAME                             => 'onModulePostEvent',
+			ModulePostRecipientEvent::NAME                    => 'onModulePostRecipientEvent',
 		];
 	}
 

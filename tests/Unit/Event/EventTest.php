@@ -9,18 +9,17 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Unit\Event;
 
-use Friendica\Event\Event;
+use Friendica\Core\Event\AbstractEvent;
 use Friendica\Event\InitEvent;
-use Friendica\Core\Event\NamedEvent;
 use PHPUnit\Framework\TestCase;
 
 class EventTest extends TestCase
 {
-	public function testImplementationOfInstances(): void
+	public function testAbstractEventIsAbstract(): void
 	{
-		$event = new Event('test');
+		$reflection = new \ReflectionClass(AbstractEvent::class);
 
-		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
+		$this->assertTrue($reflection->isAbstract());
 	}
 
 	public static function getPublicConstants(): array
@@ -34,12 +33,5 @@ class EventTest extends TestCase
 	public function testPublicConstantsAreAvailable($value, $expected): void
 	{
 		$this->assertSame($expected, $value);
-	}
-
-	public function testGetNameReturnsName(): void
-	{
-		$event = new Event('test');
-
-		$this->assertSame('test', $event->getName());
 	}
 }
