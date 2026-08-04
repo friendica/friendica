@@ -329,7 +329,7 @@ class App
 
 	private function registerEventDispatcher(): void
 	{
-		/** @var \Friendica\Event\EventDispatcher */
+		/** @var \Friendica\Core\Event\EventDispatcher */
 		$eventDispatcher = $this->container->create(EventDispatcherInterface::class);
 
 		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {

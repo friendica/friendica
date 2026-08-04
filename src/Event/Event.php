@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Friendica\Event;
 
+use Friendica\Core\Event\NamedEvent;
+
 /**
  * One-way Event to inform listener about something happend.
  *

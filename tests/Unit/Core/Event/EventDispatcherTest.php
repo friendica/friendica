@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Test\Unit\Event;
+namespace Friendica\Test\Unit\Core\Event;
 
 use Friendica\Event\Event;
-use Friendica\Event\EventDispatcher;
-use Friendica\Event\NamedEvent;
+use Friendica\Core\Event\EventDispatcher;
+use Friendica\Core\Event\NamedEvent;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 

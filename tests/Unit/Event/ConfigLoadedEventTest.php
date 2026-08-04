@@ -11,7 +11,7 @@ namespace Friendica\Test\Unit\Event;
 
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Event\ConfigLoadedEvent;
-use Friendica\Event\NamedEvent;
+use Friendica\Core\Event\NamedEvent;
 use PHPUnit\Framework\TestCase;
 
 class ConfigLoadedEventTest extends TestCase

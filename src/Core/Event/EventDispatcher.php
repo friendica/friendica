@@ -7,24 +7,20 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Event;
+namespace Friendica\Core\Event;
 
 use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 
 /**
- * Modified Event Dispatcher.
- *
  * @internal
  */
 final class EventDispatcher extends SymfonyEventDispatcher
 {
 	/**
-	 * Add support for named events.
+	 * Dispatches an event to all registered listeners.
 	 *
-	 * @template T of object
-	 * @param T $event
-	 *
-	 * @return T The passed $event MUST be returned
+	 * If $eventName is null and $event implements NamedEvent, the event name
+	 * will be extracted from the event itself.
 	 */
 	public function dispatch(object $event, ?string $eventName = null): object
 	{

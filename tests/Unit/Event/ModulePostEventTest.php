@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Friendica\Test\Unit\Event;
 
 use Friendica\Event\ModulePostEvent;
-use Friendica\Event\NamedEvent;
+use Friendica\Core\Event\NamedEvent;
 use Friendica\Module\Smilies;
 use PHPUnit\Framework\TestCase;
 

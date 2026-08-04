@@ -19,7 +19,7 @@ use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
 use Friendica\Event\ModulePostRecipientEvent;
-use Friendica\Event\NamedEvent;
+use Friendica\Core\Event\NamedEvent;
 
 /**
  * Bridge between the EventDispatcher and the Hook class.

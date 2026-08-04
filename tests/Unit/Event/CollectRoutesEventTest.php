@@ -11,7 +11,7 @@ namespace Friendica\Test\Unit\Event;
 
 use FastRoute\RouteCollector;
 use Friendica\Event\CollectRoutesEvent;
-use Friendica\Event\NamedEvent;
+use Friendica\Core\Event\NamedEvent;
 use PHPUnit\Framework\TestCase;
 
 class CollectRoutesEventTest extends TestCase

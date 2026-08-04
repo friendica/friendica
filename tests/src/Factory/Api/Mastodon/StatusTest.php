@@ -25,7 +25,7 @@ class StatusTest extends FixtureTestCase
 
 		$this->status = DI::mstdnStatus();
 
-		/** @var \Friendica\Event\EventDispatcher */
+		/** @var \Friendica\Core\Event\EventDispatcher */
 		$eventDispatcher = DI::eventDispatcher();
 
 		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
