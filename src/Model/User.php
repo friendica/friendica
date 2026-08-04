@@ -18,6 +18,7 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Module;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -782,26 +783,19 @@ class User
 	 */
 	public static function getIdFromAuthenticateHooks(string $username, string $password): int
 	{
-		$addon_auth = [
-			'username'      => $username,
-			'password'      => $password,
-			'authenticated' => 0,
-			'user_record'   => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
 		/**
-		 * An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
+		 * An addon indicates successful login by setting 'authenticated' to true and returning a user record
 		 * Addons should never set 'authenticated' except to indicate success - as hooks may be chained
 		 * and later addons should not interfere with an earlier one that succeeded.
 		 */
-		$addon_auth = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_AUTHENTICATE, $addon_auth),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new AccountAuthenticateEvent($username, $password),
+		);
 
-		if ($addon_auth['authenticated'] && $addon_auth['user_record']) {
-			return $addon_auth['user_record']['uid'];
+		if ($event->isAuthenticated() && $event->getUserRecordArray()) {
+			return $event->getUserRecordArray()['uid'];
 		}
 
 		throw new HTTPException\ForbiddenException(DI::l10n()->t('Login failed'));

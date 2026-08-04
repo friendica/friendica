@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Friendica\Core\Hooks;
 
 use Friendica\Core\Hook;
+use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
@@ -42,7 +43,7 @@ final class HookEventBridge
 		LoggingOutEvent::NAME                             => 'logging_out',
 		ConfigLoadedEvent::NAME                           => 'load_config',
 		CollectRoutesEvent::NAME                          => 'route_collection',
-		ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'authenticate',
+		AccountAuthenticateEvent::NAME                    => 'authenticate',
 		ArrayFilterEvent::ACCOUNT_REGISTER                => 'register_account',
 		ArrayFilterEvent::ACCOUNT_REGISTER_FORM           => 'register_form',
 		ArrayFilterEvent::ACCOUNT_REGISTER_POST           => 'register_post',
@@ -160,7 +161,7 @@ final class HookEventBridge
 			LoggingOutEvent::NAME                             => 'onNamedEvent',
 			ConfigLoadedEvent::NAME                           => 'onConfigLoadedEvent',
 			CollectRoutesEvent::NAME                          => 'onCollectRoutesEvent',
-			ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'onArrayFilterEvent',
+			AccountAuthenticateEvent::NAME                    => 'onAccountAuthenticateEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER_FORM           => 'onArrayFilterEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER_POST           => 'onArrayFilterEvent',
@@ -426,6 +427,24 @@ final class HookEventBridge
 		$data['bbcode2markdown'] = static::callHook($event->getName(), (string) $bbcode2markdown);
 
 		$event->setArray($data);
+	}
+
+	/**
+	 * Map the ACCOUNT_AUTHENTICATE event to `authenticate` hook
+	 */
+	public static function onAccountAuthenticateEvent(AccountAuthenticateEvent $event): void
+	{
+		$addon_auth = [
+			'username'      => $event->getUsername(),
+			'password'      => $event->getPassword(),
+			'authenticated' => $event->isAuthenticated() ? 1 : 0,
+			'user_record'   => $event->getUserRecordArray(),
+		];
+
+		$addon_auth = static::callHook($event->getName(), $addon_auth);
+
+		$event->setAuthenticated(($addon_auth['authenticated'] ?? 0) !== 0);
+		$event->setUserRecordArray($addon_auth['user_record'] ?? null);
 	}
 
 	/**

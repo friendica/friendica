@@ -12,6 +12,7 @@ namespace Friendica\Test\Unit\Core\Hooks;
 use FastRoute\RouteCollector;
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Hooks\HookEventBridge;
+use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
@@ -44,7 +45,7 @@ class HookEventBridgeTest extends TestCase
 			LoggingOutEvent::NAME                             => 'onNamedEvent',
 			ConfigLoadedEvent::NAME                           => 'onConfigLoadedEvent',
 			CollectRoutesEvent::NAME                          => 'onCollectRoutesEvent',
-			ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'onArrayFilterEvent',
+			AccountAuthenticateEvent::NAME                    => 'onAccountAuthenticateEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER_FORM           => 'onArrayFilterEvent',
 			ArrayFilterEvent::ACCOUNT_REGISTER_POST           => 'onArrayFilterEvent',
@@ -578,7 +579,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::EDIT_CONTACT_FORM, 'contact_edit'],
 			[ArrayFilterEvent::EDIT_CONTACT_POST, 'contact_edit_post'],
 			[ArrayFilterEvent::AVATAR_LOOKUP, 'avatar_lookup'],
-			[ArrayFilterEvent::ACCOUNT_AUTHENTICATE, 'authenticate'],
+			[AccountAuthenticateEvent::NAME, 'authenticate'],
 			[ArrayFilterEvent::ACCOUNT_REGISTER_FORM, 'register_form'],
 			[ArrayFilterEvent::ACCOUNT_REGISTER_POST, 'register_post'],
 			[ArrayFilterEvent::ACCOUNT_REGISTER, 'register_account'],

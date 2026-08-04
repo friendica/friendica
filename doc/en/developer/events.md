@@ -17,6 +17,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
+| `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -39,3 +40,17 @@ Fired once the home page is visited.
 Fired when a user is logging out.
 
 **Contained data:** None (notification-only event).
+
+### `\Friendica\Event\AccountAuthenticateEvent`
+
+Fired when a user attempts to login.
+
+**Contained data:**
+- `getUsername(): string` — the supplied username
+- `getPassword(): string` — the supplied password
+- `isAuthenticated(): bool` — set to true to authenticate the user
+- `getUserRecordArray(): ?array` — successful authentication must also return a valid user record
+
+**Anpassbar:**
+- `setAuthenticated(bool $authenticated): void` — set to true to authenticate
+- `setUserRecordArray(?array $userRecord): void` — set the user record on success

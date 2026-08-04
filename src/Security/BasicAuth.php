@@ -10,6 +10,7 @@ namespace Friendica\Security;
 use Exception;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\UnauthorizedException;
@@ -129,26 +130,22 @@ class BasicAuth
 		// next code from mod/auth.php. needs better solution
 		$record = null;
 
-		$addon_auth = [
-			'username'      => trim((string) $user),
-			'password'      => trim((string) $password),
-			'authenticated' => 0,
-			'user_record'   => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
 		/**
-		 * An addon indicates successful login by setting 'authenticated' to non-zero value and returning a user record
+		 * An addon indicates successful login by setting 'authenticated' to true and returning a user record
 		 * Addons should never set 'authenticated' except to indicate success - as hooks may be chained
 		 * and later addons should not interfere with an earlier one that succeeded.
 		 */
-		$addon_auth = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_AUTHENTICATE, $addon_auth),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new AccountAuthenticateEvent(
+				trim((string) $user),
+				trim((string) $password),
+			),
+		);
 
-		if ($addon_auth['authenticated'] && !empty($addon_auth['user_record'])) {
-			$record = $addon_auth['user_record'];
+		if ($event->isAuthenticated() && !empty($event->getUserRecordArray())) {
+			$record = $event->getUserRecordArray();
 		} else {
 			try {
 				$user_id = User::getIdFromPasswordAuthentication(trim((string) $user), trim((string) $password), true);

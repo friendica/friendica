@@ -150,8 +150,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const AVATAR_LOOKUP = 'friendica.data.avatar_lookup';
 
-	public const ACCOUNT_AUTHENTICATE = 'friendica.data.account_authenticate';
-
 	public const ACCOUNT_REGISTER_FORM = 'friendica.data.account_register_form';
 
 	public const ACCOUNT_REGISTER_POST = 'friendica.data.account_register_post';
