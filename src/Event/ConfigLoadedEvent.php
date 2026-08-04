@@ -13,8 +13,6 @@ use Friendica\Core\Config\Util\ConfigFileManager;
 
 /**
  * Notify that the config was loaded
- *
- * @internal
  */
 final class ConfigLoadedEvent extends Event
 {

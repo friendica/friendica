@@ -11,8 +11,6 @@ namespace Friendica\Event;
 
 /**
  * Allow modules to react on post recipient rendering.
- *
- * @internal
  */
 final class ModulePostRecipientEvent extends Event
 {

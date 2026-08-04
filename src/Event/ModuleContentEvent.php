@@ -11,8 +11,6 @@ namespace Friendica\Event;
 
 /**
  * Allow modules to react on content rendering.
- *
- * @internal
  */
 final class ModuleContentEvent extends Event
 {

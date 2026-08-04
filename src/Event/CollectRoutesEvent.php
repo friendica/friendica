@@ -13,8 +13,6 @@ use FastRoute\RouteCollector;
 
 /**
  * Allow addons to collect routes.
- *
- * @internal
  */
 final class CollectRoutesEvent extends Event
 {

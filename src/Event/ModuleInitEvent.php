@@ -11,8 +11,6 @@ namespace Friendica\Event;
 
 /**
  * Allow modules to react on initialization.
- *
- * @internal
  */
 final class ModuleInitEvent extends Event
 {
