@@ -11,7 +11,7 @@ use Exception;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\AccountAuthenticateEvent;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\LoggedInEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\UnauthorizedException;
 
@@ -169,7 +169,7 @@ class BasicAuth
 
 		DI::auth()->setForUser($record, false, false, false);
 
-		DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::LOGGED_IN, $record));
+		DI::eventDispatcher()->dispatch(new LoggedInEvent($record));
 
 		self::$current_user_id = DI::userSession()->getLocalUserId();
 

@@ -17,6 +17,7 @@ use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
+use Friendica\Event\LoggedInEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\HomeInitEvent;
@@ -99,7 +100,7 @@ final class HookEventBridge
 		ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'item_photo_menu',
 		ArrayFilterEvent::ITEM_TAGGED                     => 'tagged',
 		ArrayFilterEvent::JOT_NETWORKS                    => 'jot_networks',
-		ArrayFilterEvent::LOGGED_IN                       => 'logged_in',
+		LoggedInEvent::NAME                               => 'logged_in',
 		ArrayFilterEvent::LOGIN_FORM                      => 'login_hook',
 		ArrayFilterEvent::MAGIC_AUTH_SUCCESS              => 'magic_auth_success',
 		ArrayFilterEvent::MAP_GET_COORDINATES             => 'Map::getCoordinates',
@@ -217,7 +218,7 @@ final class HookEventBridge
 			ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_TAGGED                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::LOGGED_IN                       => 'onArrayFilterEvent',
+			LoggedInEvent::NAME                               => 'onLoggedInEvent',
 			ArrayFilterEvent::LOGIN_FORM                      => 'onLoginFormEvent',
 			ArrayFilterEvent::MAGIC_AUTH_SUCCESS              => 'onArrayFilterEvent',
 			ArrayFilterEvent::MAP_GET_COORDINATES             => 'onArrayFilterEvent',
@@ -487,6 +488,14 @@ final class HookEventBridge
 	public static function onAccountRemoveEvent(AccountRemoveEvent $event): void
 	{
 		$event->setUserArray((array) static::callHook($event->getName(), $event->getUserArray()));
+	}
+
+	/**
+	 * Map the LOGGED_IN event to `logged_in` hook
+	 */
+	public static function onLoggedInEvent(LoggedInEvent $event): void
+	{
+		static::callHook($event->getName(), $event->getRecordArray());
 	}
 
 	/**

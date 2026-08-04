@@ -98,3 +98,13 @@ Fired when a user account is being removed.
 
 **Modifiable:**
 - `setUserArray(array $user): void` — change the user record
+
+### `\Friendica\Event\LoggedInEvent`
+
+Fired when a user has logged in.
+
+**Contained data:**
+- `getRecordArray(): array` — the user record array
+
+**Modifiable:**
+- `setRecordArray(array $record): void` — change the user record
