@@ -10,11 +10,11 @@ declare(strict_types=1);
 namespace Friendica\Event;
 
 /**
- * Event is emitted once the home page is visited.
+ * Event is emitted when a user is logging out.
  */
-final class HomeInitEvent extends Event
+final class LoggingOutEvent extends Event
 {
-	public const NAME = 'friendica.home_init';
+	public const NAME = 'friendica.logging_out';
 
 	public function __construct()
 	{

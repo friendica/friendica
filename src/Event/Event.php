@@ -18,8 +18,6 @@ use Friendica\Core\Event\NamedEvent;
  */
 class Event implements NamedEvent
 {
-	public const LOGGING_OUT = 'friendica.logging_out';
-
 	public function __construct(private readonly string $name) {}
 
 	public function getName(): string

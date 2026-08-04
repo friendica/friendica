@@ -17,6 +17,7 @@ use Friendica\Event\Event;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\HomeInitEvent;
 use Friendica\Event\InitEvent;
+use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -39,7 +40,7 @@ final class HookEventBridge
 	private static array $eventMapper = [
 		InitEvent::NAME                                   => 'init_1',
 		HomeInitEvent::NAME                               => 'home_init',
-		Event::LOGGING_OUT                                => 'logging_out',
+		LoggingOutEvent::NAME                             => 'logging_out',
 		ConfigLoadedEvent::CONFIG_LOADED                  => 'load_config',
 		CollectRoutesEvent::COLLECT_ROUTES                => 'route_collection',
 		ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'authenticate',
@@ -157,7 +158,7 @@ final class HookEventBridge
 		return [
 			InitEvent::NAME                                   => 'onNamedEvent',
 			HomeInitEvent::NAME                               => 'onNamedEvent',
-			Event::LOGGING_OUT                                => 'onNamedEvent',
+			LoggingOutEvent::NAME                             => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED                  => 'onConfigLoadedEvent',
 			CollectRoutesEvent::COLLECT_ROUTES                => 'onCollectRoutesEvent',
 			ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'onArrayFilterEvent',

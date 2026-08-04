@@ -19,6 +19,7 @@ use Friendica\Event\Event;
 use Friendica\Event\HomeInitEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\InitEvent;
+use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -41,7 +42,7 @@ class HookEventBridgeTest extends TestCase
 		$expected = [
 			InitEvent::NAME                                   => 'onNamedEvent',
 			HomeInitEvent::NAME                               => 'onNamedEvent',
-			Event::LOGGING_OUT                                => 'onNamedEvent',
+			LoggingOutEvent::NAME                             => 'onNamedEvent',
 			ConfigLoadedEvent::CONFIG_LOADED                  => 'onConfigLoadedEvent',
 			CollectRoutesEvent::COLLECT_ROUTES                => 'onCollectRoutesEvent',
 			ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'onArrayFilterEvent',
