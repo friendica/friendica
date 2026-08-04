@@ -19,6 +19,7 @@ use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\LoggedInEvent;
+use Friendica\Event\LoginFormEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HomeInitEvent;
@@ -103,7 +104,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::ITEM_TAGGED                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
 			LoggedInEvent::NAME                               => 'onLoggedInEvent',
-			ArrayFilterEvent::LOGIN_FORM                      => 'onLoginFormEvent',
+			LoginFormEvent::NAME                              => 'onLoginFormEvent',
 			ArrayFilterEvent::MAGIC_AUTH_SUCCESS              => 'onArrayFilterEvent',
 			ArrayFilterEvent::MAP_GET_COORDINATES             => 'onArrayFilterEvent',
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',

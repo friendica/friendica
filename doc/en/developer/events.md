@@ -108,3 +108,13 @@ Fired when a user has logged in.
 
 **Modifiable:**
 - `setRecordArray(array $record): void` — change the user record
+
+### `\Friendica\Event\LoginFormEvent`
+
+Fired when the login form is displayed.
+
+**Contained data:**
+- `getHtml(): string` — the login form HTML
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the login form HTML

@@ -18,6 +18,7 @@ use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
+use Friendica\Event\LoginFormEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\HomeInitEvent;
@@ -101,7 +102,7 @@ final class HookEventBridge
 		ArrayFilterEvent::ITEM_TAGGED                     => 'tagged',
 		ArrayFilterEvent::JOT_NETWORKS                    => 'jot_networks',
 		LoggedInEvent::NAME                               => 'logged_in',
-		ArrayFilterEvent::LOGIN_FORM                      => 'login_hook',
+		LoginFormEvent::NAME                              => 'login_hook',
 		ArrayFilterEvent::MAGIC_AUTH_SUCCESS              => 'magic_auth_success',
 		ArrayFilterEvent::MAP_GET_COORDINATES             => 'Map::getCoordinates',
 		ArrayFilterEvent::MODERATION_USERS_TABS           => 'moderation_users_tabs',
@@ -219,7 +220,7 @@ final class HookEventBridge
 			ArrayFilterEvent::ITEM_TAGGED                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
 			LoggedInEvent::NAME                               => 'onLoggedInEvent',
-			ArrayFilterEvent::LOGIN_FORM                      => 'onLoginFormEvent',
+			LoginFormEvent::NAME                              => 'onLoginFormEvent',
 			ArrayFilterEvent::MAGIC_AUTH_SUCCESS              => 'onArrayFilterEvent',
 			ArrayFilterEvent::MAP_GET_COORDINATES             => 'onArrayFilterEvent',
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
@@ -529,12 +530,9 @@ final class HookEventBridge
 	 *
 	 * login_hook receives a string by reference, so we wrap/unwrap it in an array.
 	 */
-	public static function onLoginFormEvent(ArrayFilterEvent $event): void
+	public static function onLoginFormEvent(LoginFormEvent $event): void
 	{
-		$data         = $event->getArray();
-		$html         = $data['html'] ?? '';
-		$data['html'] = static::callHook($event->getName(), $html);
-		$event->setArray($data);
+		$event->setHtml((string) static::callHook($event->getName(), $event->getHtml()));
 	}
 
 	/**
