@@ -20,6 +20,7 @@ use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
@@ -131,7 +132,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'photo_upload_form',
 		ArrayFilterEvent::PHOTO_UPLOAD_START              => 'photo_post_init',
 		PreparePostEvent::NAME                            => 'prepare_body',
-		ArrayFilterEvent::PREPARE_POST_END                => 'prepare_body_final',
+		PreparePostEndEvent::NAME                         => 'prepare_body_final',
 		PreparePostFilterContentEvent::NAME               => 'prepare_body_content_filter',
 		PreparePostStartEvent::NAME                       => 'prepare_body_init',
 		ArrayFilterEvent::PROBE_DETECT                    => 'probe_detect',
@@ -249,7 +250,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
 			PreparePostEvent::NAME                            => 'onPreparePostEvent',
-			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
+			PreparePostEndEvent::NAME                         => 'onPreparePostEndEvent',
 			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
@@ -385,6 +386,21 @@ final class HookEventBridge
 			'html'           => $event->getHtml(),
 			'preview'        => $event->isPreview(),
 			'filter_reasons' => $event->getFilterReasons(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setHtml($hook_data['html'] ?? '');
+	}
+
+	/**
+	 * Map the PreparePostEndEvent to `prepare_body_final` hook
+	 */
+	public static function onPreparePostEndEvent(PreparePostEndEvent $event): void
+	{
+		$hook_data = [
+			'item' => $event->getItemArray(),
+			'html' => $event->getHtml(),
 		];
 
 		$hook_data = static::callHook($event->getName(), $hook_data);

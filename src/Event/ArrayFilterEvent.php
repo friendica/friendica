@@ -30,11 +30,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const INSERT_POST_LOCAL_START = 'friendica.data.insert_post_local_start';
 
-	/**
-	 * after attach icons and blockquote special case handling (spoiler, author)
-	 */
-	public const PREPARE_POST_END = 'friendica.data.prepare_post_end';
-
 	public const PHOTO_UPLOAD_FORM = 'friendica.data.photo_upload_form';
 
 	public const PHOTO_UPLOAD_START = 'friendica.data.photo_upload_start';

@@ -31,7 +31,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::FEATURE_GET, 'friendica.data.feature_get'],
 			[ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, 'friendica.data.permission_tooltip_content'],
 			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'friendica.data.insert_post_local_start'],
-			[ArrayFilterEvent::PREPARE_POST_END, 'friendica.data.prepare_post_end'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'friendica.data.photo_upload_form'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_START, 'friendica.data.photo_upload_start'],
 			[ArrayFilterEvent::PHOTO_UPLOAD, 'friendica.data.photo_upload'],

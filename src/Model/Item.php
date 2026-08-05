@@ -23,6 +23,7 @@ use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
@@ -3138,16 +3139,11 @@ class Item
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
-		$hook_data = [
-			'item' => $item,
-			'html' => $s,
-		];
+		$event = $eventDispatcher->dispatch(
+			new PreparePostEndEvent($item, $s),
+		);
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_END, $hook_data),
-		)->getArray();
-
-		return array_key_exists('html', $hook_data) ? (string) $hook_data['html'] : $s;
+		return $event->getHtml();
 	}
 
 	/**

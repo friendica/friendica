@@ -19,6 +19,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `prepare_body_init` | `\Friendica\Event\PreparePostStartEvent` |
 | `prepare_body_content_filter` | `\Friendica\Event\PreparePostFilterContentEvent` |
 | `prepare_body` | `\Friendica\Event\PreparePostEvent` |
+| `prepare_body_final` | `\Friendica\Event\PreparePostEndEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -217,6 +218,17 @@ Fired when a post is being prepared for display.
 - `getHtml(): string` — the rendered HTML
 - `isPreview(): bool` — whether this is a preview
 - `getFilterReasons(): array` — the filter reasons array (read-only)
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the rendered HTML
+
+### `\Friendica\Event\PreparePostEndEvent`
+
+Fired after a post has been prepared for display.
+
+**Contained data:**
+- `getItemArray(): array` — the item record array (read-only)
+- `getHtml(): string` — the rendered HTML
 
 **Modifiable:**
 - `setHtml(string $html): void` — change the rendered HTML

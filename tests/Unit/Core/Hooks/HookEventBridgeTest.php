@@ -34,6 +34,7 @@ use Friendica\Event\ModulePostEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
@@ -133,7 +134,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
 			PreparePostEvent::NAME                            => 'onPreparePostEvent',
-			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
+			PreparePostEndEvent::NAME                         => 'onPreparePostEndEvent',
 			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
@@ -571,7 +572,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'get'],
 			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'post_local_start'],
-			[ArrayFilterEvent::PREPARE_POST_END, 'prepare_body_final'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
 			[ArrayFilterEvent::PHOTO_UPLOAD, 'photo_post_file'],
 			[ArrayFilterEvent::NETWORK_TO_NAME, 'network_to_name'],
