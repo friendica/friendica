@@ -13,6 +13,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `logging_out` | `\Friendica\Event\LoggingOutEvent` |
 | `display_item` | `\Friendica\Event\DisplayItemEvent` |
 | `post_local` | `\Friendica\Event\InsertPostLocalEvent` |
+| `post_local_end` | `\Friendica\Event\InsertPostLocalEndEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -143,6 +144,16 @@ Fired when a ZRL init is triggered.
 ### `\Friendica\Event\InsertPostLocalEvent`
 
 Fired when a local post is being inserted.
+
+**Contained data:**
+- `getItemArray(): array` — the item record array
+
+**Modifiable:**
+- `setItemArray(array $item): void` — change the item record
+
+### `\Friendica\Event\InsertPostLocalEndEvent`
+
+Fired after a local post has been inserted.
 
 **Contained data:**
 - `getItemArray(): array` — the item record array

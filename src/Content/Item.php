@@ -21,6 +21,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Model\Attach;
 use Friendica\Model\Circle;
 use Friendica\Model\Contact;
@@ -1098,15 +1099,11 @@ class Item
 			Tag::createImplicitMentions($post['uri-id'], $post['thr-parent-id']);
 		}
 
-		$hook_data = [
-			'item' => $post,
-		];
+		$event = $this->eventDispatcher->dispatch(
+			new InsertPostLocalEndEvent($post),
+		);
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $hook_data),
-		)->getArray();
-
-		$post = $hook_data['item'] ?? $post;
+		$post = $event->getItemArray();
 
 		$author = DBA::selectFirst('contact', ['thumb'], ['uid' => $post['uid'], 'self' => true]);
 

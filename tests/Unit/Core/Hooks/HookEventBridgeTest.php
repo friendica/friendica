@@ -31,6 +31,7 @@ use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
+use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Event\ZrlInitEvent;
 use PHPUnit\Framework\TestCase;
@@ -99,7 +100,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::GLOBAL_DIR_UPDATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::HTML_TO_BBCODE_END              => 'onHtmlToBbcodeEvent',
 			InsertPostLocalEvent::NAME                        => 'onInsertPostLocalEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onInsertPostLocalEndEvent',
+			InsertPostLocalEndEvent::NAME                     => 'onInsertPostLocalEndEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE              => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'onArrayFilterEvent',
@@ -309,7 +310,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnInsertPostLocalEndEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, ['item' => ['id' => -1]]);
+		$event = new InsertPostLocalEndEvent(['id' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -323,8 +324,8 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onInsertPostLocalEndEvent($event);
 
 		$this->assertSame(
-			['item' => ['id' => 123]],
-			$event->getArray(),
+			['id' => 123],
+			$event->getItemArray(),
 		);
 	}
 

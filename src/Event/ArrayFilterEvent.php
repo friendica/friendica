@@ -30,8 +30,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const INSERT_POST_LOCAL_START = 'friendica.data.insert_post_local_start';
 
-	public const INSERT_POST_LOCAL_END = 'friendica.data.insert_post_local_end';
-
 	public const INSERT_POST_REMOTE = 'friendica.data.insert_post_remote';
 
 	public const INSERT_POST_REMOTE_END = 'friendica.data.insert_post_remote_end';
