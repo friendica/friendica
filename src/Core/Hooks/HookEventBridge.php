@@ -19,6 +19,7 @@ use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
+use Friendica\Event\InsertPostRemoteEndEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -101,8 +102,8 @@ final class HookEventBridge
 		InsertPostLocalEvent::NAME                        => 'post_local',
 		InsertPostLocalEndEvent::NAME                     => 'post_local_end',
 		InsertPostRemoteEvent::NAME                       => 'post_remote',
+		InsertPostRemoteEndEvent::NAME                    => 'post_remote_end',
 		ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'post_local_start',
-		ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'post_remote_end',
 		ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'item_photo_menu',
 		ArrayFilterEvent::ITEM_TAGGED                     => 'tagged',
 		ArrayFilterEvent::JOT_NETWORKS                    => 'jot_networks',
@@ -219,8 +220,8 @@ final class HookEventBridge
 			InsertPostLocalEvent::NAME                        => 'onInsertPostLocalEvent',
 			InsertPostLocalEndEvent::NAME                     => 'onInsertPostLocalEndEvent',
 			InsertPostRemoteEvent::NAME                       => 'onInsertPostRemoteEvent',
+			InsertPostRemoteEndEvent::NAME                    => 'onInsertPostRemoteEndEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
-			ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_TAGGED                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
@@ -335,6 +336,14 @@ final class HookEventBridge
 	 * Map the InsertPostRemoteEvent to `post_remote` hook
 	 */
 	public static function onInsertPostRemoteEvent(InsertPostRemoteEvent $event): void
+	{
+		$event->setItemArray((array) static::callHook($event->getName(), $event->getItemArray()));
+	}
+
+	/**
+	 * Map the InsertPostRemoteEndEvent to `post_remote_end` hook
+	 */
+	public static function onInsertPostRemoteEndEvent(InsertPostRemoteEndEvent $event): void
 	{
 		$event->setItemArray((array) static::callHook($event->getName(), $event->getItemArray()));
 	}

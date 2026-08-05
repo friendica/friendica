@@ -22,6 +22,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\InsertPostRemoteEvent;
+use Friendica\Event\InsertPostRemoteEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Model\Post\Category;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -1098,9 +1099,8 @@ class Item
 		} else {
 			$eventDispatcher = DI::eventDispatcher();
 
-			$posted_item = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE_END, $posted_item),
-			)->getArray();
+			$insertPostRemoteEndEvent = $eventDispatcher->dispatch(new InsertPostRemoteEndEvent($posted_item));
+			$posted_item              = $insertPostRemoteEndEvent->getItemArray();
 		}
 
 		if ($posted_item['gravity'] === self::GRAVITY_PARENT) {

@@ -33,6 +33,7 @@ use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
+use Friendica\Event\InsertPostRemoteEndEvent;
 use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Event\ZrlInitEvent;
 use PHPUnit\Framework\TestCase;
@@ -103,8 +104,8 @@ class HookEventBridgeTest extends TestCase
 			InsertPostLocalEvent::NAME                        => 'onInsertPostLocalEvent',
 			InsertPostLocalEndEvent::NAME                     => 'onInsertPostLocalEndEvent',
 			InsertPostRemoteEvent::NAME                       => 'onInsertPostRemoteEvent',
+			InsertPostRemoteEndEvent::NAME                    => 'onInsertPostRemoteEndEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
-			ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_TAGGED                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
@@ -567,7 +568,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'get'],
 			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'post_local_start'],
-			[ArrayFilterEvent::INSERT_POST_REMOTE_END, 'post_remote_end'],
 			[ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, 'prepare_body_content_filter'],
 			[ArrayFilterEvent::PREPARE_POST, 'prepare_body'],
 			[ArrayFilterEvent::PREPARE_POST_END, 'prepare_body_final'],
