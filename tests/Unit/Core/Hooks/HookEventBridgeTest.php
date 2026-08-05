@@ -34,6 +34,7 @@ use Friendica\Event\ModulePostEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Event\ZrlInitEvent;
 use PHPUnit\Framework\TestCase;
@@ -132,7 +133,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
 			ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'onArrayFilterEvent',
-			ArrayFilterEvent::PREPARE_POST_START              => 'onPreparePostStartEvent',
+			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
@@ -333,7 +334,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnPreparePostStartEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_START, ['item' => ['id' => -1]]);
+		$event = new PreparePostStartEvent(['id' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -347,8 +348,8 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onPreparePostStartEvent($event);
 
 		$this->assertSame(
-			['item' => ['id' => 123]],
-			$event->getArray(),
+			['id' => 123],
+			$event->getItemArray(),
 		);
 	}
 

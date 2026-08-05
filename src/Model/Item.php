@@ -23,6 +23,7 @@ use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Model\Post\Category;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -2942,11 +2943,8 @@ class Item
 			'item' => $item,
 		];
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_START, $hook_data),
-		)->getArray();
-
-		$item = $hook_data['item'] ?? $item;
+		$preparePostStartEvent = $eventDispatcher->dispatch(new PreparePostStartEvent($item));
+		$item                  = $preparePostStartEvent->getItemArray();
 
 		// In order to provide theme developers more possibilities, event items
 		// are treated differently.

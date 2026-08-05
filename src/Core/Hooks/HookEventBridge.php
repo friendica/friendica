@@ -20,6 +20,7 @@ use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -130,7 +131,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PREPARE_POST                    => 'prepare_body',
 		ArrayFilterEvent::PREPARE_POST_END                => 'prepare_body_final',
 		ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'prepare_body_content_filter',
-		ArrayFilterEvent::PREPARE_POST_START              => 'prepare_body_init',
+		PreparePostStartEvent::NAME                       => 'prepare_body_init',
 		ArrayFilterEvent::PROBE_DETECT                    => 'probe_detect',
 		ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'profile_edit',
 		ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'profile_post',
@@ -248,7 +249,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
 			ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'onArrayFilterEvent',
-			ArrayFilterEvent::PREPARE_POST_START              => 'onPreparePostStartEvent',
+			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
@@ -349,17 +350,11 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the PREPARE_POST_START event to `prepare_body_init` hook
+	 * Map the PreparePostStartEvent to `prepare_body_init` hook
 	 */
-	public static function onPreparePostStartEvent(ArrayFilterEvent $event): void
+	public static function onPreparePostStartEvent(PreparePostStartEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$item = $data['item'] ?? [];
-
-		$data['item'] = static::callHook($event->getName(), (array) $item);
-
-		$event->setArray($data);
+		$event->setItemArray((array) static::callHook($event->getName(), $event->getItemArray()));
 	}
 
 	/**
