@@ -19,6 +19,7 @@ use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
+use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\HomeInitEvent;
@@ -103,7 +104,7 @@ final class HookEventBridge
 		ArrayFilterEvent::JOT_NETWORKS                    => 'jot_networks',
 		LoggedInEvent::NAME                               => 'logged_in',
 		LoginFormEvent::NAME                              => 'login_hook',
-		ArrayFilterEvent::MAGIC_AUTH_SUCCESS              => 'magic_auth_success',
+		MagicAuthSuccessEvent::NAME                       => 'magic_auth_success',
 		ArrayFilterEvent::MAP_GET_COORDINATES             => 'Map::getCoordinates',
 		ArrayFilterEvent::MODERATION_USERS_TABS           => 'moderation_users_tabs',
 		ArrayFilterEvent::NAV_INFO                        => 'nav_info',
@@ -221,7 +222,7 @@ final class HookEventBridge
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
 			LoggedInEvent::NAME                               => 'onLoggedInEvent',
 			LoginFormEvent::NAME                              => 'onLoginFormEvent',
-			ArrayFilterEvent::MAGIC_AUTH_SUCCESS              => 'onArrayFilterEvent',
+			MagicAuthSuccessEvent::NAME                       => 'onMagicAuthSuccessEvent',
 			ArrayFilterEvent::MAP_GET_COORDINATES             => 'onArrayFilterEvent',
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
@@ -497,6 +498,21 @@ final class HookEventBridge
 	public static function onLoggedInEvent(LoggedInEvent $event): void
 	{
 		static::callHook($event->getName(), $event->getRecordArray());
+	}
+
+	/**
+	 * Map the MAGIC_AUTH_SUCCESS event to `magic_auth_success` hook
+	 */
+	public static function onMagicAuthSuccessEvent(MagicAuthSuccessEvent $event): void
+	{
+		$data = [
+			'visitor' => $event->getVisitorArray(),
+			'url'     => $event->getUrl(),
+		];
+		$data = static::callHook($event->getName(), $data);
+		if (is_array($data['visitor'] ?? null)) {
+			$event->setVisitorArray($data['visitor']);
+		}
 	}
 
 	/**

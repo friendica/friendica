@@ -10,6 +10,7 @@ namespace Friendica\Security;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\System;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -132,25 +133,21 @@ class OpenWebAuth
 			return;
 		}
 
-		$arr = [
-			'visitor' => $visitor,
-			'url'     => DI::args()->getQueryString(),
-		];
 		/**
 		 * @hooks magic_auth_success
 		 *   Called when a magic-auth was successful.
 		 *   * \e array \b visitor
 		 *   * \e string \b url
 		 */
-		$arr = DI::eventDispatcher()->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::MAGIC_AUTH_SUCCESS, $arr),
-		)->getArray();
+		$event = DI::eventDispatcher()->dispatch(
+			new MagicAuthSuccessEvent($visitor, DI::args()->getQueryString()),
+		);
 
-		$appHelper->setContactId($arr['visitor']['id']);
+		$appHelper->setContactId($event->getVisitorArray()['id']);
 
-		DI::sysmsg()->addInfo(DI::l10n()->t('OpenWebAuth: %1$s welcomes %2$s', DI::baseUrl()->getHost(), $visitor['name']));
+		DI::sysmsg()->addInfo(DI::l10n()->t('OpenWebAuth: %1$s welcomes %2$s', DI::baseUrl()->getHost(), $event->getVisitorArray()['name']));
 
-		DI::logger()->info('OpenWebAuth: auth success from ' . $visitor['addr']);
+		DI::logger()->info('OpenWebAuth: auth success from ' . $event->getVisitorArray()['addr']);
 	}
 
 	/**

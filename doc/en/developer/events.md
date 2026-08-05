@@ -22,6 +22,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `register_post` | `\Friendica\Event\AccountRegisterPostEvent` |
 | `register_account` | `\Friendica\Event\AccountRegisterEvent` |
 | `remove_user` | `\Friendica\Event\AccountRemoveEvent` |
+| `magic_auth_success` | `\Friendica\Event\MagicAuthSuccessEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -118,3 +119,14 @@ Fired when the login form is displayed.
 
 **Modifiable:**
 - `setHtml(string $html): void` — change the login form HTML
+
+### `\Friendica\Event\MagicAuthSuccessEvent`
+
+Fired when a magic-auth (OpenWebAuth) was successful.
+
+**Contained data:**
+- `getVisitorArray(): array` — the visitor contact array
+- `getUrl(): string` — the query string of the request
+
+**Modifiable:**
+- `setVisitorArray(array $visitor): void` — change the visitor array

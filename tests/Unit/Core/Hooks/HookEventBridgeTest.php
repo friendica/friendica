@@ -20,6 +20,7 @@ use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
+use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HomeInitEvent;
@@ -105,7 +106,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
 			LoggedInEvent::NAME                               => 'onLoggedInEvent',
 			LoginFormEvent::NAME                              => 'onLoginFormEvent',
-			ArrayFilterEvent::MAGIC_AUTH_SUCCESS              => 'onArrayFilterEvent',
+			MagicAuthSuccessEvent::NAME                       => 'onMagicAuthSuccessEvent',
 			ArrayFilterEvent::MAP_GET_COORDINATES             => 'onArrayFilterEvent',
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
@@ -529,6 +530,28 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onEventUpdatedEvent($event);
+	}
+
+	public function testOnMagicAuthSuccessEventCallsHookWithCorrectValue(): void
+	{
+		$visitor = ['id' => 42, 'name' => 'TestVisitor'];
+		$event   = new MagicAuthSuccessEvent($visitor, 'test=query');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('magic_auth_success', $name);
+			$this->assertSame(['id' => 42, 'name' => 'TestVisitor'], $data['visitor']);
+			$this->assertSame('test=query', $data['url']);
+
+			$data['visitor']['id'] = 99;
+
+			return $data;
+		});
+
+		HookEventBridge::onMagicAuthSuccessEvent($event);
+
+		$this->assertSame(99, $event->getVisitorArray()['id']);
 	}
 
 	public static function getArrayFilterEventData(): array

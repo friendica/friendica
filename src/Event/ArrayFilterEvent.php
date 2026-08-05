@@ -186,8 +186,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const GLOBAL_DIR_UPDATE = 'friendica.data.global_dir_update';
 
-	public const MAGIC_AUTH_SUCCESS = 'friendica.data.magic_auth_success';
-
 	public const MAP_GET_COORDINATES = 'friendica.data.map_get_coordinates';
 
 	public const NOTIFIER_END = 'friendica.data.notifier_end';
