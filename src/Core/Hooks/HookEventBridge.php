@@ -20,6 +20,7 @@ use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
+use Friendica\Event\ZrlInitEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\HomeInitEvent;
@@ -144,7 +145,7 @@ final class HookEventBridge
 		ArrayFilterEvent::UNBLOCK_CONTACT                 => 'unblock',
 		ArrayFilterEvent::UNFOLLOW_CONTACT                => 'unfollow',
 		ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'uexport_options',
-		ArrayFilterEvent::ZRL_INIT                        => 'zrl_init',
+		ZrlInitEvent::NAME                                => 'zrl_init',
 		HtmlFilterEvent::HEAD                             => 'head',
 		HtmlFilterEvent::FOOTER                           => 'footer',
 		HtmlFilterEvent::PAGE_HEADER                      => 'page_header',
@@ -262,7 +263,7 @@ final class HookEventBridge
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNFOLLOW_CONTACT                => 'onArrayFilterEvent',
 			ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'onArrayFilterEvent',
-			ArrayFilterEvent::ZRL_INIT                        => 'onArrayFilterEvent',
+			ZrlInitEvent::NAME                                => 'onZrlInitEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END                => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::HEAD                             => 'onHtmlFilterEvent',
@@ -513,6 +514,17 @@ final class HookEventBridge
 		if (is_array($data['visitor'] ?? null)) {
 			$event->setVisitorArray($data['visitor']);
 		}
+	}
+
+	/**
+	 * Map the ZRL_INIT event to `zrl_init` hook
+	 */
+	public static function onZrlInitEvent(ZrlInitEvent $event): void
+	{
+		static::callHook($event->getName(), [
+			'zrl' => $event->getZrlUrl(),
+			'url' => $event->getUrl(),
+		]);
 	}
 
 	/**

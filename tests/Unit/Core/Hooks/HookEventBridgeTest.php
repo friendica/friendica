@@ -31,6 +31,7 @@ use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
 use Friendica\Event\ModulePostRecipientEvent;
+use Friendica\Event\ZrlInitEvent;
 use PHPUnit\Framework\TestCase;
 
 class HookEventBridgeTest extends TestCase
@@ -146,7 +147,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNFOLLOW_CONTACT                => 'onArrayFilterEvent',
 			ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'onArrayFilterEvent',
-			ArrayFilterEvent::ZRL_INIT                        => 'onArrayFilterEvent',
+			ZrlInitEvent::NAME                                => 'onZrlInitEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END                => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                           => 'onHtmlFilterEvent',
 			HtmlFilterEvent::HEAD                             => 'onHtmlFilterEvent',

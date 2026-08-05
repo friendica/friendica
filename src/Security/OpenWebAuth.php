@@ -9,8 +9,8 @@ namespace Friendica\Security;
 
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\System;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
+use Friendica\Event\ZrlInitEvent;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
@@ -55,8 +55,7 @@ class OpenWebAuth
 
 		$addr = $_GET['addr'] ?? $my_url;
 
-		$arr = ['zrl' => $my_url, 'url' => DI::args()->getCommand()];
-		DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::ZRL_INIT, $arr));
+		DI::eventDispatcher()->dispatch(new ZrlInitEvent($my_url, DI::args()->getCommand()));
 
 		// Try to find the public contact entry of the visitor.
 		$contact = Contact::getByURL($my_url, null, ['id', 'url', 'gsid']);

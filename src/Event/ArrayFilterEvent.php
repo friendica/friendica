@@ -202,8 +202,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const USER_EXPORT_OPTIONS = 'friendica.data.user_export_options';
 
-	public const ZRL_INIT = 'friendica.data.zrl_init';
-
 	public function __construct(string $name, private array $array)
 	{
 		parent::__construct($name);

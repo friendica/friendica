@@ -23,6 +23,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `register_account` | `\Friendica\Event\AccountRegisterEvent` |
 | `remove_user` | `\Friendica\Event\AccountRemoveEvent` |
 | `magic_auth_success` | `\Friendica\Event\MagicAuthSuccessEvent` |
+| `zrl_init` | `\Friendica\Event\ZrlInitEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -130,3 +131,11 @@ Fired when a magic-auth (OpenWebAuth) was successful.
 
 **Modifiable:**
 - `setVisitorArray(array $visitor): void` — change the visitor array
+
+### `\Friendica\Event\ZrlInitEvent`
+
+Fired when a ZRL init is triggered.
+
+**Contained data:**
+- `getZrlUrl(): string` — the ZRL URL
+- `getUrl(): string` — the command URL
