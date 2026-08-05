@@ -22,6 +22,7 @@ final class AccountAuthenticateEvent extends AbstractEvent
 	/** @var array<string, mixed>|null */
 	private ?array $userRecord = null;
 
+	/** @internal */
 	public function __construct(
 		private readonly string $username,
 		#[\SensitiveParameter]

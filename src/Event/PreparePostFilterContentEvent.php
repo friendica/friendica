@@ -24,8 +24,12 @@ final class PreparePostFilterContentEvent extends AbstractEvent
 	 * @param array<string, mixed> $item
 	 * @param array<string> $filterReasons
 	 */
-	public function __construct(private readonly array $item, private readonly int $uid, private array $filterReasons)
-	{
+	/** @internal */
+	public function __construct(
+		private readonly array $item,
+		private readonly int $uid,
+		private array $filterReasons,
+	) {
 		parent::__construct(self::NAME);
 	}
 

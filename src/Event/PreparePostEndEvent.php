@@ -24,6 +24,7 @@ final class PreparePostEndEvent extends AbstractEvent
 	 * @param array<string, mixed> $item
 	 * @param string $html
 	 */
+	/** @internal */
 	public function __construct(
 		private readonly array $item,
 		private string $html,

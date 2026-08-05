@@ -18,6 +18,7 @@ final class InitEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.init';
 
+	/** @internal */
 	public function __construct()
 	{
 		parent::__construct(self::NAME);

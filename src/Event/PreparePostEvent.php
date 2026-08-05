@@ -26,6 +26,7 @@ final class PreparePostEvent extends AbstractEvent
 	 * @param bool $preview
 	 * @param array<string> $filterReasons
 	 */
+	/** @internal */
 	public function __construct(
 		private readonly array $item,
 		private string $html,

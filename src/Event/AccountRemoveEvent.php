@@ -18,6 +18,7 @@ final class AccountRemoveEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.account_remove';
 
+	/** @internal */
 	public function __construct(
 		private array $user,
 	) {

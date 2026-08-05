@@ -20,6 +20,7 @@ final class PreparePostStartEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.prepare_post_start';
 
+	/** @internal */
 	public function __construct(private array $item)
 	{
 		parent::__construct(self::NAME);

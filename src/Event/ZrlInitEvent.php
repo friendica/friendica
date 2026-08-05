@@ -18,6 +18,7 @@ final class ZrlInitEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.zrl_init';
 
+	/** @internal */
 	public function __construct(
 		private readonly string $zrl,
 		private readonly string $url,

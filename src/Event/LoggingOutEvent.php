@@ -18,6 +18,7 @@ final class LoggingOutEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.logging_out';
 
+	/** @internal */
 	public function __construct()
 	{
 		parent::__construct(self::NAME);

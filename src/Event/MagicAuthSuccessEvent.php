@@ -18,6 +18,7 @@ final class MagicAuthSuccessEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.magic_auth_success';
 
+	/** @internal */
 	public function __construct(
 		private array $visitor,
 		private readonly string $url,

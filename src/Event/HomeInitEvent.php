@@ -18,6 +18,7 @@ final class HomeInitEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.home_init';
 
+	/** @internal */
 	public function __construct()
 	{
 		parent::__construct(self::NAME);

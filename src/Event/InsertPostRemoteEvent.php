@@ -20,6 +20,7 @@ final class InsertPostRemoteEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.insert_post_remote';
 
+	/** @internal */
 	public function __construct(private array $item)
 	{
 		parent::__construct(self::NAME);

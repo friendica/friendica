@@ -18,6 +18,7 @@ final class InsertPostLocalEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.insert_post_local';
 
+	/** @internal */
 	public function __construct(
 		private array $item,
 	) {

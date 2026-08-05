@@ -18,6 +18,7 @@ final class AccountRegisterPostEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.account_register_post';
 
+	/** @internal */
 	public function __construct(
 		private array $post,
 	) {

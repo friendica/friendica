@@ -18,6 +18,7 @@ final class AccountRegisterFormEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.account_register_form';
 
+	/** @internal */
 	public function __construct(
 		private string $template,
 	) {

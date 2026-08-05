@@ -18,6 +18,7 @@ final class LoggedInEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.logged_in';
 
+	/** @internal */
 	public function __construct(
 		private readonly array $record,
 	) {

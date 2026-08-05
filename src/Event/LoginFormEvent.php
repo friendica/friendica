@@ -18,6 +18,7 @@ final class LoginFormEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.login_form';
 
+	/** @internal */
 	public function __construct(
 		private string $html,
 	) {
