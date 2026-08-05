@@ -21,6 +21,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Model\Post\Category;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -805,10 +806,8 @@ class Item
 				unset($_SESSION['uid']);
 			}
 		} elseif (!$notify) {
-			/** @var array<string,mixed> */
-			$item = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE, $item),
-			)->getArray();
+			$insertPostRemoteEvent = $eventDispatcher->dispatch(new InsertPostRemoteEvent($item));
+			$item                  = $insertPostRemoteEvent->getItemArray();
 		}
 
 		if (!empty($item['cancel'])) {
