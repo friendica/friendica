@@ -25,6 +25,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
@@ -287,15 +288,11 @@ function item_process(array $post, array $request, bool $preview, string $return
 
 	$eventDispatcher = DI::eventDispatcher();
 
-	$hook_data = [
-		'item' => $post,
-	];
+	$event = $eventDispatcher->dispatch(
+		new InsertPostLocalEvent($post),
+	);
 
-	$hook_data = $eventDispatcher->dispatch(
-		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data),
-	)->getArray();
-
-	$post = $hook_data['item'] ?? $post;
+	$post = $event->getItemArray();
 
 	unset($post['edit']);
 	unset($post['self']);
