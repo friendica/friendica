@@ -18,6 +18,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `post_remote_end` | `\Friendica\Event\InsertPostRemoteEndEvent` |
 | `prepare_body_init` | `\Friendica\Event\PreparePostStartEvent` |
 | `prepare_body_content_filter` | `\Friendica\Event\PreparePostFilterContentEvent` |
+| `prepare_body` | `\Friendica\Event\PreparePostEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -206,3 +207,16 @@ Fired before content filtering is applied to a post.
 
 **Modifiable:**
 - `setFilterReasons(array $filterReasons): void` — change the filter reasons
+
+### `\Friendica\Event\PreparePostEvent`
+
+Fired when a post is being prepared for display.
+
+**Contained data:**
+- `getItemArray(): array` — the item record array (read-only)
+- `getHtml(): string` — the rendered HTML
+- `isPreview(): bool` — whether this is a preview
+- `getFilterReasons(): array` — the filter reasons array (read-only)
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the rendered HTML

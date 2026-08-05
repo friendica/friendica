@@ -23,6 +23,7 @@ use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -3078,18 +3079,11 @@ class Item
 			$s = self::replacePlatformIcon($s, $shared_item, $uid);
 		}
 
-		$hook_data = [
-			'item'           => $item,
-			'html'           => $s,
-			'preview'        => $is_preview,
-			'filter_reasons' => $filter_reasons,
-		];
+		$event = $eventDispatcher->dispatch(
+			new PreparePostEvent($item, $s, $is_preview, $filter_reasons),
+		);
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST, $hook_data),
-		)->getArray();
-
-		$s = $hook_data['html'];
+		$s = $event->getHtml();
 
 		unset($hook_data);
 

@@ -20,6 +20,7 @@ use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\CollectRoutesEvent;
@@ -129,7 +130,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PHOTO_UPLOAD_END                => 'photo_post_end',
 		ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'photo_upload_form',
 		ArrayFilterEvent::PHOTO_UPLOAD_START              => 'photo_post_init',
-		ArrayFilterEvent::PREPARE_POST                    => 'prepare_body',
+		PreparePostEvent::NAME                            => 'prepare_body',
 		ArrayFilterEvent::PREPARE_POST_END                => 'prepare_body_final',
 		PreparePostFilterContentEvent::NAME               => 'prepare_body_content_filter',
 		PreparePostStartEvent::NAME                       => 'prepare_body_init',
@@ -247,7 +248,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
-			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
+			PreparePostEvent::NAME                            => 'onPreparePostEvent',
 			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
 			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
@@ -372,6 +373,23 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setFilterReasons($hook_data['filter_reasons'] ?? []);
+	}
+
+	/**
+	 * Map the PreparePostEvent to `prepare_body` hook
+	 */
+	public static function onPreparePostEvent(PreparePostEvent $event): void
+	{
+		$hook_data = [
+			'item'           => $event->getItemArray(),
+			'html'           => $event->getHtml(),
+			'preview'        => $event->isPreview(),
+			'filter_reasons' => $event->getFilterReasons(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setHtml($hook_data['html'] ?? '');
 	}
 
 	/**
