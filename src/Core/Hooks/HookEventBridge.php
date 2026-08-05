@@ -16,6 +16,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
@@ -81,7 +82,7 @@ final class HookEventBridge
 		ArrayFilterEvent::DB_VIEW_DEFINITION              => 'dbview_definition',
 		ArrayFilterEvent::DETECT_LANGUAGES                => 'detect_languages',
 		ArrayFilterEvent::DIRECTORY_ITEM                  => 'directory_item',
-		ArrayFilterEvent::DISPLAY_ITEM                    => 'display_item',
+		DisplayItemEvent::NAME                            => 'display_item',
 		ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'display_settings_post',
 		ArrayFilterEvent::EDIT_CONTACT_FORM               => 'contact_edit',
 		ArrayFilterEvent::EDIT_CONTACT_POST               => 'contact_edit_post',
@@ -199,7 +200,7 @@ final class HookEventBridge
 			ArrayFilterEvent::DB_VIEW_DEFINITION              => 'onArrayFilterEvent',
 			ArrayFilterEvent::DETECT_LANGUAGES                => 'onArrayFilterEvent',
 			ArrayFilterEvent::DIRECTORY_ITEM                  => 'onArrayFilterEvent',
-			ArrayFilterEvent::DISPLAY_ITEM                    => 'onArrayFilterEvent',
+			DisplayItemEvent::NAME                            => 'onDisplayItemEvent',
 			ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'onArrayFilterEvent',
 			ArrayFilterEvent::EDIT_CONTACT_FORM               => 'onArrayFilterEvent',
 			ArrayFilterEvent::EDIT_CONTACT_POST               => 'onArrayFilterEvent',
@@ -292,6 +293,21 @@ final class HookEventBridge
 	public static function onNamedEvent(NamedEvent $event): void
 	{
 		static::callHook($event->getName(), '');
+	}
+
+	/**
+	 * Map the DisplayItemEvent to `display_item` hook
+	 */
+	public static function onDisplayItemEvent(DisplayItemEvent $event): void
+	{
+		$hook_data = [
+			'item'   => $event->getItemArray(),
+			'output' => $event->getTemplateDataArray(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setTemplateDataArray($hook_data['output'] ?? []);
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void

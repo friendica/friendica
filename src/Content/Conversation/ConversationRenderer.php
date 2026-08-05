@@ -19,6 +19,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\DisplayItemEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
@@ -541,15 +542,14 @@ final readonly class ConversationRenderer
 				'thread_level'         => 1,
 			];
 
-			$arr = ['item' => $item, 'output' => $tmpItem];
-			$arr = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr),
-			)->getArray();
+			$event = $this->eventDispatcher->dispatch(
+				new DisplayItemEvent($item, $tmpItem),
+			);
 
 			$threads[] = [
 				'id'      => $item['id'],
 				'network' => $item['network'],
-				'items'   => [$arr['output']],
+				'items'   => [$event->getTemplateDataArray()],
 			];
 		}
 

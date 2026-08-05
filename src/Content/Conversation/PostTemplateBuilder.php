@@ -19,6 +19,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\DisplayItemEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
@@ -425,9 +426,8 @@ final class PostTemplateBuilder
 			'hide_text'          => $this->l10n->t('Close comments'),
 		];
 
-		$arr    = ['item' => $item, 'output' => $tmpItem];
-		$arr    = $this->eventDispatcher->dispatch(new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr))->getArray();
-		$result = $arr['output'];
+		$event  = $this->eventDispatcher->dispatch(new DisplayItemEvent($item, $tmpItem));
+		$result = $event->getTemplateDataArray();
 
 		$children = [];
 		if (!empty($item['children']) && is_array($item['children'])) {

@@ -20,6 +20,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `prepare_body_content_filter` | `\Friendica\Event\PreparePostFilterContentEvent` |
 | `prepare_body` | `\Friendica\Event\PreparePostEvent` |
 | `prepare_body_final` | `\Friendica\Event\PreparePostEndEvent` |
+| `display_item` | `\Friendica\Event\DisplayItemEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -232,3 +233,14 @@ Fired after a post has been prepared for display.
 
 **Modifiable:**
 - `setHtml(string $html): void` — change the rendered HTML
+
+### `\Friendica\Event\DisplayItemEvent`
+
+Fired when formatting a post for display.
+
+**Contained data:**
+- `getItemArray(): array` — the item record array (read-only)
+- `getTemplateDataArray(): array` — the template data array
+
+**Modifiable:**
+- `setTemplateDataArray(array $output): void` — change the template data
