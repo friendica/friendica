@@ -23,6 +23,7 @@ use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Model\Post\Category;
@@ -3062,17 +3063,11 @@ class Item
 
 			$item['attachments'] = $itemSplitAttachments;
 
-			$hook_data = [
-				'item'           => $item,
-				'filter_reasons' => $filter_reasons,
-			];
+			$event = $eventDispatcher->dispatch(
+				new PreparePostFilterContentEvent($item, $uid, $filter_reasons),
+			);
 
-			$hook_data = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, $hook_data),
-			)->getArray();
-
-			$filter_reasons = $hook_data['filter_reasons'];
-			unset($hook_data);
+			$filter_reasons = $event->getFilterReasons();
 		}
 
 		if (!empty($shared_item['uri-id'])) {

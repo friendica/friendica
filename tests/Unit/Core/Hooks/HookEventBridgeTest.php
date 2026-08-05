@@ -34,6 +34,7 @@ use Friendica\Event\ModulePostEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Event\ZrlInitEvent;
@@ -132,7 +133,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
 			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
-			ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'onArrayFilterEvent',
+			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
@@ -569,7 +570,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'get'],
 			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'post_local_start'],
-			[ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, 'prepare_body_content_filter'],
 			[ArrayFilterEvent::PREPARE_POST, 'prepare_body'],
 			[ArrayFilterEvent::PREPARE_POST_END, 'prepare_body_final'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],

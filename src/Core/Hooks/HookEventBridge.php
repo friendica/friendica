@@ -20,6 +20,7 @@ use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
@@ -130,7 +131,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PHOTO_UPLOAD_START              => 'photo_post_init',
 		ArrayFilterEvent::PREPARE_POST                    => 'prepare_body',
 		ArrayFilterEvent::PREPARE_POST_END                => 'prepare_body_final',
-		ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'prepare_body_content_filter',
+		PreparePostFilterContentEvent::NAME               => 'prepare_body_content_filter',
 		PreparePostStartEvent::NAME                       => 'prepare_body_init',
 		ArrayFilterEvent::PROBE_DETECT                    => 'probe_detect',
 		ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'profile_edit',
@@ -248,7 +249,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
 			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
-			ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'onArrayFilterEvent',
+			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
@@ -355,6 +356,22 @@ final class HookEventBridge
 	public static function onPreparePostStartEvent(PreparePostStartEvent $event): void
 	{
 		$event->setItemArray((array) static::callHook($event->getName(), $event->getItemArray()));
+	}
+
+	/**
+	 * Map the PreparePostFilterContentEvent to `prepare_body_content_filter` hook
+	 */
+	public static function onPreparePostFilterContentEvent(PreparePostFilterContentEvent $event): void
+	{
+		$hook_data = [
+			'item'           => $event->getItemArray(),
+			'uid'            => $event->getUserId(),
+			'filter_reasons' => $event->getFilterReasons(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setFilterReasons($hook_data['filter_reasons'] ?? []);
 	}
 
 	/**

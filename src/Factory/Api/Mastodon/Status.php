@@ -16,7 +16,7 @@ use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
@@ -181,22 +181,15 @@ class Status extends BaseFactory
 		}
 
 
-		$hook_data = [
-			'item'           => $item,
-			'uid'            => $uid,
-			'filter_reasons' => [],
-		];
-
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, $hook_data),
-		)->getArray();
+		$event = $this->eventDispatcher->dispatch(
+			new PreparePostFilterContentEvent($item, $uid, []),
+		);
 
 		if ($this->contentItem->redundantSummary($item['body'], $item['content-warning'])) {
 			$item['content-warning'] = '';
 		}
 
-		$filter_reasons = $hook_data['filter_reasons'];
-		unset($hook_data);
+		$filter_reasons = $event->getFilterReasons();
 		if (!empty($filter_reasons)) {
 			$sensitive = true;
 			$item['content-warning'] .= ', ' . implode(', ', $filter_reasons);

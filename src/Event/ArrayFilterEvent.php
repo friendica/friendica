@@ -31,11 +31,6 @@ final class ArrayFilterEvent extends AbstractEvent
 	public const INSERT_POST_LOCAL_START = 'friendica.data.insert_post_local_start';
 
 	/**
-	 * before first bbcode to html
-	 */
-	public const PREPARE_POST_FILTER_CONTENT = 'friendica.data.prepare_post_filter_content';
-
-	/**
 	 * after first bbcode to html
 	 */
 	public const PREPARE_POST = 'friendica.data.prepare_post';
