@@ -16,6 +16,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -95,7 +96,7 @@ final class HookEventBridge
 		ArrayFilterEvent::GET_SITE_INFO                   => 'getsiteinfo',
 		ArrayFilterEvent::GLOBAL_DIR_UPDATE               => 'globaldir_update',
 		ArrayFilterEvent::HTML_TO_BBCODE_END              => 'html2bbcode',
-		ArrayFilterEvent::INSERT_POST_LOCAL               => 'post_local',
+		InsertPostLocalEvent::NAME                        => 'post_local',
 		ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'post_local_end',
 		ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'post_local_start',
 		ArrayFilterEvent::INSERT_POST_REMOTE              => 'post_remote',
@@ -213,7 +214,7 @@ final class HookEventBridge
 			ArrayFilterEvent::GET_SITE_INFO                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::GLOBAL_DIR_UPDATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::HTML_TO_BBCODE_END              => 'onHtmlToBbcodeEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onInsertPostLocalEvent',
+			InsertPostLocalEvent::NAME                        => 'onInsertPostLocalEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onInsertPostLocalEndEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE              => 'onArrayFilterEvent',
@@ -313,17 +314,11 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the INSERT_POST_LOCAL event to `post_local` hook
+	 * Map the InsertPostLocalEvent to `post_local` hook
 	 */
-	public static function onInsertPostLocalEvent(ArrayFilterEvent $event): void
+	public static function onInsertPostLocalEvent(InsertPostLocalEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$item = $data['item'] ?? [];
-
-		$data['item'] = static::callHook($event->getName(), (array) $item);
-
-		$event->setArray($data);
+		$event->setItemArray((array) static::callHook($event->getName(), $event->getItemArray()));
 	}
 
 	/**

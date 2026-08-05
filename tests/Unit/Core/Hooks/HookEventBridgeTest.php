@@ -18,6 +18,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
@@ -97,7 +98,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::GET_SITE_INFO                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::GLOBAL_DIR_UPDATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::HTML_TO_BBCODE_END              => 'onHtmlToBbcodeEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onInsertPostLocalEvent',
+			InsertPostLocalEvent::NAME                        => 'onInsertPostLocalEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onInsertPostLocalEndEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
 			ArrayFilterEvent::INSERT_POST_REMOTE              => 'onArrayFilterEvent',
@@ -287,7 +288,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnInsertPostLocalEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, ['item' => ['id' => -1]]);
+		$event = new InsertPostLocalEvent(['id' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -301,8 +302,8 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onInsertPostLocalEvent($event);
 
 		$this->assertSame(
-			['item' => ['id' => 123]],
-			$event->getArray(),
+			['id' => 123],
+			$event->getItemArray(),
 		);
 	}
 

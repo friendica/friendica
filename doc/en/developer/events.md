@@ -139,3 +139,13 @@ Fired when a ZRL init is triggered.
 **Contained data:**
 - `getZrlUrl(): string` — the ZRL URL
 - `getUrl(): string` — the command URL
+
+### `\Friendica\Event\InsertPostLocalEvent`
+
+Fired when a local post is being inserted.
+
+**Contained data:**
+- `getItemArray(): array` — the item record array
+
+**Modifiable:**
+- `setItemArray(array $item): void` — change the item record

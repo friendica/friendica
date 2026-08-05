@@ -21,6 +21,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Model\Post\Category;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
@@ -792,16 +793,12 @@ class Item
 				$dummy_session = false;
 			}
 
-			$hook_data = [
-				'item' => $item,
-			];
-
-			$hook_data = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data),
-			)->getArray();
+			$event = $eventDispatcher->dispatch(
+				new InsertPostLocalEvent($item),
+			);
 
 			/** @var array<string,mixed> */
-			$item = $hook_data['item'] ?? $item;
+			$item = $event->getItemArray();
 
 			if ($dummy_session) {
 				unset($_SESSION['authenticated']);
