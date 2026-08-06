@@ -29,6 +29,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `item_photo_menu` | `\Friendica\Event\ItemPhotoMenuEvent` |
 | `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
 | `notifier_end` | `\Friendica\Event\NotifierEndEvent` |
+| `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -338,3 +339,13 @@ Fired after the notifier has processed an item.
 
 **Contained data:**
 - `getItemArray(): array` — the processed item record (read-only)
+
+### `\Friendica\Event\EnotifyEvent`
+
+Fired when a notification is created and an email is sent.
+
+**Contained data:**
+- `getDataArray(): array` — the notification data with the keys `params` (the notification parameters), `subject`, `preamble`, `epreamble`, `body`, `sitelink`, `tsitelink`, `hsitelink` and `itemlink`
+
+**Modifiable:**
+- `setDataArray(array $data): void` — change the notification data

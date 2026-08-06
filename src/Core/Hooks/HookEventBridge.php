@@ -21,6 +21,7 @@ use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
+use Friendica\Event\EnotifyEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
@@ -98,7 +99,7 @@ final class HookEventBridge
 		ArrayFilterEvent::EMAIL_GET_MESSAGE_END           => 'email_getmessage_end',
 		ArrayFilterEvent::EMAILER_SEND                    => 'emailer_send',
 		ArrayFilterEvent::EMAILER_SEND_PREPARE            => 'emailer_send_prepare',
-		ArrayFilterEvent::ENOTIFY                         => 'enotify',
+		EnotifyEvent::NAME                                => 'enotify',
 		ArrayFilterEvent::ENOTIFY_MAIL                    => 'enotify_mail',
 		ArrayFilterEvent::ENOTIFY_STORE                   => 'enotify_store',
 		ArrayFilterEvent::EVENT_CREATED                   => 'event_created',
@@ -216,7 +217,7 @@ final class HookEventBridge
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END           => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAILER_SEND                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAILER_SEND_PREPARE            => 'onEmailerSendPrepareEvent',
-			ArrayFilterEvent::ENOTIFY                         => 'onArrayFilterEvent',
+			EnotifyEvent::NAME                                => 'onEnotifyEvent',
 			ArrayFilterEvent::ENOTIFY_MAIL                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::ENOTIFY_STORE                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::EVENT_CREATED                   => 'onEventCreatedEvent',
@@ -434,6 +435,18 @@ final class HookEventBridge
 	public static function onNotifierEndEvent(NotifierEndEvent $event): void
 	{
 		static::callHook($event->getName(), $event->getItemArray());
+	}
+
+	/**
+	 * Map the EnotifyEvent to `enotify` hook
+	 *
+	 * The data array is passed as the whole hook data to stay backward-compatible.
+	 */
+	public static function onEnotifyEvent(EnotifyEvent $event): void
+	{
+		$event->setDataArray(
+			static::callHook($event->getName(), $event->getDataArray()),
+		);
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void

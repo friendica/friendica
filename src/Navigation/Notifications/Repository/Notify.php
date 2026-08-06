@@ -17,6 +17,7 @@ use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\EnotifyEvent;
 use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
 use Friendica\Model;
 use Friendica\Navigation\Notifications\Collection;
@@ -569,9 +570,8 @@ class Notify extends BaseRepository
 			'itemlink'  => $itemlink,
 		];
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ENOTIFY, $hook_data),
-		)->getArray();
+		$event     = $this->eventDispatcher->dispatch(new EnotifyEvent($hook_data));
+		$hook_data = $event->getDataArray();
 
 		$subject = $hook_data['subject'];
 
