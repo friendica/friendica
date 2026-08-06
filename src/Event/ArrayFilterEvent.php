@@ -52,8 +52,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const ITEM_TAGGED = 'friendica.data.item_tagged';
 
-	public const CACHE_ITEM = 'friendica.data.cache_item';
-
 	public const CHECK_ITEM_NOTIFICATION = 'friendica.data.check_item_notification';
 
 	public const ENOTIFY = 'friendica.data.enotify';

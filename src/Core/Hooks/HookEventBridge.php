@@ -16,6 +16,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\CacheItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
@@ -73,7 +74,7 @@ final class HookEventBridge
 		ArrayFilterEvent::BBCODE_TO_HTML_START            => 'bbcode',
 		ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'bb2diaspora',
 		ArrayFilterEvent::BLOCK_CONTACT                   => 'block',
-		ArrayFilterEvent::CACHE_ITEM                      => 'put_item_in_cache',
+		CacheItemEvent::NAME                              => 'put_item_in_cache',
 		ArrayFilterEvent::CHECK_ITEM_NOTIFICATION         => 'check_item_notification',
 		ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'connector_settings_post',
 		ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'contact_photo_menu',
@@ -191,7 +192,7 @@ final class HookEventBridge
 			ArrayFilterEvent::BBCODE_TO_HTML_START            => 'onBbcodeToHtmlEvent',
 			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'onBbcodeToMarkdownEvent',
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
-			ArrayFilterEvent::CACHE_ITEM                      => 'onArrayFilterEvent',
+			CacheItemEvent::NAME                              => 'onCacheItemEvent',
 			ArrayFilterEvent::CHECK_ITEM_NOTIFICATION         => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
@@ -308,6 +309,23 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setTemplateDataArray($hook_data['output'] ?? []);
+	}
+
+	/**
+	 * Map the CacheItemEvent to `put_item_in_cache` hook
+	 */
+	public static function onCacheItemEvent(CacheItemEvent $event): void
+	{
+		$hook_data = [
+			'item'          => $event->getItemArray(),
+			'rendered-html' => $event->getRenderedHtml(),
+			'rendered-hash' => $event->getRenderedHash(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setRenderedHtml($hook_data['rendered-html'] ?? '');
+		$event->setRenderedHash($hook_data['rendered-hash'] ?? '');
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void

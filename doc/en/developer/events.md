@@ -21,6 +21,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `prepare_body` | `\Friendica\Event\PreparePostEvent` |
 | `prepare_body_final` | `\Friendica\Event\PreparePostEndEvent` |
 | `display_item` | `\Friendica\Event\DisplayItemEvent` |
+| `put_item_in_cache` | `\Friendica\Event\CacheItemEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -244,3 +245,16 @@ Fired when formatting a post for display.
 
 **Modifiable:**
 - `setTemplateDataArray(array $output): void` — change the template data
+
+### `\Friendica\Event\CacheItemEvent`
+
+Fired when an item's rendered HTML is being stored in the cache.
+
+**Contained data:**
+- `getItemArray(): array` — the item record array (read-only)
+- `getRenderedHtml(): string` — the rendered HTML of the item
+- `getRenderedHash(): string` — the hash of the rendered HTML
+
+**Modifiable:**
+- `setRenderedHtml(string $renderedHtml): void` — change the cached HTML
+- `setRenderedHash(string $renderedHash): void` — change the cached hash
