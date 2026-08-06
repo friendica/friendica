@@ -39,6 +39,7 @@ use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
+use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
@@ -130,7 +131,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::NETWORK_CONTENT_START           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::NOTIFIER_END                    => 'onArrayFilterEvent',
+			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
 			ArrayFilterEvent::OCR_DETECTION                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'onArrayFilterEvent',

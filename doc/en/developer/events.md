@@ -28,6 +28,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `tagged` | `\Friendica\Event\ItemTaggedEvent` |
 | `item_photo_menu` | `\Friendica\Event\ItemPhotoMenuEvent` |
 | `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
+| `notifier_end` | `\Friendica\Event\NotifierEndEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -330,3 +331,10 @@ Fired when formatting an item for display on the directory page.
 
 **Modifiable:**
 - `setEntryArray(array $entry): void` — change the directory entry
+
+### `\Friendica\Event\NotifierEndEvent`
+
+Fired after the notifier has processed an item.
+
+**Contained data:**
+- `getItemArray(): array` — the processed item record (read-only)

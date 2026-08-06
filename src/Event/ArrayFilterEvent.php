@@ -144,7 +144,7 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const MAP_GET_COORDINATES = 'friendica.data.map_get_coordinates';
 
-	public const NOTIFIER_END = 'friendica.data.notifier_end';
+	public const NOTIFY = 'friendica.data.notify';
 
 	public const OCR_DETECTION = 'friendica.data.ocr_detection';
 

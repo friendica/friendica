@@ -42,6 +42,7 @@ use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\HomeInitEvent;
 use Friendica\Event\InitEvent;
 use Friendica\Event\LoggingOutEvent;
+use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -128,7 +129,7 @@ final class HookEventBridge
 		ArrayFilterEvent::NETWORK_CONTENT_START           => 'network_content_init',
 		ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'network_tabs',
 		ArrayFilterEvent::NETWORK_TO_NAME                 => 'network_to_name',
-		ArrayFilterEvent::NOTIFIER_END                    => 'notifier_end',
+		NotifierEndEvent::NAME                            => 'notifier_end',
 		ArrayFilterEvent::OCR_DETECTION                   => 'ocr-detection',
 		ArrayFilterEvent::OTHER_ENCAPSULATE               => 'other_encapsulate',
 		ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'other_unencapsulate',
@@ -246,7 +247,7 @@ final class HookEventBridge
 			ArrayFilterEvent::NETWORK_CONTENT_START           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::NOTIFIER_END                    => 'onArrayFilterEvent',
+			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
 			ArrayFilterEvent::OCR_DETECTION                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'onArrayFilterEvent',
@@ -423,6 +424,16 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setEntryArray($hook_data['entry'] ?? []);
+	}
+
+	/**
+	 * Map the NotifierEndEvent to `notifier_end` hook
+	 *
+	 * The item array is passed as the whole hook data to stay backward-compatible.
+	 */
+	public static function onNotifierEndEvent(NotifierEndEvent $event): void
+	{
+		static::callHook($event->getName(), $event->getItemArray());
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void
