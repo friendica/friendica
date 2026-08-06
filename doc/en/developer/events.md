@@ -27,6 +27,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
 | `tagged` | `\Friendica\Event\ItemTaggedEvent` |
 | `item_photo_menu` | `\Friendica\Event\ItemPhotoMenuEvent` |
+| `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -318,3 +319,14 @@ Fired when building the photo menu of an item.
 
 **Modifiable:**
 - `setMenuArray(array $menu): void` — change the menu entries
+
+### `\Friendica\Event\DirectoryItemEvent`
+
+Fired when formatting an item for display on the directory page.
+
+**Contained data:**
+- `getContactArray(): array` — the contact record (read-only)
+- `getEntryArray(): array` — the directory entry
+
+**Modifiable:**
+- `setEntryArray(array $entry): void` — change the directory entry

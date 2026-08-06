@@ -19,6 +19,7 @@ use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ConversationStartEvent;
+use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -87,7 +88,7 @@ final class HookEventBridge
 		ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'dbstructure_definition',
 		ArrayFilterEvent::DB_VIEW_DEFINITION              => 'dbview_definition',
 		ArrayFilterEvent::DETECT_LANGUAGES                => 'detect_languages',
-		ArrayFilterEvent::DIRECTORY_ITEM                  => 'directory_item',
+		DirectoryItemEvent::NAME                          => 'directory_item',
 		DisplayItemEvent::NAME                            => 'display_item',
 		ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'display_settings_post',
 		ArrayFilterEvent::EDIT_CONTACT_FORM               => 'contact_edit',
@@ -205,7 +206,7 @@ final class HookEventBridge
 			ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'onArrayFilterEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION              => 'onArrayFilterEvent',
 			ArrayFilterEvent::DETECT_LANGUAGES                => 'onArrayFilterEvent',
-			ArrayFilterEvent::DIRECTORY_ITEM                  => 'onArrayFilterEvent',
+			DirectoryItemEvent::NAME                          => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                            => 'onDisplayItemEvent',
 			ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'onArrayFilterEvent',
 			ArrayFilterEvent::EDIT_CONTACT_FORM               => 'onArrayFilterEvent',
@@ -407,6 +408,21 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setMenuArray($hook_data['menu'] ?? []);
+	}
+
+	/**
+	 * Map the DirectoryItemEvent to `directory_item` hook
+	 */
+	public static function onDirectoryItemEvent(DirectoryItemEvent $event): void
+	{
+		$hook_data = [
+			'contact' => $event->getContactArray(),
+			'entry'   => $event->getEntryArray(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setEntryArray($hook_data['entry'] ?? []);
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void

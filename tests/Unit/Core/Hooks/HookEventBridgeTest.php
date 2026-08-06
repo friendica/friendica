@@ -21,6 +21,7 @@ use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ConversationStartEvent;
+use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -89,7 +90,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'onArrayFilterEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION              => 'onArrayFilterEvent',
 			ArrayFilterEvent::DETECT_LANGUAGES                => 'onArrayFilterEvent',
-			ArrayFilterEvent::DIRECTORY_ITEM                  => 'onArrayFilterEvent',
+			DirectoryItemEvent::NAME                          => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                            => 'onDisplayItemEvent',
 			ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'onArrayFilterEvent',
 			ArrayFilterEvent::EDIT_CONTACT_FORM               => 'onArrayFilterEvent',
@@ -590,7 +591,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::ENOTIFY_MAIL, 'enotify_mail'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
 			[ArrayFilterEvent::RENDER_LOCATION, 'render_location'],
-			[ArrayFilterEvent::DIRECTORY_ITEM, 'directory_item'],
 			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'contact_photo_menu'],
 			[ArrayFilterEvent::PROFILE_SIDEBAR, 'profile_sidebar'],
 			[ArrayFilterEvent::PROFILE_TABS, 'profile_tabs'],
