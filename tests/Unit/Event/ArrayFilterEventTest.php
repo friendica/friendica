@@ -44,7 +44,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::ENOTIFY_MAIL, 'friendica.data.enotify_mail'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'friendica.data.detect_languages'],
 			[ArrayFilterEvent::RENDER_LOCATION, 'friendica.data.render_location'],
-			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'friendica.data.item_photo_menu'],
 			[ArrayFilterEvent::DIRECTORY_ITEM, 'friendica.data.directory_item'],
 			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'friendica.data.contact_photo_menu'],
 			[ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, 'friendica.data.profile_sidebar_entry'],

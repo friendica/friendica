@@ -25,11 +25,12 @@ use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\ItemPhotoMenuEvent;
+use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
-use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -114,7 +115,7 @@ final class HookEventBridge
 		InsertPostRemoteEvent::NAME                       => 'post_remote',
 		InsertPostRemoteEndEvent::NAME                    => 'post_remote_end',
 		ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'post_local_start',
-		ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'item_photo_menu',
+		ItemPhotoMenuEvent::NAME                          => 'item_photo_menu',
 		ItemTaggedEvent::NAME                             => 'tagged',
 		ArrayFilterEvent::JOT_NETWORKS                    => 'jot_networks',
 		LoggedInEvent::NAME                               => 'logged_in',
@@ -232,7 +233,7 @@ final class HookEventBridge
 			InsertPostRemoteEvent::NAME                       => 'onInsertPostRemoteEvent',
 			InsertPostRemoteEndEvent::NAME                    => 'onInsertPostRemoteEndEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
-			ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'onArrayFilterEvent',
+			ItemPhotoMenuEvent::NAME                          => 'onItemPhotoMenuEvent',
 			ItemTaggedEvent::NAME                             => 'onItemTaggedEvent',
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
 			LoggedInEvent::NAME                               => 'onLoggedInEvent',
@@ -391,6 +392,21 @@ final class HookEventBridge
 		];
 
 		static::callHook($event->getName(), $hook_data);
+	}
+
+	/**
+	 * Map the ItemPhotoMenuEvent to `item_photo_menu` hook
+	 */
+	public static function onItemPhotoMenuEvent(ItemPhotoMenuEvent $event): void
+	{
+		$hook_data = [
+			'item' => $event->getItemArray(),
+			'menu' => $event->getMenuArray(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setMenuArray($hook_data['menu'] ?? []);
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void

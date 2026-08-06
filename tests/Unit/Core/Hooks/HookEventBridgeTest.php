@@ -24,6 +24,7 @@ use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostLocalEvent;
+use Friendica\Event\ItemPhotoMenuEvent;
 use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -116,7 +117,7 @@ class HookEventBridgeTest extends TestCase
 			InsertPostRemoteEvent::NAME                       => 'onInsertPostRemoteEvent',
 			InsertPostRemoteEndEvent::NAME                    => 'onInsertPostRemoteEndEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
-			ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'onArrayFilterEvent',
+			ItemPhotoMenuEvent::NAME                          => 'onItemPhotoMenuEvent',
 			ItemTaggedEvent::NAME                             => 'onItemTaggedEvent',
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
 			LoggedInEvent::NAME                               => 'onLoggedInEvent',
@@ -589,7 +590,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::ENOTIFY_MAIL, 'enotify_mail'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
 			[ArrayFilterEvent::RENDER_LOCATION, 'render_location'],
-			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'item_photo_menu'],
 			[ArrayFilterEvent::DIRECTORY_ITEM, 'directory_item'],
 			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'contact_photo_menu'],
 			[ArrayFilterEvent::PROFILE_SIDEBAR, 'profile_sidebar'],

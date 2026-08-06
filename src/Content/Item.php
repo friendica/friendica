@@ -22,6 +22,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
+use Friendica\Event\ItemPhotoMenuEvent;
 use Friendica\Model\Attach;
 use Friendica\Model\Circle;
 use Friendica\Model\Contact;
@@ -452,13 +453,9 @@ class Item
 			$menu = [$this->l10n->t('View Profile') => $item['author-link']];
 		}
 
-		$args = ['item' => $item, 'menu' => $menu];
-
-		$args = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ITEM_PHOTO_MENU, $args),
-		)->getArray();
-
-		$menu = $args['menu'];
+		$menu = $this->eventDispatcher->dispatch(
+			new ItemPhotoMenuEvent($item, $menu),
+		)->getMenuArray();
 
 		$o = '';
 		foreach ($menu as $k => $v) {

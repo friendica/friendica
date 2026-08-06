@@ -26,6 +26,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `conversation_start` | `\Friendica\Event\ConversationStartEvent` |
 | `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
 | `tagged` | `\Friendica\Event\ItemTaggedEvent` |
+| `item_photo_menu` | `\Friendica\Event\ItemPhotoMenuEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -306,3 +307,14 @@ Fired when an item is tagged (e.g. mentioned) by a community owner.
 **Contained data:**
 - `getItemArray(): array` — the tagged item record (read-only)
 - `getUserArray(): array` — the tagging user record (read-only)
+
+### `\Friendica\Event\ItemPhotoMenuEvent`
+
+Fired when building the photo menu of an item.
+
+**Contained data:**
+- `getItemArray(): array` — the item record (read-only)
+- `getMenuArray(): array` — the menu entries as `label => link`
+
+**Modifiable:**
+- `setMenuArray(array $menu): void` — change the menu entries

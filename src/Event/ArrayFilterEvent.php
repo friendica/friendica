@@ -56,8 +56,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const RENDER_LOCATION = 'friendica.data.render_location';
 
-	public const ITEM_PHOTO_MENU = 'friendica.data.item_photo_menu';
-
 	public const DIRECTORY_ITEM = 'friendica.data.directory_item';
 
 	public const CONTACT_PHOTO_MENU = 'friendica.data.contact_photo_menu';
