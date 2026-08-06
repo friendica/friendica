@@ -19,6 +19,7 @@ use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CacheItemEvent;
+use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\LoggedInEvent;
@@ -77,7 +78,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'onBbcodeToMarkdownEvent',
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			CacheItemEvent::NAME                              => 'onCacheItemEvent',
-			ArrayFilterEvent::CHECK_ITEM_NOTIFICATION         => 'onArrayFilterEvent',
+			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONVERSATION_START              => 'onArrayFilterEvent',
@@ -583,7 +584,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::CONVERSATION_START, 'conversation_start'],
 			[ArrayFilterEvent::FETCH_ITEM_BY_LINK, 'item_by_link'],
 			[ArrayFilterEvent::ITEM_TAGGED, 'tagged'],
-			[ArrayFilterEvent::CHECK_ITEM_NOTIFICATION, 'check_item_notification'],
 			[ArrayFilterEvent::ENOTIFY, 'enotify'],
 			[ArrayFilterEvent::ENOTIFY_STORE, 'enotify_store'],
 			[ArrayFilterEvent::ENOTIFY_MAIL, 'enotify_mail'],

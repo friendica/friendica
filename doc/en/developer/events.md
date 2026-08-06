@@ -22,6 +22,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `prepare_body_final` | `\Friendica\Event\PreparePostEndEvent` |
 | `display_item` | `\Friendica\Event\DisplayItemEvent` |
 | `put_item_in_cache` | `\Friendica\Event\CacheItemEvent` |
+| `check_item_notification` | `\Friendica\Event\CheckItemNotificationEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -258,3 +259,14 @@ Fired when an item's rendered HTML is being stored in the cache.
 **Modifiable:**
 - `setRenderedHtml(string $renderedHtml): void` — change the cached HTML
 - `setRenderedHash(string $renderedHash): void` — change the cached hash
+
+### `\Friendica\Event\CheckItemNotificationEvent`
+
+Fired when checking item notifications for a user.
+
+**Contained data:**
+- `getUserId(): int` — the user ID (read-only)
+- `getProfilesArray(): array` — the list of profiles to check
+
+**Modifiable:**
+- `setProfilesArray(array $profiles): void` — change the list of profiles

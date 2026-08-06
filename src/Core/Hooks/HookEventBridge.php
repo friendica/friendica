@@ -17,6 +17,7 @@ use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CacheItemEvent;
+use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
@@ -75,7 +76,7 @@ final class HookEventBridge
 		ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'bb2diaspora',
 		ArrayFilterEvent::BLOCK_CONTACT                   => 'block',
 		CacheItemEvent::NAME                              => 'put_item_in_cache',
-		ArrayFilterEvent::CHECK_ITEM_NOTIFICATION         => 'check_item_notification',
+		CheckItemNotificationEvent::NAME                  => 'check_item_notification',
 		ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'connector_settings_post',
 		ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'contact_photo_menu',
 		ArrayFilterEvent::CONVERSATION_START              => 'conversation_start',
@@ -193,7 +194,7 @@ final class HookEventBridge
 			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'onBbcodeToMarkdownEvent',
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			CacheItemEvent::NAME                              => 'onCacheItemEvent',
-			ArrayFilterEvent::CHECK_ITEM_NOTIFICATION         => 'onArrayFilterEvent',
+			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONVERSATION_START              => 'onArrayFilterEvent',
@@ -326,6 +327,21 @@ final class HookEventBridge
 
 		$event->setRenderedHtml($hook_data['rendered-html'] ?? '');
 		$event->setRenderedHash($hook_data['rendered-hash'] ?? '');
+	}
+
+	/**
+	 * Map the CheckItemNotificationEvent to `check_item_notification` hook
+	 */
+	public static function onCheckItemNotificationEvent(CheckItemNotificationEvent $event): void
+	{
+		$hook_data = [
+			'uid'      => $event->getUserId(),
+			'profiles' => $event->getProfilesArray(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setProfilesArray($hook_data['profiles'] ?? []);
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void

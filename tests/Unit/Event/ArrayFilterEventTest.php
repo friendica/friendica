@@ -42,7 +42,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::CONVERSATION_START, 'friendica.data.conversation_start'],
 			[ArrayFilterEvent::FETCH_ITEM_BY_LINK, 'friendica.data.fetch_item_by_link'],
 			[ArrayFilterEvent::ITEM_TAGGED, 'friendica.data.item_tagged'],
-			[ArrayFilterEvent::CHECK_ITEM_NOTIFICATION, 'friendica.data.check_item_notification'],
 			[ArrayFilterEvent::ENOTIFY, 'friendica.data.enotify'],
 			[ArrayFilterEvent::ENOTIFY_STORE, 'friendica.data.enotify_store'],
 			[ArrayFilterEvent::ENOTIFY_MAIL, 'friendica.data.enotify_mail'],
