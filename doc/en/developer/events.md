@@ -30,6 +30,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
 | `notifier_end` | `\Friendica\Event\NotifierEndEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
+| `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -349,3 +350,13 @@ Fired when a notification is created and an email is sent.
 
 **Modifiable:**
 - `setDataArray(array $data): void` — change the notification data
+
+### `\Friendica\Event\EnotifyStoreEvent`
+
+Fired before a notification entry is stored in the database.
+
+**Contained data:**
+- `getDataArray(): array` — the notification database fields (`type`, `name`, `url`, `photo`, `msg`, `uid`, `link`, `iid`, `parent`, `seen`, `verb`, `otype`, `name_cache`, `msg_cache`, `uri-id`, `parent-uri-id`, `date`)
+
+**Modifiable:**
+- `setDataArray(array $data): void` — change the notification database fields

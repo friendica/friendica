@@ -46,8 +46,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const PARSE_LINK = 'friendica.data.parse_link';
 
-	public const ENOTIFY_STORE = 'friendica.data.enotify_store';
-
 	public const ENOTIFY_MAIL = 'friendica.data.enotify_mail';
 
 	public const DETECT_LANGUAGES = 'friendica.data.detect_languages';

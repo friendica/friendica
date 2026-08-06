@@ -18,6 +18,7 @@ use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\EnotifyEvent;
+use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
 use Friendica\Model;
 use Friendica\Navigation\Notifications\Collection;
@@ -178,9 +179,8 @@ class Notify extends BaseRepository
 		} else {
 			$fields['date'] = DateTimeFormat::utcNow();
 
-			$fields = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::ENOTIFY_STORE, $fields),
-			)->getArray();
+			$event  = $this->eventDispatcher->dispatch(new EnotifyStoreEvent($fields));
+			$fields = $event->getDataArray();
 
 			$this->db->insert(self::$table_name, $fields);
 
