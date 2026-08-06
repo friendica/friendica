@@ -16,8 +16,8 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\EnotifyEvent;
+use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
 use Friendica\Model;
@@ -652,9 +652,8 @@ class Notify extends BaseRepository
 				'headers'      => $emailBuilder->getHeaders(),
 			];
 
-			$hook_data = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::ENOTIFY_MAIL, $hook_data),
-			)->getArray();
+			$event     = $this->eventDispatcher->dispatch(new EnotifyMailEvent($hook_data));
+			$hook_data = $event->getDataArray();
 
 			$emailBuilder
 				->withHeaders($hook_data['headers'])

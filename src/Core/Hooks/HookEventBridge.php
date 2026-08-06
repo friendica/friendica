@@ -22,6 +22,7 @@ use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\EnotifyEvent;
+use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -101,7 +102,7 @@ final class HookEventBridge
 		ArrayFilterEvent::EMAILER_SEND                    => 'emailer_send',
 		ArrayFilterEvent::EMAILER_SEND_PREPARE            => 'emailer_send_prepare',
 		EnotifyEvent::NAME                                => 'enotify',
-		ArrayFilterEvent::ENOTIFY_MAIL                    => 'enotify_mail',
+		EnotifyMailEvent::NAME                            => 'enotify_mail',
 		EnotifyStoreEvent::NAME                           => 'enotify_store',
 		ArrayFilterEvent::EVENT_CREATED                   => 'event_created',
 		ArrayFilterEvent::EVENT_UPDATED                   => 'event_updated',
@@ -219,7 +220,7 @@ final class HookEventBridge
 			ArrayFilterEvent::EMAILER_SEND                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAILER_SEND_PREPARE            => 'onEmailerSendPrepareEvent',
 			EnotifyEvent::NAME                                => 'onEnotifyEvent',
-			ArrayFilterEvent::ENOTIFY_MAIL                    => 'onArrayFilterEvent',
+			EnotifyMailEvent::NAME                            => 'onEnotifyMailEvent',
 			EnotifyStoreEvent::NAME                           => 'onEnotifyStoreEvent',
 			ArrayFilterEvent::EVENT_CREATED                   => 'onEventCreatedEvent',
 			ArrayFilterEvent::EVENT_UPDATED                   => 'onEventUpdatedEvent',
@@ -456,6 +457,18 @@ final class HookEventBridge
 	 * The data array is passed as the whole hook data to stay backward-compatible.
 	 */
 	public static function onEnotifyStoreEvent(EnotifyStoreEvent $event): void
+	{
+		$event->setDataArray(
+			static::callHook($event->getName(), $event->getDataArray()),
+		);
+	}
+
+	/**
+	 * Map the EnotifyMailEvent to `enotify_mail` hook
+	 *
+	 * The data array is passed as the whole hook data to stay backward-compatible.
+	 */
+	public static function onEnotifyMailEvent(EnotifyMailEvent $event): void
 	{
 		$event->setDataArray(
 			static::callHook($event->getName(), $event->getDataArray()),

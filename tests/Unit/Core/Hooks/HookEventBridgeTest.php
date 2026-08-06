@@ -24,6 +24,7 @@ use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\EnotifyEvent;
+use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -103,7 +104,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::EMAILER_SEND                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAILER_SEND_PREPARE            => 'onEmailerSendPrepareEvent',
 			EnotifyEvent::NAME                                => 'onEnotifyEvent',
-			ArrayFilterEvent::ENOTIFY_MAIL                    => 'onArrayFilterEvent',
+			EnotifyMailEvent::NAME                            => 'onEnotifyMailEvent',
 			EnotifyStoreEvent::NAME                           => 'onEnotifyStoreEvent',
 			ArrayFilterEvent::EVENT_CREATED                   => 'onEventCreatedEvent',
 			ArrayFilterEvent::EVENT_UPDATED                   => 'onEventUpdatedEvent',
@@ -590,8 +591,8 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],
 			[ArrayFilterEvent::PARSE_LINK, 'parse_link'],
 			[EnotifyEvent::NAME, 'enotify'],
+			[EnotifyMailEvent::NAME, 'enotify_mail'],
 			[EnotifyStoreEvent::NAME, 'enotify_store'],
-			[ArrayFilterEvent::ENOTIFY_MAIL, 'enotify_mail'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
 			[ArrayFilterEvent::RENDER_LOCATION, 'render_location'],
 			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'contact_photo_menu'],
