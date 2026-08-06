@@ -20,6 +20,7 @@ use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DisplayItemEvent;
+use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
@@ -100,7 +101,7 @@ final class HookEventBridge
 		ArrayFilterEvent::EVENT_UPDATED                   => 'event_updated',
 		ArrayFilterEvent::FEATURE_ENABLED                 => 'isEnabled',
 		ArrayFilterEvent::FEATURE_GET                     => 'get',
-		ArrayFilterEvent::FETCH_ITEM_BY_LINK              => 'item_by_link',
+		FetchItemByLinkEvent::NAME                        => 'item_by_link',
 		ArrayFilterEvent::FOLLOW_CONTACT                  => 'follow',
 		ArrayFilterEvent::GENERATE_MAP                    => 'generate_map',
 		ArrayFilterEvent::GENERATE_NAMED_MAP              => 'generate_named_map',
@@ -218,7 +219,7 @@ final class HookEventBridge
 			ArrayFilterEvent::EVENT_UPDATED                   => 'onEventUpdatedEvent',
 			ArrayFilterEvent::FEATURE_ENABLED                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
-			ArrayFilterEvent::FETCH_ITEM_BY_LINK              => 'onArrayFilterEvent',
+			FetchItemByLinkEvent::NAME                        => 'onFetchItemByLinkEvent',
 			ArrayFilterEvent::FOLLOW_CONTACT                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_MAP                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP              => 'onArrayFilterEvent',
@@ -360,6 +361,22 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setItemsArray($hook_data['items'] ?? []);
+	}
+
+	/**
+	 * Map the FetchItemByLinkEvent to `item_by_link` hook
+	 */
+	public static function onFetchItemByLinkEvent(FetchItemByLinkEvent $event): void
+	{
+		$hook_data = [
+			'uri'     => $event->getUri(),
+			'uid'     => $event->getUserId(),
+			'item_id' => $event->getItemId(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setItemId(isset($hook_data['item_id']) ? (int) $hook_data['item_id'] : null);
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void

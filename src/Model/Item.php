@@ -22,6 +22,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CacheItemEvent;
+use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
 use Friendica\Event\PreparePostEndEvent;
@@ -3789,21 +3790,13 @@ class Item
 			return 0;
 		}
 
-		$eventDispatcher = DI::eventDispatcher();
+		$event = DI::eventDispatcher()->dispatch(
+			new FetchItemByLinkEvent($uri, $uid, null),
+		);
 
-		$hook_data = [
-			'uri'     => $uri,
-			'uid'     => $uid,
-			'item_id' => null,
-		];
-
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::FETCH_ITEM_BY_LINK, $hook_data),
-		)->getArray();
-
-		if (isset($hook_data['item_id'])) {
-			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hook_data['item_id']]);
-			return is_numeric($hook_data['item_id']) ? $hook_data['item_id'] : 0;
+		if ($event->getItemId() !== null) {
+			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $event->getItemId()]);
+			return $event->getItemId();
 		}
 
 		if (!$mimetype) {

@@ -22,6 +22,7 @@ use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DisplayItemEvent;
+use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -102,7 +103,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::EVENT_UPDATED                   => 'onEventUpdatedEvent',
 			ArrayFilterEvent::FEATURE_ENABLED                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
-			ArrayFilterEvent::FETCH_ITEM_BY_LINK              => 'onArrayFilterEvent',
+			FetchItemByLinkEvent::NAME                        => 'onFetchItemByLinkEvent',
 			ArrayFilterEvent::FOLLOW_CONTACT                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_MAP                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP              => 'onArrayFilterEvent',
@@ -582,7 +583,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::NETWORK_CONTENT_START, 'network_content_init'],
 			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],
 			[ArrayFilterEvent::PARSE_LINK, 'parse_link'],
-			[ArrayFilterEvent::FETCH_ITEM_BY_LINK, 'item_by_link'],
 			[ArrayFilterEvent::ITEM_TAGGED, 'tagged'],
 			[ArrayFilterEvent::ENOTIFY, 'enotify'],
 			[ArrayFilterEvent::ENOTIFY_STORE, 'enotify_store'],

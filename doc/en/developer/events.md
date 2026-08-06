@@ -24,6 +24,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `put_item_in_cache` | `\Friendica\Event\CacheItemEvent` |
 | `check_item_notification` | `\Friendica\Event\CheckItemNotificationEvent` |
 | `conversation_start` | `\Friendica\Event\ConversationStartEvent` |
+| `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -284,3 +285,15 @@ Fired when rendering a conversation timeline starts.
 
 **Modifiable:**
 - `setItemsArray(array $items): void` — change the items of the conversation timeline
+
+### `\Friendica\Event\FetchItemByLinkEvent`
+
+Fired when trying to probe an item from a given URI.
+
+**Contained data:**
+- `getUri(): string` — the item URI (read-only)
+- `getUserId(): int` — the user to return the item data for (read-only)
+- `getItemId(): ?int` — the created item ID if the probe was successful, null otherwise
+
+**Modifiable:**
+- `setItemId(?int $itemId): void` — set the fetched item ID
