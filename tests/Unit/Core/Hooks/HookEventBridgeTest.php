@@ -24,6 +24,7 @@ use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostLocalEvent;
+use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
@@ -116,7 +117,7 @@ class HookEventBridgeTest extends TestCase
 			InsertPostRemoteEndEvent::NAME                    => 'onInsertPostRemoteEndEvent',
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
 			ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::ITEM_TAGGED                     => 'onArrayFilterEvent',
+			ItemTaggedEvent::NAME                             => 'onItemTaggedEvent',
 			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
 			LoggedInEvent::NAME                               => 'onLoggedInEvent',
 			LoginFormEvent::NAME                              => 'onLoginFormEvent',
@@ -583,7 +584,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::NETWORK_CONTENT_START, 'network_content_init'],
 			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],
 			[ArrayFilterEvent::PARSE_LINK, 'parse_link'],
-			[ArrayFilterEvent::ITEM_TAGGED, 'tagged'],
 			[ArrayFilterEvent::ENOTIFY, 'enotify'],
 			[ArrayFilterEvent::ENOTIFY_STORE, 'enotify_store'],
 			[ArrayFilterEvent::ENOTIFY_MAIL, 'enotify_mail'],

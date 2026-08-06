@@ -20,10 +20,10 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostRemoteEvent;
+use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
 use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
@@ -2119,15 +2119,8 @@ class Item
 				return true;
 			}
 
-			$eventDispatcher = DI::eventDispatcher();
-
-			$arr = [
-				'item' => $item,
-				'user' => $owner,
-			];
-
-			$eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::ITEM_TAGGED, $arr),
+			DI::eventDispatcher()->dispatch(
+				new ItemTaggedEvent($item, $owner),
 			);
 		} else {
 			if (Tag::isMentioned($item['parent-uri-id'], $owner['url'])) {

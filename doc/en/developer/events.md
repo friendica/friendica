@@ -25,6 +25,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `check_item_notification` | `\Friendica\Event\CheckItemNotificationEvent` |
 | `conversation_start` | `\Friendica\Event\ConversationStartEvent` |
 | `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
+| `tagged` | `\Friendica\Event\ItemTaggedEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -297,3 +298,11 @@ Fired when trying to probe an item from a given URI.
 
 **Modifiable:**
 - `setItemId(?int $itemId): void` — set the fetched item ID
+
+### `\Friendica\Event\ItemTaggedEvent`
+
+Fired when an item is tagged (e.g. mentioned) by a community owner.
+
+**Contained data:**
+- `getItemArray(): array` — the tagged item record (read-only)
+- `getUserArray(): array` — the tagging user record (read-only)

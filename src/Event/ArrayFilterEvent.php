@@ -46,8 +46,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const PARSE_LINK = 'friendica.data.parse_link';
 
-	public const ITEM_TAGGED = 'friendica.data.item_tagged';
-
 	public const ENOTIFY = 'friendica.data.enotify';
 
 	public const ENOTIFY_STORE = 'friendica.data.enotify_store';
