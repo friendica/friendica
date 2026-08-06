@@ -39,7 +39,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::NETWORK_CONTENT_START, 'friendica.data.network_content_start'],
 			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'friendica.data.network_content_tabs'],
 			[ArrayFilterEvent::PARSE_LINK, 'friendica.data.parse_link'],
-			[ArrayFilterEvent::CONVERSATION_START, 'friendica.data.conversation_start'],
 			[ArrayFilterEvent::FETCH_ITEM_BY_LINK, 'friendica.data.fetch_item_by_link'],
 			[ArrayFilterEvent::ITEM_TAGGED, 'friendica.data.item_tagged'],
 			[ArrayFilterEvent::ENOTIFY, 'friendica.data.enotify'],

@@ -18,6 +18,7 @@ use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
+use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
@@ -79,7 +80,7 @@ final class HookEventBridge
 		CheckItemNotificationEvent::NAME                  => 'check_item_notification',
 		ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'connector_settings_post',
 		ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'contact_photo_menu',
-		ArrayFilterEvent::CONVERSATION_START              => 'conversation_start',
+		ConversationStartEvent::NAME                      => 'conversation_start',
 		ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'dbstructure_definition',
 		ArrayFilterEvent::DB_VIEW_DEFINITION              => 'dbview_definition',
 		ArrayFilterEvent::DETECT_LANGUAGES                => 'detect_languages',
@@ -197,7 +198,7 @@ final class HookEventBridge
 			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
-			ArrayFilterEvent::CONVERSATION_START              => 'onArrayFilterEvent',
+			ConversationStartEvent::NAME                      => 'onConversationStartEvent',
 			ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'onArrayFilterEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION              => 'onArrayFilterEvent',
 			ArrayFilterEvent::DETECT_LANGUAGES                => 'onArrayFilterEvent',
@@ -342,6 +343,23 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setProfilesArray($hook_data['profiles'] ?? []);
+	}
+
+	/**
+	 * Map the ConversationStartEvent to `conversation_start` hook
+	 */
+	public static function onConversationStartEvent(ConversationStartEvent $event): void
+	{
+		$hook_data = [
+			'items'   => $event->getItemsArray(),
+			'mode'    => $event->getMode(),
+			'update'  => $event->isUpdate(),
+			'preview' => $event->isPreview(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setItemsArray($hook_data['items'] ?? []);
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void

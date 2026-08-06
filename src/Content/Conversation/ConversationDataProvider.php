@@ -20,7 +20,7 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\DBA;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ConversationStartEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
@@ -246,16 +246,9 @@ final readonly class ConversationDataProvider
 	 */
 	private function dispatchConversationStart(array $items, string $mode, bool $update, bool $preview): array
 	{
-		$cb = [
-			'items'   => $items,
-			'mode'    => $mode,
-			'update'  => $update,
-			'preview' => $preview,
-		];
-
 		return $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::CONVERSATION_START, $cb),
-		)->getArray()['items'];
+			new ConversationStartEvent($items, $mode, $update, $preview),
+		)->getItemsArray();
 	}
 
 	/**

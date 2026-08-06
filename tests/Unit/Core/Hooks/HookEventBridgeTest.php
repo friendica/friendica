@@ -20,6 +20,7 @@ use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
+use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\LoggedInEvent;
@@ -81,7 +82,7 @@ class HookEventBridgeTest extends TestCase
 			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
 			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
-			ArrayFilterEvent::CONVERSATION_START              => 'onArrayFilterEvent',
+			ConversationStartEvent::NAME                      => 'onConversationStartEvent',
 			ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'onArrayFilterEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION              => 'onArrayFilterEvent',
 			ArrayFilterEvent::DETECT_LANGUAGES                => 'onArrayFilterEvent',
@@ -581,7 +582,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::NETWORK_CONTENT_START, 'network_content_init'],
 			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],
 			[ArrayFilterEvent::PARSE_LINK, 'parse_link'],
-			[ArrayFilterEvent::CONVERSATION_START, 'conversation_start'],
 			[ArrayFilterEvent::FETCH_ITEM_BY_LINK, 'item_by_link'],
 			[ArrayFilterEvent::ITEM_TAGGED, 'tagged'],
 			[ArrayFilterEvent::ENOTIFY, 'enotify'],

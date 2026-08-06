@@ -23,6 +23,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `display_item` | `\Friendica\Event\DisplayItemEvent` |
 | `put_item_in_cache` | `\Friendica\Event\CacheItemEvent` |
 | `check_item_notification` | `\Friendica\Event\CheckItemNotificationEvent` |
+| `conversation_start` | `\Friendica\Event\ConversationStartEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -270,3 +271,16 @@ Fired when checking item notifications for a user.
 
 **Modifiable:**
 - `setProfilesArray(array $profiles): void` — change the list of profiles
+
+### `\Friendica\Event\ConversationStartEvent`
+
+Fired when rendering a conversation timeline starts.
+
+**Contained data:**
+- `getItemsArray(): array` — the items of the conversation timeline
+- `getMode(): string` — the rendering mode (read-only)
+- `isUpdate(): bool` — whether this is an AJAX update (read-only)
+- `isPreview(): bool` — whether to render in preview mode (read-only)
+
+**Modifiable:**
+- `setItemsArray(array $items): void` — change the items of the conversation timeline
