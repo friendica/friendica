@@ -32,6 +32,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `ocr-detection` | `\Friendica\Event\OcrDetectionEvent` |
 | `network_to_name` | `\Friendica\Event\NetworkToNameEvent` |
 | `network_content_init` | `\Friendica\Event\NetworkContentStartEvent` |
+| `network_tabs` | `\Friendica\Event\NetworkContentTabsEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -375,6 +376,16 @@ Fired when the network timeline starts being rendered.
 
 **Contained data:**
 - `getQuery(): string` — the query string of the network timeline URL (read-only)
+
+### `\Friendica\Event\NetworkContentTabsEvent`
+
+Fired when the network timeline tabs are being rendered.
+
+**Contained data:**
+- `getTabs(): array` — the network tabs as a list of tab arrays
+
+**Modifiable:**
+- `setTabs(array $tabs): void` — change the network tabs
 
 ### `\Friendica\Event\EnotifyEvent`
 

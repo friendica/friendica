@@ -40,8 +40,8 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\DBA;
 use Friendica\Database\Database;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\NetworkContentStartEvent;
+use Friendica\Event\NetworkContentTabsEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Circle;
 use Friendica\Model\Profile;
@@ -364,24 +364,18 @@ class Network extends Timeline
 			$tabs = $tmp;
 		}
 
-		$hook_data = [
-			'tabs' => $tabs,
-		];
+		$event = $this->eventDispatcher->dispatch(new NetworkContentTabsEvent($tabs));
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_TABS, $hook_data),
-		)->getArray();
+		$tabs = $event->getTabs();
 
 		if (!empty($network_timelines)) {
 			$tabs = [];
 
-			foreach ($hook_data['tabs'] as $tab) {
+			foreach ($event->getTabs() as $tab) {
 				if (in_array($tab['code'], $network_timelines)) {
 					$tabs[] = $tab;
 				}
 			}
-		} else {
-			$tabs = $hook_data['tabs'];
 		}
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');

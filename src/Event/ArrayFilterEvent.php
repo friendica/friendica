@@ -32,8 +32,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const PHOTO_UPLOAD_FORM = 'friendica.data.photo_upload_form';
 
-	public const NETWORK_CONTENT_TABS = 'friendica.data.network_content_tabs';
-
 	public const PARSE_LINK = 'friendica.data.parse_link';
 
 	public const DETECT_LANGUAGES = 'friendica.data.detect_languages';

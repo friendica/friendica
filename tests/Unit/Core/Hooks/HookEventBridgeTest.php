@@ -35,6 +35,7 @@ use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\NetworkContentStartEvent;
+use Friendica\Event\NetworkContentTabsEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HomeInitEvent;
@@ -138,7 +139,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
 			NetworkContentStartEvent::NAME                    => 'onNetworkContentStartEvent',
-			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
+			NetworkContentTabsEvent::NAME                     => 'onNetworkContentTabsEvent',
 			NetworkToNameEvent::NAME                          => 'onNetworkToNameEvent',
 			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
 			OcrDetectionEvent::NAME                           => 'onOcrDetectionEvent',
@@ -445,6 +446,27 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onNetworkContentStartEvent($event);
 	}
 
+	public function testOnNetworkContentTabsEventCallsHookWithCorrectValue(): void
+	{
+		$event = new NetworkContentTabsEvent([['code' => 'all', 'name' => 'All']]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('network_tabs', $name);
+			$this->assertSame(['tabs' => [['code' => 'all', 'name' => 'All']]], $data);
+
+			return ['tabs' => [['code' => 'all', 'name' => 'All'], ['code' => 'feed', 'name' => 'RSS']]];
+		});
+
+		HookEventBridge::onNetworkContentTabsEvent($event);
+
+		$this->assertSame(
+			[['code' => 'all', 'name' => 'All'], ['code' => 'feed', 'name' => 'RSS']],
+			$event->getTabs(),
+		);
+	}
+
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new PhotoUploadEndEvent(-1);
@@ -644,7 +666,7 @@ class HookEventBridgeTest extends TestCase
 			[PhotoUploadEvent::NAME, 'photo_post_file'],
 			[NetworkToNameEvent::NAME, 'network_to_name'],
 			[NetworkContentStartEvent::NAME, 'network_content_init'],
-			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],
+			[NetworkContentTabsEvent::NAME, 'network_tabs'],
 			[ArrayFilterEvent::PARSE_LINK, 'parse_link'],
 			[EnotifyEvent::NAME, 'enotify'],
 			[EnotifyMailEvent::NAME, 'enotify_mail'],

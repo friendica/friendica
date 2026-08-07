@@ -44,6 +44,7 @@ use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\NetworkContentStartEvent;
+use Friendica\Event\NetworkContentTabsEvent;
 use Friendica\Event\ZrlInitEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HtmlFilterEvent;
@@ -136,7 +137,7 @@ final class HookEventBridge
 		ArrayFilterEvent::MODERATION_USERS_TABS           => 'moderation_users_tabs',
 		ArrayFilterEvent::NAV_INFO                        => 'nav_info',
 		NetworkContentStartEvent::NAME                    => 'network_content_init',
-		ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'network_tabs',
+		NetworkContentTabsEvent::NAME                     => 'network_tabs',
 		NetworkToNameEvent::NAME                          => 'network_to_name',
 		NotifierEndEvent::NAME                            => 'notifier_end',
 		OcrDetectionEvent::NAME                           => 'ocr-detection',
@@ -254,7 +255,7 @@ final class HookEventBridge
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
 			NetworkContentStartEvent::NAME                    => 'onNetworkContentStartEvent',
-			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
+			NetworkContentTabsEvent::NAME                     => 'onNetworkContentTabsEvent',
 			NetworkToNameEvent::NAME                          => 'onNetworkToNameEvent',
 			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
 			OcrDetectionEvent::NAME                           => 'onOcrDetectionEvent',
@@ -847,6 +848,17 @@ final class HookEventBridge
 		static::callHook($event->getName(), [
 			'query' => $event->getQuery(),
 		]);
+	}
+
+	public static function onNetworkContentTabsEvent(NetworkContentTabsEvent $event): void
+	{
+		$data = static::callHook($event->getName(), [
+			'tabs' => $event->getTabs(),
+		]);
+
+		if (isset($data['tabs'])) {
+			$event->setTabs($data['tabs']);
+		}
 	}
 
 	public static function onOcrDetectionEvent(OcrDetectionEvent $event): void
