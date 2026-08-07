@@ -41,6 +41,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\DBA;
 use Friendica\Database\Database;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\NetworkContentStartEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Circle;
 use Friendica\Model\Profile;
@@ -167,12 +168,8 @@ class Network extends Timeline
 
 		$module = 'network';
 
-		$hook_data = [
-			'query' => $this->args->getQueryString(),
-		];
-
 		$this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_CONTENT_START, $hook_data),
+			new NetworkContentStartEvent($this->args->getQueryString()),
 		);
 
 		$o           = '';

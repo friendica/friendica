@@ -43,6 +43,7 @@ use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\NetworkToNameEvent;
+use Friendica\Event\NetworkContentStartEvent;
 use Friendica\Event\ZrlInitEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HtmlFilterEvent;
@@ -134,7 +135,7 @@ final class HookEventBridge
 		ArrayFilterEvent::MAP_GET_COORDINATES             => 'Map::getCoordinates',
 		ArrayFilterEvent::MODERATION_USERS_TABS           => 'moderation_users_tabs',
 		ArrayFilterEvent::NAV_INFO                        => 'nav_info',
-		ArrayFilterEvent::NETWORK_CONTENT_START           => 'network_content_init',
+		NetworkContentStartEvent::NAME                    => 'network_content_init',
 		ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'network_tabs',
 		NetworkToNameEvent::NAME                          => 'network_to_name',
 		NotifierEndEvent::NAME                            => 'notifier_end',
@@ -252,7 +253,7 @@ final class HookEventBridge
 			ArrayFilterEvent::MAP_GET_COORDINATES             => 'onArrayFilterEvent',
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
-			ArrayFilterEvent::NETWORK_CONTENT_START           => 'onArrayFilterEvent',
+			NetworkContentStartEvent::NAME                    => 'onNetworkContentStartEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
 			NetworkToNameEvent::NAME                          => 'onNetworkToNameEvent',
 			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
@@ -839,6 +840,13 @@ final class HookEventBridge
 		$event->setNetworks(
 			static::callHook($event->getName(), $event->getNetworks()),
 		);
+	}
+
+	public static function onNetworkContentStartEvent(NetworkContentStartEvent $event): void
+	{
+		static::callHook($event->getName(), [
+			'query' => $event->getQuery(),
+		]);
 	}
 
 	public static function onOcrDetectionEvent(OcrDetectionEvent $event): void

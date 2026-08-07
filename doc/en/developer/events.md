@@ -31,6 +31,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `notifier_end` | `\Friendica\Event\NotifierEndEvent` |
 | `ocr-detection` | `\Friendica\Event\OcrDetectionEvent` |
 | `network_to_name` | `\Friendica\Event\NetworkToNameEvent` |
+| `network_content_init` | `\Friendica\Event\NetworkContentStartEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -367,6 +368,13 @@ Fired when the name of a network is being determined.
 
 **Modifiable:**
 - `setNetworks(array $networks): void` — change the network names
+
+### `\Friendica\Event\NetworkContentStartEvent`
+
+Fired when the network timeline starts being rendered.
+
+**Contained data:**
+- `getQuery(): string` — the query string of the network timeline URL (read-only)
 
 ### `\Friendica\Event\EnotifyEvent`
 

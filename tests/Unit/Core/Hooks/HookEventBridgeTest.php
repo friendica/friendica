@@ -34,6 +34,7 @@ use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\NetworkToNameEvent;
+use Friendica\Event\NetworkContentStartEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HomeInitEvent;
@@ -136,7 +137,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::MAP_GET_COORDINATES             => 'onArrayFilterEvent',
 			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
-			ArrayFilterEvent::NETWORK_CONTENT_START           => 'onArrayFilterEvent',
+			NetworkContentStartEvent::NAME                    => 'onNetworkContentStartEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
 			NetworkToNameEvent::NAME                          => 'onNetworkToNameEvent',
 			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
@@ -430,6 +431,20 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame(['dfrn' => 'DFRN', 'feed' => 'RSS/Atom'], $event->getNetworks());
 	}
 
+	public function testOnNetworkContentStartEventCallsHookWithCorrectValue(): void
+	{
+		$event = new NetworkContentStartEvent('q=/network');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): void {
+			$this->assertSame('network_content_init', $name);
+			$this->assertSame(['query' => 'q=/network'], $data);
+		});
+
+		HookEventBridge::onNetworkContentStartEvent($event);
+	}
+
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new PhotoUploadEndEvent(-1);
@@ -628,7 +643,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
 			[PhotoUploadEvent::NAME, 'photo_post_file'],
 			[NetworkToNameEvent::NAME, 'network_to_name'],
-			[ArrayFilterEvent::NETWORK_CONTENT_START, 'network_content_init'],
+			[NetworkContentStartEvent::NAME, 'network_content_init'],
 			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],
 			[ArrayFilterEvent::PARSE_LINK, 'parse_link'],
 			[EnotifyEvent::NAME, 'enotify'],
