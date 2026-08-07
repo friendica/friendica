@@ -48,6 +48,7 @@ use Friendica\Event\ModulePostEvent;
 use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\ParseLinkEvent;
+use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
@@ -166,7 +167,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
-			ArrayFilterEvent::RENDER_LOCATION                 => 'onArrayFilterEvent',
+			RenderLocationEvent::NAME                         => 'onRenderLocationEvent',
 			ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
@@ -494,6 +495,32 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('Some text', $event->getText());
 	}
 
+	public function testOnRenderLocationEventCallsHookWithCorrectValue(): void
+	{
+		$event = new RenderLocationEvent('Berlin', '52.52,13.405');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('render_location', $name);
+			$this->assertSame([
+				'location' => 'Berlin',
+				'coord'    => '52.52,13.405',
+				'html'     => '',
+			], $data);
+
+			return [
+				'location' => 'Berlin',
+				'coord'    => '52.52,13.405',
+				'html'     => '<span>Berlin</span>',
+			];
+		});
+
+		HookEventBridge::onRenderLocationEvent($event);
+
+		$this->assertSame('<span>Berlin</span>', $event->getHtml());
+	}
+
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new PhotoUploadEndEvent(-1);
@@ -699,7 +726,7 @@ class HookEventBridgeTest extends TestCase
 			[EnotifyMailEvent::NAME, 'enotify_mail'],
 			[EnotifyStoreEvent::NAME, 'enotify_store'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
-			[ArrayFilterEvent::RENDER_LOCATION, 'render_location'],
+			[RenderLocationEvent::NAME, 'render_location'],
 			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'contact_photo_menu'],
 			[ArrayFilterEvent::PROFILE_SIDEBAR, 'profile_sidebar'],
 			[ArrayFilterEvent::PROFILE_TABS, 'profile_tabs'],

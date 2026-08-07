@@ -34,6 +34,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `network_content_init` | `\Friendica\Event\NetworkContentStartEvent` |
 | `network_tabs` | `\Friendica\Event\NetworkContentTabsEvent` |
 | `parse_link` | `\Friendica\Event\ParseLinkEvent` |
+| `render_location` | `\Friendica\Event\RenderLocationEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -399,6 +400,18 @@ Fired when a link is being parsed.
 
 **Modifiable:**
 - `setText(?string $text): void` — provide the parsed text
+
+### `\Friendica\Event\RenderLocationEvent`
+
+Fired when a location is being rendered.
+
+**Contained data:**
+- `getLocation(): string` — the location name (read-only)
+- `getCoord(): string` — the location coordinates (read-only)
+- `getHtml(): string` — the rendered location HTML, empty if not provided
+
+**Modifiable:**
+- `setHtml(string $html): void` — set the rendered location HTML
 
 ### `\Friendica\Event\EnotifyEvent`
 

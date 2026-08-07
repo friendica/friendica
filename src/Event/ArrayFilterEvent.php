@@ -34,8 +34,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const DETECT_LANGUAGES = 'friendica.data.detect_languages';
 
-	public const RENDER_LOCATION = 'friendica.data.render_location';
-
 	public const CONTACT_PHOTO_MENU = 'friendica.data.contact_photo_menu';
 
 	public const PROFILE_SIDEBAR_ENTRY = 'friendica.data.profile_sidebar_entry';

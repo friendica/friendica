@@ -18,7 +18,7 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Model\Contact;
@@ -448,11 +448,10 @@ final readonly class ConversationRenderer
 				$sparkle = ' sparkle';
 			}
 
-			$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];
-			$locate = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::RENDER_LOCATION, $locate),
-			)->getArray();
-			$locationHtml = $locate['html'] ?: Strings::escapeHtml($locate['location'] ?: $locate['coord'] ?: '');
+			$event = $this->eventDispatcher->dispatch(
+				new RenderLocationEvent($item['location'], $item['coord']),
+			);
+			$locationHtml = $event->getHtml() ?: Strings::escapeHtml($event->getLocation() ?: $event->getCoord() ?: '');
 
 			$this->item->localize($item);
 			$drop = [

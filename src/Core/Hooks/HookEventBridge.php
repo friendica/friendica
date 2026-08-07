@@ -54,6 +54,7 @@ use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\ParseLinkEvent;
+use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -164,7 +165,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'support_follow',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'support_probe',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'support_revoke_follow',
-		ArrayFilterEvent::RENDER_LOCATION                 => 'render_location',
+		RenderLocationEvent::NAME                         => 'render_location',
 		ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'revoke_follow',
 		ArrayFilterEvent::SMILEY_LIST                     => 'smilie',
 		ArrayFilterEvent::STORAGE_CONFIG                  => 'storage_config',
@@ -282,7 +283,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
-			ArrayFilterEvent::RENDER_LOCATION                 => 'onArrayFilterEvent',
+			RenderLocationEvent::NAME                         => 'onRenderLocationEvent',
 			ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'onArrayFilterEvent',
 			ArrayFilterEvent::SMILEY_LIST                     => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
@@ -872,6 +873,19 @@ final class HookEventBridge
 
 		if (isset($data['text'])) {
 			$event->setText($data['text']);
+		}
+	}
+
+	public static function onRenderLocationEvent(RenderLocationEvent $event): void
+	{
+		$data = static::callHook($event->getName(), [
+			'location' => $event->getLocation(),
+			'coord'    => $event->getCoord(),
+			'html'     => $event->getHtml(),
+		]);
+
+		if (isset($data['html'])) {
+			$event->setHtml($data['html']);
 		}
 	}
 
