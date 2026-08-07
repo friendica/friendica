@@ -134,8 +134,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const NOTIFY = 'friendica.data.notify';
 
-	public const OCR_DETECTION = 'friendica.data.ocr_detection';
-
 	public const OTHER_ENCAPSULATE = 'friendica.data.other_encapsulate';
 
 	public const OTHER_UNENCAPSULATE = 'friendica.data.other_unencapsulate';

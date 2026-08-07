@@ -8,7 +8,7 @@
 namespace Friendica\Util;
 
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\OcrDetectionEvent;
 use Friendica\Model\Photo;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
@@ -371,10 +371,9 @@ class Images
 			$data['blurhash'] = $image->getBlurHash($img_str);
 
 			if ($ocr) {
-				$media = ['img_str' => $img_str];
-				$media = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::OCR_DETECTION, $media))->getArray();
-				if (!empty($media['description'])) {
-					$data['description'] = $media['description'];
+				$event = DI::eventDispatcher()->dispatch(new OcrDetectionEvent($img_str));
+				if (!empty($event->getDescription())) {
+					$data['description'] = $event->getDescription();
 				}
 			}
 

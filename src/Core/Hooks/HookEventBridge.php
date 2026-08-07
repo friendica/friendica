@@ -49,6 +49,7 @@ use Friendica\Event\HomeInitEvent;
 use Friendica\Event\InitEvent;
 use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\NotifierEndEvent;
+use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -136,7 +137,7 @@ final class HookEventBridge
 		ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'network_tabs',
 		ArrayFilterEvent::NETWORK_TO_NAME                 => 'network_to_name',
 		NotifierEndEvent::NAME                            => 'notifier_end',
-		ArrayFilterEvent::OCR_DETECTION                   => 'ocr-detection',
+		OcrDetectionEvent::NAME                           => 'ocr-detection',
 		ArrayFilterEvent::OTHER_ENCAPSULATE               => 'other_encapsulate',
 		ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'other_unencapsulate',
 		ArrayFilterEvent::PAGE_INFO                       => 'page_info_data',
@@ -254,7 +255,7 @@ final class HookEventBridge
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
 			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
-			ArrayFilterEvent::OCR_DETECTION                   => 'onArrayFilterEvent',
+			OcrDetectionEvent::NAME                           => 'onOcrDetectionEvent',
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'onArrayFilterEvent',
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
@@ -830,6 +831,18 @@ final class HookEventBridge
 		$event->setArray(
 			static::callHook($event->getName(), $event->getArray()),
 		);
+	}
+
+	public static function onOcrDetectionEvent(OcrDetectionEvent $event): void
+	{
+		$data = static::callHook($event->getName(), [
+			'img_str'     => $event->getImgStr(),
+			'description' => $event->getDescription(),
+		]);
+
+		if (isset($data['description'])) {
+			$event->setDescription($data['description']);
+		}
 	}
 
 	public static function onHtmlFilterEvent(HtmlFilterEvent $event): void

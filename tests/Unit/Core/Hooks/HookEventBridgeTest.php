@@ -43,6 +43,7 @@ use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
 use Friendica\Event\NotifierEndEvent;
+use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
@@ -138,7 +139,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
 			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
-			ArrayFilterEvent::OCR_DETECTION                   => 'onArrayFilterEvent',
+			OcrDetectionEvent::NAME                           => 'onOcrDetectionEvent',
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'onArrayFilterEvent',
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
@@ -390,6 +391,24 @@ class HookEventBridgeTest extends TestCase
 			['album' => 123],
 			$event->getRequestArray(),
 		);
+	}
+
+	public function testOnOcrDetectionEventCallsHookWithCorrectValue(): void
+	{
+		$event = new OcrDetectionEvent('binary data');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('ocr-detection', $name);
+			$this->assertSame(['img_str' => 'binary data', 'description' => null], $data);
+
+			return ['img_str' => 'binary data', 'description' => 'A photo of a cat'];
+		});
+
+		HookEventBridge::onOcrDetectionEvent($event);
+
+		$this->assertSame('A photo of a cat', $event->getDescription());
 	}
 
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void

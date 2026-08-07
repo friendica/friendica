@@ -29,6 +29,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `item_photo_menu` | `\Friendica\Event\ItemPhotoMenuEvent` |
 | `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
 | `notifier_end` | `\Friendica\Event\NotifierEndEvent` |
+| `ocr-detection` | `\Friendica\Event\OcrDetectionEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -344,6 +345,17 @@ Fired after the notifier has processed an item.
 
 **Contained data:**
 - `getItemArray(): array` — the processed item record (read-only)
+
+### `\Friendica\Event\OcrDetectionEvent`
+
+Fired when OCR detection is run on an image.
+
+**Contained data:**
+- `getImgStr(): string` — the binary image data (read-only)
+- `getDescription(): ?string` — the detected image description, `null` if none has been detected yet
+
+**Modifiable:**
+- `setDescription(string $description): void` — set the detected image description
 
 ### `\Friendica\Event\EnotifyEvent`
 
