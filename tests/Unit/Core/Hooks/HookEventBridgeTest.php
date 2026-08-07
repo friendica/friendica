@@ -50,6 +50,7 @@ use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
+use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Event\ZrlInitEvent;
 use PHPUnit\Framework\TestCase;
@@ -144,7 +145,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PHOTO_UPLOAD                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
+			PhotoUploadStartEvent::NAME                       => 'onPhotoUploadStartEvent',
 			PreparePostEvent::NAME                            => 'onPreparePostEvent',
 			PreparePostEndEvent::NAME                         => 'onPreparePostEndEvent',
 			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
@@ -370,7 +371,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnPhotoUploadStartEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_START, ['request' => ['album' => -1]]);
+		$event = new PhotoUploadStartEvent(['album' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -384,8 +385,8 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onPhotoUploadStartEvent($event);
 
 		$this->assertSame(
-			['request' => ['album' => 123]],
-			$event->getArray(),
+			['album' => 123],
+			$event->getRequestArray(),
 		);
 	}
 

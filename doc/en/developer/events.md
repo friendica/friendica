@@ -32,6 +32,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
+| `photo_post_init` | `\Friendica\Event\PhotoUploadStartEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -371,3 +372,13 @@ Fired when a notification email is being sent.
 
 **Modifiable:**
 - `setDataArray(array $data): void` — change the notification email data
+
+### `\Friendica\Event\PhotoUploadStartEvent`
+
+Fired when a photo is about to be uploaded.
+
+**Contained data:**
+- `getRequestArray(): array` — the photo upload request data
+
+**Modifiable:**
+- `setRequestArray(array $request): void` — change the photo upload request data

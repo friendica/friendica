@@ -18,6 +18,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
@@ -89,16 +90,9 @@ class Photos extends \Friendica\Module\BaseProfile
 			$str_contact_allow .= $this->aclFormatter->toString((string) Contact::getPublicIdByUserId($this->owner['uid']));
 		}
 
-		$hook_data = [
-			'request' => $request,
-		];
-
 		// default post action - upload a photo
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_START, $hook_data),
-		)->getArray();
-
-		$request = $hook_data['request'] ?? $request;
+		$event   = $this->eventDispatcher->dispatch(new PhotoUploadStartEvent($request));
+		$request = $event->getRequestArray();
 
 		// Determine the album to use
 		$album    = strip_tags(trim($request['album'] ?? ''));

@@ -35,6 +35,7 @@ use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
+use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -142,7 +143,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PHOTO_UPLOAD                    => 'photo_post_file',
 		ArrayFilterEvent::PHOTO_UPLOAD_END                => 'photo_post_end',
 		ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'photo_upload_form',
-		ArrayFilterEvent::PHOTO_UPLOAD_START              => 'photo_post_init',
+		PhotoUploadStartEvent::NAME                       => 'photo_post_init',
 		PreparePostEvent::NAME                            => 'prepare_body',
 		PreparePostEndEvent::NAME                         => 'prepare_body_final',
 		PreparePostFilterContentEvent::NAME               => 'prepare_body_content_filter',
@@ -260,7 +261,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PHOTO_UPLOAD                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
+			PhotoUploadStartEvent::NAME                       => 'onPhotoUploadStartEvent',
 			PreparePostEvent::NAME                            => 'onPreparePostEvent',
 			PreparePostEndEvent::NAME                         => 'onPreparePostEndEvent',
 			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
@@ -590,17 +591,13 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the PHOTO_UPLOAD_START event to `photo_post_init` hook
+	 * Map the PhotoUploadStartEvent to `photo_post_init` hook
 	 */
-	public static function onPhotoUploadStartEvent(ArrayFilterEvent $event): void
+	public static function onPhotoUploadStartEvent(PhotoUploadStartEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$request = $data['request'] ?? [];
-
-		$data['request'] = static::callHook($event->getName(), (array) $request);
-
-		$event->setArray($data);
+		$event->setRequestArray(
+			static::callHook($event->getName(), $event->getRequestArray()),
+		);
 	}
 
 	/**
