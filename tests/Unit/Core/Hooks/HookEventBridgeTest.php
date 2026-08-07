@@ -33,6 +33,7 @@ use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
+use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HomeInitEvent;
@@ -137,7 +138,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_START           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
-			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
+			NetworkToNameEvent::NAME                          => 'onNetworkToNameEvent',
 			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
 			OcrDetectionEvent::NAME                           => 'onOcrDetectionEvent',
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
@@ -411,6 +412,24 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('A photo of a cat', $event->getDescription());
 	}
 
+	public function testOnNetworkToNameEventCallsHookWithCorrectValue(): void
+	{
+		$event = new NetworkToNameEvent(['dfrn' => 'DFRN']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('network_to_name', $name);
+			$this->assertSame(['dfrn' => 'DFRN'], $data);
+
+			return ['dfrn' => 'DFRN', 'feed' => 'RSS/Atom'];
+		});
+
+		HookEventBridge::onNetworkToNameEvent($event);
+
+		$this->assertSame(['dfrn' => 'DFRN', 'feed' => 'RSS/Atom'], $event->getNetworks());
+	}
+
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new PhotoUploadEndEvent(-1);
@@ -608,7 +627,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'post_local_start'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
 			[PhotoUploadEvent::NAME, 'photo_post_file'],
-			[ArrayFilterEvent::NETWORK_TO_NAME, 'network_to_name'],
+			[NetworkToNameEvent::NAME, 'network_to_name'],
 			[ArrayFilterEvent::NETWORK_CONTENT_START, 'network_content_init'],
 			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],
 			[ArrayFilterEvent::PARSE_LINK, 'parse_link'],

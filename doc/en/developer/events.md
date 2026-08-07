@@ -30,6 +30,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
 | `notifier_end` | `\Friendica\Event\NotifierEndEvent` |
 | `ocr-detection` | `\Friendica\Event\OcrDetectionEvent` |
+| `network_to_name` | `\Friendica\Event\NetworkToNameEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -356,6 +357,16 @@ Fired when OCR detection is run on an image.
 
 **Modifiable:**
 - `setDescription(string $description): void` — set the detected image description
+
+### `\Friendica\Event\NetworkToNameEvent`
+
+Fired when the name of a network is being determined.
+
+**Contained data:**
+- `getNetworks(): array` — the network names keyed by network name
+
+**Modifiable:**
+- `setNetworks(array $networks): void` — change the network names
 
 ### `\Friendica\Event\EnotifyEvent`
 

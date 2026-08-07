@@ -42,6 +42,7 @@ use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
+use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\ZrlInitEvent;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\HtmlFilterEvent;
@@ -135,7 +136,7 @@ final class HookEventBridge
 		ArrayFilterEvent::NAV_INFO                        => 'nav_info',
 		ArrayFilterEvent::NETWORK_CONTENT_START           => 'network_content_init',
 		ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'network_tabs',
-		ArrayFilterEvent::NETWORK_TO_NAME                 => 'network_to_name',
+		NetworkToNameEvent::NAME                          => 'network_to_name',
 		NotifierEndEvent::NAME                            => 'notifier_end',
 		OcrDetectionEvent::NAME                           => 'ocr-detection',
 		ArrayFilterEvent::OTHER_ENCAPSULATE               => 'other_encapsulate',
@@ -253,7 +254,7 @@ final class HookEventBridge
 			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_START           => 'onArrayFilterEvent',
 			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
-			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
+			NetworkToNameEvent::NAME                          => 'onNetworkToNameEvent',
 			NotifierEndEvent::NAME                            => 'onNotifierEndEvent',
 			OcrDetectionEvent::NAME                           => 'onOcrDetectionEvent',
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
@@ -830,6 +831,13 @@ final class HookEventBridge
 	{
 		$event->setArray(
 			static::callHook($event->getName(), $event->getArray()),
+		);
+	}
+
+	public static function onNetworkToNameEvent(NetworkToNameEvent $event): void
+	{
+		$event->setNetworks(
+			static::callHook($event->getName(), $event->getNetworks()),
 		);
 	}
 
