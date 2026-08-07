@@ -50,6 +50,7 @@ use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
+use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ModulePostRecipientEvent;
@@ -144,7 +145,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PARSE_LINK                      => 'onArrayFilterEvent',
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
+			PhotoUploadEndEvent::NAME                         => 'onPhotoUploadEndEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
 			PhotoUploadStartEvent::NAME                       => 'onPhotoUploadStartEvent',
 			PreparePostEvent::NAME                            => 'onPreparePostEvent',
@@ -393,7 +394,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => -1]);
+		$event = new PhotoUploadEndEvent(-1);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 

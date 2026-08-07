@@ -34,6 +34,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
 | `photo_post_init` | `\Friendica\Event\PhotoUploadStartEvent` |
 | `photo_post_file` | `\Friendica\Event\PhotoUploadEvent` |
+| `photo_post_end` | `\Friendica\Event\PhotoUploadEndEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -399,3 +400,10 @@ Fired when a photo upload is being processed.
 - `setFilename(string $filename): void` — change the filename
 - `setFilesize(int $filesize): void` — change the filesize
 - `setType(string $type): void` — change the MIME type
+
+### `\Friendica\Event\PhotoUploadEndEvent`
+
+Fired after a photo upload has been processed.
+
+**Contained data:**
+- `getId(): int` — the resource ID of the uploaded photo, `0` if the upload failed (read-only)

@@ -17,7 +17,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Model\Contact;
@@ -159,7 +159,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			}
 
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(0),
 			);
 
 			return;
@@ -174,7 +174,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			@unlink($src);
 
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(0),
 			);
 
 			return;
@@ -185,7 +185,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			@unlink($src);
 
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(0),
 			);
 
 			return;
@@ -203,7 +203,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			@unlink($src);
 
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(0),
 			);
 
 			return;
@@ -223,7 +223,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			$this->logger->warning('image store failed');
 			$this->systemMessages->addNotice($this->t('Image upload failed.'));
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(0),
 			);
 			return;
 		}
@@ -232,7 +232,7 @@ class Photos extends \Friendica\Module\BaseProfile
 		Photo::clearAlbumCache($this->owner['uid']);
 
 		$this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => $resource_id]),
+			new PhotoUploadEndEvent($resource_id),
 		);
 
 		$this->baseUrl->redirect($this->session->get('photo_return') ?? 'profile/' . $this->owner['nickname'] . '/photos');

@@ -35,6 +35,7 @@ use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
+use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\CollectRoutesEvent;
@@ -142,7 +143,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PARSE_LINK                      => 'parse_link',
 		ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'lockview_content',
 		PhotoUploadEvent::NAME                            => 'photo_post_file',
-		ArrayFilterEvent::PHOTO_UPLOAD_END                => 'photo_post_end',
+		PhotoUploadEndEvent::NAME                         => 'photo_post_end',
 		ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'photo_upload_form',
 		PhotoUploadStartEvent::NAME                       => 'photo_post_init',
 		PreparePostEvent::NAME                            => 'prepare_body',
@@ -260,7 +261,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PARSE_LINK                      => 'onArrayFilterEvent',
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
+			PhotoUploadEndEvent::NAME                         => 'onPhotoUploadEndEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
 			PhotoUploadStartEvent::NAME                       => 'onPhotoUploadStartEvent',
 			PreparePostEvent::NAME                            => 'onPreparePostEvent',
@@ -622,16 +623,12 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the PHOTO_UPLOAD_END event to `photo_post_end` hook
+	 * Map the PhotoUploadEndEvent to `photo_post_end` hook
 	 */
-	public static function onPhotoUploadEndEvent(ArrayFilterEvent $event): void
+	public static function onPhotoUploadEndEvent(PhotoUploadEndEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$id = $data['id'] ?? 0;
-
 		// one-way-event: we don't care about the returned value
-		static::callHook($event->getName(), (int) $id);
+		static::callHook($event->getName(), $event->getId());
 	}
 
 	/**
