@@ -18,6 +18,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
@@ -102,16 +103,14 @@ class Photos extends \Friendica\Module\BaseProfile
 
 		$album = $album ?: $newalbum ?: DateTimeFormat::localNow('Y');
 
-		$hook_data = [
-			'src'      => '',
-			'filename' => '',
-			'filesize' => 0,
-			'type'     => '',
-		];
+		$event = $this->eventDispatcher->dispatch(new PhotoUploadEvent('', '', 0, ''));
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD, $hook_data),
-		)->getArray();
+		$hook_data = [
+			'src'      => $event->getSrc(),
+			'filename' => $event->getFilename(),
+			'filesize' => $event->getFilesize(),
+			'type'     => $event->getType(),
+		];
 
 		$src      = null;
 		$filename = '';

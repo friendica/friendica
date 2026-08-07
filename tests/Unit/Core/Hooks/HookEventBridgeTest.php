@@ -50,6 +50,7 @@ use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
+use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Event\ZrlInitEvent;
@@ -142,7 +143,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
 			ArrayFilterEvent::PARSE_LINK                      => 'onArrayFilterEvent',
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD                    => 'onArrayFilterEvent',
+			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
 			PhotoUploadStartEvent::NAME                       => 'onPhotoUploadStartEvent',
@@ -586,7 +587,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::FEATURE_GET, 'get'],
 			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'post_local_start'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
-			[ArrayFilterEvent::PHOTO_UPLOAD, 'photo_post_file'],
+			[PhotoUploadEvent::NAME, 'photo_post_file'],
 			[ArrayFilterEvent::NETWORK_TO_NAME, 'network_to_name'],
 			[ArrayFilterEvent::NETWORK_CONTENT_START, 'network_content_init'],
 			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],

@@ -33,6 +33,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
 | `photo_post_init` | `\Friendica\Event\PhotoUploadStartEvent` |
+| `photo_post_file` | `\Friendica\Event\PhotoUploadEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -382,3 +383,19 @@ Fired when a photo is about to be uploaded.
 
 **Modifiable:**
 - `setRequestArray(array $request): void` — change the photo upload request data
+
+### `\Friendica\Event\PhotoUploadEvent`
+
+Fired when a photo upload is being processed.
+
+**Contained data:**
+- `getSrc(): string` — the local source path of the uploaded file
+- `getFilename(): string` — the filename of the uploaded file
+- `getFilesize(): int` — the filesize of the uploaded file in bytes
+- `getType(): string` — the MIME type of the uploaded file
+
+**Modifiable:**
+- `setSrc(string $src): void` — change the source path
+- `setFilename(string $filename): void` — change the filename
+- `setFilesize(int $filesize): void` — change the filesize
+- `setType(string $type): void` — change the MIME type

@@ -32,8 +32,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const PHOTO_UPLOAD_FORM = 'friendica.data.photo_upload_form';
 
-	public const PHOTO_UPLOAD = 'friendica.data.photo_upload';
-
 	public const PHOTO_UPLOAD_END = 'friendica.data.photo_upload_end';
 
 	public const NETWORK_TO_NAME = 'friendica.data.network_to_name';

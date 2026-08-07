@@ -35,6 +35,7 @@ use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
+use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
@@ -140,7 +141,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PAGE_INFO                       => 'page_info_data',
 		ArrayFilterEvent::PARSE_LINK                      => 'parse_link',
 		ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'lockview_content',
-		ArrayFilterEvent::PHOTO_UPLOAD                    => 'photo_post_file',
+		PhotoUploadEvent::NAME                            => 'photo_post_file',
 		ArrayFilterEvent::PHOTO_UPLOAD_END                => 'photo_post_end',
 		ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'photo_upload_form',
 		PhotoUploadStartEvent::NAME                       => 'photo_post_init',
@@ -258,7 +259,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
 			ArrayFilterEvent::PARSE_LINK                      => 'onArrayFilterEvent',
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD                    => 'onArrayFilterEvent',
+			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
 			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
 			PhotoUploadStartEvent::NAME                       => 'onPhotoUploadStartEvent',
@@ -598,6 +599,26 @@ final class HookEventBridge
 		$event->setRequestArray(
 			static::callHook($event->getName(), $event->getRequestArray()),
 		);
+	}
+
+	/**
+	 * Map the PhotoUploadEvent to `photo_post_file` hook
+	 */
+	public static function onPhotoUploadEvent(PhotoUploadEvent $event): void
+	{
+		$data = [
+			'src'      => $event->getSrc(),
+			'filename' => $event->getFilename(),
+			'filesize' => $event->getFilesize(),
+			'type'     => $event->getType(),
+		];
+
+		$data = static::callHook($event->getName(), $data);
+
+		$event->setSrc($data['src']);
+		$event->setFilename($data['filename']);
+		$event->setFilesize((int) $data['filesize']);
+		$event->setType($data['type']);
 	}
 
 	/**
