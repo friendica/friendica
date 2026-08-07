@@ -56,6 +56,7 @@ use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\RenderLocationEvent;
+use Friendica\Event\SmileyListEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -168,7 +169,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'support_revoke_follow',
 		RenderLocationEvent::NAME                         => 'render_location',
 		ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'revoke_follow',
-		ArrayFilterEvent::SMILEY_LIST                     => 'smilie',
+		SmileyListEvent::NAME                             => 'smilie',
 		ArrayFilterEvent::STORAGE_CONFIG                  => 'storage_config',
 		ArrayFilterEvent::STORAGE_INSTANCE                => 'storage_instance',
 		ArrayFilterEvent::TEMPLATE_VARS                   => 'template_vars',
@@ -286,7 +287,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
 			RenderLocationEvent::NAME                         => 'onRenderLocationEvent',
 			ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'onArrayFilterEvent',
-			ArrayFilterEvent::SMILEY_LIST                     => 'onArrayFilterEvent',
+			SmileyListEvent::NAME                             => 'onSmileyListEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
 			ArrayFilterEvent::TEMPLATE_VARS                   => 'onArrayFilterEvent',
@@ -895,6 +896,22 @@ final class HookEventBridge
 		$event->setDataArray(
 			static::callHook($event->getName(), $event->getDataArray()),
 		);
+	}
+
+	public static function onSmileyListEvent(SmileyListEvent $event): void
+	{
+		$data = static::callHook($event->getName(), [
+			'texts' => $event->getTexts(),
+			'icons' => $event->getIcons(),
+		]);
+
+		if (isset($data['texts'])) {
+			$event->setTexts($data['texts']);
+		}
+
+		if (isset($data['icons'])) {
+			$event->setIcons($data['icons']);
+		}
 	}
 
 	public static function onOcrDetectionEvent(OcrDetectionEvent $event): void

@@ -9,7 +9,7 @@ namespace Friendica\Content;
 
 use Friendica\Content\Text\BBCode;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\SmileyListEvent;
 use Friendica\Util\Strings;
 
 /**
@@ -135,13 +135,11 @@ class Smilies
 
 		$eventDispatcher = DI::eventDispatcher();
 
-		$params = ['texts' => $texts, 'icons' => $icons];
-
 		$params = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::SMILEY_LIST, $params),
-		)->getArray();
+			new SmileyListEvent($texts, $icons),
+		);
 
-		return $params;
+		return ['texts' => $params->getTexts(), 'icons' => $params->getIcons()];
 	}
 
 	/**

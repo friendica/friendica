@@ -50,6 +50,7 @@ use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\RenderLocationEvent;
+use Friendica\Event\SmileyListEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
@@ -170,7 +171,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
 			RenderLocationEvent::NAME                         => 'onRenderLocationEvent',
 			ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'onArrayFilterEvent',
-			ArrayFilterEvent::SMILEY_LIST                     => 'onArrayFilterEvent',
+			SmileyListEvent::NAME                             => 'onSmileyListEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
 			ArrayFilterEvent::TEMPLATE_VARS                   => 'onArrayFilterEvent',
@@ -540,6 +541,31 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame(['url' => 'https://example.com', 'type' => 'photo'], $event->getDataArray());
 	}
 
+	public function testOnSmileyListEventCallsHookWithCorrectValue(): void
+	{
+		$event = new SmileyListEvent(['&lt;3'], ['<img src="heart.gif" />']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('smilie', $name);
+			$this->assertSame([
+				'texts' => ['&lt;3'],
+				'icons' => ['<img src="heart.gif" />'],
+			], $data);
+
+			return [
+				'texts' => ['&lt;3', ':-)'],
+				'icons' => ['<img src="heart.gif" />', '<img src="smile.gif" />'],
+			];
+		});
+
+		HookEventBridge::onSmileyListEvent($event);
+
+		$this->assertSame(['&lt;3', ':-)'], $event->getTexts());
+		$this->assertSame(['<img src="heart.gif" />', '<img src="smile.gif" />'], $event->getIcons());
+	}
+
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new PhotoUploadEndEvent(-1);
@@ -754,7 +780,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'moderation_users_tabs'],
 			[ArrayFilterEvent::ACL_LOOKUP_END, 'acl_lookup_end'],
 			[PageInfoEvent::NAME, 'page_info_data'],
-			[ArrayFilterEvent::SMILEY_LIST, 'smilie'],
+			[SmileyListEvent::NAME, 'smilie'],
 			[ArrayFilterEvent::JOT_NETWORKS, 'jot_networks'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'support_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'support_revoke_follow'],

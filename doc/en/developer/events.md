@@ -36,6 +36,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `parse_link` | `\Friendica\Event\ParseLinkEvent` |
 | `render_location` | `\Friendica\Event\RenderLocationEvent` |
 | `page_info_data` | `\Friendica\Event\PageInfoEvent` |
+| `smilie` | `\Friendica\Event\SmileyListEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -423,6 +424,18 @@ Fired when page info data is being processed.
 
 **Modifiable:**
 - `setDataArray(array $data): void` — change the page info data
+
+### `\Friendica\Event\SmileyListEvent`
+
+Fired when the smiley list is being built.
+
+**Contained data:**
+- `getTexts(): array` — the smiley text codes
+- `getIcons(): array` — the smiley HTML icons
+
+**Modifiable:**
+- `setTexts(array $texts): void` — change the smiley text codes
+- `setIcons(array $icons): void` — change the smiley HTML icons
 
 ### `\Friendica\Event\EnotifyEvent`
 
