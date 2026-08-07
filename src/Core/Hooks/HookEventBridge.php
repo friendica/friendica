@@ -29,6 +29,7 @@ use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\JotNetworksEvent;
 use Friendica\Event\ItemPhotoMenuEvent;
 use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\PreparePostEndEvent;
@@ -134,7 +135,7 @@ final class HookEventBridge
 		ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'post_local_start',
 		ItemPhotoMenuEvent::NAME                          => 'item_photo_menu',
 		ItemTaggedEvent::NAME                             => 'tagged',
-		ArrayFilterEvent::JOT_NETWORKS                    => 'jot_networks',
+		JotNetworksEvent::NAME                            => 'jot_networks',
 		LoggedInEvent::NAME                               => 'logged_in',
 		LoginFormEvent::NAME                              => 'login_hook',
 		MagicAuthSuccessEvent::NAME                       => 'magic_auth_success',
@@ -252,7 +253,7 @@ final class HookEventBridge
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
 			ItemPhotoMenuEvent::NAME                          => 'onItemPhotoMenuEvent',
 			ItemTaggedEvent::NAME                             => 'onItemTaggedEvent',
-			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
+			JotNetworksEvent::NAME                            => 'onJotNetworksEvent',
 			LoggedInEvent::NAME                               => 'onLoggedInEvent',
 			LoginFormEvent::NAME                              => 'onLoginFormEvent',
 			MagicAuthSuccessEvent::NAME                       => 'onMagicAuthSuccessEvent',
@@ -925,6 +926,13 @@ final class HookEventBridge
 		if (isset($data['vars'])) {
 			$event->setVars($data['vars']);
 		}
+	}
+
+	public static function onJotNetworksEvent(JotNetworksEvent $event): void
+	{
+		$event->setJotnetsFields(
+			static::callHook($event->getName(), $event->getJotnetsFields()),
+		);
 	}
 
 	public static function onOcrDetectionEvent(OcrDetectionEvent $event): void

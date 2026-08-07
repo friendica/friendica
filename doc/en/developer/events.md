@@ -38,6 +38,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `page_info_data` | `\Friendica\Event\PageInfoEvent` |
 | `smilie` | `\Friendica\Event\SmileyListEvent` |
 | `template_vars` | `\Friendica\Event\TemplateVarsEvent` |
+| `jot_networks` | `\Friendica\Event\JotNetworksEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -448,6 +449,16 @@ Fired when template variables are being set.
 
 **Modifiable:**
 - `setVars(array $vars): void` — change the template variables
+
+### `\Friendica\Event\JotNetworksEvent`
+
+Fired when the jot networks are being built.
+
+**Contained data:**
+- `getJotnetsFields(): array` — the jot networks fields as a list of field arrays
+
+**Modifiable:**
+- `setJotnetsFields(array $jotnets_fields): void` — change the jot networks fields
 
 ### `\Friendica\Event\EnotifyEvent`
 

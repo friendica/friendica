@@ -55,6 +55,7 @@ use Friendica\Event\TemplateVarsEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\JotNetworksEvent;
 use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
@@ -136,7 +137,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
 			ItemPhotoMenuEvent::NAME                          => 'onItemPhotoMenuEvent',
 			ItemTaggedEvent::NAME                             => 'onItemTaggedEvent',
-			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
+			JotNetworksEvent::NAME                            => 'onJotNetworksEvent',
 			LoggedInEvent::NAME                               => 'onLoggedInEvent',
 			LoginFormEvent::NAME                              => 'onLoginFormEvent',
 			MagicAuthSuccessEvent::NAME                       => 'onMagicAuthSuccessEvent',
@@ -591,6 +592,24 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame(['foo' => 'baz'], $event->getVars());
 	}
 
+	public function testOnJotNetworksEventCallsHookWithCorrectValue(): void
+	{
+		$event = new JotNetworksEvent([['type' => 'checkbox']]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('jot_networks', $name);
+			$this->assertSame([['type' => 'checkbox']], $data);
+
+			return [['type' => 'checkbox'], ['type' => 'text']];
+		});
+
+		HookEventBridge::onJotNetworksEvent($event);
+
+		$this->assertSame([['type' => 'checkbox'], ['type' => 'text']], $event->getJotnetsFields());
+	}
+
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new PhotoUploadEndEvent(-1);
@@ -806,7 +825,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::ACL_LOOKUP_END, 'acl_lookup_end'],
 			[PageInfoEvent::NAME, 'page_info_data'],
 			[SmileyListEvent::NAME, 'smilie'],
-			[ArrayFilterEvent::JOT_NETWORKS, 'jot_networks'],
+			[JotNetworksEvent::NAME, 'jot_networks'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'support_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'support_revoke_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'support_probe'],

@@ -56,8 +56,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const BBCODE_TO_MARKDOWN_END = 'friendica.data.bbcode_to_markdown_end';
 
-	public const JOT_NETWORKS = 'friendica.data.jot_networks';
-
 	public const PROTOCOL_SUPPORTS_FOLLOW = 'friendica.data.protocol_supports_follow';
 
 	public const PROTOCOL_SUPPORTS_REVOKE_FOLLOW = 'friendica.data.protocol_supports_revoke_follow';
