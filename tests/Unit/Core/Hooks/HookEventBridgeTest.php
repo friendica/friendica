@@ -47,6 +47,7 @@ use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
 use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\OcrDetectionEvent;
+use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
@@ -146,7 +147,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'onArrayFilterEvent',
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
-			ArrayFilterEvent::PARSE_LINK                      => 'onArrayFilterEvent',
+			ParseLinkEvent::NAME                              => 'onParseLinkEvent',
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
 			PhotoUploadEndEvent::NAME                         => 'onPhotoUploadEndEvent',
@@ -467,6 +468,32 @@ class HookEventBridgeTest extends TestCase
 		);
 	}
 
+	public function testOnParseLinkEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ParseLinkEvent('https://friendica.example', 'json');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('parse_link', $name);
+			$this->assertSame([
+				'url'    => 'https://friendica.example',
+				'format' => 'json',
+				'text'   => null,
+			], $data);
+
+			return [
+				'url'    => 'https://friendica.example',
+				'format' => 'json',
+				'text'   => 'Some text',
+			];
+		});
+
+		HookEventBridge::onParseLinkEvent($event);
+
+		$this->assertSame('Some text', $event->getText());
+	}
+
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new PhotoUploadEndEvent(-1);
@@ -667,7 +694,7 @@ class HookEventBridgeTest extends TestCase
 			[NetworkToNameEvent::NAME, 'network_to_name'],
 			[NetworkContentStartEvent::NAME, 'network_content_init'],
 			[NetworkContentTabsEvent::NAME, 'network_tabs'],
-			[ArrayFilterEvent::PARSE_LINK, 'parse_link'],
+			[ParseLinkEvent::NAME, 'parse_link'],
 			[EnotifyEvent::NAME, 'enotify'],
 			[EnotifyMailEvent::NAME, 'enotify_mail'],
 			[EnotifyStoreEvent::NAME, 'enotify_store'],

@@ -21,6 +21,8 @@ final class OcrDetectionEvent extends AbstractEvent
 	public const NAME = 'friendica.data.ocr_detection';
 
 	/**
+	 * @internal
+	 *
 	 * @param string $img_str      binary image data
 	 * @param ?string $description the detected image description
 	 */

@@ -33,6 +33,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `network_to_name` | `\Friendica\Event\NetworkToNameEvent` |
 | `network_content_init` | `\Friendica\Event\NetworkContentStartEvent` |
 | `network_tabs` | `\Friendica\Event\NetworkContentTabsEvent` |
+| `parse_link` | `\Friendica\Event\ParseLinkEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -386,6 +387,18 @@ Fired when the network timeline tabs are being rendered.
 
 **Modifiable:**
 - `setTabs(array $tabs): void` — change the network tabs
+
+### `\Friendica\Event\ParseLinkEvent`
+
+Fired when a link is being parsed.
+
+**Contained data:**
+- `getUrl(): string` — the URL to parse (read-only)
+- `getFormat(): string` — the requested output format (`json` or `html`) (read-only)
+- `getText(): ?string` — the parsed text, `null` if not provided
+
+**Modifiable:**
+- `setText(?string $text): void` — provide the parsed text
 
 ### `\Friendica\Event\EnotifyEvent`
 

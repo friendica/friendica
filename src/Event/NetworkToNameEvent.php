@@ -21,6 +21,8 @@ final class NetworkToNameEvent extends AbstractEvent
 	public const NAME = 'friendica.data.network_to_name';
 
 	/**
+	 * @internal
+	 *
 	 * @param array<string, string> $networks the network names keyed by network name
 	 */
 	public function __construct(

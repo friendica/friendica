@@ -21,6 +21,8 @@ final class NetworkContentTabsEvent extends AbstractEvent
 	public const NAME = 'friendica.data.network_content_tabs';
 
 	/**
+	 * @internal
+	 *
 	 * @param array<int, array> $tabs the network tabs
 	 */
 	public function __construct(

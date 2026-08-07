@@ -53,6 +53,7 @@ use Friendica\Event\InitEvent;
 use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\OcrDetectionEvent;
+use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -144,7 +145,7 @@ final class HookEventBridge
 		ArrayFilterEvent::OTHER_ENCAPSULATE               => 'other_encapsulate',
 		ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'other_unencapsulate',
 		ArrayFilterEvent::PAGE_INFO                       => 'page_info_data',
-		ArrayFilterEvent::PARSE_LINK                      => 'parse_link',
+		ParseLinkEvent::NAME                              => 'parse_link',
 		ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'lockview_content',
 		PhotoUploadEvent::NAME                            => 'photo_post_file',
 		PhotoUploadEndEvent::NAME                         => 'photo_post_end',
@@ -262,7 +263,7 @@ final class HookEventBridge
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'onArrayFilterEvent',
 			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
-			ArrayFilterEvent::PARSE_LINK                      => 'onArrayFilterEvent',
+			ParseLinkEvent::NAME                              => 'onParseLinkEvent',
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
 			PhotoUploadEndEvent::NAME                         => 'onPhotoUploadEndEvent',
@@ -858,6 +859,19 @@ final class HookEventBridge
 
 		if (isset($data['tabs'])) {
 			$event->setTabs($data['tabs']);
+		}
+	}
+
+	public static function onParseLinkEvent(ParseLinkEvent $event): void
+	{
+		$data = static::callHook($event->getName(), [
+			'url'    => $event->getUrl(),
+			'format' => $event->getFormat(),
+			'text'   => $event->getText(),
+		]);
+
+		if (isset($data['text'])) {
+			$event->setText($data['text']);
 		}
 	}
 

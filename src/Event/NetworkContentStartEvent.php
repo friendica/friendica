@@ -18,6 +18,11 @@ final class NetworkContentStartEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.network_content_start';
 
+	/**
+	 * @internal
+	 *
+	 * @param string $query
+	 */
 	public function __construct(private readonly string $query)
 	{
 		parent::__construct(self::NAME);
