@@ -35,6 +35,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `network_tabs` | `\Friendica\Event\NetworkContentTabsEvent` |
 | `parse_link` | `\Friendica\Event\ParseLinkEvent` |
 | `render_location` | `\Friendica\Event\RenderLocationEvent` |
+| `page_info_data` | `\Friendica\Event\PageInfoEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -412,6 +413,16 @@ Fired when a location is being rendered.
 
 **Modifiable:**
 - `setHtml(string $html): void` — set the rendered location HTML
+
+### `\Friendica\Event\PageInfoEvent`
+
+Fired when page info data is being processed.
+
+**Contained data:**
+- `getDataArray(): array` — the page info data (e.g. `url`, `type`, `title`, `text`, `images`)
+
+**Modifiable:**
+- `setDataArray(array $data): void` — change the page info data
 
 ### `\Friendica\Event\EnotifyEvent`
 

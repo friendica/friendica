@@ -53,6 +53,7 @@ use Friendica\Event\InitEvent;
 use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\OcrDetectionEvent;
+use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\ModuleContentEvent;
@@ -145,7 +146,7 @@ final class HookEventBridge
 		OcrDetectionEvent::NAME                           => 'ocr-detection',
 		ArrayFilterEvent::OTHER_ENCAPSULATE               => 'other_encapsulate',
 		ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'other_unencapsulate',
-		ArrayFilterEvent::PAGE_INFO                       => 'page_info_data',
+		PageInfoEvent::NAME                               => 'page_info_data',
 		ParseLinkEvent::NAME                              => 'parse_link',
 		ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'lockview_content',
 		PhotoUploadEvent::NAME                            => 'photo_post_file',
@@ -263,7 +264,7 @@ final class HookEventBridge
 			OcrDetectionEvent::NAME                           => 'onOcrDetectionEvent',
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'onArrayFilterEvent',
-			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
+			PageInfoEvent::NAME                               => 'onPageInfoEvent',
 			ParseLinkEvent::NAME                              => 'onParseLinkEvent',
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
@@ -887,6 +888,13 @@ final class HookEventBridge
 		if (isset($data['html'])) {
 			$event->setHtml($data['html']);
 		}
+	}
+
+	public static function onPageInfoEvent(PageInfoEvent $event): void
+	{
+		$event->setDataArray(
+			static::callHook($event->getName(), $event->getDataArray()),
+		);
 	}
 
 	public static function onOcrDetectionEvent(OcrDetectionEvent $event): void

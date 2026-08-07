@@ -47,6 +47,7 @@ use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
 use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\OcrDetectionEvent;
+use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
@@ -147,7 +148,7 @@ class HookEventBridgeTest extends TestCase
 			OcrDetectionEvent::NAME                           => 'onOcrDetectionEvent',
 			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'onArrayFilterEvent',
-			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
+			PageInfoEvent::NAME                               => 'onPageInfoEvent',
 			ParseLinkEvent::NAME                              => 'onParseLinkEvent',
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
@@ -521,6 +522,24 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('<span>Berlin</span>', $event->getHtml());
 	}
 
+	public function testOnPageInfoEventCallsHookWithCorrectValue(): void
+	{
+		$event = new PageInfoEvent(['url' => 'https://example.com', 'type' => 'link']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('page_info_data', $name);
+			$this->assertSame(['url' => 'https://example.com', 'type' => 'link'], $data);
+
+			return ['url' => 'https://example.com', 'type' => 'photo'];
+		});
+
+		HookEventBridge::onPageInfoEvent($event);
+
+		$this->assertSame(['url' => 'https://example.com', 'type' => 'photo'], $event->getDataArray());
+	}
+
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
 		$event = new PhotoUploadEndEvent(-1);
@@ -734,7 +753,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::PROFILE_SETTINGS_POST, 'profile_post'],
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'moderation_users_tabs'],
 			[ArrayFilterEvent::ACL_LOOKUP_END, 'acl_lookup_end'],
-			[ArrayFilterEvent::PAGE_INFO, 'page_info_data'],
+			[PageInfoEvent::NAME, 'page_info_data'],
 			[ArrayFilterEvent::SMILEY_LIST, 'smilie'],
 			[ArrayFilterEvent::JOT_NETWORKS, 'jot_networks'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'support_follow'],

@@ -50,8 +50,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const ACL_LOOKUP_END = 'friendica.data.acl_lookup_end';
 
-	public const PAGE_INFO = 'friendica.data.page_info';
-
 	public const SMILEY_LIST = 'friendica.data.smiley_list';
 
 	public const BBCODE_TO_HTML_START = 'friendica.data.bbcode_to_html_start';
