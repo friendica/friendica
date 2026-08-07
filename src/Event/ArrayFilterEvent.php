@@ -126,8 +126,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const PROBE_DETECT = 'friendica.data.probe_detect';
 
-	public const TEMPLATE_VARS = 'friendica.data.template_vars';
-
 	public const USER_EXPORT_OPTIONS = 'friendica.data.user_export_options';
 
 	public function __construct(string $name, private array $array)

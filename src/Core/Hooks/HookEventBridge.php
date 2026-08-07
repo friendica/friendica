@@ -57,6 +57,7 @@ use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\SmileyListEvent;
+use Friendica\Event\TemplateVarsEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -172,7 +173,7 @@ final class HookEventBridge
 		SmileyListEvent::NAME                             => 'smilie',
 		ArrayFilterEvent::STORAGE_CONFIG                  => 'storage_config',
 		ArrayFilterEvent::STORAGE_INSTANCE                => 'storage_instance',
-		ArrayFilterEvent::TEMPLATE_VARS                   => 'template_vars',
+		TemplateVarsEvent::NAME                           => 'template_vars',
 		ArrayFilterEvent::UNBLOCK_CONTACT                 => 'unblock',
 		ArrayFilterEvent::UNFOLLOW_CONTACT                => 'unfollow',
 		ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'uexport_options',
@@ -290,7 +291,7 @@ final class HookEventBridge
 			SmileyListEvent::NAME                             => 'onSmileyListEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
-			ArrayFilterEvent::TEMPLATE_VARS                   => 'onArrayFilterEvent',
+			TemplateVarsEvent::NAME                           => 'onTemplateVarsEvent',
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNFOLLOW_CONTACT                => 'onArrayFilterEvent',
 			ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'onArrayFilterEvent',
@@ -911,6 +912,18 @@ final class HookEventBridge
 
 		if (isset($data['icons'])) {
 			$event->setIcons($data['icons']);
+		}
+	}
+
+	public static function onTemplateVarsEvent(TemplateVarsEvent $event): void
+	{
+		$data = static::callHook($event->getName(), [
+			'template' => $event->getTemplate(),
+			'vars'     => $event->getVars(),
+		]);
+
+		if (isset($data['vars'])) {
+			$event->setVars($data['vars']);
 		}
 	}
 

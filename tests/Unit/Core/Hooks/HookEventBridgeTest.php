@@ -51,6 +51,7 @@ use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\SmileyListEvent;
+use Friendica\Event\TemplateVarsEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
@@ -174,7 +175,7 @@ class HookEventBridgeTest extends TestCase
 			SmileyListEvent::NAME                             => 'onSmileyListEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
-			ArrayFilterEvent::TEMPLATE_VARS                   => 'onArrayFilterEvent',
+			TemplateVarsEvent::NAME                           => 'onTemplateVarsEvent',
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::UNFOLLOW_CONTACT                => 'onArrayFilterEvent',
 			ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'onArrayFilterEvent',
@@ -564,6 +565,30 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertSame(['&lt;3', ':-)'], $event->getTexts());
 		$this->assertSame(['<img src="heart.gif" />', '<img src="smile.gif" />'], $event->getIcons());
+	}
+
+	public function testOnTemplateVarsEventCallsHookWithCorrectValue(): void
+	{
+		$event = new TemplateVarsEvent('test.tpl', ['foo' => 'bar']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('template_vars', $name);
+			$this->assertSame([
+				'template' => 'test.tpl',
+				'vars'     => ['foo' => 'bar'],
+			], $data);
+
+			return [
+				'template' => 'test.tpl',
+				'vars'     => ['foo' => 'baz'],
+			];
+		});
+
+		HookEventBridge::onTemplateVarsEvent($event);
+
+		$this->assertSame(['foo' => 'baz'], $event->getVars());
 	}
 
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void

@@ -37,6 +37,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `render_location` | `\Friendica\Event\RenderLocationEvent` |
 | `page_info_data` | `\Friendica\Event\PageInfoEvent` |
 | `smilie` | `\Friendica\Event\SmileyListEvent` |
+| `template_vars` | `\Friendica\Event\TemplateVarsEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -436,6 +437,17 @@ Fired when the smiley list is being built.
 **Modifiable:**
 - `setTexts(array $texts): void` — change the smiley text codes
 - `setIcons(array $icons): void` — change the smiley HTML icons
+
+### `\Friendica\Event\TemplateVarsEvent`
+
+Fired when template variables are being set.
+
+**Contained data:**
+- `getTemplate(): string` — the name of the template being rendered (read-only)
+- `getVars(): array` — the template variables
+
+**Modifiable:**
+- `setVars(array $vars): void` — change the template variables
 
 ### `\Friendica\Event\EnotifyEvent`
 
