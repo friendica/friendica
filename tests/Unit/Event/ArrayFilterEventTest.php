@@ -31,7 +31,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::FEATURE_GET, 'friendica.data.feature_get'],
 			[ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, 'friendica.data.permission_tooltip_content'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'friendica.data.detect_languages'],
-			[ArrayFilterEvent::PROFILE_TABS, 'friendica.data.profile_tabs'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_FORM, 'friendica.data.profile_settings_form'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_POST, 'friendica.data.profile_settings_post'],
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'friendica.data.moderation_users_tabs'],

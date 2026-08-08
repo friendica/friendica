@@ -47,6 +47,7 @@ use Friendica\Event\PhotoUploadFormEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
+use Friendica\Event\ProfileTabsEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -173,7 +174,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'profile_post',
 		ProfileSidebarEvent::NAME                         => 'profile_sidebar',
 		ProfileSidebarStartEvent::NAME                    => 'profile_sidebar_enter',
-		ArrayFilterEvent::PROFILE_TABS                    => 'profile_tabs',
+		ProfileTabsEvent::NAME                            => 'profile_tabs',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'support_follow',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'support_probe',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'support_revoke_follow',
@@ -291,7 +292,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
-			ArrayFilterEvent::PROFILE_TABS                    => 'onArrayFilterEvent',
+			ProfileTabsEvent::NAME                            => 'onProfileTabsEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
@@ -697,6 +698,25 @@ final class HookEventBridge
 
 		if (isset($profile)) {
 			$event->setProfileArray($profile);
+		}
+	}
+
+	/**
+	 * Map the ProfileTabsEvent to `profile_tabs` hook
+	 *
+	 * The tabs list is the only data that can be modified.
+	 */
+	public static function onProfileTabsEvent(ProfileTabsEvent $event): void
+	{
+		$data = static::callHook($event->getName(), [
+			'is_owner' => $event->isOwner(),
+			'nickname' => $event->getNickname(),
+			'tab'      => $event->getTab(),
+			'tabs'     => $event->getTabsArray(),
+		]);
+
+		if (isset($data['tabs'])) {
+			$event->setTabsArray($data['tabs']);
 		}
 	}
 

@@ -69,6 +69,7 @@ use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadFormEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
+use Friendica\Event\ProfileTabsEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ModulePostRecipientEvent;
@@ -175,7 +176,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
-			ArrayFilterEvent::PROFILE_TABS                    => 'onArrayFilterEvent',
+			ProfileTabsEvent::NAME                            => 'onProfileTabsEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
@@ -755,6 +756,42 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('<p>modified</p>', $event->getEntry());
 	}
 
+	public function testOnProfileTabsEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProfileTabsEvent(
+			true,
+			'testnick',
+			'status',
+			[['label' => 'Posts', 'url' => '/profile/testnick/conversations', 'sel' => 'active', 'title' => 'All posts', 'id' => 'status-tab', 'accesskey' => 'm']],
+		);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('profile_tabs', $name);
+			$this->assertSame([
+				'is_owner' => true,
+				'nickname' => 'testnick',
+				'tab'      => 'status',
+				'tabs'     => [['label' => 'Posts', 'url' => '/profile/testnick/conversations', 'sel' => 'active', 'title' => 'All posts', 'id' => 'status-tab', 'accesskey' => 'm']],
+			], $data);
+
+			return [
+				'is_owner' => true,
+				'nickname' => 'testnick',
+				'tab'      => 'status',
+				'tabs'     => [['label' => 'Other', 'url' => '/profile/testnick/other', 'sel' => '', 'title' => 'Other', 'id' => 'other-tab', 'accesskey' => 'o']],
+			];
+		});
+
+		HookEventBridge::onProfileTabsEvent($event);
+
+		$this->assertSame(
+			[['label' => 'Other', 'url' => '/profile/testnick/other', 'sel' => '', 'title' => 'Other', 'id' => 'other-tab', 'accesskey' => 'o']],
+			$event->getTabsArray(),
+		);
+	}
+
 	public function testOnBbcodeToHtmlEventCallsHookWithCorrectValue(): void
 	{
 		$event = new BbcodeToHtmlStartEvent('[b]original[/b]');
@@ -923,7 +960,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
 			[RenderLocationEvent::NAME, 'render_location'],
 			[ContactPhotoMenuEvent::NAME, 'contact_photo_menu'],
-			[ArrayFilterEvent::PROFILE_TABS, 'profile_tabs'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_FORM, 'profile_edit'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_POST, 'profile_post'],
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'moderation_users_tabs'],
