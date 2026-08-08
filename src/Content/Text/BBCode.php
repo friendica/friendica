@@ -18,6 +18,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\BbcodeToHtmlStartEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\Post;
@@ -1319,13 +1320,11 @@ class BBCode
 
 		$eventDispatcher = DI::eventDispatcher();
 
-		$text_data = ['bbcode2html' => $text];
-
 		$text_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_HTML_START, $text_data),
-		)->getArray();
+			new BbcodeToHtmlStartEvent($text),
+		)->getBbcode2html();
 
-		$text = $text_data['bbcode2html'] ?? $text;
+		$text = $text_data;
 
 		$ev = Event::fromBBCode($text);
 

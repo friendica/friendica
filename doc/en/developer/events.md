@@ -39,6 +39,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `smilie` | `\Friendica\Event\SmileyListEvent` |
 | `template_vars` | `\Friendica\Event\TemplateVarsEvent` |
 | `jot_networks` | `\Friendica\Event\JotNetworksEvent` |
+| `bbcode` | `\Friendica\Event\BbcodeToHtmlStartEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -459,6 +460,16 @@ Fired when the jot networks are being built.
 
 **Modifiable:**
 - `setJotnetsFields(array $jotnets_fields): void` — change the jot networks fields
+
+### `\Friendica\Event\BbcodeToHtmlStartEvent`
+
+Fired before BBCode is converted to HTML.
+
+**Contained data:**
+- `getBbcode2html(): string` — the BBCode text to be converted
+
+**Modifiable:**
+- `setBbcode2html(string $bbcode2html): void` — change the BBCode text
 
 ### `\Friendica\Event\EnotifyEvent`
 

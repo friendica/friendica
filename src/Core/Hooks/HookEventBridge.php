@@ -16,6 +16,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\BbcodeToHtmlStartEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ConversationStartEvent;
@@ -94,7 +95,7 @@ final class HookEventBridge
 		ArrayFilterEvent::ADDON_SETTINGS_POST             => 'addon_settings_post',
 		ArrayFilterEvent::APP_MENU                        => 'app_menu',
 		ArrayFilterEvent::AVATAR_LOOKUP                   => 'avatar_lookup',
-		ArrayFilterEvent::BBCODE_TO_HTML_START            => 'bbcode',
+		BbcodeToHtmlStartEvent::NAME                      => 'bbcode',
 		ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'bb2diaspora',
 		ArrayFilterEvent::BLOCK_CONTACT                   => 'block',
 		CacheItemEvent::NAME                              => 'put_item_in_cache',
@@ -212,7 +213,7 @@ final class HookEventBridge
 			ArrayFilterEvent::ADDON_SETTINGS_POST             => 'onArrayFilterEvent',
 			ArrayFilterEvent::APP_MENU                        => 'onArrayFilterEvent',
 			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
-			ArrayFilterEvent::BBCODE_TO_HTML_START            => 'onBbcodeToHtmlEvent',
+			BbcodeToHtmlStartEvent::NAME                      => 'onBbcodeToHtmlEvent',
 			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'onBbcodeToMarkdownEvent',
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			CacheItemEvent::NAME                              => 'onCacheItemEvent',
@@ -658,15 +659,11 @@ final class HookEventBridge
 	/**
 	 * Map the BBCODE_TO_HTML_START event to `bbcode` hook
 	 */
-	public static function onBbcodeToHtmlEvent(ArrayFilterEvent $event): void
+	public static function onBbcodeToHtmlEvent(BbcodeToHtmlStartEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$bbcode2html = $data['bbcode2html'] ?? '';
-
-		$data['bbcode2html'] = static::callHook($event->getName(), (string) $bbcode2html);
-
-		$event->setArray($data);
+		$event->setBbcode2html(
+			static::callHook($event->getName(), $event->getBbcode2html()),
+		);
 	}
 
 	/**
