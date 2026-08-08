@@ -26,6 +26,7 @@ use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\FetchItemByLinkEvent;
+use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
@@ -128,7 +129,7 @@ final class HookEventBridge
 		ArrayFilterEvent::GENERATE_NAMED_MAP              => 'generate_named_map',
 		ArrayFilterEvent::GET_SITE_INFO                   => 'getsiteinfo',
 		ArrayFilterEvent::GLOBAL_DIR_UPDATE               => 'globaldir_update',
-		ArrayFilterEvent::HTML_TO_BBCODE_END              => 'html2bbcode',
+		HtmlToBbcodeEndEvent::NAME                        => 'html2bbcode',
 		InsertPostLocalEvent::NAME                        => 'post_local',
 		InsertPostLocalEndEvent::NAME                     => 'post_local_end',
 		InsertPostRemoteEvent::NAME                       => 'post_remote',
@@ -246,7 +247,7 @@ final class HookEventBridge
 			ArrayFilterEvent::GENERATE_NAMED_MAP              => 'onArrayFilterEvent',
 			ArrayFilterEvent::GET_SITE_INFO                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::GLOBAL_DIR_UPDATE               => 'onArrayFilterEvent',
-			ArrayFilterEvent::HTML_TO_BBCODE_END              => 'onHtmlToBbcodeEvent',
+			HtmlToBbcodeEndEvent::NAME                        => 'onHtmlToBbcodeEvent',
 			InsertPostLocalEvent::NAME                        => 'onInsertPostLocalEvent',
 			InsertPostLocalEndEvent::NAME                     => 'onInsertPostLocalEndEvent',
 			InsertPostRemoteEvent::NAME                       => 'onInsertPostRemoteEvent',
@@ -669,15 +670,11 @@ final class HookEventBridge
 	/**
 	 * Map the HTML_TO_BBCODE_END event to `html2bbcode` hook
 	 */
-	public static function onHtmlToBbcodeEvent(ArrayFilterEvent $event): void
+	public static function onHtmlToBbcodeEvent(HtmlToBbcodeEndEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$html2bbcode = $data['html2bbcode'] ?? '';
-
-		$data['html2bbcode'] = static::callHook($event->getName(), (string) $html2bbcode);
-
-		$event->setArray($data);
+		$event->setHtml2bbcode(
+			static::callHook($event->getName(), $event->getHtml2bbcode()),
+		);
 	}
 
 	/**

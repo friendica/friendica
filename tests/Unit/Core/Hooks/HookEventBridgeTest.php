@@ -28,6 +28,7 @@ use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\FetchItemByLinkEvent;
+use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\ItemPhotoMenuEvent;
 use Friendica\Event\ItemTaggedEvent;
@@ -130,7 +131,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::GENERATE_NAMED_MAP              => 'onArrayFilterEvent',
 			ArrayFilterEvent::GET_SITE_INFO                   => 'onArrayFilterEvent',
 			ArrayFilterEvent::GLOBAL_DIR_UPDATE               => 'onArrayFilterEvent',
-			ArrayFilterEvent::HTML_TO_BBCODE_END              => 'onHtmlToBbcodeEvent',
+			HtmlToBbcodeEndEvent::NAME                        => 'onHtmlToBbcodeEvent',
 			InsertPostLocalEvent::NAME                        => 'onInsertPostLocalEvent',
 			InsertPostLocalEndEvent::NAME                     => 'onInsertPostLocalEndEvent',
 			InsertPostRemoteEvent::NAME                       => 'onInsertPostRemoteEvent',
@@ -671,7 +672,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnHtmlToBbcodeEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::HTML_TO_BBCODE_END, ['html2bbcode' => '<b>original</b>']);
+		$event = new HtmlToBbcodeEndEvent('<b>original</b>');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -685,8 +686,8 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onHtmlToBbcodeEvent($event);
 
 		$this->assertSame(
-			['html2bbcode' => '[b]changed[/b]'],
-			$event->getArray(),
+			'[b]changed[/b]',
+			$event->getHtml2bbcode(),
 		);
 	}
 
