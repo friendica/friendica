@@ -43,6 +43,7 @@ use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
+use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
@@ -168,7 +169,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PROBE_DETECT                    => 'probe_detect',
 		ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'profile_edit',
 		ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'profile_post',
-		ArrayFilterEvent::PROFILE_SIDEBAR                 => 'profile_sidebar',
+		ProfileSidebarEvent::NAME                         => 'profile_sidebar',
 		ProfileSidebarStartEvent::NAME                    => 'profile_sidebar_enter',
 		ArrayFilterEvent::PROFILE_TABS                    => 'profile_tabs',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'support_follow',
@@ -286,7 +287,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SIDEBAR                 => 'onArrayFilterEvent',
+			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
 			ArrayFilterEvent::PROFILE_TABS                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
@@ -644,6 +645,21 @@ final class HookEventBridge
 	{
 		// one-way-event: we don't care about the returned value
 		static::callHook($event->getName(), $event->getId());
+	}
+
+	/**
+	 * Map the ProfileSidebarEvent event to `profile_sidebar` hook
+	 */
+	public static function onProfileSidebarEvent(ProfileSidebarEvent $event): void
+	{
+		$hook_data = [
+			'profile' => $event->getProfileArray(),
+			'entry'   => $event->getEntry(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setEntry($hook_data['entry'] ?? $event->getEntry());
 	}
 
 	/**

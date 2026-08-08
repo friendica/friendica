@@ -19,7 +19,7 @@ use Friendica\Core\Search;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
@@ -501,17 +501,9 @@ class Profile
 			'$network_icon'                => $network_icon,
 		]);
 
-		$hook_data = [
-			'profile' => &$profile,
-			'entry'   => &$o,
-		];
-
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SIDEBAR, $hook_data),
-		)->getArray();
-
-		$profile = $hook_data['profile'] ?? $profile;
-		$o       = $hook_data['entry']   ?? $o;
+		$o = $eventDispatcher->dispatch(
+			new ProfileSidebarEvent($profile, $o),
+		)->getEntry();
 
 		return $o;
 	}

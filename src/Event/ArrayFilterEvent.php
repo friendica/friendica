@@ -34,8 +34,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const DETECT_LANGUAGES = 'friendica.data.detect_languages';
 
-	public const PROFILE_SIDEBAR = 'friendica.data.profile_sidebar';
-
 	public const PROFILE_TABS = 'friendica.data.profile_tabs';
 
 	public const PROFILE_SETTINGS_FORM = 'friendica.data.profile_settings_form';

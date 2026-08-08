@@ -33,7 +33,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'friendica.data.insert_post_local_start'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'friendica.data.photo_upload_form'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'friendica.data.detect_languages'],
-			[ArrayFilterEvent::PROFILE_SIDEBAR, 'friendica.data.profile_sidebar'],
 			[ArrayFilterEvent::PROFILE_TABS, 'friendica.data.profile_tabs'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_FORM, 'friendica.data.profile_settings_form'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_POST, 'friendica.data.profile_settings_post'],

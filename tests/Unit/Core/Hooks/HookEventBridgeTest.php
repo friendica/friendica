@@ -65,6 +65,7 @@ use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\PhotoUploadEndEvent;
+use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
@@ -170,7 +171,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SIDEBAR                 => 'onArrayFilterEvent',
+			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
 			ArrayFilterEvent::PROFILE_TABS                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
@@ -682,6 +683,34 @@ class HookEventBridgeTest extends TestCase
 		);
 	}
 
+	public function testOnProfileSidebarEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProfileSidebarEvent(['uid' => 0, 'name' => 'original'], '<p>entry</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('profile_sidebar', $name);
+			$this->assertSame([
+				'profile' => ['uid' => 0, 'name' => 'original'],
+				'entry'   => '<p>entry</p>',
+			], $data);
+
+			return [
+				'profile' => ['uid' => 0, 'name' => 'changed'],
+				'entry'   => '<p>modified</p>',
+			];
+		});
+
+		HookEventBridge::onProfileSidebarEvent($event);
+
+		$this->assertSame(
+			['uid' => 0, 'name' => 'original'],
+			$event->getProfileArray(),
+		);
+		$this->assertSame('<p>modified</p>', $event->getEntry());
+	}
+
 	public function testOnBbcodeToHtmlEventCallsHookWithCorrectValue(): void
 	{
 		$event = new BbcodeToHtmlStartEvent('[b]original[/b]');
@@ -852,7 +881,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
 			[RenderLocationEvent::NAME, 'render_location'],
 			[ContactPhotoMenuEvent::NAME, 'contact_photo_menu'],
-			[ArrayFilterEvent::PROFILE_SIDEBAR, 'profile_sidebar'],
 			[ArrayFilterEvent::PROFILE_TABS, 'profile_tabs'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_FORM, 'profile_edit'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_POST, 'profile_post'],
