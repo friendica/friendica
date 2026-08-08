@@ -29,6 +29,7 @@ use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
+use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -121,7 +122,7 @@ class HookEventBridgeTest extends TestCase
 			DirectoryItemEvent::NAME                          => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                            => 'onDisplayItemEvent',
 			ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'onArrayFilterEvent',
-			ArrayFilterEvent::EDIT_CONTACT_FORM               => 'onArrayFilterEvent',
+			EditContactFormEvent::NAME                        => 'onEditContactFormEvent',
 			ArrayFilterEvent::EDIT_CONTACT_POST               => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END           => 'onArrayFilterEvent',
@@ -280,6 +281,48 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onConfigLoadedEvent($event);
+	}
+
+	public function testOnEditContactFormEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EditContactFormEvent(['name' => 'original'], '<p>original</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('contact_edit', $name);
+			$this->assertSame([
+				'contact' => ['name' => 'original'],
+				'output'  => '<p>original</p>',
+			], $data);
+
+			return [
+				'contact' => ['name' => 'original'],
+				'output'  => '<p>modified</p>',
+			];
+		});
+
+		HookEventBridge::onEditContactFormEvent($event);
+
+		$this->assertSame('<p>modified</p>', $event->getOutput());
+	}
+
+	public function testOnEditContactFormEventCallsSetterOnlyForValidOutput(): void
+	{
+		$event = new EditContactFormEvent(['name' => 'original'], '<p>original</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			return [
+				'contact' => ['name' => 'original'],
+				'output'  => null,
+			];
+		});
+
+		HookEventBridge::onEditContactFormEvent($event);
+
+		$this->assertSame('<p>original</p>', $event->getOutput());
 	}
 
 	public static function getCollectRoutesEventData(): array
@@ -1040,7 +1083,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, 'revoke_follow'],
 			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
-			[ArrayFilterEvent::EDIT_CONTACT_FORM, 'contact_edit'],
+			[EditContactFormEvent::NAME, 'contact_edit'],
 			[ArrayFilterEvent::EDIT_CONTACT_POST, 'contact_edit_post'],
 			[ArrayFilterEvent::AVATAR_LOOKUP, 'avatar_lookup'],
 			[AccountAuthenticateEvent::NAME, 'authenticate'],

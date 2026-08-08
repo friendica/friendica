@@ -44,6 +44,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `html2bbcode` | `\Friendica\Event\HtmlToBbcodeEndEvent` |
 | `bb2diaspora` | `\Friendica\Event\BbcodeToMarkdownEndEvent` |
 | `contact_photo_menu` | `\Friendica\Event\ContactPhotoMenuEvent` |
+| `contact_edit` | `\Friendica\Event\EditContactFormEvent` |
 | `profile_sidebar` | `\Friendica\Event\ProfileSidebarEvent` |
 | `profile_sidebar_enter` | `\Friendica\Event\ProfileSidebarStartEvent` |
 | `profile_edit` | `\Friendica\Event\ProfileSettingsFormEvent` |
@@ -521,6 +522,17 @@ Fired when the contact photo menu is being built.
 
 **Modifiable:**
 - `setMenu(array $menu): void` — change the menu entries
+
+### `\Friendica\Event\EditContactFormEvent`
+
+Fired when the contact edit page is being built.
+
+**Contained data:**
+- `getContactArray(): array` — the contact record of the target contact (read-only)
+- `getOutput(): string` — the generated HTML of the contact edit page
+
+**Modifiable:**
+- `setOutput(string $output): void` — change the generated HTML
 
 ### `\Friendica\Event\ProfileSidebarEvent`
 

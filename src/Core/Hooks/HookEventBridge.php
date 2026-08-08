@@ -27,6 +27,7 @@ use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
+use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -119,7 +120,7 @@ final class HookEventBridge
 		DirectoryItemEvent::NAME                          => 'directory_item',
 		DisplayItemEvent::NAME                            => 'display_item',
 		ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'display_settings_post',
-		ArrayFilterEvent::EDIT_CONTACT_FORM               => 'contact_edit',
+		EditContactFormEvent::NAME                        => 'contact_edit',
 		ArrayFilterEvent::EDIT_CONTACT_POST               => 'contact_edit_post',
 		ArrayFilterEvent::EMAIL_GET_MESSAGE               => 'email_getmessage',
 		ArrayFilterEvent::EMAIL_GET_MESSAGE_END           => 'email_getmessage_end',
@@ -237,7 +238,7 @@ final class HookEventBridge
 			DirectoryItemEvent::NAME                          => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                            => 'onDisplayItemEvent',
 			ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'onArrayFilterEvent',
-			ArrayFilterEvent::EDIT_CONTACT_FORM               => 'onArrayFilterEvent',
+			EditContactFormEvent::NAME                        => 'onEditContactFormEvent',
 			ArrayFilterEvent::EDIT_CONTACT_POST               => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END           => 'onArrayFilterEvent',
@@ -497,6 +498,23 @@ final class HookEventBridge
 		$event->setDataArray(
 			static::callHook($event->getName(), $event->getDataArray()),
 		);
+	}
+
+	/**
+	 * Map the EditContactFormEvent to `contact_edit` hook
+	 */
+	public static function onEditContactFormEvent(EditContactFormEvent $event): void
+	{
+		$hook_data = [
+			'contact' => $event->getContactArray(),
+			'output'  => $event->getOutput(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['output']) && is_string($hook_data['output'])) {
+			$event->setOutput($hook_data['output']);
+		}
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void

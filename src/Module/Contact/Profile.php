@@ -26,6 +26,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\EditContactFormEvent;
 use Friendica\Model\Circle;
 use Friendica\Model\Contact as ContactModel;
 use Friendica\Model\Contact\User as UserContact;
@@ -455,16 +456,11 @@ class Profile extends BaseModule
 			'$channel_only'           => ['channel_only', $this->t('Channel Only'), $channel_only, $this->t('If enabled, posts from this contact will only appear in channels and network streams in circles, but not in the general network stream.')],
 		]);
 
-		$hook_data = [
-			'contact' => $contact,
-			'output'  => $o,
-		];
+		$event = $this->eventDispatcher->dispatch(
+			new EditContactFormEvent($contact, $o),
+		);
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::EDIT_CONTACT_FORM, $hook_data),
-		)->getArray();
-
-		return $hook_data['output'] ?? $o;
+		return $event->getOutput();
 	}
 
 	/**
