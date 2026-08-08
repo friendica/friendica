@@ -20,6 +20,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Diaspora;
@@ -283,15 +284,11 @@ class Profile
 
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = [
-			'profile' => $profile,
-		];
+		$event = $eventDispatcher->dispatch(
+			new ProfileSidebarStartEvent($profile),
+		);
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, $hook_data),
-		)->getArray();
-
-		$profile = $hook_data['profile'] ?? $profile;
+		$profile = $event->getProfileArray();
 
 		$profile_url = $profile['url'];
 

@@ -65,6 +65,7 @@ use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\PhotoUploadEndEvent;
+use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ModulePostRecipientEvent;
@@ -170,7 +171,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SIDEBAR                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY           => 'onProfileSidebarEntryEvent',
+			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
 			ArrayFilterEvent::PROFILE_TABS                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
@@ -660,9 +661,9 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onPhotoUploadEndEvent($event);
 	}
 
-	public function testOnProfileSidebarEntryEventCallsHookWithCorrectValue(): void
+	public function testOnProfileSidebarStartEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, ['profile' => ['uid' => 0, 'name' => 'original']]);
+		$event = new ProfileSidebarStartEvent(['uid' => 0, 'name' => 'original']);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -673,11 +674,11 @@ class HookEventBridgeTest extends TestCase
 			return ['uid' => 0, 'name' => 'changed'];
 		});
 
-		HookEventBridge::onProfileSidebarEntryEvent($event);
+		HookEventBridge::onProfileSidebarStartEvent($event);
 
 		$this->assertSame(
-			['profile' => ['uid' => 0, 'name' => 'changed']],
-			$event->getArray(),
+			['uid' => 0, 'name' => 'changed'],
+			$event->getProfileArray(),
 		);
 	}
 

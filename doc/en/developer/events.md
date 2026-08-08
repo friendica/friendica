@@ -43,6 +43,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `html2bbcode` | `\Friendica\Event\HtmlToBbcodeEndEvent` |
 | `bb2diaspora` | `\Friendica\Event\BbcodeToMarkdownEndEvent` |
 | `contact_photo_menu` | `\Friendica\Event\ContactPhotoMenuEvent` |
+| `profile_sidebar_enter` | `\Friendica\Event\ProfileSidebarStartEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -504,6 +505,16 @@ Fired when the contact photo menu is being built.
 
 **Modifiable:**
 - `setMenu(array $menu): void` — change the menu entries
+
+### `\Friendica\Event\ProfileSidebarStartEvent`
+
+Fired before the profile sidebar entry is being built.
+
+**Contained data:**
+- `getProfileArray(): array` — the profile record
+
+**Modifiable:**
+- `setProfileArray(array $profile): void` — change the profile record
 
 ### `\Friendica\Event\EnotifyEvent`
 

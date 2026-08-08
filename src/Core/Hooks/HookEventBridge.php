@@ -43,6 +43,7 @@ use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
+use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -168,7 +169,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'profile_edit',
 		ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'profile_post',
 		ArrayFilterEvent::PROFILE_SIDEBAR                 => 'profile_sidebar',
-		ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY           => 'profile_sidebar_enter',
+		ProfileSidebarStartEvent::NAME                    => 'profile_sidebar_enter',
 		ArrayFilterEvent::PROFILE_TABS                    => 'profile_tabs',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'support_follow',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'support_probe',
@@ -286,7 +287,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROFILE_SIDEBAR                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY           => 'onProfileSidebarEntryEvent',
+			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
 			ArrayFilterEvent::PROFILE_TABS                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
@@ -646,17 +647,15 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the PROFILE_SIDEBAR_ENTRY event to `profile_sidebar_enter` hook
+	 * Map the ProfileSidebarStartEvent event to `profile_sidebar_enter` hook
 	 */
-	public static function onProfileSidebarEntryEvent(ArrayFilterEvent $event): void
+	public static function onProfileSidebarStartEvent(ProfileSidebarStartEvent $event): void
 	{
-		$data = $event->getArray();
+		$profile = static::callHook($event->getName(), $event->getProfileArray());
 
-		$profile = $data['profile'] ?? [];
-
-		$data['profile'] = static::callHook($event->getName(), (array) $profile);
-
-		$event->setArray($data);
+		if (isset($profile)) {
+			$event->setProfileArray($profile);
+		}
 	}
 
 	/**
