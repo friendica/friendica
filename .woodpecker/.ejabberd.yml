@@ -197,8 +197,14 @@ steps:
   # per connection (inetd style), wiring the socket to the daemon's stdin/stdout — production
   # being a friendica-extauth.socket + friendica-extauth@.service unit pair. The daemon runs
   # through `sh -c "exec php -d …"` so PHP 8.5 deprecation notices stay out of the log.
+  #
+  # The listener shuts itself down as soon as e2e_systemd drops the marker file in the shared
+  # workspace, so it ends with exit 0 instead of being SIGKILLed (137) during pipeline teardown.
+  # `failure: ignore` stays as a safety net: a teardown kill must never redden the pipeline —
+  # the actual assertions live in e2e_systemd, which fails on its own if this listener is down.
   extauth_systemd:
     detach: true
+    failure: ignore
     depends_on: [db_bootstrap]
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     environment:
@@ -213,10 +219,31 @@ steps:
       - bin/wait-for-connection $MYSQL_HOST $MYSQL_PORT 300
       - apt-get update && apt-get install -y --no-install-recommends systemd
       - |
-        exec systemd-socket-activate --inetd --accept -l 9000 \
+        DONE="$(pwd)/.ci-extauth-done"
+        rm -f "$DONE"
+
+        systemd-socket-activate --inetd --accept -l 9000 \
           -E MYSQL_HOST="$MYSQL_HOST" -E MYSQL_PORT="$MYSQL_PORT" -E MYSQL_DATABASE="$MYSQL_DATABASE" \
           -E MYSQL_USER="$MYSQL_USER" -E MYSQL_PASSWORD="$MYSQL_PASSWORD" -E FRIENDICA_URL="$FRIENDICA_URL" \
-          /bin/sh -c "exec /usr/bin/php -d error_reporting='E_ALL & ~E_DEPRECATED' $(pwd)/bin/console.php auth_ejabberd"
+          /bin/sh -c "exec /usr/bin/php -d error_reporting='E_ALL & ~E_DEPRECATED' $(pwd)/bin/console.php auth_ejabberd" &
+        SA=$!
+
+        # Serve until e2e_systemd is finished (marker), but never hang the pipeline (30 min cap).
+        i=0
+        while [ ! -f "$DONE" ]; do
+          if ! kill -0 $SA 2>/dev/null; then
+            echo "FAIL: systemd-socket-activate died before the E2E step finished"
+            wait $SA; exit 1
+          fi
+          i=$((i + 1))
+          [ $i -ge 900 ] && { echo "timeout waiting for e2e_systemd"; break; }
+          sleep 2
+        done
+
+        echo "e2e_systemd finished, shutting the listener down"
+        kill $SA 2>/dev/null || true
+        wait $SA 2>/dev/null || true
+        exit 0
 
   # ejabberd "host": reaches the systemd socket with a thin socat STDIO->TCP client and, like
   # the same-host step, owns ejabberd's lifecycle so teardown stays clean.
@@ -229,6 +256,10 @@ steps:
       - apt-get update && apt-get install -y --no-install-recommends ejabberd socat curl
       - |
         set -e
+        # Release the detached listener on ANY exit path, so it can end with exit 0 itself
+        # instead of being killed during teardown.
+        trap 'touch "$(pwd)/.ci-extauth-done"' EXIT
+
         # Wait for the systemd socket to accept connections before ejabberd probes it.
         until socat -u /dev/null TCP:extauth_systemd:9000 2>/dev/null; do
           echo "waiting for extauth_systemd:9000..."; sleep 2
