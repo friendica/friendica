@@ -46,6 +46,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `contact_photo_menu` | `\Friendica\Event\ContactPhotoMenuEvent` |
 | `profile_sidebar` | `\Friendica\Event\ProfileSidebarEvent` |
 | `profile_sidebar_enter` | `\Friendica\Event\ProfileSidebarStartEvent` |
+| `profile_edit` | `\Friendica\Event\ProfileSettingsFormEvent` |
 | `profile_tabs` | `\Friendica\Event\ProfileTabsEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
@@ -553,6 +554,17 @@ Fired when the profile page tabs are being built.
 
 **Modifiable:**
 - `setTabsArray(array $tabs): void` — change the list of tabs
+
+### `\Friendica\Event\ProfileSettingsFormEvent`
+
+Fired when the profile settings form is being built.
+
+**Contained data:**
+- `getProfileArray(): array` — the profile record from the database (read-only)
+- `getEntry(): string` — the generated entry HTML
+
+**Modifiable:**
+- `setEntry(string $entry): void` — change the generated entry HTML
 
 ### `\Friendica\Event\EnotifyEvent`
 

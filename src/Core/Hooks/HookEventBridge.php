@@ -45,6 +45,7 @@ use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadFormEvent;
 use Friendica\Event\PhotoUploadStartEvent;
+use Friendica\Event\ProfileSettingsFormEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\ProfileTabsEvent;
@@ -170,7 +171,7 @@ final class HookEventBridge
 		PreparePostFilterContentEvent::NAME               => 'prepare_body_content_filter',
 		PreparePostStartEvent::NAME                       => 'prepare_body_init',
 		ArrayFilterEvent::PROBE_DETECT                    => 'probe_detect',
-		ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'profile_edit',
+		ProfileSettingsFormEvent::NAME                    => 'profile_edit',
 		ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'profile_post',
 		ProfileSidebarEvent::NAME                         => 'profile_sidebar',
 		ProfileSidebarStartEvent::NAME                    => 'profile_sidebar_enter',
@@ -288,7 +289,7 @@ final class HookEventBridge
 			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
+			ProfileSettingsFormEvent::NAME                    => 'onProfileSettingsFormEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
@@ -687,6 +688,23 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setEntry($hook_data['entry'] ?? $event->getEntry());
+	}
+
+	/**
+	 * Map the ProfileSettingsFormEvent to `profile_edit` hook
+	 */
+	public static function onProfileSettingsFormEvent(ProfileSettingsFormEvent $event): void
+	{
+		$hook_data = [
+			'profile' => $event->getProfileArray(),
+			'entry'   => $event->getEntry(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['entry']) && is_string($hook_data['entry'])) {
+			$event->setEntry($hook_data['entry']);
+		}
 	}
 
 	/**

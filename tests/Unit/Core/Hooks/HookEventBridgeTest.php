@@ -67,6 +67,7 @@ use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadFormEvent;
+use Friendica\Event\ProfileSettingsFormEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\ProfileTabsEvent;
@@ -172,7 +173,7 @@ class HookEventBridgeTest extends TestCase
 			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
+			ProfileSettingsFormEvent::NAME                    => 'onProfileSettingsFormEvent',
 			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
@@ -792,6 +793,48 @@ class HookEventBridgeTest extends TestCase
 		);
 	}
 
+	public function testOnProfileSettingsFormEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProfileSettingsFormEvent(['name' => 'original'], '<p>original</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('profile_edit', $name);
+			$this->assertSame([
+				'profile' => ['name' => 'original'],
+				'entry'   => '<p>original</p>',
+			], $data);
+
+			return [
+				'profile' => ['name' => 'original'],
+				'entry'   => '<p>modified</p>',
+			];
+		});
+
+		HookEventBridge::onProfileSettingsFormEvent($event);
+
+		$this->assertSame('<p>modified</p>', $event->getEntry());
+	}
+
+	public function testOnProfileSettingsFormEventCallsSetterOnlyForValidEntry(): void
+	{
+		$event = new ProfileSettingsFormEvent(['name' => 'original'], '<p>original</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			return [
+				'profile' => ['name' => 'original'],
+				'entry'   => null,
+			];
+		});
+
+		HookEventBridge::onProfileSettingsFormEvent($event);
+
+		$this->assertSame('<p>original</p>', $event->getEntry());
+	}
+
 	public function testOnBbcodeToHtmlEventCallsHookWithCorrectValue(): void
 	{
 		$event = new BbcodeToHtmlStartEvent('[b]original[/b]');
@@ -960,7 +1003,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
 			[RenderLocationEvent::NAME, 'render_location'],
 			[ContactPhotoMenuEvent::NAME, 'contact_photo_menu'],
-			[ArrayFilterEvent::PROFILE_SETTINGS_FORM, 'profile_edit'],
+			[ProfileSettingsFormEvent::NAME, 'profile_edit'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_POST, 'profile_post'],
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'moderation_users_tabs'],
 			[ArrayFilterEvent::ACL_LOOKUP_END, 'acl_lookup_end'],
