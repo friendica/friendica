@@ -52,6 +52,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `photo_post_init` | `\Friendica\Event\PhotoUploadStartEvent` |
 | `photo_post_file` | `\Friendica\Event\PhotoUploadEvent` |
 | `photo_post_end` | `\Friendica\Event\PhotoUploadEndEvent` |
+| `photo_upload_form` | `\Friendica\Event\PhotoUploadFormEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
@@ -601,3 +602,13 @@ Fired after a photo upload has been processed.
 
 **Contained data:**
 - `getId(): int` — the resource ID of the uploaded photo, `0` if the upload failed (read-only)
+
+### `\Friendica\Event\PhotoUploadFormEvent`
+
+Fired when the photo upload form is being built.
+
+**Contained data:**
+- `getFormArray(): array` — the form data with the keys `post_url`, `addon_text` and `default_upload`
+
+**Modifiable:**
+- `setFormArray(array $form): void` — change the form data

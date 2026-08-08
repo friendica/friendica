@@ -43,6 +43,7 @@ use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadEvent;
+use Friendica\Event\PhotoUploadFormEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
@@ -161,7 +162,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'lockview_content',
 		PhotoUploadEvent::NAME                            => 'photo_post_file',
 		PhotoUploadEndEvent::NAME                         => 'photo_post_end',
-		ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'photo_upload_form',
+		PhotoUploadFormEvent::NAME                        => 'photo_upload_form',
 		PhotoUploadStartEvent::NAME                       => 'photo_post_init',
 		PreparePostEvent::NAME                            => 'prepare_body',
 		PreparePostEndEvent::NAME                         => 'prepare_body_final',
@@ -279,7 +280,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
 			PhotoUploadEndEvent::NAME                         => 'onPhotoUploadEndEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
+			PhotoUploadFormEvent::NAME                        => 'onPhotoUploadFormEvent',
 			PhotoUploadStartEvent::NAME                       => 'onPhotoUploadStartEvent',
 			PreparePostEvent::NAME                            => 'onPreparePostEvent',
 			PreparePostEndEvent::NAME                         => 'onPreparePostEndEvent',
@@ -649,6 +650,18 @@ final class HookEventBridge
 		$event->setFilename($data['filename']);
 		$event->setFilesize((int) $data['filesize']);
 		$event->setType($data['type']);
+	}
+
+	/**
+	 * Map the PhotoUploadFormEvent to `photo_upload_form` hook
+	 *
+	 * The form data is passed as the whole hook data to stay backward-compatible.
+	 */
+	public static function onPhotoUploadFormEvent(PhotoUploadFormEvent $event): void
+	{
+		$event->setFormArray(
+			static::callHook($event->getName(), $event->getFormArray()),
+		);
 	}
 
 	/**

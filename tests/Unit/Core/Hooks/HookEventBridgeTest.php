@@ -66,6 +66,7 @@ use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\PhotoUploadEndEvent;
+use Friendica\Event\PhotoUploadFormEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\PhotoUploadEvent;
@@ -163,7 +164,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
 			PhotoUploadEvent::NAME                            => 'onPhotoUploadEvent',
 			PhotoUploadEndEvent::NAME                         => 'onPhotoUploadEndEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
+			PhotoUploadFormEvent::NAME                        => 'onPhotoUploadFormEvent',
 			PhotoUploadStartEvent::NAME                       => 'onPhotoUploadStartEvent',
 			PreparePostEvent::NAME                            => 'onPreparePostEvent',
 			PreparePostEndEvent::NAME                         => 'onPreparePostEndEvent',
@@ -427,6 +428,27 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame(
 			['album' => 123],
 			$event->getRequestArray(),
+		);
+	}
+
+	public function testOnPhotoUploadFormEventCallsHookWithCorrectValue(): void
+	{
+		$event = new PhotoUploadFormEvent(['post_url' => '/photos', 'addon_text' => '', 'default_upload' => true]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('photo_upload_form', $name);
+			$this->assertSame(['post_url' => '/photos', 'addon_text' => '', 'default_upload' => true], $data);
+
+			return ['post_url' => '/photos', 'addon_text' => 'text', 'default_upload' => false];
+		});
+
+		HookEventBridge::onPhotoUploadFormEvent($event);
+
+		$this->assertSame(
+			['post_url' => '/photos', 'addon_text' => 'text', 'default_upload' => false],
+			$event->getFormArray(),
 		);
 	}
 
@@ -890,7 +912,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::NAV_INFO, 'nav_info'],
 			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'get'],
-			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
 			[PhotoUploadEvent::NAME, 'photo_post_file'],
 			[NetworkToNameEvent::NAME, 'network_to_name'],
 			[NetworkContentStartEvent::NAME, 'network_content_init'],

@@ -16,7 +16,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\PhotoUploadFormEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
@@ -445,8 +445,8 @@ function photos_content()
 		$eventDispatcher = DI::eventDispatcher();
 
 		$ret = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_FORM, $ret),
-		)->getArray();
+			new PhotoUploadFormEvent($ret),
+		)->getFormArray();
 
 		// Determine if we're in album context (uploading to a specific album)
 		$is_album_context = !empty($selname);

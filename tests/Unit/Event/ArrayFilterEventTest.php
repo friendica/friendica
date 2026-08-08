@@ -30,7 +30,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::FEATURE_ENABLED, 'friendica.data.feature_enabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'friendica.data.feature_get'],
 			[ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, 'friendica.data.permission_tooltip_content'],
-			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'friendica.data.photo_upload_form'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'friendica.data.detect_languages'],
 			[ArrayFilterEvent::PROFILE_TABS, 'friendica.data.profile_tabs'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_FORM, 'friendica.data.profile_settings_form'],
