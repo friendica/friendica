@@ -15,6 +15,7 @@ use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Conversation\StatusEditor;
+use Friendica\Content\GroupManager;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
@@ -51,6 +52,7 @@ class Index extends BaseModule
 		private readonly AppHelper $appHelper,
 		private readonly Database $database,
 		private readonly EventDispatcherInterface $eventDispatcher,
+		private readonly GroupManager $groupManager,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -65,7 +67,7 @@ class Index extends BaseModule
 
 	protected function rawContent(array $request = [])
 	{
-		(new Profile($this->profileField, $this->page, $this->config, $this->session, $this->appHelper, $this->database, $this->eventDispatcher, $this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters))->rawContent();
+		(new Profile($this->profileField, $this->page, $this->config, $this->session, $this->appHelper, $this->database, $this->eventDispatcher, $this->groupManager, $this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters))->rawContent();
 	}
 
 	protected function content(array $request = []): string
