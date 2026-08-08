@@ -45,6 +45,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `bb2diaspora` | `\Friendica\Event\BbcodeToMarkdownEndEvent` |
 | `contact_photo_menu` | `\Friendica\Event\ContactPhotoMenuEvent` |
 | `contact_edit` | `\Friendica\Event\EditContactFormEvent` |
+| `contact_edit_post` | `\Friendica\Event\EditContactPostEvent` |
 | `profile_sidebar` | `\Friendica\Event\ProfileSidebarEvent` |
 | `profile_sidebar_enter` | `\Friendica\Event\ProfileSidebarStartEvent` |
 | `profile_edit` | `\Friendica\Event\ProfileSettingsFormEvent` |
@@ -533,6 +534,16 @@ Fired when the contact edit page is being built.
 
 **Modifiable:**
 - `setOutput(string $output): void` — change the generated HTML
+
+### `\Friendica\Event\EditContactPostEvent`
+
+Fired when the contact edit page is being posted.
+
+**Contained data:**
+- `getRequestArray(): array` — the contact edit post data
+
+**Modifiable:**
+- `setRequestArray(array $request): void` — change the contact edit post data
 
 ### `\Friendica\Event\ProfileSidebarEvent`
 

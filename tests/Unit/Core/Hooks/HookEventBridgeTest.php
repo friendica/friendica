@@ -30,6 +30,7 @@ use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\EditContactFormEvent;
+use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -123,7 +124,7 @@ class HookEventBridgeTest extends TestCase
 			DisplayItemEvent::NAME                            => 'onDisplayItemEvent',
 			ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'onArrayFilterEvent',
 			EditContactFormEvent::NAME                        => 'onEditContactFormEvent',
-			ArrayFilterEvent::EDIT_CONTACT_POST               => 'onArrayFilterEvent',
+			EditContactPostEvent::NAME                        => 'onEditContactPostEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END           => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAILER_SEND                    => 'onArrayFilterEvent',
@@ -323,6 +324,27 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onEditContactFormEvent($event);
 
 		$this->assertSame('<p>original</p>', $event->getOutput());
+	}
+
+	public function testOnEditContactPostEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EditContactPostEvent(['hidden' => true]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('contact_edit_post', $name);
+			$this->assertSame(['hidden' => true], $data);
+
+			return ['hidden' => false];
+		});
+
+		HookEventBridge::onEditContactPostEvent($event);
+
+		$this->assertSame(
+			['hidden' => false],
+			$event->getRequestArray(),
+		);
 	}
 
 	public static function getCollectRoutesEventData(): array
@@ -1084,7 +1106,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
 			[EditContactFormEvent::NAME, 'contact_edit'],
-			[ArrayFilterEvent::EDIT_CONTACT_POST, 'contact_edit_post'],
+			[EditContactPostEvent::NAME, 'contact_edit_post'],
 			[ArrayFilterEvent::AVATAR_LOOKUP, 'avatar_lookup'],
 			[AccountAuthenticateEvent::NAME, 'authenticate'],
 			[AccountRegisterFormEvent::NAME, 'register_form'],

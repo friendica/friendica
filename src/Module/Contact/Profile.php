@@ -25,8 +25,8 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\EditContactFormEvent;
+use Friendica\Event\EditContactPostEvent;
 use Friendica\Model\Circle;
 use Friendica\Model\Contact as ContactModel;
 use Friendica\Model\Contact\User as UserContact;
@@ -84,8 +84,8 @@ class Profile extends BaseModule
 		}
 
 		$request = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::EDIT_CONTACT_POST, $request),
-		)->getArray();
+			new EditContactPostEvent($request),
+		)->getRequestArray();
 
 		$fields = [];
 

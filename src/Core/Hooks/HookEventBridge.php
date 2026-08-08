@@ -28,6 +28,7 @@ use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\EditContactFormEvent;
+use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -121,7 +122,7 @@ final class HookEventBridge
 		DisplayItemEvent::NAME                            => 'display_item',
 		ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'display_settings_post',
 		EditContactFormEvent::NAME                        => 'contact_edit',
-		ArrayFilterEvent::EDIT_CONTACT_POST               => 'contact_edit_post',
+		EditContactPostEvent::NAME                        => 'contact_edit_post',
 		ArrayFilterEvent::EMAIL_GET_MESSAGE               => 'email_getmessage',
 		ArrayFilterEvent::EMAIL_GET_MESSAGE_END           => 'email_getmessage_end',
 		ArrayFilterEvent::EMAILER_SEND                    => 'emailer_send',
@@ -239,7 +240,7 @@ final class HookEventBridge
 			DisplayItemEvent::NAME                            => 'onDisplayItemEvent',
 			ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'onArrayFilterEvent',
 			EditContactFormEvent::NAME                        => 'onEditContactFormEvent',
-			ArrayFilterEvent::EDIT_CONTACT_POST               => 'onArrayFilterEvent',
+			EditContactPostEvent::NAME                        => 'onEditContactPostEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE               => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END           => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAILER_SEND                    => 'onArrayFilterEvent',
@@ -515,6 +516,18 @@ final class HookEventBridge
 		if (isset($hook_data['output']) && is_string($hook_data['output'])) {
 			$event->setOutput($hook_data['output']);
 		}
+	}
+
+	/**
+	 * Map the EditContactPostEvent to `contact_edit_post` hook
+	 *
+	 * The request data is passed as the whole hook data to stay backward-compatible.
+	 */
+	public static function onEditContactPostEvent(EditContactPostEvent $event): void
+	{
+		$event->setRequestArray(
+			static::callHook($event->getName(), $event->getRequestArray()),
+		);
 	}
 
 	public static function onConfigLoadedEvent(ConfigLoadedEvent $event): void
