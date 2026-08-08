@@ -30,6 +30,7 @@ use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
+use Friendica\Event\InsertPostLocalStartEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
@@ -138,7 +139,7 @@ final class HookEventBridge
 		InsertPostLocalEndEvent::NAME                     => 'post_local_end',
 		InsertPostRemoteEvent::NAME                       => 'post_remote',
 		InsertPostRemoteEndEvent::NAME                    => 'post_remote_end',
-		ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'post_local_start',
+		InsertPostLocalStartEvent::NAME                   => 'post_local_start',
 		ItemPhotoMenuEvent::NAME                          => 'item_photo_menu',
 		ItemTaggedEvent::NAME                             => 'tagged',
 		JotNetworksEvent::NAME                            => 'jot_networks',
@@ -256,7 +257,7 @@ final class HookEventBridge
 			InsertPostLocalEndEvent::NAME                     => 'onInsertPostLocalEndEvent',
 			InsertPostRemoteEvent::NAME                       => 'onInsertPostRemoteEvent',
 			InsertPostRemoteEndEvent::NAME                    => 'onInsertPostRemoteEndEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
+			InsertPostLocalStartEvent::NAME                   => 'onInsertPostLocalStartEvent',
 			ItemPhotoMenuEvent::NAME                          => 'onItemPhotoMenuEvent',
 			ItemTaggedEvent::NAME                             => 'onItemTaggedEvent',
 			JotNetworksEvent::NAME                            => 'onJotNetworksEvent',
@@ -526,6 +527,18 @@ final class HookEventBridge
 	public static function onInsertPostLocalEvent(InsertPostLocalEvent $event): void
 	{
 		$event->setItemArray((array) static::callHook($event->getName(), $event->getItemArray()));
+	}
+
+	/**
+	 * Map the InsertPostLocalStartEvent to `post_local_start` hook
+	 *
+	 * The request array is passed as the whole hook data to stay backward-compatible.
+	 */
+	public static function onInsertPostLocalStartEvent(InsertPostLocalStartEvent $event): void
+	{
+		$event->setRequestArray(
+			static::callHook($event->getName(), $event->getRequestArray()),
+		);
 	}
 
 	/**

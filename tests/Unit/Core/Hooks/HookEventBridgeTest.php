@@ -57,6 +57,7 @@ use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\SmileyListEvent;
 use Friendica\Event\TemplateVarsEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
+use Friendica\Event\InsertPostLocalStartEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
 use Friendica\Event\JotNetworksEvent;
@@ -140,7 +141,7 @@ class HookEventBridgeTest extends TestCase
 			InsertPostLocalEndEvent::NAME                     => 'onInsertPostLocalEndEvent',
 			InsertPostRemoteEvent::NAME                       => 'onInsertPostRemoteEvent',
 			InsertPostRemoteEndEvent::NAME                    => 'onInsertPostRemoteEndEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
+			InsertPostLocalStartEvent::NAME                   => 'onInsertPostLocalStartEvent',
 			ItemPhotoMenuEvent::NAME                          => 'onItemPhotoMenuEvent',
 			ItemTaggedEvent::NAME                             => 'onItemTaggedEvent',
 			JotNetworksEvent::NAME                            => 'onJotNetworksEvent',
@@ -342,6 +343,27 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame(
 			['id' => 123],
 			$event->getItemArray(),
+		);
+	}
+
+	public function testOnInsertPostLocalStartEventCallsHookWithCorrectValue(): void
+	{
+		$event = new InsertPostLocalStartEvent(['uid' => 1]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('post_local_start', $name);
+			$this->assertSame(['uid' => 1], $data);
+
+			return ['uid' => 2];
+		});
+
+		HookEventBridge::onInsertPostLocalStartEvent($event);
+
+		$this->assertSame(
+			['uid' => 2],
+			$event->getRequestArray(),
 		);
 	}
 
@@ -868,7 +890,6 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::NAV_INFO, 'nav_info'],
 			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'get'],
-			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'post_local_start'],
 			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
 			[PhotoUploadEvent::NAME, 'photo_post_file'],
 			[NetworkToNameEvent::NAME, 'network_to_name'],

@@ -13,6 +13,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `logging_out` | `\Friendica\Event\LoggingOutEvent` |
 | `display_item` | `\Friendica\Event\DisplayItemEvent` |
 | `post_local` | `\Friendica\Event\InsertPostLocalEvent` |
+| `post_local_start` | `\Friendica\Event\InsertPostLocalStartEvent` |
 | `post_local_end` | `\Friendica\Event\InsertPostLocalEndEvent` |
 | `post_remote` | `\Friendica\Event\InsertPostRemoteEvent` |
 | `post_remote_end` | `\Friendica\Event\InsertPostRemoteEndEvent` |
@@ -187,6 +188,16 @@ Fired when a local post is being inserted.
 
 **Modifiable:**
 - `setItemArray(array $item): void` — change the item record
+
+### `\Friendica\Event\InsertPostLocalStartEvent`
+
+Fired when a local post is being created, before any processing.
+
+**Contained data:**
+- `getRequestArray(): array` — the request data
+
+**Modifiable:**
+- `setRequestArray(array $request): void` — change the request data
 
 ### `\Friendica\Event\InsertPostLocalEndEvent`
 
