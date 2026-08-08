@@ -17,8 +17,8 @@ use Friendica\Content\Smilies;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
+use Friendica\Event\BbcodeToMarkdownEndEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Event;
 use Friendica\Model\Post;
@@ -2355,13 +2355,11 @@ class BBCode
 
 		$eventDispatcher = DI::eventDispatcher();
 
-		$text_data = ['bbcode2markdown' => $text];
-
 		$text_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_MARKDOWN_END, $text_data),
-		)->getArray();
+			new BbcodeToMarkdownEndEvent($text),
+		)->getBbcode2markdown();
 
-		$text = $text_data['bbcode2markdown'] ?? $text;
+		$text = $text_data;
 
 		DI::profiler()->stopRecording();
 

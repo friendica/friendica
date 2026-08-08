@@ -17,6 +17,7 @@ use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
+use Friendica\Event\BbcodeToMarkdownEndEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ConversationStartEvent;
@@ -97,7 +98,7 @@ final class HookEventBridge
 		ArrayFilterEvent::APP_MENU                        => 'app_menu',
 		ArrayFilterEvent::AVATAR_LOOKUP                   => 'avatar_lookup',
 		BbcodeToHtmlStartEvent::NAME                      => 'bbcode',
-		ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'bb2diaspora',
+		BbcodeToMarkdownEndEvent::NAME                    => 'bb2diaspora',
 		ArrayFilterEvent::BLOCK_CONTACT                   => 'block',
 		CacheItemEvent::NAME                              => 'put_item_in_cache',
 		CheckItemNotificationEvent::NAME                  => 'check_item_notification',
@@ -215,7 +216,7 @@ final class HookEventBridge
 			ArrayFilterEvent::APP_MENU                        => 'onArrayFilterEvent',
 			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
 			BbcodeToHtmlStartEvent::NAME                      => 'onBbcodeToHtmlEvent',
-			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'onBbcodeToMarkdownEvent',
+			BbcodeToMarkdownEndEvent::NAME                    => 'onBbcodeToMarkdownEndEvent',
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			CacheItemEvent::NAME                              => 'onCacheItemEvent',
 			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
@@ -658,7 +659,7 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the BBCODE_TO_HTML_START event to `bbcode` hook
+	 * Map the BbcodeToHtmlStartEvent event to `bbcode` hook
 	 */
 	public static function onBbcodeToHtmlEvent(BbcodeToHtmlStartEvent $event): void
 	{
@@ -668,7 +669,7 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the HTML_TO_BBCODE_END event to `html2bbcode` hook
+	 * Map the HtmlToBbcodeEndEvent event to `html2bbcode` hook
 	 */
 	public static function onHtmlToBbcodeEvent(HtmlToBbcodeEndEvent $event): void
 	{
@@ -678,17 +679,13 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the BBCODE_TO_MARKDOWN_END event to `bb2diaspora` hook
+	 * Map the BbcodeToMarkdownEndEvent event to `bb2diaspora` hook
 	 */
-	public static function onBbcodeToMarkdownEvent(ArrayFilterEvent $event): void
+	public static function onBbcodeToMarkdownEndEvent(BbcodeToMarkdownEndEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$bbcode2markdown = $data['bbcode2markdown'] ?? '';
-
-		$data['bbcode2markdown'] = static::callHook($event->getName(), (string) $bbcode2markdown);
-
-		$event->setArray($data);
+		$event->setBbcode2markdown(
+			static::callHook($event->getName(), $event->getBbcode2markdown()),
+		);
 	}
 
 	/**

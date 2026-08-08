@@ -19,6 +19,7 @@ use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
+use Friendica\Event\BbcodeToMarkdownEndEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ConversationStartEvent;
@@ -99,7 +100,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::APP_MENU                        => 'onArrayFilterEvent',
 			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
 			BbcodeToHtmlStartEvent::NAME                      => 'onBbcodeToHtmlEvent',
-			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'onBbcodeToMarkdownEvent',
+			BbcodeToMarkdownEndEvent::NAME                    => 'onBbcodeToMarkdownEndEvent',
 			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
 			CacheItemEvent::NAME                              => 'onCacheItemEvent',
 			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
@@ -693,7 +694,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnBbcodeToMarkdownEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_MARKDOWN_END, ['bbcode2markdown' => '[b]original[/b]']);
+		$event = new BbcodeToMarkdownEndEvent('[b]original[/b]');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -704,11 +705,11 @@ class HookEventBridgeTest extends TestCase
 			return '**changed**';
 		});
 
-		HookEventBridge::onBbcodeToMarkdownEvent($event);
+		HookEventBridge::onBbcodeToMarkdownEndEvent($event);
 
 		$this->assertSame(
-			['bbcode2markdown' => '**changed**'],
-			$event->getArray(),
+			'**changed**',
+			$event->getBbcode2markdown(),
 		);
 	}
 

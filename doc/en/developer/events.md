@@ -41,6 +41,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `jot_networks` | `\Friendica\Event\JotNetworksEvent` |
 | `bbcode` | `\Friendica\Event\BbcodeToHtmlStartEvent` |
 | `html2bbcode` | `\Friendica\Event\HtmlToBbcodeEndEvent` |
+| `bb2diaspora` | `\Friendica\Event\BbcodeToMarkdownEndEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -481,6 +482,16 @@ Fired after HTML is converted to BBCode.
 
 **Modifiable:**
 - `setHtml2bbcode(string $html2bbcode): void` — change the BBCode text
+
+### `\Friendica\Event\BbcodeToMarkdownEndEvent`
+
+Fired after BBCode is converted to Markdown.
+
+**Contained data:**
+- `getBbcode2markdown(): string` — the Markdown text that was converted
+
+**Modifiable:**
+- `setBbcode2markdown(string $bbcode2markdown): void` — change the Markdown text
 
 ### `\Friendica\Event\EnotifyEvent`
 
