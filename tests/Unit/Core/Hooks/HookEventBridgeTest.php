@@ -68,6 +68,7 @@ use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadFormEvent;
 use Friendica\Event\ProfileSettingsFormEvent;
+use Friendica\Event\ProfileSettingsPostEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\ProfileTabsEvent;
@@ -174,7 +175,7 @@ class HookEventBridgeTest extends TestCase
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
 			ProfileSettingsFormEvent::NAME                    => 'onProfileSettingsFormEvent',
-			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
+			ProfileSettingsPostEvent::NAME                    => 'onProfileSettingsPostEvent',
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
 			ProfileTabsEvent::NAME                            => 'onProfileTabsEvent',
@@ -835,6 +836,27 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('<p>original</p>', $event->getEntry());
 	}
 
+	public function testOnProfileSettingsPostEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProfileSettingsPostEvent(['name' => 'original']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('profile_post', $name);
+			$this->assertSame(['name' => 'original'], $data);
+
+			return ['name' => 'modified'];
+		});
+
+		HookEventBridge::onProfileSettingsPostEvent($event);
+
+		$this->assertSame(
+			['name' => 'modified'],
+			$event->getRequestArray(),
+		);
+	}
+
 	public function testOnBbcodeToHtmlEventCallsHookWithCorrectValue(): void
 	{
 		$event = new BbcodeToHtmlStartEvent('[b]original[/b]');
@@ -1004,7 +1026,7 @@ class HookEventBridgeTest extends TestCase
 			[RenderLocationEvent::NAME, 'render_location'],
 			[ContactPhotoMenuEvent::NAME, 'contact_photo_menu'],
 			[ProfileSettingsFormEvent::NAME, 'profile_edit'],
-			[ArrayFilterEvent::PROFILE_SETTINGS_POST, 'profile_post'],
+			[ProfileSettingsPostEvent::NAME, 'profile_post'],
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'moderation_users_tabs'],
 			[ArrayFilterEvent::ACL_LOOKUP_END, 'acl_lookup_end'],
 			[PageInfoEvent::NAME, 'page_info_data'],

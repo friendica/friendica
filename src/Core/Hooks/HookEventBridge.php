@@ -46,6 +46,7 @@ use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadFormEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ProfileSettingsFormEvent;
+use Friendica\Event\ProfileSettingsPostEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\ProfileTabsEvent;
@@ -172,7 +173,7 @@ final class HookEventBridge
 		PreparePostStartEvent::NAME                       => 'prepare_body_init',
 		ArrayFilterEvent::PROBE_DETECT                    => 'probe_detect',
 		ProfileSettingsFormEvent::NAME                    => 'profile_edit',
-		ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'profile_post',
+		ProfileSettingsPostEvent::NAME                    => 'profile_post',
 		ProfileSidebarEvent::NAME                         => 'profile_sidebar',
 		ProfileSidebarStartEvent::NAME                    => 'profile_sidebar_enter',
 		ProfileTabsEvent::NAME                            => 'profile_tabs',
@@ -290,7 +291,7 @@ final class HookEventBridge
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
 			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
 			ProfileSettingsFormEvent::NAME                    => 'onProfileSettingsFormEvent',
-			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
+			ProfileSettingsPostEvent::NAME                    => 'onProfileSettingsPostEvent',
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
 			ProfileTabsEvent::NAME                            => 'onProfileTabsEvent',
@@ -705,6 +706,18 @@ final class HookEventBridge
 		if (isset($hook_data['entry']) && is_string($hook_data['entry'])) {
 			$event->setEntry($hook_data['entry']);
 		}
+	}
+
+	/**
+	 * Map the ProfileSettingsPostEvent to `profile_post` hook
+	 *
+	 * The request data is passed as the whole hook data to stay backward-compatible.
+	 */
+	public static function onProfileSettingsPostEvent(ProfileSettingsPostEvent $event): void
+	{
+		$event->setRequestArray(
+			static::callHook($event->getName(), $event->getRequestArray()),
+		);
 	}
 
 	/**

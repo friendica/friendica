@@ -18,8 +18,8 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\ProfileSettingsFormEvent;
+use Friendica\Event\ProfileSettingsPostEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Module\Response;
@@ -75,8 +75,8 @@ class Index extends BaseSettings
 		self::checkFormSecurityTokenRedirectOnError('/settings/profile', 'settings_profile');
 
 		$request = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SETTINGS_POST, $request),
-		)->getArray();
+			new ProfileSettingsPostEvent($request),
+		)->getRequestArray();
 
 		$dob = $this->cleanInput($request['dob'] ?? '');
 

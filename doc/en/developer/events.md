@@ -47,6 +47,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `profile_sidebar` | `\Friendica\Event\ProfileSidebarEvent` |
 | `profile_sidebar_enter` | `\Friendica\Event\ProfileSidebarStartEvent` |
 | `profile_edit` | `\Friendica\Event\ProfileSettingsFormEvent` |
+| `profile_post` | `\Friendica\Event\ProfileSettingsPostEvent` |
 | `profile_tabs` | `\Friendica\Event\ProfileTabsEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
@@ -565,6 +566,16 @@ Fired when the profile settings form is being built.
 
 **Modifiable:**
 - `setEntry(string $entry): void` — change the generated entry HTML
+
+### `\Friendica\Event\ProfileSettingsPostEvent`
+
+Fired when the profile settings are being posted.
+
+**Contained data:**
+- `getRequestArray(): array` — the profile settings post data
+
+**Modifiable:**
+- `setRequestArray(array $request): void` — change the profile settings post data
 
 ### `\Friendica\Event\EnotifyEvent`
 
