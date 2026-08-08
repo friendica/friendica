@@ -22,6 +22,7 @@ use Friendica\Event\BbcodeToHtmlStartEvent;
 use Friendica\Event\BbcodeToMarkdownEndEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
+use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
@@ -105,7 +106,7 @@ class HookEventBridgeTest extends TestCase
 			CacheItemEvent::NAME                              => 'onCacheItemEvent',
 			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
-			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
+			ContactPhotoMenuEvent::NAME                       => 'onContactPhotoMenuEvent',
 			ConversationStartEvent::NAME                      => 'onConversationStartEvent',
 			ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'onArrayFilterEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION              => 'onArrayFilterEvent',
@@ -595,6 +596,36 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame(['foo' => 'baz'], $event->getVars());
 	}
 
+	public function testOnContactPhotoMenuEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ContactPhotoMenuEvent(
+			['id' => 1, 'name' => 'Alice'],
+			['profile' => ['View Profile', 'https://example.com', true]],
+		);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('contact_photo_menu', $name);
+			$this->assertSame([
+				'contact' => ['id' => 1, 'name' => 'Alice'],
+				'menu'    => ['profile' => ['View Profile', 'https://example.com', true]],
+			], $data);
+
+			return [
+				'contact' => ['id' => 1, 'name' => 'Alice'],
+				'menu'    => ['profile' => ['View Profile', 'https://example.com', true], 'pm' => ['Message', 'https://example.com/pm', false]],
+			];
+		});
+
+		HookEventBridge::onContactPhotoMenuEvent($event);
+
+		$this->assertSame(
+			['profile' => ['View Profile', 'https://example.com', true], 'pm' => ['Message', 'https://example.com/pm', false]],
+			$event->getMenu(),
+		);
+	}
+
 	public function testOnJotNetworksEventCallsHookWithCorrectValue(): void
 	{
 		$event = new JotNetworksEvent([['type' => 'checkbox']]);
@@ -819,7 +850,7 @@ class HookEventBridgeTest extends TestCase
 			[EnotifyStoreEvent::NAME, 'enotify_store'],
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
 			[RenderLocationEvent::NAME, 'render_location'],
-			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'contact_photo_menu'],
+			[ContactPhotoMenuEvent::NAME, 'contact_photo_menu'],
 			[ArrayFilterEvent::PROFILE_SIDEBAR, 'profile_sidebar'],
 			[ArrayFilterEvent::PROFILE_TABS, 'profile_tabs'],
 			[ArrayFilterEvent::PROFILE_SETTINGS_FORM, 'profile_edit'],

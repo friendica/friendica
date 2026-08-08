@@ -21,6 +21,7 @@ use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPException\NotFoundException;
@@ -1323,17 +1324,13 @@ class Contact
 			}
 		}
 
-		$args = ['contact' => $contact, 'menu' => $menu];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$args = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::CONTACT_PHOTO_MENU, $args),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new ContactPhotoMenuEvent($contact, $menu),
+		);
 
-		if (is_array($args['menu'])) {
-			$menu = $args['menu'];
-		}
+		$menu = $event->getMenu();
 
 		$menucondensed = [];
 

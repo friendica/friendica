@@ -42,6 +42,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `bbcode` | `\Friendica\Event\BbcodeToHtmlStartEvent` |
 | `html2bbcode` | `\Friendica\Event\HtmlToBbcodeEndEvent` |
 | `bb2diaspora` | `\Friendica\Event\BbcodeToMarkdownEndEvent` |
+| `contact_photo_menu` | `\Friendica\Event\ContactPhotoMenuEvent` |
 | `enotify` | `\Friendica\Event\EnotifyEvent` |
 | `enotify_mail` | `\Friendica\Event\EnotifyMailEvent` |
 | `enotify_store` | `\Friendica\Event\EnotifyStoreEvent` |
@@ -492,6 +493,17 @@ Fired after BBCode is converted to Markdown.
 
 **Modifiable:**
 - `setBbcode2markdown(string $bbcode2markdown): void` — change the Markdown text
+
+### `\Friendica\Event\ContactPhotoMenuEvent`
+
+Fired when the contact photo menu is being built.
+
+**Contained data:**
+- `getContact(): array` — the contact record (read-only)
+- `getMenu(): array` — the menu entries keyed by menu name
+
+**Modifiable:**
+- `setMenu(array $menu): void` — change the menu entries
 
 ### `\Friendica\Event\EnotifyEvent`
 

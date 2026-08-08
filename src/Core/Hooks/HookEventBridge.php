@@ -20,6 +20,7 @@ use Friendica\Event\BbcodeToHtmlStartEvent;
 use Friendica\Event\BbcodeToMarkdownEndEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
+use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
@@ -103,7 +104,7 @@ final class HookEventBridge
 		CacheItemEvent::NAME                              => 'put_item_in_cache',
 		CheckItemNotificationEvent::NAME                  => 'check_item_notification',
 		ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'connector_settings_post',
-		ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'contact_photo_menu',
+		ContactPhotoMenuEvent::NAME                       => 'contact_photo_menu',
 		ConversationStartEvent::NAME                      => 'conversation_start',
 		ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'dbstructure_definition',
 		ArrayFilterEvent::DB_VIEW_DEFINITION              => 'dbview_definition',
@@ -221,7 +222,7 @@ final class HookEventBridge
 			CacheItemEvent::NAME                              => 'onCacheItemEvent',
 			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
-			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
+			ContactPhotoMenuEvent::NAME                       => 'onContactPhotoMenuEvent',
 			ConversationStartEvent::NAME                      => 'onConversationStartEvent',
 			ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'onArrayFilterEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION              => 'onArrayFilterEvent',
@@ -916,6 +917,18 @@ final class HookEventBridge
 
 		if (isset($data['vars'])) {
 			$event->setVars($data['vars']);
+		}
+	}
+
+	public static function onContactPhotoMenuEvent(ContactPhotoMenuEvent $event): void
+	{
+		$data = static::callHook($event->getName(), [
+			'contact' => $event->getContact(),
+			'menu'    => $event->getMenu(),
+		]);
+
+		if (isset($data['menu'])) {
+			$event->setMenu($data['menu']);
 		}
 	}
 
