@@ -113,6 +113,7 @@ class Display extends BaseSettings
 		$display_resharer        = (bool) $request['display_resharer'];
 		$stay_local              = (bool) $request['stay_local'];
 		$compact_timeline        = (bool) $request['compact_timeline'];
+		$hide_comments           = (bool) $request['hide_comments'];
 		$hide_empty_descriptions = (bool) $request['hide_empty_descriptions'];
 		$hide_custom_emojis      = (bool) $request['hide_custom_emojis'];
 		$platform_icon_style     = (int) $request['platform_icon_style'];
@@ -169,6 +170,7 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'display_resharer', $display_resharer);
 		$this->pConfig->set($uid, 'system', 'stay_local', $stay_local);
 		$this->pConfig->set($uid, 'system', 'compact_timeline', $compact_timeline);
+		$this->pConfig->set($uid, 'system', 'hide_comments', $hide_comments);
 		$this->pConfig->set($uid, 'system', 'show_page_drop', $show_page_drop);
 		$this->pConfig->set($uid, 'system', 'display_eventlist', $display_eventlist);
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
@@ -283,6 +285,7 @@ class Display extends BaseSettings
 		$display_resharer       = $this->pConfig->get($uid, 'system', 'display_resharer', false);
 		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', true);
 		$compact_timeline       = $this->pConfig->get($uid, 'system', 'compact_timeline', false);
+		$hide_comments          = $this->pConfig->get($uid, 'system', 'hide_comments', false);
 		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
 		$display_eventlist      = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
 		$embed_remote_media     = $this->pConfig->get($uid, 'system', 'embed_remote_media', false);
@@ -474,6 +477,7 @@ class Display extends BaseSettings
 			'$display_resharer'         => ['display_resharer', $this->t('Display the resharer'), $display_resharer, $this->t('Display the first resharer as icon and text on a reshared item.')],
 			'$stay_local'               => ['stay_local', $this->t('Stay local'), $stay_local, $this->t("Don't go to a remote system when following a contact link.")],
 			'$compact_timeline'         => ['compact_timeline', $this->t('Compact conversation view'), $compact_timeline, $this->t('Show only comments from the thread author and yourself that form coherent conversation threads. Hides replies to filtered-out comments.')],
+			'$hide_comments'            => ['hide_comments', $this->t('Hide Comments in Feeds'), $hide_comments, $this->t('Hides comments in feeds and makes post body clickable to open posts in a new page with any comments.')],
 			'$show_page_drop'           => ['show_page_drop', $this->t('Show the post deletion checkbox'), $show_page_drop, $this->t("Display the checkbox for the post deletion on the network page.")],
 			'$display_eventlist'        => ['display_eventlist', $this->t('Display the event list'), $display_eventlist, $this->t("Display the birthday reminder and event list on the network page.")],
 			'$preview_mode'             => ['preview_mode', $this->t('Link preview mode'), $preview_mode, $this->t('Appearance of the link preview that is added to each post with a link.'), $preview_modes, false],
