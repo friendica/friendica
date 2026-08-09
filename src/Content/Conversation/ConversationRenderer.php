@@ -185,7 +185,7 @@ final readonly class ConversationRenderer
 
 		$hide_comments = $uid && $this->pConfig->get($uid, 'system', 'hide_comments', false);
 
-		$html = $this->renderThreadedTemplate([$root], $mode, $update, $page_dropping);
+		$html = $this->renderThreadedTemplate([$root], $mode, $update, $page_dropping, $hide_comments);
 		$this->profiler->stopRecording();
 		return $live_update_div . $html;
 	}
@@ -355,7 +355,7 @@ final readonly class ConversationRenderer
 
 		$hide_comments = $uid && $this->pConfig->get($uid, 'system', 'hide_comments', false);
 
-		return $this->renderThreadedTemplate($roots, $mode, $update, $page_dropping);
+		return $this->renderThreadedTemplate($roots, $mode, $update, $page_dropping, $hide_comments);
 	}
 
 	/**
@@ -365,7 +365,7 @@ final readonly class ConversationRenderer
 	 * @param string $mode The rendering mode (e.g., self::MODE_DISPLAY)
 	 * @return string The rendered HTML of the conversation
 	 */
-	private function renderThreadedTemplate(array $threads, string $mode, bool $update, bool $pagedrop): string
+	private function renderThreadedTemplate(array $threads, string $mode, bool $update, bool $pagedrop, bool $hide_comments): string
 	{
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('threaded_conversation.tpl'), [
 			'$live_update'   => '',
