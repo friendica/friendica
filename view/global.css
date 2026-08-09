@@ -921,3 +921,50 @@ a:has(img.has-alt-description)::after {
 .edit-profile-link-wrapper {
 	text-align: center;
 }
+/* 	HIDE FEED COMMENTS
+	When the "Hide Comments" option is ticked in the Display options
+	the post body needs to become a clickable link to the post display
+	page, but any images, videos, or links need to still be clickable
+	too. The a.click-body element should never exist if comments are
+	not being hidden. There is already a .hide-comments so this uses
+	.hide-feed-comments on the .tread-wrapper so whole post can be
+	styled differently if desired.
+*/
+a.click-body {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+.hide-feed-comments .type-link,
+.hide-feed-comments .type-video,
+.hide-feed-comments .image-allocated-width,
+.hide-feed-comments .body-attach,
+.hide-feed-comments .imagegrid {
+	position: relative;
+	z-index: 1;
+}
+.hide-feed-comments .comment-fake-form,
+.hide-feed-comments .comment-edit-text-empty {
+	display: none !important;
+}
+.hide-feed-comments .plink-btn {
+	display: none;
+}
+/* not compatible with Compact Conversation View */
+.hide-feed-comments [id^="load-more-comments"] {
+	display: none !important;
+}
+	/* PHP and templates should handle this but here is a CSS fallback */
+	body.mod-display a.click-body {
+		display: none;
+	}
+	body.mod-display .comment-container {
+		display: block;
+	}
+	/* offer user a way to go back, especially if in PWA mode */
+	a.back-link {
+		font-size: 18px;
+	}
+/* end Hide Comments block */
