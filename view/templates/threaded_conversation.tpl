@@ -7,7 +7,7 @@
 {{$live_update nofilter}}
 {{foreach $threads as $thread}}
 <hr class="sr-only" />
-<div id="tread-wrapper-{{$thread.uriid}}" class="tread-wrapper {{if $thread.threaded}}threaded{{/if}}  {{$thread.toplevel}} {{if $thread.toplevel}}h-entry{{/if}} {{$thread.network}}">
+<div id="tread-wrapper-{{$thread.uriid}}" class="tread-wrapper {{if $thread.threaded}}threaded{{/if}}  {{$thread.toplevel}} {{if $thread.toplevel}}h-entry{{/if}} {{$thread.network}} {{if $hide_comments && $mode != display}}hide-feed-comments{{/if}}">
        
        
 		{{if $thread.type == tag}}
