@@ -28,7 +28,7 @@ window.addEventListener('spa:navigate', (e) => {
 {{/if}}
 {{$live_update nofilter}}
 {{foreach $threads as $thread}}
-<div id="tread-wrapper-{{$thread.uriid}}" class="tread-wrapper {{if $thread.threaded}}threaded{{/if}} {{$thread.toplevel}} {{$thread.network}} {{if $thread.thread_level==1}}panel-default panel{{/if}} {{if $thread.thread_level!=1}}comment-wrapper{{/if}}" style="{{if $item.thread_level>2}}margin-left: -15px; margin-right:-16px; margin-bottom:-16px;{{/if}}"><!-- panel -->
+<div id="tread-wrapper-{{$thread.uriid}}" class="tread-wrapper {{if $thread.threaded}}threaded{{/if}} {{$thread.toplevel}} {{$thread.network}} {{if $thread.thread_level==1}}panel-default panel{{/if}} {{if $thread.thread_level!=1}}comment-wrapper{{/if}} {{if $hide_comments && $mode != display}}hide-feed-comments{{/if}}" style="{{if $item.thread_level>2}}margin-left: -15px; margin-right:-16px; margin-bottom:-16px;{{/if}}"><!-- panel -->
 
 		{{* {{if $thread.type == tag}}
 			{{include file="wall_item_tag.tpl" item=$thread}}
