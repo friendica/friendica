@@ -4,6 +4,9 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
+{{if $mode == display}}
+<p><a href="#" class="back-link" title="{{$back_link}}"><i class="ri ri-arrow-left-long-line"></i> {{$back_link}}</a></p>
+{{/if}}
 {{$live_update nofilter}}
 {{foreach $threads as $thread}}
 <hr class="sr-only" />
@@ -39,7 +42,27 @@
 <script>
     var id = window.location.pathname.split("/").pop();
     $(window).scrollTop($('#item-'+id).position().top);
-    $('#item-'+id).animate(colWhite, 1000).animate(colShiny).animate(colWhite, 2000);   
+    $('#item-'+id).animate(colWhite, 1000).animate(colShiny).animate(colWhite, 2000);
+	$(function(){
+		// plinks to source are rel="noreferer noopener" in new tab
+		if (!window.opener && !document.referrer){
+			$('a.back-link').hide();
+		}
+	});
+    $('a.back-link').on('click',function(e){
+    	e.preventDefault();
+    		if (window.history.length === 1){
+    			if (document.referrer){
+    				window.location = document.referrer;
+    			} else if (window.opener) {
+    				window.location = window.opener;
+    			} else {
+    				// no idea where to go
+    			}
+    		} else {
+    			window.history.back();
+    		}
+    });
 </script>
 {{/if}}
 {{/if}}
