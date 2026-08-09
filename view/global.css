@@ -930,13 +930,20 @@ a:has(img.has-alt-description)::after {
 	.hide-feed-comments on the .tread-wrapper so whole post can be
 	styled differently if desired.
 */
-a.click-body {
+a.click-body,
+.hide-feed-comments .shared-wrapper a.plink {
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
 }
+	.hide-feed-comments .shared-wrapper a.plink img {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+	}
+.hide-feed-comments .shared-wrapper,
 .hide-feed-comments .type-link,
 .hide-feed-comments .type-video,
 .hide-feed-comments .image-allocated-width,
