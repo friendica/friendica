@@ -4,6 +4,28 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
+{{* This is a little bit hacky. This is needed to have some sort comments container.
+It would be better if it would be done in friendica core but since core lacks this functionality
+it is done in the theme
+
+In short: the piece of code counts the total number of children of the toplevelpost
+- this are usually all posts with thread_level = 2 - and stores it in variable $top_children_total.
+The first time a children which hits thread_level = 2 and $top_child = 1 opens the div.
+
+Everytime when a children with top_level = 2 comes up $top_child_nr rises with 1.
+The div get's closed if thread_level = 2 and the value of $top_child_nr is the same
+as the value of $top_child_total (this is done at the end of this file)
+*}}
+{{if $item.thread_level==1}}
+	{{assign var="top_child_total" value=count($item.children)}}
+	{{assign var="top_child_nr" value=0}}
+{{/if}}
+{{if $item.thread_level==2}}
+	{{assign var="top_child_nr" value=$top_child_nr+1 scope=parent}}
+{{/if}}
+{{if $item.thread_level==2 && $top_child_nr==1}}
+<div class="comment-container {{if !$item.not_smart_threaded}} smart-threaded{{/if}}"> <!--top-child-begin-->
+{{/if}}
 {{if $mode == display}}
 {{else}}
 {{if $item.comment_firstcollapsed}}
@@ -83,6 +105,7 @@
 						</div>
 
 						<div itemprop="description" class="wall-item-content">
+							{{if $item.plink && $hide_comments && $mode != display}}<a href="{{$item.plink.href}}" class="click-body"></a>{{/if}}
                             {{if $item.title}}<h2 dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name" dir="auto">{{$item.title}}</a></h2>{{/if}}
 							{{if $item.summary}}<summary class="wall-item-summary" id="wall-item-summary-{{$item.id}}">{{$item.summary}}</summary>{{/if}}
 							<div class="wall-item-body e-content {{if !$item.title}}p-name{{/if}}" dir="auto">{{$item.body_html nofilter}}</div>
@@ -229,13 +252,17 @@
 				</div>
                 {{/if}}
 
-                {{foreach $item.children as $child}}
-                    {{if $item.type == tag}}
-                        {{include file="wall_item_tag.tpl" item=$child}}
-                    {{else}}
-                        {{include file="{{$item.template}}" item=$child}}
-                    {{/if}}
-                {{/foreach}}
+				{{if $mode != display && $hide_comments}}
+					{{* do not even create comments *}}
+				{{else}}
+                	{{foreach $item.children as $child}}
+                    	{{if $item.type == tag}}
+                        	{{include file="wall_item_tag.tpl" item=$child}}
+                    	{{else}}
+                        	{{include file="{{$item.template}}" item=$child}}
+                    	{{/if}}
+                	{{/foreach}}
+				{{/if}}
 
                 {{if $item.thread_level!=1}}</div>{{/if}}
 
@@ -262,3 +289,7 @@
 				<div class="wall-item-comment-wrapper" id="item-comments-{{$item.id}}" style="display: none;">{{$item.comment_html nofilter}}</div>
             {{/if}}
         {{/if}}
+{{* close the comment-container div if no more thread_level = 2 children are left *}}
+{{if $item.thread_level==2 && $top_child_nr==$top_child_total}}
+</div><!--./comment-container-->
+{{/if}}
