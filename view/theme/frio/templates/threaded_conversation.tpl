@@ -4,6 +4,9 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
+{{if $mode == display}}
+<p><a href="#" class="back-link" title="{{$back_link}}"><i class="ri ri-arrow-left-long-line"></i> {{$back_link}}</a></p>
+{{/if}}
 {{if !$update}}<script type="text/javascript" src="view/theme/frio/frameworks/jquery-color/jquery.color.js?v={{$VERSION}}"></script>{{/if}}
 {{if $mode == display}}
 <script type="text/javascript">
@@ -47,4 +50,28 @@ window.addEventListener('spa:navigate', (e) => {
       <span>{{$dropping}}</span>
     </button>
   {{/if}}
+{{/if}}
+{{if $mode == display}}
+<script>
+	$(function(){
+		// plinks to source are rel="noreferer noopener" in new tab
+		if (!window.opener && !document.referrer){
+			$('a.back-link').hide();
+		}
+	});
+    $('a.back-link').on('click',function(e){
+    	e.preventDefault();
+    		if (window.history.length === 1){
+    			if (document.referrer){
+    				window.location = document.referrer;
+    			} else if (window.opener) {
+    				window.location = window.opener;
+    			} else {
+    				// no idea where to go
+    			}
+    		} else {
+    			window.history.back();
+    		}
+    });    
+</script>
 {{/if}}
