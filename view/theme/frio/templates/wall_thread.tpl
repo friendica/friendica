@@ -26,7 +26,7 @@ as the value of $top_child_total (this is done at the end of this file)
 {{/if}}
 
 {{if $item.thread_level==2 && $top_child_nr==1}}
-<div class="comment-container"> <!--top-child-begin-->
+<div class="comment-container{{if !$not_smart_threaded}} smart-threaded{{/if}}"> <!--top-child-begin-->
 {{/if}}
 {{* end of hacky part to count children *}}
 
@@ -270,6 +270,7 @@ as the value of $top_child_total (this is done at the end of this file)
 
 		{{* item content *}}
 		<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}" lang="{{$item.lang}}">
+			{{if $item.plink && $hide_comments && $mode != display}}<a href="{{$item.plink.href}}" class="click-body"></a>{{/if}}
 			{{if $item.title}}
 			<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h3 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name" target="_blank">{{$item.title}}</a></h3><br /></span>
 			{{/if}}
@@ -777,11 +778,13 @@ as the value of $top_child_total (this is done at the end of this file)
 		<span id="load-more-loading-{{$item.id}}" class="loading-text" style="display: none;">{{$item.loading}} <img class="like-rotator" src="images/rotator.gif" alt="{{$item.loading}}" /></span>
 	</div>
 	{{/if}}
-
-	{{foreach $item.children as $child}}
-		{{include file="{{$item.template}}" item=$child}}
-	{{/foreach}}
-
+	{{if $mode != display && $hide_comments}}
+		{{* do not even create comments *}}
+	{{else}}
+		{{foreach $item.children as $child}}
+			{{include file="{{$item.template}}" item=$child}}
+		{{/foreach}}
+	{{/if}}
 	{{* Insert the comment box of the top level post at the bottom of the thread.
 		Display this comment box if there are any comments. If not hide it. In this
 		case it could be opend with the "comment" button *}}
