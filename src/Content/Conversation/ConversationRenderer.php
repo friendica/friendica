@@ -183,6 +183,8 @@ final readonly class ConversationRenderer
 			return '';
 		}
 
+		$hide_comments = $uid && $this->pConfig->get($uid, 'system', 'hide_comments', false);
+
 		$html = $this->renderThreadedTemplate([$root], $mode, $update, $page_dropping);
 		$this->profiler->stopRecording();
 		return $live_update_div . $html;
@@ -351,6 +353,8 @@ final readonly class ConversationRenderer
 			return '';
 		}
 
+		$hide_comments = $uid && $this->pConfig->get($uid, 'system', 'hide_comments', false);
+
 		return $this->renderThreadedTemplate($roots, $mode, $update, $page_dropping);
 	}
 
@@ -364,11 +368,13 @@ final readonly class ConversationRenderer
 	private function renderThreadedTemplate(array $threads, string $mode, bool $update, bool $pagedrop): string
 	{
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('threaded_conversation.tpl'), [
-			'$live_update' => '',
-			'$mode'        => $mode,
-			'$update'      => $update,
-			'$threads'     => $threads,
-			'$dropping'    => ($pagedrop ? $this->l10n->t('Delete Selected Items') : false),
+			'$live_update'   => '',
+			'$mode'          => $mode,
+			'$update'        => $update,
+			'$threads'       => $threads,
+			'$dropping'      => ($pagedrop ? $this->l10n->t('Delete Selected Items') : false),
+			'$hide_comments' => $hide_comments,
+			'$back_link'     => $this->l10n->t('Go Back'),
 		]);
 	}
 
