@@ -27,6 +27,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `conversation_start` | `\Friendica\Event\ConversationStartEvent` |
 | `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
 | `follow` | `\Friendica\Event\FollowContactEvent` |
+| `unfollow` | `\Friendica\Event\UnfollowContactEvent` |
 | `tagged` | `\Friendica\Event\ItemTaggedEvent` |
 | `item_photo_menu` | `\Friendica\Event\ItemPhotoMenuEvent` |
 | `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
@@ -355,6 +356,18 @@ Fired before adding a new contact for a user, to handle non-native network remot
 **Modifiable:**
 - `setContactArray(array $contact): void` — set the contact record
 - `setAborted(): void` — abort the follow process
+
+### `\Friendica\Event\UnfollowContactEvent`
+
+Fired before unfollowing a remote contact for a user, to handle non-native network remote contact (like the AT Protocol).
+
+**Contained data:**
+- `getContactArray(): array` — the target public contact record (uid = 0) (read-only)
+- `getUid(): int` — the ID of the source local user (read-only)
+- `getResult(): ?bool` — `null` by default, `true` if the unfollow was successful, `false` if not
+
+**Modifiable:**
+- `setResult(?bool $result): void` — report whether the unfollow was successful
 
 ### `\Friendica\Event\ItemTaggedEvent`
 

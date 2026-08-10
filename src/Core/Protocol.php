@@ -10,6 +10,7 @@ namespace Friendica\Core;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\UnfollowContactEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
@@ -177,20 +178,13 @@ class Protocol
 			return ActivityPub\Transmitter::sendContactUndo($contact['url'], $contact['id'], $owner);
 		}
 
-		// Catch-all hook for connector addons
-		$hook_data = [
-			'contact' => $contact,
-			'uid'     => $owner['uid'],
-			'result'  => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::UNFOLLOW_CONTACT, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new UnfollowContactEvent($contact, $owner['uid']),
+		);
 
-		return $hook_data['result'];
+		return $event->getResult();
 	}
 
 	/**

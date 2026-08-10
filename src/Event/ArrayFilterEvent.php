@@ -40,8 +40,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const PROTOCOL_SUPPORTS_PROBE = 'friendica.data.protocol_supports_probe';
 
-	public const UNFOLLOW_CONTACT = 'friendica.data.unfollow_contact';
-
 	public const REVOKE_FOLLOW_CONTACT = 'friendica.data.revoke_follow_contact';
 
 	public const BLOCK_CONTACT = 'friendica.data.block_contact';

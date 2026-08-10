@@ -73,6 +73,7 @@ use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\SmileyListEvent;
 use Friendica\Event\TemplateVarsEvent;
+use Friendica\Event\UnfollowContactEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -190,7 +191,7 @@ final class HookEventBridge
 		ArrayFilterEvent::STORAGE_INSTANCE                => 'storage_instance',
 		TemplateVarsEvent::NAME                           => 'template_vars',
 		ArrayFilterEvent::UNBLOCK_CONTACT                 => 'unblock',
-		ArrayFilterEvent::UNFOLLOW_CONTACT                => 'unfollow',
+		UnfollowContactEvent::NAME                        => 'unfollow',
 		ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'uexport_options',
 		ZrlInitEvent::NAME                                => 'zrl_init',
 		HtmlFilterEvent::HEAD                             => 'head',
@@ -308,7 +309,7 @@ final class HookEventBridge
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
 			TemplateVarsEvent::NAME                           => 'onTemplateVarsEvent',
 			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::UNFOLLOW_CONTACT                => 'onArrayFilterEvent',
+			UnfollowContactEvent::NAME                        => 'onUnfollowContactEvent',
 			ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'onArrayFilterEvent',
 			ZrlInitEvent::NAME                                => 'onZrlInitEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END                => 'onHtmlFilterEvent',
@@ -1062,6 +1063,24 @@ final class HookEventBridge
 
 		if (isset($data['vars'])) {
 			$event->setVars($data['vars']);
+		}
+	}
+
+	/**
+	 * Map the UnfollowContactEvent to `unfollow` hook
+	 */
+	public static function onUnfollowContactEvent(UnfollowContactEvent $event): void
+	{
+		$hook_data = [
+			'contact' => $event->getContactArray(),
+			'uid'     => $event->getUid(),
+			'result'  => $event->getResult(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['result'])) {
+			$event->setResult((bool) $hook_data['result']);
 		}
 	}
 
