@@ -17,22 +17,22 @@ class PhotoUploadEndEventTest extends TestCase
 {
 	public function testImplementationOfNamedEvent(): void
 	{
-		$event = new PhotoUploadEndEvent(0);
+		$event = new PhotoUploadEndEvent('');
 
 		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
 	}
 
 	public function testGetNameReturnsName(): void
 	{
-		$event = new PhotoUploadEndEvent(0);
+		$event = new PhotoUploadEndEvent('');
 
 		$this->assertSame(PhotoUploadEndEvent::NAME, $event->getName());
 	}
 
 	public function testGetId(): void
 	{
-		$event = new PhotoUploadEndEvent(42);
+		$event = new PhotoUploadEndEvent('abc123');
 
-		$this->assertSame(42, $event->getId());
+		$this->assertSame('abc123', $event->getId());
 	}
 }

@@ -806,13 +806,13 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
-		$event = new PhotoUploadEndEvent(-1);
+		$event = new PhotoUploadEndEvent('abc123');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
-		$reflectionProperty->setValue(null, function (string $name, int $data): int {
+		$reflectionProperty->setValue(null, function (string $name, string $data): int {
 			$this->assertSame('photo_post_end', $name);
-			$this->assertSame(-1, $data);
+			$this->assertSame('abc123', $data);
 
 			return 123;
 		});

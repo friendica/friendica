@@ -159,7 +159,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			}
 
 			$this->eventDispatcher->dispatch(
-				new PhotoUploadEndEvent(0),
+				new PhotoUploadEndEvent(''),
 			);
 
 			return;
@@ -174,7 +174,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			@unlink($src);
 
 			$this->eventDispatcher->dispatch(
-				new PhotoUploadEndEvent(0),
+				new PhotoUploadEndEvent(''),
 			);
 
 			return;
@@ -185,7 +185,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			@unlink($src);
 
 			$this->eventDispatcher->dispatch(
-				new PhotoUploadEndEvent(0),
+				new PhotoUploadEndEvent(''),
 			);
 
 			return;
@@ -203,7 +203,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			@unlink($src);
 
 			$this->eventDispatcher->dispatch(
-				new PhotoUploadEndEvent(0),
+				new PhotoUploadEndEvent(''),
 			);
 
 			return;
@@ -223,7 +223,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			$this->logger->warning('image store failed');
 			$this->systemMessages->addNotice($this->t('Image upload failed.'));
 			$this->eventDispatcher->dispatch(
-				new PhotoUploadEndEvent(0),
+				new PhotoUploadEndEvent(''),
 			);
 			return;
 		}

@@ -676,7 +676,7 @@ Fired when a photo upload is being processed.
 Fired after a photo upload has been processed.
 
 **Contained data:**
-- `getId(): int` — the resource ID of the uploaded photo, `0` if the upload failed (read-only)
+- `getId(): string` — the resource ID of the uploaded photo, empty string if the upload failed (read-only)
 
 ### `\Friendica\Event\PhotoUploadFormEvent`
 

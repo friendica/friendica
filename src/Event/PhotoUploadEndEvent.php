@@ -23,15 +23,15 @@ final class PhotoUploadEndEvent extends AbstractEvent
 	/**
 	 * @internal
 	 *
-	 * @param int $id The resource ID of the uploaded photo, 0 if the upload failed
+	 * @param string $id The resource ID of the uploaded photo, empty string if the upload failed
 	 */
 	public function __construct(
-		private readonly int $id,
+		private readonly string $id,
 	) {
 		parent::__construct(self::NAME);
 	}
 
-	public function getId(): int
+	public function getId(): string
 	{
 		return $this->id;
 	}

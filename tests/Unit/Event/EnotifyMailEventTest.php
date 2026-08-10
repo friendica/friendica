@@ -17,21 +17,52 @@ class EnotifyMailEventTest extends TestCase
 {
 	public function testImplementationOfNamedEvent(): void
 	{
-		$event = new EnotifyMailEvent(['uid' => 42]);
+		$event = new EnotifyMailEvent($this->createData());
 
 		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
 	}
 
 	public function testGetNameReturnsName(): void
 	{
-		$event = new EnotifyMailEvent(['uid' => 42]);
+		$event = new EnotifyMailEvent($this->createData());
 
 		$this->assertSame(EnotifyMailEvent::NAME, $event->getName());
 	}
 
 	public function testGetDataArray(): void
 	{
-		$data = [
+		$data = $this->createData();
+
+		$event = new EnotifyMailEvent($data);
+
+		$this->assertSame($data, $event->getDataArray());
+	}
+
+	public function testSetDataArray(): void
+	{
+		$event = new EnotifyMailEvent($this->createData());
+
+		$data                 = $this->createData();
+		$data['preamble']     = 'Changed preamble';
+		$data['type']         = 2;
+		$data['parent']       = 8;
+		$data['source_name']  = 'Changed name';
+		$data['source_link']  = 'https://example.com/changed';
+		$data['source_photo'] = 'https://example.com/changed-photo';
+		$data['title']        = 'Changed title';
+		$data['body']         = 'Changed body';
+		$data['subject']      = 'Changed subject';
+		$data['headers']      = ['Message-ID' => ['<changed@example.com>']];
+
+		$event->setDataArray($data);
+
+		$this->assertSame($data, $event->getDataArray());
+	}
+
+	/** @return array{preamble: string, type: int, parent: int, source_name: ?string, source_link: ?string, source_photo: ?string, uid: int, hsitelink: string, tsitelink: string, itemlink: string, title: string, body: string, subject: string, headers: array<string, array<string>>} */
+	private function createData(): array
+	{
+		return [
 			'preamble'     => 'Preamble',
 			'type'         => 1,
 			'parent'       => 7,
@@ -47,23 +78,5 @@ class EnotifyMailEventTest extends TestCase
 			'subject'      => 'Subject',
 			'headers'      => ['Message-ID' => ['<abc@example.com>']],
 		];
-
-		$event = new EnotifyMailEvent($data);
-
-		$this->assertSame($data, $event->getDataArray());
-	}
-
-	public function testSetDataArray(): void
-	{
-		$event = new EnotifyMailEvent(['uid' => 42]);
-
-		$data = [
-			'uid'     => 42,
-			'subject' => 'Changed subject',
-		];
-
-		$event->setDataArray($data);
-
-		$this->assertSame($data, $event->getDataArray());
 	}
 }
