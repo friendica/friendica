@@ -36,7 +36,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'friendica.data.protocol_supports_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'friendica.data.protocol_supports_revoke_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'friendica.data.protocol_supports_probe'],
-			[ArrayFilterEvent::BLOCK_CONTACT, 'friendica.data.block_contact'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'friendica.data.unblock_contact'],
 			[ArrayFilterEvent::AVATAR_LOOKUP, 'friendica.data.avatar_lookup'],
 			[ArrayFilterEvent::EVENT_CREATED, 'friendica.data.event_created'],

@@ -20,6 +20,7 @@ use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
 use Friendica\Event\BbcodeToMarkdownEndEvent;
+use Friendica\Event\BlockContactEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
@@ -114,7 +115,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
 			BbcodeToHtmlStartEvent::NAME                      => 'onBbcodeToHtmlEvent',
 			BbcodeToMarkdownEndEvent::NAME                    => 'onBbcodeToMarkdownEndEvent',
-			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
+			BlockContactEvent::NAME                           => 'onBlockContactEvent',
 			CacheItemEvent::NAME                              => 'onCacheItemEvent',
 			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
@@ -1151,7 +1152,7 @@ class HookEventBridgeTest extends TestCase
 			[FollowContactEvent::NAME, 'follow'],
 			[UnfollowContactEvent::NAME, 'unfollow'],
 			[RevokeFollowContactEvent::NAME, 'revoke_follow'],
-			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
+			[BlockContactEvent::NAME, 'block'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
 			[EditContactFormEvent::NAME, 'contact_edit'],
 			[EditContactPostEvent::NAME, 'contact_edit_post'],

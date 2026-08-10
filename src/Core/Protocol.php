@@ -10,6 +10,7 @@ namespace Friendica\Core;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\BlockContactEvent;
 use Friendica\Event\RevokeFollowContactEvent;
 use Friendica\Event\UnfollowContactEvent;
 use Friendica\Model\User;
@@ -248,20 +249,13 @@ class Protocol
 			return ActivityPub\Transmitter::sendActivity('Block', $contact['url'], $uid, $activity_id);
 		}
 
-		// Catch-all hook for connector addons
-		$hook_data = [
-			'contact' => $contact,
-			'uid'     => $uid,
-			'result'  => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::BLOCK_CONTACT, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new BlockContactEvent($contact, $uid),
+		);
 
-		return $hook_data['result'];
+		return $event->getResult();
 	}
 
 	/**

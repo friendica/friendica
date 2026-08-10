@@ -18,6 +18,7 @@ use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
 use Friendica\Event\BbcodeToMarkdownEndEvent;
+use Friendica\Event\BlockContactEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
@@ -112,7 +113,7 @@ final class HookEventBridge
 		ArrayFilterEvent::AVATAR_LOOKUP                   => 'avatar_lookup',
 		BbcodeToHtmlStartEvent::NAME                      => 'bbcode',
 		BbcodeToMarkdownEndEvent::NAME                    => 'bb2diaspora',
-		ArrayFilterEvent::BLOCK_CONTACT                   => 'block',
+		BlockContactEvent::NAME                           => 'block',
 		CacheItemEvent::NAME                              => 'put_item_in_cache',
 		CheckItemNotificationEvent::NAME                  => 'check_item_notification',
 		ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'connector_settings_post',
@@ -230,7 +231,7 @@ final class HookEventBridge
 			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
 			BbcodeToHtmlStartEvent::NAME                      => 'onBbcodeToHtmlEvent',
 			BbcodeToMarkdownEndEvent::NAME                    => 'onBbcodeToMarkdownEndEvent',
-			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
+			BlockContactEvent::NAME                           => 'onBlockContactEvent',
 			CacheItemEvent::NAME                              => 'onCacheItemEvent',
 			CheckItemNotificationEvent::NAME                  => 'onCheckItemNotificationEvent',
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
@@ -834,6 +835,24 @@ final class HookEventBridge
 		$event->setBbcode2markdown(
 			static::callHook($event->getName(), $event->getBbcode2markdown()),
 		);
+	}
+
+	/**
+	 * Map the BlockContactEvent to `block` hook
+	 */
+	public static function onBlockContactEvent(BlockContactEvent $event): void
+	{
+		$hook_data = [
+			'contact' => $event->getContactArray(),
+			'uid'     => $event->getUid(),
+			'result'  => $event->getResult(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['result'])) {
+			$event->setResult((bool) $hook_data['result']);
+		}
 	}
 
 	/**
