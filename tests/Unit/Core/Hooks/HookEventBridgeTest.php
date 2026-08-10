@@ -32,6 +32,7 @@ use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\FetchItemByLinkEvent;
+use Friendica\Event\FollowContactEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\ItemPhotoMenuEvent;
@@ -137,7 +138,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::FEATURE_ENABLED                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
 			FetchItemByLinkEvent::NAME                        => 'onFetchItemByLinkEvent',
-			ArrayFilterEvent::FOLLOW_CONTACT                  => 'onArrayFilterEvent',
+			FollowContactEvent::NAME                          => 'onFollowContactEvent',
 			ArrayFilterEvent::GENERATE_MAP                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP              => 'onArrayFilterEvent',
 			ArrayFilterEvent::GET_SITE_INFO                   => 'onArrayFilterEvent',
@@ -345,6 +346,51 @@ class HookEventBridgeTest extends TestCase
 			['hidden' => false],
 			$event->getRequestArray(),
 		);
+	}
+
+	public function testOnFollowContactEventCallsHookWithCorrectValue(): void
+	{
+		$event = new FollowContactEvent('https://example.com/profile', 42, []);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('follow', $name);
+			$this->assertSame([
+				'url'     => 'https://example.com/profile',
+				'uid'     => 42,
+				'contact' => [],
+			], $data);
+
+			return [
+				'url'     => 'https://example.com/profile',
+				'uid'     => 42,
+				'contact' => ['name' => 'contact'],
+			];
+		});
+
+		HookEventBridge::onFollowContactEvent($event);
+
+		$this->assertFalse($event->isAborted());
+		$this->assertSame(['name' => 'contact'], $event->getContactArray());
+	}
+
+	public function testOnFollowContactEventSetsAbortedOnEmptyHookData(): void
+	{
+		$event = new FollowContactEvent('https://example.com/profile', 42, []);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('follow', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onFollowContactEvent($event);
+
+		$this->assertTrue($event->isAborted());
+		$this->assertSame([], $event->getContactArray());
 	}
 
 	public static function getCollectRoutesEventData(): array
@@ -1100,7 +1146,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'support_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'support_revoke_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'support_probe'],
-			[ArrayFilterEvent::FOLLOW_CONTACT, 'follow'],
+			[FollowContactEvent::NAME, 'follow'],
 			[ArrayFilterEvent::UNFOLLOW_CONTACT, 'unfollow'],
 			[ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, 'revoke_follow'],
 			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],

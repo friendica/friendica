@@ -22,6 +22,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
+use Friendica\Event\FollowContactEvent;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPException\NotFoundException;
@@ -3148,22 +3149,20 @@ class Contact
 			return $result;
 		}
 
-		$arr = ['url' => $url, 'uid' => $uid, 'contact' => []];
+		$event = DI::eventDispatcher()->dispatch(
+			new FollowContactEvent($url, $uid, []),
+		);
 
-		$eventDispatcher = DI::eventDispatcher();
-
-		$arr = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::FOLLOW_CONTACT, $arr),
-		)->getArray();
-
-		if (empty($arr)) {
+		if ($event->isAborted()) {
 			$result['message'] = DI::l10n()->t('The contact could not be added. Please check the relevant network credentials in your Settings -> Social Networks page.');
 			return $result;
 		}
 
-		if (!empty($arr['contact']['name'])) {
+		$contact = $event->getContactArray();
+
+		if (!empty($contact['name'])) {
 			$probed = false;
-			$ret    = $arr['contact'];
+			$ret    = $contact;
 		} else {
 			$probed = true;
 			$ret    = Probe::uri($url, $network, $uid);

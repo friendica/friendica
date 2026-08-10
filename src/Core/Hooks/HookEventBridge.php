@@ -30,6 +30,7 @@ use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\FetchItemByLinkEvent;
+use Friendica\Event\FollowContactEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalStartEvent;
@@ -135,7 +136,7 @@ final class HookEventBridge
 		ArrayFilterEvent::FEATURE_ENABLED                 => 'isEnabled',
 		ArrayFilterEvent::FEATURE_GET                     => 'get',
 		FetchItemByLinkEvent::NAME                        => 'item_by_link',
-		ArrayFilterEvent::FOLLOW_CONTACT                  => 'follow',
+		FollowContactEvent::NAME                          => 'follow',
 		ArrayFilterEvent::GENERATE_MAP                    => 'generate_map',
 		ArrayFilterEvent::GENERATE_NAMED_MAP              => 'generate_named_map',
 		ArrayFilterEvent::GET_SITE_INFO                   => 'getsiteinfo',
@@ -253,7 +254,7 @@ final class HookEventBridge
 			ArrayFilterEvent::FEATURE_ENABLED                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
 			FetchItemByLinkEvent::NAME                        => 'onFetchItemByLinkEvent',
-			ArrayFilterEvent::FOLLOW_CONTACT                  => 'onArrayFilterEvent',
+			FollowContactEvent::NAME                          => 'onFollowContactEvent',
 			ArrayFilterEvent::GENERATE_MAP                    => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP              => 'onArrayFilterEvent',
 			ArrayFilterEvent::GET_SITE_INFO                   => 'onArrayFilterEvent',
@@ -410,6 +411,27 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setItemId(isset($hook_data['item_id']) ? (int) $hook_data['item_id'] : null);
+	}
+
+	/**
+	 * Map the FollowContactEvent to `follow` hook
+	 */
+	public static function onFollowContactEvent(FollowContactEvent $event): void
+	{
+		$hook_data = [
+			'url'     => $event->getUrl(),
+			'uid'     => $event->getUid(),
+			'contact' => $event->getContactArray(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (empty($hook_data)) {
+			$event->setAborted();
+			return;
+		}
+
+		$event->setContactArray($hook_data['contact'] ?? $event->getContactArray());
 	}
 
 	/**

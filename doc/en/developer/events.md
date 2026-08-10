@@ -26,6 +26,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `check_item_notification` | `\Friendica\Event\CheckItemNotificationEvent` |
 | `conversation_start` | `\Friendica\Event\ConversationStartEvent` |
 | `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
+| `follow` | `\Friendica\Event\FollowContactEvent` |
 | `tagged` | `\Friendica\Event\ItemTaggedEvent` |
 | `item_photo_menu` | `\Friendica\Event\ItemPhotoMenuEvent` |
 | `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
@@ -340,6 +341,20 @@ Fired when trying to probe an item from a given URI.
 
 **Modifiable:**
 - `setItemId(?int $itemId): void` — set the fetched item ID
+
+### `\Friendica\Event\FollowContactEvent`
+
+Fired before adding a new contact for a user, to handle non-native network remote contact (like the AT Protocol).
+
+**Contained data:**
+- `getUrl(): string` — the URL of the remote contact (read-only)
+- `getUid(): int` — the ID of the local user adding the contact (read-only)
+- `getContactArray(): array` — the contact record, filled if the follow was successful
+- `isAborted(): bool` — whether an addon aborted the follow process
+
+**Modifiable:**
+- `setContactArray(array $contact): void` — set the contact record
+- `setAborted(): void` — abort the follow process
 
 ### `\Friendica\Event\ItemTaggedEvent`
 
