@@ -71,6 +71,7 @@ use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\RenderLocationEvent;
+use Friendica\Event\RevokeFollowContactEvent;
 use Friendica\Event\SmileyListEvent;
 use Friendica\Event\TemplateVarsEvent;
 use Friendica\Event\UnfollowContactEvent;
@@ -185,7 +186,7 @@ final class HookEventBridge
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'support_probe',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'support_revoke_follow',
 		RenderLocationEvent::NAME                         => 'render_location',
-		ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'revoke_follow',
+		RevokeFollowContactEvent::NAME                    => 'revoke_follow',
 		SmileyListEvent::NAME                             => 'smilie',
 		ArrayFilterEvent::STORAGE_CONFIG                  => 'storage_config',
 		ArrayFilterEvent::STORAGE_INSTANCE                => 'storage_instance',
@@ -303,7 +304,7 @@ final class HookEventBridge
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
 			RenderLocationEvent::NAME                         => 'onRenderLocationEvent',
-			ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'onArrayFilterEvent',
+			RevokeFollowContactEvent::NAME                    => 'onRevokeFollowContactEvent',
 			SmileyListEvent::NAME                             => 'onSmileyListEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
@@ -1028,6 +1029,24 @@ final class HookEventBridge
 
 		if (isset($data['html'])) {
 			$event->setHtml($data['html']);
+		}
+	}
+
+	/**
+	 * Map the RevokeFollowContactEvent to `revoke_follow` hook
+	 */
+	public static function onRevokeFollowContactEvent(RevokeFollowContactEvent $event): void
+	{
+		$hook_data = [
+			'contact' => $event->getContactArray(),
+			'uid'     => $event->getUid(),
+			'result'  => $event->getResult(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['result'])) {
+			$event->setResult((bool) $hook_data['result']);
 		}
 	}
 

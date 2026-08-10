@@ -80,6 +80,7 @@ use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Event\ZrlInitEvent;
 use Friendica\Event\UnfollowContactEvent;
+use Friendica\Event\RevokeFollowContactEvent;
 use PHPUnit\Framework\TestCase;
 
 class HookEventBridgeTest extends TestCase
@@ -187,7 +188,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
 			RenderLocationEvent::NAME                         => 'onRenderLocationEvent',
-			ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'onArrayFilterEvent',
+			RevokeFollowContactEvent::NAME                    => 'onRevokeFollowContactEvent',
 			SmileyListEvent::NAME                             => 'onSmileyListEvent',
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
@@ -1149,7 +1150,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'support_probe'],
 			[FollowContactEvent::NAME, 'follow'],
 			[UnfollowContactEvent::NAME, 'unfollow'],
-			[ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, 'revoke_follow'],
+			[RevokeFollowContactEvent::NAME, 'revoke_follow'],
 			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
 			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
 			[EditContactFormEvent::NAME, 'contact_edit'],

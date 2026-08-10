@@ -10,6 +10,7 @@ namespace Friendica\Core;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\RevokeFollowContactEvent;
 use Friendica\Event\UnfollowContactEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
@@ -211,20 +212,13 @@ class Protocol
 			return ActivityPub\Transmitter::sendContactReject($contact['url'], $contact['hub-verify'], $owner);
 		}
 
-		// Catch-all hook for connector addons
-		$hook_data = [
-			'contact' => $contact,
-			'uid'     => $owner['uid'],
-			'result'  => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new RevokeFollowContactEvent($contact, $owner['uid']),
+		);
 
-		return $hook_data['result'];
+		return $event->getResult();
 	}
 
 	/**

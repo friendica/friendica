@@ -28,6 +28,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
 | `follow` | `\Friendica\Event\FollowContactEvent` |
 | `unfollow` | `\Friendica\Event\UnfollowContactEvent` |
+| `revoke_follow` | `\Friendica\Event\RevokeFollowContactEvent` |
 | `tagged` | `\Friendica\Event\ItemTaggedEvent` |
 | `item_photo_menu` | `\Friendica\Event\ItemPhotoMenuEvent` |
 | `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
@@ -368,6 +369,18 @@ Fired before unfollowing a remote contact for a user, to handle non-native netwo
 
 **Modifiable:**
 - `setResult(?bool $result): void` — report whether the unfollow was successful
+
+### `\Friendica\Event\RevokeFollowContactEvent`
+
+Fired before revoking an incoming follow for a user, to handle non-native network remote contact (like the AT Protocol).
+
+**Contained data:**
+- `getContactArray(): array` — the target public contact record (uid = 0) (read-only)
+- `getUid(): int` — the ID of the source local user (read-only)
+- `getResult(): ?bool` — `null` by default, `true` if the revocation was successful, `false` if not
+
+**Modifiable:**
+- `setResult(?bool $result): void` — report whether the revocation was successful
 
 ### `\Friendica\Event\ItemTaggedEvent`
 
