@@ -12,6 +12,7 @@ use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\BlockContactEvent;
 use Friendica\Event\RevokeFollowContactEvent;
+use Friendica\Event\UnblockContactEvent;
 use Friendica\Event\UnfollowContactEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
@@ -286,20 +287,13 @@ class Protocol
 			return ActivityPub\Transmitter::sendContactUnblock($contact['url'], $contact['id'], $owner);
 		}
 
-		// Catch-all hook for connector addons
-		$hook_data = [
-			'contact' => $contact,
-			'uid'     => $uid,
-			'result'  => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::UNBLOCK_CONTACT, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new UnblockContactEvent($contact, $uid),
+		);
 
-		return $hook_data['result'];
+		return $event->getResult();
 	}
 
 	/**

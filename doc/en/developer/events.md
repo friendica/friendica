@@ -30,6 +30,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `unfollow` | `\Friendica\Event\UnfollowContactEvent` |
 | `revoke_follow` | `\Friendica\Event\RevokeFollowContactEvent` |
 | `block` | `\Friendica\Event\BlockContactEvent` |
+| `unblock` | `\Friendica\Event\UnblockContactEvent` |
 | `tagged` | `\Friendica\Event\ItemTaggedEvent` |
 | `item_photo_menu` | `\Friendica\Event\ItemPhotoMenuEvent` |
 | `directory_item` | `\Friendica\Event\DirectoryItemEvent` |
@@ -394,6 +395,18 @@ Fired before blocking a remote contact for a user, to handle non-native network 
 
 **Modifiable:**
 - `setResult(?bool $result): void` — report whether the block was successful
+
+### `\Friendica\Event\UnblockContactEvent`
+
+Fired before unblocking a remote contact for a user, to handle non-native network remote contact (like the AT Protocol).
+
+**Contained data:**
+- `getContactArray(): array` — the remote contact record (uid = 0) (read-only)
+- `getUid(): int` — the ID of the user revoking the block (read-only)
+- `getResult(): ?bool` — `null` by default, `true` if the unblock was successful, `false` if not
+
+**Modifiable:**
+- `setResult(?bool $result): void` — report whether the unblock was successful
 
 ### `\Friendica\Event\ItemTaggedEvent`
 

@@ -75,6 +75,7 @@ use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\RevokeFollowContactEvent;
 use Friendica\Event\SmileyListEvent;
 use Friendica\Event\TemplateVarsEvent;
+use Friendica\Event\UnblockContactEvent;
 use Friendica\Event\UnfollowContactEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
@@ -192,7 +193,7 @@ final class HookEventBridge
 		ArrayFilterEvent::STORAGE_CONFIG                  => 'storage_config',
 		ArrayFilterEvent::STORAGE_INSTANCE                => 'storage_instance',
 		TemplateVarsEvent::NAME                           => 'template_vars',
-		ArrayFilterEvent::UNBLOCK_CONTACT                 => 'unblock',
+		UnblockContactEvent::NAME                         => 'unblock',
 		UnfollowContactEvent::NAME                        => 'unfollow',
 		ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'uexport_options',
 		ZrlInitEvent::NAME                                => 'zrl_init',
@@ -310,7 +311,7 @@ final class HookEventBridge
 			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
 			TemplateVarsEvent::NAME                           => 'onTemplateVarsEvent',
-			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
+			UnblockContactEvent::NAME                         => 'onUnblockContactEvent',
 			UnfollowContactEvent::NAME                        => 'onUnfollowContactEvent',
 			ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'onArrayFilterEvent',
 			ZrlInitEvent::NAME                                => 'onZrlInitEvent',
@@ -1108,6 +1109,24 @@ final class HookEventBridge
 	 * Map the UnfollowContactEvent to `unfollow` hook
 	 */
 	public static function onUnfollowContactEvent(UnfollowContactEvent $event): void
+	{
+		$hook_data = [
+			'contact' => $event->getContactArray(),
+			'uid'     => $event->getUid(),
+			'result'  => $event->getResult(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['result'])) {
+			$event->setResult((bool) $hook_data['result']);
+		}
+	}
+
+	/**
+	 * Map the UnblockContactEvent to `unblock` hook
+	 */
+	public static function onUnblockContactEvent(UnblockContactEvent $event): void
 	{
 		$hook_data = [
 			'contact' => $event->getContactArray(),
