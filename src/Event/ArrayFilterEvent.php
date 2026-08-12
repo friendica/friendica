@@ -34,8 +34,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const ACL_LOOKUP_END = 'friendica.data.acl_lookup_end';
 
-	public const PROTOCOL_SUPPORTS_REVOKE_FOLLOW = 'friendica.data.protocol_supports_revoke_follow';
-
 	public const PROTOCOL_SUPPORTS_PROBE = 'friendica.data.protocol_supports_probe';
 
 	public const EVENT_CREATED = 'friendica.data.event_created';

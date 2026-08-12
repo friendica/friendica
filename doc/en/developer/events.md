@@ -43,6 +43,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `parse_link` | `\Friendica\Event\ParseLinkEvent` |
 | `probe_detect` | `\Friendica\Event\ProbeDetectEvent` |
 | `support_follow` | `\Friendica\Event\ProtocolSupportsFollowEvent` |
+| `support_revoke_follow` | `\Friendica\Event\ProtocolSupportsRevokeFollowEvent` |
 | `render_location` | `\Friendica\Event\RenderLocationEvent` |
 | `page_info_data` | `\Friendica\Event\PageInfoEvent` |
 | `smilie` | `\Friendica\Event\SmileyListEvent` |
@@ -535,6 +536,17 @@ Fired to assert whether a connector addon provides follow capabilities.
 
 **Modifiable:**
 - `setResult(?bool $result): void` — report whether the connector provides follow capabilities
+
+### `\Friendica\Event\ProtocolSupportsRevokeFollowEvent`
+
+Fired to assert whether a connector addon provides revoking of inbound follows.
+
+**Contained data:**
+- `getProtocol(): string` — shorthand for the protocol, values are available in `src/Core/Protocol.php` (read-only)
+- `getResult(): ?bool` — `null` by default, `true` if the connector provides revoke capabilities
+
+**Modifiable:**
+- `setResult(?bool $result): void` — report whether the connector provides revoke capabilities
 
 ### `\Friendica\Event\RenderLocationEvent`
 

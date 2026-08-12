@@ -33,7 +33,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::DETECT_LANGUAGES, 'friendica.data.detect_languages'],
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'friendica.data.moderation_users_tabs'],
 			[ArrayFilterEvent::ACL_LOOKUP_END, 'friendica.data.acl_lookup_end'],
-			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'friendica.data.protocol_supports_revoke_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'friendica.data.protocol_supports_probe'],
 			[ArrayFilterEvent::EVENT_CREATED, 'friendica.data.event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'friendica.data.event_updated'],
