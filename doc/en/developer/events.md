@@ -43,6 +43,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `parse_link` | `\Friendica\Event\ParseLinkEvent` |
 | `probe_detect` | `\Friendica\Event\ProbeDetectEvent` |
 | `support_follow` | `\Friendica\Event\ProtocolSupportsFollowEvent` |
+| `support_probe` | `\Friendica\Event\ProtocolSupportsProbeEvent` |
 | `support_revoke_follow` | `\Friendica\Event\ProtocolSupportsRevokeFollowEvent` |
 | `render_location` | `\Friendica\Event\RenderLocationEvent` |
 | `page_info_data` | `\Friendica\Event\PageInfoEvent` |
@@ -536,6 +537,17 @@ Fired to assert whether a connector addon provides follow capabilities.
 
 **Modifiable:**
 - `setResult(?bool $result): void` — report whether the connector provides follow capabilities
+
+### `\Friendica\Event\ProtocolSupportsProbeEvent`
+
+Fired to assert whether a connector addon provides probing for contacts.
+
+**Contained data:**
+- `getProtocol(): string` — shorthand for the protocol, values are available in `src/Core/Protocol.php` (read-only)
+- `getResult(): ?bool` — `null` by default, `true` if the connector provides probing capabilities
+
+**Modifiable:**
+- `setResult(?bool $result): void` — report whether the connector provides probing capabilities
 
 ### `\Friendica\Event\ProtocolSupportsRevokeFollowEvent`
 

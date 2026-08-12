@@ -57,6 +57,7 @@ use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\ProfileTabsEvent;
 use Friendica\Event\ProtocolSupportsFollowEvent;
+use Friendica\Event\ProtocolSupportsProbeEvent;
 use Friendica\Event\ProtocolSupportsRevokeFollowEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
@@ -189,7 +190,7 @@ final class HookEventBridge
 		ProfileSidebarStartEvent::NAME               => 'profile_sidebar_enter',
 		ProfileTabsEvent::NAME                       => 'profile_tabs',
 		ProtocolSupportsFollowEvent::NAME            => 'support_follow',
-		ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE    => 'support_probe',
+		ProtocolSupportsProbeEvent::NAME             => 'support_probe',
 		ProtocolSupportsRevokeFollowEvent::NAME      => 'support_revoke_follow',
 		RenderLocationEvent::NAME                    => 'render_location',
 		RevokeFollowContactEvent::NAME               => 'revoke_follow',
@@ -307,7 +308,7 @@ final class HookEventBridge
 			ProfileSidebarStartEvent::NAME               => 'onProfileSidebarStartEvent',
 			ProfileTabsEvent::NAME                       => 'onProfileTabsEvent',
 			ProtocolSupportsFollowEvent::NAME            => 'onProtocolSupportsFollowEvent',
-			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE    => 'onArrayFilterEvent',
+			ProtocolSupportsProbeEvent::NAME             => 'onProtocolSupportsProbeEvent',
 			ProtocolSupportsRevokeFollowEvent::NAME      => 'onProtocolSupportsRevokeFollowEvent',
 			RenderLocationEvent::NAME                    => 'onRenderLocationEvent',
 			RevokeFollowContactEvent::NAME               => 'onRevokeFollowContactEvent',
@@ -901,6 +902,23 @@ final class HookEventBridge
 	 * Map the ProtocolSupportsFollowEvent to `support_follow` hook
 	 */
 	public static function onProtocolSupportsFollowEvent(ProtocolSupportsFollowEvent $event): void
+	{
+		$hook_data = [
+			'protocol' => $event->getProtocol(),
+			'result'   => $event->getResult(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['result'])) {
+			$event->setResult((bool) $hook_data['result']);
+		}
+	}
+
+	/**
+	 * Map the ProtocolSupportsProbeEvent to `support_probe` hook
+	 */
+	public static function onProtocolSupportsProbeEvent(ProtocolSupportsProbeEvent $event): void
 	{
 		$hook_data = [
 			'protocol' => $event->getProtocol(),

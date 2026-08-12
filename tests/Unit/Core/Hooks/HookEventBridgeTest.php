@@ -78,6 +78,7 @@ use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\ProfileTabsEvent;
 use Friendica\Event\ProtocolSupportsFollowEvent;
+use Friendica\Event\ProtocolSupportsProbeEvent;
 use Friendica\Event\ProtocolSupportsRevokeFollowEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
@@ -191,7 +192,7 @@ class HookEventBridgeTest extends TestCase
 			ProfileSidebarStartEvent::NAME               => 'onProfileSidebarStartEvent',
 			ProfileTabsEvent::NAME                       => 'onProfileTabsEvent',
 			ProtocolSupportsFollowEvent::NAME            => 'onProtocolSupportsFollowEvent',
-			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE    => 'onArrayFilterEvent',
+			ProtocolSupportsProbeEvent::NAME             => 'onProtocolSupportsProbeEvent',
 			ProtocolSupportsRevokeFollowEvent::NAME      => 'onProtocolSupportsRevokeFollowEvent',
 			RenderLocationEvent::NAME                    => 'onRenderLocationEvent',
 			RevokeFollowContactEvent::NAME               => 'onRevokeFollowContactEvent',
@@ -478,6 +479,30 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onProtocolSupportsFollowEvent($event);
+
+		$this->assertTrue($event->getResult());
+	}
+
+	public function testOnProtocolSupportsProbeEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProtocolSupportsProbeEvent('activitypub');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('support_probe', $name);
+			$this->assertSame([
+				'protocol' => 'activitypub',
+				'result'   => null,
+			], $data);
+
+			return [
+				'protocol' => 'activitypub',
+				'result'   => true,
+			];
+		});
+
+		HookEventBridge::onProtocolSupportsProbeEvent($event);
 
 		$this->assertTrue($event->getResult());
 	}
@@ -1256,7 +1281,6 @@ class HookEventBridgeTest extends TestCase
 			[PageInfoEvent::NAME, 'page_info_data'],
 			[SmileyListEvent::NAME, 'smilie'],
 			[JotNetworksEvent::NAME, 'jot_networks'],
-			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'support_probe'],
 			[FollowContactEvent::NAME, 'follow'],
 			[UnfollowContactEvent::NAME, 'unfollow'],
 			[RevokeFollowContactEvent::NAME, 'revoke_follow'],
