@@ -26,6 +26,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `check_item_notification` | `\Friendica\Event\CheckItemNotificationEvent` |
 | `conversation_start` | `\Friendica\Event\ConversationStartEvent` |
 | `avatar_lookup` | `\Friendica\Event\AvatarLookupEvent` |
+| `detect_languages` | `\Friendica\Event\DetectLanguagesEvent` |
 | `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
 | `follow` | `\Friendica\Event\FollowContactEvent` |
 | `unfollow` | `\Friendica\Event\UnfollowContactEvent` |
@@ -338,6 +339,19 @@ Fired when rendering a conversation timeline starts.
 
 **Modifiable:**
 - `setItemsArray(array $items): void` — change the items of the conversation timeline
+
+### `\Friendica\Event\DetectLanguagesEvent`
+
+Fired after the language detection, to allow alternative language detection methods to modify the result.
+
+**Contained data:**
+- `getText(): string` — the text that is analyzed (read-only)
+- `getDetected(): array` — the detected language codes, the array key is the language code, the array value the probability
+- `getUriId(): int` — the Uri-Id of the item (read-only)
+- `getAuthorId(): int` — the id of the author contact (read-only)
+
+**Modifiable:**
+- `setDetected(array $detected): void` — change the detected language codes
 
 ### `\Friendica\Event\FetchItemByLinkEvent`
 

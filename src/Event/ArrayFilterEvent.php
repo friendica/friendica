@@ -28,8 +28,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const PERMISSION_TOOLTIP_CONTENT = 'friendica.data.permission_tooltip_content';
 
-	public const DETECT_LANGUAGES = 'friendica.data.detect_languages';
-
 	public const MODERATION_USERS_TABS = 'friendica.data.moderation_users_tabs';
 
 	public const ACL_LOOKUP_END = 'friendica.data.acl_lookup_end';

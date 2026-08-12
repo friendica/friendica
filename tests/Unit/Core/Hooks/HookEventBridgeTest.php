@@ -26,6 +26,7 @@ use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\ConversationStartEvent;
+use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\EnotifyEvent;
@@ -129,7 +130,7 @@ class HookEventBridgeTest extends TestCase
 			ConversationStartEvent::NAME                 => 'onConversationStartEvent',
 			ArrayFilterEvent::DB_STRUCTURE_DEFINITION    => 'onArrayFilterEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION         => 'onArrayFilterEvent',
-			ArrayFilterEvent::DETECT_LANGUAGES           => 'onArrayFilterEvent',
+			DetectLanguagesEvent::NAME                   => 'onDetectLanguagesEvent',
 			DirectoryItemEvent::NAME                     => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                       => 'onDisplayItemEvent',
 			ArrayFilterEvent::DISPLAY_SETTINGS_POST      => 'onArrayFilterEvent',
@@ -529,6 +530,34 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onProtocolSupportsRevokeFollowEvent($event);
 
 		$this->assertTrue($event->getResult());
+	}
+
+	public function testOnDetectLanguagesEventCallsHookWithCorrectValue(): void
+	{
+		$event = new DetectLanguagesEvent('This is some text', ['en' => 0.8], 42, 99);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('detect_languages', $name);
+			$this->assertSame([
+				'text'      => 'This is some text',
+				'detected'  => ['en' => 0.8],
+				'uri-id'    => 42,
+				'author-id' => 99,
+			], $data);
+
+			return [
+				'text'      => 'This is some text',
+				'detected'  => ['de' => 0.9],
+				'uri-id'    => 42,
+				'author-id' => 99,
+			];
+		});
+
+		HookEventBridge::onDetectLanguagesEvent($event);
+
+		$this->assertSame(['de' => 0.9], $event->getDetected());
 	}
 
 	public static function getCollectRoutesEventData(): array
@@ -1271,7 +1300,6 @@ class HookEventBridgeTest extends TestCase
 			[EnotifyEvent::NAME, 'enotify'],
 			[EnotifyMailEvent::NAME, 'enotify_mail'],
 			[EnotifyStoreEvent::NAME, 'enotify_store'],
-			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
 			[RenderLocationEvent::NAME, 'render_location'],
 			[ContactPhotoMenuEvent::NAME, 'contact_photo_menu'],
 			[ProfileSettingsFormEvent::NAME, 'profile_edit'],

@@ -20,7 +20,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\ItemPhotoMenuEvent;
 use Friendica\Model\Attach;
@@ -1295,18 +1295,11 @@ class Item
 		foreach ($this->splitByBlocks($searchtext) as $block) {
 			$languages = $ld->detect($block)->close() ?: [];
 
-			$hook_data = [
-				'text'      => $block,
-				'detected'  => $languages,
-				'uri-id'    => $uri_id,
-				'author-id' => $author_id,
-			];
+			$event = $this->eventDispatcher->dispatch(
+				new DetectLanguagesEvent($block, $languages, $uri_id, $author_id),
+			);
 
-			$hook_data = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::DETECT_LANGUAGES, $hook_data),
-			)->getArray();
-
-			foreach ($hook_data['detected'] as $language => $quality) {
+			foreach ($event->getDetected() as $language => $quality) {
 				$result[$language] = max($result[$language] ?? 0, $quality * (strlen((string) $block) / strlen($searchtext)));
 			}
 		}

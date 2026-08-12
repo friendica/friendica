@@ -24,6 +24,7 @@ use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\ConversationStartEvent;
+use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\EnotifyEvent;
@@ -127,7 +128,7 @@ final class HookEventBridge
 		ConversationStartEvent::NAME                 => 'conversation_start',
 		ArrayFilterEvent::DB_STRUCTURE_DEFINITION    => 'dbstructure_definition',
 		ArrayFilterEvent::DB_VIEW_DEFINITION         => 'dbview_definition',
-		ArrayFilterEvent::DETECT_LANGUAGES           => 'detect_languages',
+		DetectLanguagesEvent::NAME                   => 'detect_languages',
 		DirectoryItemEvent::NAME                     => 'directory_item',
 		DisplayItemEvent::NAME                       => 'display_item',
 		ArrayFilterEvent::DISPLAY_SETTINGS_POST      => 'display_settings_post',
@@ -245,7 +246,7 @@ final class HookEventBridge
 			ConversationStartEvent::NAME                 => 'onConversationStartEvent',
 			ArrayFilterEvent::DB_STRUCTURE_DEFINITION    => 'onArrayFilterEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION         => 'onArrayFilterEvent',
-			ArrayFilterEvent::DETECT_LANGUAGES           => 'onArrayFilterEvent',
+			DetectLanguagesEvent::NAME                   => 'onDetectLanguagesEvent',
 			DirectoryItemEvent::NAME                     => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                       => 'onDisplayItemEvent',
 			ArrayFilterEvent::DISPLAY_SETTINGS_POST      => 'onArrayFilterEvent',
@@ -404,6 +405,23 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setItemsArray($hook_data['items'] ?? []);
+	}
+
+	/**
+	 * Map the DetectLanguagesEvent to `detect_languages` hook
+	 */
+	public static function onDetectLanguagesEvent(DetectLanguagesEvent $event): void
+	{
+		$hook_data = [
+			'text'      => $event->getText(),
+			'detected'  => $event->getDetected(),
+			'uri-id'    => $event->getUriId(),
+			'author-id' => $event->getAuthorId(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setDetected((array) $hook_data['detected']);
 	}
 
 	/**
