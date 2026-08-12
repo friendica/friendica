@@ -56,6 +56,7 @@ use Friendica\Event\ProfileSettingsPostEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\ProfileTabsEvent;
+use Friendica\Event\ProtocolSupportsFollowEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
@@ -186,7 +187,7 @@ final class HookEventBridge
 		ProfileSidebarEvent::NAME                         => 'profile_sidebar',
 		ProfileSidebarStartEvent::NAME                    => 'profile_sidebar_enter',
 		ProfileTabsEvent::NAME                            => 'profile_tabs',
-		ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'support_follow',
+		ProtocolSupportsFollowEvent::NAME                 => 'support_follow',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'support_probe',
 		ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'support_revoke_follow',
 		RenderLocationEvent::NAME                         => 'render_location',
@@ -304,7 +305,7 @@ final class HookEventBridge
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
 			ProfileTabsEvent::NAME                            => 'onProfileTabsEvent',
-			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
+			ProtocolSupportsFollowEvent::NAME                 => 'onProtocolSupportsFollowEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
 			RenderLocationEvent::NAME                         => 'onRenderLocationEvent',
@@ -892,6 +893,23 @@ final class HookEventBridge
 
 		if (isset($hook_data['result'])) {
 			$event->setResult(is_array($hook_data['result']) ? $hook_data['result'] : false);
+		}
+	}
+
+	/**
+	 * Map the ProtocolSupportsFollowEvent to `support_follow` hook
+	 */
+	public static function onProtocolSupportsFollowEvent(ProtocolSupportsFollowEvent $event): void
+	{
+		$hook_data = [
+			'protocol' => $event->getProtocol(),
+			'result'   => $event->getResult(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['result'])) {
+			$event->setResult((bool) $hook_data['result']);
 		}
 	}
 

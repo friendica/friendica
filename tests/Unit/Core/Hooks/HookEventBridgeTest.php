@@ -77,6 +77,7 @@ use Friendica\Event\ProfileSettingsPostEvent;
 use Friendica\Event\ProfileSidebarEvent;
 use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\ProfileTabsEvent;
+use Friendica\Event\ProtocolSupportsFollowEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Event\ProbeDetectEvent;
@@ -188,7 +189,7 @@ class HookEventBridgeTest extends TestCase
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
 			ProfileSidebarStartEvent::NAME                    => 'onProfileSidebarStartEvent',
 			ProfileTabsEvent::NAME                            => 'onProfileTabsEvent',
-			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
+			ProtocolSupportsFollowEvent::NAME                 => 'onProtocolSupportsFollowEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
 			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
 			RenderLocationEvent::NAME                         => 'onRenderLocationEvent',
@@ -454,6 +455,30 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onProbeDetectEvent($event);
 
 		$this->assertSame(['name' => 'contact'], $event->getResult());
+	}
+
+	public function testOnProtocolSupportsFollowEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProtocolSupportsFollowEvent('activitypub');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('support_follow', $name);
+			$this->assertSame([
+				'protocol' => 'activitypub',
+				'result'   => null,
+			], $data);
+
+			return [
+				'protocol' => 'activitypub',
+				'result'   => true,
+			];
+		});
+
+		HookEventBridge::onProtocolSupportsFollowEvent($event);
+
+		$this->assertTrue($event->getResult());
 	}
 
 	public static function getCollectRoutesEventData(): array
@@ -1206,7 +1231,6 @@ class HookEventBridgeTest extends TestCase
 			[PageInfoEvent::NAME, 'page_info_data'],
 			[SmileyListEvent::NAME, 'smilie'],
 			[JotNetworksEvent::NAME, 'jot_networks'],
-			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'support_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'support_revoke_follow'],
 			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'support_probe'],
 			[FollowContactEvent::NAME, 'follow'],

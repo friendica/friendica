@@ -11,6 +11,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\BlockContactEvent;
+use Friendica\Event\ProtocolSupportsFollowEvent;
 use Friendica\Event\RevokeFollowContactEvent;
 use Friendica\Event\UnblockContactEvent;
 use Friendica\Event\UnfollowContactEvent;
@@ -77,18 +78,13 @@ class Protocol
 			return true;
 		}
 
-		$hook_data = [
-			'protocol' => $protocol,
-			'result'   => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new ProtocolSupportsFollowEvent((string) $protocol),
+		);
 
-		return $hook_data['result'] === true;
+		return $event->getResult() === true;
 	}
 
 	/**

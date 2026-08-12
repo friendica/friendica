@@ -42,6 +42,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `network_tabs` | `\Friendica\Event\NetworkContentTabsEvent` |
 | `parse_link` | `\Friendica\Event\ParseLinkEvent` |
 | `probe_detect` | `\Friendica\Event\ProbeDetectEvent` |
+| `support_follow` | `\Friendica\Event\ProtocolSupportsFollowEvent` |
 | `render_location` | `\Friendica\Event\RenderLocationEvent` |
 | `page_info_data` | `\Friendica\Event\PageInfoEvent` |
 | `smilie` | `\Friendica\Event\SmileyListEvent` |
@@ -523,6 +524,17 @@ Fired before trying to detect the target network of a URI. If the `result` is se
 
 **Modifiable:**
 - `setResult(array|false|null $result): void` — report the probe result
+
+### `\Friendica\Event\ProtocolSupportsFollowEvent`
+
+Fired to assert whether a connector addon provides follow capabilities.
+
+**Contained data:**
+- `getProtocol(): string` — shorthand for the protocol, values are available in `src/Core/Protocol.php` (read-only)
+- `getResult(): ?bool` — `null` by default, `true` if the connector provides follow capabilities
+
+**Modifiable:**
+- `setResult(?bool $result): void` — report whether the connector provides follow capabilities
 
 ### `\Friendica\Event\RenderLocationEvent`
 
