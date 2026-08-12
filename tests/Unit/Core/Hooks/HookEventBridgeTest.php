@@ -18,6 +18,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\AvatarLookupEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
 use Friendica\Event\BbcodeToMarkdownEndEvent;
 use Friendica\Event\BlockContactEvent;
@@ -113,7 +114,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADDON_SETTINGS_POST             => 'onArrayFilterEvent',
 			ArrayFilterEvent::APP_MENU                        => 'onArrayFilterEvent',
-			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
+			AvatarLookupEvent::NAME                           => 'onAvatarLookupEvent',
 			BbcodeToHtmlStartEvent::NAME                      => 'onBbcodeToHtmlEvent',
 			BbcodeToMarkdownEndEvent::NAME                    => 'onBbcodeToMarkdownEndEvent',
 			BlockContactEvent::NAME                           => 'onBlockContactEvent',
@@ -395,6 +396,35 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertTrue($event->isAborted());
 		$this->assertSame([], $event->getContactArray());
+	}
+
+	public function testOnAvatarLookupEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AvatarLookupEvent(300, 'contact@example.com');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('avatar_lookup', $name);
+			$this->assertSame([
+				'size'    => 300,
+				'email'   => 'contact@example.com',
+				'url'     => '',
+				'success' => false,
+			], $data);
+
+			return [
+				'size'    => 300,
+				'email'   => 'contact@example.com',
+				'url'     => 'https://example.com/avatar',
+				'success' => true,
+			];
+		});
+
+		HookEventBridge::onAvatarLookupEvent($event);
+
+		$this->assertSame('https://example.com/avatar', $event->getUrl());
+		$this->assertTrue($event->isSuccess());
 	}
 
 	public static function getCollectRoutesEventData(): array
@@ -1157,7 +1187,6 @@ class HookEventBridgeTest extends TestCase
 			[UnblockContactEvent::NAME, 'unblock'],
 			[EditContactFormEvent::NAME, 'contact_edit'],
 			[EditContactPostEvent::NAME, 'contact_edit_post'],
-			[ArrayFilterEvent::AVATAR_LOOKUP, 'avatar_lookup'],
 			[AccountAuthenticateEvent::NAME, 'authenticate'],
 			[AccountRegisterFormEvent::NAME, 'register_form'],
 			[AccountRegisterPostEvent::NAME, 'register_post'],

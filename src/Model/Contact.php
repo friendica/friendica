@@ -20,7 +20,7 @@ use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\AvatarLookupEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\FollowContactEvent;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -2191,26 +2191,23 @@ class Contact
 		}
 
 		if (!empty($contact['xmpp'])) {
-			$avatar['email'] = $contact['xmpp'];
+			$email = $contact['xmpp'];
 		} elseif (!empty($contact['addr'])) {
-			$avatar['email'] = $contact['addr'];
+			$email = $contact['addr'];
 		} elseif (!empty($contact['url'])) {
-			$avatar['email'] = $contact['url'];
+			$email = $contact['url'];
 		} else {
 			return DI::baseUrl() . $default;
 		}
 
-		$avatar['url']     = '';
-		$avatar['success'] = false;
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$avatar = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::AVATAR_LOOKUP, $avatar),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new AvatarLookupEvent($avatar['size'], $email),
+		);
 
-		if ($avatar['success'] && !empty($avatar['url'])) {
-			return $avatar['url'];
+		if ($event->isSuccess() && !empty($event->getUrl())) {
+			return $event->getUrl();
 		}
 
 		return DI::baseUrl() . $default;

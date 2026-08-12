@@ -25,6 +25,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `put_item_in_cache` | `\Friendica\Event\CacheItemEvent` |
 | `check_item_notification` | `\Friendica\Event\CheckItemNotificationEvent` |
 | `conversation_start` | `\Friendica\Event\ConversationStartEvent` |
+| `avatar_lookup` | `\Friendica\Event\AvatarLookupEvent` |
 | `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
 | `follow` | `\Friendica\Event\FollowContactEvent` |
 | `unfollow` | `\Friendica\Event\UnfollowContactEvent` |
@@ -407,6 +408,20 @@ Fired before unblocking a remote contact for a user, to handle non-native networ
 
 **Modifiable:**
 - `setResult(?bool $result): void` — report whether the unblock was successful
+
+### `\Friendica\Event\AvatarLookupEvent`
+
+Fired when looking up the avatar for a contact. Can be used by addons to provide an avatar URL (e.g. from a remote service).
+
+**Contained data:**
+- `getSize(): int` — the size of the avatar that will be looked up (read-only)
+- `getEmail(): string` — the email to look up the avatar for (read-only)
+- `getUrl(): string` — the generated URL of the avatar
+- `isSuccess(): bool` — whether the lookup succeeded
+
+**Modifiable:**
+- `setUrl(string $url): void` — set the generated URL of the avatar
+- `setSuccess(bool $success): void` — report whether the lookup succeeded
 
 ### `\Friendica\Event\ItemTaggedEvent`
 

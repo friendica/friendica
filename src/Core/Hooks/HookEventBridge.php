@@ -16,6 +16,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\AvatarLookupEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
 use Friendica\Event\BbcodeToMarkdownEndEvent;
 use Friendica\Event\BlockContactEvent;
@@ -111,7 +112,7 @@ final class HookEventBridge
 		ArrayFilterEvent::ADD_WORKER_TASK                 => 'proc_run',
 		ArrayFilterEvent::ADDON_SETTINGS_POST             => 'addon_settings_post',
 		ArrayFilterEvent::APP_MENU                        => 'app_menu',
-		ArrayFilterEvent::AVATAR_LOOKUP                   => 'avatar_lookup',
+		AvatarLookupEvent::NAME                           => 'avatar_lookup',
 		BbcodeToHtmlStartEvent::NAME                      => 'bbcode',
 		BbcodeToMarkdownEndEvent::NAME                    => 'bb2diaspora',
 		BlockContactEvent::NAME                           => 'block',
@@ -229,7 +230,7 @@ final class HookEventBridge
 			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADDON_SETTINGS_POST             => 'onArrayFilterEvent',
 			ArrayFilterEvent::APP_MENU                        => 'onArrayFilterEvent',
-			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
+			AvatarLookupEvent::NAME                           => 'onAvatarLookupEvent',
 			BbcodeToHtmlStartEvent::NAME                      => 'onBbcodeToHtmlEvent',
 			BbcodeToMarkdownEndEvent::NAME                    => 'onBbcodeToMarkdownEndEvent',
 			BlockContactEvent::NAME                           => 'onBlockContactEvent',
@@ -854,6 +855,24 @@ final class HookEventBridge
 		if (isset($hook_data['result'])) {
 			$event->setResult((bool) $hook_data['result']);
 		}
+	}
+
+	/**
+	 * Map the AvatarLookupEvent to `avatar_lookup` hook
+	 */
+	public static function onAvatarLookupEvent(AvatarLookupEvent $event): void
+	{
+		$hook_data = [
+			'size'    => $event->getSize(),
+			'email'   => $event->getEmail(),
+			'url'     => $event->getUrl(),
+			'success' => $event->isSuccess(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setUrl((string) $hook_data['url']);
+		$event->setSuccess((bool) $hook_data['success']);
 	}
 
 	/**

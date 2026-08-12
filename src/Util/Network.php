@@ -8,7 +8,7 @@
 namespace Friendica\Util;
 
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\AvatarLookupEvent;
 use Friendica\Model\Contact;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
@@ -296,23 +296,18 @@ class Network
 
 	public static function lookupAvatarByEmail(string $email): string
 	{
-		$avatar['size']    = 300;
-		$avatar['email']   = $email;
-		$avatar['url']     = '';
-		$avatar['success'] = false;
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$avatar = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::AVATAR_LOOKUP, $avatar),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new AvatarLookupEvent(300, $email),
+		);
 
-		if (! $avatar['success']) {
-			$avatar['url'] = DI::baseUrl() . Contact::DEFAULT_AVATAR_PHOTO;
+		if (! $event->isSuccess()) {
+			$event->setUrl(DI::baseUrl() . Contact::DEFAULT_AVATAR_PHOTO);
 		}
 
-		DI::logger()->info('Avatar: ' . $avatar['email'] . ' ' . $avatar['url']);
-		return $avatar['url'];
+		DI::logger()->info('Avatar: ' . $event->getEmail() . ' ' . $event->getUrl());
+		return $event->getUrl();
 	}
 
 	/**

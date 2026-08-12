@@ -40,8 +40,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const PROTOCOL_SUPPORTS_PROBE = 'friendica.data.protocol_supports_probe';
 
-	public const AVATAR_LOOKUP = 'friendica.data.avatar_lookup';
-
 	public const EVENT_CREATED = 'friendica.data.event_created';
 
 	public const EVENT_UPDATED = 'friendica.data.event_updated';
