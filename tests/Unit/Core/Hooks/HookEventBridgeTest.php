@@ -79,6 +79,7 @@ use Friendica\Event\ProfileSidebarStartEvent;
 use Friendica\Event\ProfileTabsEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadStartEvent;
+use Friendica\Event\ProbeDetectEvent;
 use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Event\ZrlInitEvent;
 use Friendica\Event\UnblockContactEvent;
@@ -181,7 +182,7 @@ class HookEventBridgeTest extends TestCase
 			PreparePostEndEvent::NAME                         => 'onPreparePostEndEvent',
 			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
-			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
+			ProbeDetectEvent::NAME                            => 'onProbeDetectEvent',
 			ProfileSettingsFormEvent::NAME                    => 'onProfileSettingsFormEvent',
 			ProfileSettingsPostEvent::NAME                    => 'onProfileSettingsPostEvent',
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
@@ -425,6 +426,34 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertSame('https://example.com/avatar', $event->getUrl());
 		$this->assertTrue($event->isSuccess());
+	}
+
+	public function testOnProbeDetectEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProbeDetectEvent('https://example.com/profile', 'activitypub', 42);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('probe_detect', $name);
+			$this->assertSame([
+				'uri'     => 'https://example.com/profile',
+				'network' => 'activitypub',
+				'uid'     => 42,
+				'result'  => null,
+			], $data);
+
+			return [
+				'uri'     => 'https://example.com/profile',
+				'network' => 'activitypub',
+				'uid'     => 42,
+				'result'  => ['name' => 'contact'],
+			];
+		});
+
+		HookEventBridge::onProbeDetectEvent($event);
+
+		$this->assertSame(['name' => 'contact'], $event->getResult());
 	}
 
 	public static function getCollectRoutesEventData(): array

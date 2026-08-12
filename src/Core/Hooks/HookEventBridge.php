@@ -50,6 +50,7 @@ use Friendica\Event\PhotoUploadEndEvent;
 use Friendica\Event\PhotoUploadEvent;
 use Friendica\Event\PhotoUploadFormEvent;
 use Friendica\Event\PhotoUploadStartEvent;
+use Friendica\Event\ProbeDetectEvent;
 use Friendica\Event\ProfileSettingsFormEvent;
 use Friendica\Event\ProfileSettingsPostEvent;
 use Friendica\Event\ProfileSidebarEvent;
@@ -179,7 +180,7 @@ final class HookEventBridge
 		PreparePostEndEvent::NAME                         => 'prepare_body_final',
 		PreparePostFilterContentEvent::NAME               => 'prepare_body_content_filter',
 		PreparePostStartEvent::NAME                       => 'prepare_body_init',
-		ArrayFilterEvent::PROBE_DETECT                    => 'probe_detect',
+		ProbeDetectEvent::NAME                            => 'probe_detect',
 		ProfileSettingsFormEvent::NAME                    => 'profile_edit',
 		ProfileSettingsPostEvent::NAME                    => 'profile_post',
 		ProfileSidebarEvent::NAME                         => 'profile_sidebar',
@@ -297,7 +298,7 @@ final class HookEventBridge
 			PreparePostEndEvent::NAME                         => 'onPreparePostEndEvent',
 			PreparePostFilterContentEvent::NAME               => 'onPreparePostFilterContentEvent',
 			PreparePostStartEvent::NAME                       => 'onPreparePostStartEvent',
-			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
+			ProbeDetectEvent::NAME                            => 'onProbeDetectEvent',
 			ProfileSettingsFormEvent::NAME                    => 'onProfileSettingsFormEvent',
 			ProfileSettingsPostEvent::NAME                    => 'onProfileSettingsPostEvent',
 			ProfileSidebarEvent::NAME                         => 'onProfileSidebarEvent',
@@ -873,6 +874,25 @@ final class HookEventBridge
 
 		$event->setUrl((string) $hook_data['url']);
 		$event->setSuccess((bool) $hook_data['success']);
+	}
+
+	/**
+	 * Map the ProbeDetectEvent to `probe_detect` hook
+	 */
+	public static function onProbeDetectEvent(ProbeDetectEvent $event): void
+	{
+		$hook_data = [
+			'uri'     => $event->getUri(),
+			'network' => $event->getNetwork(),
+			'uid'     => $event->getUid(),
+			'result'  => $event->getResult(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['result'])) {
+			$event->setResult(is_array($hook_data['result']) ? $hook_data['result'] : false);
+		}
 	}
 
 	/**

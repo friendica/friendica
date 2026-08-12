@@ -41,6 +41,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `network_content_init` | `\Friendica\Event\NetworkContentStartEvent` |
 | `network_tabs` | `\Friendica\Event\NetworkContentTabsEvent` |
 | `parse_link` | `\Friendica\Event\ParseLinkEvent` |
+| `probe_detect` | `\Friendica\Event\ProbeDetectEvent` |
 | `render_location` | `\Friendica\Event\RenderLocationEvent` |
 | `page_info_data` | `\Friendica\Event\PageInfoEvent` |
 | `smilie` | `\Friendica\Event\SmileyListEvent` |
@@ -509,6 +510,19 @@ Fired when a link is being parsed.
 
 **Modifiable:**
 - `setText(?string $text): void` — provide the parsed text
+
+### `\Friendica\Event\ProbeDetectEvent`
+
+Fired before trying to detect the target network of a URI. If the `result` is set, it is returned immediately.
+
+**Contained data:**
+- `getUri(): string` — the profile URI (read-only)
+- `getNetwork(): string` — the target network, can be empty for auto-detection (read-only)
+- `getUid(): int` — the user to return the contact data for, can be empty for public contacts (read-only)
+- `getResult(): array|false|null` — `null` by default, set to a contact array if the probe was successful, `false` if not
+
+**Modifiable:**
+- `setResult(array|false|null $result): void` — report the probe result
 
 ### `\Friendica\Event\RenderLocationEvent`
 
