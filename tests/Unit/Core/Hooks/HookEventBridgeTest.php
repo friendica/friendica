@@ -43,6 +43,7 @@ use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
 use Friendica\Event\GetSiteInfoEvent;
+use Friendica\Event\GlobalDirUpdateEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\ItemPhotoMenuEvent;
@@ -162,7 +163,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::GENERATE_MAP            => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP      => 'onArrayFilterEvent',
 			GetSiteInfoEvent::NAME                    => 'onGetSiteInfoEvent',
-			ArrayFilterEvent::GLOBAL_DIR_UPDATE       => 'onArrayFilterEvent',
+			GlobalDirUpdateEvent::NAME                => 'onGlobalDirUpdateEvent',
 			HtmlToBbcodeEndEvent::NAME                => 'onHtmlToBbcodeEvent',
 			InsertPostLocalEvent::NAME                => 'onInsertPostLocalEvent',
 			InsertPostLocalEndEvent::NAME             => 'onInsertPostLocalEndEvent',
@@ -443,6 +444,28 @@ class HookEventBridgeTest extends TestCase
 			'type'  => 'photo',
 			'title' => 'Example',
 		], $event->getSiteInfoArray());
+	}
+
+	public function testOnGlobalDirUpdateEventCallsHookWithCorrectValue(): void
+	{
+		$event = new GlobalDirUpdateEvent('https://example.org/profile');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('globaldir_update', $name);
+			$this->assertSame([
+				'url' => 'https://example.org/profile',
+			], $data);
+
+			return [
+				'url' => '',
+			];
+		});
+
+		HookEventBridge::onGlobalDirUpdateEvent($event);
+
+		$this->assertSame('', $event->getUrl());
 	}
 
 	public function testOnAppMenuEventCallsHookWithCorrectValue(): void
@@ -1583,6 +1606,7 @@ class HookEventBridgeTest extends TestCase
 			[JotNetworksEvent::NAME, 'jot_networks'],
 			[FollowContactEvent::NAME, 'follow'],
 			[GetSiteInfoEvent::NAME, 'getsiteinfo'],
+			[GlobalDirUpdateEvent::NAME, 'globaldir_update'],
 			[UnfollowContactEvent::NAME, 'unfollow'],
 			[RevokeFollowContactEvent::NAME, 'revoke_follow'],
 			[BlockContactEvent::NAME, 'block'],

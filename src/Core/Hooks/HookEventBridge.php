@@ -40,6 +40,7 @@ use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
 use Friendica\Event\GetSiteInfoEvent;
+use Friendica\Event\GlobalDirUpdateEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalStartEvent;
@@ -159,7 +160,7 @@ final class HookEventBridge
 		ArrayFilterEvent::GENERATE_MAP            => 'generate_map',
 		ArrayFilterEvent::GENERATE_NAMED_MAP      => 'generate_named_map',
 		GetSiteInfoEvent::NAME                    => 'getsiteinfo',
-		ArrayFilterEvent::GLOBAL_DIR_UPDATE       => 'globaldir_update',
+		GlobalDirUpdateEvent::NAME                => 'globaldir_update',
 		HtmlToBbcodeEndEvent::NAME                => 'html2bbcode',
 		InsertPostLocalEvent::NAME                => 'post_local',
 		InsertPostLocalEndEvent::NAME             => 'post_local_end',
@@ -277,7 +278,7 @@ final class HookEventBridge
 			ArrayFilterEvent::GENERATE_MAP            => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP      => 'onArrayFilterEvent',
 			GetSiteInfoEvent::NAME                    => 'onGetSiteInfoEvent',
-			ArrayFilterEvent::GLOBAL_DIR_UPDATE       => 'onArrayFilterEvent',
+			GlobalDirUpdateEvent::NAME                => 'onGlobalDirUpdateEvent',
 			HtmlToBbcodeEndEvent::NAME                => 'onHtmlToBbcodeEvent',
 			InsertPostLocalEvent::NAME                => 'onInsertPostLocalEvent',
 			InsertPostLocalEndEvent::NAME             => 'onInsertPostLocalEndEvent',
@@ -504,6 +505,20 @@ final class HookEventBridge
 		$event->setSiteInfoArray(
 			static::callHook($event->getName(), $event->getSiteInfoArray()),
 		);
+	}
+
+	/**
+	 * Map the GlobalDirUpdateEvent to `globaldir_update` hook
+	 */
+	public static function onGlobalDirUpdateEvent(GlobalDirUpdateEvent $event): void
+	{
+		$hook_data = [
+			'url' => $event->getUrl(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setUrl((string) ($hook_data['url'] ?? $event->getUrl()));
 	}
 
 	/**

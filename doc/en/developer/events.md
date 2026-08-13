@@ -78,6 +78,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `nav_info` | `\Friendica\Event\NavInfoEvent` |
 | `proc_run` | `\Friendica\Event\AddWorkerTaskEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
+| `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -282,6 +283,16 @@ Fired after the site information of a URL has been scraped, before it is returne
 
 **Modifiable:**
 - `setSiteInfoArray(array $siteinfo): void` — change the site information
+
+### `\Friendica\Event\GlobalDirUpdateEvent`
+
+Fired before a profile URL is submitted to the global directory. Addons can change the URL or empty it to suppress the submission.
+
+**Contained data:**
+- `getUrl(): string` — the profile URL to submit
+
+**Modifiable:**
+- `setUrl(string $url): void` — change the profile URL
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 

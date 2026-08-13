@@ -8,8 +8,8 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Search;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Core\Worker;
+use Friendica\Event\GlobalDirUpdateEvent;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
@@ -35,15 +35,13 @@ class Directory
 
 		$dir .= "/submit";
 
-		$arr = ['url' => $url];
+		$url = DI::eventDispatcher()->dispatch(
+			new GlobalDirUpdateEvent($url),
+		)->getUrl();
 
-		$arr = DI::eventDispatcher()->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::GLOBAL_DIR_UPDATE, $arr),
-		)->getArray();
-
-		DI::logger()->info('Updating directory: ' . $arr['url']);
-		if (strlen((string) $arr['url'])) {
-			DI::httpClient()->fetch($dir . '?url=' . bin2hex((string) $arr['url']), HttpClientAccept::HTML, 0, '', HttpClientRequest::CONTACTDISCOVER);
+		DI::logger()->info('Updating directory: ' . $url);
+		if (strlen($url)) {
+			DI::httpClient()->fetch($dir . '?url=' . bin2hex($url), HttpClientAccept::HTML, 0, '', HttpClientRequest::CONTACTDISCOVER);
 		}
 
 		return;
