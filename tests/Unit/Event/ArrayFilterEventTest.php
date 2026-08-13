@@ -27,7 +27,6 @@ class ArrayFilterEventTest extends TestCase
 		return [
 			[ArrayFilterEvent::APP_MENU, 'friendica.data.app_menu'],
 			[ArrayFilterEvent::NAV_INFO, 'friendica.data.nav_info'],
-			[ArrayFilterEvent::MODERATION_USERS_TABS, 'friendica.data.moderation_users_tabs'],
 			[ArrayFilterEvent::EVENT_CREATED, 'friendica.data.event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'friendica.data.event_updated'],
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'friendica.data.add_worker_task'],

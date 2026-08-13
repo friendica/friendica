@@ -84,6 +84,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `magic_auth_success` | `\Friendica\Event\MagicAuthSuccessEvent` |
 | `zrl_init` | `\Friendica\Event\ZrlInitEvent` |
 | `acl_lookup_end` | `\Friendica\Event\AclLookupEndEvent` |
+| `moderation_users_tabs` | `\Friendica\Event\ModerationUsersTabsEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -211,6 +212,17 @@ Fired when a magic-auth (OpenWebAuth) was successful.
 
 **Modifiable:**
 - `setVisitorArray(array $visitor): void` — change the visitor array
+
+### `\Friendica\Event\ModerationUsersTabsEvent`
+
+Fired when the user tabs of the moderation panel are about to be rendered, to allow addons to add, change or remove tabs.
+
+**Contained data:**
+- `getTabsArray(): array` — the list of user tabs
+- `getSelectedTab(): string` — the id of the currently selected tab (read-only)
+
+**Modifiable:**
+- `setTabsArray(array $tabs): void` — change the list of user tabs
 
 ### `\Friendica\Event\ZrlInitEvent`
 

@@ -67,6 +67,7 @@ use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
+use Friendica\Event\ModerationUsersTabsEvent;
 use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\NetworkContentStartEvent;
 use Friendica\Event\NetworkContentTabsEvent;
@@ -168,7 +169,7 @@ final class HookEventBridge
 		LoginFormEvent::NAME                      => 'login_hook',
 		MagicAuthSuccessEvent::NAME               => 'magic_auth_success',
 		ArrayFilterEvent::MAP_GET_COORDINATES     => 'Map::getCoordinates',
-		ArrayFilterEvent::MODERATION_USERS_TABS   => 'moderation_users_tabs',
+		ModerationUsersTabsEvent::NAME            => 'moderation_users_tabs',
 		ArrayFilterEvent::NAV_INFO                => 'nav_info',
 		NetworkContentStartEvent::NAME            => 'network_content_init',
 		NetworkContentTabsEvent::NAME             => 'network_tabs',
@@ -286,7 +287,7 @@ final class HookEventBridge
 			LoginFormEvent::NAME                      => 'onLoginFormEvent',
 			MagicAuthSuccessEvent::NAME               => 'onMagicAuthSuccessEvent',
 			ArrayFilterEvent::MAP_GET_COORDINATES     => 'onArrayFilterEvent',
-			ArrayFilterEvent::MODERATION_USERS_TABS   => 'onArrayFilterEvent',
+			ModerationUsersTabsEvent::NAME            => 'onModerationUsersTabsEvent',
 			ArrayFilterEvent::NAV_INFO                => 'onArrayFilterEvent',
 			NetworkContentStartEvent::NAME            => 'onNetworkContentStartEvent',
 			NetworkContentTabsEvent::NAME             => 'onNetworkContentTabsEvent',
@@ -1094,6 +1095,21 @@ final class HookEventBridge
 		if (is_array($data['visitor'] ?? null)) {
 			$event->setVisitorArray($data['visitor']);
 		}
+	}
+
+	/**
+	 * Map the ModerationUsersTabsEvent to `moderation_users_tabs` hook
+	 */
+	public static function onModerationUsersTabsEvent(ModerationUsersTabsEvent $event): void
+	{
+		$hook_data = [
+			'tabs'        => $event->getTabsArray(),
+			'selectedTab' => $event->getSelectedTab(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setTabsArray((array) $hook_data['tabs']);
 	}
 
 	/**

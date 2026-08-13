@@ -22,8 +22,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const NAV_INFO = 'friendica.data.nav_info';
 
-	public const MODERATION_USERS_TABS = 'friendica.data.moderation_users_tabs';
-
 	public const EVENT_CREATED = 'friendica.data.event_created';
 
 	public const EVENT_UPDATED = 'friendica.data.event_updated';

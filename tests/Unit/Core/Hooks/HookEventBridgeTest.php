@@ -46,6 +46,7 @@ use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
+use Friendica\Event\ModerationUsersTabsEvent;
 use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\NetworkContentStartEvent;
 use Friendica\Event\NetworkContentTabsEvent;
@@ -170,7 +171,7 @@ class HookEventBridgeTest extends TestCase
 			LoginFormEvent::NAME                      => 'onLoginFormEvent',
 			MagicAuthSuccessEvent::NAME               => 'onMagicAuthSuccessEvent',
 			ArrayFilterEvent::MAP_GET_COORDINATES     => 'onArrayFilterEvent',
-			ArrayFilterEvent::MODERATION_USERS_TABS   => 'onArrayFilterEvent',
+			ModerationUsersTabsEvent::NAME            => 'onModerationUsersTabsEvent',
 			ArrayFilterEvent::NAV_INFO                => 'onArrayFilterEvent',
 			NetworkContentStartEvent::NAME            => 'onNetworkContentStartEvent',
 			NetworkContentTabsEvent::NAME             => 'onNetworkContentTabsEvent',
@@ -1378,6 +1379,54 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame(99, $event->getVisitorArray()['id']);
 	}
 
+	public function testOnModerationUsersTabsEventCallsHookWithCorrectValue(): void
+	{
+		$tabs = [
+			[
+				'label'     => 'Users',
+				'url'       => 'moderation/users',
+				'sel'       => 'active',
+				'title'     => 'List of users',
+				'id'        => 'admin-users',
+				'accesskey' => 'u',
+			],
+		];
+		$event = new ModerationUsersTabsEvent($tabs, 'users');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('moderation_users_tabs', $name);
+			$this->assertSame([
+				[
+					'label'     => 'Users',
+					'url'       => 'moderation/users',
+					'sel'       => 'active',
+					'title'     => 'List of users',
+					'id'        => 'admin-users',
+					'accesskey' => 'u',
+				],
+			], $data['tabs']);
+			$this->assertSame('users', $data['selectedTab']);
+
+			$data['tabs'][] = [
+				'label'     => 'Behaviour',
+				'url'       => 'ratioed',
+				'sel'       => '',
+				'title'     => 'Statistics about users behaviour',
+				'id'        => 'admin-users-ratioed',
+				'accesskey' => 'r',
+			];
+
+			return $data;
+		});
+
+		HookEventBridge::onModerationUsersTabsEvent($event);
+
+		$this->assertCount(2, $event->getTabsArray());
+		$this->assertSame('Behaviour', $event->getTabsArray()[1]['label']);
+	}
+
 	public static function getArrayFilterEventData(): array
 	{
 		return [
@@ -1396,7 +1445,7 @@ class HookEventBridgeTest extends TestCase
 			[ContactPhotoMenuEvent::NAME, 'contact_photo_menu'],
 			[ProfileSettingsFormEvent::NAME, 'profile_edit'],
 			[ProfileSettingsPostEvent::NAME, 'profile_post'],
-			[ArrayFilterEvent::MODERATION_USERS_TABS, 'moderation_users_tabs'],
+			[ModerationUsersTabsEvent::NAME, 'moderation_users_tabs'],
 			[AclLookupEndEvent::NAME, 'acl_lookup_end'],
 			[PageInfoEvent::NAME, 'page_info_data'],
 			[SmileyListEvent::NAME, 'smilie'],
