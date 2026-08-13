@@ -16,6 +16,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\AclLookupEndEvent;
+use Friendica\Event\AddonSettingsPostEvent;
 use Friendica\Event\AddWorkerTaskEvent;
 use Friendica\Event\AppMenuEvent;
 use Friendica\Event\ArrayFilterEvent;
@@ -130,7 +131,7 @@ final class HookEventBridge
 		AccountRemoveEvent::NAME                  => 'remove_user',
 		AclLookupEndEvent::NAME                   => 'acl_lookup_end',
 		AddWorkerTaskEvent::NAME                  => 'proc_run',
-		ArrayFilterEvent::ADDON_SETTINGS_POST     => 'addon_settings_post',
+		AddonSettingsPostEvent::NAME              => 'addon_settings_post',
 		AppMenuEvent::NAME                        => 'app_menu',
 		AvatarLookupEvent::NAME                   => 'avatar_lookup',
 		BbcodeToHtmlStartEvent::NAME              => 'bbcode',
@@ -248,7 +249,7 @@ final class HookEventBridge
 			AccountRemoveEvent::NAME                  => 'onAccountRemoveEvent',
 			AclLookupEndEvent::NAME                   => 'onAclLookupEndEvent',
 			AddWorkerTaskEvent::NAME                  => 'onAddWorkerTaskEvent',
-			ArrayFilterEvent::ADDON_SETTINGS_POST     => 'onArrayFilterEvent',
+			AddonSettingsPostEvent::NAME              => 'onAddonSettingsPostEvent',
 			AppMenuEvent::NAME                        => 'onAppMenuEvent',
 			AvatarLookupEvent::NAME                   => 'onAvatarLookupEvent',
 			BbcodeToHtmlStartEvent::NAME              => 'onBbcodeToHtmlEvent',
@@ -1155,6 +1156,14 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setRunCmd((bool) ($hook_data['run_cmd'] ?? $event->isRunCmd()));
+	}
+
+	/**
+	 * Map the AddonSettingsPostEvent to `addon_settings_post` hook
+	 */
+	public static function onAddonSettingsPostEvent(AddonSettingsPostEvent $event): void
+	{
+		static::callHook($event->getName(), $event->getRequestArray());
 	}
 
 	/**

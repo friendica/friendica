@@ -21,6 +21,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\AclLookupEndEvent;
+use Friendica\Event\AddonSettingsPostEvent;
 use Friendica\Event\AddWorkerTaskEvent;
 use Friendica\Event\AppMenuEvent;
 use Friendica\Event\ArrayFilterEvent;
@@ -135,7 +136,7 @@ class HookEventBridgeTest extends TestCase
 			AccountRemoveEvent::NAME                  => 'onAccountRemoveEvent',
 			AclLookupEndEvent::NAME                   => 'onAclLookupEndEvent',
 			AddWorkerTaskEvent::NAME                  => 'onAddWorkerTaskEvent',
-			ArrayFilterEvent::ADDON_SETTINGS_POST     => 'onArrayFilterEvent',
+			AddonSettingsPostEvent::NAME              => 'onAddonSettingsPostEvent',
 			AppMenuEvent::NAME                        => 'onAppMenuEvent',
 			AvatarLookupEvent::NAME                   => 'onAvatarLookupEvent',
 			BbcodeToHtmlStartEvent::NAME              => 'onBbcodeToHtmlEvent',
@@ -1641,6 +1642,26 @@ class HookEventBridgeTest extends TestCase
 		$this->assertFalse($event->isRunCmd());
 	}
 
+	public function testOnAddonSettingsPostEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AddonSettingsPostEvent([
+			'irc-submit' => 'foo',
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('addon_settings_post', $name);
+			$this->assertSame([
+				'irc-submit' => 'foo',
+			], $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onAddonSettingsPostEvent($event);
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => ['id' => 123]]);
@@ -1818,6 +1839,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::EVENT_CREATED, 'event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'event_updated'],
 			[AddWorkerTaskEvent::NAME, 'proc_run'],
+			[AddonSettingsPostEvent::NAME, 'addon_settings_post'],
 			[StorageConfigEvent::NAME, 'storage_config'],
 			[StorageInstanceEvent::NAME, 'storage_instance'],
 			[DbStructureDefinitionEvent::NAME, 'dbstructure_definition'],

@@ -77,6 +77,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `app_menu` | `\Friendica\Event\AppMenuEvent` |
 | `nav_info` | `\Friendica\Event\NavInfoEvent` |
 | `proc_run` | `\Friendica\Event\AddWorkerTaskEvent` |
+| `addon_settings_post` | `\Friendica\Event\AddonSettingsPostEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -278,6 +279,13 @@ Fired before a task is added to the worker queue, to allow addons to prevent it 
 
 **Modifiable:**
 - `setRunCmd(bool $runCmd): void` — prevent the worker task from being executed
+
+### `\Friendica\Event\AddonSettingsPostEvent`
+
+Fired when addon settings are saved, to notify addons about the submitted request data.
+
+**Contained data:**
+- `getRequestArray(): array` — the submitted request data
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 
