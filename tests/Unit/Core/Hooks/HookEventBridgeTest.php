@@ -18,6 +18,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\AclLookupEndEvent;
+use Friendica\Event\AppMenuEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\AvatarLookupEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
@@ -123,7 +124,7 @@ class HookEventBridgeTest extends TestCase
 			AclLookupEndEvent::NAME                   => 'onAclLookupEndEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK         => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADDON_SETTINGS_POST     => 'onArrayFilterEvent',
-			ArrayFilterEvent::APP_MENU                => 'onArrayFilterEvent',
+			AppMenuEvent::NAME                        => 'onAppMenuEvent',
 			AvatarLookupEvent::NAME                   => 'onAvatarLookupEvent',
 			BbcodeToHtmlStartEvent::NAME              => 'onBbcodeToHtmlEvent',
 			BbcodeToMarkdownEndEvent::NAME            => 'onBbcodeToMarkdownEndEvent',
@@ -406,6 +407,26 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertTrue($event->isAborted());
 		$this->assertSame([], $event->getContactArray());
+	}
+
+	public function testOnAppMenuEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AppMenuEvent([]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('app_menu', $name);
+			$this->assertSame(['app_menu' => []], $data);
+
+			$data['app_menu'][] = '<div class="app-title"><a href="irc">IRC Chatroom</a></div>';
+
+			return $data;
+		});
+
+		HookEventBridge::onAppMenuEvent($event);
+
+		$this->assertSame(['<div class="app-title"><a href="irc">IRC Chatroom</a></div>'], $event->getAppMenuArray());
 	}
 
 	public function testOnAvatarLookupEventCallsHookWithCorrectValue(): void
@@ -1431,7 +1452,7 @@ class HookEventBridgeTest extends TestCase
 	{
 		return [
 			['test', 'test'],
-			[ArrayFilterEvent::APP_MENU, 'app_menu'],
+			[AppMenuEvent::NAME, 'app_menu'],
 			[ArrayFilterEvent::NAV_INFO, 'nav_info'],
 			[PhotoUploadEvent::NAME, 'photo_post_file'],
 			[NetworkToNameEvent::NAME, 'network_to_name'],

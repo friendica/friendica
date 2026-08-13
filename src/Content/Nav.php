@@ -14,6 +14,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
+use Friendica\Event\AppMenuEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
@@ -132,13 +133,11 @@ class Nav
 			$this->session->getLocalUserId()
 			|| !$this->config->get('config', 'private_addons', false)
 		) {
-			$arr = ['app_menu' => $appMenu];
+			$event = $this->eventDispatcher->dispatch(
+				new AppMenuEvent($appMenu),
+			);
 
-			$arr = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::APP_MENU, $arr),
-			)->getArray();
-
-			$appMenu = $arr['app_menu'] ?? [];
+			$appMenu = $event->getAppMenuArray();
 		}
 
 		return $appMenu;

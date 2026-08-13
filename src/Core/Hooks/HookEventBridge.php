@@ -16,6 +16,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\AclLookupEndEvent;
+use Friendica\Event\AppMenuEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\AvatarLookupEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
@@ -121,7 +122,7 @@ final class HookEventBridge
 		AclLookupEndEvent::NAME                   => 'acl_lookup_end',
 		ArrayFilterEvent::ADD_WORKER_TASK         => 'proc_run',
 		ArrayFilterEvent::ADDON_SETTINGS_POST     => 'addon_settings_post',
-		ArrayFilterEvent::APP_MENU                => 'app_menu',
+		AppMenuEvent::NAME                        => 'app_menu',
 		AvatarLookupEvent::NAME                   => 'avatar_lookup',
 		BbcodeToHtmlStartEvent::NAME              => 'bbcode',
 		BbcodeToMarkdownEndEvent::NAME            => 'bb2diaspora',
@@ -239,7 +240,7 @@ final class HookEventBridge
 			AclLookupEndEvent::NAME                   => 'onAclLookupEndEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK         => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADDON_SETTINGS_POST     => 'onArrayFilterEvent',
-			ArrayFilterEvent::APP_MENU                => 'onArrayFilterEvent',
+			AppMenuEvent::NAME                        => 'onAppMenuEvent',
 			AvatarLookupEvent::NAME                   => 'onAvatarLookupEvent',
 			BbcodeToHtmlStartEvent::NAME              => 'onBbcodeToHtmlEvent',
 			BbcodeToMarkdownEndEvent::NAME            => 'onBbcodeToMarkdownEndEvent',
@@ -904,6 +905,20 @@ final class HookEventBridge
 		if (isset($hook_data['result'])) {
 			$event->setResult((bool) $hook_data['result']);
 		}
+	}
+
+	/**
+	 * Map the AppMenuEvent to `app_menu` hook
+	 */
+	public static function onAppMenuEvent(AppMenuEvent $event): void
+	{
+		$hook_data = [
+			'app_menu' => $event->getAppMenuArray(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setAppMenuArray((array) $hook_data['app_menu']);
 	}
 
 	/**

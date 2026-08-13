@@ -74,6 +74,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `photo_upload_form` | `\Friendica\Event\PhotoUploadFormEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
+| `app_menu` | `\Friendica\Event\AppMenuEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -231,6 +232,16 @@ Fired when a ZRL init is triggered.
 **Contained data:**
 - `getZrlUrl(): string` — the ZRL URL
 - `getUrl(): string` — the command URL
+
+### `\Friendica\Event\AppMenuEvent`
+
+Fired when the app menu entries are about to be rendered, to allow addons to add menu entries.
+
+**Contained data:**
+- `getAppMenuArray(): array` — the list of app menu HTML entries
+
+**Modifiable:**
+- `setAppMenuArray(array $appMenu): void` — change the list of app menu HTML entries
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 

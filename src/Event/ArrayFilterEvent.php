@@ -18,8 +18,6 @@ use Friendica\Core\Event\AbstractEvent;
  */
 final class ArrayFilterEvent extends AbstractEvent
 {
-	public const APP_MENU = 'friendica.data.app_menu';
-
 	public const NAV_INFO = 'friendica.data.nav_info';
 
 	public const EVENT_CREATED = 'friendica.data.event_created';
