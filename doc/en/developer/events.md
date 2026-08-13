@@ -82,6 +82,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
 | `storage_config` | `\Friendica\Event\StorageConfigEvent` |
 | `storage_instance` | `\Friendica\Event\StorageInstanceEvent` |
+| `dbstructure_definition` | `\Friendica\Event\DbStructureDefinitionEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -328,6 +329,16 @@ Fired when a storage backend instance is requested, to allow addons to provide o
 
 **Modifiable:**
 - `setStorage(?ICanReadFromStorage $storage): void` — provide the backend instance
+
+### `\Friendica\Event\DbStructureDefinitionEvent`
+
+Fired after the database structure definition has been loaded, to allow addons to add, change or remove tables.
+
+**Contained data:**
+- `getDefinitionArray(): array` — the database structure definition (table name → `{comment, fields, indexes}`)
+
+**Modifiable:**
+- `setDefinitionArray(array $definition): void` — change the database structure definition
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 

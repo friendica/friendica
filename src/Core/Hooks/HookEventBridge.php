@@ -27,6 +27,7 @@ use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\ConversationStartEvent;
+use Friendica\Event\DbStructureDefinitionEvent;
 use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
@@ -139,7 +140,7 @@ final class HookEventBridge
 		ArrayFilterEvent::CONNECTOR_SETTINGS_POST => 'connector_settings_post',
 		ContactPhotoMenuEvent::NAME               => 'contact_photo_menu',
 		ConversationStartEvent::NAME              => 'conversation_start',
-		ArrayFilterEvent::DB_STRUCTURE_DEFINITION => 'dbstructure_definition',
+		DbStructureDefinitionEvent::NAME          => 'dbstructure_definition',
 		ArrayFilterEvent::DB_VIEW_DEFINITION      => 'dbview_definition',
 		DetectLanguagesEvent::NAME                => 'detect_languages',
 		DirectoryItemEvent::NAME                  => 'directory_item',
@@ -257,7 +258,7 @@ final class HookEventBridge
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST => 'onArrayFilterEvent',
 			ContactPhotoMenuEvent::NAME               => 'onContactPhotoMenuEvent',
 			ConversationStartEvent::NAME              => 'onConversationStartEvent',
-			ArrayFilterEvent::DB_STRUCTURE_DEFINITION => 'onArrayFilterEvent',
+			DbStructureDefinitionEvent::NAME          => 'onDbStructureDefinitionEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION      => 'onArrayFilterEvent',
 			DetectLanguagesEvent::NAME                => 'onDetectLanguagesEvent',
 			DirectoryItemEvent::NAME                  => 'onDirectoryItemEvent',
@@ -418,6 +419,16 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setItemsArray($hook_data['items'] ?? []);
+	}
+
+	/**
+	 * Map the DbStructureDefinitionEvent to `dbstructure_definition` hook
+	 */
+	public static function onDbStructureDefinitionEvent(DbStructureDefinitionEvent $event): void
+	{
+		$event->setDefinitionArray(
+			static::callHook($event->getName(), $event->getDefinitionArray()),
+		);
 	}
 
 	/**

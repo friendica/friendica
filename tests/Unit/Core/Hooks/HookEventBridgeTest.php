@@ -32,6 +32,7 @@ use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\ConversationStartEvent;
+use Friendica\Event\DbStructureDefinitionEvent;
 use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
@@ -144,7 +145,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::CONNECTOR_SETTINGS_POST => 'onArrayFilterEvent',
 			ContactPhotoMenuEvent::NAME               => 'onContactPhotoMenuEvent',
 			ConversationStartEvent::NAME              => 'onConversationStartEvent',
-			ArrayFilterEvent::DB_STRUCTURE_DEFINITION => 'onArrayFilterEvent',
+			DbStructureDefinitionEvent::NAME          => 'onDbStructureDefinitionEvent',
 			ArrayFilterEvent::DB_VIEW_DEFINITION      => 'onArrayFilterEvent',
 			DetectLanguagesEvent::NAME                => 'onDetectLanguagesEvent',
 			DirectoryItemEvent::NAME                  => 'onDirectoryItemEvent',
@@ -646,6 +647,48 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onProtocolSupportsRevokeFollowEvent($event);
 
 		$this->assertTrue($event->getResult());
+	}
+
+	public function testOnDbStructureDefinitionEventCallsHookWithCorrectValue(): void
+	{
+		$event = new DbStructureDefinitionEvent([
+			'user' => [
+				'fields' => [
+					'uid' => ['type' => 'int unsigned', 'primary' => '1'],
+				],
+			],
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('dbstructure_definition', $name);
+			$this->assertSame([
+				'user' => [
+					'fields' => [
+						'uid' => ['type' => 'int unsigned', 'primary' => '1'],
+					],
+				],
+			], $data);
+
+			return [
+				'rules' => [
+					'fields' => [
+						'id' => ['type' => 'int unsigned', 'primary' => '1'],
+					],
+				],
+			];
+		});
+
+		HookEventBridge::onDbStructureDefinitionEvent($event);
+
+		$this->assertSame([
+			'rules' => [
+				'fields' => [
+					'id' => ['type' => 'int unsigned', 'primary' => '1'],
+				],
+			],
+		], $event->getDefinitionArray());
 	}
 
 	public function testOnDetectLanguagesEventCallsHookWithCorrectValue(): void
@@ -1734,7 +1777,7 @@ class HookEventBridgeTest extends TestCase
 			[AddWorkerTaskEvent::NAME, 'proc_run'],
 			[StorageConfigEvent::NAME, 'storage_config'],
 			[StorageInstanceEvent::NAME, 'storage_instance'],
-			[ArrayFilterEvent::DB_STRUCTURE_DEFINITION, 'dbstructure_definition'],
+			[DbStructureDefinitionEvent::NAME, 'dbstructure_definition'],
 			[ArrayFilterEvent::DB_VIEW_DEFINITION, 'dbview_definition'],
 		];
 	}
