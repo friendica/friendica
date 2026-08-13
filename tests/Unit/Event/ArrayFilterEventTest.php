@@ -25,7 +25,6 @@ class ArrayFilterEventTest extends TestCase
 	public static function getPublicConstants(): array
 	{
 		return [
-			[ArrayFilterEvent::NAV_INFO, 'friendica.data.nav_info'],
 			[ArrayFilterEvent::EVENT_CREATED, 'friendica.data.event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'friendica.data.event_updated'],
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'friendica.data.add_worker_task'],

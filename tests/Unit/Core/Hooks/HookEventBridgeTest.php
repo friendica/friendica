@@ -48,6 +48,7 @@ use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\ModerationUsersTabsEvent;
+use Friendica\Event\NavInfoEvent;
 use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\NetworkContentStartEvent;
 use Friendica\Event\NetworkContentTabsEvent;
@@ -173,7 +174,7 @@ class HookEventBridgeTest extends TestCase
 			MagicAuthSuccessEvent::NAME               => 'onMagicAuthSuccessEvent',
 			ArrayFilterEvent::MAP_GET_COORDINATES     => 'onArrayFilterEvent',
 			ModerationUsersTabsEvent::NAME            => 'onModerationUsersTabsEvent',
-			ArrayFilterEvent::NAV_INFO                => 'onArrayFilterEvent',
+			NavInfoEvent::NAME                        => 'onNavInfoEvent',
 			NetworkContentStartEvent::NAME            => 'onNetworkContentStartEvent',
 			NetworkContentTabsEvent::NAME             => 'onNetworkContentTabsEvent',
 			NetworkToNameEvent::NAME                  => 'onNetworkToNameEvent',
@@ -1448,12 +1449,63 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('Behaviour', $event->getTabsArray()[1]['label']);
 	}
 
+	public function testOnNavInfoEventCallsHookWithCorrectValue(): void
+	{
+		$event = new NavInfoEvent(
+			'<span id="logo-text"><a href="https://friendi.ca">Friendica</a></span>',
+			['login' => ['login', 'Sign in', 'selected', 'Sign in']],
+			'@friendica@friendi.ca',
+			null,
+		);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('nav_info', $name);
+			$this->assertSame([
+				'banner'       => '<span id="logo-text"><a href="https://friendi.ca">Friendica</a></span>',
+				'nav'          => ['login' => ['login', 'Sign in', 'selected', 'Sign in']],
+				'sitelocation' => '@friendica@friendi.ca',
+				'userinfo'     => null,
+			], $data);
+
+			return [
+				'banner'       => '<a href="https://friendi.ca">Friendica</a>',
+				'nav'          => ['logout' => ['logout', 'Sign out', '', 'End this session']],
+				'sitelocation' => '@friendica@friendi.ca',
+				'userinfo'     => ['icon' => 'images/user.png', 'name' => 'John', 'link' => 'profile/john'],
+			];
+		});
+
+		HookEventBridge::onNavInfoEvent($event);
+
+		$this->assertSame('<a href="https://friendi.ca">Friendica</a>', $event->getBanner());
+		$this->assertSame(['logout' => ['logout', 'Sign out', '', 'End this session']], $event->getNavArray());
+		$this->assertSame('@friendica@friendi.ca', $event->getSitelocation());
+		$this->assertSame(['icon' => 'images/user.png', 'name' => 'John', 'link' => 'profile/john'], $event->getUserinfoArray());
+	}
+
+	public function testOnNavInfoEventKeepsUserinfoNullOnEmptyHookData(): void
+	{
+		$event = new NavInfoEvent('<h1>Banner</h1>', ['network' => null], '@friendica@friendi.ca', null);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			return [];
+		});
+
+		HookEventBridge::onNavInfoEvent($event);
+
+		$this->assertNull($event->getUserinfoArray());
+	}
+
 	public static function getArrayFilterEventData(): array
 	{
 		return [
 			['test', 'test'],
 			[AppMenuEvent::NAME, 'app_menu'],
-			[ArrayFilterEvent::NAV_INFO, 'nav_info'],
+			[NavInfoEvent::NAME, 'nav_info'],
 			[PhotoUploadEvent::NAME, 'photo_post_file'],
 			[NetworkToNameEvent::NAME, 'network_to_name'],
 			[NetworkContentStartEvent::NAME, 'network_content_init'],

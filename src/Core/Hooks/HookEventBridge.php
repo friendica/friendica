@@ -69,6 +69,7 @@ use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\ModerationUsersTabsEvent;
+use Friendica\Event\NavInfoEvent;
 use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\NetworkContentStartEvent;
 use Friendica\Event\NetworkContentTabsEvent;
@@ -171,7 +172,7 @@ final class HookEventBridge
 		MagicAuthSuccessEvent::NAME               => 'magic_auth_success',
 		ArrayFilterEvent::MAP_GET_COORDINATES     => 'Map::getCoordinates',
 		ModerationUsersTabsEvent::NAME            => 'moderation_users_tabs',
-		ArrayFilterEvent::NAV_INFO                => 'nav_info',
+		NavInfoEvent::NAME                        => 'nav_info',
 		NetworkContentStartEvent::NAME            => 'network_content_init',
 		NetworkContentTabsEvent::NAME             => 'network_tabs',
 		NetworkToNameEvent::NAME                  => 'network_to_name',
@@ -289,7 +290,7 @@ final class HookEventBridge
 			MagicAuthSuccessEvent::NAME               => 'onMagicAuthSuccessEvent',
 			ArrayFilterEvent::MAP_GET_COORDINATES     => 'onArrayFilterEvent',
 			ModerationUsersTabsEvent::NAME            => 'onModerationUsersTabsEvent',
-			ArrayFilterEvent::NAV_INFO                => 'onArrayFilterEvent',
+			NavInfoEvent::NAME                        => 'onNavInfoEvent',
 			NetworkContentStartEvent::NAME            => 'onNetworkContentStartEvent',
 			NetworkContentTabsEvent::NAME             => 'onNetworkContentTabsEvent',
 			NetworkToNameEvent::NAME                  => 'onNetworkToNameEvent',
@@ -1125,6 +1126,26 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setTabsArray((array) $hook_data['tabs']);
+	}
+
+	/**
+	 * Map the NavInfoEvent to `nav_info` hook
+	 */
+	public static function onNavInfoEvent(NavInfoEvent $event): void
+	{
+		$hook_data = [
+			'banner'       => $event->getBanner(),
+			'nav'          => $event->getNavArray(),
+			'sitelocation' => $event->getSitelocation(),
+			'userinfo'     => $event->getUserinfoArray(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setBanner((string) ($hook_data['banner'] ?? ''));
+		$event->setNavArray((array) ($hook_data['nav'] ?? []));
+		$event->setSitelocation((string) ($hook_data['sitelocation'] ?? ''));
+		$event->setUserinfoArray(is_array($hook_data['userinfo'] ?? null) ? $hook_data['userinfo'] : null);
 	}
 
 	/**

@@ -15,8 +15,8 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Event\AppMenuEvent;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\NavInfoEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Module\Conversation\Community;
@@ -308,17 +308,15 @@ class Nav
 			$banner = '<a href="https://friendi.ca"><img id="logo-img" width="32" height="32" src="images/friendica.svg" alt="logo" /></a><span id="logo-text"><a href="https://friendi.ca">Friendica</a></span>';
 		}
 
-		$nav_info = [
-			'banner'       => $banner,
-			'nav'          => $nav,
-			'sitelocation' => $sitelocation,
-			'userinfo'     => $userinfo,
+		$event = $this->eventDispatcher->dispatch(
+			new NavInfoEvent($banner, $nav, $sitelocation, $userinfo),
+		);
+
+		return [
+			'banner'       => $event->getBanner(),
+			'nav'          => $event->getNavArray(),
+			'sitelocation' => $event->getSitelocation(),
+			'userinfo'     => $event->getUserinfoArray(),
 		];
-
-		$nav_info = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NAV_INFO, $nav_info),
-		)->getArray();
-
-		return $nav_info;
 	}
 }

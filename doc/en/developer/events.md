@@ -75,6 +75,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `app_menu` | `\Friendica\Event\AppMenuEvent` |
+| `nav_info` | `\Friendica\Event\NavInfoEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -242,6 +243,22 @@ Fired when the app menu entries are about to be rendered, to allow addons to add
 
 **Modifiable:**
 - `setAppMenuArray(array $appMenu): void` — change the list of app menu HTML entries
+
+### `\Friendica\Event\NavInfoEvent`
+
+Fired when the navigation information for the template is about to be returned, to allow addons to add, change or remove navigation entries.
+
+**Contained data:**
+- `getBanner(): string` — the banner HTML
+- `getNavArray(): array` — the navigation entries
+- `getSitelocation(): string` — the webbie (username@site.com)
+- `getUserinfoArray(): ?array` — the user information (name, icon), `null` if not authenticated
+
+**Modifiable:**
+- `setBanner(string $banner): void` — change the banner HTML
+- `setNavArray(array $nav): void` — change the navigation entries
+- `setSitelocation(string $sitelocation): void` — change the webbie
+- `setUserinfoArray(?array $userinfo): void` — change the user information
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 
