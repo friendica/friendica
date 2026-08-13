@@ -28,6 +28,7 @@ use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DbStructureDefinitionEvent;
+use Friendica\Event\DbViewDefinitionEvent;
 use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
@@ -141,7 +142,7 @@ final class HookEventBridge
 		ContactPhotoMenuEvent::NAME               => 'contact_photo_menu',
 		ConversationStartEvent::NAME              => 'conversation_start',
 		DbStructureDefinitionEvent::NAME          => 'dbstructure_definition',
-		ArrayFilterEvent::DB_VIEW_DEFINITION      => 'dbview_definition',
+		DbViewDefinitionEvent::NAME               => 'dbview_definition',
 		DetectLanguagesEvent::NAME                => 'detect_languages',
 		DirectoryItemEvent::NAME                  => 'directory_item',
 		DisplayItemEvent::NAME                    => 'display_item',
@@ -259,7 +260,7 @@ final class HookEventBridge
 			ContactPhotoMenuEvent::NAME               => 'onContactPhotoMenuEvent',
 			ConversationStartEvent::NAME              => 'onConversationStartEvent',
 			DbStructureDefinitionEvent::NAME          => 'onDbStructureDefinitionEvent',
-			ArrayFilterEvent::DB_VIEW_DEFINITION      => 'onArrayFilterEvent',
+			DbViewDefinitionEvent::NAME               => 'onDbViewDefinitionEvent',
 			DetectLanguagesEvent::NAME                => 'onDetectLanguagesEvent',
 			DirectoryItemEvent::NAME                  => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                    => 'onDisplayItemEvent',
@@ -425,6 +426,16 @@ final class HookEventBridge
 	 * Map the DbStructureDefinitionEvent to `dbstructure_definition` hook
 	 */
 	public static function onDbStructureDefinitionEvent(DbStructureDefinitionEvent $event): void
+	{
+		$event->setDefinitionArray(
+			static::callHook($event->getName(), $event->getDefinitionArray()),
+		);
+	}
+
+	/**
+	 * Map the DbViewDefinitionEvent to `dbview_definition` hook
+	 */
+	public static function onDbViewDefinitionEvent(DbViewDefinitionEvent $event): void
 	{
 		$event->setDefinitionArray(
 			static::callHook($event->getName(), $event->getDefinitionArray()),

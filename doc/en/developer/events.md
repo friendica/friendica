@@ -83,6 +83,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `storage_config` | `\Friendica\Event\StorageConfigEvent` |
 | `storage_instance` | `\Friendica\Event\StorageInstanceEvent` |
 | `dbstructure_definition` | `\Friendica\Event\DbStructureDefinitionEvent` |
+| `dbview_definition` | `\Friendica\Event\DbViewDefinitionEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -339,6 +340,16 @@ Fired after the database structure definition has been loaded, to allow addons t
 
 **Modifiable:**
 - `setDefinitionArray(array $definition): void` — change the database structure definition
+
+### `\Friendica\Event\DbViewDefinitionEvent`
+
+Fired after the database view definition has been loaded, to allow addons to add, change or remove views.
+
+**Contained data:**
+- `getDefinitionArray(): array` — the database view definition (view name → `{fields, query}`)
+
+**Modifiable:**
+- `setDefinitionArray(array $definition): void` — change the database view definition
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 

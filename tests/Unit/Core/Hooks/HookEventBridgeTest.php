@@ -33,6 +33,7 @@ use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DbStructureDefinitionEvent;
+use Friendica\Event\DbViewDefinitionEvent;
 use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
@@ -146,7 +147,7 @@ class HookEventBridgeTest extends TestCase
 			ContactPhotoMenuEvent::NAME               => 'onContactPhotoMenuEvent',
 			ConversationStartEvent::NAME              => 'onConversationStartEvent',
 			DbStructureDefinitionEvent::NAME          => 'onDbStructureDefinitionEvent',
-			ArrayFilterEvent::DB_VIEW_DEFINITION      => 'onArrayFilterEvent',
+			DbViewDefinitionEvent::NAME               => 'onDbViewDefinitionEvent',
 			DetectLanguagesEvent::NAME                => 'onDetectLanguagesEvent',
 			DirectoryItemEvent::NAME                  => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                    => 'onDisplayItemEvent',
@@ -686,6 +687,48 @@ class HookEventBridgeTest extends TestCase
 			'rules' => [
 				'fields' => [
 					'id' => ['type' => 'int unsigned', 'primary' => '1'],
+				],
+			],
+		], $event->getDefinitionArray());
+	}
+
+	public function testOnDbViewDefinitionEventCallsHookWithCorrectValue(): void
+	{
+		$event = new DbViewDefinitionEvent([
+			'user-view' => [
+				'fields' => [
+					'uid' => ['type' => 'int unsigned'],
+				],
+			],
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('dbview_definition', $name);
+			$this->assertSame([
+				'user-view' => [
+					'fields' => [
+						'uid' => ['type' => 'int unsigned'],
+					],
+				],
+			], $data);
+
+			return [
+				'post-view' => [
+					'fields' => [
+						'id' => ['type' => 'int unsigned'],
+					],
+				],
+			];
+		});
+
+		HookEventBridge::onDbViewDefinitionEvent($event);
+
+		$this->assertSame([
+			'post-view' => [
+				'fields' => [
+					'id' => ['type' => 'int unsigned'],
 				],
 			],
 		], $event->getDefinitionArray());
@@ -1778,7 +1821,7 @@ class HookEventBridgeTest extends TestCase
 			[StorageConfigEvent::NAME, 'storage_config'],
 			[StorageInstanceEvent::NAME, 'storage_instance'],
 			[DbStructureDefinitionEvent::NAME, 'dbstructure_definition'],
-			[ArrayFilterEvent::DB_VIEW_DEFINITION, 'dbview_definition'],
+			[DbViewDefinitionEvent::NAME, 'dbview_definition'],
 		];
 	}
 
