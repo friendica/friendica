@@ -36,6 +36,7 @@ use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
+use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -147,7 +148,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::EVENT_CREATED              => 'onEventCreatedEvent',
 			ArrayFilterEvent::EVENT_UPDATED              => 'onEventUpdatedEvent',
 			FeatureEnabledEvent::NAME                    => 'onFeatureEnabledEvent',
-			ArrayFilterEvent::FEATURE_GET                => 'onArrayFilterEvent',
+			FeatureGetEvent::NAME                        => 'onFeatureGetEvent',
 			FetchItemByLinkEvent::NAME                   => 'onFetchItemByLinkEvent',
 			FollowContactEvent::NAME                     => 'onFollowContactEvent',
 			ArrayFilterEvent::GENERATE_MAP               => 'onArrayFilterEvent',
@@ -585,6 +586,25 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onFeatureEnabledEvent($event);
 
 		$this->assertTrue($event->isEnabled());
+	}
+
+	public function testOnFeatureGetEventCallsHookWithCorrectValue(): void
+	{
+		$features = ['general' => ['General Settings', [['expanding', 'Expanding Events', 'Provide the ability to expand posts', true, false]]]];
+		$event    = new FeatureGetEvent($features);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('get', $name);
+			$this->assertSame(['general' => ['General Settings', [['expanding', 'Expanding Events', 'Provide the ability to expand posts', true, false]]]], $data);
+
+			return ['network' => ['Network Widgets', [['circles', 'Circles', 'Display posts of the selected circle', true, false]]]];
+		});
+
+		HookEventBridge::onFeatureGetEvent($event);
+
+		$this->assertSame(['network' => ['Network Widgets', [['circles', 'Circles', 'Display posts of the selected circle', true, false]]]], $event->getFeatures());
 	}
 
 	public static function getCollectRoutesEventData(): array
@@ -1317,7 +1337,6 @@ class HookEventBridgeTest extends TestCase
 			['test', 'test'],
 			[ArrayFilterEvent::APP_MENU, 'app_menu'],
 			[ArrayFilterEvent::NAV_INFO, 'nav_info'],
-			[ArrayFilterEvent::FEATURE_GET, 'get'],
 			[PhotoUploadEvent::NAME, 'photo_post_file'],
 			[NetworkToNameEvent::NAME, 'network_to_name'],
 			[NetworkContentStartEvent::NAME, 'network_content_init'],

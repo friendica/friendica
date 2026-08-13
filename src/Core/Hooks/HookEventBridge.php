@@ -34,6 +34,7 @@ use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
+use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -145,7 +146,7 @@ final class HookEventBridge
 		ArrayFilterEvent::EVENT_CREATED              => 'event_created',
 		ArrayFilterEvent::EVENT_UPDATED              => 'event_updated',
 		FeatureEnabledEvent::NAME                    => 'isEnabled',
-		ArrayFilterEvent::FEATURE_GET                => 'get',
+		FeatureGetEvent::NAME                        => 'get',
 		FetchItemByLinkEvent::NAME                   => 'item_by_link',
 		FollowContactEvent::NAME                     => 'follow',
 		ArrayFilterEvent::GENERATE_MAP               => 'generate_map',
@@ -263,7 +264,7 @@ final class HookEventBridge
 			ArrayFilterEvent::EVENT_CREATED              => 'onEventCreatedEvent',
 			ArrayFilterEvent::EVENT_UPDATED              => 'onEventUpdatedEvent',
 			FeatureEnabledEvent::NAME                    => 'onFeatureEnabledEvent',
-			ArrayFilterEvent::FEATURE_GET                => 'onArrayFilterEvent',
+			FeatureGetEvent::NAME                        => 'onFeatureGetEvent',
 			FetchItemByLinkEvent::NAME                   => 'onFetchItemByLinkEvent',
 			FollowContactEvent::NAME                     => 'onFollowContactEvent',
 			ArrayFilterEvent::GENERATE_MAP               => 'onArrayFilterEvent',
@@ -455,6 +456,16 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setEnabled((bool) $hook_data['enabled']);
+	}
+
+	/**
+	 * Map the FeatureGetEvent to `get` hook
+	 */
+	public static function onFeatureGetEvent(FeatureGetEvent $event): void
+	{
+		$event->setFeatures(
+			(array) static::callHook($event->getName(), $event->getFeatures()),
+		);
 	}
 
 	/**

@@ -28,6 +28,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `avatar_lookup` | `\Friendica\Event\AvatarLookupEvent` |
 | `detect_languages` | `\Friendica\Event\DetectLanguagesEvent` |
 | `isEnabled` | `\Friendica\Event\FeatureEnabledEvent` |
+| `get` | `\Friendica\Event\FeatureGetEvent` |
 | `item_by_link` | `\Friendica\Event\FetchItemByLinkEvent` |
 | `follow` | `\Friendica\Event\FollowContactEvent` |
 | `unfollow` | `\Friendica\Event\UnfollowContactEvent` |
@@ -377,6 +378,16 @@ Fired when checking whether a feature is enabled for a user, to allow addons to 
 
 **Modifiable:**
 - `setEnabled(bool $enabled): void` — change whether the feature is considered enabled
+
+### `\Friendica\Event\FeatureGetEvent`
+
+Fired when the list of available features for the feature settings is about to be returned.
+
+**Contained data:**
+- `getFeatures(): array` — the list of available features
+
+**Modifiable:**
+- `setFeatures(array $features): void` — change the list of available features
 
 ### `\Friendica\Event\FollowContactEvent`
 

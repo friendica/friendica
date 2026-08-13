@@ -8,8 +8,8 @@
 namespace Friendica\Content;
 
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\FeatureEnabledEvent;
+use Friendica\Event\FeatureGetEvent;
 
 class Feature
 {
@@ -172,10 +172,10 @@ class Feature
 			}
 		}
 
-		$arr = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::FEATURE_GET, $arr),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new FeatureGetEvent($arr),
+		);
 
-		return $arr;
+		return $event->getFeatures();
 	}
 }
