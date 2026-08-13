@@ -26,8 +26,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const MODERATION_USERS_TABS = 'friendica.data.moderation_users_tabs';
 
-	public const ACL_LOOKUP_END = 'friendica.data.acl_lookup_end';
-
 	public const EVENT_CREATED = 'friendica.data.event_created';
 
 	public const EVENT_UPDATED = 'friendica.data.event_updated';

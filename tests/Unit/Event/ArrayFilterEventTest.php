@@ -29,7 +29,6 @@ class ArrayFilterEventTest extends TestCase
 			[ArrayFilterEvent::NAV_INFO, 'friendica.data.nav_info'],
 			[ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, 'friendica.data.permission_tooltip_content'],
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'friendica.data.moderation_users_tabs'],
-			[ArrayFilterEvent::ACL_LOOKUP_END, 'friendica.data.acl_lookup_end'],
 			[ArrayFilterEvent::EVENT_CREATED, 'friendica.data.event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'friendica.data.event_updated'],
 			[ArrayFilterEvent::ADD_WORKER_TASK, 'friendica.data.add_worker_task'],

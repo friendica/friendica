@@ -15,6 +15,7 @@ use Friendica\Event\AccountRegisterEvent;
 use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
+use Friendica\Event\AclLookupEndEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\AvatarLookupEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
@@ -115,7 +116,7 @@ final class HookEventBridge
 		AccountRegisterFormEvent::NAME               => 'register_form',
 		AccountRegisterPostEvent::NAME               => 'register_post',
 		AccountRemoveEvent::NAME                     => 'remove_user',
-		ArrayFilterEvent::ACL_LOOKUP_END             => 'acl_lookup_end',
+		AclLookupEndEvent::NAME                      => 'acl_lookup_end',
 		ArrayFilterEvent::ADD_WORKER_TASK            => 'proc_run',
 		ArrayFilterEvent::ADDON_SETTINGS_POST        => 'addon_settings_post',
 		ArrayFilterEvent::APP_MENU                   => 'app_menu',
@@ -233,7 +234,7 @@ final class HookEventBridge
 			AccountRegisterFormEvent::NAME               => 'onAccountRegisterFormEvent',
 			AccountRegisterPostEvent::NAME               => 'onAccountRegisterPostEvent',
 			AccountRemoveEvent::NAME                     => 'onAccountRemoveEvent',
-			ArrayFilterEvent::ACL_LOOKUP_END             => 'onArrayFilterEvent',
+			AclLookupEndEvent::NAME                      => 'onAclLookupEndEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK            => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADDON_SETTINGS_POST        => 'onArrayFilterEvent',
 			ArrayFilterEvent::APP_MENU                   => 'onArrayFilterEvent',
@@ -1049,6 +1050,30 @@ final class HookEventBridge
 	public static function onAccountRemoveEvent(AccountRemoveEvent $event): void
 	{
 		$event->setUserArray((array) static::callHook($event->getName(), $event->getUserArray()));
+	}
+
+	/**
+	 * Map the AclLookupEndEvent to `acl_lookup_end` hook
+	 */
+	public static function onAclLookupEndEvent(AclLookupEndEvent $event): void
+	{
+		$hook_data = [
+			'tot'      => $event->getTotal(),
+			'start'    => $event->getStart(),
+			'count'    => $event->getCount(),
+			'circles'  => $event->getCircles(),
+			'contacts' => $event->getContacts(),
+			'items'    => $event->getItems(),
+			'type'     => $event->getType(),
+			'search'   => $event->getSearch(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setTotal((int) $hook_data['tot']);
+		$event->setStart((int) $hook_data['start']);
+		$event->setCount((int) $hook_data['count']);
+		$event->setItems((array) $hook_data['items']);
 	}
 
 	/**

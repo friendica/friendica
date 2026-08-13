@@ -82,6 +82,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `remove_user` | `\Friendica\Event\AccountRemoveEvent` |
 | `magic_auth_success` | `\Friendica\Event\MagicAuthSuccessEvent` |
 | `zrl_init` | `\Friendica\Event\ZrlInitEvent` |
+| `acl_lookup_end` | `\Friendica\Event\AclLookupEndEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -158,6 +159,26 @@ Fired when a user account is being removed.
 
 **Modifiable:**
 - `setUserArray(array $user): void` — change the user record
+
+### `\Friendica\Event\AclLookupEndEvent`
+
+Fired after the ACL autocomplete lookup results are collected, to allow addons to add, change or remove the lookup results.
+
+**Contained data:**
+- `getTotal(): int` — the total number of results
+- `getStart(): int` — the first result returned
+- `getCount(): int` — the number of results returned
+- `getCircles(): array` — the circle lookup results (read-only)
+- `getContacts(): array` — the contact lookup results (read-only)
+- `getItems(): array` — the merged lookup results
+- `getType(): string` — the type of lookup performed (read-only)
+- `getSearch(): string` — the search term (read-only)
+
+**Modifiable:**
+- `setTotal(int $total): void` — change the total number of results
+- `setStart(int $start): void` — change the first result returned
+- `setCount(int $count): void` — change the number of results returned
+- `setItems(array $items): void` — change the merged lookup results
 
 ### `\Friendica\Event\LoggedInEvent`
 

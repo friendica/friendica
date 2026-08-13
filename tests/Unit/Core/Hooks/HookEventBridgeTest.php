@@ -17,6 +17,7 @@ use Friendica\Event\AccountRegisterEvent;
 use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
+use Friendica\Event\AclLookupEndEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\AvatarLookupEvent;
 use Friendica\Event\BbcodeToHtmlStartEvent;
@@ -117,7 +118,7 @@ class HookEventBridgeTest extends TestCase
 			AccountRegisterFormEvent::NAME               => 'onAccountRegisterFormEvent',
 			AccountRegisterPostEvent::NAME               => 'onAccountRegisterPostEvent',
 			AccountRemoveEvent::NAME                     => 'onAccountRemoveEvent',
-			ArrayFilterEvent::ACL_LOOKUP_END             => 'onArrayFilterEvent',
+			AclLookupEndEvent::NAME                      => 'onAclLookupEndEvent',
 			ArrayFilterEvent::ADD_WORKER_TASK            => 'onArrayFilterEvent',
 			ArrayFilterEvent::ADDON_SETTINGS_POST        => 'onArrayFilterEvent',
 			ArrayFilterEvent::APP_MENU                   => 'onArrayFilterEvent',
@@ -1293,6 +1294,54 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onAccountRemoveEvent($event);
 	}
 
+	public function testOnAclLookupEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AclLookupEndEvent(
+			5,
+			0,
+			10,
+			[['type' => 'circle', 'name' => 'Friends', 'id' => 1]],
+			[['type' => 'contact', 'name' => 'John', 'id' => 2]],
+			[['type' => 'contact', 'name' => 'Jane', 'id' => 3]],
+			'contact',
+			'john',
+		);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('acl_lookup_end', $name);
+			$this->assertSame([
+				'tot'      => 5,
+				'start'    => 0,
+				'count'    => 10,
+				'circles'  => [['type' => 'circle', 'name' => 'Friends', 'id' => 1]],
+				'contacts' => [['type' => 'contact', 'name' => 'John', 'id' => 2]],
+				'items'    => [['type' => 'contact', 'name' => 'Jane', 'id' => 3]],
+				'type'     => 'contact',
+				'search'   => 'john',
+			], $data);
+
+			return [
+				'tot'      => 6,
+				'start'    => 1,
+				'count'    => 20,
+				'circles'  => [['type' => 'circle', 'name' => 'Friends', 'id' => 1]],
+				'contacts' => [['type' => 'contact', 'name' => 'John', 'id' => 2]],
+				'items'    => [['type' => 'contact', 'name' => 'Joe', 'id' => 4]],
+				'type'     => 'contact',
+				'search'   => 'john',
+			];
+		});
+
+		HookEventBridge::onAclLookupEndEvent($event);
+
+		$this->assertSame(6, $event->getTotal());
+		$this->assertSame(1, $event->getStart());
+		$this->assertSame(20, $event->getCount());
+		$this->assertSame([['type' => 'contact', 'name' => 'Joe', 'id' => 4]], $event->getItems());
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => ['id' => 123]]);
@@ -1350,7 +1399,7 @@ class HookEventBridgeTest extends TestCase
 			[ProfileSettingsFormEvent::NAME, 'profile_edit'],
 			[ProfileSettingsPostEvent::NAME, 'profile_post'],
 			[ArrayFilterEvent::MODERATION_USERS_TABS, 'moderation_users_tabs'],
-			[ArrayFilterEvent::ACL_LOOKUP_END, 'acl_lookup_end'],
+			[AclLookupEndEvent::NAME, 'acl_lookup_end'],
 			[PageInfoEvent::NAME, 'page_info_data'],
 			[SmileyListEvent::NAME, 'smilie'],
 			[JotNetworksEvent::NAME, 'jot_networks'],
