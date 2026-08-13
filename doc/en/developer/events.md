@@ -44,6 +44,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `network_content_init` | `\Friendica\Event\NetworkContentStartEvent` |
 | `network_tabs` | `\Friendica\Event\NetworkContentTabsEvent` |
 | `parse_link` | `\Friendica\Event\ParseLinkEvent` |
+| `lockview_content` | `\Friendica\Event\PermissionTooltipContentEvent` |
 | `probe_detect` | `\Friendica\Event\ProbeDetectEvent` |
 | `support_follow` | `\Friendica\Event\ProtocolSupportsFollowEvent` |
 | `support_probe` | `\Friendica\Event\ProtocolSupportsProbeEvent` |
@@ -572,6 +573,16 @@ Fired when a link is being parsed.
 
 **Modifiable:**
 - `setText(?string $text): void` — provide the parsed text
+
+### `\Friendica\Event\PermissionTooltipContentEvent`
+
+Fired before the permission tooltip HTML content is rendered.
+
+**Contained data:**
+- `getModelArray(): array` — the item, photo or event model
+
+**Modifiable:**
+- `setModelArray(array $model): void` — change the model
 
 ### `\Friendica\Event\ProbeDetectEvent`
 
