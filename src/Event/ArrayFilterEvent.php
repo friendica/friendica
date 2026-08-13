@@ -22,8 +22,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const EVENT_UPDATED = 'friendica.data.event_updated';
 
-	public const STORAGE_CONFIG = 'friendica.data.storage_config';
-
 	public const STORAGE_INSTANCE = 'friendica.data.storage_instance';
 
 	public const DB_STRUCTURE_DEFINITION = 'friendica.data.db_structure_definition';

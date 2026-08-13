@@ -90,6 +90,7 @@ use Friendica\Event\PermissionTooltipContentEvent;
 use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\RevokeFollowContactEvent;
 use Friendica\Event\SmileyListEvent;
+use Friendica\Event\StorageConfigEvent;
 use Friendica\Event\TemplateVarsEvent;
 use Friendica\Event\UnblockContactEvent;
 use Friendica\Event\UnfollowContactEvent;
@@ -207,7 +208,7 @@ final class HookEventBridge
 		RenderLocationEvent::NAME                 => 'render_location',
 		RevokeFollowContactEvent::NAME            => 'revoke_follow',
 		SmileyListEvent::NAME                     => 'smilie',
-		ArrayFilterEvent::STORAGE_CONFIG          => 'storage_config',
+		StorageConfigEvent::NAME                  => 'storage_config',
 		ArrayFilterEvent::STORAGE_INSTANCE        => 'storage_instance',
 		TemplateVarsEvent::NAME                   => 'template_vars',
 		UnblockContactEvent::NAME                 => 'unblock',
@@ -325,7 +326,7 @@ final class HookEventBridge
 			RenderLocationEvent::NAME                 => 'onRenderLocationEvent',
 			RevokeFollowContactEvent::NAME            => 'onRevokeFollowContactEvent',
 			SmileyListEvent::NAME                     => 'onSmileyListEvent',
-			ArrayFilterEvent::STORAGE_CONFIG          => 'onArrayFilterEvent',
+			StorageConfigEvent::NAME                  => 'onStorageConfigEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE        => 'onArrayFilterEvent',
 			TemplateVarsEvent::NAME                   => 'onTemplateVarsEvent',
 			UnblockContactEvent::NAME                 => 'onUnblockContactEvent',
@@ -1346,6 +1347,23 @@ final class HookEventBridge
 
 		if (isset($data['icons'])) {
 			$event->setIcons($data['icons']);
+		}
+	}
+
+	/**
+	 * Map the StorageConfigEvent to `storage_config` hook
+	 */
+	public static function onStorageConfigEvent(StorageConfigEvent $event): void
+	{
+		$hook_data = [
+			'name'           => $event->getBackendName(),
+			'storage_config' => $event->getConfig(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['storage_config'])) {
+			$event->setConfig($hook_data['storage_config']);
 		}
 	}
 

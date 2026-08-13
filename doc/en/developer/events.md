@@ -80,6 +80,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
+| `storage_config` | `\Friendica\Event\StorageConfigEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -304,6 +305,17 @@ Fired when the export options on the "Export personal data" page are collected, 
 
 **Modifiable:**
 - `setOptionsArray(array $options): void` — change the export options
+
+### `\Friendica\Event\StorageConfigEvent`
+
+Fired when the configuration form for a storage backend is requested, to allow addons to provide an `ICanConfigureStorage` instance.
+
+**Contained data:**
+- `getBackendName(): string` — the backend name
+- `getConfig(): ?ICanConfigureStorage` — `null` by default
+
+**Modifiable:**
+- `setConfig(?ICanConfigureStorage $config): void` — provide the backend configuration
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 

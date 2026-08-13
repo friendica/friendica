@@ -12,6 +12,7 @@ namespace Friendica\Test\Unit\Core\Hooks;
 use FastRoute\RouteCollector;
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Hooks\HookEventBridge;
+use Friendica\Core\Storage\Capability\ICanConfigureStorage;
 use Friendica\Core\Worker;
 use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\AccountRegisterEvent;
@@ -72,6 +73,7 @@ use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\PermissionTooltipContentEvent;
 use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\SmileyListEvent;
+use Friendica\Event\StorageConfigEvent;
 use Friendica\Event\TemplateVarsEvent;
 use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostLocalStartEvent;
@@ -210,7 +212,7 @@ class HookEventBridgeTest extends TestCase
 			RenderLocationEvent::NAME                 => 'onRenderLocationEvent',
 			RevokeFollowContactEvent::NAME            => 'onRevokeFollowContactEvent',
 			SmileyListEvent::NAME                     => 'onSmileyListEvent',
-			ArrayFilterEvent::STORAGE_CONFIG          => 'onArrayFilterEvent',
+			StorageConfigEvent::NAME                  => 'onStorageConfigEvent',
 			ArrayFilterEvent::STORAGE_INSTANCE        => 'onArrayFilterEvent',
 			TemplateVarsEvent::NAME                   => 'onTemplateVarsEvent',
 			UnblockContactEvent::NAME                 => 'onUnblockContactEvent',
@@ -1053,6 +1055,46 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame(['<img src="heart.gif" />', '<img src="smile.gif" />'], $event->getIcons());
 	}
 
+	public function testOnStorageConfigEventCallsHookWithCorrectValue(): void
+	{
+		$event     = new StorageConfigEvent('s3_storage');
+		$getConfig = $this->createStub(ICanConfigureStorage::class);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data) use ($getConfig): array {
+			$this->assertSame('storage_config', $name);
+			$this->assertSame([
+				'name'           => 's3_storage',
+				'storage_config' => null,
+			], $data);
+
+			return [
+				'name'           => 's3_storage',
+				'storage_config' => $getConfig,
+			];
+		});
+
+		HookEventBridge::onStorageConfigEvent($event);
+
+		$this->assertSame($getConfig, $event->getConfig());
+	}
+
+	public function testOnStorageConfigEventKeepsConfigNullOnEmptyHookData(): void
+	{
+		$event = new StorageConfigEvent('s3_storage');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			return [];
+		});
+
+		HookEventBridge::onStorageConfigEvent($event);
+
+		$this->assertNull($event->getConfig());
+	}
+
 	public function testOnTemplateVarsEventCallsHookWithCorrectValue(): void
 	{
 		$event = new TemplateVarsEvent('test.tpl', ['foo' => 'bar']);
@@ -1648,7 +1690,7 @@ class HookEventBridgeTest extends TestCase
 			[ArrayFilterEvent::EVENT_CREATED, 'event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'event_updated'],
 			[AddWorkerTaskEvent::NAME, 'proc_run'],
-			[ArrayFilterEvent::STORAGE_CONFIG, 'storage_config'],
+			[StorageConfigEvent::NAME, 'storage_config'],
 			[ArrayFilterEvent::STORAGE_INSTANCE, 'storage_instance'],
 			[ArrayFilterEvent::DB_STRUCTURE_DEFINITION, 'dbstructure_definition'],
 			[ArrayFilterEvent::DB_VIEW_DEFINITION, 'dbview_definition'],
