@@ -18,6 +18,9 @@ final class GlobalDirUpdateEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.data.global_dir_update';
 
+	/**
+	 * @internal
+	 */
 	public function __construct(
 		private string $url,
 	) {

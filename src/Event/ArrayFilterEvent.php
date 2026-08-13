@@ -56,8 +56,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const OTHER_UNENCAPSULATE = 'friendica.data.other_unencapsulate';
 
-	public const USER_EXPORT_OPTIONS = 'friendica.data.user_export_options';
-
 	public function __construct(string $name, private array $array)
 	{
 		parent::__construct($name);

@@ -9,7 +9,7 @@ namespace Friendica\Module\Settings;
 
 use Friendica\App;
 use Friendica\Core\L10n;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\UserExportOptionsEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
@@ -87,8 +87,8 @@ class UserExport extends BaseSettings
 			['settings/userexport/contact?t=' . $t, $this->l10n->t('Export Contacts to CSV'), $this->l10n->t('Export the list of the accounts you are following as CSV file. Compatible to e.g. Mastodon.')],
 		];
 		$options = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::USER_EXPORT_OPTIONS, $options),
-		)->getArray();
+			new UserExportOptionsEvent($options),
+		)->getOptionsArray();
 
 		$tpl = Renderer::getMarkupTemplate('settings/userexport.tpl');
 		return Renderer::replaceMacros($tpl, [

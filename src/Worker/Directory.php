@@ -40,8 +40,8 @@ class Directory
 		)->getUrl();
 
 		DI::logger()->info('Updating directory: ' . $url);
-		if (strlen($url)) {
-			DI::httpClient()->fetch($dir . '?url=' . bin2hex($url), HttpClientAccept::HTML, 0, '', HttpClientRequest::CONTACTDISCOVER);
+		if (strlen((string) $url)) {
+			DI::httpClient()->fetch($dir . '?url=' . bin2hex((string) $url), HttpClientAccept::HTML, 0, '', HttpClientRequest::CONTACTDISCOVER);
 		}
 
 		return;

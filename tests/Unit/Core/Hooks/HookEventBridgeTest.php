@@ -99,6 +99,7 @@ use Friendica\Event\ModulePostRecipientEvent;
 use Friendica\Event\ZrlInitEvent;
 use Friendica\Event\UnblockContactEvent;
 use Friendica\Event\UnfollowContactEvent;
+use Friendica\Event\UserExportOptionsEvent;
 use Friendica\Event\RevokeFollowContactEvent;
 use PHPUnit\Framework\TestCase;
 
@@ -214,7 +215,7 @@ class HookEventBridgeTest extends TestCase
 			TemplateVarsEvent::NAME                   => 'onTemplateVarsEvent',
 			UnblockContactEvent::NAME                 => 'onUnblockContactEvent',
 			UnfollowContactEvent::NAME                => 'onUnfollowContactEvent',
-			ArrayFilterEvent::USER_EXPORT_OPTIONS     => 'onArrayFilterEvent',
+			UserExportOptionsEvent::NAME              => 'onUserExportOptionsEvent',
 			ZrlInitEvent::NAME                        => 'onZrlInitEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END        => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                   => 'onHtmlFilterEvent',
@@ -466,6 +467,32 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onGlobalDirUpdateEvent($event);
 
 		$this->assertSame('', $event->getUrl());
+	}
+
+	public function testOnUserExportOptionsEventCallsHookWithCorrectValue(): void
+	{
+		$event = new UserExportOptionsEvent([
+			['settings/userexport/account', 'Export account', 'Export your account info and contacts.'],
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('uexport_options', $name);
+			$this->assertSame([
+				['settings/userexport/account', 'Export account', 'Export your account info and contacts.'],
+			], $data);
+
+			return [
+				['settings/userexport/backup', 'Export all', 'Export your account info, contacts and all your items.'],
+			];
+		});
+
+		HookEventBridge::onUserExportOptionsEvent($event);
+
+		$this->assertSame([
+			['settings/userexport/backup', 'Export all', 'Export your account info, contacts and all your items.'],
+		], $event->getOptionsArray());
 	}
 
 	public function testOnAppMenuEventCallsHookWithCorrectValue(): void
@@ -1608,6 +1635,7 @@ class HookEventBridgeTest extends TestCase
 			[GetSiteInfoEvent::NAME, 'getsiteinfo'],
 			[GlobalDirUpdateEvent::NAME, 'globaldir_update'],
 			[UnfollowContactEvent::NAME, 'unfollow'],
+			[UserExportOptionsEvent::NAME, 'uexport_options'],
 			[RevokeFollowContactEvent::NAME, 'revoke_follow'],
 			[BlockContactEvent::NAME, 'block'],
 			[UnblockContactEvent::NAME, 'unblock'],

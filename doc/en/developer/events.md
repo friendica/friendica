@@ -79,6 +79,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `proc_run` | `\Friendica\Event\AddWorkerTaskEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
+| `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -293,6 +294,16 @@ Fired before a profile URL is submitted to the global directory. Addons can chan
 
 **Modifiable:**
 - `setUrl(string $url): void` — change the profile URL
+
+### `\Friendica\Event\UserExportOptionsEvent`
+
+Fired when the export options on the "Export personal data" page are collected, to allow addons to add, change or remove options.
+
+**Contained data:**
+- `getOptionsArray(): array` — the export options, each as `[link URL, link text, help text]`
+
+**Modifiable:**
+- `setOptionsArray(array $options): void` — change the export options
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 

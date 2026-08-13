@@ -93,6 +93,7 @@ use Friendica\Event\SmileyListEvent;
 use Friendica\Event\TemplateVarsEvent;
 use Friendica\Event\UnblockContactEvent;
 use Friendica\Event\UnfollowContactEvent;
+use Friendica\Event\UserExportOptionsEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
@@ -211,7 +212,7 @@ final class HookEventBridge
 		TemplateVarsEvent::NAME                   => 'template_vars',
 		UnblockContactEvent::NAME                 => 'unblock',
 		UnfollowContactEvent::NAME                => 'unfollow',
-		ArrayFilterEvent::USER_EXPORT_OPTIONS     => 'uexport_options',
+		UserExportOptionsEvent::NAME              => 'uexport_options',
 		ZrlInitEvent::NAME                        => 'zrl_init',
 		HtmlFilterEvent::HEAD                     => 'head',
 		HtmlFilterEvent::FOOTER                   => 'footer',
@@ -329,7 +330,7 @@ final class HookEventBridge
 			TemplateVarsEvent::NAME                   => 'onTemplateVarsEvent',
 			UnblockContactEvent::NAME                 => 'onUnblockContactEvent',
 			UnfollowContactEvent::NAME                => 'onUnfollowContactEvent',
-			ArrayFilterEvent::USER_EXPORT_OPTIONS     => 'onArrayFilterEvent',
+			UserExportOptionsEvent::NAME              => 'onUserExportOptionsEvent',
 			ZrlInitEvent::NAME                        => 'onZrlInitEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END        => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                   => 'onHtmlFilterEvent',
@@ -1394,6 +1395,16 @@ final class HookEventBridge
 		if (isset($hook_data['result'])) {
 			$event->setResult((bool) $hook_data['result']);
 		}
+	}
+
+	/**
+	 * Map the UserExportOptionsEvent to `uexport_options` hook
+	 */
+	public static function onUserExportOptionsEvent(UserExportOptionsEvent $event): void
+	{
+		$event->setOptionsArray(
+			static::callHook($event->getName(), $event->getOptionsArray()),
+		);
 	}
 
 	public static function onContactPhotoMenuEvent(ContactPhotoMenuEvent $event): void
