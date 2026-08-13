@@ -91,6 +91,7 @@ use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\RevokeFollowContactEvent;
 use Friendica\Event\SmileyListEvent;
 use Friendica\Event\StorageConfigEvent;
+use Friendica\Event\StorageInstanceEvent;
 use Friendica\Event\TemplateVarsEvent;
 use Friendica\Event\UnblockContactEvent;
 use Friendica\Event\UnfollowContactEvent;
@@ -209,7 +210,7 @@ final class HookEventBridge
 		RevokeFollowContactEvent::NAME            => 'revoke_follow',
 		SmileyListEvent::NAME                     => 'smilie',
 		StorageConfigEvent::NAME                  => 'storage_config',
-		ArrayFilterEvent::STORAGE_INSTANCE        => 'storage_instance',
+		StorageInstanceEvent::NAME                => 'storage_instance',
 		TemplateVarsEvent::NAME                   => 'template_vars',
 		UnblockContactEvent::NAME                 => 'unblock',
 		UnfollowContactEvent::NAME                => 'unfollow',
@@ -327,7 +328,7 @@ final class HookEventBridge
 			RevokeFollowContactEvent::NAME            => 'onRevokeFollowContactEvent',
 			SmileyListEvent::NAME                     => 'onSmileyListEvent',
 			StorageConfigEvent::NAME                  => 'onStorageConfigEvent',
-			ArrayFilterEvent::STORAGE_INSTANCE        => 'onArrayFilterEvent',
+			StorageInstanceEvent::NAME                => 'onStorageInstanceEvent',
 			TemplateVarsEvent::NAME                   => 'onTemplateVarsEvent',
 			UnblockContactEvent::NAME                 => 'onUnblockContactEvent',
 			UnfollowContactEvent::NAME                => 'onUnfollowContactEvent',
@@ -1364,6 +1365,23 @@ final class HookEventBridge
 
 		if (isset($hook_data['storage_config'])) {
 			$event->setConfig($hook_data['storage_config']);
+		}
+	}
+
+	/**
+	 * Map the StorageInstanceEvent to `storage_instance` hook
+	 */
+	public static function onStorageInstanceEvent(StorageInstanceEvent $event): void
+	{
+		$hook_data = [
+			'name'    => $event->getBackendName(),
+			'storage' => $event->getStorage(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		if (isset($hook_data['storage'])) {
+			$event->setStorage($hook_data['storage']);
 		}
 	}
 

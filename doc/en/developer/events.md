@@ -81,6 +81,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
 | `storage_config` | `\Friendica\Event\StorageConfigEvent` |
+| `storage_instance` | `\Friendica\Event\StorageInstanceEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -316,6 +317,17 @@ Fired when the configuration form for a storage backend is requested, to allow a
 
 **Modifiable:**
 - `setConfig(?ICanConfigureStorage $config): void` — provide the backend configuration
+
+### `\Friendica\Event\StorageInstanceEvent`
+
+Fired when a storage backend instance is requested, to allow addons to provide one.
+
+**Contained data:**
+- `getBackendName(): string` — the backend name
+- `getStorage(): ?ICanReadFromStorage` — `null` by default
+
+**Modifiable:**
+- `setStorage(?ICanReadFromStorage $storage): void` — provide the backend instance
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 
