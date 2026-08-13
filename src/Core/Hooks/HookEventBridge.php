@@ -39,6 +39,7 @@ use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
+use Friendica\Event\GetSiteInfoEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalStartEvent;
@@ -157,7 +158,7 @@ final class HookEventBridge
 		FollowContactEvent::NAME                  => 'follow',
 		ArrayFilterEvent::GENERATE_MAP            => 'generate_map',
 		ArrayFilterEvent::GENERATE_NAMED_MAP      => 'generate_named_map',
-		ArrayFilterEvent::GET_SITE_INFO           => 'getsiteinfo',
+		GetSiteInfoEvent::NAME                    => 'getsiteinfo',
 		ArrayFilterEvent::GLOBAL_DIR_UPDATE       => 'globaldir_update',
 		HtmlToBbcodeEndEvent::NAME                => 'html2bbcode',
 		InsertPostLocalEvent::NAME                => 'post_local',
@@ -275,7 +276,7 @@ final class HookEventBridge
 			FollowContactEvent::NAME                  => 'onFollowContactEvent',
 			ArrayFilterEvent::GENERATE_MAP            => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP      => 'onArrayFilterEvent',
-			ArrayFilterEvent::GET_SITE_INFO           => 'onArrayFilterEvent',
+			GetSiteInfoEvent::NAME                    => 'onGetSiteInfoEvent',
 			ArrayFilterEvent::GLOBAL_DIR_UPDATE       => 'onArrayFilterEvent',
 			HtmlToBbcodeEndEvent::NAME                => 'onHtmlToBbcodeEvent',
 			InsertPostLocalEvent::NAME                => 'onInsertPostLocalEvent',
@@ -493,6 +494,16 @@ final class HookEventBridge
 		}
 
 		$event->setContactArray($hook_data['contact'] ?? $event->getContactArray());
+	}
+
+	/**
+	 * Map the GetSiteInfoEvent to `getsiteinfo` hook
+	 */
+	public static function onGetSiteInfoEvent(GetSiteInfoEvent $event): void
+	{
+		$event->setSiteInfoArray(
+			static::callHook($event->getName(), $event->getSiteInfoArray()),
+		);
 	}
 
 	/**

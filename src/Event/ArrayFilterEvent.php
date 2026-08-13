@@ -48,8 +48,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const GENERATE_NAMED_MAP = 'friendica.data.generate_named_map';
 
-	public const GET_SITE_INFO = 'friendica.data.get_site_info';
-
 	public const GLOBAL_DIR_UPDATE = 'friendica.data.global_dir_update';
 
 	public const MAP_GET_COORDINATES = 'friendica.data.map_get_coordinates';

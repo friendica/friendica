@@ -42,6 +42,7 @@ use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
+use Friendica\Event\GetSiteInfoEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\ItemPhotoMenuEvent;
@@ -160,7 +161,7 @@ class HookEventBridgeTest extends TestCase
 			FollowContactEvent::NAME                  => 'onFollowContactEvent',
 			ArrayFilterEvent::GENERATE_MAP            => 'onArrayFilterEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP      => 'onArrayFilterEvent',
-			ArrayFilterEvent::GET_SITE_INFO           => 'onArrayFilterEvent',
+			GetSiteInfoEvent::NAME                    => 'onGetSiteInfoEvent',
 			ArrayFilterEvent::GLOBAL_DIR_UPDATE       => 'onArrayFilterEvent',
 			HtmlToBbcodeEndEvent::NAME                => 'onHtmlToBbcodeEvent',
 			InsertPostLocalEvent::NAME                => 'onInsertPostLocalEvent',
@@ -410,6 +411,38 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertTrue($event->isAborted());
 		$this->assertSame([], $event->getContactArray());
+	}
+
+	public function testOnGetSiteInfoEventCallsHookWithCorrectValue(): void
+	{
+		$event = new GetSiteInfoEvent([
+			'url'  => 'https://example.org',
+			'type' => 'link',
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('getsiteinfo', $name);
+			$this->assertSame([
+				'url'  => 'https://example.org',
+				'type' => 'link',
+			], $data);
+
+			return [
+				'url'   => 'https://example.org',
+				'type'  => 'photo',
+				'title' => 'Example',
+			];
+		});
+
+		HookEventBridge::onGetSiteInfoEvent($event);
+
+		$this->assertSame([
+			'url'   => 'https://example.org',
+			'type'  => 'photo',
+			'title' => 'Example',
+		], $event->getSiteInfoArray());
 	}
 
 	public function testOnAppMenuEventCallsHookWithCorrectValue(): void
@@ -1549,6 +1582,7 @@ class HookEventBridgeTest extends TestCase
 			[SmileyListEvent::NAME, 'smilie'],
 			[JotNetworksEvent::NAME, 'jot_networks'],
 			[FollowContactEvent::NAME, 'follow'],
+			[GetSiteInfoEvent::NAME, 'getsiteinfo'],
 			[UnfollowContactEvent::NAME, 'unfollow'],
 			[RevokeFollowContactEvent::NAME, 'revoke_follow'],
 			[BlockContactEvent::NAME, 'block'],

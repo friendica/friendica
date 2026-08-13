@@ -77,6 +77,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `app_menu` | `\Friendica\Event\AppMenuEvent` |
 | `nav_info` | `\Friendica\Event\NavInfoEvent` |
 | `proc_run` | `\Friendica\Event\AddWorkerTaskEvent` |
+| `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -271,6 +272,16 @@ Fired before a task is added to the worker queue, to allow addons to prevent it 
 
 **Modifiable:**
 - `setRunCmd(bool $runCmd): void` — prevent the worker task from being executed
+
+### `\Friendica\Event\GetSiteInfoEvent`
+
+Fired after the site information of a URL has been scraped, before it is returned. Addons can add, change or remove parts of the site information.
+
+**Contained data:**
+- `getSiteInfoArray(): array` — the scraped site information (e.g. `url`, `type`, `title`, `text`, `images`)
+
+**Modifiable:**
+- `setSiteInfoArray(array $siteinfo): void` — change the site information
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 
