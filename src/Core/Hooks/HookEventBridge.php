@@ -16,6 +16,7 @@ use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\AclLookupEndEvent;
+use Friendica\Event\AddWorkerTaskEvent;
 use Friendica\Event\AppMenuEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\AvatarLookupEvent;
@@ -121,7 +122,7 @@ final class HookEventBridge
 		AccountRegisterPostEvent::NAME            => 'register_post',
 		AccountRemoveEvent::NAME                  => 'remove_user',
 		AclLookupEndEvent::NAME                   => 'acl_lookup_end',
-		ArrayFilterEvent::ADD_WORKER_TASK         => 'proc_run',
+		AddWorkerTaskEvent::NAME                  => 'proc_run',
 		ArrayFilterEvent::ADDON_SETTINGS_POST     => 'addon_settings_post',
 		AppMenuEvent::NAME                        => 'app_menu',
 		AvatarLookupEvent::NAME                   => 'avatar_lookup',
@@ -239,7 +240,7 @@ final class HookEventBridge
 			AccountRegisterPostEvent::NAME            => 'onAccountRegisterPostEvent',
 			AccountRemoveEvent::NAME                  => 'onAccountRemoveEvent',
 			AclLookupEndEvent::NAME                   => 'onAclLookupEndEvent',
-			ArrayFilterEvent::ADD_WORKER_TASK         => 'onArrayFilterEvent',
+			AddWorkerTaskEvent::NAME                  => 'onAddWorkerTaskEvent',
 			ArrayFilterEvent::ADDON_SETTINGS_POST     => 'onArrayFilterEvent',
 			AppMenuEvent::NAME                        => 'onAppMenuEvent',
 			AvatarLookupEvent::NAME                   => 'onAvatarLookupEvent',
@@ -1088,6 +1089,21 @@ final class HookEventBridge
 		$event->setStart((int) $hook_data['start']);
 		$event->setCount((int) $hook_data['count']);
 		$event->setItems((array) $hook_data['items']);
+	}
+
+	/**
+	 * Map the AddWorkerTaskEvent to `proc_run` hook
+	 */
+	public static function onAddWorkerTaskEvent(AddWorkerTaskEvent $event): void
+	{
+		$hook_data = [
+			'args'    => $event->getArgsArray(),
+			'run_cmd' => $event->isRunCmd(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setRunCmd((bool) ($hook_data['run_cmd'] ?? $event->isRunCmd()));
 	}
 
 	/**

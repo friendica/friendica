@@ -27,7 +27,6 @@ class ArrayFilterEventTest extends TestCase
 		return [
 			[ArrayFilterEvent::EVENT_CREATED, 'friendica.data.event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'friendica.data.event_updated'],
-			[ArrayFilterEvent::ADD_WORKER_TASK, 'friendica.data.add_worker_task'],
 			[ArrayFilterEvent::STORAGE_CONFIG, 'friendica.data.storage_config'],
 			[ArrayFilterEvent::STORAGE_INSTANCE, 'friendica.data.storage_instance'],
 			[ArrayFilterEvent::DB_STRUCTURE_DEFINITION, 'friendica.data.db_structure_definition'],

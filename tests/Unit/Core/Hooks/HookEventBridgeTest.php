@@ -12,12 +12,14 @@ namespace Friendica\Test\Unit\Core\Hooks;
 use FastRoute\RouteCollector;
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Hooks\HookEventBridge;
+use Friendica\Core\Worker;
 use Friendica\Event\AccountAuthenticateEvent;
 use Friendica\Event\AccountRegisterEvent;
 use Friendica\Event\AccountRegisterFormEvent;
 use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Event\AccountRemoveEvent;
 use Friendica\Event\AclLookupEndEvent;
+use Friendica\Event\AddWorkerTaskEvent;
 use Friendica\Event\AppMenuEvent;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\AvatarLookupEvent;
@@ -123,7 +125,7 @@ class HookEventBridgeTest extends TestCase
 			AccountRegisterPostEvent::NAME            => 'onAccountRegisterPostEvent',
 			AccountRemoveEvent::NAME                  => 'onAccountRemoveEvent',
 			AclLookupEndEvent::NAME                   => 'onAclLookupEndEvent',
-			ArrayFilterEvent::ADD_WORKER_TASK         => 'onArrayFilterEvent',
+			AddWorkerTaskEvent::NAME                  => 'onAddWorkerTaskEvent',
 			ArrayFilterEvent::ADDON_SETTINGS_POST     => 'onArrayFilterEvent',
 			AppMenuEvent::NAME                        => 'onAppMenuEvent',
 			AvatarLookupEvent::NAME                   => 'onAvatarLookupEvent',
@@ -1363,6 +1365,29 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame([['type' => 'contact', 'name' => 'Joe', 'id' => 4]], $event->getItems());
 	}
 
+	public function testOnAddWorkerTaskEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AddWorkerTaskEvent([Worker::PRIORITY_MEDIUM, 'Notifier', 123], true);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('proc_run', $name);
+			$this->assertSame([
+				'args'    => [Worker::PRIORITY_MEDIUM, 'Notifier', 123],
+				'run_cmd' => true,
+			], $data);
+
+			$data['run_cmd'] = false;
+
+			return $data;
+		});
+
+		HookEventBridge::onAddWorkerTaskEvent($event);
+
+		$this->assertFalse($event->isRunCmd());
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => ['id' => 123]]);
@@ -1536,7 +1561,7 @@ class HookEventBridgeTest extends TestCase
 			[AccountRegisterEvent::NAME, 'register_account'],
 			[ArrayFilterEvent::EVENT_CREATED, 'event_created'],
 			[ArrayFilterEvent::EVENT_UPDATED, 'event_updated'],
-			[ArrayFilterEvent::ADD_WORKER_TASK, 'proc_run'],
+			[AddWorkerTaskEvent::NAME, 'proc_run'],
 			[ArrayFilterEvent::STORAGE_CONFIG, 'storage_config'],
 			[ArrayFilterEvent::STORAGE_INSTANCE, 'storage_instance'],
 			[ArrayFilterEvent::DB_STRUCTURE_DEFINITION, 'dbstructure_definition'],

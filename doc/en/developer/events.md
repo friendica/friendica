@@ -76,6 +76,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `app_menu` | `\Friendica\Event\AppMenuEvent` |
 | `nav_info` | `\Friendica\Event\NavInfoEvent` |
+| `proc_run` | `\Friendica\Event\AddWorkerTaskEvent` |
 | `login_hook` | `\Friendica\Event\LoginFormEvent` |
 | `logged_in` | `\Friendica\Event\LoggedInEvent` |
 | `authenticate` | `\Friendica\Event\AccountAuthenticateEvent` |
@@ -259,6 +260,17 @@ Fired when the navigation information for the template is about to be returned, 
 - `setNavArray(array $nav): void` — change the navigation entries
 - `setSitelocation(string $sitelocation): void` — change the webbie
 - `setUserinfoArray(?array $userinfo): void` — change the user information
+
+### `\Friendica\Event\AddWorkerTaskEvent`
+
+Fired before a task is added to the worker queue, to allow addons to prevent it from being executed.
+
+**Contained data:**
+- `getArgsArray(): array` — the worker task parameters (read-only)
+- `isRunCmd(): bool` — whether the worker task should be executed
+
+**Modifiable:**
+- `setRunCmd(bool $runCmd): void` — prevent the worker task from being executed
 
 ### `\Friendica\Event\InsertPostLocalEvent`
 
