@@ -35,6 +35,7 @@ use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\FetchItemByLinkEvent;
+use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FollowContactEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -145,7 +146,7 @@ class HookEventBridgeTest extends TestCase
 			EnotifyStoreEvent::NAME                      => 'onEnotifyStoreEvent',
 			ArrayFilterEvent::EVENT_CREATED              => 'onEventCreatedEvent',
 			ArrayFilterEvent::EVENT_UPDATED              => 'onEventUpdatedEvent',
-			ArrayFilterEvent::FEATURE_ENABLED            => 'onArrayFilterEvent',
+			FeatureEnabledEvent::NAME                    => 'onFeatureEnabledEvent',
 			ArrayFilterEvent::FEATURE_GET                => 'onArrayFilterEvent',
 			FetchItemByLinkEvent::NAME                   => 'onFetchItemByLinkEvent',
 			FollowContactEvent::NAME                     => 'onFollowContactEvent',
@@ -558,6 +559,32 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onDetectLanguagesEvent($event);
 
 		$this->assertSame(['de' => 0.9], $event->getDetected());
+	}
+
+	public function testOnFeatureEnabledEventCallsHookWithCorrectValue(): void
+	{
+		$event = new FeatureEnabledEvent(42, 'expanding_events', false);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('isEnabled', $name);
+			$this->assertSame([
+				'uid'     => 42,
+				'feature' => 'expanding_events',
+				'enabled' => false,
+			], $data);
+
+			return [
+				'uid'     => 42,
+				'feature' => 'expanding_events',
+				'enabled' => true,
+			];
+		});
+
+		HookEventBridge::onFeatureEnabledEvent($event);
+
+		$this->assertTrue($event->isEnabled());
 	}
 
 	public static function getCollectRoutesEventData(): array
@@ -1290,7 +1317,6 @@ class HookEventBridgeTest extends TestCase
 			['test', 'test'],
 			[ArrayFilterEvent::APP_MENU, 'app_menu'],
 			[ArrayFilterEvent::NAV_INFO, 'nav_info'],
-			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
 			[ArrayFilterEvent::FEATURE_GET, 'get'],
 			[PhotoUploadEvent::NAME, 'photo_post_file'],
 			[NetworkToNameEvent::NAME, 'network_to_name'],

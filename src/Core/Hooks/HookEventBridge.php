@@ -33,6 +33,7 @@ use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\FetchItemByLinkEvent;
+use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FollowContactEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -143,7 +144,7 @@ final class HookEventBridge
 		EnotifyStoreEvent::NAME                      => 'enotify_store',
 		ArrayFilterEvent::EVENT_CREATED              => 'event_created',
 		ArrayFilterEvent::EVENT_UPDATED              => 'event_updated',
-		ArrayFilterEvent::FEATURE_ENABLED            => 'isEnabled',
+		FeatureEnabledEvent::NAME                    => 'isEnabled',
 		ArrayFilterEvent::FEATURE_GET                => 'get',
 		FetchItemByLinkEvent::NAME                   => 'item_by_link',
 		FollowContactEvent::NAME                     => 'follow',
@@ -261,7 +262,7 @@ final class HookEventBridge
 			EnotifyStoreEvent::NAME                      => 'onEnotifyStoreEvent',
 			ArrayFilterEvent::EVENT_CREATED              => 'onEventCreatedEvent',
 			ArrayFilterEvent::EVENT_UPDATED              => 'onEventUpdatedEvent',
-			ArrayFilterEvent::FEATURE_ENABLED            => 'onArrayFilterEvent',
+			FeatureEnabledEvent::NAME                    => 'onFeatureEnabledEvent',
 			ArrayFilterEvent::FEATURE_GET                => 'onArrayFilterEvent',
 			FetchItemByLinkEvent::NAME                   => 'onFetchItemByLinkEvent',
 			FollowContactEvent::NAME                     => 'onFollowContactEvent',
@@ -438,6 +439,22 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setItemId(isset($hook_data['item_id']) ? (int) $hook_data['item_id'] : null);
+	}
+
+	/**
+	 * Map the FeatureEnabledEvent to `isEnabled` hook
+	 */
+	public static function onFeatureEnabledEvent(FeatureEnabledEvent $event): void
+	{
+		$hook_data = [
+			'uid'     => $event->getUid(),
+			'feature' => $event->getFeature(),
+			'enabled' => $event->isEnabled(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setEnabled((bool) $hook_data['enabled']);
 	}
 
 	/**

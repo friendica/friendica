@@ -9,6 +9,7 @@ namespace Friendica\Content;
 
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\FeatureEnabledEvent;
 
 class Feature
 {
@@ -54,13 +55,11 @@ class Feature
 			$enabled = true;
 		}
 
-		$arr = ['uid' => $uid, 'feature' => $feature, 'enabled' => $enabled];
+		$event = $eventDispatcher->dispatch(
+			new FeatureEnabledEvent($uid, (string) $feature, (bool) $enabled),
+		);
 
-		$arr = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::FEATURE_ENABLED, $arr),
-		)->getArray();
-
-		return (bool) $arr['enabled'];
+		return $event->isEnabled();
 	}
 
 	/**

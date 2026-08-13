@@ -22,8 +22,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const NAV_INFO = 'friendica.data.nav_info';
 
-	public const FEATURE_ENABLED = 'friendica.data.feature_enabled';
-
 	public const FEATURE_GET = 'friendica.data.feature_get';
 
 	public const PERMISSION_TOOLTIP_CONTENT = 'friendica.data.permission_tooltip_content';
