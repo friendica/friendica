@@ -48,6 +48,7 @@ use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
+use Friendica\Event\GenerateMapEvent;
 use Friendica\Event\GetSiteInfoEvent;
 use Friendica\Event\GlobalDirUpdateEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
@@ -170,7 +171,7 @@ final class HookEventBridge
 		FeatureGetEvent::NAME                   => 'get',
 		FetchItemByLinkEvent::NAME              => 'item_by_link',
 		FollowContactEvent::NAME                => 'follow',
-		ArrayFilterEvent::GENERATE_MAP          => 'generate_map',
+		GenerateMapEvent::NAME                  => 'generate_map',
 		ArrayFilterEvent::GENERATE_NAMED_MAP    => 'generate_named_map',
 		GetSiteInfoEvent::NAME                  => 'getsiteinfo',
 		GlobalDirUpdateEvent::NAME              => 'globaldir_update',
@@ -288,7 +289,7 @@ final class HookEventBridge
 			FeatureGetEvent::NAME                   => 'onFeatureGetEvent',
 			FetchItemByLinkEvent::NAME              => 'onFetchItemByLinkEvent',
 			FollowContactEvent::NAME                => 'onFollowContactEvent',
-			ArrayFilterEvent::GENERATE_MAP          => 'onArrayFilterEvent',
+			GenerateMapEvent::NAME                  => 'onGenerateMapEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP    => 'onArrayFilterEvent',
 			GetSiteInfoEvent::NAME                  => 'onGetSiteInfoEvent',
 			GlobalDirUpdateEvent::NAME              => 'onGlobalDirUpdateEvent',
@@ -1360,6 +1361,23 @@ final class HookEventBridge
 		$event->setArray(
 			static::callHook($event->getName(), $event->getArray()),
 		);
+	}
+
+	/**
+	 * Map the GenerateMapEvent to `generate_map` hook
+	 */
+	public static function onGenerateMapEvent(GenerateMapEvent $event): void
+	{
+		$hook_data = [
+			'lat'  => $event->getLatitude(),
+			'lon'  => $event->getLongitude(),
+			'mode' => $event->getMode(),
+			'html' => $event->getHtml(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setHtml((string) ($hook_data['html'] ?? $event->getHtml()));
 	}
 
 	public static function onNetworkToNameEvent(NetworkToNameEvent $event): void

@@ -53,8 +53,9 @@ use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
-use Friendica\Object\EMail\IEmail;
+use Friendica\Event\GenerateMapEvent;
 use Friendica\Event\GetSiteInfoEvent;
+use Friendica\Object\EMail\IEmail;
 use Friendica\Event\GlobalDirUpdateEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
@@ -175,7 +176,7 @@ class HookEventBridgeTest extends TestCase
 			FeatureGetEvent::NAME                   => 'onFeatureGetEvent',
 			FetchItemByLinkEvent::NAME              => 'onFetchItemByLinkEvent',
 			FollowContactEvent::NAME                => 'onFollowContactEvent',
-			ArrayFilterEvent::GENERATE_MAP          => 'onArrayFilterEvent',
+			GenerateMapEvent::NAME                  => 'onGenerateMapEvent',
 			ArrayFilterEvent::GENERATE_NAMED_MAP    => 'onArrayFilterEvent',
 			GetSiteInfoEvent::NAME                  => 'onGetSiteInfoEvent',
 			GlobalDirUpdateEvent::NAME              => 'onGlobalDirUpdateEvent',
@@ -1890,6 +1891,48 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onEmailGetMessageEndEvent($event);
 
 		$this->assertSame(['body' => 'Body'], $event->getItemArray());
+	}
+
+	public function testOnGenerateMapEventCallsHookWithCorrectValue(): void
+	{
+		$event = new GenerateMapEvent('52.1832', '11.6316', 0);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('generate_map', $name);
+			$this->assertSame([
+				'lat'  => '52.1832',
+				'lon'  => '11.6316',
+				'mode' => 0,
+				'html' => '',
+			], $data);
+
+			$data['html'] = '<iframe>';
+
+			return $data;
+		});
+
+		HookEventBridge::onGenerateMapEvent($event);
+
+		$this->assertSame('<iframe>', $event->getHtml());
+	}
+
+	public function testOnGenerateMapEventCallsHookWithMissingValues(): void
+	{
+		$event = new GenerateMapEvent('52.1832', '11.6316', 0);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('generate_map', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onGenerateMapEvent($event);
+
+		$this->assertSame('', $event->getHtml());
 	}
 
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void

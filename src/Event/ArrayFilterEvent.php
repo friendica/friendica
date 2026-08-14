@@ -22,8 +22,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const EVENT_UPDATED = 'friendica.data.event_updated';
 
-	public const GENERATE_MAP = 'friendica.data.generate_map';
-
 	public const GENERATE_NAMED_MAP = 'friendica.data.generate_named_map';
 
 	public const MAP_GET_COORDINATES = 'friendica.data.map_get_coordinates';

@@ -8,6 +8,7 @@
 namespace Friendica\Util;
 
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\GenerateMapEvent;
 use Friendica\DI;
 
 /**
@@ -15,13 +16,14 @@ use Friendica\DI;
  */
 class Map
 {
-	public static function byCoordinates($coord, $html_mode = 0)
+	public static function byCoordinates($coord, $html_mode = 0): string
 	{
 		$coord = trim((string) $coord);
 		$coord = str_replace([',','/','  '], [' ',' ',' '], $coord);
-		$arr   = ['lat' => trim(substr($coord, 0, strpos($coord, ' '))), 'lon' => trim(substr($coord, strpos($coord, ' ') + 1)), 'mode' => $html_mode, 'html' => ''];
-		$arr   = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::GENERATE_MAP, $arr))->getArray();
-		return $arr['html'] ?: $coord;
+		$lat   = trim(substr($coord, 0, strpos($coord, ' ')));
+		$lon   = trim(substr($coord, strpos($coord, ' ') + 1));
+		$event = DI::eventDispatcher()->dispatch(new GenerateMapEvent($lat, $lon, $html_mode));
+		return $event->getHtml() ?: $coord;
 	}
 
 	public static function byLocation($location, $html_mode = 0)

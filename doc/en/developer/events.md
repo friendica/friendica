@@ -84,6 +84,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `emailer_send_prepare` | `\Friendica\Event\EmailerSendPrepareEvent` |
 | `email_getmessage` | `\Friendica\Event\EmailGetMessageEvent` |
 | `email_getmessage_end` | `\Friendica\Event\EmailGetMessageEndEvent` |
+| `generate_map` | `\Friendica\Event\GenerateMapEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -354,6 +355,18 @@ Fired when an email message has been fully fetched, to allow addons to modify th
 
 **Modifiable:**
 - `setItemArray(array $item): void` — change the item data of the message
+
+### `\Friendica\Event\GenerateMapEvent`
+
+Fired when a map is generated from coordinates, to allow addons to provide the map HTML.
+
+**Contained data:**
+- `getLatitude(): string` — the latitude of the location
+- `getLongitude(): string` — the longitude of the location
+- `getMode(): int` — the HTML mode (empty for `0`)
+
+**Modifiable:**
+- `setHtml(string $html): void` — the generated map HTML
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 
