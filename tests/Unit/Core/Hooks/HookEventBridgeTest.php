@@ -41,6 +41,7 @@ use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\DisplaySettingsPostEvent;
 use Friendica\Event\EmailGetMessageEvent;
+use Friendica\Event\EmailGetMessageEndEvent;
 use Friendica\Event\EmailerSendEvent;
 use Friendica\Event\EmailerSendPrepareEvent;
 use Friendica\Event\EnotifyEvent;
@@ -162,7 +163,7 @@ class HookEventBridgeTest extends TestCase
 			EditContactFormEvent::NAME              => 'onEditContactFormEvent',
 			EditContactPostEvent::NAME              => 'onEditContactPostEvent',
 			EmailGetMessageEvent::NAME              => 'onEmailGetMessageEvent',
-			ArrayFilterEvent::EMAIL_GET_MESSAGE_END => 'onArrayFilterEvent',
+			EmailGetMessageEndEvent::NAME           => 'onEmailGetMessageEndEvent',
 			EmailerSendEvent::NAME                  => 'onEmailerSendEvent',
 			EmailerSendPrepareEvent::NAME           => 'onEmailerSendPrepareEvent',
 			EnotifyEvent::NAME                      => 'onEnotifyEvent',
@@ -1851,6 +1852,43 @@ class HookEventBridgeTest extends TestCase
 
 		$this->assertSame('Text', $event->getText());
 		$this->assertSame('Html', $event->getHtml());
+		$this->assertSame(['body' => 'Body'], $event->getItemArray());
+	}
+
+	public function testOnEmailGetMessageEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EmailGetMessageEndEvent(['body' => 'Body']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('email_getmessage_end', $name);
+			$this->assertSame(['body' => 'Body'], $data);
+
+			$data['body'] = 'New Body';
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailGetMessageEndEvent($event);
+
+		$this->assertSame(['body' => 'New Body'], $event->getItemArray());
+	}
+
+	public function testOnEmailGetMessageEndEventCallsHookWithMissingValue(): void
+	{
+		$event = new EmailGetMessageEndEvent(['body' => 'Body']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data) {
+			$this->assertSame('email_getmessage_end', $name);
+
+			return 'wrong type';
+		});
+
+		HookEventBridge::onEmailGetMessageEndEvent($event);
+
 		$this->assertSame(['body' => 'Body'], $event->getItemArray());
 	}
 

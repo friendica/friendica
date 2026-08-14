@@ -9,7 +9,7 @@ namespace Friendica\Protocol;
 
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\EmailGetMessageEndEvent;
 use Friendica\Event\EmailGetMessageEvent;
 use Friendica\Core\Protocol;
 use Friendica\DI;
@@ -197,7 +197,7 @@ class Email
 		$ret['body'] = Strings::escapeHtml($ret['body']);
 		$ret['body'] = BBCode::limitBodySize($ret['body']);
 
-		$ret = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::EMAIL_GET_MESSAGE_END, $ret))->getArray();
+		$ret = DI::eventDispatcher()->dispatch(new EmailGetMessageEndEvent($ret))->getItemArray();
 
 		return $ret;
 	}
