@@ -40,6 +40,7 @@ use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\DisplaySettingsPostEvent;
+use Friendica\Event\EmailerSendEvent;
 use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
@@ -159,7 +160,7 @@ class HookEventBridgeTest extends TestCase
 			EditContactPostEvent::NAME              => 'onEditContactPostEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END => 'onArrayFilterEvent',
-			ArrayFilterEvent::EMAILER_SEND          => 'onArrayFilterEvent',
+			EmailerSendEvent::NAME                  => 'onEmailerSendEvent',
 			ArrayFilterEvent::EMAILER_SEND_PREPARE  => 'onEmailerSendPrepareEvent',
 			EnotifyEvent::NAME                      => 'onEnotifyEvent',
 			EnotifyMailEvent::NAME                  => 'onEnotifyMailEvent',
@@ -1702,6 +1703,50 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onDisplaySettingsPostEvent($event);
+	}
+
+	public function testOnEmailerSendEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EmailerSendEvent('recipient@example.com', 'Subject', 'Body', 'Header', '-f sender@example.com');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('emailer_send', $name);
+			$this->assertSame([
+				'to'         => 'recipient@example.com',
+				'subject'    => 'Subject',
+				'body'       => 'Body',
+				'headers'    => 'Header',
+				'parameters' => '-f sender@example.com',
+				'sent'       => false,
+			], $data);
+
+			$data['sent'] = true;
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailerSendEvent($event);
+
+		$this->assertTrue($event->isSent());
+	}
+
+	public function testOnEmailerSendEventCallsHookWithNullParameters(): void
+	{
+		$event = new EmailerSendEvent('recipient@example.com', 'Subject', 'Body', 'Header', null);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertNull($data['parameters']);
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailerSendEvent($event);
+
+		$this->assertFalse($event->isSent());
 	}
 
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
