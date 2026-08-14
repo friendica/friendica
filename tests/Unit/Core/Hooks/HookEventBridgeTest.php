@@ -41,6 +41,7 @@ use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\DisplaySettingsPostEvent;
 use Friendica\Event\EmailerSendEvent;
+use Friendica\Event\EmailerSendPrepareEvent;
 use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
@@ -50,6 +51,7 @@ use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
+use Friendica\Object\EMail\IEmail;
 use Friendica\Event\GetSiteInfoEvent;
 use Friendica\Event\GlobalDirUpdateEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
@@ -161,7 +163,7 @@ class HookEventBridgeTest extends TestCase
 			ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END => 'onArrayFilterEvent',
 			EmailerSendEvent::NAME                  => 'onEmailerSendEvent',
-			ArrayFilterEvent::EMAILER_SEND_PREPARE  => 'onEmailerSendPrepareEvent',
+			EmailerSendPrepareEvent::NAME           => 'onEmailerSendPrepareEvent',
 			EnotifyEvent::NAME                      => 'onEnotifyEvent',
 			EnotifyMailEvent::NAME                  => 'onEnotifyMailEvent',
 			EnotifyStoreEvent::NAME                 => 'onEnotifyStoreEvent',
@@ -1747,6 +1749,61 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onEmailerSendEvent($event);
 
 		$this->assertFalse($event->isSent());
+	}
+
+	public function testOnEmailerSendPrepareEventCallsHookWithCorrectValue(): void
+	{
+		$email = \Mockery::mock(IEmail::class);
+		$event = new EmailerSendPrepareEvent($email);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, IEmail $data) use ($email): IEmail {
+			$this->assertSame('emailer_send_prepare', $name);
+			$this->assertSame($email, $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailerSendPrepareEvent($event);
+
+		$this->assertSame($email, $event->getEmail());
+	}
+
+	public function testOnEmailerSendPrepareEventCallsHookWithNullValue(): void
+	{
+		$event = new EmailerSendPrepareEvent();
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, ?IEmail $data): ?IEmail {
+			$this->assertSame('emailer_send_prepare', $name);
+			$this->assertNull($data);
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailerSendPrepareEvent($event);
+
+		$this->assertNull($event->getEmail());
+	}
+
+	public function testOnEmailerSendPrepareEventCallsHookWithWrongValue(): void
+	{
+		$event = new EmailerSendPrepareEvent();
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, ?IEmail $data) {
+			$this->assertSame('emailer_send_prepare', $name);
+			$this->assertNull($data);
+
+			return 'wrong type';
+		});
+
+		HookEventBridge::onEmailerSendPrepareEvent($event);
+
+		$this->assertNull($event->getEmail());
 	}
 
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void

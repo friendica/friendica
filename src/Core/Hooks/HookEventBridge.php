@@ -36,6 +36,7 @@ use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\DisplaySettingsPostEvent;
 use Friendica\Event\EmailerSendEvent;
+use Friendica\Event\EmailerSendPrepareEvent;
 use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
@@ -92,6 +93,7 @@ use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
+use Friendica\Object\EMail\IEmail;
 use Friendica\Event\PermissionTooltipContentEvent;
 use Friendica\Event\RenderLocationEvent;
 use Friendica\Event\RevokeFollowContactEvent;
@@ -156,7 +158,7 @@ final class HookEventBridge
 		ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'email_getmessage',
 		ArrayFilterEvent::EMAIL_GET_MESSAGE_END => 'email_getmessage_end',
 		EmailerSendEvent::NAME                  => 'emailer_send',
-		ArrayFilterEvent::EMAILER_SEND_PREPARE  => 'emailer_send_prepare',
+		EmailerSendPrepareEvent::NAME           => 'emailer_send_prepare',
 		EnotifyEvent::NAME                      => 'enotify',
 		EnotifyMailEvent::NAME                  => 'enotify_mail',
 		EnotifyStoreEvent::NAME                 => 'enotify_store',
@@ -274,7 +276,7 @@ final class HookEventBridge
 			ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'onArrayFilterEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END => 'onArrayFilterEvent',
 			EmailerSendEvent::NAME                  => 'onEmailerSendEvent',
-			ArrayFilterEvent::EMAILER_SEND_PREPARE  => 'onEmailerSendPrepareEvent',
+			EmailerSendPrepareEvent::NAME           => 'onEmailerSendPrepareEvent',
 			EnotifyEvent::NAME                      => 'onEnotifyEvent',
 			EnotifyMailEvent::NAME                  => 'onEnotifyMailEvent',
 			EnotifyStoreEvent::NAME                 => 'onEnotifyStoreEvent',
@@ -1291,15 +1293,15 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the EMAILER_SEND_PREPARE event to `emailer_send_prepare` hook
+	 * Map the EmailerSendPrepareEvent to `emailer_send_prepare` hook
 	 *
 	 * emailer_send_prepare receives an IEmail object by reference, so we wrap/unwrap it.
 	 */
-	public static function onEmailerSendPrepareEvent(ArrayFilterEvent $event): void
+	public static function onEmailerSendPrepareEvent(EmailerSendPrepareEvent $event): void
 	{
-		$data          = $event->getArray();
-		$data['email'] = static::callHook($event->getName(), $data['email'] ?? null);
-		$event->setArray($data);
+		$email = static::callHook($event->getName(), $event->getEmail());
+
+		$event->setEmail($email instanceof IEmail ? $email : null);
 	}
 
 	/**

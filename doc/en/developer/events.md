@@ -81,6 +81,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `connector_settings_post` | `\Friendica\Event\ConnectorSettingsPostEvent` |
 | `display_settings_post` | `\Friendica\Event\DisplaySettingsPostEvent` |
 | `emailer_send` | `\Friendica\Event\EmailerSendEvent` |
+| `emailer_send_prepare` | `\Friendica\Event\EmailerSendPrepareEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -317,6 +318,16 @@ Fired before an email is sent, to allow addons to inspect the email data or repo
 
 **Modifiable:**
 - `setSent(bool $sent): void` — mark the email as sent so that it is not sent again
+
+### `\Friendica\Event\EmailerSendPrepareEvent`
+
+Fired before an email is sent, to allow addons to prepare or replace the email object.
+
+**Contained data:**
+- `getEmail(): ?IEmail` — the email to be sent
+
+**Modifiable:**
+- `setEmail(?IEmail $email): void` — replace the email object or set it to `null` to prevent sending
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

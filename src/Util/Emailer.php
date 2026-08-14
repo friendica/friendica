@@ -10,8 +10,8 @@ namespace Friendica\Util;
 use Friendica\App\BaseURL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\EmailerSendEvent;
+use Friendica\Event\EmailerSendPrepareEvent;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -118,9 +118,9 @@ class Emailer
 	{
 		if ($this->eventDispatcher) {
 			$emailData = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::EMAILER_SEND_PREPARE, ['email' => $email]),
-			)->getArray();
-			$email = $emailData['email'] ?? null;
+				new EmailerSendPrepareEvent($email),
+			);
+			$email = $emailData->getEmail();
 		}
 
 		if (! ($email instanceof IEmail)) {
