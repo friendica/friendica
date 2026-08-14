@@ -22,8 +22,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const EVENT_UPDATED = 'friendica.data.event_updated';
 
-	public const EMAIL_GET_MESSAGE = 'friendica.data.email_get_message';
-
 	public const EMAIL_GET_MESSAGE_END = 'friendica.data.email_get_message_end';
 
 	public const GENERATE_MAP = 'friendica.data.generate_map';

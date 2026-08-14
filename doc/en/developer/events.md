@@ -82,6 +82,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `display_settings_post` | `\Friendica\Event\DisplaySettingsPostEvent` |
 | `emailer_send` | `\Friendica\Event\EmailerSendEvent` |
 | `emailer_send_prepare` | `\Friendica\Event\EmailerSendPrepareEvent` |
+| `email_getmessage` | `\Friendica\Event\EmailGetMessageEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -328,6 +329,20 @@ Fired before an email is sent, to allow addons to prepare or replace the email o
 
 **Modifiable:**
 - `setEmail(?IEmail $email): void` — replace the email object or set it to `null` to prevent sending
+
+### `\Friendica\Event\EmailGetMessageEvent`
+
+Fired when an email message is fetched from an IMAP mailbox, to allow addons to modify the message data.
+
+**Contained data:**
+- `getText(): string` — the plain text part of the message
+- `getHtml(): string` — the HTML part of the message
+- `getItemArray(): array` — the item data of the message
+
+**Modifiable:**
+- `setText(string $text): void` — change the plain text part of the message
+- `setHtml(string $html): void` — change the HTML part of the message
+- `setItemArray(array $item): void` — change the item data of the message
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

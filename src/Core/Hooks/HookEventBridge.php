@@ -35,6 +35,7 @@ use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\DisplaySettingsPostEvent;
+use Friendica\Event\EmailGetMessageEvent;
 use Friendica\Event\EmailerSendEvent;
 use Friendica\Event\EmailerSendPrepareEvent;
 use Friendica\Event\EnotifyEvent;
@@ -155,7 +156,7 @@ final class HookEventBridge
 		DisplaySettingsPostEvent::NAME          => 'display_settings_post',
 		EditContactFormEvent::NAME              => 'contact_edit',
 		EditContactPostEvent::NAME              => 'contact_edit_post',
-		ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'email_getmessage',
+		EmailGetMessageEvent::NAME              => 'email_getmessage',
 		ArrayFilterEvent::EMAIL_GET_MESSAGE_END => 'email_getmessage_end',
 		EmailerSendEvent::NAME                  => 'emailer_send',
 		EmailerSendPrepareEvent::NAME           => 'emailer_send_prepare',
@@ -273,7 +274,7 @@ final class HookEventBridge
 			DisplaySettingsPostEvent::NAME          => 'onDisplaySettingsPostEvent',
 			EditContactFormEvent::NAME              => 'onEditContactFormEvent',
 			EditContactPostEvent::NAME              => 'onEditContactPostEvent',
-			ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'onArrayFilterEvent',
+			EmailGetMessageEvent::NAME              => 'onEmailGetMessageEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END => 'onArrayFilterEvent',
 			EmailerSendEvent::NAME                  => 'onEmailerSendEvent',
 			EmailerSendPrepareEvent::NAME           => 'onEmailerSendPrepareEvent',
@@ -1321,6 +1322,24 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setSent((bool) ($hook_data['sent'] ?? $event->isSent()));
+	}
+
+	/**
+	 * Map the EmailGetMessageEvent to `email_getmessage` hook
+	 */
+	public static function onEmailGetMessageEvent(EmailGetMessageEvent $event): void
+	{
+		$hook_data = [
+			'text' => $event->getText(),
+			'html' => $event->getHtml(),
+			'item' => $event->getItemArray(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setText((string) ($hook_data['text'] ?? $event->getText()));
+		$event->setHtml((string) ($hook_data['html'] ?? $event->getHtml()));
+		$event->setItemArray(is_array($hook_data['item'] ?? null) ? $hook_data['item'] : $event->getItemArray());
 	}
 
 	public static function onArrayFilterEvent(ArrayFilterEvent $event): void

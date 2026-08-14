@@ -8,8 +8,9 @@
 namespace Friendica\Protocol;
 
 use Friendica\Content\Text\BBCode;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Content\Text\HTML;
+use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\EmailGetMessageEvent;
 use Friendica\Core\Protocol;
 use Friendica\DI;
 use Friendica\Model\Item;
@@ -141,21 +142,19 @@ class Email
 			$html = trim(self::messageGetPart($mbox, $uid, $struc, 0, 'html'));
 
 			if (!empty($html)) {
-				$message = ['text' => '', 'html' => $html, 'item' => $ret];
-				$message = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::EMAIL_GET_MESSAGE, $message))->getArray();
-				$ret     = $message['item'];
+				$event = DI::eventDispatcher()->dispatch(new EmailGetMessageEvent('', $html, $ret));
+				$ret   = $event->getItemArray();
 				if (empty($ret['body'])) {
-					$ret['body'] = HTML::toBBCode($message['html']);
+					$ret['body'] = HTML::toBBCode($event->getHtml());
 				}
 			}
 
 			if (empty($ret['body'])) {
 				$text = self::messageGetPart($mbox, $uid, $struc, 0, 'plain');
 
-				$message     = ['text' => $text, 'html' => '', 'item' => $ret];
-				$message     = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::EMAIL_GET_MESSAGE, $message))->getArray();
-				$ret         = $message['item'];
-				$ret['body'] = $message['text'];
+				$event       = DI::eventDispatcher()->dispatch(new EmailGetMessageEvent($text, '', $ret));
+				$ret         = $event->getItemArray();
+				$ret['body'] = $event->getText();
 			}
 		} else {
 			$text = '';
@@ -172,16 +171,15 @@ class Email
 				}
 			}
 
-			$message = ['text' => trim($text), 'html' => trim($html), 'item' => $ret];
-			$message = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::EMAIL_GET_MESSAGE, $message))->getArray();
-			$ret     = $message['item'];
+			$event = DI::eventDispatcher()->dispatch(new EmailGetMessageEvent(trim($text), trim($html), $ret));
+			$ret   = $event->getItemArray();
 
-			if (empty($ret['body']) && !empty($message['html'])) {
-				$ret['body'] = HTML::toBBCode($message['html']);
+			if (empty($ret['body']) && !empty($event->getHtml())) {
+				$ret['body'] = HTML::toBBCode($event->getHtml());
 			}
 
 			if (empty($ret['body'])) {
-				$ret['body'] = $message['text'];
+				$ret['body'] = $event->getText();
 			}
 		}
 

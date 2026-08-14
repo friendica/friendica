@@ -40,6 +40,7 @@ use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
 use Friendica\Event\DisplaySettingsPostEvent;
+use Friendica\Event\EmailGetMessageEvent;
 use Friendica\Event\EmailerSendEvent;
 use Friendica\Event\EmailerSendPrepareEvent;
 use Friendica\Event\EnotifyEvent;
@@ -160,7 +161,7 @@ class HookEventBridgeTest extends TestCase
 			DisplaySettingsPostEvent::NAME          => 'onDisplaySettingsPostEvent',
 			EditContactFormEvent::NAME              => 'onEditContactFormEvent',
 			EditContactPostEvent::NAME              => 'onEditContactPostEvent',
-			ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'onArrayFilterEvent',
+			EmailGetMessageEvent::NAME              => 'onEmailGetMessageEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE_END => 'onArrayFilterEvent',
 			EmailerSendEvent::NAME                  => 'onEmailerSendEvent',
 			EmailerSendPrepareEvent::NAME           => 'onEmailerSendPrepareEvent',
@@ -1804,6 +1805,53 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onEmailerSendPrepareEvent($event);
 
 		$this->assertNull($event->getEmail());
+	}
+
+	public function testOnEmailGetMessageEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EmailGetMessageEvent('Text', 'Html', ['body' => 'Body']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('email_getmessage', $name);
+			$this->assertSame([
+				'text' => 'Text',
+				'html' => 'Html',
+				'item' => ['body' => 'Body'],
+			], $data);
+
+			$data['text'] = 'New Text';
+			$data['html'] = 'New Html';
+			$data['item'] = ['body' => 'New Body'];
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailGetMessageEvent($event);
+
+		$this->assertSame('New Text', $event->getText());
+		$this->assertSame('New Html', $event->getHtml());
+		$this->assertSame(['body' => 'New Body'], $event->getItemArray());
+	}
+
+	public function testOnEmailGetMessageEventCallsHookWithMissingValues(): void
+	{
+		$event = new EmailGetMessageEvent('Text', 'Html', ['body' => 'Body']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('email_getmessage', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onEmailGetMessageEvent($event);
+
+		$this->assertSame('Text', $event->getText());
+		$this->assertSame('Html', $event->getHtml());
+		$this->assertSame(['body' => 'Body'], $event->getItemArray());
 	}
 
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
