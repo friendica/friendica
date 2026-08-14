@@ -39,6 +39,7 @@ use Friendica\Event\DbViewDefinitionEvent;
 use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
+use Friendica\Event\DisplaySettingsPostEvent;
 use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
@@ -153,7 +154,7 @@ class HookEventBridgeTest extends TestCase
 			DetectLanguagesEvent::NAME              => 'onDetectLanguagesEvent',
 			DirectoryItemEvent::NAME                => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                  => 'onDisplayItemEvent',
-			ArrayFilterEvent::DISPLAY_SETTINGS_POST => 'onArrayFilterEvent',
+			DisplaySettingsPostEvent::NAME          => 'onDisplaySettingsPostEvent',
 			EditContactFormEvent::NAME              => 'onEditContactFormEvent',
 			EditContactPostEvent::NAME              => 'onEditContactPostEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'onArrayFilterEvent',
@@ -1683,6 +1684,26 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onConnectorSettingsPostEvent($event);
 	}
 
+	public function testOnDisplaySettingsPostEventCallsHookWithCorrectValue(): void
+	{
+		$event = new DisplaySettingsPostEvent([
+			'theme' => 'frio',
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('display_settings_post', $name);
+			$this->assertSame([
+				'theme' => 'frio',
+			], $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onDisplaySettingsPostEvent($event);
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
 		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => ['id' => 123]]);
@@ -1862,6 +1883,7 @@ class HookEventBridgeTest extends TestCase
 			[AddWorkerTaskEvent::NAME, 'proc_run'],
 			[AddonSettingsPostEvent::NAME, 'addon_settings_post'],
 			[ConnectorSettingsPostEvent::NAME, 'connector_settings_post'],
+			[DisplaySettingsPostEvent::NAME, 'display_settings_post'],
 			[StorageConfigEvent::NAME, 'storage_config'],
 			[StorageInstanceEvent::NAME, 'storage_instance'],
 			[DbStructureDefinitionEvent::NAME, 'dbstructure_definition'],

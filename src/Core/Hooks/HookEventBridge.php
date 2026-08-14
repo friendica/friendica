@@ -34,6 +34,7 @@ use Friendica\Event\DbViewDefinitionEvent;
 use Friendica\Event\DetectLanguagesEvent;
 use Friendica\Event\DirectoryItemEvent;
 use Friendica\Event\DisplayItemEvent;
+use Friendica\Event\DisplaySettingsPostEvent;
 use Friendica\Event\EnotifyEvent;
 use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
@@ -148,7 +149,7 @@ final class HookEventBridge
 		DetectLanguagesEvent::NAME              => 'detect_languages',
 		DirectoryItemEvent::NAME                => 'directory_item',
 		DisplayItemEvent::NAME                  => 'display_item',
-		ArrayFilterEvent::DISPLAY_SETTINGS_POST => 'display_settings_post',
+		DisplaySettingsPostEvent::NAME          => 'display_settings_post',
 		EditContactFormEvent::NAME              => 'contact_edit',
 		EditContactPostEvent::NAME              => 'contact_edit_post',
 		ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'email_getmessage',
@@ -266,7 +267,7 @@ final class HookEventBridge
 			DetectLanguagesEvent::NAME              => 'onDetectLanguagesEvent',
 			DirectoryItemEvent::NAME                => 'onDirectoryItemEvent',
 			DisplayItemEvent::NAME                  => 'onDisplayItemEvent',
-			ArrayFilterEvent::DISPLAY_SETTINGS_POST => 'onArrayFilterEvent',
+			DisplaySettingsPostEvent::NAME          => 'onDisplaySettingsPostEvent',
 			EditContactFormEvent::NAME              => 'onEditContactFormEvent',
 			EditContactPostEvent::NAME              => 'onEditContactPostEvent',
 			ArrayFilterEvent::EMAIL_GET_MESSAGE     => 'onArrayFilterEvent',
@@ -373,6 +374,14 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setTemplateDataArray($hook_data['output'] ?? []);
+	}
+
+	/**
+	 * Map the DisplaySettingsPostEvent to `display_settings_post` hook
+	 */
+	public static function onDisplaySettingsPostEvent(DisplaySettingsPostEvent $event): void
+	{
+		static::callHook($event->getName(), $event->getRequestArray());
 	}
 
 	/**

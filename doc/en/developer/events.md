@@ -79,6 +79,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `proc_run` | `\Friendica\Event\AddWorkerTaskEvent` |
 | `addon_settings_post` | `\Friendica\Event\AddonSettingsPostEvent` |
 | `connector_settings_post` | `\Friendica\Event\ConnectorSettingsPostEvent` |
+| `display_settings_post` | `\Friendica\Event\DisplaySettingsPostEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -291,6 +292,13 @@ Fired when addon settings are saved, to notify addons about the submitted reques
 ### `\Friendica\Event\ConnectorSettingsPostEvent`
 
 Fired when connector settings are saved, to notify addons about the submitted request data.
+
+**Contained data:**
+- `getRequestArray(): array` — the submitted request data
+
+### `\Friendica\Event\DisplaySettingsPostEvent`
+
+Fired when display settings are saved, to notify addons about the submitted request data.
 
 **Contained data:**
 - `getRequestArray(): array` — the submitted request data

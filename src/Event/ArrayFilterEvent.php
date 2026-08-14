@@ -22,8 +22,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const EVENT_UPDATED = 'friendica.data.event_updated';
 
-	public const DISPLAY_SETTINGS_POST = 'friendica.data.display_settings_post';
-
 	public const EMAILER_SEND = 'friendica.data.emailer_send';
 
 	public const EMAILER_SEND_PREPARE = 'friendica.data.emailer_send_prepare';
