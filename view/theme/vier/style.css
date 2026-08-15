@@ -172,11 +172,6 @@ img {
 	color: #000;
 }
 
-.icon a:hover,
-.icon a:focus,
-.icon a:active {
-}
-
 .icon.text {
 	text-indent: 0px;
 }
@@ -274,9 +269,6 @@ div.pager {
 	border-bottom: 1px solid #D2D2D2;
 	width: 100%;
 	height: 10px;
-}
-
-.pager a {
 }
 
 .pager a.pager_older {
@@ -382,7 +374,6 @@ button.fakelink {
 }
 pre code {
 	font-family: Courier, monospace;
-	white-space: pre;
 	display: block;
 	overflow: auto;
 	border: 1px solid #444;
@@ -1062,7 +1053,6 @@ nav#topbar-first ul.menu-popup,
 ul.menu-popup {
 	visibility:hidden;
 	opacity:0;
-	z-index:1;
 	transition:all 0.2s ease-in-out;
 	/* display: none; */
 	position: absolute;
@@ -2105,7 +2095,7 @@ section.minimal {
 	margin-top: 3px;
 	color: #9c9c9c;
 }
-profile-jot-form #jot-title, #profile-jot-form #jot-category {
+#profile-jot-form #jot-category {
 	border-radius: 5px 5px 5px 5px;
 	font-weight: bold;
 	height: 20px;
@@ -2175,11 +2165,8 @@ profile-jot-form #jot-title, #profile-jot-form #jot-category {
 	height: 25px;
 	background: #FFFFFF;
 	border: 2px solid #364e59;
-	height: 25px;
-	width: 25px;
 	overflow: hidden;
 	padding: 1px;
-	position: absolute !important;
 	top: 40px;
 	left: 30px;
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
@@ -2353,7 +2340,6 @@ profile-jot-form #jot-title, #profile-jot-form #jot-category {
 }
 /* #jot */
 #jot-title {
-	border: 0px;
 	margin: 0px;
 	height: 20px;
 	width: 700px;
@@ -3811,7 +3797,6 @@ img.photo-album-photo {
 }
 
 /* upload/select popup */
-fbrowser.photo .photo-album-image-wrapper { margin-left: 10px; }
 #message-preview { margin-top: 15px; }
 #message-preview span { width: 100%; }
 #message-preview .mail-count, #message-preview .mail-delete { display:none; }

@@ -234,9 +234,9 @@ aside.show {
 #acl-wrapper { width: 100%; float: none; }
 /* flexbox for ACL window */
 #acl-wrapper {
-  display: -ms-Flexbox !important;
   -ms-box-orient: vertical;
 
+  display: -ms-Flexbox !important;
   display: -webkit-flex !important;
   display: -moz-flex !important;
   display: -ms-flex !important;

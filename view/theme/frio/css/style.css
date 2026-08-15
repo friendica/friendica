@@ -424,8 +424,7 @@ ul#nav-user-menu {
 	background: transparent;
 	box-shadow: none;
 }
-.btn-eventnav,
-btn-eventnav:hover {
+.btn-eventnav {
 	font-size: 16px;
 	background: none;
 	background-color: transparent;
@@ -810,7 +809,6 @@ nav.navbar .nav > li > button:focus {
 	height: 0;
 	border-color: transparent;
 	border-style: solid;
-	z-index: 1001;
 	border-width: 11px;
 	left: 50%;
 	margin-left: -18px;
@@ -1301,7 +1299,6 @@ aside .widget li.selected a {
 	-webkit-filter: grayscale(100%);
 	filter: grayscale(100%);
 	opacity: 0.5;
-	filter: alpha(opacity=50); /* For IE8 and earlier */
 	-webkit-transition: all 0.2s ease-in-out;
 	-moz-transition: all 0.2s ease-in-out;
 	-o-transition: all 0.2s ease-in-out;
@@ -3064,7 +3061,6 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 #mail-conversation {
 	overflow-y: auto;
 	max-height: calc(100vh - 400px);
-	max-height: auto;
 	margin-bottom: 0px;
 	padding: 0 15px;
 }
@@ -4154,7 +4150,6 @@ div.login-form, .login-content-wrapper,
 	font-size: 14px;
 	font-weight: 600;
 	padding: 8px 16px;
-	color: inherit;
 	width: 100% !important;
 }
 
@@ -4167,7 +4162,6 @@ div.login-form, .login-content-wrapper,
 	background-image: none;
 	text-shadow: none;
 	border-radius: 3px;
-	margin-bottom: 0;
 	font-size: 14px;
 	font-weight: 600;
 	padding: 8px 16px;

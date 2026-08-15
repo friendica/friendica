@@ -443,7 +443,6 @@
 	pointer-events: none;
 	z-index: 1000;
 	position: absolute;
-	display: block;
 	display: none;
 	opacity: 0;
 	-webkit-transition: opacity 0.3s ease;

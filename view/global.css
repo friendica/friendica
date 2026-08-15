@@ -128,9 +128,6 @@ span.connector {
   line-height: normal;
 }
 
-.type-link img, .type-video img {
-}
-
 .type-video .embed_video {
   margin: 0em;
 }
@@ -265,7 +262,7 @@ h4 {
   margin: 0px 0px 0px 0px;
 }
 
-code, key {
+code {
   display: inline;
   background-color: #eee;
   color: #666;
@@ -821,8 +818,6 @@ figure.img-allocated-height img{
 /**
  * Log levels colorized in the admin panel
  **/
-.loglevel-debug {
-}
 .loglevel-info {
 	color: #0f009f; /* blue */
 }
