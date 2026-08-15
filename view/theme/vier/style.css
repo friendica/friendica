@@ -2112,6 +2112,12 @@ section.minimal {
 #profile-jot-form #jot-title:-moz-placeholder {
 	font-weight: normal;
 }
+#profile-jot-form #jot-title:hover,
+#profile-jot-form #jot-title:focus,
+#profile-jot-form #jot-title:active,
+#profile-jot-form #jot-title:focus-within {
+	border: 1px solid #999999;
+}
 #profile-jot-form #profile-jot-text_parent #profile-jot-text_tbl {
 /*  width: 785px; */
 	width: 100%;
@@ -2244,101 +2250,6 @@ section.minimal {
 .jothidden {
 	display: none;
 }
-#jot {
-	width: 785px;
-	margin: 0px 2em 20px 0px;
-}
-#jot .profile-jot-text {
-	height: 1.2em;
-	width: 99%;
-	font-size: 10px;
-	color: #999999;
-	border: 1px solid #DDD;
-	padding: 0.3em;
-}
-#jot #jot-tools {
-	margin: 0px;
-	padding: 0px;
-	height: 40px;
-	width: 783px;
-	background-color: #0e232e;
-	border-bottom: 2px solid #9eabb0;
-}
-#jot #jot-tools li {
-	list-style: none;
-	float: left;
-	width: 80px;
-	height: 40px;
-	border-bottom: 2px solid #9eabb0;
-}
-#jot #jot-tools li a {
-	display: block;
-	color: #cccccc;
-	width: 100%;
-	height: 40px;
-	text-align: center;
-	line-height: 40px;
-	overflow: hidden;
-}
-#jot #jot-tools li:hover,
-#jot #jot-tools li:focus,
-#jot #jot-tools li:active,
-#jot #jot-tools li:focus-within {
-	background-color: #364e59;
-	border-bottom: 2px solid #bdcdd4;
-}
-#jot #jot-tools li.perms {
-	float: right;
-	width: 40px;
-}
-#jot #jot-tools li.perms a.unlock {
-	width: 30px;
-	border-left: 10px solid #cccccc;
-	background-color: #cccccc;
-	background-position: left center;
-}
-#jot #jot-tools li.perms a.lock {
-	width: 30px;
-	border-left: 10px solid #666666;
-	background-color: #666666;
-}
-#jot #jot-tools li.submit {
-	float: right;
-	background-color: #cccccc;
-	border-bottom: 2px solid #cccccc;
-	border-right: 1px solid #666666;
-	border-left: 1px solid #666666;
-}
-#jot #jot-tools li.submit input {
-	border: 0px;
-	margin: 0px;
-	padding: 0px;
-	background-color: #cccccc;
-	color: #666666;
-	width: 80px;
-	height: 40px;
-	line-height: 40px;
-}
-#jot #jot-tools li.submit input:hover,
-#jot #jot-tools li.submit input:focus,
-#jot #jot-tools li.submit input:active,
-#jot #jot-tools li.submit input:focus-within {
-	background-color: #bdcdd4;
-	color: #666666;
-}
-#jot #jot-tools li.loading {
-	float: right;
-	background-color: #ffffff;
-	width: 20px;
-	vertical-align: center;
-	text-align: center;
-	border-top: 2px solid #9eabb0;
-	height: 38px;
-}
-#jot #jot-tools li.loading img {
-	margin-top: 10px;
-}
-/* #jot */
 #jot-title {
 	margin: 0px;
 	height: 20px;
@@ -2346,26 +2257,6 @@ section.minimal {
 	max-width: 100%;
 	font-weight: bold;
 	border: 1px solid #ffffff;
-}
-#jot #jot-title:-webkit-input-placeholder {
-	font-weight: normal;
-}
-#jot #jot-title:-moz-placeholder {
-	font-weight: normal;
-}
-#jot #jot-title:hover,
-#jot #jot-title:focus,
-#jot #jot-title:active,
-#jot #jot-title:focus-within {
-	border: 1px solid #999999;
-}
-#jot #character-counter {
-	width: 80px;
-	float: right;
-	text-align: right;
-	height: 20px;
-	line-height: 20px;
-	padding-right: 20px;
 }
 
 #profile-jot-submit {
