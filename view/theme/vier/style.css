@@ -2095,7 +2095,7 @@ section.minimal {
 	margin-top: 3px;
 	color: #9c9c9c;
 }
-#profile-jot-form #jot-category {
+#profile-jot-form #jot-title, #profile-jot-form #jot-category {
 	border-radius: 5px 5px 5px 5px;
 	font-weight: bold;
 	height: 20px;
