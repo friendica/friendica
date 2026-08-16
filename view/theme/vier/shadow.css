@@ -7,8 +7,7 @@
 nav#topbar-first {
   background: rgb(36, 76, 94);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
-  padding: 0px;
-  padding-left: 0px;
+  padding: 6px 0px;
 }
 
 nav#topbar-first a:active,
