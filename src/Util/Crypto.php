@@ -8,8 +8,8 @@
 namespace Friendica\Util;
 
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\OtherEncapsulateEvent;
+use Friendica\Event\OtherUnencapsulateEvent;
 use phpseclib3\Crypt\PublicKeyLoader;
 
 /**
@@ -269,10 +269,9 @@ class Crypto
 
 			return self::$fn(Strings::base64UrlDecode($data['data']), $k, $i);
 		} else {
-			$x = ['data' => $data, 'prvkey' => $prvkey, 'alg' => $alg, 'result' => $data];
-			$x = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::OTHER_UNENCAPSULATE, $x))->getArray();
+			$event = DI::eventDispatcher()->dispatch(new OtherUnencapsulateEvent($data, $prvkey, $alg));
 
-			return $x['result'];
+			return $event->getResultArray();
 		}
 	}
 

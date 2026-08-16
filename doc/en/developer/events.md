@@ -88,6 +88,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `generate_named_map` | `\Friendica\Event\GenerateNamedMapEvent` |
 | `Map::getCoordinates` | `\Friendica\Event\MapGetCoordinatesEvent` |
 | `other_encapsulate` | `\Friendica\Event\OtherEncapsulateEvent` |
+| `other_unencapsulate` | `\Friendica\Event\OtherUnencapsulateEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -409,6 +410,19 @@ Fired when a message is encapsulated with an unknown algorithm, to allow addons 
 
 **Modifiable:**
 - `setResult(string $result): void` — change the encapsulated result
+
+### `\Friendica\Event\OtherUnencapsulateEvent`
+
+Fired when a message is unencapsulated with an unknown algorithm, to allow addons to provide the unencapsulated result.
+
+**Contained data:**
+- `getDataArray(): array` — the data to be unencapsulated
+- `getPrivateKey(): string` — the private key used for unencapsulation
+- `getAlg(): string` — the algorithm used for unencapsulation
+- `getResultArray(): array` — the unencapsulated result
+
+**Modifiable:**
+- `setResultArray(array $result): void` — change the unencapsulated result
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

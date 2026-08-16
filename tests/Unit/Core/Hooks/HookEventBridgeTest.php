@@ -83,6 +83,7 @@ use Friendica\Event\ModulePostEvent;
 use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\OtherEncapsulateEvent;
+use Friendica\Event\OtherUnencapsulateEvent;
 use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\PermissionTooltipContentEvent;
@@ -204,7 +205,7 @@ class HookEventBridgeTest extends TestCase
 			NotifierEndEvent::NAME                  => 'onNotifierEndEvent',
 			OcrDetectionEvent::NAME                 => 'onOcrDetectionEvent',
 			OtherEncapsulateEvent::NAME             => 'onOtherEncapsulateEvent',
-			ArrayFilterEvent::OTHER_UNENCAPSULATE   => 'onArrayFilterEvent',
+			OtherUnencapsulateEvent::NAME           => 'onOtherUnencapsulateEvent',
 			PageInfoEvent::NAME                     => 'onPageInfoEvent',
 			ParseLinkEvent::NAME                    => 'onParseLinkEvent',
 			PermissionTooltipContentEvent::NAME     => 'onPermissionTooltipContentEvent',
@@ -2063,6 +2064,48 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onOtherEncapsulateEvent($event);
 
 		$this->assertSame('data', $event->getResult());
+	}
+
+	public function testOnOtherUnencapsulateEventCallsHookWithCorrectValue(): void
+	{
+		$event = new OtherUnencapsulateEvent(['data' => 'encrypted'], 'prvkey', 'aes256cbc');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('other_unencapsulate', $name);
+			$this->assertSame([
+				'data'   => ['data' => 'encrypted'],
+				'prvkey' => 'prvkey',
+				'alg'    => 'aes256cbc',
+				'result' => ['data' => 'encrypted'],
+			], $data);
+
+			$data['result'] = ['data' => 'decrypted'];
+
+			return $data;
+		});
+
+		HookEventBridge::onOtherUnencapsulateEvent($event);
+
+		$this->assertSame(['data' => 'decrypted'], $event->getResultArray());
+	}
+
+	public function testOnOtherUnencapsulateEventCallsHookWithMissingValues(): void
+	{
+		$event = new OtherUnencapsulateEvent(['data' => 'encrypted'], 'prvkey', 'aes256cbc');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('other_unencapsulate', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onOtherUnencapsulateEvent($event);
+
+		$this->assertSame(['data' => 'encrypted'], $event->getResultArray());
 	}
 
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void

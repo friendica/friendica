@@ -97,6 +97,7 @@ use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\NotifierEndEvent;
 use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\OtherEncapsulateEvent;
+use Friendica\Event\OtherUnencapsulateEvent;
 use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Object\EMail\IEmail;
@@ -199,7 +200,7 @@ final class HookEventBridge
 		NotifierEndEvent::NAME                  => 'notifier_end',
 		OcrDetectionEvent::NAME                 => 'ocr-detection',
 		OtherEncapsulateEvent::NAME             => 'other_encapsulate',
-		ArrayFilterEvent::OTHER_UNENCAPSULATE   => 'other_unencapsulate',
+		OtherUnencapsulateEvent::NAME           => 'other_unencapsulate',
 		PageInfoEvent::NAME                     => 'page_info_data',
 		ParseLinkEvent::NAME                    => 'parse_link',
 		PermissionTooltipContentEvent::NAME     => 'lockview_content',
@@ -317,7 +318,7 @@ final class HookEventBridge
 			NotifierEndEvent::NAME                  => 'onNotifierEndEvent',
 			OcrDetectionEvent::NAME                 => 'onOcrDetectionEvent',
 			OtherEncapsulateEvent::NAME             => 'onOtherEncapsulateEvent',
-			ArrayFilterEvent::OTHER_UNENCAPSULATE   => 'onArrayFilterEvent',
+			OtherUnencapsulateEvent::NAME           => 'onOtherUnencapsulateEvent',
 			PageInfoEvent::NAME                     => 'onPageInfoEvent',
 			ParseLinkEvent::NAME                    => 'onParseLinkEvent',
 			PermissionTooltipContentEvent::NAME     => 'onPermissionTooltipContentEvent',
@@ -1431,6 +1432,23 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setResult((string) ($hook_data['result'] ?? $event->getResult()));
+	}
+
+	/**
+	 * Map the OtherUnencapsulateEvent to `other_unencapsulate` hook
+	 */
+	public static function onOtherUnencapsulateEvent(OtherUnencapsulateEvent $event): void
+	{
+		$hook_data = [
+			'data'   => $event->getDataArray(),
+			'prvkey' => $event->getPrivateKey(),
+			'alg'    => $event->getAlg(),
+			'result' => $event->getResultArray(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setResultArray(is_array($hook_data['result'] ?? null) ? $hook_data['result'] : $event->getResultArray());
 	}
 
 	public static function onNetworkToNameEvent(NetworkToNameEvent $event): void
