@@ -49,6 +49,7 @@ use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
 use Friendica\Event\GenerateMapEvent;
+use Friendica\Event\GenerateNamedMapEvent;
 use Friendica\Event\GetSiteInfoEvent;
 use Friendica\Event\GlobalDirUpdateEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
@@ -172,7 +173,7 @@ final class HookEventBridge
 		FetchItemByLinkEvent::NAME              => 'item_by_link',
 		FollowContactEvent::NAME                => 'follow',
 		GenerateMapEvent::NAME                  => 'generate_map',
-		ArrayFilterEvent::GENERATE_NAMED_MAP    => 'generate_named_map',
+		GenerateNamedMapEvent::NAME             => 'generate_named_map',
 		GetSiteInfoEvent::NAME                  => 'getsiteinfo',
 		GlobalDirUpdateEvent::NAME              => 'globaldir_update',
 		HtmlToBbcodeEndEvent::NAME              => 'html2bbcode',
@@ -290,7 +291,7 @@ final class HookEventBridge
 			FetchItemByLinkEvent::NAME              => 'onFetchItemByLinkEvent',
 			FollowContactEvent::NAME                => 'onFollowContactEvent',
 			GenerateMapEvent::NAME                  => 'onGenerateMapEvent',
-			ArrayFilterEvent::GENERATE_NAMED_MAP    => 'onArrayFilterEvent',
+			GenerateNamedMapEvent::NAME             => 'onGenerateNamedMapEvent',
 			GetSiteInfoEvent::NAME                  => 'onGetSiteInfoEvent',
 			GlobalDirUpdateEvent::NAME              => 'onGlobalDirUpdateEvent',
 			HtmlToBbcodeEndEvent::NAME              => 'onHtmlToBbcodeEvent',
@@ -1373,6 +1374,22 @@ final class HookEventBridge
 			'lon'  => $event->getLongitude(),
 			'mode' => $event->getMode(),
 			'html' => $event->getHtml(),
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setHtml((string) ($hook_data['html'] ?? $event->getHtml()));
+	}
+
+	/**
+	 * Map the GenerateNamedMapEvent to `generate_named_map` hook
+	 */
+	public static function onGenerateNamedMapEvent(GenerateNamedMapEvent $event): void
+	{
+		$hook_data = [
+			'location' => $event->getLocation(),
+			'mode'     => $event->getMode(),
+			'html'     => $event->getHtml(),
 		];
 
 		$hook_data = static::callHook($event->getName(), $hook_data);

@@ -54,6 +54,7 @@ use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
 use Friendica\Event\GenerateMapEvent;
+use Friendica\Event\GenerateNamedMapEvent;
 use Friendica\Event\GetSiteInfoEvent;
 use Friendica\Object\EMail\IEmail;
 use Friendica\Event\GlobalDirUpdateEvent;
@@ -177,7 +178,7 @@ class HookEventBridgeTest extends TestCase
 			FetchItemByLinkEvent::NAME              => 'onFetchItemByLinkEvent',
 			FollowContactEvent::NAME                => 'onFollowContactEvent',
 			GenerateMapEvent::NAME                  => 'onGenerateMapEvent',
-			ArrayFilterEvent::GENERATE_NAMED_MAP    => 'onArrayFilterEvent',
+			GenerateNamedMapEvent::NAME             => 'onGenerateNamedMapEvent',
 			GetSiteInfoEvent::NAME                  => 'onGetSiteInfoEvent',
 			GlobalDirUpdateEvent::NAME              => 'onGlobalDirUpdateEvent',
 			HtmlToBbcodeEndEvent::NAME              => 'onHtmlToBbcodeEvent',
@@ -1931,6 +1932,47 @@ class HookEventBridgeTest extends TestCase
 		});
 
 		HookEventBridge::onGenerateMapEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnGenerateNamedMapEventCallsHookWithCorrectValue(): void
+	{
+		$event = new GenerateNamedMapEvent('Berlin', 0);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('generate_named_map', $name);
+			$this->assertSame([
+				'location' => 'Berlin',
+				'mode'     => 0,
+				'html'     => '',
+			], $data);
+
+			$data['html'] = '<iframe>';
+
+			return $data;
+		});
+
+		HookEventBridge::onGenerateNamedMapEvent($event);
+
+		$this->assertSame('<iframe>', $event->getHtml());
+	}
+
+	public function testOnGenerateNamedMapEventCallsHookWithMissingValues(): void
+	{
+		$event = new GenerateNamedMapEvent('Berlin', 0);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('generate_named_map', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onGenerateNamedMapEvent($event);
 
 		$this->assertSame('', $event->getHtml());
 	}

@@ -85,6 +85,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `email_getmessage` | `\Friendica\Event\EmailGetMessageEvent` |
 | `email_getmessage_end` | `\Friendica\Event\EmailGetMessageEndEvent` |
 | `generate_map` | `\Friendica\Event\GenerateMapEvent` |
+| `generate_named_map` | `\Friendica\Event\GenerateNamedMapEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -364,6 +365,19 @@ Fired when a map is generated from coordinates, to allow addons to provide the m
 - `getLatitude(): string` — the latitude of the location
 - `getLongitude(): string` — the longitude of the location
 - `getMode(): int` — the HTML mode (empty for `0`)
+- `getHtml(): string` — the generated map HTML
+
+**Modifiable:**
+- `setHtml(string $html): void` — the generated map HTML
+
+### `\Friendica\Event\GenerateNamedMapEvent`
+
+Fired when a map is generated from a location name, to allow addons to provide the map HTML.
+
+**Contained data:**
+- `getLocation(): string` — the location name
+- `getMode(): int` — the HTML mode
+- `getHtml(): string` — the generated map HTML
 
 **Modifiable:**
 - `setHtml(string $html): void` — the generated map HTML

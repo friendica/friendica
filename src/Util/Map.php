@@ -9,6 +9,7 @@ namespace Friendica\Util;
 
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\GenerateMapEvent;
+use Friendica\Event\GenerateNamedMapEvent;
 use Friendica\DI;
 
 /**
@@ -16,7 +17,7 @@ use Friendica\DI;
  */
 class Map
 {
-	public static function byCoordinates($coord, $html_mode = 0): string
+	public static function byCoordinates($coord, $html_mode = 0)
 	{
 		$coord = trim((string) $coord);
 		$coord = str_replace([',','/','  '], [' ',' ',' '], $coord);
@@ -28,9 +29,8 @@ class Map
 
 	public static function byLocation($location, $html_mode = 0)
 	{
-		$arr = ['location' => $location, 'mode' => $html_mode, 'html' => ''];
-		$arr = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::GENERATE_NAMED_MAP, $arr))->getArray();
-		return $arr['html'] ?: $location;
+		$event = DI::eventDispatcher()->dispatch(new GenerateNamedMapEvent($location, $html_mode));
+		return $event->getHtml() ?: $location;
 	}
 
 	public static function getCoordinates($location)
