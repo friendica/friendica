@@ -87,6 +87,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `generate_map` | `\Friendica\Event\GenerateMapEvent` |
 | `generate_named_map` | `\Friendica\Event\GenerateNamedMapEvent` |
 | `Map::getCoordinates` | `\Friendica\Event\MapGetCoordinatesEvent` |
+| `other_encapsulate` | `\Friendica\Event\OtherEncapsulateEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -395,6 +396,19 @@ Fired when the coordinates of a location are looked up, to allow addons to provi
 **Modifiable:**
 - `setLatitude(?string $lat): void` — change the latitude of the location
 - `setLongitude(?string $lon): void` — change the longitude of the location
+
+### `\Friendica\Event\OtherEncapsulateEvent`
+
+Fired when a message is encapsulated with an unknown algorithm, to allow addons to provide the encapsulated result.
+
+**Contained data:**
+- `getData(): string` — the data to be encapsulated
+- `getPubkey(): string` — the public key used for encapsulation
+- `getAlg(): string` — the algorithm used for encapsulation
+- `getResult(): string` — the encapsulated result
+
+**Modifiable:**
+- `setResult(string $result): void` — change the encapsulated result
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

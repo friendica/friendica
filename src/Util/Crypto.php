@@ -9,6 +9,7 @@ namespace Friendica\Util;
 
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\OtherEncapsulateEvent;
 use phpseclib3\Crypt\PublicKeyLoader;
 
 /**
@@ -183,10 +184,9 @@ class Crypto
 
 			return $result;
 		} else {
-			$x = ['data' => $data, 'pubkey' => $pubkey, 'alg' => $alg, 'result' => $data];
-			$x = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::OTHER_ENCAPSULATE, $x))->getArray();
+			$event = DI::eventDispatcher()->dispatch(new OtherEncapsulateEvent($data, $pubkey, $alg));
 
-			return $x['result'];
+			return $event->getResult();
 		}
 	}
 
