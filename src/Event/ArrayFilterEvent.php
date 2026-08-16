@@ -22,8 +22,6 @@ final class ArrayFilterEvent extends AbstractEvent
 
 	public const EVENT_UPDATED = 'friendica.data.event_updated';
 
-	public const MAP_GET_COORDINATES = 'friendica.data.map_get_coordinates';
-
 	public const NOTIFY = 'friendica.data.notify';
 
 	public const OTHER_ENCAPSULATE = 'friendica.data.other_encapsulate';

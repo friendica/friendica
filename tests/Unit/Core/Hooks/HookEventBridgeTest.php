@@ -65,6 +65,7 @@ use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
+use Friendica\Event\MapGetCoordinatesEvent;
 use Friendica\Event\ModerationUsersTabsEvent;
 use Friendica\Event\NavInfoEvent;
 use Friendica\Event\NetworkToNameEvent;
@@ -193,7 +194,7 @@ class HookEventBridgeTest extends TestCase
 			LoggedInEvent::NAME                     => 'onLoggedInEvent',
 			LoginFormEvent::NAME                    => 'onLoginFormEvent',
 			MagicAuthSuccessEvent::NAME             => 'onMagicAuthSuccessEvent',
-			ArrayFilterEvent::MAP_GET_COORDINATES   => 'onArrayFilterEvent',
+			MapGetCoordinatesEvent::NAME            => 'onMapGetCoordinatesEvent',
 			ModerationUsersTabsEvent::NAME          => 'onModerationUsersTabsEvent',
 			NavInfoEvent::NAME                      => 'onNavInfoEvent',
 			NetworkContentStartEvent::NAME          => 'onNetworkContentStartEvent',
@@ -1975,6 +1976,50 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onGenerateNamedMapEvent($event);
 
 		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnMapGetCoordinatesEventCallsHookWithCorrectValue(): void
+	{
+		$event = new MapGetCoordinatesEvent('Berlin');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('Map::getCoordinates', $name);
+			$this->assertSame([
+				'location' => 'Berlin',
+				'lat'      => false,
+				'lon'      => false,
+			], $data);
+
+			$data['lat'] = '52.5200';
+			$data['lon'] = '13.4050';
+
+			return $data;
+		});
+
+		HookEventBridge::onMapGetCoordinatesEvent($event);
+
+		$this->assertSame('52.5200', $event->getLatitude());
+		$this->assertSame('13.4050', $event->getLongitude());
+	}
+
+	public function testOnMapGetCoordinatesEventCallsHookWithMissingValues(): void
+	{
+		$event = new MapGetCoordinatesEvent('Berlin');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('Map::getCoordinates', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onMapGetCoordinatesEvent($event);
+
+		$this->assertNull($event->getLatitude());
+		$this->assertNull($event->getLongitude());
 	}
 
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void

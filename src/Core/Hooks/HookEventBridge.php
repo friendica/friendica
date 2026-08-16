@@ -82,6 +82,7 @@ use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
+use Friendica\Event\MapGetCoordinatesEvent;
 use Friendica\Event\ModerationUsersTabsEvent;
 use Friendica\Event\NavInfoEvent;
 use Friendica\Event\NetworkToNameEvent;
@@ -188,7 +189,7 @@ final class HookEventBridge
 		LoggedInEvent::NAME                     => 'logged_in',
 		LoginFormEvent::NAME                    => 'login_hook',
 		MagicAuthSuccessEvent::NAME             => 'magic_auth_success',
-		ArrayFilterEvent::MAP_GET_COORDINATES   => 'Map::getCoordinates',
+		MapGetCoordinatesEvent::NAME            => 'Map::getCoordinates',
 		ModerationUsersTabsEvent::NAME          => 'moderation_users_tabs',
 		NavInfoEvent::NAME                      => 'nav_info',
 		NetworkContentStartEvent::NAME          => 'network_content_init',
@@ -306,7 +307,7 @@ final class HookEventBridge
 			LoggedInEvent::NAME                     => 'onLoggedInEvent',
 			LoginFormEvent::NAME                    => 'onLoginFormEvent',
 			MagicAuthSuccessEvent::NAME             => 'onMagicAuthSuccessEvent',
-			ArrayFilterEvent::MAP_GET_COORDINATES   => 'onArrayFilterEvent',
+			MapGetCoordinatesEvent::NAME            => 'onMapGetCoordinatesEvent',
 			ModerationUsersTabsEvent::NAME          => 'onModerationUsersTabsEvent',
 			NavInfoEvent::NAME                      => 'onNavInfoEvent',
 			NetworkContentStartEvent::NAME          => 'onNetworkContentStartEvent',
@@ -1395,6 +1396,23 @@ final class HookEventBridge
 		$hook_data = static::callHook($event->getName(), $hook_data);
 
 		$event->setHtml((string) ($hook_data['html'] ?? $event->getHtml()));
+	}
+
+	/**
+	 * Map the MapGetCoordinatesEvent to `Map::getCoordinates` hook
+	 */
+	public static function onMapGetCoordinatesEvent(MapGetCoordinatesEvent $event): void
+	{
+		$hook_data = [
+			'location' => $event->getLocation(),
+			'lat'      => $event->getLatitude()  ?? false,
+			'lon'      => $event->getLongitude() ?? false,
+		];
+
+		$hook_data = static::callHook($event->getName(), $hook_data);
+
+		$event->setLatitude(is_string($hook_data['lat'] ?? null) ? $hook_data['lat'] : null);
+		$event->setLongitude(is_string($hook_data['lon'] ?? null) ? $hook_data['lon'] : null);
 	}
 
 	public static function onNetworkToNameEvent(NetworkToNameEvent $event): void

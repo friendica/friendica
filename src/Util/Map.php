@@ -7,9 +7,9 @@
 
 namespace Friendica\Util;
 
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\GenerateMapEvent;
 use Friendica\Event\GenerateNamedMapEvent;
+use Friendica\Event\MapGetCoordinatesEvent;
 use Friendica\DI;
 
 /**
@@ -35,8 +35,11 @@ class Map
 
 	public static function getCoordinates($location)
 	{
-		$arr = ['location' => $location, 'lat' => false, 'lon' => false];
-		$arr = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::MAP_GET_COORDINATES, $arr))->getArray();
-		return $arr;
+		$event = DI::eventDispatcher()->dispatch(new MapGetCoordinatesEvent($location));
+		return [
+			'location' => $event->getLocation(),
+			'lat'      => $event->getLatitude()  ?? false,
+			'lon'      => $event->getLongitude() ?? false,
+		];
 	}
 }
