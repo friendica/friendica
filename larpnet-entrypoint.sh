@@ -21,7 +21,8 @@ if [ -f /var/www/html/index.php ]; then
     src/App/Page.php \
     src/Worker/NtfyPush.php \
     src/Model/Subscription.php \
-    src/Module/FriendSuggest.php
+    src/Module/FriendSuggest.php \
+    src/Module/Api/Mastodon/Accounts/UpdateCredentials.php
   do
     cp "/usr/src/friendica/$f" "/var/www/html/$f"
   done
