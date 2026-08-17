@@ -24,6 +24,7 @@ class LookupTest extends ApiTestCase
 	{
 		$this->expectException(NotFoundException::class);
 
+		// @phpstan-ignore method.deprecated
 		(new Lookup(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
@@ -38,6 +39,7 @@ class LookupTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
+		// @phpstan-ignore method.deprecated
 		$response = (new Lookup(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'user_id' => static::OTHER_USER['id'],
