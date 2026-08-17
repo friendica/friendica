@@ -28,10 +28,18 @@ class UpdateCredentials extends BaseApi
 
 		$request = $this->getRequest([
 			'bot'               => ($owner['contact-type'] == Contact::TYPE_NEWS),
-			'discoverable'      => $owner['net-publish'],
+			// (bool) casts matter here: BaseModule::getRequestValue() picks its coercion
+			// branch off the *type* of the default, not the field's meaning. `net-publish`/
+			// `manually-approve` come back from the DB as ints, not native bools, so without
+			// the cast they fell into the is_int() branch, which runs FILTER_VALIDATE_INT on
+			// the incoming "true"/"false" string -- that fails to parse as an int and silently
+			// collapses to false, so `locked`/`discoverable` could never actually be set to
+			// true from this endpoint. `bot`'s default is already a real bool (comparison
+			// result), which is why it was never affected.
+			'discoverable'      => (bool) $owner['net-publish'],
 			'display_name'      => $owner['name'],
 			'fields_attributes' => [],
-			'locked'            => $owner['manually-approve'],
+			'locked'            => (bool) $owner['manually-approve'],
 			'note'              => $owner['about'],
 			'avatar'            => [],
 			'header'            => [],
@@ -84,12 +92,6 @@ class UpdateCredentials extends BaseApi
 
 		User::update($user, $uid);
 		Profile::update($profile, $uid);
-
-		// Without this, the self-contact's cached fields (manually-approve, net-publish, ...)
-		// stay stale after the updates above, so verify_credentials keeps echoing the old
-		// values back even though the update succeeded -- see Api\Twitter\Account\UpdateProfile
-		// for the same call on the older endpoint.
-		Contact::updateSelfFromUserID($uid);
 
 		$ucid = Contact::getUserContactId($owner['id'], $uid);
 		if (!$ucid) {
