@@ -15,8 +15,8 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Event\AppMenuEvent;
-use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\NavInfoEvent;
+use Friendica\Event\PageHeaderEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Module\Conversation\Community;
@@ -96,9 +96,7 @@ class Nav
 			'$search_placeholder'   => $this->l10n->t('Search: @name, !group, #tags, content'),
 		]);
 
-		$nav = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::PAGE_HEADER, $nav),
-		)->getHtml();
+		$nav = $this->eventDispatcher->dispatch(new PageHeaderEvent($nav))->getHtml();
 
 		return $nav;
 	}
