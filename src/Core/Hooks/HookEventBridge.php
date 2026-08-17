@@ -50,6 +50,7 @@ use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
 use Friendica\Event\FollowContactEvent;
+use Friendica\Event\FooterEvent;
 use Friendica\Event\GenerateMapEvent;
 use Friendica\Event\GenerateNamedMapEvent;
 use Friendica\Event\GetSiteInfoEvent;
@@ -235,7 +236,7 @@ final class HookEventBridge
 		UserExportOptionsEvent::NAME            => 'uexport_options',
 		ZrlInitEvent::NAME                      => 'zrl_init',
 		HeadEvent::NAME                         => 'head',
-		HtmlFilterEvent::FOOTER                 => 'footer',
+		FooterEvent::NAME                       => 'footer',
 		HtmlFilterEvent::PAGE_HEADER            => 'page_header',
 		HtmlFilterEvent::PAGE_CONTENT_TOP       => 'page_content_top',
 		HtmlFilterEvent::PAGE_END               => 'page_end',
@@ -353,7 +354,7 @@ final class HookEventBridge
 			UserExportOptionsEvent::NAME            => 'onUserExportOptionsEvent',
 			ZrlInitEvent::NAME                      => 'onZrlInitEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END      => 'onHtmlFilterEvent',
-			HtmlFilterEvent::FOOTER                 => 'onHtmlFilterEvent',
+			FooterEvent::NAME                       => 'onFooterEvent',
 			HeadEvent::NAME                         => 'onHeadEvent',
 			HtmlFilterEvent::JOT_TOOL               => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'onHtmlFilterEvent',
@@ -1672,6 +1673,14 @@ final class HookEventBridge
 	 * Map the HeadEvent to `head` hook
 	 */
 	public static function onHeadEvent(HeadEvent $event): void
+	{
+		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
+	}
+
+	/**
+	 * Map the FooterEvent to `footer` hook
+	 */
+	public static function onFooterEvent(FooterEvent $event): void
 	{
 		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
 	}

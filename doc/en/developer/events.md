@@ -72,7 +72,6 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `photo_post_file` | `\Friendica\Event\PhotoUploadEvent` |
 | `photo_post_end` | `\Friendica\Event\PhotoUploadEndEvent` |
 | `photo_upload_form` | `\Friendica\Event\PhotoUploadFormEvent` |
-| `footer` | `\Friendica\Event\FooterEvent` |
 | `app_menu` | `\Friendica\Event\AppMenuEvent` |
 | `nav_info` | `\Friendica\Event\NavInfoEvent` |
 | `proc_run` | `\Friendica\Event\AddWorkerTaskEvent` |
@@ -91,6 +90,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `event_created` | `\Friendica\Event\EventCreatedEvent` |
 | `event_updated` | `\Friendica\Event\EventUpdatedEvent` |
 | `head` | `\Friendica\Event\HeadEvent` |
+| `footer` | `\Friendica\Event\FooterEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -453,6 +453,16 @@ Fired when the head of a page is rendered, to allow addons to add or change the 
 
 **Modifiable:**
 - `setHtml(string $html): void` — change the HTML of the head
+
+### `\Friendica\Event\FooterEvent`
+
+Fired when the footer of a page is rendered, to allow addons to add or change the HTML of the footer.
+
+**Contained data:**
+- `getHtml(): string` — the HTML of the footer
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the HTML of the footer
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

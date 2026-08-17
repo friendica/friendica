@@ -21,6 +21,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\DI;
+use Friendica\Event\FooterEvent;
 use Friendica\Event\HeadEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Network\HTTPException;
@@ -353,9 +354,7 @@ class Page implements ArrayAccess
 			]);
 		}
 
-		$this->page['footer'] = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::FOOTER, $this->page['footer']),
-		)->getHtml();
+		$this->page['footer'] = $this->eventDispatcher->dispatch(new FooterEvent($this->page['footer']))->getHtml();
 
 		$tpl                  = Renderer::getMarkupTemplate('footer.tpl');
 		$this->page['footer'] = Renderer::replaceMacros($tpl, [
