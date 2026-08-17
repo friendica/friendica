@@ -8,11 +8,9 @@
 namespace Friendica\Test\src\Module;
 
 use Friendica\Capabilities\ICanCreateResponses;
-use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Type\ArrayCache;
 use Friendica\Core\Cache\Type\DatabaseCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\Lock\Type\CacheLock;
 use Friendica\Core\Lock\Type\DatabaseLock;
 use Friendica\DI;
@@ -20,15 +18,11 @@ use Friendica\Module\Special\HTTPException;
 use Friendica\Module\StatsCaching;
 use Friendica\Test\FixtureTestCase;
 use Mockery\MockInterface;
-use phpmock\mockery\PHPMockery;
 
 class StatsCachingTest extends FixtureTestCase
 {
 	/** @var MockInterface|HTTPException */
 	protected $httpExceptionMock;
-
-	protected ICanCache $cache;
-	protected ICanLock $lock;
 
 	/** @var MockInterface|IManageConfigValues */
 	protected $config;
@@ -39,15 +33,34 @@ class StatsCachingTest extends FixtureTestCase
 
 		$this->httpExceptionMock = \Mockery::mock(HTTPException::class);
 		$this->config            = \Mockery::mock(IManageConfigValues::class);
-		$this->cache             = new ArrayCache('localhost');
-		$this->lock              = new CacheLock($this->cache);
+	}
+
+	protected function getOpcacheDisabled(): StatsCaching
+	{
+		$config = $this->config;
+		$cache  = new ArrayCache('localhost');
+		$lock   = new CacheLock($cache);
+
+		return new class (DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $config, $cache, $lock) extends StatsCaching {
+			protected function getOpcacheStatus(): array|false
+			{
+				return false;
+			}
+		};
 	}
 
 	public function testStatsCachingNotAllowed(): void
 	{
 		$this->httpExceptionMock->shouldReceive('content')->andReturn('failed')->once();
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
+		$config = DI::config();
+		$config->set('system', 'stats_key', 'my-secret-key');
+
+		$cache = new ArrayCache('localhost');
+		$lock  = new CacheLock($cache);
+
+		// @phpstan-ignore method.deprecated
+		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $cache, $lock))
 			->run($this->httpExceptionMock);
 
 		self::assertEquals('404', $response->getStatusCode());
@@ -61,10 +74,19 @@ class StatsCachingTest extends FixtureTestCase
 			'key' => '12345',
 		];
 		$this->config->shouldReceive('get')->with('system', 'stats_key')->twice()->andReturn('12345');
-		PHPMockery::mock("Friendica\\Module", "function_exists")->with('opcache_get_status')->once()->andReturn(false);
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
-			->run($this->httpExceptionMock, $request);
+		$cache = new ArrayCache('localhost');
+		$lock  = new CacheLock($cache);
+
+		$module = new class (DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $cache, $lock) extends StatsCaching {
+			protected function getOpcacheStatus(): array|false
+			{
+				return false;
+			}
+		};
+
+		// @phpstan-ignore method.deprecated
+		$response = $module->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
@@ -88,19 +110,31 @@ class StatsCachingTest extends FixtureTestCase
 		];
 		$this->config->shouldReceive('get')->with('system', 'stats_key')->twice()->andReturn('12345');
 
-		$this->cache = new DatabaseCache('localhost', DI::dba());
-		$this->lock  = new DatabaseLock(DI::dba());
-		PHPMockery::mock("Friendica\\Module", "function_exists")->with('opcache_get_status')->once()->andReturn(false);
+		$cache = new DatabaseCache('localhost', DI::dba());
+		$lock  = new DatabaseLock(DI::dba());
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
-			->run($this->httpExceptionMock, $request);
+		$module = new class (DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $cache, $lock) extends StatsCaching {
+			protected function getOpcacheStatus(): array|false
+			{
+				return false;
+			}
+		};
+
+		// @phpstan-ignore method.deprecated
+		$response = $module->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
 
 		$json = json_decode($response->getBody(), true);
 
-		self::assertEquals(['enabled' => false], $json['opcache']);
+		self::assertEquals([
+			'enabled'            => false,
+			'hit_rate'           => null,
+			'used_memory'        => null,
+			'free_memory'        => null,
+			'num_cached_scripts' => null,
+		], $json['opcache']);
 		self::assertEquals(['type' => 'database'], $json['cache']);
 		self::assertEquals(['type' => 'database'], $json['lock']);
 	}
@@ -112,19 +146,31 @@ class StatsCachingTest extends FixtureTestCase
 		];
 		$this->config->shouldReceive('get')->with('system', 'stats_key')->twice()->andReturn('12345');
 
-		$this->cache = new DatabaseCache('localhost', DI::dba());
-		$this->lock  = new DatabaseLock(DI::dba());
-		PHPMockery::mock("Friendica\\Module", "function_exists")->with('opcache_get_status')->once()->andReturn(false);
+		$cache = new DatabaseCache('localhost', DI::dba());
+		$lock  = new DatabaseLock(DI::dba());
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
-			->run($this->httpExceptionMock, $request);
+		$module = new class (DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $cache, $lock) extends StatsCaching {
+			protected function getOpcacheStatus(): array|false
+			{
+				return false;
+			}
+		};
+
+		// @phpstan-ignore method.deprecated
+		$response = $module->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
 
 		$json = json_decode($response->getBody(), true);
 
-		self::assertEquals(['enabled' => false], $json['opcache']);
+		self::assertEquals([
+			'enabled'            => false,
+			'hit_rate'           => null,
+			'used_memory'        => null,
+			'free_memory'        => null,
+			'num_cached_scripts' => null,
+		], $json['opcache']);
 		self::assertEquals(['type' => 'database'], $json['cache']);
 		self::assertEquals(['type' => 'database'], $json['lock']);
 	}
@@ -136,13 +182,18 @@ class StatsCachingTest extends FixtureTestCase
 		];
 		$this->config->shouldReceive('get')->with('system', 'stats_key')->twice()->andReturn('12345');
 
-		$this->cache = new DatabaseCache('localhost', DI::dba());
-		$this->lock  = new DatabaseLock(DI::dba());
-		PHPMockery::mock("Friendica\\Module", "function_exists")->with('opcache_get_status')->once()->andReturn(true);
-		PHPMockery::mock("Friendica\\Module", "opcache_get_status")->with(false)->once()->andReturn(false);
+		$cache = new DatabaseCache('localhost', DI::dba());
+		$lock  = new DatabaseLock(DI::dba());
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
-			->run($this->httpExceptionMock, $request);
+		$module = new class (DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $cache, $lock) extends StatsCaching {
+			protected function getOpcacheStatus(): array|false
+			{
+				return false;
+			}
+		};
+
+		// @phpstan-ignore method.deprecated
+		$response = $module->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
@@ -167,23 +218,28 @@ class StatsCachingTest extends FixtureTestCase
 		];
 		$this->config->shouldReceive('get')->with('system', 'stats_key')->twice()->andReturn('12345');
 
-		$this->cache = new DatabaseCache('localhost', DI::dba());
-		$this->lock  = new DatabaseLock(DI::dba());
-		PHPMockery::mock("Friendica\\Module", "function_exists")->with('opcache_get_status')->once()->andReturn(true);
-		PHPMockery::mock("Friendica\\Module", "opcache_get_status")->with(false)->once()->andReturn([
-			'opcache_enabled'    => true,
-			'opcache_statistics' => [
-				'opcache_hit_rate'   => 1,
-				'num_cached_scripts' => 2,
-			],
-			'memory_usage' => [
-				'used_memory' => 3,
-				'free_memory' => 4,
-			],
-		]);
+		$cache = new DatabaseCache('localhost', DI::dba());
+		$lock  = new DatabaseLock(DI::dba());
 
-		$response = (new StatsCaching(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $this->cache, $this->lock, []))
-			->run($this->httpExceptionMock, $request);
+		$module = new class (DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], $this->config, $cache, $lock) extends StatsCaching {
+			protected function getOpcacheStatus(): array
+			{
+				return [
+					'opcache_enabled'    => true,
+					'opcache_statistics' => [
+						'opcache_hit_rate'   => 1,
+						'num_cached_scripts' => 2,
+					],
+					'memory_usage' => [
+						'used_memory' => 3,
+						'free_memory' => 4,
+					],
+				];
+			}
+		};
+
+		// @phpstan-ignore method.deprecated
+		$response = $module->run($this->httpExceptionMock, $request);
 
 		self::assertJson($response->getBody());
 		self::assertEquals(['Content-type' => ['application/json; charset=utf-8'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
