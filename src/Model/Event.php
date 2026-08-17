@@ -14,6 +14,7 @@ use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\EventCreatedEvent;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Network\HTTPException\UnauthorizedException;
@@ -306,9 +307,7 @@ class Event
 
 			$event['id'] = DBA::lastInsertId();
 
-			$eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::EVENT_CREATED, ['event' => $event]),
-			);
+			$eventDispatcher->dispatch(new EventCreatedEvent($event));
 		}
 
 		return (int) $event['id'];

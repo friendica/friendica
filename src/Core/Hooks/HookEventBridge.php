@@ -44,6 +44,7 @@ use Friendica\Event\EnotifyMailEvent;
 use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\EditContactPostEvent;
+use Friendica\Event\EventCreatedEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
@@ -169,7 +170,7 @@ final class HookEventBridge
 		EnotifyEvent::NAME                      => 'enotify',
 		EnotifyMailEvent::NAME                  => 'enotify_mail',
 		EnotifyStoreEvent::NAME                 => 'enotify_store',
-		ArrayFilterEvent::EVENT_CREATED         => 'event_created',
+		EventCreatedEvent::NAME                 => 'event_created',
 		ArrayFilterEvent::EVENT_UPDATED         => 'event_updated',
 		FeatureEnabledEvent::NAME               => 'isEnabled',
 		FeatureGetEvent::NAME                   => 'get',
@@ -287,7 +288,7 @@ final class HookEventBridge
 			EnotifyEvent::NAME                      => 'onEnotifyEvent',
 			EnotifyMailEvent::NAME                  => 'onEnotifyMailEvent',
 			EnotifyStoreEvent::NAME                 => 'onEnotifyStoreEvent',
-			ArrayFilterEvent::EVENT_CREATED         => 'onEventCreatedEvent',
+			EventCreatedEvent::NAME                 => 'onEventCreatedEvent',
 			ArrayFilterEvent::EVENT_UPDATED         => 'onEventUpdatedEvent',
 			FeatureEnabledEvent::NAME               => 'onFeatureEnabledEvent',
 			FeatureGetEvent::NAME                   => 'onFeatureGetEvent',
@@ -1264,16 +1265,12 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the EVENT_CREATED event to `event_created` hook
+	 * Map the EventCreatedEvent to `event_created` hook
 	 */
-	public static function onEventCreatedEvent(ArrayFilterEvent $event): void
+	public static function onEventCreatedEvent(EventCreatedEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$id = $data['event']['id'] ?? 0;
-
 		// one-way-event: we don't care about the returned value
-		static::callHook($event->getName(), (int) $id);
+		static::callHook($event->getName(), (int) ($event->getEventArray()['id'] ?? 0));
 	}
 
 	/**
