@@ -26,6 +26,7 @@ class SearchTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
+		// @phpstan-ignore method.deprecated
 		$response = (new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'q' => static::OTHER_USER['name'],
@@ -46,6 +47,7 @@ class SearchTest extends ApiTestCase
 		// @todo: This call is needed for this test
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
+		// @phpstan-ignore method.deprecated
 		$response = (new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
 			'extension' => ICanCreateResponses::TYPE_XML,
 		]))->run($this->httpExceptionMock, [
@@ -64,6 +66,7 @@ class SearchTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
+		// @phpstan-ignore method.deprecated
 		(new Search(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
