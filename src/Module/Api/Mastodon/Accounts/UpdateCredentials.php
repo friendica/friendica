@@ -85,6 +85,12 @@ class UpdateCredentials extends BaseApi
 		User::update($user, $uid);
 		Profile::update($profile, $uid);
 
+		// Without this, the self-contact's cached fields (manually-approve, net-publish, ...)
+		// stay stale after the updates above, so verify_credentials keeps echoing the old
+		// values back even though the update succeeded -- see Api\Twitter\Account\UpdateProfile
+		// for the same call on the older endpoint.
+		Contact::updateSelfFromUserID($uid);
+
 		$ucid = Contact::getUserContactId($owner['id'], $uid);
 		if (!$ucid) {
 			DI::mstdnError()->InternalError();
