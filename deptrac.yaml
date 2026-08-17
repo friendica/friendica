@@ -1,0 +1,140 @@
+# SPDX-FileCopyrightText: 2010-2026 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Dependency direction check for src/.
+#
+# The one rule: code dependencies point in the same direction as our foreign keys and never back. See doc/en/developer/php-architecture.md for the tiers.
+#
+#   Delivery  ->  Features  ->  Domain  ->  Base
+#
+# Feature packages must not import each other - they talk via the event bus.
+#
+# Today's violations are frozen in deptrac-baseline.yaml, so this only blocks *new* upward or sideways imports.
+
+imports:
+    - deptrac-baseline.yaml
+
+deptrac:
+    paths:
+        - ./src
+
+    layers:
+        # --- Tier 0: Base -----------------------------------------------------
+        # Plumbing and framework primitives. Uses nothing above.
+        - name: Base
+          collectors:
+              - type: directory
+                value: src/App/.*
+              - type: directory
+                value: src/Capabilities/.*
+              - type: directory
+                value: src/Core/.*
+              - type: directory
+                value: src/Database/.*
+              - type: directory
+                value: src/Event/.*
+              - type: directory
+                value: src/Network/.*
+              - type: directory
+                value: src/Render/.*
+              - type: directory
+                value: src/System/.*
+              - type: directory
+                value: src/Util/.*
+              - type: classLike
+                value: ^Friendica\\(App|AppHelper|AppLegacy|DI|Base(Collection|DataTransferObject|Entity|Factory|Repository))$
+
+        # --- Tier 1: Domain ---------------------------------------------------
+        # The core nouns everything else points at. Uses Base only.
+        - name: Domain
+          collectors:
+              - type: directory
+                value: src/Model/.*
+              - type: directory
+                value: src/Post/.*
+              - type: directory
+                value: src/Federation/.*
+
+        # --- Tier 2: Features -------------------------------------------------
+        # One layer per feature package, so cross-feature imports are violations.
+        - name: Feature/Contact
+          collectors:
+              - type: directory
+                value: src/Contact/.*
+        - name: Feature/Moderation
+          collectors:
+              - type: directory
+                value: src/Moderation/.*
+        - name: Feature/Navigation
+          collectors:
+              - type: directory
+                value: src/Navigation/.*
+        - name: Feature/Privacy
+          collectors:
+              - type: directory
+                value: src/Privacy/.*
+        - name: Feature/Profile
+          collectors:
+              - type: directory
+                value: src/Profile/.*
+        - name: Feature/Security
+          collectors:
+              - type: directory
+                value: src/Security/.*
+        - name: Feature/User
+          collectors:
+              - type: directory
+                value: src/User/.*
+
+        # --- Tier 3: Delivery -------------------------------------------------
+        # Handles a request or a job. Nothing depends on it.
+        # The frozen top-level buckets (Object/, Factory/, Collection/) are almost
+        # entirely API DTOs and live here until they are folded into features.
+        - name: Delivery
+          collectors:
+              - type: directory
+                value: src/Collection/.*
+              - type: directory
+                value: src/Console/.*
+              - type: directory
+                value: src/Content/.*
+              - type: directory
+                value: src/Factory/.*
+              - type: directory
+                value: src/Module/.*
+              - type: directory
+                value: src/Object/.*
+              - type: directory
+                value: src/Protocol/.*
+              - type: directory
+                value: src/Worker/.*
+              - type: classLike
+                value: ^Friendica\\(BaseModule|LegacyModule)$
+
+    ruleset:
+        Base: ~
+
+        Domain:
+            - Base
+
+        Feature/Contact: &feature
+            - Domain
+            - Base
+        Feature/Moderation: *feature
+        Feature/Navigation: *feature
+        Feature/Privacy: *feature
+        Feature/Profile: *feature
+        Feature/Security: *feature
+        Feature/User: *feature
+
+        Delivery:
+            - Feature/Contact
+            - Feature/Moderation
+            - Feature/Navigation
+            - Feature/Privacy
+            - Feature/Profile
+            - Feature/Security
+            - Feature/User
+            - Domain
+            - Base

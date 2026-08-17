@@ -76,6 +76,40 @@ jobs:
       - name: Run PHPStan
         run: composer run phpstan
 
+  deptrac:
+    name: Deptrac (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: ['ubuntu-latest']
+        php: ['8.5']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Setup PHP with composer and extensions
+        uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: none
+
+      - name: Clone addon repository
+        run: git clone -b develop --single-branch https://github.com/friendica/friendica-addons.git addon
+
+      - name: Install Composer dependencies
+        uses: "ramsey/composer-install@v4"
+
+      # Only new violations fail - everything that exists today is frozen in
+      # deptrac-baseline.yaml. See doc/en/developer/php-architecture.md.
+      - name: Run Deptrac
+        run: vendor/bin/deptrac analyse --no-progress --config-file=deptrac.yaml --formatter=github-actions
+
   phpstan-addons:
     name: PHPStan in addons (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest

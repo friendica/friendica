@@ -11,6 +11,7 @@ path = [
      "package-lock.json",
      ".stylelintrc.json",
      "eslint-suppressions.json",
+     "deptrac-baseline.yaml",
      "doc/**",
      "spec/*",
      "tests/**",

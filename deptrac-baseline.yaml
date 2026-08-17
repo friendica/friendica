@@ -1,0 +1,395 @@
+deptrac:
+  skip_violations:
+    Friendica\App:
+      - Friendica\BaseModule
+      - Friendica\Content\Nav
+      - Friendica\Module\Maintenance
+      - Friendica\Module\Response
+      - Friendica\Module\Special\HTTPException
+      - Friendica\Protocol\ATProtocol\DID
+      - Friendica\Security\Authentication
+      - Friendica\Security\ExAuth
+      - Friendica\Security\OpenWebAuth
+    Friendica\App\Page:
+      - Friendica\Content\Nav
+    Friendica\App\Router:
+      - Friendica\LegacyModule
+      - Friendica\Module\HTTPException\MethodNotAllowed
+      - Friendica\Module\HTTPException\PageNotFound
+      - Friendica\Module\Special\Options
+    Friendica\Capabilities\ICanHandleRequests:
+      - Friendica\Module\Special\HTTPException
+    Friendica\Contact\Avatar:
+      - Friendica\Object\Image
+    Friendica\Core\ACL:
+      - Friendica\Model\Circle
+      - Friendica\Model\Contact
+      - Friendica\Model\User
+    Friendica\Core\Console:
+      - Friendica\Console\Addon
+      - Friendica\Console\ArchiveContact
+      - Friendica\Console\AutomaticInstallation
+      - Friendica\Console\Cache
+      - Friendica\Console\ClearAvatarCache
+      - Friendica\Console\Config
+      - Friendica\Console\Contact
+      - Friendica\Console\CreateDoxygen
+      - Friendica\Console\Daemon
+      - Friendica\Console\DatabaseStructure
+      - Friendica\Console\DocBloxErrorChecker
+      - Friendica\Console\Extract
+      - Friendica\Console\FediBuzzRelay
+      - Friendica\Console\FixAPDeliveryWorkerTaskParameters
+      - Friendica\Console\GlobalCommunityBlock
+      - Friendica\Console\GlobalCommunitySilence
+      - Friendica\Console\JetstreamDaemon
+      - Friendica\Console\Lock
+      - Friendica\Console\Maintenance
+      - Friendica\Console\MergeContacts
+      - Friendica\Console\MoveToAvatarCache
+      - Friendica\Console\PhpToPo
+      - Friendica\Console\PoToPhp
+      - Friendica\Console\PostUpdate
+      - Friendica\Console\Relay
+      - Friendica\Console\Relocate
+      - Friendica\Console\ServerBlock
+      - Friendica\Console\Storage
+      - Friendica\Console\Test
+      - Friendica\Console\Typo
+      - Friendica\Console\User
+      - Friendica\Console\Worker
+    Friendica\Core\Protocol:
+      - Friendica\Model\User
+      - Friendica\Protocol\ActivityPub\Transmitter
+      - Friendica\Protocol\Diaspora
+    Friendica\Core\Search:
+      - Friendica\Model\Contact
+      - Friendica\Object\Search\ContactResult
+      - Friendica\Object\Search\ResultList
+    Friendica\Core\Session\Model\UserSession:
+      - Friendica\Model\Contact
+      - Friendica\Model\User
+    Friendica\Core\Session\Type\Native:
+      - Friendica\Model\User\Cookie
+    Friendica\Core\System:
+      - Friendica\Content\Text\BBCode
+      - Friendica\Module\Response
+    Friendica\Core\Theme:
+      - Friendica\Model\Profile
+    Friendica\Core\Update:
+      - Friendica\Model\User
+    Friendica\Core\Worker\Cron:
+      - Friendica\Model\GServer
+      - Friendica\Model\Post\Delivery
+      - Friendica\Model\User
+      - Friendica\Protocol\ActivityPub\Delivery
+    Friendica\DI:
+      - Friendica\Contact\FriendSuggest\Factory\FriendSuggest
+      - Friendica\Contact\FriendSuggest\Repository\FriendSuggest
+      - Friendica\Contact\Introduction\Factory\Introduction
+      - Friendica\Contact\Introduction\Repository\Introduction
+      - Friendica\Contact\LocalRelationship\Repository\LocalRelationship
+      - Friendica\Content\Conversation\ActivityFormatter
+      - Friendica\Content\Conversation\ConversationDataProvider
+      - Friendica\Content\Conversation\ConversationRenderer
+      - Friendica\Content\Conversation\Factory\Activity
+      - Friendica\Content\Conversation\Factory\Channel
+      - Friendica\Content\Conversation\Factory\ChannelPost
+      - Friendica\Content\Conversation\Factory\Community
+      - Friendica\Content\Conversation\Factory\Network
+      - Friendica\Content\Conversation\Factory\SystemChannelPost
+      - Friendica\Content\Conversation\Factory\Timeline
+      - Friendica\Content\Conversation\PostTemplateBuilder
+      - Friendica\Content\Conversation\Repository\UserDefinedChannel
+      - Friendica\Content\Conversation\StatusEditor
+      - Friendica\Content\Item
+      - Friendica\Content\Post\Factory\PostMedia
+      - Friendica\Content\Post\Repository\PostMedia
+      - Friendica\Content\Text\BBCode\Video
+      - Friendica\Factory\Api\Mastodon\Account
+      - Friendica\Factory\Api\Mastodon\Application
+      - Friendica\Factory\Api\Mastodon\Attachment
+      - Friendica\Factory\Api\Mastodon\Card
+      - Friendica\Factory\Api\Mastodon\Conversation
+      - Friendica\Factory\Api\Mastodon\Emoji
+      - Friendica\Factory\Api\Mastodon\Error
+      - Friendica\Factory\Api\Mastodon\ListEntity
+      - Friendica\Factory\Api\Mastodon\Notification
+      - Friendica\Factory\Api\Mastodon\Poll
+      - Friendica\Factory\Api\Mastodon\Relationship
+      - Friendica\Factory\Api\Mastodon\ScheduledStatus
+      - Friendica\Factory\Api\Mastodon\Status
+      - Friendica\Factory\Api\Mastodon\StatusSource
+      - Friendica\Factory\Api\Mastodon\Subscription
+      - Friendica\Factory\Api\Twitter\Status
+      - Friendica\Factory\Api\Twitter\User
+      - Friendica\Federation\Factory\DeliveryQueueItem
+      - Friendica\Federation\Repository\DeliveryQueueItem
+      - Friendica\Model\Log\ParsedLogIterator
+      - Friendica\Model\User\Cookie
+      - Friendica\Moderation\Factory\Report
+      - Friendica\Moderation\Repository\Report
+      - Friendica\Module\Api\ApiResponse
+      - Friendica\Navigation\Notifications\Factory\FormattedNavNotification
+      - Friendica\Navigation\Notifications\Factory\FormattedNotify
+      - Friendica\Navigation\Notifications\Factory\Introduction
+      - Friendica\Navigation\Notifications\Factory\Notification
+      - Friendica\Navigation\Notifications\Factory\Notify
+      - Friendica\Navigation\Notifications\Repository\Notification
+      - Friendica\Navigation\Notifications\Repository\Notify
+      - Friendica\Navigation\SystemMessages
+      - Friendica\Post\UriGenerator
+      - Friendica\Profile\ProfileField\Factory\ProfileField
+      - Friendica\Profile\ProfileField\Repository\ProfileField
+      - Friendica\Protocol\ATProtocol
+      - Friendica\Protocol\ATProtocol\Actor
+      - Friendica\Protocol\ATProtocol\Processor
+      - Friendica\Protocol\Activity
+      - Friendica\Protocol\Diaspora\Repository\DiasporaContact
+      - Friendica\Security\Authentication
+      - Friendica\Security\PermissionSet\Factory\PermissionSet
+      - Friendica\Security\PermissionSet\Repository\PermissionSet
+      - Friendica\User\Settings\Repository\UserGServer
+    Friendica\Database\DBStructure:
+      - Friendica\Model\Item
+      - Friendica\Model\User
+    Friendica\Database\PostUpdate:
+      - Friendica\Model\Contact
+      - Friendica\Model\Conversation
+      - Friendica\Model\GServer
+      - Friendica\Model\Item
+      - Friendica\Model\ItemURI
+      - Friendica\Model\Photo
+      - Friendica\Model\Post
+      - Friendica\Model\Post\Category
+      - Friendica\Model\Post\Counts
+      - Friendica\Model\Post\Engagement
+      - Friendica\Model\Post\SearchIndex
+      - Friendica\Model\Post\UserNotification
+      - Friendica\Model\Tag
+      - Friendica\Model\Verb
+      - Friendica\Protocol\ActivityPub\Processor
+      - Friendica\Protocol\ActivityPub\Receiver
+    Friendica\Event\ModuleContentEvent:
+      - Friendica\BaseModule
+    Friendica\Event\ModuleInitEvent:
+      - Friendica\BaseModule
+    Friendica\Event\ModulePostEvent:
+      - Friendica\BaseModule
+    Friendica\Event\ModulePostRecipientEvent:
+      - Friendica\BaseModule
+    Friendica\Model\APContact:
+      - Friendica\Content\Text\HTML
+      - Friendica\Protocol\ActivityNamespace
+      - Friendica\Protocol\ActivityPub
+      - Friendica\Protocol\ActivityPub\Transmitter
+    Friendica\Model\Attach:
+      - Friendica\Content\Post\Entity\PostMedia
+      - Friendica\Object\Image
+      - Friendica\Security\Security
+    Friendica\Model\Circle:
+      - Friendica\BaseModule
+      - Friendica\Content\Widget
+      - Friendica\Protocol\ActivityPub
+    Friendica\Model\Contact:
+      - Friendica\Contact\Avatar
+      - Friendica\Contact\Header
+      - Friendica\Contact\Introduction\Exception\IntroductionNotFoundException
+      - Friendica\Content\Conversation\ConversationRenderer
+      - Friendica\Content\Pager
+      - Friendica\Content\Post\Entity\PostMedia
+      - Friendica\Content\Text\HTML
+      - Friendica\Object\Image
+      - Friendica\Protocol\Activity
+      - Friendica\Protocol\ActivityPub\Transmitter
+      - Friendica\Worker\AddContact
+      - Friendica\Worker\ContactDiscovery
+      - Friendica\Worker\ContactDiscoveryForUser
+      - Friendica\Worker\UpdateContact
+    Friendica\Model\Contact\Circle:
+      - Friendica\Content\Widget
+    Friendica\Model\Contact\Introduction:
+      - Friendica\Contact\Introduction\Entity\Introduction
+      - Friendica\Protocol\ActivityPub\Transmitter
+      - Friendica\Protocol\Diaspora
+    Friendica\Model\Contact\Relation:
+      - Friendica\Content\Widget
+      - Friendica\Protocol\Activity
+      - Friendica\Protocol\ActivityPub
+      - Friendica\Worker\AddContact
+    Friendica\Model\Event:
+      - Friendica\Content\Feature
+      - Friendica\Content\Text\BBCode
+      - Friendica\Protocol\Activity
+      - Friendica\Protocol\Activity\ObjectType
+    Friendica\Model\GServer:
+      - Friendica\Module\Register
+      - Friendica\Protocol\ActivityPub\Receiver
+      - Friendica\Protocol\Relay
+      - Friendica\Worker\UpdateGServer
+    Friendica\Model\Item:
+      - Friendica\Contact\LocalRelationship\Entity\LocalRelationship
+      - Friendica\Content\ContactSelector
+      - Friendica\Content\Image
+      - Friendica\Content\Post\Collection\PostMedias
+      - Friendica\Content\Post\Entity\PostMedia
+      - Friendica\Content\Text\BBCode
+      - Friendica\Content\Text\HTML
+      - Friendica\Protocol\Activity
+      - Friendica\Protocol\ActivityPub\Processor
+      - Friendica\Protocol\ActivityPub\Receiver
+      - Friendica\Protocol\ActivityPub\Transmitter
+      - Friendica\Protocol\Activity\ObjectType
+      - Friendica\Protocol\Delivery
+      - Friendica\Protocol\Diaspora
+    Friendica\Model\ItemHelper:
+      - Friendica\Content\Item
+      - Friendica\Protocol\Activity
+    Friendica\Model\Log\ParsedLogIterator:
+      - Friendica\Object\Log\ParsedLogLine
+    Friendica\Model\Mail:
+      - Friendica\Protocol\Activity
+      - Friendica\Protocol\Delivery
+    Friendica\Model\Photo:
+      - Friendica\Object\Image
+      - Friendica\Security\Security
+    Friendica\Model\Post:
+      - Friendica\Protocol\Activity
+      - Friendica\Protocol\Activity\ObjectType
+    Friendica\Model\Post\Collection:
+      - Friendica\Protocol\ActivityPub\Transmitter
+    Friendica\Model\Post\Counts:
+      - Friendica\Content\Smilies
+      - Friendica\Protocol\Activity
+    Friendica\Model\Post\Engagement:
+      - Friendica\Content\Post\Entity\PostMedia
+      - Friendica\Content\Text\BBCode
+      - Friendica\Protocol\Activity
+      - Friendica\Protocol\ActivityPub\Receiver
+      - Friendica\Protocol\Relay
+    Friendica\Model\Post\Link:
+      - Friendica\Object\Image
+    Friendica\Model\Post\Media:
+      - Friendica\Content\PageInfo
+      - Friendica\Content\Post\Entity\PostMedia
+      - Friendica\Content\Text\BBCode
+      - Friendica\Object\Image
+      - Friendica\Protocol\ActivityPub\Receiver
+    Friendica\Model\Post\User:
+      - Friendica\Protocol\Activity
+    Friendica\Model\Post\UserNotification:
+      - Friendica\Protocol\Activity
+    Friendica\Model\Profile:
+      - Friendica\Content\Feature
+      - Friendica\Content\Text\BBCode
+      - Friendica\Content\Widget\ContactBlock
+      - Friendica\Protocol\Activity
+      - Friendica\Protocol\Diaspora
+      - Friendica\Security\PermissionSet\Entity\PermissionSet
+    Friendica\Model\Register:
+      - Friendica\Content\Pager
+    Friendica\Model\Subscription:
+      - Friendica\Factory\Api\Mastodon\Notification
+      - Friendica\Navigation\Notifications\Entity\Notification
+    Friendica\Model\Tag:
+      - Friendica\Content\Text\BBCode
+      - Friendica\Protocol\ActivityPub
+    Friendica\Model\User:
+      - Friendica\Content\Pager
+      - Friendica\Module\Register
+      - Friendica\Object\Image
+      - Friendica\Protocol\Delivery
+      - Friendica\Security\TwoFactor\Model\AppSpecificPassword
+    Friendica\Navigation\Notifications\Entity\Notify:
+      - Friendica\Content\Text\BBCode
+    Friendica\Navigation\Notifications\Factory\FormattedNavNotification:
+      - Friendica\Contact\Introduction\Entity\Introduction
+    Friendica\Navigation\Notifications\Factory\FormattedNotify:
+      - Friendica\Content\Text\BBCode
+      - Friendica\Module\BaseNotifications
+      - Friendica\Protocol\Activity
+    Friendica\Navigation\Notifications\Factory\Introduction:
+      - Friendica\Content\Text\BBCode
+      - Friendica\Module\BaseNotifications
+    Friendica\Navigation\Notifications\Factory\Notification:
+      - Friendica\Content\Text\BBCode
+      - Friendica\Content\Text\Plaintext
+      - Friendica\Protocol\Activity
+    Friendica\Navigation\Notifications\Factory\Notify:
+      - Friendica\Content\Text\BBCode
+    Friendica\Navigation\Notifications\Repository\Notification:
+      - Friendica\Protocol\Activity
+    Friendica\Navigation\Notifications\Repository\Notify:
+      - Friendica\Content\Text\BBCode
+      - Friendica\Content\Text\Plaintext
+      - Friendica\Factory\Api\Mastodon\Notification
+      - Friendica\Object\Api\Mastodon\Notification
+      - Friendica\Protocol\Activity
+    Friendica\Network\Probe:
+      - Friendica\Content\Text\HTML
+      - Friendica\Model\Contact
+      - Friendica\Model\GServer
+      - Friendica\Model\Profile
+      - Friendica\Model\User
+      - Friendica\Protocol\ActivityNamespace
+      - Friendica\Protocol\ActivityPub
+      - Friendica\Protocol\ActivityPub\Transmitter
+      - Friendica\Protocol\Diaspora
+      - Friendica\Protocol\Email
+      - Friendica\Protocol\Feed
+    Friendica\Profile\ProfileField\Entity\ProfileField:
+      - Friendica\Security\PermissionSet\Entity\PermissionSet
+    Friendica\Profile\ProfileField\Factory\ProfileField:
+      - Friendica\Security\PermissionSet\Entity\PermissionSet
+      - Friendica\Security\PermissionSet\Factory\PermissionSet
+    Friendica\Profile\ProfileField\Repository\ProfileField:
+      - Friendica\Security\PermissionSet\Repository\PermissionSet
+    Friendica\Security\OAuth:
+      - Friendica\Module\BaseApi
+    Friendica\User\Settings\Repository\UserGServer:
+      - Friendica\Content\Pager
+    Friendica\Util\ACLFormatter:
+      - Friendica\Model\Circle
+    Friendica\Util\EMailer\MailBuilder:
+      - Friendica\Model\User
+      - Friendica\Object\EMail\IEmail
+      - Friendica\Object\Email
+    Friendica\Util\EMailer\NotifyMailBuilder:
+      - Friendica\Content\Text\BBCode
+      - Friendica\Model\User
+      - Friendica\Object\EMail\IEmail
+      - Friendica\Object\Email
+    Friendica\Util\EMailer\SystemMailBuilder:
+      - Friendica\Content\Text\BBCode
+      - Friendica\Model\User
+      - Friendica\Object\EMail\IEmail
+      - Friendica\Object\Email
+    Friendica\Util\Emailer:
+      - Friendica\Object\EMail\IEmail
+      - Friendica\Protocol\Email
+    Friendica\Util\HTTPSignature:
+      - Friendica\Model\APContact
+      - Friendica\Model\Contact
+      - Friendica\Model\GServer
+      - Friendica\Model\Item
+      - Friendica\Model\ItemURI
+      - Friendica\Model\User
+      - Friendica\Protocol\ActivityPub\Receiver
+    Friendica\Util\Images:
+      - Friendica\Model\Photo
+      - Friendica\Object\Image
+    Friendica\Util\JsonLD:
+      - Friendica\Protocol\ActivityPub
+    Friendica\Util\LDSignature:
+      - Friendica\Model\APContact
+    Friendica\Util\Network:
+      - Friendica\Model\Contact
+    Friendica\Util\ParseUrl:
+      - Friendica\Content\Text\BBCode
+      - Friendica\Content\Text\HTML
+      - Friendica\Model\Post\Media
+      - Friendica\Protocol\HTTP\MediaType
+    Friendica\Util\Proxy:
+      - Friendica\Content\Text\BBCode
+    Friendica\Util\Strings:
+      - Friendica\Content\ContactSelector

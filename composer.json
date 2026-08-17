@@ -156,6 +156,7 @@
 		]
 	},
 	"require-dev": {
+		"deptrac/deptrac": "^3.0",
 		"friendsofphp/php-cs-fixer": "^3.94",
 		"mikey179/vfsstream": "^1.6",
 		"mockery/mockery": "^1.3",
@@ -194,6 +195,8 @@
 		"phpmd": "phpmd src/ text .phpmd-ruleset.xml --color --cache",
 		"phpstan": "phpstan analyze --memory-limit 1024M --configuration .phpstan.neon",
 		"phpstan:generate-baseline": "phpstan --generate-baseline=.phpstan-baseline.neon --memory-limit=1024M --configuration=.phpstan.neon",
+		"deptrac": "deptrac analyse --no-progress --config-file=deptrac.yaml",
+		"deptrac:generate-baseline": "deptrac analyse --no-progress --config-file=deptrac.yaml --formatter=baseline --output=deptrac-baseline.yaml",
 		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './view/asset/*' -print0 | xargs -0 -n1 php -l",
 		"docker:translate": "docker run --rm -v $PWD:/data -w /data friendicaci/transifex bin/run_xgettext.sh",
 		"lang:recreate": "bin/run_xgettext.sh",
@@ -204,6 +207,7 @@
 		"qa": [
 			"@phpstan",
 			"@addons:phpstan",
+			"@deptrac",
 			"@test:unit",
 			"@test:legacy",
 			"@rector:check",
