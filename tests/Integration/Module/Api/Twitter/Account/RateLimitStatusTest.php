@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Integration\Module\Api\Twitter\Account;
 
-use Friendica\Capabilities\ICanCreateResponses;
 use Friendica\DI;
 use Friendica\Module\Api\Twitter\Account\RateLimitStatus;
 use Friendica\Test\ApiTestCase;

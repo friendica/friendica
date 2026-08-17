@@ -5,22 +5,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Test\src\Module\Api\GnuSocial\GnuSocial;
+declare(strict_types=1);
+
+namespace Friendica\Test\Integration\Module\Api\GnuSocial\GNUSocial;
 
 use Friendica\DI;
 use Friendica\Module\Api\GNUSocial\GNUSocial\Config;
 use Friendica\Test\ApiTestCase;
+use GuzzleHttp\Psr7\ServerRequest;
 
-class ConfigTest extends ApiTestCase
+final class ConfigTest extends ApiTestCase
 {
-	/**
-	 * Test the api_statusnet_config() function.
-	 */
 	public function testApiStatusnetConfig(): void
 	{
-		// @phpstan-ignore method.deprecated
-		$response = (new Config(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run($this->httpExceptionMock);
+		$module = new Config(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = new ServerRequest('GET', 'https://friendica.local/api/gnusocial/config');
+
+		$response = $module->handleRequest($request);
+
+		self::assertEquals(200, $response->getStatusCode());
+
 		$json = $this->toJson($response);
 
 		self::assertEquals(DI::baseUrl()->getHost(), $json->site->server);
