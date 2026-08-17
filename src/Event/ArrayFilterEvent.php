@@ -18,8 +18,6 @@ use Friendica\Core\Event\AbstractEvent;
  */
 final class ArrayFilterEvent extends AbstractEvent
 {
-	public const EVENT_UPDATED = 'friendica.data.event_updated';
-
 	public const NOTIFY = 'friendica.data.notify';
 
 	public function __construct(string $name, private array $array)

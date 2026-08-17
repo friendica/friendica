@@ -90,6 +90,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `other_encapsulate` | `\Friendica\Event\OtherEncapsulateEvent` |
 | `other_unencapsulate` | `\Friendica\Event\OtherUnencapsulateEvent` |
 | `event_created` | `\Friendica\Event\EventCreatedEvent` |
+| `event_updated` | `\Friendica\Event\EventUpdatedEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -428,6 +429,15 @@ Fired when a message is unencapsulated with an unknown algorithm, to allow addon
 ### `\Friendica\Event\EventCreatedEvent`
 
 Fired when a new event has been created, to allow addons to react to the new event.
+
+**Contained data:**
+- `getEventArray(): array` — the event data
+
+This is a one-way event, so there is no modifiable data.
+
+### `\Friendica\Event\EventUpdatedEvent`
+
+Fired when an event has been updated, to allow addons to react to the update.
 
 **Contained data:**
 - `getEventArray(): array` — the event data

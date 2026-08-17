@@ -13,8 +13,8 @@ use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Event\EventCreatedEvent;
+use Friendica\Event\EventUpdatedEvent;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Network\HTTPException\UnauthorizedException;
@@ -298,9 +298,7 @@ class Event
 				Item::update($fields, ['id' => $item['id']]);
 			}
 
-			$eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => $event]),
-			);
+			$eventDispatcher->dispatch(new EventUpdatedEvent($event));
 		} else {
 			// New event. Store it.
 			DBA::insert('event', $event);

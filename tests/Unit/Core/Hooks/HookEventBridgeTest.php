@@ -50,6 +50,7 @@ use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\EventCreatedEvent;
+use Friendica\Event\EventUpdatedEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
@@ -176,7 +177,7 @@ class HookEventBridgeTest extends TestCase
 			EnotifyMailEvent::NAME                  => 'onEnotifyMailEvent',
 			EnotifyStoreEvent::NAME                 => 'onEnotifyStoreEvent',
 			EventCreatedEvent::NAME                 => 'onEventCreatedEvent',
-			ArrayFilterEvent::EVENT_UPDATED         => 'onEventUpdatedEvent',
+			EventUpdatedEvent::NAME                 => 'onEventUpdatedEvent',
 			FeatureEnabledEvent::NAME               => 'onFeatureEnabledEvent',
 			FeatureGetEvent::NAME                   => 'onFeatureGetEvent',
 			FetchItemByLinkEvent::NAME              => 'onFetchItemByLinkEvent',
@@ -2111,7 +2112,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => ['id' => 123]]);
+		$event = new EventUpdatedEvent(['id' => 123]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -2284,7 +2285,7 @@ class HookEventBridgeTest extends TestCase
 			[AccountRegisterPostEvent::NAME, 'register_post'],
 			[AccountRegisterEvent::NAME, 'register_account'],
 			[EventCreatedEvent::NAME, 'event_created'],
-			[ArrayFilterEvent::EVENT_UPDATED, 'event_updated'],
+			[EventUpdatedEvent::NAME, 'event_updated'],
 			[AddWorkerTaskEvent::NAME, 'proc_run'],
 			[AddonSettingsPostEvent::NAME, 'addon_settings_post'],
 			[ConnectorSettingsPostEvent::NAME, 'connector_settings_post'],

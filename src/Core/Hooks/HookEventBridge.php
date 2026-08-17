@@ -45,6 +45,7 @@ use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Event\EditContactFormEvent;
 use Friendica\Event\EditContactPostEvent;
 use Friendica\Event\EventCreatedEvent;
+use Friendica\Event\EventUpdatedEvent;
 use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\FeatureEnabledEvent;
 use Friendica\Event\FeatureGetEvent;
@@ -171,7 +172,7 @@ final class HookEventBridge
 		EnotifyMailEvent::NAME                  => 'enotify_mail',
 		EnotifyStoreEvent::NAME                 => 'enotify_store',
 		EventCreatedEvent::NAME                 => 'event_created',
-		ArrayFilterEvent::EVENT_UPDATED         => 'event_updated',
+		EventUpdatedEvent::NAME                 => 'event_updated',
 		FeatureEnabledEvent::NAME               => 'isEnabled',
 		FeatureGetEvent::NAME                   => 'get',
 		FetchItemByLinkEvent::NAME              => 'item_by_link',
@@ -289,7 +290,7 @@ final class HookEventBridge
 			EnotifyMailEvent::NAME                  => 'onEnotifyMailEvent',
 			EnotifyStoreEvent::NAME                 => 'onEnotifyStoreEvent',
 			EventCreatedEvent::NAME                 => 'onEventCreatedEvent',
-			ArrayFilterEvent::EVENT_UPDATED         => 'onEventUpdatedEvent',
+			EventUpdatedEvent::NAME                 => 'onEventUpdatedEvent',
 			FeatureEnabledEvent::NAME               => 'onFeatureEnabledEvent',
 			FeatureGetEvent::NAME                   => 'onFeatureGetEvent',
 			FetchItemByLinkEvent::NAME              => 'onFetchItemByLinkEvent',
@@ -1274,16 +1275,12 @@ final class HookEventBridge
 	}
 
 	/**
-	 * Map the EVENT_UPDATED event to `event_updated` hook
+	 * Map the EventUpdatedEvent to `event_updated` hook
 	 */
-	public static function onEventUpdatedEvent(ArrayFilterEvent $event): void
+	public static function onEventUpdatedEvent(EventUpdatedEvent $event): void
 	{
-		$data = $event->getArray();
-
-		$id = $data['event']['id'] ?? 0;
-
-		// one-way-event: we don't care about the  returned value
-		static::callHook($event->getName(), (int) $id);
+		// one-way-event: we don't care about the returned value
+		static::callHook($event->getName(), (int) ($event->getEventArray()['id'] ?? 0));
 	}
 
 	/**
