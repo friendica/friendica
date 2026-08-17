@@ -54,6 +54,7 @@ use Friendica\Event\GenerateMapEvent;
 use Friendica\Event\GenerateNamedMapEvent;
 use Friendica\Event\GetSiteInfoEvent;
 use Friendica\Event\GlobalDirUpdateEvent;
+use Friendica\Event\HeadEvent;
 use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Event\InsertPostLocalStartEvent;
@@ -233,7 +234,7 @@ final class HookEventBridge
 		UnfollowContactEvent::NAME              => 'unfollow',
 		UserExportOptionsEvent::NAME            => 'uexport_options',
 		ZrlInitEvent::NAME                      => 'zrl_init',
-		HtmlFilterEvent::HEAD                   => 'head',
+		HeadEvent::NAME                         => 'head',
 		HtmlFilterEvent::FOOTER                 => 'footer',
 		HtmlFilterEvent::PAGE_HEADER            => 'page_header',
 		HtmlFilterEvent::PAGE_CONTENT_TOP       => 'page_content_top',
@@ -353,7 +354,7 @@ final class HookEventBridge
 			ZrlInitEvent::NAME                      => 'onZrlInitEvent',
 			HtmlFilterEvent::CONTACT_BLOCK_END      => 'onHtmlFilterEvent',
 			HtmlFilterEvent::FOOTER                 => 'onHtmlFilterEvent',
-			HtmlFilterEvent::HEAD                   => 'onHtmlFilterEvent',
+			HeadEvent::NAME                         => 'onHeadEvent',
 			HtmlFilterEvent::JOT_TOOL               => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_HOME_CONTENT       => 'onHtmlFilterEvent',
@@ -1665,6 +1666,14 @@ final class HookEventBridge
 		$event->setHtml(
 			static::callHook($event->getName(), $event->getHtml()),
 		);
+	}
+
+	/**
+	 * Map the HeadEvent to `head` hook
+	 */
+	public static function onHeadEvent(HeadEvent $event): void
+	{
+		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
 	}
 
 	public static function onModuleInitEvent(ModuleInitEvent $event): void

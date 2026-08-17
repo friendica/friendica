@@ -72,7 +72,6 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `photo_post_file` | `\Friendica\Event\PhotoUploadEvent` |
 | `photo_post_end` | `\Friendica\Event\PhotoUploadEndEvent` |
 | `photo_upload_form` | `\Friendica\Event\PhotoUploadFormEvent` |
-| `head` | `\Friendica\Event\HeadEvent` |
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `app_menu` | `\Friendica\Event\AppMenuEvent` |
 | `nav_info` | `\Friendica\Event\NavInfoEvent` |
@@ -91,6 +90,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `other_unencapsulate` | `\Friendica\Event\OtherUnencapsulateEvent` |
 | `event_created` | `\Friendica\Event\EventCreatedEvent` |
 | `event_updated` | `\Friendica\Event\EventUpdatedEvent` |
+| `head` | `\Friendica\Event\HeadEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -443,6 +443,16 @@ Fired when an event has been updated, to allow addons to react to the update.
 - `getEventArray(): array` — the event data
 
 This is a one-way event, so there is no modifiable data.
+
+### `\Friendica\Event\HeadEvent`
+
+Fired when the head of a page is rendered, to allow addons to add or change the HTML of the head.
+
+**Contained data:**
+- `getHtml(): string` — the HTML of the head
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the HTML of the head
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

@@ -21,6 +21,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\DI;
+use Friendica\Event\HeadEvent;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Images;
@@ -216,9 +217,7 @@ class Page implements ArrayAccess
 			$touch_icon = 'images/friendica-192.png';
 		}
 
-		$this->page['htmlhead'] = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::HEAD, $this->page['htmlhead']),
-		)->getHtml();
+		$this->page['htmlhead'] = $this->eventDispatcher->dispatch(new HeadEvent($this->page['htmlhead']))->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('head.tpl');
 		/* put the head template at the beginning of page['htmlhead']
