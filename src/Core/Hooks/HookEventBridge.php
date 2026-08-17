@@ -103,6 +103,7 @@ use Friendica\Event\OcrDetectionEvent;
 use Friendica\Event\OtherEncapsulateEvent;
 use Friendica\Event\OtherUnencapsulateEvent;
 use Friendica\Event\PageHeaderEvent;
+use Friendica\Event\PageContentTopEvent;
 use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Object\EMail\IEmail;
@@ -239,7 +240,7 @@ final class HookEventBridge
 		HeadEvent::NAME                         => 'head',
 		FooterEvent::NAME                       => 'footer',
 		PageHeaderEvent::NAME                   => 'page_header',
-		HtmlFilterEvent::PAGE_CONTENT_TOP       => 'page_content_top',
+		PageContentTopEvent::NAME               => 'page_content_top',
 		HtmlFilterEvent::PAGE_END               => 'page_end',
 		HtmlFilterEvent::MOD_HOME_CONTENT       => 'home_content',
 		HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'about_hook',
@@ -361,7 +362,7 @@ final class HookEventBridge
 			HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_HOME_CONTENT       => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_PROFILE_CONTENT    => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_CONTENT_TOP       => 'onHtmlFilterEvent',
+			PageContentTopEvent::NAME               => 'onPageContentTopEvent',
 			HtmlFilterEvent::PAGE_END               => 'onHtmlFilterEvent',
 			PageHeaderEvent::NAME                   => 'onPageHeaderEvent',
 			ModuleContentEvent::NAME                => 'onModuleContentEvent',
@@ -1690,6 +1691,14 @@ final class HookEventBridge
 	 * Map the PageHeaderEvent to `page_header` hook
 	 */
 	public static function onPageHeaderEvent(PageHeaderEvent $event): void
+	{
+		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
+	}
+
+	/**
+	 * Map the PageContentTopEvent to `page_content_top` hook
+	 */
+	public static function onPageContentTopEvent(PageContentTopEvent $event): void
 	{
 		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
 	}

@@ -24,6 +24,7 @@ use Friendica\DI;
 use Friendica\Event\FooterEvent;
 use Friendica\Event\HeadEvent;
 use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\PageContentTopEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
@@ -380,7 +381,7 @@ class Page implements ArrayAccess
 		// initialise content region
 		if ($mode->isNormal()) {
 			$this->page['content'] = $this->eventDispatcher->dispatch(
-				new HtmlFilterEvent(HtmlFilterEvent::PAGE_CONTENT_TOP, $this->page['content']),
+				new PageContentTopEvent($this->page['content']),
 			)->getHtml();
 		}
 

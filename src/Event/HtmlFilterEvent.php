@@ -18,8 +18,6 @@ use Friendica\Core\Event\AbstractEvent;
  */
 final class HtmlFilterEvent extends AbstractEvent
 {
-	public const PAGE_CONTENT_TOP = 'friendica.html.page_content_top';
-
 	public const PAGE_END = 'friendica.html.page_end';
 
 	public const MOD_HOME_CONTENT = 'friendica.html.mod_home_content';
