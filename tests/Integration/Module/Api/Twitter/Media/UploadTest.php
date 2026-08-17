@@ -26,6 +26,13 @@ final class UploadTest extends ApiTestCase
 		parent::setUp();
 
 		$this->useHttpMethod(Router::POST);
+		$_FILES = [];
+	}
+
+	protected function tearDown(): void
+	{
+		$_FILES = [];
+		parent::tearDown();
 	}
 
 	public function testApiMediaUpload(): void
