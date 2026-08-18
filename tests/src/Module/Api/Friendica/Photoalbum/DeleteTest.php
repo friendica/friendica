@@ -25,6 +25,7 @@ class DeleteTest extends ApiTestCase
 	public function testEmpty(): void
 	{
 		$this->expectException(BadRequestException::class);
+		// @phpstan-ignore method.deprecated
 		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 
@@ -33,6 +34,7 @@ class DeleteTest extends ApiTestCase
 	public function testWrong(): void
 	{
 		$this->expectException(BadRequestException::class);
+		// @phpstan-ignore method.deprecated
 		(new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'album' => 'album_name',
@@ -43,6 +45,7 @@ class DeleteTest extends ApiTestCase
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
 
+		// @phpstan-ignore method.deprecated
 		$response = (new Delete(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run(
 				$this->httpExceptionMock,

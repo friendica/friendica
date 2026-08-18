@@ -5,29 +5,32 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Test\src\Module\Api\Twitter\DirectMessages;
+declare(strict_types=1);
+
+namespace Friendica\Test\Integration\Module\Api\Twitter\DirectMessages;
 
 use Friendica\DI;
 use Friendica\Factory\Api\Twitter\DirectMessage;
 use Friendica\Module\Api\Twitter\DirectMessages\Inbox;
 use Friendica\Test\ApiTestCase;
+use GuzzleHttp\Psr7\ServerRequest;
 
-class InboxTest extends ApiTestCase
+final class InboxTest extends ApiTestCase
 {
-	/**
-	 * Test the api_direct_messages_box() function.
-	 *
-	 * @return void
-	 */
 	public function testApiDirectMessagesBoxWithInbox(): void
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/mail/mail.fixture.php', DI::dba());
 
 		$directMessage = new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser());
 
-		// @phpstan-ignore method.deprecated
-		$response = (new Inbox($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
-			->run($this->httpExceptionMock);
+		$module = new Inbox($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']);
+
+		$request = (new ServerRequest('GET', 'https://friendica.local/api/direct_messages/inbox'))
+			->withQueryParams(['format' => 'json']);
+
+		$response = $module->handleRequest($request);
+
+		self::assertEquals(200, $response->getStatusCode());
 
 		$json = $this->toJson($response);
 

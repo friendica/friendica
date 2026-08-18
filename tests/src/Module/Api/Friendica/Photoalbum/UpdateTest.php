@@ -25,6 +25,7 @@ class UpdateTest extends ApiTestCase
 	public function testEmpty(): void
 	{
 		$this->expectException(BadRequestException::class);
+		// @phpstan-ignore method.deprecated
 		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
@@ -32,6 +33,7 @@ class UpdateTest extends ApiTestCase
 	public function testTooFewArgs(): void
 	{
 		$this->expectException(BadRequestException::class);
+		// @phpstan-ignore method.deprecated
 		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'album' => 'album_name',
@@ -41,6 +43,7 @@ class UpdateTest extends ApiTestCase
 	public function testWrongUpdate(): void
 	{
 		$this->expectException(BadRequestException::class);
+		// @phpstan-ignore method.deprecated
 		(new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'album'     => 'album_name',
@@ -57,6 +60,7 @@ class UpdateTest extends ApiTestCase
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
 
+		// @phpstan-ignore method.deprecated
 		$response = (new Update(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'album'     => 'test_album',

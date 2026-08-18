@@ -58,7 +58,7 @@ class StatsCaching extends BaseModule
 
 		// OPcache
 		if (function_exists('opcache_get_status')) {
-			$status          = opcache_get_status(false);
+			$status          = $this->getOpcacheStatus();
 			$data['opcache'] = [
 				'enabled'            => $status['opcache_enabled']                          ?? false,
 				'hit_rate'           => $status['opcache_statistics']['opcache_hit_rate']   ?? null,
@@ -96,5 +96,13 @@ class StatsCaching extends BaseModule
 
 		$this->response->setType('json', 'application/json; charset=utf-8');
 		$this->response->addContent(json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+	}
+
+	/**
+	 * @internal Only protected for integration test overrides. Do not call directly.
+	 */
+	protected function getOpcacheStatus(): array|false
+	{
+		return opcache_get_status(false);
 	}
 }

@@ -31,6 +31,7 @@ class NodeInfoTest extends FixtureTestCase
 
 	public function testNodeInfo110(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new NodeInfo110(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
 			->run($this->httpExceptionMock);
 
@@ -52,6 +53,7 @@ class NodeInfoTest extends FixtureTestCase
 
 	public function testNodeInfo120(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new NodeInfo120(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
 			->run($this->httpExceptionMock);
 
@@ -72,6 +74,7 @@ class NodeInfoTest extends FixtureTestCase
 
 	public function testNodeInfo210(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new NodeInfo210(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), DI::config(), []))
 			->run($this->httpExceptionMock);
 

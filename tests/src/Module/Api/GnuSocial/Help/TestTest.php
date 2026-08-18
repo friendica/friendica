@@ -16,6 +16,7 @@ class TestTest extends ApiTestCase
 {
 	public function testJson(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new Test(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock);
 
@@ -30,6 +31,7 @@ class TestTest extends ApiTestCase
 
 	public function testXml(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new Test(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'xml']))
 			->run($this->httpExceptionMock);
 

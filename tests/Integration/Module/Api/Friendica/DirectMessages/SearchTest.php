@@ -5,23 +5,30 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Test\src\Module\Api\Friendica\DirectMessages;
+declare(strict_types=1);
+
+namespace Friendica\Test\Integration\Module\Api\Friendica\DirectMessages;
 
 use Friendica\DI;
 use Friendica\Factory\Api\Twitter\DirectMessage;
 use Friendica\Module\Api\Friendica\DirectMessages\Search;
 use Friendica\Test\ApiTestCase;
+use GuzzleHttp\Psr7\ServerRequest;
 use Psr\Log\NullLogger;
 
-class SearchTest extends ApiTestCase
+final class SearchTest extends ApiTestCase
 {
 	public function testEmpty(): void
 	{
 		$directMessage = new DirectMessage(new NullLogger(), DI::dba(), DI::twitterUser());
 
-		// @phpstan-ignore method.deprecated
-		$response = (new Search($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run($this->httpExceptionMock);
+		$module = new Search($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = new ServerRequest('GET', 'https://friendica.local/api/friendica/direct_messages_search');
+
+		$response = $module->handleRequest($request);
+
+		self::assertEquals(200, $response->getStatusCode());
 
 		$json = $this->toJson($response);
 
@@ -38,11 +45,14 @@ class SearchTest extends ApiTestCase
 
 		$directMessage = new DirectMessage(new NullLogger(), DI::dba(), DI::twitterUser());
 
-		// @phpstan-ignore method.deprecated
-		$response = (new Search($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run($this->httpExceptionMock, [
-				'searchstring' => 'item_body',
-			]);
+		$module = new Search($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = (new ServerRequest('GET', 'https://friendica.local/api/friendica/direct_messages_search'))
+			->withQueryParams(['searchstring' => 'item_body']);
+
+		$response = $module->handleRequest($request);
+
+		self::assertEquals(200, $response->getStatusCode());
 
 		$json = $this->toJson($response);
 
@@ -60,11 +70,14 @@ class SearchTest extends ApiTestCase
 	{
 		$directMessage = new DirectMessage(new NullLogger(), DI::dba(), DI::twitterUser());
 
-		// @phpstan-ignore method.deprecated
-		$response = (new Search($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
-			->run($this->httpExceptionMock, [
-				'searchstring' => 'test',
-			]);
+		$module = new Search($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+
+		$request = (new ServerRequest('GET', 'https://friendica.local/api/friendica/direct_messages_search'))
+			->withQueryParams(['searchstring' => 'test']);
+
+		$response = $module->handleRequest($request);
+
+		self::assertEquals(200, $response->getStatusCode());
 
 		$json = $this->toJson($response);
 

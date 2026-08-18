@@ -32,6 +32,7 @@ class UploadTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
+		// @phpstan-ignore method.deprecated
 		(new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
@@ -46,6 +47,7 @@ class UploadTest extends ApiTestCase
 		$this->expectException(UnauthorizedException::class);
 		AuthTestConfig::$authenticated = false;
 
+		// @phpstan-ignore method.deprecated
 		(new class (DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []) extends Upload {
 			public function earlyJsonError(int $httpCode, mixed $content, string $contentType = 'application/json'): never
 			{
@@ -73,6 +75,7 @@ class UploadTest extends ApiTestCase
 			],
 		];
 
+		// @phpstan-ignore method.deprecated
 		(new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
@@ -96,6 +99,7 @@ class UploadTest extends ApiTestCase
 			],
 		];
 
+		// @phpstan-ignore method.deprecated
 		$response = (new Upload(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 

@@ -31,6 +31,7 @@ class DestroyTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
+		// @phpstan-ignore method.deprecated
 		(new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
@@ -42,6 +43,7 @@ class DestroyTest extends ApiTestCase
 	 */
 	public function testApiFavoritesCreateDestroyWithDestroyAction(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'id' => 3,

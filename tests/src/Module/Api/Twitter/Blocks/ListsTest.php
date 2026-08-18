@@ -18,6 +18,7 @@ class ListsTest extends ApiTestCase
 	 */
 	public function testApiStatusesFWithBlocks(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new Lists(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 

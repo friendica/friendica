@@ -16,6 +16,7 @@ class RateLimitStatusTest extends ApiTestCase
 {
 	public function testWithJson(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new RateLimitStatus(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock);
 
@@ -32,6 +33,7 @@ class RateLimitStatusTest extends ApiTestCase
 
 	public function testWithXml(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new RateLimitStatus(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'xml']))
 			->run($this->httpExceptionMock);
 

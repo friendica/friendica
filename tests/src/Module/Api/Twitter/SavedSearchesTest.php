@@ -16,6 +16,7 @@ class SavedSearchesTest extends ApiTestCase
 {
 	public function test(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new SavedSearches(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock);
 

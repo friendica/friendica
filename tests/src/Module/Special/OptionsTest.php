@@ -31,6 +31,7 @@ class OptionsTest extends FixtureTestCase
 	{
 		$this->useHttpMethod(Router::OPTIONS);
 
+		// @phpstan-ignore method.deprecated
 		$response = (new Options(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))->run($this->httpExceptionMock);
 
 		self::assertEmpty((string) $response->getBody());
@@ -47,6 +48,7 @@ class OptionsTest extends FixtureTestCase
 	{
 		$this->useHttpMethod(Router::OPTIONS);
 
+		// @phpstan-ignore method.deprecated
 		$response = (new Options(DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], [
 			'AllowedMethods' => [Router::GET, Router::POST],
 		]))->run($this->httpExceptionMock);

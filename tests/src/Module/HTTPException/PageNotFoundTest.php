@@ -53,6 +53,7 @@ class PageNotFoundTest extends FixtureTestCase
 			$server,
 		);
 
+		// @phpstan-ignore method.deprecated
 		$response = $pageNotFound->run($this->httpExceptionMock);
 
 		self::assertEquals(404, $response->getStatusCode());
