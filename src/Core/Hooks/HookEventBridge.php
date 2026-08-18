@@ -88,6 +88,7 @@ use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\MapGetCoordinatesEvent;
 use Friendica\Event\ModerationUsersTabsEvent;
+use Friendica\Event\ModHomeContentEvent;
 use Friendica\Event\NavInfoEvent;
 use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\NetworkContentStartEvent;
@@ -243,7 +244,7 @@ final class HookEventBridge
 		PageHeaderEvent::NAME                   => 'page_header',
 		PageContentTopEvent::NAME               => 'page_content_top',
 		PageEndEvent::NAME                      => 'page_end',
-		HtmlFilterEvent::MOD_HOME_CONTENT       => 'home_content',
+		ModHomeContentEvent::NAME               => 'home_content',
 		HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'about_hook',
 		HtmlFilterEvent::MOD_PROFILE_CONTENT    => 'profile_advanced',
 		HtmlFilterEvent::JOT_TOOL               => 'jot_tool',
@@ -361,7 +362,7 @@ final class HookEventBridge
 			HeadEvent::NAME                         => 'onHeadEvent',
 			HtmlFilterEvent::JOT_TOOL               => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'onHtmlFilterEvent',
-			HtmlFilterEvent::MOD_HOME_CONTENT       => 'onHtmlFilterEvent',
+			ModHomeContentEvent::NAME               => 'onModHomeContentEvent',
 			HtmlFilterEvent::MOD_PROFILE_CONTENT    => 'onHtmlFilterEvent',
 			PageContentTopEvent::NAME               => 'onPageContentTopEvent',
 			PageEndEvent::NAME                      => 'onPageEndEvent',
@@ -1708,6 +1709,14 @@ final class HookEventBridge
 	 * Map the PageEndEvent to `page_end` hook
 	 */
 	public static function onPageEndEvent(PageEndEvent $event): void
+	{
+		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
+	}
+
+	/**
+	 * Map the ModHomeContentEvent to `home_content` hook
+	 */
+	public static function onModHomeContentEvent(ModHomeContentEvent $event): void
 	{
 		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
 	}

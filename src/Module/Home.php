@@ -11,7 +11,7 @@ use Friendica\BaseModule;
 use Friendica\Core\Renderer;
 use Friendica\DI;
 use Friendica\Event\HomeInitEvent;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\ModHomeContentEvent;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
 use Friendica\Protocol\ActivityPub;
@@ -67,9 +67,7 @@ class Home extends BaseModule
 
 		$content = '';
 
-		$content = $eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::MOD_HOME_CONTENT, $content),
-		)->getHtml();
+		$content = $eventDispatcher->dispatch(new ModHomeContentEvent($content))->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('home.tpl');
 		return Renderer::replaceMacros($tpl, [

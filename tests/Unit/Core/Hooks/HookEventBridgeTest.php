@@ -71,6 +71,7 @@ use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\MapGetCoordinatesEvent;
 use Friendica\Event\ModerationUsersTabsEvent;
+use Friendica\Event\ModHomeContentEvent;
 use Friendica\Event\NavInfoEvent;
 use Friendica\Event\NetworkToNameEvent;
 use Friendica\Event\NetworkContentStartEvent;
@@ -248,7 +249,7 @@ class HookEventBridgeTest extends TestCase
 			HeadEvent::NAME                         => 'onHeadEvent',
 			HtmlFilterEvent::JOT_TOOL               => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'onHtmlFilterEvent',
-			HtmlFilterEvent::MOD_HOME_CONTENT       => 'onHtmlFilterEvent',
+			ModHomeContentEvent::NAME               => 'onModHomeContentEvent',
 			HtmlFilterEvent::MOD_PROFILE_CONTENT    => 'onHtmlFilterEvent',
 			PageContentTopEvent::NAME               => 'onPageContentTopEvent',
 			PageEndEvent::NAME                      => 'onPageEndEvent',
@@ -2290,6 +2291,41 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('', $event->getHtml());
 	}
 
+	public function testOnModHomeContentEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ModHomeContentEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('home_content', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onModHomeContentEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnModHomeContentEventCallsHookWithMissingValues(): void
+	{
+		$event = new ModHomeContentEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('home_content', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onModHomeContentEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
 		$event = new EventUpdatedEvent(['id' => 123]);
@@ -2498,7 +2534,7 @@ class HookEventBridgeTest extends TestCase
 	{
 		return [
 			['test', 'test'],
-			[HtmlFilterEvent::MOD_HOME_CONTENT, 'home_content'],
+			[ModHomeContentEvent::NAME, 'home_content'],
 			[HtmlFilterEvent::MOD_ABOUT_CONTENT, 'about_hook'],
 			[HtmlFilterEvent::MOD_PROFILE_CONTENT, 'profile_advanced'],
 			[HtmlFilterEvent::JOT_TOOL, 'jot_tool'],
