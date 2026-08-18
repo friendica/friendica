@@ -63,6 +63,7 @@ use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
 use Friendica\Event\JotNetworksEvent;
+use Friendica\Event\JotToolEvent;
 use Friendica\Event\ItemPhotoMenuEvent;
 use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\PreparePostEndEvent;
@@ -249,7 +250,7 @@ final class HookEventBridge
 		ModHomeContentEvent::NAME               => 'home_content',
 		ModAboutContentEvent::NAME              => 'about_hook',
 		ModProfileContentEvent::NAME            => 'profile_advanced',
-		HtmlFilterEvent::JOT_TOOL               => 'jot_tool',
+		JotToolEvent::NAME                      => 'jot_tool',
 		HtmlFilterEvent::CONTACT_BLOCK_END      => 'contact_block_end',
 	];
 
@@ -362,7 +363,7 @@ final class HookEventBridge
 			HtmlFilterEvent::CONTACT_BLOCK_END      => 'onHtmlFilterEvent',
 			FooterEvent::NAME                       => 'onFooterEvent',
 			HeadEvent::NAME                         => 'onHeadEvent',
-			HtmlFilterEvent::JOT_TOOL               => 'onHtmlFilterEvent',
+			JotToolEvent::NAME                      => 'onJotToolEvent',
 			ModAboutContentEvent::NAME              => 'onModAboutContentEvent',
 			ModHomeContentEvent::NAME               => 'onModHomeContentEvent',
 			ModProfileContentEvent::NAME            => 'onModProfileContentEvent',
@@ -1735,6 +1736,14 @@ final class HookEventBridge
 	 * Map the ModProfileContentEvent to `profile_advanced` hook
 	 */
 	public static function onModProfileContentEvent(ModProfileContentEvent $event): void
+	{
+		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
+	}
+
+	/**
+	 * Map the JotToolEvent to `jot_tool` hook
+	 */
+	public static function onJotToolEvent(JotToolEvent $event): void
 	{
 		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
 	}

@@ -97,6 +97,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `home_content` | `\Friendica\Event\ModHomeContentEvent` |
 | `about_hook` | `\Friendica\Event\ModAboutContentEvent` |
 | `profile_advanced` | `\Friendica\Event\ModProfileContentEvent` |
+| `jot_tool` | `\Friendica\Event\JotToolEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -529,6 +530,16 @@ Fired when the content of a profile page is rendered, to allow addons to add or 
 
 **Modifiable:**
 - `setHtml(string $html): void` — change the HTML of the profile page content
+
+### `\Friendica\Event\JotToolEvent`
+
+Fired when the composer is rendered, to allow addons to add or change the HTML of the composer tools.
+
+**Contained data:**
+- `getHtml(): string` — the HTML of the composer tools
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the HTML of the composer tools
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

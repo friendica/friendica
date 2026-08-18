@@ -18,7 +18,7 @@ use Friendica\Content\Feature;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\JotToolEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Model\User;
@@ -129,9 +129,7 @@ class Edit extends BaseModule
 		$item['body'] = Post\Media::addAttachmentsToBody($item['uri-id'], $item['body']);
 		$item         = Post\Media::addHTMLAttachmentToItem($item);
 
-		$jotplugins = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
-		)->getHtml();
+		$jotplugins = $this->eventDispatcher->dispatch(new JotToolEvent(''))->getHtml();
 
 		$output .= Renderer::replaceMacros(Renderer::getMarkupTemplate('jot.tpl'), [
 			'$is_edit'             => true,

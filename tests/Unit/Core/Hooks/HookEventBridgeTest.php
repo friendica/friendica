@@ -107,6 +107,7 @@ use Friendica\Event\InsertPostLocalStartEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
 use Friendica\Event\JotNetworksEvent;
+use Friendica\Event\JotToolEvent;
 use Friendica\Event\PreparePostEndEvent;
 use Friendica\Event\PreparePostEvent;
 use Friendica\Event\PreparePostFilterContentEvent;
@@ -249,7 +250,7 @@ class HookEventBridgeTest extends TestCase
 			HtmlFilterEvent::CONTACT_BLOCK_END      => 'onHtmlFilterEvent',
 			FooterEvent::NAME                       => 'onFooterEvent',
 			HeadEvent::NAME                         => 'onHeadEvent',
-			HtmlFilterEvent::JOT_TOOL               => 'onHtmlFilterEvent',
+			JotToolEvent::NAME                      => 'onJotToolEvent',
 			ModAboutContentEvent::NAME              => 'onModAboutContentEvent',
 			ModHomeContentEvent::NAME               => 'onModHomeContentEvent',
 			ModProfileContentEvent::NAME            => 'onModProfileContentEvent',
@@ -2398,6 +2399,41 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('', $event->getHtml());
 	}
 
+	public function testOnJotToolEventCallsHookWithCorrectValue(): void
+	{
+		$event = new JotToolEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('jot_tool', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onJotToolEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnJotToolEventCallsHookWithMissingValues(): void
+	{
+		$event = new JotToolEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('jot_tool', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onJotToolEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
 		$event = new EventUpdatedEvent(['id' => 123]);
@@ -2609,7 +2645,7 @@ class HookEventBridgeTest extends TestCase
 			[ModHomeContentEvent::NAME, 'home_content'],
 			[ModAboutContentEvent::NAME, 'about_hook'],
 			[ModProfileContentEvent::NAME, 'profile_advanced'],
-			[HtmlFilterEvent::JOT_TOOL, 'jot_tool'],
+			[JotToolEvent::NAME, 'jot_tool'],
 			[HtmlFilterEvent::CONTACT_BLOCK_END, 'contact_block_end'],
 		];
 	}
