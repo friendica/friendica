@@ -48,14 +48,6 @@ parameters:
             path: src/
             count: 90
 
-        # Deprecated run() calls in tests are preserved for BC promise and
-        # will be replaced by handleRequest() tests in the future
-        -
-            message: '#^Call to deprecated method run\(\) of class#'
-            identifier: method.deprecated
-            path: tests/
-            count: 15
-
         # vfsStream v1.6.12: getChild() returns vfsStreamContent, but at() expects
         # vfsStreamContainer. vfsStreamContainer does NOT extend vfsStreamContent,
         # so PHPStan can't narrow the type. Library is frozen, no upstream fix.
