@@ -32,18 +32,22 @@ class Conversation extends BaseFactory
 	}
 
 	/**
-	 * @param int $id Conversation id
+	 * @param int $id  Conversation id
+	 * @param int $uid Current user id, used to exclude the caller's own contact from the
+	 *                 returned participant list (Mastodon's spec has `accounts` list the
+	 *                 *other* participants, not the caller themselves).
 	 *
 	 * @return \Friendica\Object\Api\Mastodon\Conversation
 	 * @throws ImagickException|HTTPException\InternalServerErrorException|HTTPException\NotFoundException
 	 */
-	public function createFromConvId(int $id): \Friendica\Object\Api\Mastodon\Conversation
+	public function createFromConvId(int $id, int $uid = 0): \Friendica\Object\Api\Mastodon\Conversation
 	{
 		$accounts    = [];
 		$unread      = false;
 		$last_status = null;
 
-		$ids = [];
+		$ids    = [];
+		$selfId = $uid ? Contact::getPublicIdByUserId($uid) : 0;
 
 		$mails = $this->dba->select('mail', ['id', 'from-url', 'uid', 'seen'], ['convid' => $id], ['order' => ['id' => true]]);
 		while ($mail = $this->dba->fetch($mails)) {
@@ -51,18 +55,24 @@ class Conversation extends BaseFactory
 				$unread = true;
 			}
 
-			$id = Contact::getIdForURL($mail['from-url'], 0, false);
-			if (in_array($id, $ids)) {
+			// Bug fix: this used to reassign the method's own $id parameter here, so the
+			// Conversation object returned below carried the last distinct sender's contact
+			// id instead of the actual conversation id -- breaking mark-read/delete (wrong
+			// convid) and list rendering (duplicate/colliding React keys across conversations).
+			$contactId = Contact::getIdForURL($mail['from-url'], 0, false);
+			if (in_array($contactId, $ids)) {
 				continue;
 			}
 
-			$ids[] = $id;
+			$ids[] = $contactId;
 
 			if (empty($last_status)) {
 				$last_status = $this->mstdnStatusFactory->createFromMailId($mail['id']);
 			}
 
-			$accounts[] = $this->mstdnAccountFactory->createFromContactId($id, 0);
+			if ($contactId != $selfId) {
+				$accounts[] = $this->mstdnAccountFactory->createFromContactId($contactId, 0);
+			}
 		}
 
 		return new \Friendica\Object\Api\Mastodon\Conversation($id, $accounts, $unread, $last_status);

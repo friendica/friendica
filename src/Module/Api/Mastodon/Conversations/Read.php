@@ -30,7 +30,7 @@ class Read extends BaseApi
 		DBA::update('mail', ['seen' => true], ['convid' => $this->parameters['id'], 'uid' => $uid]);
 
 		try {
-			$this->jsonExit(DI::mstdnConversation()->createFromConvId($this->parameters['id'])->toArray());
+			$this->jsonExit(DI::mstdnConversation()->createFromConvId($this->parameters['id'], $uid)->toArray());
 		} catch (NotFoundException $e) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}

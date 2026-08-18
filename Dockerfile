@@ -35,3 +35,5 @@ COPY src/Module/FriendSuggest.php                 /usr/src/friendica/src/Module/
 COPY src/Module/Api/Mastodon/Accounts/UpdateCredentials.php /usr/src/friendica/src/Module/Api/Mastodon/Accounts/UpdateCredentials.php
 COPY src/Module/Api/Mastodon/Conversations.php               /usr/src/friendica/src/Module/Api/Mastodon/Conversations.php
 COPY src/Module/Api/Mastodon/Conversations/Read.php          /usr/src/friendica/src/Module/Api/Mastodon/Conversations/Read.php
+COPY src/Factory/Api/Mastodon/Conversation.php               /usr/src/friendica/src/Factory/Api/Mastodon/Conversation.php
+COPY src/Module/Api/Twitter/DirectMessagesEndpoint.php       /usr/src/friendica/src/Module/Api/Twitter/DirectMessagesEndpoint.php

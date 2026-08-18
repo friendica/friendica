@@ -73,7 +73,7 @@ class Conversations extends BaseApi
 		try {
 			while ($conv = DBA::fetch($convs)) {
 				self::setBoundaries($conv['id']);
-				$conversations[] = DI::mstdnConversation()->createFromConvId($conv['id']);
+				$conversations[] = DI::mstdnConversation()->createFromConvId($conv['id'], $uid);
 			}
 		} catch (NotFoundException $e) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
