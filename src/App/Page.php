@@ -23,8 +23,8 @@ use Friendica\Core\Theme;
 use Friendica\DI;
 use Friendica\Event\FooterEvent;
 use Friendica\Event\HeadEvent;
-use Friendica\Event\HtmlFilterEvent;
 use Friendica\Event\PageContentTopEvent;
+use Friendica\Event\PageEndEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
@@ -480,9 +480,7 @@ class Page implements ArrayAccess
 		$profiler->set(microtime(true) - $timestamp, 'aftermath');
 
 		if (!$mode->isAjax()) {
-			$this->page['content'] = $this->eventDispatcher->dispatch(
-				new HtmlFilterEvent(HtmlFilterEvent::PAGE_END, $this->page['content']),
-			)->getHtml();
+			$this->page['content'] = $this->eventDispatcher->dispatch(new PageEndEvent($this->page['content']))->getHtml();
 		}
 
 		// Add the navigation (menu) template

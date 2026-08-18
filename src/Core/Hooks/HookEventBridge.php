@@ -104,6 +104,7 @@ use Friendica\Event\OtherEncapsulateEvent;
 use Friendica\Event\OtherUnencapsulateEvent;
 use Friendica\Event\PageHeaderEvent;
 use Friendica\Event\PageContentTopEvent;
+use Friendica\Event\PageEndEvent;
 use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Object\EMail\IEmail;
@@ -241,7 +242,7 @@ final class HookEventBridge
 		FooterEvent::NAME                       => 'footer',
 		PageHeaderEvent::NAME                   => 'page_header',
 		PageContentTopEvent::NAME               => 'page_content_top',
-		HtmlFilterEvent::PAGE_END               => 'page_end',
+		PageEndEvent::NAME                      => 'page_end',
 		HtmlFilterEvent::MOD_HOME_CONTENT       => 'home_content',
 		HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'about_hook',
 		HtmlFilterEvent::MOD_PROFILE_CONTENT    => 'profile_advanced',
@@ -363,7 +364,7 @@ final class HookEventBridge
 			HtmlFilterEvent::MOD_HOME_CONTENT       => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_PROFILE_CONTENT    => 'onHtmlFilterEvent',
 			PageContentTopEvent::NAME               => 'onPageContentTopEvent',
-			HtmlFilterEvent::PAGE_END               => 'onHtmlFilterEvent',
+			PageEndEvent::NAME                      => 'onPageEndEvent',
 			PageHeaderEvent::NAME                   => 'onPageHeaderEvent',
 			ModuleContentEvent::NAME                => 'onModuleContentEvent',
 			ModuleInitEvent::NAME                   => 'onModuleInitEvent',
@@ -1699,6 +1700,14 @@ final class HookEventBridge
 	 * Map the PageContentTopEvent to `page_content_top` hook
 	 */
 	public static function onPageContentTopEvent(PageContentTopEvent $event): void
+	{
+		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
+	}
+
+	/**
+	 * Map the PageEndEvent to `page_end` hook
+	 */
+	public static function onPageEndEvent(PageEndEvent $event): void
 	{
 		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
 	}

@@ -25,7 +25,6 @@ class HtmlFilterEventTest extends TestCase
 	public static function getPublicConstants(): array
 	{
 		return [
-			[HtmlFilterEvent::PAGE_END, 'friendica.html.page_end'],
 			[HtmlFilterEvent::MOD_HOME_CONTENT, 'friendica.html.mod_home_content'],
 			[HtmlFilterEvent::MOD_ABOUT_CONTENT, 'friendica.html.mod_about_content'],
 			[HtmlFilterEvent::MOD_PROFILE_CONTENT, 'friendica.html.mod_profile_content'],

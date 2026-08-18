@@ -93,6 +93,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `footer` | `\Friendica\Event\FooterEvent` |
 | `page_header` | `\Friendica\Event\PageHeaderEvent` |
 | `page_content_top` | `\Friendica\Event\PageContentTopEvent` |
+| `page_end` | `\Friendica\Event\PageEndEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -485,6 +486,16 @@ Fired when the content of a page is rendered, to allow addons to add or change t
 
 **Modifiable:**
 - `setHtml(string $html): void` — change the HTML of the top of the content
+
+### `\Friendica\Event\PageEndEvent`
+
+Fired when a page is finished rendering, to allow addons to add or change the HTML at the end of the page.
+
+**Contained data:**
+- `getHtml(): string` — the HTML at the end of the page
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the HTML at the end of the page
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

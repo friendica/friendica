@@ -90,6 +90,7 @@ use Friendica\Event\OtherEncapsulateEvent;
 use Friendica\Event\OtherUnencapsulateEvent;
 use Friendica\Event\PageHeaderEvent;
 use Friendica\Event\PageContentTopEvent;
+use Friendica\Event\PageEndEvent;
 use Friendica\Event\PageInfoEvent;
 use Friendica\Event\ParseLinkEvent;
 use Friendica\Event\PermissionTooltipContentEvent;
@@ -250,7 +251,7 @@ class HookEventBridgeTest extends TestCase
 			HtmlFilterEvent::MOD_HOME_CONTENT       => 'onHtmlFilterEvent',
 			HtmlFilterEvent::MOD_PROFILE_CONTENT    => 'onHtmlFilterEvent',
 			PageContentTopEvent::NAME               => 'onPageContentTopEvent',
-			HtmlFilterEvent::PAGE_END               => 'onHtmlFilterEvent',
+			PageEndEvent::NAME                      => 'onPageEndEvent',
 			PageHeaderEvent::NAME                   => 'onPageHeaderEvent',
 			ModuleContentEvent::NAME                => 'onModuleContentEvent',
 			ModuleInitEvent::NAME                   => 'onModuleInitEvent',
@@ -2254,6 +2255,41 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('', $event->getHtml());
 	}
 
+	public function testOnPageEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new PageEndEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('page_end', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onPageEndEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnPageEndEventCallsHookWithMissingValues(): void
+	{
+		$event = new PageEndEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('page_end', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onPageEndEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
 		$event = new EventUpdatedEvent(['id' => 123]);
@@ -2462,7 +2498,6 @@ class HookEventBridgeTest extends TestCase
 	{
 		return [
 			['test', 'test'],
-			[HtmlFilterEvent::PAGE_END, 'page_end'],
 			[HtmlFilterEvent::MOD_HOME_CONTENT, 'home_content'],
 			[HtmlFilterEvent::MOD_ABOUT_CONTENT, 'about_hook'],
 			[HtmlFilterEvent::MOD_PROFILE_CONTENT, 'profile_advanced'],
