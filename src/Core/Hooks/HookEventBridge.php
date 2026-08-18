@@ -87,6 +87,7 @@ use Friendica\Event\LoggedInEvent;
 use Friendica\Event\LoginFormEvent;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\MapGetCoordinatesEvent;
+use Friendica\Event\ModAboutContentEvent;
 use Friendica\Event\ModerationUsersTabsEvent;
 use Friendica\Event\ModHomeContentEvent;
 use Friendica\Event\NavInfoEvent;
@@ -245,7 +246,7 @@ final class HookEventBridge
 		PageContentTopEvent::NAME               => 'page_content_top',
 		PageEndEvent::NAME                      => 'page_end',
 		ModHomeContentEvent::NAME               => 'home_content',
-		HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'about_hook',
+		ModAboutContentEvent::NAME              => 'about_hook',
 		HtmlFilterEvent::MOD_PROFILE_CONTENT    => 'profile_advanced',
 		HtmlFilterEvent::JOT_TOOL               => 'jot_tool',
 		HtmlFilterEvent::CONTACT_BLOCK_END      => 'contact_block_end',
@@ -361,7 +362,7 @@ final class HookEventBridge
 			FooterEvent::NAME                       => 'onFooterEvent',
 			HeadEvent::NAME                         => 'onHeadEvent',
 			HtmlFilterEvent::JOT_TOOL               => 'onHtmlFilterEvent',
-			HtmlFilterEvent::MOD_ABOUT_CONTENT      => 'onHtmlFilterEvent',
+			ModAboutContentEvent::NAME              => 'onModAboutContentEvent',
 			ModHomeContentEvent::NAME               => 'onModHomeContentEvent',
 			HtmlFilterEvent::MOD_PROFILE_CONTENT    => 'onHtmlFilterEvent',
 			PageContentTopEvent::NAME               => 'onPageContentTopEvent',
@@ -1717,6 +1718,14 @@ final class HookEventBridge
 	 * Map the ModHomeContentEvent to `home_content` hook
 	 */
 	public static function onModHomeContentEvent(ModHomeContentEvent $event): void
+	{
+		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
+	}
+
+	/**
+	 * Map the ModAboutContentEvent to `about_hook` hook
+	 */
+	public static function onModAboutContentEvent(ModAboutContentEvent $event): void
 	{
 		$event->setHtml(static::callHook($event->getName(), $event->getHtml()));
 	}

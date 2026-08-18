@@ -18,7 +18,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\PostUpdate;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\ModAboutContentEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
@@ -100,9 +100,7 @@ class Friendica extends BaseModule
 
 		$hooked = '';
 
-		$hooked = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::MOD_ABOUT_CONTENT, $hooked),
-		)->getHtml();
+		$hooked = $this->eventDispatcher->dispatch(new ModAboutContentEvent($hooked))->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('friendica.tpl');
 

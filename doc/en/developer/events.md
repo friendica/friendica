@@ -95,6 +95,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `page_content_top` | `\Friendica\Event\PageContentTopEvent` |
 | `page_end` | `\Friendica\Event\PageEndEvent` |
 | `home_content` | `\Friendica\Event\ModHomeContentEvent` |
+| `about_hook` | `\Friendica\Event\ModAboutContentEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -507,6 +508,16 @@ Fired when the content of the home page is rendered, to allow addons to add or c
 
 **Modifiable:**
 - `setHtml(string $html): void` — change the HTML of the home page content
+
+### `\Friendica\Event\ModAboutContentEvent`
+
+Fired when the content of the about page is rendered, to allow addons to add or change the HTML of the about page content.
+
+**Contained data:**
+- `getHtml(): string` — the HTML of the about page content
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the HTML of the about page content
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

@@ -12,21 +12,18 @@ namespace Friendica\Event;
 use Friendica\Core\Event\AbstractEvent;
 
 /**
- * Allow Event listener to modify HTML.
- *
- * @internal
+ * Fired when the content of the about page is rendered, to allow addons to add or change the HTML of the about page content.
  */
-final class HtmlFilterEvent extends AbstractEvent
+final class ModAboutContentEvent extends AbstractEvent
 {
-	public const MOD_PROFILE_CONTENT = 'friendica.html.mod_profile_content';
+	public const NAME = 'friendica.html.mod_about_content';
 
-	public const JOT_TOOL = 'friendica.html.jot_tool';
-
-	public const CONTACT_BLOCK_END = 'friendica.html.contact_block_end';
-
-	public function __construct(string $name, private string $html)
+	/**
+	 * @internal
+	 */
+	public function __construct(private string $html)
 	{
-		parent::__construct($name);
+		parent::__construct(self::NAME);
 	}
 
 	public function getHtml(): string
