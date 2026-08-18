@@ -244,6 +244,7 @@ return [
 			'/instance/extended_description'           => [Module\Api\Mastodon\Instance\ExtendedDescription::class, [R::GET         ]],
 			'/instance/peers'                          => [Module\Api\Mastodon\Instance\Peers::class,           [R::GET         ]],
 			'/instance/rules'                          => [Module\Api\Mastodon\Instance\Rules::class,           [R::GET         ]],
+			'/larpnet_push_config'                     => [Module\Api\Mastodon\LarpnetPushConfig::class,        [R::GET         ]],
 			'/lists'                                   => [Module\Api\Mastodon\Lists::class,                    [R::GET, R::POST]],
 			'/lists/{id:\d+}'                          => [Module\Api\Mastodon\Lists::class,                    [R::GET, R::PUT, R::DELETE]],
 			'/lists/{id:\d+}/accounts'                 => [Module\Api\Mastodon\Lists\Accounts::class,           [R::GET, R::POST, R::DELETE]],

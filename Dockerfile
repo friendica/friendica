@@ -22,6 +22,9 @@ COPY src/Worker/Notifier.php                      /usr/src/friendica/src/Worker/
 COPY src/Content/Item.php                         /usr/src/friendica/src/Content/Item.php
 COPY src/Core/ACL.php                             /usr/src/friendica/src/Core/ACL.php
 COPY src/Worker/NtfyPush.php                      /usr/src/friendica/src/Worker/NtfyPush.php
+COPY src/Worker/NtfyPushMail.php                  /usr/src/friendica/src/Worker/NtfyPushMail.php
+COPY src/Model/LarpnetPush.php                    /usr/src/friendica/src/Model/LarpnetPush.php
+COPY src/Model/Mail.php                           /usr/src/friendica/src/Model/Mail.php
 COPY src/Model/Subscription.php                   /usr/src/friendica/src/Model/Subscription.php
 COPY src/Model/Item.php                           /usr/src/friendica/src/Model/Item.php
 COPY src/Object/Post.php                          /usr/src/friendica/src/Object/Post.php
@@ -37,3 +40,5 @@ COPY src/Module/Api/Mastodon/Conversations.php               /usr/src/friendica/
 COPY src/Module/Api/Mastodon/Conversations/Read.php          /usr/src/friendica/src/Module/Api/Mastodon/Conversations/Read.php
 COPY src/Factory/Api/Mastodon/Conversation.php               /usr/src/friendica/src/Factory/Api/Mastodon/Conversation.php
 COPY src/Module/Api/Twitter/DirectMessagesEndpoint.php       /usr/src/friendica/src/Module/Api/Twitter/DirectMessagesEndpoint.php
+COPY src/Module/Api/Mastodon/LarpnetPushConfig.php           /usr/src/friendica/src/Module/Api/Mastodon/LarpnetPushConfig.php
+COPY static/routes.config.php                                /usr/src/friendica/static/routes.config.php

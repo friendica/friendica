@@ -93,6 +93,8 @@ class Mail
 
 			DI::notify()->createFromArray($notif_params);
 
+			Worker::add(Worker::PRIORITY_HIGH, 'NtfyPushMail', $user['uid'], $msg['id']);
+
 			DI::logger()->info('Mail is processed, notification was sent.', ['id' => $msg['id'], 'uri' => $msg['uri']]);
 		}
 

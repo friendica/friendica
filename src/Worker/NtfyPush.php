@@ -11,6 +11,7 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\Plaintext;
 use Friendica\DI;
 use Friendica\Model\Contact;
+use Friendica\Model\LarpnetPush;
 use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException\NotFoundException;
@@ -19,14 +20,8 @@ class NtfyPush
 {
 	public static function execute(int $uid, int $nid)
 	{
-		$ntfyUrl   = DI::config()->get('larpnet_notifications', 'ntfy_url');
-		$ntfyToken = DI::config()->get('larpnet_notifications', 'ntfy_token');
+		$ntfyUrl = DI::config()->get('larpnet_notifications', 'ntfy_url');
 		if (empty($ntfyUrl)) {
-			return;
-		}
-
-		$topic = DI::pConfig()->get($uid, 'larpnet_notifications', 'ntfy_topic');
-		if (empty($topic)) {
 			return;
 		}
 
@@ -59,26 +54,13 @@ class NtfyPush
 		$message = DI::notificationFactory()->getMessageFromNotification($notification);
 		$title   = $message['plain'] ?? '';
 
-		$payload = [
-			'topic'   => $topic,
-			'title'   => $title ?: DI::l10n()->t('Notification'),
-			'message' => $body  ?: $title,
-			'click'   => (string) DI::baseUrl() . '/notification',
-		];
-		if (!empty($actor['thumb'])) {
-			$payload['icon'] = $actor['thumb'];
-		}
-
-		$headers = ['Content-Type' => 'application/json'];
-		if ($ntfyToken) {
-			$headers['Authorization'] = 'Bearer ' . $ntfyToken;
-		}
-
-		try {
-			DI::httpClient()->post(rtrim($ntfyUrl, '/') . '/', json_encode($payload), $headers);
-			DI::logger()->info('NtfyPush: sent', ['uid' => $uid, 'topic' => $topic]);
-		} catch (\Throwable $e) {
-			DI::logger()->warning('NtfyPush: failed', ['uid' => $uid, 'error' => $e->getMessage()]);
-		}
+		$topic = LarpnetPush::getOrCreateTopic($uid);
+		LarpnetPush::send(
+			$topic,
+			$title ?: DI::l10n()->t('Notification'),
+			$body ?: $title,
+			(string) DI::baseUrl() . '/notification',
+			$actor['thumb'] ?? null
+		);
 	}
 }

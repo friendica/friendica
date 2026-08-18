@@ -20,13 +20,18 @@ if [ -f /var/www/html/index.php ]; then
     src/Module/Manifest.php \
     src/App/Page.php \
     src/Worker/NtfyPush.php \
+    src/Worker/NtfyPushMail.php \
+    src/Model/LarpnetPush.php \
+    src/Model/Mail.php \
     src/Model/Subscription.php \
     src/Module/FriendSuggest.php \
     src/Module/Api/Mastodon/Accounts/UpdateCredentials.php \
     src/Module/Api/Mastodon/Conversations.php \
     src/Module/Api/Mastodon/Conversations/Read.php \
     src/Factory/Api/Mastodon/Conversation.php \
-    src/Module/Api/Twitter/DirectMessagesEndpoint.php
+    src/Module/Api/Twitter/DirectMessagesEndpoint.php \
+    src/Module/Api/Mastodon/LarpnetPushConfig.php \
+    static/routes.config.php
   do
     cp "/usr/src/friendica/$f" "/var/www/html/$f"
   done

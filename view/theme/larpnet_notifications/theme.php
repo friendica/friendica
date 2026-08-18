@@ -21,6 +21,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
+use Friendica\Model\LarpnetPush;
 use Friendica\Model\Subscription;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
@@ -110,13 +111,7 @@ function larpnet_notifications_get_or_create_token(int $uid, int $appId): ?strin
 
 function larpnet_notifications_get_or_create_ntfy_topic(int $uid): string
 {
-	$topic = DI::pConfig()->get($uid, 'larpnet_notifications', 'ntfy_topic');
-	// Regenerate if empty or contains hyphens (old format rejected by ntfy)
-	if (empty($topic) || strpos($topic, '-') !== false) {
-		$topic = 'ln' . Strings::getRandomHex(16);
-		DI::pConfig()->set($uid, 'larpnet_notifications', 'ntfy_topic', $topic);
-	}
-	return $topic;
+	return LarpnetPush::getOrCreateTopic($uid);
 }
 
 function larpnet_notifications_head(string &$b)
