@@ -326,6 +326,7 @@ final class PostTemplateBuilder
 			'wall'                   => $this->l10n->t('Wall-to-Wall'),
 			'vwall'                  => $this->l10n->t('via Wall-To-Wall:'),
 			'profile_url'            => $profileUrl,
+			'profile_addr'           => $item['author-addr'] ?? '',
 			'name'                   => $profileName,
 			'item_photo_menu_html'   => $this->item->photoMenu($item, $formSecurityToken),
 			'thumb'                  => $this->baseURL->remove($this->item->getAuthorAvatar($item)),

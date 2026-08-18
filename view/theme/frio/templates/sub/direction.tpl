@@ -6,7 +6,6 @@
   *}}
 {{if $direction.direction > 0}}
 	<span class="direction" title="{{$direction.title}}">
-		<span aria-hidden="true">&bull;</span>
 		{{if $direction.direction == 1}}
 			<i class="ri ri-inbox-line"></i>
 		{{elseif $direction.direction == 2}}

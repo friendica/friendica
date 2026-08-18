@@ -33,77 +33,46 @@
 
 
 			{{* contact info header*}}
-			<div class="contact-info hidden-sm hidden-xs media-body"><!-- Desktop -->
-				<div class="preferences">
-					{{if $item.network_svg && $item.plink}}
-						<span class="wall-item-network"><a href="{{$item.plink.href}}" class="plink u-url" target="_blank"><img class="network-svg" src="{{$item.network_svg}}" alt="{{$item.plink.title}}" title="{{$item.network_name}} - {{$item.plink.title}}" loading="lazy"/></a></span>
-					{{elseif $item.plink}}
-						<a href="{{$item.plink.href}}" class="plink u-url" aria-label="{{$item.plink.title}}" title="{{$item.network_name}} - {{$item.plink.title}}" target="_blank">{{$item.network_name}}</a>
-					{{elseif $item.network_svg}}
-						<span class="wall-item-network"><img class="network-svg" src="{{$item.network_svg}}" title="{{$item.network_name}}" loading="lazy" aria-hidden="true"/></span>
-					{{else}}
-						<span class="wall-item-network" title="{{$item.app}}">{{$item.network_name}}</span>
-					{{/if}}
-				</div>
+			<div class="contact-info media-body"><!-- Desktop -->
 				<h2 class="media-heading">
 					<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-name-link userinfo hover-card">
 						<span class="wall-item-name {{$item.sparkle}}">{{$item.name}}</span>
 					</a>
-				{{if $item.owner_url}}
-					{{$item.via}}
-					<a href="{{$item.owner_url}}" target="redir" title="{{$item.olinktitle}}" class="wall-item-name-link userinfo hover-card">
-						<span class="wall-item-name {{$item.osparkle}}" id="wall-item-ownername-{{$item.id}}">{{$item.owner_name}}</span>
-					</a>
-				{{/if}}
-				{{if $item.lock}}
-					<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.lock}}">
-						&nbsp;<small><i class="ri ri-lock-line" aria-hidden="true"></i></small>
-					</span>
-				{{elseif $item.connector}}
-					<span class="ri ri-lock-line" title="{{$item.connector}}"></span>
-				{{/if}}
-					<div class="additional-info text-muted">
-						<div id="wall-item-ago-{{$item.id}}" class="wall-item-ago">
-							<small>
-								<a href="{{$item.plink.orig}}">
-									<time class="time" title="{{$item.localtime}}" data-toggle="tooltip" datetime="{{$item.utc}}">{{$item.ago}}</time>
-								</a>
-								{{if $item.pinned}}
-									<span aria-hidden="true">&bull;</span> <i class="ri ri-pushpin-line" aria-hidden="true" title="{{$item.pinned}}"></i>
-									<span class="sr-only">{{$item.pinned}}</span>
-								{{/if}}
-							</small>
-						</div>
-
-						{{if $item.location_html}}
-						<div id="wall-item-location-{{$item.id}}" class="wall-item-location">
-							<small><span class="location">({{$item.location_html nofilter}})</span></small>
-						</div>
-						{{/if}}
-					</div>
-				{{* @todo $item.created have to be inserted *}}
-				</h2>
-			</div>
-
-			{{* contact info header for smartphones *}}
-			<div class="contact-info contact-info-xs hidden-lg hidden-md">
-				<div class="preferences">
-					{{if $item.network_svg && $item.plink}}
-						<span class="wall-item-network"><a href="{{$item.plink.href}}" class="plink u-url" target="_blank"><img class="network-svg" src="{{$item.network_svg}}" alt="{{$item.plink.title}}" title="{{$item.network_name}} - {{$item.plink.title}}" loading="lazy"/></a></span>
-					{{elseif $item.plink}}
-						<a href="{{$item.plink.href}}" class="plink u-url" aria-label="{{$item.plink.title}}" title="{{$item.network_name}} - {{$item.plink.title}}" target="_blank">{{$item.network_name}}</a>
-					{{elseif $item.network_svg}}
-						<span class="wall-item-network"><img class="network-svg" src="{{$item.network_svg}}" alt="{{$item.plink.title}}" title="{{$item.network_name}} - {{$item.plink.title}}" loading="lazy"/></span>
-					{{else}}
-						<span class="wall-item-network" title="{{$item.app}}">{{$item.network_name}}</span>
+					{{include file="network_profile_address.tpl" item=$item}}
+					{{if $item.owner_url}}
+						{{$item.via}}
+						<a href="{{$item.owner_url}}" target="redir" title="{{$item.olinktitle}}" class="wall-item-name-link userinfo hover-card">
+							<span class="wall-item-name {{$item.osparkle}}" id="wall-item-ownername-{{$item.id}}">{{$item.owner_name}}</span>
+							{{include file="network_profile_address.tpl" item=$item}}
+						</a>
 					{{/if}}
+					{{if $item.lock}}
+						<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.lock}}">
+							&nbsp;<small><i class="ri ri-lock-line" aria-hidden="true"></i></small>
+						</span>
+					{{elseif $item.connector}}
+						<span class="ri ri-lock-line" title="{{$item.connector}}"></span>
+					{{/if}}
+				</h2>
+
+				<div class="additional-info text-muted">
+					{{if $item.location_html}}
+					<div id="wall-item-location-{{$item.id}}" class="wall-item-location">
+						<small><span class="location">({{$item.location_html nofilter}})</span></small>
+					</div>
+					{{/if}}
+					<div id="wall-item-ago-{{$item.id}}" class="wall-item-ago">
+						<small>
+							<a href="{{$item.plink.orig}}">
+								<time class="time" title="{{$item.localtime}}" data-toggle="tooltip" datetime="{{$item.utc}}">{{$item.ago}}</time>
+							</a>
+							{{if $item.pinned}}
+								<span aria-hidden="true">&middot;</span> <i class="fa fa-thumb-tack" aria-hidden="true" title="{{$item.pinned}}"></i>
+								<span class="sr-only">{{$item.pinned}}</span>
+							{{/if}}
+						</small>
+					</div>
 				</div>
-				<h5 class="media-heading">
-					<a href="{{$item.profile_url}}" title="{{$item.linktitle}}" class="wall-item-name-link userinfo hover-card"><span>{{$item.name}}</span></a>
-					<p class="text-muted"><small>
-						<span class="wall-item-ago">{{$item.ago}}</span> {{if $item.location_html}}&nbsp;&mdash;&nbsp;({{$item.location_html nofilter}}){{/if}}</small>
-					</p>
-				</h5>
 			</div>
 
 			<div class="clearfix"></div>
@@ -113,7 +82,7 @@
 			{{* item content *}}
 			<article class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}" lang="{{$item.lang}}" aria-posinset="{{$item.id}}" aria-setsize="-1">
 				{{if $item.title}}
-				<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h3 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}}">{{$item.title}}</a></h3><br /></span>
+				<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h3 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}}">{{$item.title}}</a></h3></span>
 				{{/if}}
 
 				<div class="wall-item-body" id="wall-item-body-{{$item.id}}" dir="auto">{{$item.body_html nofilter}}</div>
