@@ -22,7 +22,11 @@ if [ -f /var/www/html/index.php ]; then
     src/Worker/NtfyPush.php \
     src/Model/Subscription.php \
     src/Module/FriendSuggest.php \
-    src/Module/Api/Mastodon/Accounts/UpdateCredentials.php
+    src/Module/Api/Mastodon/Accounts/UpdateCredentials.php \
+    src/Module/Api/Mastodon/Conversations.php \
+    src/Module/Api/Mastodon/Conversations/Read.php \
+    src/Factory/Api/Mastodon/Conversation.php \
+    src/Module/Api/Twitter/DirectMessagesEndpoint.php
   do
     cp "/usr/src/friendica/$f" "/var/www/html/$f"
   done

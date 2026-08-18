@@ -76,10 +76,14 @@ abstract class DirectMessagesEndpoint extends BaseApi
 
 		$cid = BaseApi::getContactIDForSearchterm($this->getRequestValue($request, 'screen_name', ''), $this->getRequestValue($request, 'profileurl', ''), $this->getRequestValue($request, 'user_id', 0), 0);
 		if (!empty($cid)) {
-			$ucid = Contact::getUserContactId($cid, $uid);
-			if ($ucid) {
-				$condition = DBA::mergeConditions($condition, ["`contact-id` = ?", $ucid]);
-			}
+			// Bug fix: when the caller has no established contact relationship with the
+			// resolved account, $ucid is falsy and this used to skip adding a contact-id
+			// filter entirely -- silently widening the query from "messages with this
+			// person" to "all of the caller's messages with everyone". -1 is an
+			// unmatchable sentinel so a non-contact search correctly yields zero results
+			// instead of the caller's whole mailbox.
+			$ucid      = Contact::getUserContactId($cid, $uid);
+			$condition = DBA::mergeConditions($condition, ["`contact-id` = ?", $ucid ?: -1]);
 		}
 
 		$condition = DBA::mergeConditions($condition, ["`uid` = ?", $uid]);

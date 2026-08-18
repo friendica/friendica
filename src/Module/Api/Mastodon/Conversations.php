@@ -23,7 +23,7 @@ class Conversations extends BaseApi
 		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		if (!empty($this->parameters['id'])) {
+		if (empty($this->parameters['id'])) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
@@ -73,7 +73,7 @@ class Conversations extends BaseApi
 		try {
 			while ($conv = DBA::fetch($convs)) {
 				self::setBoundaries($conv['id']);
-				$conversations[] = DI::mstdnConversation()->createFromConvId($conv['id']);
+				$conversations[] = DI::mstdnConversation()->createFromConvId($conv['id'], $uid);
 			}
 		} catch (NotFoundException $e) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
