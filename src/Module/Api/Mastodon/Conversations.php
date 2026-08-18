@@ -23,7 +23,7 @@ class Conversations extends BaseApi
 		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		if (!empty($this->parameters['id'])) {
+		if (empty($this->parameters['id'])) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
