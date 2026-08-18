@@ -22,19 +22,6 @@ class HtmlFilterEventTest extends TestCase
 		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
 	}
 
-	public static function getPublicConstants(): array
-	{
-		return [
-			[HtmlFilterEvent::CONTACT_BLOCK_END, 'friendica.html.contact_block_end'],
-		];
-	}
-
-	#[\PHPUnit\Framework\Attributes\DataProvider('getPublicConstants')]
-	public function testPublicConstantsAreAvailable($value, $expected): void
-	{
-		$this->assertSame($expected, $value);
-	}
-
 	public function testGetNameReturnsName(): void
 	{
 		$event = new HtmlFilterEvent('test', '');

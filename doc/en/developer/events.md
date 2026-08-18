@@ -98,6 +98,7 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `about_hook` | `\Friendica\Event\ModAboutContentEvent` |
 | `profile_advanced` | `\Friendica\Event\ModProfileContentEvent` |
 | `jot_tool` | `\Friendica\Event\JotToolEvent` |
+| `contact_block_end` | `\Friendica\Event\ContactBlockEndEvent` |
 | `getsiteinfo` | `\Friendica\Event\GetSiteInfoEvent` |
 | `globaldir_update` | `\Friendica\Event\GlobalDirUpdateEvent` |
 | `uexport_options` | `\Friendica\Event\UserExportOptionsEvent` |
@@ -540,6 +541,16 @@ Fired when the composer is rendered, to allow addons to add or change the HTML o
 
 **Modifiable:**
 - `setHtml(string $html): void` — change the HTML of the composer tools
+
+### `\Friendica\Event\ContactBlockEndEvent`
+
+Fired when a contact block is rendered, to allow addons to add or change the HTML at the end of the contact block.
+
+**Contained data:**
+- `getHtml(): string` — the HTML at the end of the contact block
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the HTML at the end of the contact block
 
 ### `\Friendica\Event\GetSiteInfoEvent`
 

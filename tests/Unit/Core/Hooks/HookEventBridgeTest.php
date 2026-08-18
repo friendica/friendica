@@ -32,6 +32,7 @@ use Friendica\Event\BlockContactEvent;
 use Friendica\Event\CacheItemEvent;
 use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Event\ConnectorSettingsPostEvent;
+use Friendica\Event\ContactBlockEndEvent;
 use Friendica\Event\ContactPhotoMenuEvent;
 use Friendica\Event\ConversationStartEvent;
 use Friendica\Event\DbStructureDefinitionEvent;
@@ -247,7 +248,7 @@ class HookEventBridgeTest extends TestCase
 			UnfollowContactEvent::NAME              => 'onUnfollowContactEvent',
 			UserExportOptionsEvent::NAME            => 'onUserExportOptionsEvent',
 			ZrlInitEvent::NAME                      => 'onZrlInitEvent',
-			HtmlFilterEvent::CONTACT_BLOCK_END      => 'onHtmlFilterEvent',
+			ContactBlockEndEvent::NAME              => 'onContactBlockEndEvent',
 			FooterEvent::NAME                       => 'onFooterEvent',
 			HeadEvent::NAME                         => 'onHeadEvent',
 			JotToolEvent::NAME                      => 'onJotToolEvent',
@@ -2434,6 +2435,41 @@ class HookEventBridgeTest extends TestCase
 		$this->assertSame('', $event->getHtml());
 	}
 
+	public function testOnContactBlockEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ContactBlockEndEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('contact_block_end', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onContactBlockEndEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnContactBlockEndEventCallsHookWithMissingValues(): void
+	{
+		$event = new ContactBlockEndEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('contact_block_end', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onContactBlockEndEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
 		$event = new EventUpdatedEvent(['id' => 123]);
@@ -2646,7 +2682,7 @@ class HookEventBridgeTest extends TestCase
 			[ModAboutContentEvent::NAME, 'about_hook'],
 			[ModProfileContentEvent::NAME, 'profile_advanced'],
 			[JotToolEvent::NAME, 'jot_tool'],
-			[HtmlFilterEvent::CONTACT_BLOCK_END, 'contact_block_end'],
+			[ContactBlockEndEvent::NAME, 'contact_block_end'],
 		];
 	}
 

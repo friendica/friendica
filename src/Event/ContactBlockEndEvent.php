@@ -12,15 +12,18 @@ namespace Friendica\Event;
 use Friendica\Core\Event\AbstractEvent;
 
 /**
- * Allow Event listener to modify HTML.
- *
- * @internal
+ * Fired when a contact block is rendered, to allow addons to add or change the HTML at the end of the contact block.
  */
-final class HtmlFilterEvent extends AbstractEvent
+final class ContactBlockEndEvent extends AbstractEvent
 {
-	public function __construct(string $name, private string $html)
+	public const NAME = 'friendica.html.contact_block_end';
+
+	/**
+	 * @internal
+	 */
+	public function __construct(private string $html)
 	{
-		parent::__construct($name);
+		parent::__construct(self::NAME);
 	}
 
 	public function getHtml(): string
