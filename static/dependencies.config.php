@@ -185,7 +185,7 @@ return (function (string $basepath, array $getVars, array $serverVars, array $co
 			'instanceOf' => \Friendica\Core\Logger\Factory\SyslogLoggerFactory::class,
 		],
 		\Psr\EventDispatcher\EventDispatcherInterface::class => [
-			'instanceOf' => \Friendica\Event\EventDispatcher::class,
+			'instanceOf' => \Friendica\Core\Event\EventDispatcher::class,
 		],
 		\Friendica\Core\Logger\Capability\IHaveCallIntrospections::class => [
 			'instanceOf'      => \Friendica\Core\Logger\Util\Introspection::class,

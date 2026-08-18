@@ -9,21 +9,21 @@ declare(strict_types=1);
 
 namespace Friendica\Event;
 
+use Friendica\Core\Event\AbstractEvent;
+
 /**
  * Allow modules to react on post recipient rendering.
- *
- * @internal
  */
-final class ModulePostRecipientEvent extends Event
+final class ModulePostRecipientEvent extends AbstractEvent
 {
-	public const MODULE_POST_RECIPIENT = 'friendica.module_post_recipient';
+	public const NAME = 'friendica.module_post_recipient';
 
 	/**
 	 * @param class-string<\Friendica\BaseModule> $moduleClass
 	 */
-	public function __construct(string $name, private readonly string $moduleName, private readonly string $moduleClass, private string $html)
+	public function __construct(private readonly string $moduleName, private readonly string $moduleClass, private string $html)
 	{
-		parent::__construct($name);
+		parent::__construct(self::NAME);
 	}
 
 	public function getModuleName(): string

@@ -15,7 +15,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
-use Friendica\Event\Event;
+use Friendica\Event\HomeInitEvent;
 use Friendica\Model\Notification;
 use Friendica\Model\User;
 use Friendica\Module\Response;
@@ -120,7 +120,7 @@ class Delegation extends BaseModule
 		}
 
 		$this->eventDispatcher->dispatch(
-			new Event(Event::HOME_INIT),
+			new HomeInitEvent(),
 		);
 
 		$this->systemMessages->addNotice($this->t('You are now logged in as %s', $user['username']));

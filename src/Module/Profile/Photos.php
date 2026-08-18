@@ -17,7 +17,9 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\PhotoUploadEndEvent;
+use Friendica\Event\PhotoUploadEvent;
+use Friendica\Event\PhotoUploadStartEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
 use Friendica\Model\Profile;
@@ -89,16 +91,9 @@ class Photos extends \Friendica\Module\BaseProfile
 			$str_contact_allow .= $this->aclFormatter->toString((string) Contact::getPublicIdByUserId($this->owner['uid']));
 		}
 
-		$hook_data = [
-			'request' => $request,
-		];
-
 		// default post action - upload a photo
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_START, $hook_data),
-		)->getArray();
-
-		$request = $hook_data['request'] ?? $request;
+		$event   = $this->eventDispatcher->dispatch(new PhotoUploadStartEvent($request));
+		$request = $event->getRequestArray();
 
 		// Determine the album to use
 		$album    = strip_tags(trim($request['album'] ?? ''));
@@ -108,16 +103,14 @@ class Photos extends \Friendica\Module\BaseProfile
 
 		$album = $album ?: $newalbum ?: DateTimeFormat::localNow('Y');
 
-		$hook_data = [
-			'src'      => '',
-			'filename' => '',
-			'filesize' => 0,
-			'type'     => '',
-		];
+		$event = $this->eventDispatcher->dispatch(new PhotoUploadEvent('', '', 0, ''));
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD, $hook_data),
-		)->getArray();
+		$hook_data = [
+			'src'      => $event->getSrc(),
+			'filename' => $event->getFilename(),
+			'filesize' => $event->getFilesize(),
+			'type'     => $event->getType(),
+		];
 
 		$src      = null;
 		$filename = '';
@@ -166,7 +159,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			}
 
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(''),
 			);
 
 			return;
@@ -181,7 +174,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			@unlink($src);
 
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(''),
 			);
 
 			return;
@@ -192,7 +185,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			@unlink($src);
 
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(''),
 			);
 
 			return;
@@ -210,7 +203,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			@unlink($src);
 
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(''),
 			);
 
 			return;
@@ -230,7 +223,7 @@ class Photos extends \Friendica\Module\BaseProfile
 			$this->logger->warning('image store failed');
 			$this->systemMessages->addNotice($this->t('Image upload failed.'));
 			$this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => 0]),
+				new PhotoUploadEndEvent(''),
 			);
 			return;
 		}
@@ -239,7 +232,7 @@ class Photos extends \Friendica\Module\BaseProfile
 		Photo::clearAlbumCache($this->owner['uid']);
 
 		$this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => $resource_id]),
+			new PhotoUploadEndEvent($resource_id),
 		);
 
 		$this->baseUrl->redirect($this->session->get('photo_return') ?? 'profile/' . $this->owner['nickname'] . '/photos');

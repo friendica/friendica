@@ -22,13 +22,13 @@ use Friendica\Content\Conversation\Factory\Network as NetworkFactory;
 use Friendica\Content\Conversation\Factory\Timeline as TimelineFactory;
 use Friendica\Content\Conversation\Repository;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Core\L10n;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
+use Friendica\Event\DisplaySettingsPostEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Friendica\Model\Post\Engagement;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
@@ -216,7 +216,7 @@ class Display extends BaseSettings
 			$this->systemMessages->addNotice($this->t('The theme you chose isn\'t available.'));
 		}
 
-		$this->eventDispatcher->dispatch(new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_SETTINGS_POST, $request));
+		$this->eventDispatcher->dispatch(new DisplaySettingsPostEvent($request));
 
 		$this->baseUrl->redirect('settings/display');
 	}

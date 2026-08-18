@@ -7,24 +7,15 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Event;
+namespace Friendica\Core\Event;
 
 /**
- * One-way Event to inform listener about something happend.
+ * Base class for all Friendica events.
  *
  * @internal
  */
-class Event implements NamedEvent
+abstract class AbstractEvent implements NamedEvent
 {
-	/**
-	 * Friendica is initialized.
-	 */
-	public const INIT = 'friendica.init';
-
-	public const HOME_INIT = 'friendica.home_init';
-
-	public const LOGGING_OUT = 'friendica.logging_out';
-
 	public function __construct(private readonly string $name) {}
 
 	public function getName(): string

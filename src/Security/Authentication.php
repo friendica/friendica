@@ -15,7 +15,7 @@ use Friendica\AppHelper;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\LoggedInEvent;
 use Friendica\Core\System;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
@@ -360,7 +360,7 @@ class Authentication
 		}
 
 		if ($login_initial) {
-			DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::LOGGED_IN, $user_record));
+			DI::eventDispatcher()->dispatch(new LoggedInEvent($user_record));
 		}
 	}
 

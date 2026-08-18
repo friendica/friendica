@@ -18,7 +18,8 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\AccountRegisterFormEvent;
+use Friendica\Event\AccountRegisterPostEvent;
 use Friendica\Model;
 use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
@@ -198,15 +199,10 @@ class Register extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('register.tpl');
 
-		$hook_data = [
-			'template' => $tpl,
-		];
-
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER_FORM, $hook_data),
-		)->getArray();
-
-		$tpl = $hook_data['template'] ?? $tpl;
+		$event = $this->eventDispatcher->dispatch(
+			new AccountRegisterFormEvent($tpl),
+		);
+		$tpl = $event->getMarkupTemplate();
 
 		$o = Renderer::replaceMacros($tpl, [
 			'$notices'               => $notices,
@@ -265,11 +261,11 @@ class Register extends BaseModule
 	{
 		BaseModule::checkFormSecurityTokenRedirectOnError('/register', 'register');
 
-		$eventData = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER_POST, ['post' => $_POST]),
-		)->getArray();
+		$event = $this->eventDispatcher->dispatch(
+			new AccountRegisterPostEvent($_POST),
+		);
 
-		$post = $eventData['post'];
+		$post = $event->getPostArray();
 
 		$additional_account = false;
 		$regdata            = ['type' => $post['register_type'], 'nickname' => $post['nickname'], 'username' => $post['username']];

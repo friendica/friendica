@@ -18,7 +18,9 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\RenderLocationEvent;
+use Friendica\Event\ConversationStartEvent;
+use Friendica\Event\DisplayItemEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
@@ -95,13 +97,9 @@ final readonly class ConversationRenderer
 			$_SESSION['return_path'] = $this->args->getQueryString();
 		}
 
-		$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => false];
-
-		$cb = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::CONVERSATION_START, $cb),
-		)->getArray();
-
-		$items = $cb['items'];
+		$items = $this->eventDispatcher->dispatch(
+			new ConversationStartEvent($items, $mode, $update, false),
+		)->getItemsArray();
 
 		$timelineHtml = $this->renderTimelineByItems($items, $viewerUid, $mode, $order, $update);
 		$html         = $live_update_div . $timelineHtml;
@@ -214,13 +212,9 @@ final readonly class ConversationRenderer
 
 		$_SESSION['return_path'] = $this->args->getQueryString();
 
-		$cb = ['items' => $items, 'mode' => $mode, 'update' => false, 'preview' => $preview];
-
-		$cb = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::CONVERSATION_START, $cb),
-		)->getArray();
-
-		$items = $cb['items'];
+		$items = $this->eventDispatcher->dispatch(
+			new ConversationStartEvent($items, $mode, false, $preview),
+		)->getItemsArray();
 
 		$html = $this->renderContextLessTimelineByItems(
 			$items,
@@ -454,11 +448,10 @@ final readonly class ConversationRenderer
 				$sparkle = ' sparkle';
 			}
 
-			$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];
-			$locate = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::RENDER_LOCATION, $locate),
-			)->getArray();
-			$locationHtml = $locate['html'] ?: Strings::escapeHtml($locate['location'] ?: $locate['coord'] ?: '');
+			$event = $this->eventDispatcher->dispatch(
+				new RenderLocationEvent($item['location'], $item['coord']),
+			);
+			$locationHtml = $event->getHtml() ?: Strings::escapeHtml($event->getLocation() ?: $event->getCoord() ?: '');
 
 			$this->item->localize($item);
 			$drop = [
@@ -541,15 +534,14 @@ final readonly class ConversationRenderer
 				'thread_level'         => 1,
 			];
 
-			$arr = ['item' => $item, 'output' => $tmpItem];
-			$arr = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr),
-			)->getArray();
+			$event = $this->eventDispatcher->dispatch(
+				new DisplayItemEvent($item, $tmpItem),
+			);
 
 			$threads[] = [
 				'id'      => $item['id'],
 				'network' => $item['network'],
-				'items'   => [$arr['output']],
+				'items'   => [$event->getTemplateDataArray()],
 			];
 		}
 

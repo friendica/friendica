@@ -8,7 +8,7 @@
 namespace Friendica\Content;
 
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\PageInfoEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Strings;
@@ -94,8 +94,8 @@ class PageInfo
 
 		/** @var array<string,mixed> */
 		$data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PAGE_INFO, $data),
-		)->getArray();
+			new PageInfoEvent($data),
+		)->getDataArray();
 
 		if (empty($data['type'])) {
 			return '';

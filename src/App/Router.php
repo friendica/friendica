@@ -121,7 +121,7 @@ class Router
 
 		// Add routes from addons
 		$routeCollector = $this->eventDispatcher->dispatch(
-			new CollectRoutesEvent(CollectRoutesEvent::COLLECT_ROUTES, $routeCollector),
+			new CollectRoutesEvent($routeCollector),
 		)->getRouteCollector();
 
 		$this->routeCollector = $routeCollector;

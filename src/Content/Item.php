@@ -20,7 +20,9 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\DetectLanguagesEvent;
+use Friendica\Event\InsertPostLocalEndEvent;
+use Friendica\Event\ItemPhotoMenuEvent;
 use Friendica\Model\Attach;
 use Friendica\Model\Circle;
 use Friendica\Model\Contact;
@@ -451,13 +453,9 @@ class Item
 			$menu = [$this->l10n->t('View Profile') => $item['author-link']];
 		}
 
-		$args = ['item' => $item, 'menu' => $menu];
-
-		$args = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ITEM_PHOTO_MENU, $args),
-		)->getArray();
-
-		$menu = $args['menu'];
+		$menu = $this->eventDispatcher->dispatch(
+			new ItemPhotoMenuEvent($item, $menu),
+		)->getMenuArray();
 
 		$o = '';
 		foreach ($menu as $k => $v) {
@@ -1098,15 +1096,11 @@ class Item
 			Tag::createImplicitMentions($post['uri-id'], $post['thr-parent-id']);
 		}
 
-		$hook_data = [
-			'item' => $post,
-		];
+		$event = $this->eventDispatcher->dispatch(
+			new InsertPostLocalEndEvent($post),
+		);
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $hook_data),
-		)->getArray();
-
-		$post = $hook_data['item'] ?? $post;
+		$post = $event->getItemArray();
 
 		$author = DBA::selectFirst('contact', ['thumb'], ['uid' => $post['uid'], 'self' => true]);
 
@@ -1301,18 +1295,11 @@ class Item
 		foreach ($this->splitByBlocks($searchtext) as $block) {
 			$languages = $ld->detect($block)->close() ?: [];
 
-			$hook_data = [
-				'text'      => $block,
-				'detected'  => $languages,
-				'uri-id'    => $uri_id,
-				'author-id' => $author_id,
-			];
+			$event = $this->eventDispatcher->dispatch(
+				new DetectLanguagesEvent($block, $languages, $uri_id, $author_id),
+			);
 
-			$hook_data = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::DETECT_LANGUAGES, $hook_data),
-			)->getArray();
-
-			foreach ($hook_data['detected'] as $language => $quality) {
+			foreach ($event->getDetected() as $language => $quality) {
 				$result[$language] = max($result[$language] ?? 0, $quality * (strlen((string) $block) / strlen($searchtext)));
 			}
 		}

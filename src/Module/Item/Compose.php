@@ -22,7 +22,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\JotToolEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
@@ -121,9 +121,7 @@ class Compose extends BaseModule
 		$location  = $request['location']  ?? $user['default-location'];
 		$wall      = $request['wall']      ?? $type == 'post';
 
-		$jotplugins = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
-		)->getHtml();
+		$jotplugins = $this->eventDispatcher->dispatch(new JotToolEvent(''))->getHtml();
 
 		// Output
 		$this->page->registerFooterScript(Theme::getPathForFile('js/ajaxupload.js'));

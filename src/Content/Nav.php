@@ -14,8 +14,9 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
-use Friendica\Event\ArrayFilterEvent;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\AppMenuEvent;
+use Friendica\Event\NavInfoEvent;
+use Friendica\Event\PageHeaderEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Module\Conversation\Community;
@@ -95,9 +96,7 @@ class Nav
 			'$search_placeholder'   => $this->l10n->t('Search: @name, !group, #tags, content'),
 		]);
 
-		$nav = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::PAGE_HEADER, $nav),
-		)->getHtml();
+		$nav = $this->eventDispatcher->dispatch(new PageHeaderEvent($nav))->getHtml();
 
 		return $nav;
 	}
@@ -132,13 +131,11 @@ class Nav
 			$this->session->getLocalUserId()
 			|| !$this->config->get('config', 'private_addons', false)
 		) {
-			$arr = ['app_menu' => $appMenu];
+			$event = $this->eventDispatcher->dispatch(
+				new AppMenuEvent($appMenu),
+			);
 
-			$arr = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::APP_MENU, $arr),
-			)->getArray();
-
-			$appMenu = $arr['app_menu'] ?? [];
+			$appMenu = $event->getAppMenuArray();
 		}
 
 		return $appMenu;
@@ -309,17 +306,15 @@ class Nav
 			$banner = '<a href="https://friendi.ca"><img id="logo-img" width="32" height="32" src="images/friendica.svg" alt="logo" /></a><span id="logo-text"><a href="https://friendi.ca">Friendica</a></span>';
 		}
 
-		$nav_info = [
-			'banner'       => $banner,
-			'nav'          => $nav,
-			'sitelocation' => $sitelocation,
-			'userinfo'     => $userinfo,
+		$event = $this->eventDispatcher->dispatch(
+			new NavInfoEvent($banner, $nav, $sitelocation, $userinfo),
+		);
+
+		return [
+			'banner'       => $event->getBanner(),
+			'nav'          => $event->getNavArray(),
+			'sitelocation' => $event->getSitelocation(),
+			'userinfo'     => $event->getUserinfoArray(),
 		];
-
-		$nav_info = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NAV_INFO, $nav_info),
-		)->getArray();
-
-		return $nav_info;
 	}
 }

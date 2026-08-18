@@ -37,7 +37,7 @@ use Friendica\Core\Update;
 use Friendica\Database\Definition\DbaDefinition;
 use Friendica\Database\Definition\ViewDefinition;
 use Friendica\Event\ConfigLoadedEvent;
-use Friendica\Event\Event;
+use Friendica\Event\InitEvent;
 use Friendica\Module\Maintenance;
 use Friendica\Module\Response;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
@@ -329,7 +329,7 @@ class App
 
 	private function registerEventDispatcher(): void
 	{
-		/** @var \Friendica\Event\EventDispatcher */
+		/** @var \Friendica\Core\Event\EventDispatcher */
 		$eventDispatcher = $this->container->create(EventDispatcherInterface::class);
 
 		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
@@ -378,7 +378,7 @@ class App
 			Core\Hook::loadHooks();
 			$loader = (new Config())->createConfigFileManager($appHelper->getBasePath(), $addonHelper->getAddonPath(), $serverParams);
 
-			$eventDispatcher->dispatch(new ConfigLoadedEvent(ConfigLoadedEvent::CONFIG_LOADED, $loader));
+			$eventDispatcher->dispatch(new ConfigLoadedEvent($loader));
 
 			// Hooks are now working, reload the whole definitions with hook enabled
 			$dbaDefinition->load(true);
@@ -475,7 +475,7 @@ class App
 					System::externalRedirect($this->baseURL . '/' . $this->args->getQueryString());
 				}
 
-				$eventDispatcher->dispatch(new Event(Event::INIT));
+				$eventDispatcher->dispatch(new InitEvent());
 			}
 
 			DID::routeRequest($this->args->getCommand(), $serverVars);

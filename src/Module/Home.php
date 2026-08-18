@@ -10,8 +10,8 @@ namespace Friendica\Module;
 use Friendica\BaseModule;
 use Friendica\Core\Renderer;
 use Friendica\DI;
-use Friendica\Event\Event;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\HomeInitEvent;
+use Friendica\Event\ModHomeContentEvent;
 use Friendica\Model\User;
 use Friendica\Module\Security\Login;
 use Friendica\Protocol\ActivityPub;
@@ -38,7 +38,7 @@ class Home extends BaseModule
 		$eventDispatcher = DI::eventDispatcher();
 
 		$eventDispatcher->dispatch(
-			new Event(Event::HOME_INIT),
+			new HomeInitEvent(),
 		);
 
 		if (DI::userSession()->getLocalUserId() && (DI::userSession()->getLocalUserNickname())) {
@@ -67,9 +67,7 @@ class Home extends BaseModule
 
 		$content = '';
 
-		$content = $eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::MOD_HOME_CONTENT, $content),
-		)->getHtml();
+		$content = $eventDispatcher->dispatch(new ModHomeContentEvent($content))->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('home.tpl');
 		return Renderer::replaceMacros($tpl, [

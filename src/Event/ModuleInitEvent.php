@@ -9,21 +9,21 @@ declare(strict_types=1);
 
 namespace Friendica\Event;
 
+use Friendica\Core\Event\AbstractEvent;
+
 /**
  * Allow modules to react on initialization.
- *
- * @internal
  */
-final class ModuleInitEvent extends Event
+final class ModuleInitEvent extends AbstractEvent
 {
-	public const MODULE_INIT = 'friendica.module_init';
+	public const NAME = 'friendica.module_init';
 
 	/**
 	 * @param class-string<\Friendica\BaseModule> $moduleClass
 	 */
-	public function __construct(string $name, private readonly string $moduleName, private readonly string $moduleClass)
+	public function __construct(private readonly string $moduleName, private readonly string $moduleClass)
 	{
-		parent::__construct($name);
+		parent::__construct(self::NAME);
 	}
 
 	public function getModuleName(): string

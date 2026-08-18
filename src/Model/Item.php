@@ -20,7 +20,16 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\CacheItemEvent;
+use Friendica\Event\FetchItemByLinkEvent;
+use Friendica\Event\InsertPostRemoteEvent;
+use Friendica\Event\ItemTaggedEvent;
+use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\PreparePostEndEvent;
+use Friendica\Event\PreparePostEvent;
+use Friendica\Event\PreparePostFilterContentEvent;
+use Friendica\Event\PreparePostStartEvent;
+use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Model\Post\Category;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
@@ -792,26 +801,20 @@ class Item
 				$dummy_session = false;
 			}
 
-			$hook_data = [
-				'item' => $item,
-			];
-
-			$hook_data = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data),
-			)->getArray();
+			$event = $eventDispatcher->dispatch(
+				new InsertPostLocalEvent($item),
+			);
 
 			/** @var array<string,mixed> */
-			$item = $hook_data['item'] ?? $item;
+			$item = $event->getItemArray();
 
 			if ($dummy_session) {
 				unset($_SESSION['authenticated']);
 				unset($_SESSION['uid']);
 			}
 		} elseif (!$notify) {
-			/** @var array<string,mixed> */
-			$item = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE, $item),
-			)->getArray();
+			$insertPostRemoteEvent = $eventDispatcher->dispatch(new InsertPostRemoteEvent($item));
+			$item                  = $insertPostRemoteEvent->getItemArray();
 		}
 
 		if (!empty($item['cancel'])) {
@@ -1102,9 +1105,8 @@ class Item
 		} else {
 			$eventDispatcher = DI::eventDispatcher();
 
-			$posted_item = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_REMOTE_END, $posted_item),
-			)->getArray();
+			$insertPostRemoteEndEvent = $eventDispatcher->dispatch(new InsertPostRemoteEndEvent($posted_item));
+			$posted_item              = $insertPostRemoteEndEvent->getItemArray();
 		}
 
 		if ($posted_item['gravity'] === self::GRAVITY_PARENT) {
@@ -2117,15 +2119,8 @@ class Item
 				return true;
 			}
 
-			$eventDispatcher = DI::eventDispatcher();
-
-			$arr = [
-				'item' => $item,
-				'user' => $owner,
-			];
-
-			$eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::ITEM_TAGGED, $arr),
+			DI::eventDispatcher()->dispatch(
+				new ItemTaggedEvent($item, $owner),
 			);
 		} else {
 			if (Tag::isMentioned($item['parent-uri-id'], $owner['url'])) {
@@ -2893,21 +2888,14 @@ class Item
 			$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $item['body']);
 			$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $body);
 
-			$hook_data = [
-				'rendered-html' => $item['rendered-html'],
-				'rendered-hash' => $item['rendered-hash'],
-				'item'          => $item,
-			];
-
 			$eventDispatcher = DI::eventDispatcher();
 
-			$hook_data = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::CACHE_ITEM, $hook_data),
-			)->getArray();
+			$event = $eventDispatcher->dispatch(
+				new CacheItemEvent($item, $item['rendered-html'], $item['rendered-hash']),
+			);
 
-			$item['rendered-html'] = $hook_data['rendered-html'];
-			$item['rendered-hash'] = $hook_data['rendered-hash'];
-			unset($hook_data);
+			$item['rendered-html'] = $event->getRenderedHtml();
+			$item['rendered-hash'] = $event->getRenderedHash();
 
 			// Update if the generated values differ from the existing ones
 			if ((($rendered_hash != $item['rendered-hash']) || ($rendered_html != $item['rendered-html'])) && !empty($item['id'])) {
@@ -2946,11 +2934,8 @@ class Item
 			'item' => $item,
 		];
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_START, $hook_data),
-		)->getArray();
-
-		$item = $hook_data['item'] ?? $item;
+		$preparePostStartEvent = $eventDispatcher->dispatch(new PreparePostStartEvent($item));
+		$item                  = $preparePostStartEvent->getItemArray();
 
 		// In order to provide theme developers more possibilities, event items
 		// are treated differently.
@@ -3068,17 +3053,11 @@ class Item
 
 			$item['attachments'] = $itemSplitAttachments;
 
-			$hook_data = [
-				'item'           => $item,
-				'filter_reasons' => $filter_reasons,
-			];
+			$event = $eventDispatcher->dispatch(
+				new PreparePostFilterContentEvent($item, $uid, $filter_reasons),
+			);
 
-			$hook_data = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, $hook_data),
-			)->getArray();
-
-			$filter_reasons = $hook_data['filter_reasons'];
-			unset($hook_data);
+			$filter_reasons = $event->getFilterReasons();
 		}
 
 		if (!empty($shared_item['uri-id'])) {
@@ -3089,18 +3068,11 @@ class Item
 			$s = self::replacePlatformIcon($s, $shared_item, $uid);
 		}
 
-		$hook_data = [
-			'item'           => $item,
-			'html'           => $s,
-			'preview'        => $is_preview,
-			'filter_reasons' => $filter_reasons,
-		];
+		$event = $eventDispatcher->dispatch(
+			new PreparePostEvent($item, $s, $is_preview, $filter_reasons),
+		);
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST, $hook_data),
-		)->getArray();
-
-		$s = $hook_data['html'];
+		$s = $event->getHtml();
 
 		unset($hook_data);
 
@@ -3155,16 +3127,11 @@ class Item
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
-		$hook_data = [
-			'item' => $item,
-			'html' => $s,
-		];
+		$event = $eventDispatcher->dispatch(
+			new PreparePostEndEvent($item, $s),
+		);
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_END, $hook_data),
-		)->getArray();
-
-		return array_key_exists('html', $hook_data) ? (string) $hook_data['html'] : $s;
+		return $event->getHtml();
 	}
 
 	/**
@@ -3816,21 +3783,13 @@ class Item
 			return 0;
 		}
 
-		$eventDispatcher = DI::eventDispatcher();
+		$event = DI::eventDispatcher()->dispatch(
+			new FetchItemByLinkEvent($uri, $uid, null),
+		);
 
-		$hook_data = [
-			'uri'     => $uri,
-			'uid'     => $uid,
-			'item_id' => null,
-		];
-
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::FETCH_ITEM_BY_LINK, $hook_data),
-		)->getArray();
-
-		if (isset($hook_data['item_id'])) {
-			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $hook_data['item_id']]);
-			return is_numeric($hook_data['item_id']) ? $hook_data['item_id'] : 0;
+		if ($event->getItemId() !== null) {
+			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $event->getItemId()]);
+			return $event->getItemId();
 		}
 
 		if (!$mimetype) {

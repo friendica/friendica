@@ -265,7 +265,7 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 		$timestamp = microtime(true);
 
 		$this->eventDispatcher->dispatch(
-			new ModuleInitEvent(ModuleInitEvent::MODULE_INIT, $this->args->getModuleName(), static::class),
+			new ModuleInitEvent($this->args->getModuleName(), static::class),
 		);
 
 		$this->profiler->set(microtime(true) - $timestamp, 'init');
@@ -279,7 +279,7 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 				break;
 			case Router::POST:
 				$request = $this->eventDispatcher->dispatch(
-					new ModulePostEvent(ModulePostEvent::MODULE_POST, $this->args->getModuleName(), static::class, $request),
+					new ModulePostEvent($this->args->getModuleName(), static::class, $request),
 				)->getPost();
 
 				$this->post($request);
@@ -300,7 +300,7 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 
 		try {
 			$content = $this->eventDispatcher->dispatch(
-				new ModuleContentEvent(ModuleContentEvent::MODULE_CONTENT, $this->args->getModuleName(), static::class, ''),
+				new ModuleContentEvent($this->args->getModuleName(), static::class, ''),
 			)->getContent();
 			$this->response->addContent($content);
 			$this->response->addContent($this->content($request));

@@ -12,7 +12,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\InsertPostLocalEndEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -158,15 +158,11 @@ EOT;
 
 		$post['id'] = $post_id;
 
-		$hook_data = [
-			'item' => $post,
-		];
+		$event = $this->eventDispatcher->dispatch(
+			new InsertPostLocalEndEvent($post),
+		);
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, $hook_data),
-		)->getArray();
-
-		$post = $hook_data['item'] ?? $post;
+		$post = $event->getItemArray();
 
 		$post = Post::selectFirst(['uri-id', 'uid'], ['id' => $post_id]);
 

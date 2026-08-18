@@ -24,7 +24,8 @@ use Friendica\Core\System;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\InsertPostLocalEvent;
+use Friendica\Event\InsertPostLocalStartEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
@@ -48,8 +49,8 @@ function item_post(): void
 	$eventDispatcher = DI::eventDispatcher();
 
 	$_REQUEST = $eventDispatcher->dispatch(
-		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_START, $_REQUEST),
-	)->getArray();
+		new InsertPostLocalStartEvent($_REQUEST),
+	)->getRequestArray();
 
 	$return_path = $_REQUEST['return'] ?? '';
 	$preview     = intval($_REQUEST['preview'] ?? 0);
@@ -287,15 +288,11 @@ function item_process(array $post, array $request, bool $preview, string $return
 
 	$eventDispatcher = DI::eventDispatcher();
 
-	$hook_data = [
-		'item' => $post,
-	];
+	$event = $eventDispatcher->dispatch(
+		new InsertPostLocalEvent($post),
+	);
 
-	$hook_data = $eventDispatcher->dispatch(
-		new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, $hook_data),
-	)->getArray();
-
-	$post = $hook_data['item'] ?? $post;
+	$post = $event->getItemArray();
 
 	unset($post['edit']);
 	unset($post['self']);

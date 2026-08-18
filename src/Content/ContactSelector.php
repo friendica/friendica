@@ -10,7 +10,7 @@ namespace Friendica\Content;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\NetworkToNameEvent;
 use Friendica\Util\Strings;
 
 /**
@@ -137,12 +137,10 @@ class ContactSelector
 			Protocol::ATPROTO     => DI::l10n()->t('AT Protocol'),
 		];
 
-		$nets = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::NETWORK_TO_NAME, $nets),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(new NetworkToNameEvent($nets));
 
-		$search  = array_keys($nets);
-		$replace = array_values($nets);
+		$search  = array_keys($event->getNetworks());
+		$replace = array_values($event->getNetworks());
 
 		$networkname = str_replace($search, $replace, $network);
 		$platform    = '';

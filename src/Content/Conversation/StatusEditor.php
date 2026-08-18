@@ -19,7 +19,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\JotToolEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\User;
@@ -117,9 +117,7 @@ final class StatusEditor
 			return $o;
 		}
 
-		$jotplugins = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
-		)->getHtml();
+		$jotplugins = $this->eventDispatcher->dispatch(new JotToolEvent(''))->getHtml();
 
 		if ($this->config->get('system', 'set_creation_date')) {
 			$created_at = Temporal::getDateTimeField(

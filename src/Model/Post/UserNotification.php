@@ -12,7 +12,7 @@ use Exception;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\CheckItemNotificationEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -395,16 +395,12 @@ class UserNotification
 
 		$profiles = [$owner['nurl']];
 
-		$notification_data = ['uid' => $uid, 'profiles' => []];
-
-		$eventDispatcher = DI::eventDispatcher();
-
-		$notification_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::CHECK_ITEM_NOTIFICATION, $notification_data),
-		)->getArray();
+		$event = DI::eventDispatcher()->dispatch(
+			new CheckItemNotificationEvent($uid, []),
+		);
 
 		// Normalize the connector profiles
-		foreach ($notification_data['profiles'] as $profile) {
+		foreach ($event->getProfilesArray() as $profile) {
 			if (empty(parse_url((string) $profile, PHP_URL_SCHEME)) || empty(parse_url((string) $profile, PHP_URL_HOST)) || empty(parse_url((string) $profile, PHP_URL_PATH))) {
 				$profiles[] = $profile;
 			} else {

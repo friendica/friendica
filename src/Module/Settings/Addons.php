@@ -10,14 +10,14 @@ namespace Friendica\Module\Settings;
 use Friendica\App;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Event\ArrayFilterEvent;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
+use Friendica\Event\AddonSettingsPostEvent;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Response;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Addons extends BaseSettings
@@ -43,7 +43,7 @@ class Addons extends BaseSettings
 	{
 		BaseSettings::checkFormSecurityTokenRedirectOnError($this->args->getQueryString(), 'settings_addon');
 
-		$this->eventDispatcher->dispatch(new ArrayFilterEvent(ArrayFilterEvent::ADDON_SETTINGS_POST, $request));
+		$this->eventDispatcher->dispatch(new AddonSettingsPostEvent($request));
 		$this->baseUrl->redirect($this->args->getQueryString());
 	}
 

@@ -160,7 +160,7 @@ abstract class ApiTestCase extends FixtureTestCase
 		;
 		DI::init($this->dice);
 
-		/** @var \Friendica\Event\EventDispatcher */
+		/** @var \Friendica\Core\Event\EventDispatcher */
 		$eventDispatcher = DI::eventDispatcher();
 
 		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {

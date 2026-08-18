@@ -11,14 +11,14 @@ namespace Friendica\Test\Unit\Event;
 
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Event\ConfigLoadedEvent;
-use Friendica\Event\NamedEvent;
+use Friendica\Core\Event\NamedEvent;
 use PHPUnit\Framework\TestCase;
 
 class ConfigLoadedEventTest extends TestCase
 {
 	public function testImplementationOfInstances(): void
 	{
-		$event = new ConfigLoadedEvent('test', $this->createStub(ConfigFileManager::class));
+		$event = new ConfigLoadedEvent($this->createStub(ConfigFileManager::class));
 
 		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
 	}
@@ -26,7 +26,7 @@ class ConfigLoadedEventTest extends TestCase
 	public static function getPublicConstants(): array
 	{
 		return [
-			[ConfigLoadedEvent::CONFIG_LOADED, 'friendica.config_loaded'],
+			[ConfigLoadedEvent::NAME, 'friendica.config_loaded'],
 		];
 	}
 
@@ -38,16 +38,16 @@ class ConfigLoadedEventTest extends TestCase
 
 	public function testGetNameReturnsName(): void
 	{
-		$event = new ConfigLoadedEvent('test', $this->createStub(ConfigFileManager::class));
+		$event = new ConfigLoadedEvent($this->createStub(ConfigFileManager::class));
 
-		$this->assertSame('test', $event->getName());
+		$this->assertSame('friendica.config_loaded', $event->getName());
 	}
 
 	public function testGetConfigReturnsCorrectString(): void
 	{
 		$config = $this->createStub(ConfigFileManager::class);
 
-		$event = new ConfigLoadedEvent('test', $config);
+		$event = new ConfigLoadedEvent($config);
 
 		$this->assertSame($config, $event->getConfig());
 	}

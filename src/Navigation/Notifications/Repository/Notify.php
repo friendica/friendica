@@ -16,7 +16,9 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\EnotifyEvent;
+use Friendica\Event\EnotifyMailEvent;
+use Friendica\Event\EnotifyStoreEvent;
 use Friendica\Factory\Api\Mastodon\Notification as NotificationFactory;
 use Friendica\Model;
 use Friendica\Navigation\Notifications\Collection;
@@ -177,9 +179,8 @@ class Notify extends BaseRepository
 		} else {
 			$fields['date'] = DateTimeFormat::utcNow();
 
-			$fields = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::ENOTIFY_STORE, $fields),
-			)->getArray();
+			$event  = $this->eventDispatcher->dispatch(new EnotifyStoreEvent($fields));
+			$fields = $event->getDataArray();
 
 			$this->db->insert(self::$table_name, $fields);
 
@@ -569,9 +570,8 @@ class Notify extends BaseRepository
 			'itemlink'  => $itemlink,
 		];
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ENOTIFY, $hook_data),
-		)->getArray();
+		$event     = $this->eventDispatcher->dispatch(new EnotifyEvent($hook_data));
+		$hook_data = $event->getDataArray();
 
 		$subject = $hook_data['subject'];
 
@@ -652,9 +652,8 @@ class Notify extends BaseRepository
 				'headers'      => $emailBuilder->getHeaders(),
 			];
 
-			$hook_data = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::ENOTIFY_MAIL, $hook_data),
-			)->getArray();
+			$event     = $this->eventDispatcher->dispatch(new EnotifyMailEvent($hook_data));
+			$hook_data = $event->getDataArray();
 
 			$emailBuilder
 				->withHeaders($hook_data['headers'])

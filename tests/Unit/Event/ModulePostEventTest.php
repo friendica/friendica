@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Friendica\Test\Unit\Event;
 
 use Friendica\Event\ModulePostEvent;
-use Friendica\Event\NamedEvent;
+use Friendica\Core\Event\NamedEvent;
 use Friendica\Module\Smilies;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,7 @@ class ModulePostEventTest extends TestCase
 {
 	public function testImplementationOfInstances(): void
 	{
-		$event = new ModulePostEvent('test', 'moduleName', Smilies::class, []);
+		$event = new ModulePostEvent('moduleName', Smilies::class, []);
 
 		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
 	}
@@ -26,7 +26,7 @@ class ModulePostEventTest extends TestCase
 	public static function getPublicConstants(): array
 	{
 		return [
-			[ModulePostEvent::MODULE_POST, 'friendica.module_post'],
+			[ModulePostEvent::NAME, 'friendica.module_post'],
 		];
 	}
 
@@ -38,21 +38,21 @@ class ModulePostEventTest extends TestCase
 
 	public function testGetNameReturnsName(): void
 	{
-		$event = new ModulePostEvent('test', 'moduleName', Smilies::class, []);
+		$event = new ModulePostEvent('moduleName', Smilies::class, []);
 
-		$this->assertSame('test', $event->getName());
+		$this->assertSame('friendica.module_post', $event->getName());
 	}
 
 	public function testGetModuleNameReturnsModuleName(): void
 	{
-		$event = new ModulePostEvent('test', 'moduleName', Smilies::class, []);
+		$event = new ModulePostEvent('moduleName', Smilies::class, []);
 
 		$this->assertSame('moduleName', $event->getModuleName());
 	}
 
 	public function testGetModuleClassReturnsModuleClass(): void
 	{
-		$event = new ModulePostEvent('test', 'moduleName', Smilies::class, []);
+		$event = new ModulePostEvent('moduleName', Smilies::class, []);
 
 		$this->assertSame(Smilies::class, $event->getModuleClass());
 	}
@@ -61,14 +61,14 @@ class ModulePostEventTest extends TestCase
 	{
 		$post = ['key' => 'value'];
 
-		$event = new ModulePostEvent('test', 'moduleName', Smilies::class, $post);
+		$event = new ModulePostEvent('moduleName', Smilies::class, $post);
 
 		$this->assertSame($post, $event->getPost());
 	}
 
 	public function testSetPostUpdatesPost(): void
 	{
-		$event = new ModulePostEvent('test', 'moduleName', Smilies::class, ['key' => 'value']);
+		$event = new ModulePostEvent('moduleName', Smilies::class, ['key' => 'value']);
 
 		$newPost = ['key2' => 'value2'];
 

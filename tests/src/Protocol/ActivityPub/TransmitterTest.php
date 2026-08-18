@@ -22,7 +22,7 @@ class TransmitterTest extends FixtureTestCase
 
 		DI::config()->set('system', 'no_smilies', false);
 
-		/** @var \Friendica\Event\EventDispatcher */
+		/** @var \Friendica\Core\Event\EventDispatcher */
 		$eventDispatcher = DI::eventDispatcher();
 
 		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {

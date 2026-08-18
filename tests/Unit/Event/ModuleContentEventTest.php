@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Friendica\Test\Unit\Event;
 
 use Friendica\Event\ModuleContentEvent;
-use Friendica\Event\NamedEvent;
+use Friendica\Core\Event\NamedEvent;
 use Friendica\Module\Smilies;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,7 @@ class ModuleContentEventTest extends TestCase
 {
 	public function testImplementationOfInstances(): void
 	{
-		$event = new ModuleContentEvent('test', 'moduleName', Smilies::class, 'content');
+		$event = new ModuleContentEvent('moduleName', Smilies::class, 'content');
 
 		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
 	}
@@ -26,7 +26,7 @@ class ModuleContentEventTest extends TestCase
 	public static function getPublicConstants(): array
 	{
 		return [
-			[ModuleContentEvent::MODULE_CONTENT, 'friendica.module_content'],
+			[ModuleContentEvent::NAME, 'friendica.module_content'],
 		];
 	}
 
@@ -38,35 +38,35 @@ class ModuleContentEventTest extends TestCase
 
 	public function testGetNameReturnsName(): void
 	{
-		$event = new ModuleContentEvent('test', 'moduleName', Smilies::class, 'content');
+		$event = new ModuleContentEvent('moduleName', Smilies::class, 'content');
 
-		$this->assertSame('test', $event->getName());
+		$this->assertSame('friendica.module_content', $event->getName());
 	}
 
 	public function testGetModuleNameReturnsModuleName(): void
 	{
-		$event = new ModuleContentEvent('test', 'moduleName', Smilies::class, 'content');
+		$event = new ModuleContentEvent('moduleName', Smilies::class, 'content');
 
 		$this->assertSame('moduleName', $event->getModuleName());
 	}
 
 	public function testGetModuleClassReturnsModuleClass(): void
 	{
-		$event = new ModuleContentEvent('test', 'moduleName', Smilies::class, 'content');
+		$event = new ModuleContentEvent('moduleName', Smilies::class, 'content');
 
 		$this->assertSame(Smilies::class, $event->getModuleClass());
 	}
 
 	public function testGetContentReturnsCorrectString(): void
 	{
-		$event = new ModuleContentEvent('test', 'moduleName', Smilies::class, 'myContent');
+		$event = new ModuleContentEvent('moduleName', Smilies::class, 'myContent');
 
 		$this->assertSame('myContent', $event->getContent());
 	}
 
 	public function testSetContentUpdatesContent(): void
 	{
-		$event = new ModuleContentEvent('test', 'moduleName', Smilies::class, 'oldContent');
+		$event = new ModuleContentEvent('moduleName', Smilies::class, 'oldContent');
 
 		$event->setContent('newContent');
 

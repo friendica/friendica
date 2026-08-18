@@ -10,7 +10,8 @@ namespace Friendica\Util;
 use Friendica\App\BaseURL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\EmailerSendEvent;
+use Friendica\Event\EmailerSendPrepareEvent;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -117,9 +118,9 @@ class Emailer
 	{
 		if ($this->eventDispatcher) {
 			$emailData = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::EMAILER_SEND_PREPARE, ['email' => $email]),
-			)->getArray();
-			$email = $emailData['email'] ?? null;
+				new EmailerSendPrepareEvent($email),
+			);
+			$email = $emailData->getEmail();
 		}
 
 		if (! ($email instanceof IEmail)) {
@@ -190,31 +191,22 @@ class Emailer
 		}
 
 		// send the message
-		$hookdata = [
-			'to'         => $email->getToAddress(),
-			'subject'    => $messageSubject,
-			'body'       => $multipartMessageBody,
-			'headers'    => $messageHeader,
-			'parameters' => $sendmail_params,
-			'sent'       => false,
-		];
-
 		if ($this->eventDispatcher) {
-			$hookdata = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::EMAILER_SEND, $hookdata),
-			)->getArray();
-		}
+			$event = $this->eventDispatcher->dispatch(
+				new EmailerSendEvent($email->getToAddress(), $messageSubject, $multipartMessageBody, $messageHeader, $sendmail_params),
+			);
 
-		if ($hookdata['sent']) {
-			return true;
+			if ($event->isSent()) {
+				return true;
+			}
 		}
 
 		$res = $this->mail(
-			$hookdata['to'],
-			$hookdata['subject'],
-			$hookdata['body'],
-			$hookdata['headers'],
-			$hookdata['parameters'],
+			$email->getToAddress(),
+			$messageSubject,
+			$multipartMessageBody,
+			$messageHeader,
+			$sendmail_params,
 		);
 
 		$this->logger->debug('Email message header', ['To' => $email->getToAddress(), 'messageHeader' => $messageHeader, 'return' => ($res) ? 'true' : 'false']);

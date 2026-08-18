@@ -7,7 +7,9 @@
 
 namespace Friendica\Util;
 
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\GenerateMapEvent;
+use Friendica\Event\GenerateNamedMapEvent;
+use Friendica\Event\MapGetCoordinatesEvent;
 use Friendica\DI;
 
 /**
@@ -19,22 +21,25 @@ class Map
 	{
 		$coord = trim((string) $coord);
 		$coord = str_replace([',','/','  '], [' ',' ',' '], $coord);
-		$arr   = ['lat' => trim(substr($coord, 0, strpos($coord, ' '))), 'lon' => trim(substr($coord, strpos($coord, ' ') + 1)), 'mode' => $html_mode, 'html' => ''];
-		$arr   = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::GENERATE_MAP, $arr))->getArray();
-		return $arr['html'] ?: $coord;
+		$lat   = trim(substr($coord, 0, strpos($coord, ' ')));
+		$lon   = trim(substr($coord, strpos($coord, ' ') + 1));
+		$event = DI::eventDispatcher()->dispatch(new GenerateMapEvent($lat, $lon, $html_mode));
+		return $event->getHtml() ?: $coord;
 	}
 
 	public static function byLocation($location, $html_mode = 0)
 	{
-		$arr = ['location' => $location, 'mode' => $html_mode, 'html' => ''];
-		$arr = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::GENERATE_NAMED_MAP, $arr))->getArray();
-		return $arr['html'] ?: $location;
+		$event = DI::eventDispatcher()->dispatch(new GenerateNamedMapEvent($location, $html_mode));
+		return $event->getHtml() ?: $location;
 	}
 
 	public static function getCoordinates($location)
 	{
-		$arr = ['location' => $location, 'lat' => false, 'lon' => false];
-		$arr = DI::eventDispatcher()->dispatch(new ArrayFilterEvent(ArrayFilterEvent::MAP_GET_COORDINATES, $arr))->getArray();
-		return $arr;
+		$event = DI::eventDispatcher()->dispatch(new MapGetCoordinatesEvent($location));
+		return [
+			'location' => $event->getLocation(),
+			'lat'      => $event->getLatitude()  ?? false,
+			'lon'      => $event->getLongitude() ?? false,
+		];
 	}
 }
