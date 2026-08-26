@@ -479,8 +479,10 @@ class Post
 
 		$values = [0, $uid, $uid, $uid];
 
-		// A block by the contact only excludes what that contact authored, never what they
-		// merely own, which for a received comment is usually the whole thread.
+		// A contact's block on the user only excludes what that contact authored, never what they
+		// merely own, which could be a thread including the user's own content.
+		// For thread roots, we even want the blocking author's post, which is needed for the
+		// thread's integrity. PostTemplateBuilder ensures the content won't be rendered.
 		if (!$includeRemoteBlocked) {
 			$sql .= "
 			AND NOT EXISTS(SELECT `cid`    FROM `user-contact` WHERE `uid` = ? AND `cid` = `author-id` AND `is-blocked`)";

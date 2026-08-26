@@ -114,8 +114,7 @@ final class PostTemplateBuilder
 		$sparkle = str_starts_with((string) $profileUrl, 'contact/redir/') ? ' sparkle' : '';
 
 		// The node of an author who blocked this user is kept so that the replies of everyone
-		// else survive, but their content is never generated: ItemModel::prepareBody() also
-		// resolves attachments, media and link previews, and caches the rendered HTML for all users.
+		// else survive, but their content is never generated.
 		$blockedByAuthor = !empty($item['author-blocked-user']);
 
 		if ($blockedByAuthor) {
