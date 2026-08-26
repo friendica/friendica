@@ -62,14 +62,14 @@ class Database
 	protected $server_info = '';
 	/** @var PDO|mysqli|null */
 	protected $connection;
-	protected $driver               = '';
-	protected $pdo_emulate_prepares = false;
-	private $error                  = '';
-	private $errorno                = 0;
-	private $affected_rows          = 0;
-	protected $in_transaction       = false;
-	protected $in_retrial           = false;
-	protected $testmode             = false;
+	protected $driver                     = '';
+	protected $pdo_emulate_prepares       = false;
+	private $error                        = '';
+	private $errorno                      = 0;
+	private $affected_rows                = 0;
+	protected $in_transaction             = false;
+	protected $in_retrial                 = false;
+	private bool $throwExceptionsOnErrors = false;
 	/** @var DbaDefinition */
 	protected $dbaDefinition;
 	/** @var ViewDefinition */
@@ -204,9 +204,18 @@ class Database
 		return $this->connected;
 	}
 
-	public function setTestmode(bool $test)
+	/**
+	 * Should errors throwns as exceptions?
+	 *
+	 * @return bool returns the previous value
+	 */
+	public function throwExceptionsOnErrors(bool $throwExceptions): bool
 	{
-		$this->testmode = $test;
+		$prev = $this->throwExceptionsOnErrors;
+
+		$this->throwExceptionsOnErrors = $throwExceptions;
+
+		return $prev;
 	}
 
 	/**
@@ -596,7 +605,7 @@ class Database
 			$error   = $this->error;
 			$errorno = $this->errorno;
 
-			if ($this->testmode) {
+			if ($this->throwExceptionsOnErrors) {
 				throw new DatabaseException($error, $errorno, $this->replaceParameters($sql, $args));
 			}
 
@@ -703,7 +712,7 @@ class Database
 			$error   = $this->error;
 			$errorno = $this->errorno;
 
-			if ($this->testmode) {
+			if ($this->throwExceptionsOnErrors) {
 				throw new DatabaseException($error, $errorno, $this->replaceParameters($sql, $params));
 			}
 

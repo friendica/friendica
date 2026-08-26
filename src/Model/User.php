@@ -294,10 +294,12 @@ class User
 			return $system_actor_name;
 		}
 
+		$userDeletedRepository = DI::databaseService()->getDeletedUserRepository();
+
 		// List of possible actor names
 		$possible_accounts = ['friendica', 'actor', 'system', 'internal'];
 		foreach ($possible_accounts as $name) {
-			if (!DBA::exists('user', ['nickname' => $name]) && !DBA::exists('userd', ['username' => $name])) {
+			if (!DBA::exists('user', ['nickname' => $name]) && !$userDeletedRepository->existsByUsername($name)) {
 				DI::logger()->notice('Selected system actor', ['systemactor' => $name]);
 				DI::config()->set('system', 'actor_name', $name);
 				return $name;
@@ -1320,10 +1322,12 @@ class User
 			throw new Exception(DI::l10n()->t('Your nickname can only contain a-z, 0-9 and _.'));
 		}
 
+		$userDeletedRepository = DI::databaseService()->getDeletedUserRepository();
+
 		// Check existing and deleted accounts for this nickname.
 		if (
 			DBA::exists('user', ['nickname' => $nickname])
-			|| DBA::exists('userd', ['username' => $nickname])
+			|| $userDeletedRepository->existsByUsername($nickname)
 		) {
 			throw new Exception(DI::l10n()->t('Nickname is already registered. Please choose another.'));
 		}
@@ -1835,9 +1839,15 @@ class User
 
 		$user = $hook_data['user'] ?? $user;
 
+		$userDeletedRepository = DI::databaseService()->getDeletedUserRepository();
+
 		// save username (actually the nickname as it is guaranteed
 		// unique), so it cannot be re-registered in the future.
-		DBA::insert('userd', ['username' => $user['nickname']]);
+		try {
+			$userDeletedRepository->insertByUsername($user['nickname']);
+		} catch (\Throwable $th) {
+			DI::logger()->error('Error while inserting username of deleted user.', ['username' => $user['nickname'], 'exception' => $th]);
+		}
 
 		// Remove all personal settings, especially connector settings
 		DBA::delete('pconfig', ['uid' => $uid]);

@@ -35,6 +35,7 @@ use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Profile\ProfileField\Repository\ProfileField;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Repository\DeletedUserRepository;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
@@ -51,6 +52,7 @@ class Profile extends BaseProfile
 		private readonly IHandleUserSessions $session,
 		private readonly AppHelper $appHelper,
 		private readonly Database $database,
+		private readonly DeletedUserRepository $deletedUserRepository,
 		private readonly EventDispatcherInterface $eventDispatcher,
 		private readonly GroupManager $groupManager,
 		L10n $l10n,
@@ -80,7 +82,7 @@ class Profile extends BaseProfile
 				}
 			}
 
-			if ($this->database->exists('userd', ['username' => $this->parameters['nickname']])) {
+			if ($this->deletedUserRepository->existsByUsername($this->parameters['nickname'])) {
 				// Known deleted user
 				$data = ActivityPub\Transmitter::getDeletedUser($this->parameters['nickname']);
 

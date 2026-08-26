@@ -63,7 +63,7 @@ trait FixtureTestTrait
 
 		/** @var Database $dba */
 		$dba = $this->dice->create(Database::class);
-		$dba->setTestmode(true);
+		$dba->throwExceptionsOnErrors(true);
 
 		DBStructure::checkInitialValues();
 

@@ -43,7 +43,7 @@ trait CreateDatabaseTrait
 		]));
 
 		$database = new StaticDatabase($config, (new DbaDefinition($this->root->url()))->load(), (new ViewDefinition($this->root->url()))->load());
-		$database->setTestmode(true);
+		$database->throwExceptionsOnErrors(true);
 
 		return $database;
 	}
