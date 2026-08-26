@@ -78,7 +78,7 @@ final readonly class ConversationDataProvider
 		$selected = ItemModel::DISPLAY_FIELDLIST;
 		$params   = ['order' => ['uid' => true]];
 
-		$parentItem = Post::selectFirstForUser($viewerUid, $selected, ['uri-id' => $parentUriId, 'uid' => [0, $viewerUid]], $params);
+		$parentItem = Post::selectFirstForConversation($viewerUid, $selected, ['uri-id' => $parentUriId, 'uid' => [0, $viewerUid]], $params);
 		if (empty($parentItem) && !$viewerUid) {
 			$parentItem = Post::selectFirst($selected, ['uri-id' => $parentUriId, 'uid' => 0], $params);
 		}
@@ -439,8 +439,9 @@ final readonly class ConversationDataProvider
 		$blocks    = [];
 		$ignores   = [];
 		$collapses = [];
+		$blockedBy = [];
 		if (!empty($authors)) {
-			$userContacts = DBA::select('user-contact', ['cid', 'blocked', 'ignored', 'collapsed'], ['uid' => $uid, 'cid' => $authors]);
+			$userContacts = DBA::select('user-contact', ['cid', 'blocked', 'ignored', 'collapsed', 'is-blocked'], ['uid' => $uid, 'cid' => $authors]);
 			while ($userContact = DBA::fetch($userContacts)) {
 				if ($userContact['blocked']) {
 					$blocks[] = $userContact['cid'];
@@ -450,6 +451,9 @@ final readonly class ConversationDataProvider
 				}
 				if ($userContact['collapsed']) {
 					$collapses[] = $userContact['cid'];
+				}
+				if ($userContact['is-blocked']) {
+					$blockedBy[] = $userContact['cid'];
 				}
 			}
 			DBA::close($userContacts);
@@ -470,6 +474,7 @@ final readonly class ConversationDataProvider
 			$items[$key]['user-ignored-owner']    = !$alwaysDisplay && in_array($row['owner-id'], $ignores);
 			$items[$key]['user-collapsed-author'] = !$alwaysDisplay && in_array($row['author-id'], $collapses);
 			$items[$key]['user-collapsed-owner']  = !$alwaysDisplay && in_array($row['owner-id'], $collapses);
+			$items[$key]['author-blocked-user']   = in_array($row['author-id'], $blockedBy);
 
 			if (in_array($mode, [ConversationRenderer::MODE_CHANNEL, ConversationRenderer::MODE_COMMUNITY, ConversationRenderer::MODE_NETWORK])
 				&& (in_array($row['author-id'], $blocks) || in_array($row['owner-id'], $blocks) || in_array($row['author-id'], $ignores) || in_array($row['owner-id'], $ignores))

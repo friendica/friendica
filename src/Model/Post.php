@@ -454,31 +454,40 @@ class Post
 	/**
 	 * Select rows from the given view for a given user
 	 *
-	 * @param string  $view      View (post-user-view or post-thread-user-view)
-	 * @param integer $uid       User ID
-	 * @param array   $selected  Array of selected fields, empty for all
-	 * @param array   $condition Array of fields for condition
-	 * @param array   $params    Array of several parameters
+	 * @param string  $view                 View (post-user-view or post-thread-user-view)
+	 * @param integer $uid                  User ID
+	 * @param array   $selected             Array of selected fields, empty for all
+	 * @param array   $condition            Array of fields for condition
+	 * @param array   $params               Array of several parameters
+	 * @param bool    $includeRemoteBlocked Keep posts whose author has blocked this user
 	 *
 	 * @return boolean|object
 	 * @throws \Exception
 	 */
-	private static function selectViewForUser(string $view, int $uid, array $selected = [], array $condition = [], array $params = [])
+	private static function selectViewForUser(string $view, int $uid, array $selected = [], array $condition = [], array $params = [], bool $includeRemoteBlocked = false)
 	{
 		if (empty($selected)) {
 			$selected = Item::DISPLAY_FIELDLIST;
 		}
 
-		$condition = DBA::mergeConditions(
-			$condition,
-			["`visible` AND NOT `deleted`
+		$sql = "`visible` AND NOT `deleted`
 			AND NOT `author-blocked` AND NOT `owner-blocked`
 			AND (NOT `causer-blocked` OR `causer-id` = ? OR `causer-id` IS NULL) AND NOT `contact-blocked`
 			AND NOT EXISTS(SELECT `uri-id` FROM `post-user`    WHERE `uid` = ? AND `uri-id` = " . DBA::quoteIdentifier($view) . ".`uri-id` AND `hidden`)
-			AND NOT EXISTS(SELECT `cid`    FROM `user-contact` WHERE `uid` = ? AND `cid` IN (`author-id`, `owner-id`) AND (`blocked` OR `ignored` OR `is-blocked`))
-			AND NOT EXISTS(SELECT `gsid`   FROM `user-gserver` WHERE `uid` = ? AND `gsid` IN (`author-gsid`, `owner-gsid`, `causer-gsid`) AND `ignored`)",
-				0, $uid, $uid, $uid],
-		);
+			AND NOT EXISTS(SELECT `cid`    FROM `user-contact` WHERE `uid` = ? AND `cid` IN (`author-id`, `owner-id`) AND (`blocked` OR `ignored`))
+			AND NOT EXISTS(SELECT `gsid`   FROM `user-gserver` WHERE `uid` = ? AND `gsid` IN (`author-gsid`, `owner-gsid`, `causer-gsid`) AND `ignored`)";
+
+		$values = [0, $uid, $uid, $uid];
+
+		// A block by the contact only excludes what that contact authored, never what they
+		// merely own, which for a received comment is usually the whole thread.
+		if (!$includeRemoteBlocked) {
+			$sql .= "
+			AND NOT EXISTS(SELECT `cid`    FROM `user-contact` WHERE `uid` = ? AND `cid` = `author-id` AND `is-blocked`)";
+			$values[] = $uid;
+		}
+
+		$condition = DBA::mergeConditions($condition, array_merge([$sql], $values));
 
 		$select_string = implode(', ', array_map(DBA::quoteIdentifier(...), $selected));
 
@@ -593,6 +602,37 @@ class Post
 		$params['limit'] = 1;
 
 		$result = self::selectForUser($uid, $selected, $condition, $params);
+
+		if (is_bool($result)) {
+			return $result;
+		} else {
+			$row = self::fetch($result);
+			DBA::close($result);
+			return $row;
+		}
+	}
+
+	/**
+	 * Retrieve a single record from the post-user-view view for a given user, keeping posts
+	 * whose author has blocked that user, and returns it in an associative array
+	 *
+	 * A conversation cannot be rendered without its root. Dropping the root would take the
+	 * whole thread with it, including the posts of third parties and of the user themselves,
+	 * so the row is kept here and the render layer withholds its content instead.
+	 *
+	 * @param integer $uid User ID
+	 * @param array   $selected
+	 * @param array   $condition
+	 * @param array   $params
+	 * @return bool|array
+	 * @throws \Exception
+	 * @see   Post::selectFirstForUser
+	 */
+	public static function selectFirstForConversation(int $uid, array $selected = [], array $condition = [], array $params = [])
+	{
+		$params['limit'] = 1;
+
+		$result = self::selectViewForUser('post-user-view', $uid, $selected, $condition, $params, true);
 
 		if (is_bool($result)) {
 			return $result;

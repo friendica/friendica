@@ -115,15 +115,14 @@ class PostTest extends FixtureTestCase
 	 * The second half of the bug.
 	 *
 	 * Rendering a conversation needs the thread root even when the root's author blocked
-	 * us, otherwise the whole thread collapses to "Conversation Not Found". Callers that
-	 * render a thread pass $includeRemoteBlocked so the row survives the query; the render
-	 * layer then replaces its content instead of dropping the node.
+	 * us, otherwise the whole thread collapses to "Conversation Not Found". The render
+	 * layer withholds its content instead of dropping the node.
 	 */
 	public function testConversationFetchKeepsTheBlockersPostSoTheThreadSurvives(): void
 	{
 		$this->contactBlocksUser(self::BLOCKER_CID);
 
-		$root = Post::selectFirstForUser(self::UID, self::FIELDS, ['uri-id' => self::ROOT_URI_ID, 'uid' => self::UID], [], true);
+		$root = Post::selectFirstForConversation(self::UID, self::FIELDS, ['uri-id' => self::ROOT_URI_ID, 'uid' => self::UID]);
 
 		self::assertNotEmpty($root, 'The thread root must be fetchable so the conversation can be rendered');
 		self::assertEquals(self::BLOCKER_CID, $root['author-id']);
@@ -136,7 +135,7 @@ class PostTest extends FixtureTestCase
 	{
 		$this->userBlocksContact(self::BLOCKER_CID);
 
-		$root = Post::selectFirstForUser(self::UID, self::FIELDS, ['uri-id' => self::ROOT_URI_ID, 'uid' => self::UID], [], true);
+		$root = Post::selectFirstForConversation(self::UID, self::FIELDS, ['uri-id' => self::ROOT_URI_ID, 'uid' => self::UID]);
 
 		self::assertEmpty($root, 'A block set by the user themselves must hide the post in every query');
 	}
