@@ -4,13 +4,7 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<span id="settings_{{$connector}}_inflated" class="settings-block fakelink" style="display: {{if $open}}none{{else}}block{{/if}};" onclick="openClose('settings_{{$connector}}_expanded'); openClose('settings_{{$connector}}_inflated');">
-	<img class="connector{{if !$enabled}}-disabled{{/if}}" src="{{$image}}" /><h3 class="connector">{{$title}}</h3>
-</span>
-<div id="settings_{{$connector}}_expanded" class="settings-block" style="display: {{if $open}}block{{else}}none{{/if}};">
-	<span class="fakelink" onclick="openClose('settings_{{$connector}}_expanded'); openClose('settings_{{$connector}}_inflated');">
-		<img class="connector{{if !$enabled}}-disabled{{/if}}" src="{{$image}}" /><h3 class="connector">{{$title}}</h3>
-	</span>
+<summary class="settings-heading"><h2><img class="connector{{if !$enabled}}-disabled{{/if}}" src="{{$image}}" /><span class="connector">{{$title}}</span></h2></summary>
 	{{$html nofilter}}
 	<div class="clear"></div>
 {{if $submit}}
@@ -37,4 +31,3 @@
     {{/if}}
 	</div>
 {{/if}}
-</div>

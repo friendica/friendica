@@ -111,6 +111,11 @@ class Media
 
 		$media['url'] = Network::sanitizeUrl($media['url']);
 
+		if (!empty($media['player-url']) && !self::isEmbeddablePlayerUrl($media['player-url'])) {
+			DI::logger()->notice('Dropped unsafe player-url', ['uri-id' => $media['uri-id'], 'player-url' => $media['player-url']]);
+			unset($media['player-url']);
+		}
+
 		$media = self::unsetEmptyFields($media);
 		$media = DI::dbaDefinition()->truncateFieldsForTable('post-media', $media);
 
@@ -128,6 +133,12 @@ class Media
 		if (array_diff_assoc($media, $stored)) {
 			$result = DBA::insert('post-media', $media, Database::INSERT_UPDATE);
 			$id     = $media['id'] ?? DBA::lastInsertId();
+			if (empty($id)) {
+				// When the entry had already existed, the insert turned into an update
+				// and no insert id is provided. So we fetch the id via the unique key.
+				$existing = DBA::selectFirst('post-media', ['id'], ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
+				$id       = $existing['id'] ?? null;
+			}
 			DI::logger()->info('Updated media', ['result' => $result, 'id' => $id, 'media' => $media]);
 		} else {
 			$id = null;
@@ -162,6 +173,42 @@ class Media
 		if (isset($media['publisher-image'])) {
 			Post\Link::getByLink($media['uri-id'], $media['publisher-image']);
 		}
+	}
+
+	/**
+	 * Checks whether a player URL is safe to render into an iframe "src".
+	 *
+	 * The player iframe (content/iframe.tpl) is sandboxed with
+	 * "allow-same-origin allow-scripts", so a same-origin src runs with this
+	 * instance's origin and could read the viewer's DOM and cookies. Only
+	 * absolute, cross-origin http(s) URLs (including protocol-relative
+	 * "//host/…" ones) are considered safe; relative paths, URLs pointing back
+	 * at the local host and non-HTTP schemes such as "javascript:"/"data:" are
+	 * rejected.
+	 *
+	 * @param string $url
+	 * @return bool
+	 */
+	private static function isEmbeddablePlayerUrl(string $url): bool
+	{
+		$url = trim($url);
+		if ($url === '') {
+			return false;
+		}
+
+		// Resolve protocol-relative URLs (//host/path) against https for the check
+		if (str_starts_with($url, '//')) {
+			$url = 'https:' . $url;
+		}
+
+		$scheme = strtolower(parse_url($url, PHP_URL_SCHEME));
+		$host   = parse_url($url, PHP_URL_HOST);
+
+		if (empty($host) || !in_array($scheme, ['http', 'https'], true)) {
+			return false;
+		}
+
+		return !DI::baseUrl()->isLocalUrl($url);
 	}
 
 	/**

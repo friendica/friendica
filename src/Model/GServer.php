@@ -1697,6 +1697,8 @@ class GServer
 			return 'blacksky';
 		} elseif ($host === 'northsky.social') {
 			return 'northsky';
+		} elseif ($host === 'pds.wsocial.network') {
+			return 'wsocial';
 		}
 		return 'atprotocol';
 	}

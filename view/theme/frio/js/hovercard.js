@@ -12,17 +12,19 @@
  * It is licensed under the GNU Affero General Public License <http://www.gnu.org/licenses/>
  *
  */
-$(document).ready(function () {
+window.onDocumentReady('body', function () {
 	let $body = $("body");
+	$body.off(".friendicaHovercard");
+
 	// Prevents normal click action on click hovercard elements
-	$body.on("click", ".userinfo.click-card", function (e) {
+	$body.on("click.friendicaHovercard", ".userinfo.click-card", function (e) {
 		e.preventDefault();
 	});
 	// This event listener needs to be declared before the one that removes
 	// all cards so that we can stop the immediate propagation of the event
 	// Since the manual popover appears instantly and the hovercard removal is
 	// on a 100ms delay, leaving event propagation immediately hides any click hovercard
-	$body.on("mousedown", ".userinfo.click-card", function (e) {
+	$body.on("mousedown.friendicaHovercard", ".userinfo.click-card", function (e) {
 		e.stopImmediatePropagation();
 		let timeNow = new Date().getTime();
 
@@ -45,14 +47,14 @@ $(document).ready(function () {
 	});
 
 	// hover cards should be removed very easily, e.g. when any of these events happens
-	$body.on("mouseleave touchstart scroll mousedown submit keydown", function (e) {
+	$body.on("mouseleave.friendicaHovercard touchstart.friendicaHovercard scroll.friendicaHovercard mousedown.friendicaHovercard submit.friendicaHovercard keydown.friendicaHovercard", function (e) {
 		// remove hover card only for desktop user, since on mobile we open the hovercards
 		// by click event insteadof hover
 		removeAllHovercards(e, new Date().getTime());
 	});
 
 	$body
-		.on("mouseover", ".userinfo.hover-card, .wall-item-responses a, .wall-item-bottom .mention a", function (e) {
+		.on("mouseover.friendicaHovercard", ".userinfo.hover-card, .wall-item-responses a, .wall-item-bottom .mention a", function (e) {
 			let timeNow = new Date().getTime();
 			removeAllHovercards(e, timeNow);
 			let contactUrl = false;
@@ -88,21 +90,21 @@ $(document).ready(function () {
 				}
 			}, 500);
 		})
-		.on("mouseleave", ".userinfo.hover-card, .wall-item-responses a, .wall-item-bottom .mention a", function (e) {
+		.on("mouseleave.friendicaHovercard", ".userinfo.hover-card, .wall-item-responses a, .wall-item-bottom .mention a", function (e) {
 			// action when mouse leaves the hover-card
 			removeAllHovercards(e, new Date().getTime());
 		});
 
 	// if we're hovering a hover card, give it a class, so we don't remove it
-	$body.on("mouseover", ".hovercard", function (e) {
+	$body.on("mouseover.friendicaHovercard", ".hovercard", function (e) {
 		$(this).addClass("dont-remove-card");
 	});
 
-	$body.on("mouseleave", ".hovercard", function (e) {
+	$body.on("mouseleave.friendicaHovercard", ".hovercard", function (e) {
 		$(this).removeClass("dont-remove-card");
 		$(this).popover("hide");
 	});
-}); // End of $(document).ready
+});
 
 // removes all hover cards
 function removeAllHovercards(event, priorTo) {

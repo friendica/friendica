@@ -62,7 +62,19 @@ header #banner #logo-img:hover {
 .account .dropdown-menu li {
 	border-color: $background_color;
 }
-
+#nav-delegation-link {
+	background-color: rgba(255, 255, 255, $contentbg_transp);
+	box-shadow: 0 0 3px $link_color;
+  	-webkit-box-shadow: 0 0 3px $link_color;
+  	-moz-box-shadow: 0 0 3px $link_color;
+  	color: $link_color;
+}
+#nav-delegation-link:hover,
+#nav-delegation-link:focus,
+#nav-delegation-link:active {
+	background-color: rgba(0, 0, 0, $contentbg_transp);
+	color: white;
+}
 .dropdown-menu > li > a:focus,
 .dropdown-menu > li > a:hover {
 	background-image: none;

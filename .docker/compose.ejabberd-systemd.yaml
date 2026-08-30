@@ -1,0 +1,82 @@
+# SPDX-FileCopyrightText: 2010 - 2024 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# ejabberd CROSS-HOST module (systemd socket activation) — load on top of compose.yaml:
+#   docker compose -f .docker/compose.yaml -f .docker/compose.ejabberd-systemd.yaml up -d
+#
+# This is the cross-host production model from doc/en/admin/install-ejabberd.md, simulated
+# locally with two containers on different "hosts":
+#
+#   ejabberd  --(socat STDIO TCP:9000)-->  friendica-extauth
+#                                            (systemd-socket-activate -> php auth daemon)
+#
+# The auth daemon's lifecycle is owned by systemd socket activation on the Friendica side
+# (production: a friendica-extauth.socket + friendica-extauth@.service unit pair). socat on
+# the ejabberd side is only the thin stdin/stdout <-> TCP connector that ejabberd's extauth
+# protocol fundamentally needs across a host boundary.
+#
+# For the bridge-free SAME-HOST model use compose.ejabberd.yaml instead.
+
+services:
+  # Friendica host: systemd-socket-activate listens on :9000 and launches one auth daemon per
+  # connection (inetd style), wiring the socket to the daemon's stdin/stdout.
+  friendica-extauth:
+    build:
+      context: .
+      dockerfile: ./php/Dockerfile
+    working_dir: /var/www/html
+    # Run as root so systemd can be installed and the per-connection PHP daemon can read the
+    # mounted code / write Friendica's log (local-dev convenience).
+    user: root
+    volumes:
+      - ../:/var/www/html
+      - ./php/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
+    env_file:
+      - path: ./.dist.env
+        required: true
+      - path: ./.env.local
+        required: false
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST:-db}
+      - MYSQL_USER=${MYSQL_USER:-friendica}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-friendica}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-friendica}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - friendica-network
+    expose:
+      - "9000"
+    # systemd-socket-activate ships in the systemd package (standalone tool — no PID 1 needed).
+    command:
+      - bash
+      - -c
+      - |
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update && apt-get install -y --no-install-recommends systemd
+        exec systemd-socket-activate --inetd --accept -l 9000 \
+          -E MYSQL_HOST="$$MYSQL_HOST" -E MYSQL_USER="$$MYSQL_USER" \
+          -E MYSQL_PASSWORD="$$MYSQL_PASSWORD" -E MYSQL_DATABASE="$$MYSQL_DATABASE" \
+          -E FRIENDICA_URL="$$FRIENDICA_URL" \
+          /usr/local/bin/php /var/www/html/bin/console.php auth_ejabberd
+
+  # ejabberd host: relays its extauth stdin/stdout to friendica-extauth:9000 via socat.
+  ejabberd:
+    build:
+      context: ./ejabberd
+      dockerfile: Dockerfile.cross
+    volumes:
+      - ./ejabberd/ejabberd.systemd.yml:/opt/ejabberd/conf/ejabberd.yml:ro
+      - ejabberd_data:/opt/ejabberd/database
+    ports:
+      - "5222:5222"   # XMPP c2s (clients)
+      - "5281:5281"   # HTTP API  (curl check_password)
+    depends_on:
+      - friendica-extauth
+    networks:
+      - friendica-network
+
+volumes:
+  ejabberd_data:

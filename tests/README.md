@@ -1,153 +1,6 @@
 # Using the Friendica tests
 
-## Install Tools
-
-You need to install the following software:
-
-* PHP
-* MySQL or Mariadb (the latter is preferred)
-
-For example in Ubuntu you can run:
-
-```
-sudo apt install mariadb-server php
-```
-
-## Install PHP extensions
-
-The following extensions must be installed:
-
-* MySQL
-* Curl
-* GD
-* XML
-* DOM
-* SimpleXML
-* Intl
-* Multi-precision
-* Multi-byte string
-
-For example in Ubuntu:
-
-```
-sudo apt install php-mysql php-curl php-gd php-xml php-intl php-gmp php-mbstring
-```
-
-## Create Local Database
-
-The test harness reads its connection from the environment variables
-`MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DATABASE`
-(optional `MYSQL_PORT`). There is no built-in default — they must be set,
-otherwise the harness aborts with "Host, User or Database missing".
-Whatever settings you choose, you must give the corresponding user the
-necessary privileges to create and destroy the chosen database.
-
-```
-GRANT ALL PRIVILEGES ON test.* TO 'friendica'@'localhost' IDENTIFIED BY 'friendica' WITH GRANT OPTION;
-GRANT CREATE, DROP ON test.* TO 'friendica'@'localhost';
-```
-
-## Use Docker Database
-
-Instead of using a local database, you can also use a database running in a docker container.
-
-The local development stack starts a MariaDB service that is reachable from the host on
-`127.0.0.1:3306` by default:
-
-```
-docker compose -f .docker/compose.yaml up -d db
-```
-
-The default credentials are defined in `.docker/.dist.env`:
-
-```
-MYSQL_HOST=127.0.0.1
-MYSQL_PORT=3306
-MYSQL_DATABASE=friendica
-MYSQL_USER=friendica
-MYSQL_PASSWORD=friendica
-```
-
-The database test harness reads the `MYSQL_*` variables. To run PHPUnit against the
-Docker database from the host, export them first:
-
-```
-export MYSQL_HOST=127.0.0.1
-export MYSQL_PORT=3306
-export MYSQL_DATABASE=friendica
-export MYSQL_USER=friendica
-export MYSQL_PASSWORD=friendica
-
-composer run test:legacy
-```
-
-## Running Tests
-
-Fast unit tests do not require a database:
-
-```
-composer run test:unit
-```
-
-Functional tests are meant for complete use cases with test doubles or fakes.
-Add new DB-free use-case tests to `tests/Functional/`.
-
-```
-composer run test: functional
-```
-
-Integration tests use real infrastructure or adapter wiring. They usually require
-the `MYSQL_*` variables described above:
-
-```
-composer run test:integration
-```
-
-The legacy suite contains the older tests under `tests/src/`, many of which still
-use global DI state, broad fixtures, or a real database:
-
-```
-composer run test:legacy
-```
-
-All configured suites can be run through Composer:
-
-```
-composer run test
-```
-
-You can then run the tests using the `autotest.sh` script.  You should
-specify the type of database as an argument, either `mysql` or
-`mariadb`:
-
-```
-bin/dev/autotest.sh mariadb
-```
-
-You can also run just one particular file of tests:
-
-```
-bin/dev/autotest.sh mariadb src/Util/ImagesTest.php
-```
-
-Example output of tests passing:
-
-```
-OK (2 tests, 2 assertions)
-```
-
-Failed tests look like this.  Examine the output before this to see which tests failed.
-
-```
-FAILURES!
-Tests: 2, Assertions: 2, Failures: 1.
-```
-
-## File structure
-
-Tests are divided into test suites and supporting files.
-
-### Test Suites
+## Test suites
 
 | Name                  | Location             | Description                                                                                                                                                                                                                    |
 |-----------------------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -156,16 +9,159 @@ Tests are divided into test suites and supporting files.
 | **Integration Tests** | `tests/Integration/` | Tests of the interaction between multiple components, including real infrastructure (database, filesystem, external libraries). Especially useful for verifying adapters to external systems.                                  |
 | **Legacy Tests**      | `tests/src/`         | Existing tests that predate the current suite structure. New tests should only be added here when they intentionally cover legacy behavior that cannot yet be isolated.                                                        |
 
-### Placement Rules
+Each suite has its own Composer script:
+
+```bash
+composer run test:unit
+composer run test:functional
+composer run test:integration
+composer run test:legacy
+composer run test              # all suites at once
+```
+
+Only `composer run test:unit` runs without any setup. Everything else needs a database — see below.
+That includes the functional suite: its only test (`DependencyCheckTest`) extends `FixtureTestCase` and therefore boots a real database connection.
+
+> **Note:** `tests/Integration/` does not contain any test yet, so `composer run test:integration` currently aborts with `No tests executed!` (exit code 1) until the first test is added there.
+
+## Running the DB-dependent tests with the Docker stack
+
+This is the recommended setup for local development.
+It needs no MariaDB, no PHP extensions and no MySQL client on your host.
+
+### 1. Start the stack
+
+```bash
+docker compose -f .docker/compose.yaml up -d
+```
+
+See [`.docker/README.md`](../.docker/README.md) for the full development environment.
+
+### 2. Create the test database
+
+The tests use their own database (`test`), so a test run never touches the data of your local dev instance (`friendica`).
+A freshly created stack creates it automatically.
+If your `mariadb_data` volume predates that, create it once by hand:
+
+```bash
+docker compose -f ../.docker/compose.yaml exec db \
+  mariadb -uroot -proot -e "CREATE DATABASE IF NOT EXISTS \`test\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; GRANT ALL PRIVILEGES ON \`test\`.* TO 'friendica'@'%';"
+```
+
+### 3. Import the database schema
+
+The tests expect the tables to exist — they do not create them. Import `database.sql`, the same way CI does:
+
+```bash
+docker compose -f ../.docker/compose.yaml exec -T db \
+  mariadb -ufriendica -pfriendica test < ../database.sql
+```
+
+Without this step every DB test fails with `Base table or view not found: 1146 Table 'test.config' doesn't exist`.
+
+`database.sql` only contains `CREATE TABLE IF NOT EXISTS` statements, so a second import does not pick up structure changes.
+After a schema change, drop the database and redo steps 2 and 3, or apply the update in place:
+
+```bash
+docker compose -f ../.docker/compose.yaml exec -e MYSQL_DATABASE=test php \
+  bin/console dbstructure update
+```
+
+### 4. Run the tests inside the PHP container
+
+```bash
+docker compose -f ../.docker/compose.yaml exec php \
+  ./vendor/bin/phpunit -c tests/phpunit.xml --testsuite legacy
+```
+
+The container already provides `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD` and `MYSQL_TEST_DATABASE`.
+The PHPUnit bootstrap maps `MYSQL_TEST_DATABASE` to `MYSQL_DATABASE`, so tests use the separate test database without overriding the development database setting.
+
+A single test file works the same way:
+
+```bash
+docker compose -f ../.docker/compose.yaml exec php \
+  ./vendor/bin/phpunit -c tests/phpunit.xml tests/src/Content/Text/BBCodeTest.php
+```
+
+> **On macOS, run the DB tests inside the container, not on the host.**
+> `tests/src/` exercises code that validates hostnames with `dns_get_record()`, and the test configuration (`mods/local.config.ci.php`) uses `https://friendica.local` as base URL.
+> macOS routes every `.local` lookup to mDNS/Bonjour, where it blocks for ~30 seconds instead of failing right away — the suite then takes hours instead of minutes.
+> Inside the Linux container it finishes in about 3 minutes.
+
+### Running against the Docker database from the host
+
+Possible, but see the warning above. The database is published on `127.0.0.1:3306`, and the
+host has to pass all connection variables itself:
+
+```bash
+export MYSQL_HOST=127.0.0.1
+export MYSQL_PORT=3306
+export MYSQL_DATABASE=test
+export MYSQL_USER=friendica
+export MYSQL_PASSWORD=friendica
+
+composer run test:legacy
+```
+
+## Running the DB-dependent tests with a local database
+
+If you prefer a database on your host, install it together with the PHP extensions the application needs:
+
+```bash
+sudo apt install mariadb-server php
+sudo apt install php-mysql php-curl php-gd php-xml php-intl php-gmp php-mbstring
+```
+
+Then create the database and a user that may create and drop it:
+
+```sql
+CREATE DATABASE test DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+GRANT ALL PRIVILEGES ON test.* TO 'friendica'@'localhost' IDENTIFIED BY 'friendica' WITH GRANT OPTION;
+```
+
+Import the schema (`mysql -ufriendica -pfriendica test < database.sql`), export the variables from the next section and run the Composer scripts.
+
+## Database environment variables
+
+The test harness (`tests/Util/Database/StaticDatabase.php`) builds its connection purely from the environment — there are no defaults, and `config/local.config.php` is not used:
+
+| Variable                         | Required | Description                           |
+|----------------------------------|----------|---------------------------------------|
+| `MYSQL_HOST`                     | yes      | Hostname or IP of the database server |
+| `MYSQL_PORT`                     | no       | Port, appended to the host if set     |
+| `MYSQL_USERNAME` or `MYSQL_USER` | yes      | Database user                         |
+| `MYSQL_PASSWORD`                 | yes      | Database password                     |
+| `MYSQL_DATABASE`                 | yes, unless `MYSQL_TEST_DATABASE` is set for PHPUnit | Database name |
+| `MYSQL_TEST_DATABASE`            | no       | Test database name. When set, PHPUnit uses it instead of `MYSQL_DATABASE`. |
+
+If host, user or database is missing, the run aborts with `Either one of the following settings are missing: Host, User or Database`.
+
+## Reading the output
+
+Example output of tests passing:
+
+```
+OK (2 tests, 2 assertions)
+```
+
+Failed tests look like this. Examine the output before this to see which tests failed.
+
+```
+FAILURES!
+Tests: 2, Assertions: 2, Failures: 1.
+```
+
+## Where to put new tests
 
 New tests should use the narrowest suite that can verify the behavior:
 
-* Use `tests/Unit/` when collaborators can be replaced with mocks, stubs, builders, or fakes.
+* Use `tests/Unit/` when collaborators can be replaced with mocks, stubs, builders or fakes.
 * Use `tests/Functional/` for complete business flows that should not require real infrastructure.
-* Use `tests/Integration/` only when the database, filesystem, external library behavior, or container wiring is part of what is being verified.
+* Use `tests/Integration/` only when the database, filesystem, external library behavior or container wiring is part of what is being verified.
 * Avoid adding new tests to `tests/src/` unless the code under test still depends on legacy global state.
 
-### Supporting Test Files
+### Supporting test files
 
 | Name         | Location          | Description                                                                                                                                                 | Example Names                                                                                     |
 |--------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|

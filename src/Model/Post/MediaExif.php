@@ -46,8 +46,8 @@ class MediaExif
 			'DateTime'          => self::getDateTime($exif),
 			'DateTimeOriginal'  => self::getDateTimeOriginal($exif),
 			'DateTimeDigitized' => self::getDateTimeDigitized($exif),
-			'BodySerialNumber'  => $exif['BodySerialNumber']      ?? null,
-			'Orientation'       => $exif['Orientation']           ?? null,
+			'BodySerialNumber'  => $exif['BodySerialNumber'] ?? null,
+			'Orientation'       => self::getOrientation($exif),
 			'Artist'            => $exif['Artist']                ?? null,
 			'Copyright'         => $data['COMPUTED']['Copyright'] ?? null,
 			'ExpandFilm'        => $exif['ExpandFilm']            ?? null,
@@ -113,6 +113,26 @@ class MediaExif
 		}
 
 		return $LensSpecification;
+	}
+
+	/**
+	 * Get the orientation from exif data
+	 *
+	 * Exif defines the orientation as a value between 1 and 8. Some images carry
+	 * values outside of that range, these are discarded.
+	 *
+	 * @param array $exif
+	 * @return int|null
+	 */
+	private static function getOrientation(array $exif): ?int
+	{
+		if (!isset($exif['Orientation']) || !is_numeric($exif['Orientation'])) {
+			return null;
+		}
+
+		$orientation = (int) $exif['Orientation'];
+
+		return ($orientation >= 1 && $orientation <= 8) ? $orientation : null;
 	}
 
 	/**

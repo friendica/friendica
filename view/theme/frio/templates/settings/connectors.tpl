@@ -14,79 +14,69 @@
 
 		<form action="settings/connectors" method="post" autocomplete="off" class="panel">
 			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="content-settings-title"><h2>{{$general_settings}}</h2></summary>
+				<div id="content-settings-content">
+					<div class="panel-body">
+						{{include file="field_select.tpl" field=$accept_only_sharer}}
 
-			<div class="section-subtitle-wrapper panel-heading" role="tab" id="content-settings-title">
-				<h2>
-					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings-connectors" href="#content-settings-content" aria-expanded="false" aria-controls="content-settings-content">
-						{{$general_settings}}
-					</button>
-				</h2>
-			</div>
-			<div id="content-settings-content" class="panel-collapse collapse" role="tabpanel" aria-labelledby="content-settings-title">
-				<div class="panel-body">
-					{{include file="field_select.tpl" field=$accept_only_sharer}}
+						{{include file="field_checkbox.tpl" field=$enable_cw}}
 
-					{{include file="field_checkbox.tpl" field=$enable_cw}}
+						{{include file="field_checkbox.tpl" field=$enable_smart_shortening}}
 
-					{{include file="field_checkbox.tpl" field=$enable_smart_shortening}}
+						{{include file="field_checkbox.tpl" field=$simple_shortening}}
 
-					{{include file="field_checkbox.tpl" field=$simple_shortening}}
+						{{include file="field_checkbox.tpl" field=$attach_link_title}}
 
-					{{include file="field_checkbox.tpl" field=$attach_link_title}}
+						{{include file="field_checkbox.tpl" field=$api_spoiler_title}}
 
-					{{include file="field_checkbox.tpl" field=$api_spoiler_title}}
+						{{include file="field_checkbox.tpl" field=$api_auto_attach}}
 
-					{{include file="field_checkbox.tpl" field=$api_auto_attach}}
+						{{include file="field_select.tpl" field=$article_mode}}
 
-					{{include file="field_select.tpl" field=$article_mode}}
-
-					{{include file="field_input.tpl" field=$minimum_posting_interval}}
+						{{include file="field_input.tpl" field=$minimum_posting_interval}}
+					</div>
+					<div class="panel-footer">
+						<button type="submit" id="general-submit" name="general-submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
+					</div>
 				</div>
-				<div class="panel-footer">
-					<button type="submit" id="general-submit" name="general-submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
-				</div>
-			</div>
+			</details>
 		</form>
 
 		<form action="settings/connectors" method="post" autocomplete="off" class="panel">
 			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="mail-settings-title"><h2><i class="ri ri-mail-line"></i> {{$h_mail}}</h2></summary>
+				<div id="mail-settings-content">
+					<div class="panel-body">
+				{{if $mail_disabled}}
+						<p>{{$mail_disabled}}</p>
+				{{else}}
+						<p>{{$mail_desc nofilter}}</p>
 
-			<div class="section-subtitle-wrapper panel-heading" role="tab" id="mail-settings-title">
-				<h2>
-					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings-connectors" href="#mail-settings-content" aria-expanded="false" aria-controls="mail-settings-content">
-						<img class="connector" src="images/mail.png" /> {{$h_mail}}
-					</button>
-				</h2>
-			</div>
-			<div id="mail-settings-content" class="panel-collapse collapse" role="tabpanel" aria-labelledby="mail-settings-title">
-				<div class="panel-body">
-			{{if $mail_disabled}}
-					<p>{{$mail_disabled}}</p>
-			{{else}}
-					<p>{{$mail_desc nofilter}}</p>
-
-					{{include file="field_custom.tpl" field=$mail_lastcheck}}
-					{{include file="field_input.tpl" field=$mail_server}}
-					{{include file="field_input.tpl" field=$mail_port}}
-					{{include file="field_select.tpl" field=$mail_ssl}}
-					{{include file="field_input.tpl" field=$mail_user}}
-					{{include file="field_password.tpl" field=$mail_pass}}
-					{{include file="field_input.tpl" field=$mail_replyto}}
-					{{include file="field_checkbox.tpl" field=$mail_pubmail}}
-					{{include file="field_select.tpl" field=$mail_action}}
-					{{include file="field_input.tpl" field=$mail_movetofolder}}
+						{{include file="field_custom.tpl" field=$mail_lastcheck}}
+						{{include file="field_input.tpl" field=$mail_server}}
+						{{include file="field_input.tpl" field=$mail_port}}
+						{{include file="field_select.tpl" field=$mail_ssl}}
+						{{include file="field_input.tpl" field=$mail_user}}
+						{{include file="field_password.tpl" field=$mail_pass}}
+						{{include file="field_input.tpl" field=$mail_replyto}}
+						{{include file="field_checkbox.tpl" field=$mail_pubmail}}
+						{{include file="field_select.tpl" field=$mail_action}}
+						{{include file="field_input.tpl" field=$mail_movetofolder}}
+					</div>
+					<div class="panel-footer">
+						<button type="submit" id="mail-submit" name="mail-submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
+					</div>
+				{{/if}}
 				</div>
-				<div class="panel-footer">
-					<button type="submit" id="mail-submit" name="mail-submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
-			{{/if}}
-				</div>
-			</div>
+			</details>
 		</form>
 
 {{foreach $connector_settings_forms as $addon => $connector_settings_form}}
 		<form action="settings/connectors/{{$addon}}" method="post" autocomplete="off" class="panel">
 			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-			{{$connector_settings_form nofilter}}
+				{{$connector_settings_form nofilter}}
 		</form>
 {{/foreach}}
 	</div>

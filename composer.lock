@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ae98cb26982cdb34599a8cec57de4b9",
+    "content-hash": "fe242e5d9a8f125df2a9f3f0833959b4",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -1805,6 +1805,18 @@
             "time": "2018-02-13T20:26:39+00:00"
         },
         {
+            "name": "npm-asset/acorn",
+            "version": "8.18.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/acorn/-/acorn-8.18.0.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
             "name": "npm-asset/chart.js",
             "version": "2.9.4",
             "dist": {
@@ -2098,6 +2110,18 @@
                 "npm-asset/jquery": ">=1.7"
             },
             "type": "npm-asset"
+        },
+        {
+            "name": "npm-asset/unpoly",
+            "version": "3.14.3",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/unpoly/-/unpoly-3.14.3.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
         },
         {
             "name": "oomphinc/composer-installers-extender",

@@ -32,6 +32,7 @@ class CreateTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
+		// @phpstan-ignore method.deprecated
 		(new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
@@ -43,6 +44,7 @@ class CreateTest extends ApiTestCase
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateAction(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'id' => 3,
@@ -60,6 +62,7 @@ class CreateTest extends ApiTestCase
 	 */
 	public function testApiFavoritesCreateDestroyWithCreateActionAndRss(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new Create(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => ICanCreateResponses::TYPE_RSS]))
 			->run($this->httpExceptionMock, [
 				'id' => 3,
@@ -68,22 +71,5 @@ class CreateTest extends ApiTestCase
 		self::assertEquals(ICanCreateResponses::TYPE_RSS, $response->getHeaderLine(ICanCreateResponses::X_HEADER));
 
 		self::assertXml((string) $response->getBody(), 'statuses');
-	}
-
-	/**
-	 * Test the api_favorites_create_destroy() function without an authenticated user.
-	 *
-	 */
-	public function testApiFavoritesCreateDestroyWithoutAuthenticatedUser(): void
-	{
-		self::markTestIncomplete('Needs refactoring of Lists - replace filter_input() with $request parameter checks');
-
-		/*
-		$this->expectException(\Friendica\Network\HTTPException\UnauthorizedException::class);
-		DI::args()->setArgv(['api', '1.1', 'favorites', 'create.json']);
-		BasicAuth::setCurrentUserID();
-		$_SESSION['authenticated'] = false;
-		api_favorites_create_destroy('json');
-		*/
 	}
 }

@@ -43,6 +43,7 @@
 						data-target="#search-mobile" aria-expanded="false" aria-controls="search-mobile">
 						<span class="sr-only">Toggle Search</span>
 						<i class="ri ri-search-line ri-fw ri-lg" aria-hidden="true"></i>
+						<span class="nav-label">{{$nav.search.1}}</span>
 					</button>
 				</header>
 				<!-- div for navbar width-->
@@ -63,7 +64,7 @@
 							<li class="nav-segment">
 								<a accesskey="b" class="nav-menu" href="{{$nav.back.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 										aria-label="{{$nav.back.3}}" title="{{$nav.back.3}}"><i class="ri ri-xl ri-arrow-go-back-line ri-fw"
-										aria-hidden="true"></i> <span class="d-none">{{$nav.back.1}}</span></a>
+										aria-hidden="true"></i> <span class="nav-label">{{$nav.back.1}}</span></a>
 							</li>
 						{{/if}}
 
@@ -71,7 +72,7 @@
 							<li class="nav-segment">
 								<a accesskey="n" class="nav-menu {{$sel.network}}" href="{{$nav.network.0}}"
 									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.network.3}}" title="{{$nav.network.3}}"><i
-									 class="ri ri-xl ri-home-5-{{if $sel.network}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="d-none">{{$nav.network.1}}</span><span id="net-update"
+									 class="ri ri-xl ri-home-5-{{if $sel.network}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.network.1}}</span><span id="net-update"
 										class="nav-network-badge badge nav-notification"></span></a>
 							</li>
 						{{/if}}
@@ -80,7 +81,7 @@
 							<li class="nav-segment">
 								<a accesskey="c" class="nav-menu {{$sel.community}}" href="{{$nav.community.0}}"
 									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.community.3}}" title="{{$nav.community.3}}"><i
-									  class="ri ri-xl ri-earth-{{if $sel.community}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="d-none">{{$nav.community.1}}</span></a>
+									  class="ri ri-xl ri-earth-{{if $sel.community}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.community.1}}</span></a>
 							</li>
 						{{/if}}
 
@@ -88,7 +89,7 @@
 							<li class="nav-segment">
 								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.calendar.1}}" title="{{$nav.calendar.3}}" class="nav-menu {{$sel.calendar}}"><i
-									class="ri ri-xl ri-calendar-2-{{if $sel.calendar}}fill{{else}}line{{/if}} ri-fw"></i> <span class="d-none">{{$nav.calendar.1}}</span></a>
+									class="ri ri-xl ri-calendar-2-{{if $sel.calendar}}fill{{else}}line{{/if}} ri-fw"></i> <span class="nav-label">{{$nav.calendar.1}}</span></a>
 							</li>
 						{{/if}}
 
@@ -97,7 +98,7 @@
 							<li class="nav-segment">
 								<a accesskey="l" class="nav-menu {{$sel.channel}}" href="{{$nav.channel.0}}"
 									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.channel.3}}" title="{{$nav.channel.3}}"><i
-										class="ri ri-xl ri-newspaper-{{if $sel.channel}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="d-none">{{$nav.channel.1}}</span></a>
+										class="ri ri-xl ri-newspaper-{{if $sel.channel}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.channel.1}}</span></a>
 							</li>
 						{{/if}}
 
@@ -113,7 +114,7 @@
 								<a accesskey="k" id="nav-contacts-link" href="{{$nav.contacts.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.contacts.1}}" title="{{$nav.contacts.1}}"
 									class="nav-menu {{$sel.contacts}} {{$nav.contacts.2}}"><i
-										class="ri ri-contacts-{{if $sel.contacts}}fill{{else}}line{{/if}} ri-lg ri-fw"></i> <span class="d-none">{{$nav.contacts.1}}</span></a>
+										class="ri ri-contacts-{{if $sel.contacts}}fill{{else}}line{{/if}} ri-lg ri-fw"></i> <span class="nav-label">{{$nav.contacts.1}}</span></a>
 							</li>
 						{{/if}}
 
@@ -122,7 +123,7 @@
 								<a accesskey="m" id="nav-messages-link" href="{{$nav.messages.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 									aria-label="{{$nav.messages.1}}" title="{{$nav.messages.1}}"
 									class="nav-menu {{$sel.messages}}"><i class="ri ri-mail-{{if $sel.messages}}fill{{else}}line{{/if}} ri-lg ri-fw"
-										aria-hidden="true"></i> <span class="d-none">{{$nav.messages.1}}</span><span id="mail-update"
+										aria-hidden="true"></i> <span class="nav-label">{{$nav.messages.1}}</span><span id="mail-update"
 										class="nav-mail-badge badge nav-notification"></span></a>
 							</li>
 						{{/if}}
@@ -134,7 +135,7 @@
 									type="button" aria-haspopup="true" aria-expanded="false"
 									aria-controls="nav-notifications-menu">
 									<span id="notification-update" class="nav-notification-badge badge nav-notification"></span>
-									<i class="ri ri-notification-line ri-lg" aria-label="{{$nav.notifications.1}}"></i>  <span class="d-none">{{$nav.notifications.1}}</span>
+									<i class="ri ri-notification-line ri-lg" aria-label="{{$nav.notifications.1}}"></i>  <span class="nav-label">{{$nav.notifications.1}}</span>
 								</button>
 								{{* The notifications dropdown menu. There are two parts of menu. The second is at the bottom of this file. It is loaded via js. Look at nav-notifications-template *}}
 								<ul id="nav-notifications-menu" class="dropdown-menu menu-popup" role="menu"
@@ -163,26 +164,24 @@
 							</li>
 						{{/if}}
 
-					{{* Mobile user menu dropdown button *}}
-					<button type="button" class="navbar-toggle offcanvas-right-toggle"
-						aria-controls="offcanvasUsermenu" aria-haspopup="true">
-						<span class="sr-only">Toggle navigation</span>
-						<i class="ri ri-more-2-line ri-fw ri-lg" aria-hidden="true"></i>
-					</button>
-
 						{{* The user dropdown menu *}}
 						{{if $userinfo}}
-							<li id="nav-user-linkmenu" class="dropdown account nav-menu hidden-xs">
+							<li id="nav-user-linkmenu" class="dropdown account nav-menu">
 								<button accesskey="u" id="main-menu" class="btn-link dropdown-toggle nav-avatar"
 									data-toggle="dropdown" type="button" aria-haspopup="true" aria-expanded="false"
 									aria-controls="nav-user-menu">
-									<div aria-hidden="true" class="user-title pull-left hidden-xs hidden-sm hidden-md">
-										{{$userinfo.name}}<br>
+									<div aria-hidden="true" class="user-title pull-left hidden-xs hidden-sm hidden-md nav-label">
+										<strong>{{$userinfo.name}}</strong><br>
 										{{if $nav.remote}}<span class="truncate">{{$nav.remote}}</span>{{/if}}
 									</div>
-
+									<div class="user-avatar hidden-xs">
 									<img id="avatar" src="{{$userinfo.icon}}" alt="{{$userinfo.name}}">
 									<span class="caret"></span>
+									</div>
+									<div aria-hidden="true" class="mobile-toggle visible-xs">
+										<span class="sr-only">Toggle navigation</span>
+										<i class="ri ri-more-2-line ri-fw ri-lg" aria-hidden="true"></i>
+									</div>
 								</button>
 
 								{{* The list of available usermenu links *}}
@@ -190,17 +189,28 @@
 									aria-labelledby="main-menu">
 									{{if $nav.remote}}
 										{{if $nav.sitename}}
-											<li id="nav-sitename" role="menuitem">{{$nav.sitename}}</li>
-											<li class="divider"><hr></li>
+											<li role="menuitem" class="nav-sitename list-group-item">{{$nav.sitename}}</li>
 										{{/if}}
 									{{/if}}
-
-									<li class="profile-link">
-										<a href="{{$userinfo.link}}">
-											<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}">&nbsp;
-											{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}){{/if}}
+									<li>
+										<a role="menuitem" id="nav-profile-link" href="{{$userinfo.link.0}}" title="{{$userinfo.link.3}}">
+										<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"
+											style="max-width:15px; max-height:15px; min-width:15px; min-height:15px; width:15px; height:15px;"/>&nbsp;
+										{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}) {{/if}}
 										</a>
 									</li>
+									{{if $nav.delegation}}
+										<li>
+											<a role="menuitem" id="nav-delegation-link"
+												class="nav-commlink {{$nav.delegation.2}} {{$sel.delegation}}"
+												href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}">
+												{{if $nav.delegation.2}}
+												<i class="ri ri-user-add-line ri-fw" aria-hidden="true"></i>
+												{{else}}
+												<i class="ri ri-arrow-left-right-line ri-fw" aria-hidden="true"></i>{{/if}} {{$nav.delegation.1}}
+											</a>
+										</li>
+									{{/if}}
 									{{foreach $nav.usermenu as $usermenu}}
 										<li>
 											<a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}"
@@ -211,6 +221,17 @@
 										</li>
 									{{/foreach}}
 									<li class="divider visible-xs"><hr></li>
+									{{if $nav.messages}}
+										<li class="visible-xs">
+											<a role="menuitem"
+												class="nav-commlink {{$nav.messages.2}} {{$sel.messages}}"
+												href="{{$nav.messages.0}}" title="{{$nav.messages.3}}">
+												<i class="ri ri-mail-line ri-fw" aria-hidden="true"></i>
+												{{$nav.messages.1}} <span id="mail-update-li"
+													class="nav-mail-badge badge nav-notification"></span>
+											</a>
+										</li>
+									{{/if}}
 									{{if $nav.contacts}}
 										<li class="visible-xs">
 											<a role="menuitem" id="nav-menu-contacts-link"
@@ -218,15 +239,6 @@
 												title="{{$nav.contacts.3}}">
 												<i class="ri ri-contacts-line ri-fw" aria-hidden="true"></i>
 												{{$nav.contacts.1}}
-											</a>
-										</li>
-									{{/if}}
-									{{if $nav.delegation}}
-										<li>
-											<a role="menuitem" id="nav-delegation-link"
-												class="nav-commlink {{$nav.delegation.2}} {{$sel.delegation}}"
-												href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}">
-												<i class="ri ri-arrow-left-right-line ri-fw" aria-hidden="true"></i> {{$nav.delegation.1}}
 											</a>
 										</li>
 									{{/if}}
@@ -270,7 +282,8 @@
 												title="{{$nav.admin.3}}"><i class="ri ri-medal-2-fill ri-fw" aria-hidden="true"></i>
 												{{$nav.admin.1}}
 											</a>
-										</li>									{{/if}}
+										</li>
+									{{/if}}
 									{{if $nav.moderation}}
 										<li>
 											<a accesskey="m" role="menuitem" id="nav-moderation-link"
@@ -313,118 +326,12 @@
 											</a>
 										</li>
 									{{/if}}
-								</ul>
-							</li>{{* End of userinfo dropdown menu *}}
+								</ul>{{* End of userinfo dropdown menu *}}
+							</li>
 						{{/if}}
-
 					</ul>
 				</div>{{* End of right navbar *}}
 
-				{{* The usermenu dropdown for the mobile view. Offcanvas on the right side of the screen.
-					It is called via the buttons. Have a look at the top of this file *}}
-				<div class="offcanvas-right-overlay visible-xs-block"></div>
-				<div id="offcanvasUsermenu" class="offcanvas-right visible-xs-block">
-					<div class="nav-container">
-						<ul role="menu" class="list-group">
-							{{if $nav.remote}}
-								{{if $nav.sitename}}
-									<li role="menuitem" class="nav-sitename list-group-item">{{$nav.sitename}}</li>
-								{{/if}}
-							{{/if}}
-							<li class="list-group-item profile-link">
-								<a href="{{$userinfo.link}}">
-									<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}">&nbsp;
-									{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}){{/if}}
-								</a>
-							</li>
-							{{foreach $nav.usermenu as $usermenu}}
-								<li class="list-group-item">
-									<a role="menuitem" class="{{$usermenu.2}}"
-										href="{{$usermenu.0}}" title="{{$usermenu.3}}">
-										<i class="ri {{$usermenu.4}}"></i>&nbsp;
-										{{$usermenu.1}}
-									</a>
-								</li>
-							{{/foreach}}
-							{{if $nav.contacts || $nav.delegation}}
-								<li class="divider"><hr></li>
-							{{/if}}
-							{{if $nav.contacts}}
-								<li class="list-group-item">
-									<a role="menuitem"
-										class="nav-link {{$nav.contacts.2}}" href="{{$nav.contacts.0}}"
-										title="{{$nav.contacts.3}}"><i class="ri ri-contacts-line ri-fw" aria-hidden="true"></i>
-										{{$nav.contacts.1}}
-									</a>
-								</li>
-							{{/if}}
-							{{if $nav.delegation}}
-								<li class="list-group-item">
-									<a role="menuitem"
-										class="nav-commlink {{$nav.delegation.2}} {{$sel.delegation}}"
-										href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}"><i class="ri ri-arrow-left-right-line ri-fw"
-											aria-hidden="true"></i> {{$nav.delegation.1}}
-									</a>
-								</li>
-							{{/if}}
-							{{if $nav.settings || $nav.admin || $nav.logout}}
-								<li class="divider"><hr></li>
-							{{/if}}
-							{{if $nav.settings}}
-								<li class="list-group-item">
-									<a role="menuitem" class="nav-link {{$nav.settings.2}}" href="{{$nav.settings.0}}"
-										title="{{$nav.settings.3}}"><i class="ri ri-settings-3-line ri-fw" aria-hidden="true"></i>
-										{{$nav.settings.1}}
-									</a>
-								</li>
-							{{/if}}
-							{{if $nav.admin}}
-								<li class="list-group-item">
-									<a role="menuitem"
-										class="nav-link {{$nav.admin.2}}" href="{{$nav.admin.0}}" title="{{$nav.admin.3}}"><i
-											class="ri ri-admin-line ri-fw" aria-hidden="true"></i>
-										{{$nav.admin.1}}
-									</a>
-								</li>
-							{{/if}}
-							{{if $nav.moderation}}
-								<li class="list-group-item">
-									<a role="menuitem"
-										class="nav-link {{$nav.moderation.2}}" href="{{$nav.moderation.0}}" title="{{$nav.moderation.3}}"><i
-											class="ri ri-shield-user-line ri-fw" aria-hidden="true"></i>
-										{{$nav.moderation.1}}
-									</a>
-								</li>
-							{{/if}}
-							<li class="divider"><hr></li>
-						<li class="list-group-item">
-							<a role="menuitem" class="nav-link {{$nav.about.2}}"
-								href="{{$nav.about.0}}" title="{{$nav.about.3}}">
-								<i class="ri ri-information-line ri-fw" aria-hidden="true"></i> {{$nav.about.1}}
-							</a>
-						</li>
-							<li class="divider"><hr></li>
-							{{if $nav.logout}}
-								<li class="list-group-item">
-									<a role="menuitem"
-										class="nav-link {{$nav.logout.2}}" href="{{$nav.logout.0}}" title="{{$nav.logout.3}}"><i
-											class="ri ri ri-logout-box-line ri-fw" aria-hidden="true"></i>
-										{{$nav.logout.1}}
-									</a>
-								</li>
-							{{else}}
-								<li class="list-group-item">
-									<a role="menuitem"
-										class="nav-login-link {{$nav.login.2}}" href="{{$nav.login.0}}"
-										title="{{$nav.login.3}}"><i class="ri ri-shut-down-line ri-fw" aria-hidden="true"></i>
-										{{$nav.login.1}}
-									</a>
-								</li>
-							{{/if}}
-						</ul>
-					</div>
-				</div>
-				<!--/.sidebar-offcanvas-->
 			</div><!-- end of div for navbar width-->
 		</div><!-- /.container -->
 	</nav><!-- /.navbar -->

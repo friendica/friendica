@@ -40,7 +40,7 @@ class NPF
 		$doc = new DOMDocument();
 
 		$doc->formatOutput = true;
-		if (!@$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'))) {
+		if (!@$doc->loadHTML(HTML::toNumericEntities($html))) {
 			return [];
 		}
 

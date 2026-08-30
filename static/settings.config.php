@@ -226,6 +226,15 @@ return [
 		// Process the "View" activity that is used by Peertube.
 		'process_view' => false,
 
+		// proxy (String)
+		// Address of the proxy server that is used for outgoing HTTP requests.
+		// Leave empty to send the requests directly.
+		'proxy' => '',
+
+		// proxyuser (String)
+		// Optional "user:password" that is prepended to the proxy address.
+		'proxyuser' => '',
+
 		// register_notification (Boolean)
 		// Send a notification mail to the admin for each new registration.
 		'register_notification' => true,
@@ -286,6 +295,11 @@ return [
 		// The fully-qualified URL of this Friendica node.
 		// Used by the worker in a non-HTTP execution environment.
 		'url' => '',
+
+		// verifyssl (Boolean)
+		// Verify the certificate of a server before sending requests to it.
+		// Disabled by default, so that servers with a self-signed certificate stay reachable.
+		'verifyssl' => false,
 
 		// poco_discovery (Boolean)
 		// If enabled, the system will check for the existance of other contacts and servers

@@ -404,7 +404,114 @@ if ($script !== '') {
 }
 ```
 
-### 6.3 Pass data and translations to JS via a JSON block
+### 6.3 SPA lifecycle initialization
+
+Friendica can navigate between pages without a full browser reload when the SPA
+mode is enabled. Page-specific JavaScript must therefore be initialized through
+the lifecycle helpers from `view/js/main.js`:
+
+```javascript
+window.onDocumentReady('#my-widget', function (element) {
+        // Initialize content that is ready with the document.
+});
+
+window.onWindowLoad('#my-widget', function (element) {
+        // Initialize content that depends on the window load phase.
+});
+```
+
+Do not use `$(document).ready(...)`, `$(window).load(...)`,
+`DOMContentLoaded`, or direct `load` listeners for page-specific initialization
+that must work with SPA navigation. Those handlers are tied to the initial
+document load and are not reliably repeated when the SPA replaces page content.
+
+Both helpers take the same two parameters:
+
+- `target` — the initialization target. A CSS selector such as `'#my-widget'`
+    is resolved against the current document. A DOM element or jQuery object is
+    also accepted. The callback is skipped when the target does not exist on the
+    current page.
+- `initialize` — the callback that initializes the target. It receives the
+    resolved DOM element as its first argument.
+
+Use `onDocumentReady` for normal DOM initialization and `onWindowLoad` when the
+initialization depends on resources that finish loading with the window. The
+helpers take care of both the normal page lifecycle and the corresponding SPA
+lifecycle events.
+
+### 6.4 SPA implementation details
+
+The lifecycle helpers are necessary but not sufficient for SPA-compatible code.
+Keep the following details in mind when adding or changing frontend code:
+
+- **Make initialization repeatable.** A lifecycle callback can run again after
+    navigation. Avoid registering duplicate handlers or starting duplicate
+    processes. Use namespaced events and remove the previous handler before
+    registering it again:
+
+    ```javascript
+    window.onDocumentReady('#my-widget', function (element) {
+            $(element)
+                    .off('click.my-feature', '.my-action')
+                    .on('click.my-feature', '.my-action', handleAction);
+    });
+    ```
+
+- **Do not retain stale DOM references.** SPA navigation replaces central
+    containers such as `main`. Look up page elements inside the lifecycle
+    callback or use the callback's `element` argument instead of keeping a
+    reference to an element from the previous page.
+
+- **Control timers and polling.** `setTimeout`, `setInterval`, and polling can
+    outlive a navigation. Store their handles and clear them before starting a
+    replacement, or guard against starting the same process more than once.
+
+- **Handle dynamically inserted content explicitly.** Content added by live
+    updates or infinite scroll does not automatically go through the initial
+    page setup. Register a single `postprocess_liveupdate` handler when such
+    content needs additional processing:
+
+    ```javascript
+    document.addEventListener('postprocess_liveupdate', function () {
+            initializeDynamicContent();
+    });
+    ```
+
+    The handler itself must not be registered repeatedly during navigation.
+
+- **Separate global definitions from page initialization.** External scripts
+    are managed by the SPA router and page-specific scripts can be loaded and
+    executed again. Keep reusable definitions separate from initialization code,
+    and do not rely on page-specific global state surviving navigation.
+
+- **Mark persistent external scripts explicitly.** An external script that
+    must remain loaded across SPA navigation needs the `data-spa-persistent`
+    attribute:
+
+    ```html
+    <script src="/view/js/my-global-module.js" data-spa-persistent></script>
+    ```
+
+    Use this only for scripts that are genuinely global. Page-specific scripts
+    should be able to load again and reinitialize safely.
+
+- **Avoid competing with the SPA router.** Do not add custom navigation logic
+    to links that should be handled by the router. Links with `onclick`,
+    `data-spa-ignore`, `modal-open`, or `data-fancybox` are handled specially;
+    use semantic links and buttons and keep custom behavior explicit.
+
+- **Expect missing targets and incomplete responses.** Error pages, redirects,
+    and pages without a particular module target may not contain the expected
+    containers. Check for the required element before accessing it. The
+    lifecycle helpers skip the callback automatically when their `target` is not
+    present.
+
+- **Reinitialize plugins on the current element.** Widgets such as calendars,
+    scrollbars, autocomplete, and Masonry may need initialization after every
+    navigation. Check whether a plugin is already active before initializing it
+    again, and clean up plugin-specific state when the plugin requires it.
+
+### 6.5 Pass data and translations to JS via a JSON block
 
 In new code, don't hardcode English strings in `.js` files and don't inject PHP values straight into a `<script>`.
 Encode any data — translated strings or structured config — as JSON with the `JSON_HEX_*` flags, then read it in JS:
@@ -428,7 +535,7 @@ var data = JSON.parse(document.getElementById('my-data').textContent);
 
 The `JSON_HEX_*` flags escape `<`, `>`, `&`, `'`, `"`, so the JSON cannot break out of the `<script>` element.
 
-### 6.4 Pass small scalar values via data attributes
+### 6.6 Pass small scalar values via data attributes
 
 ```smarty
 <div id="my-widget" data-uid="{{$uid}}" data-url="{{$validated_url}}"></div>
@@ -439,7 +546,7 @@ var uid = document.getElementById('my-widget').dataset.uid;
 ```
 
 <a name="dom-xss" id="dom-xss"></a>
-### 6.5 DOM-XSS — safe JavaScript DOM manipulation
+### 6.7 DOM-XSS — safe JavaScript DOM manipulation
 
 Receiving JSON safely is not enough.
 Inserting data into the DOM can also be an XSS vector.
@@ -476,7 +583,7 @@ element.innerHTML = html;
 
 For content that is intentionally pre-rendered HTML (e.g. from `Item::prepareBody()` fetched via API), use a specifically approved sanitizer before setting `innerHTML`.
 
-### 6.6 No new inline event handlers
+### 6.8 No new inline event handlers
 
 ```smarty
 {{* ✗ *}}

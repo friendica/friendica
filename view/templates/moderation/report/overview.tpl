@@ -46,6 +46,7 @@
 	<h3>{{$h_reports}}</h3>
 	{{if $reports}}
 		<form method="post">
+			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 		<table class="table table-condensed table-striped table-bordered">
 			<thead>
 				<tr>

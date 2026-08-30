@@ -15,6 +15,7 @@ use Friendica\Content\Item;
 use Friendica\Content\Post\Collection\PostMedias as PostMediasCollection;
 use Friendica\Content\Post\Entity\PostMedia as PostMediaEntity;
 use Friendica\Content\Post\Factory\PostMedia as PostMediaFactory;
+use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
@@ -446,7 +447,7 @@ class PostMedia extends BaseRepository
 
 		$tmp = new DOMDocument();
 		$doc = new DOMDocument();
-		@$doc->loadHTML(mb_convert_encoding('<span>' . $html . '</span>', 'HTML-ENTITIES', "UTF-8"), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		@$doc->loadHTML(HTML::toNumericEntities('<span>' . $html . '</span>'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 		$xpath = new DOMXPath($doc);
 		$list  = $xpath->query('//a[@class="embed"]');
 		foreach ($list as $node) {
@@ -494,7 +495,7 @@ class PostMedia extends BaseRepository
 			if ($player === '') {
 				continue;
 			}
-			@$tmp->loadHTML(mb_convert_encoding($player, 'HTML-ENTITIES', "UTF-8"), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+			@$tmp->loadHTML(HTML::toNumericEntities($player), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 			$div      = $tmp->documentElement;
 			$imported = $doc->importNode($div, true);
 			$node->parentNode->replaceChild($imported, $node);

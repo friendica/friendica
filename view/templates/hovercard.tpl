@@ -54,40 +54,39 @@
 				{{if $profile.actions.pm}}
 					<a class="btn btn-labeled btn-primary btn-sm add-to-modal" href="{{$profile.actions.pm.1}}">
 						<i class="ri ri-mail-line" aria-hidden="true"></i>
-						<span>{{$profile.actions.pm.0}}</span>
+						<span class="action-label">{{$profile.actions.pm.0}}</span>
 					</a>
 				{{/if}}
 
 				{{if $profile.addr && !$profile.self}}
 					<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.mention.1}}">
 						<i class="ri ri-edit-box-line" aria-hidden="true"></i>
-						<span>{{$profile.actions.mention.0}}</span>
+						<span class="action-label">{{$profile.actions.mention.0}}</span>
 					</a>
 				{{/if}}
-			</div>
-			<div class="hover-card-actions-connection">
+
 				{{if $profile.actions.network}}
 					<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.network.1}}">
 							<i class="ri ri-{{($profile.contact_type==3) ? 'discuss-line' : 'cloud-line'}}" aria-hidden="true"></i>
-							{{$profile.actions.network.0}}
+							<span class="action-label">{{$profile.actions.network.0}}</span>
 					</a>
 				{{/if}}
 				{{if $profile.actions.edit}}
 					<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.edit.1}}">
 						<i class="ri ri-user-line" aria-hidden="true"></i>
-						 {{$profile.actions.edit.0}}
+						 <span class="action-label">{{$profile.actions.edit.0}}</span>
 					</a>
 				{{/if}}
 				{{if $profile.actions.follow}}
 					<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.follow.1}}">
 						<i class="ri ri-user-add-line" aria-hidden="true"></i>
-						{{$profile.actions.follow.0}}
+						<span class="action-label">{{$profile.actions.follow.0}}</span>
 					</a>
 				 {{/if}}
 				{{if $profile.actions.unfollow}}
 					<a class="btn btn-labeled btn-primary btn-sm" href="{{$profile.actions.unfollow.1}}">
 						<i class="ri ri-user-unfollow-line" aria-hidden="true"></i>
-						{{$profile.actions.unfollow.0}}
+						<span class="action-label">{{$profile.actions.unfollow.0}}</span>
 					</a>
 				{{/if}}
 			</div>

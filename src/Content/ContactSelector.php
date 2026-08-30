@@ -237,7 +237,7 @@ class ContactSelector
 			'reel2bits', 'rss', 'ruffy', 'sakura', 'seppo', 'shadowfacts', 'sharky', 'shuttlecraft',
 			'smilodon', 'smithereen', 'snac', 'soapbox', 'socialhome', 'streams', 'sublinks', 'sutty',
 			'takahē', 'takesama', 'threads', 'tumblr', 'vernissage', 'vervis', 'vidzy', 'vocata', 'wafrn',
-			'wildebeest', 'wordpress', 'write.as', 'writefreely', 'wxwclub', 'xwiki', 'zap'];
+			'wildebeest', 'wordpress', 'write.as', 'writefreely', 'wsocial', 'wxwclub', 'xwiki', 'zap'];
 
 		if (in_array($platform_icon_style, [self::SVG_WHITE, self::SVG_COLOR_WHITE])) {
 			$svg = ['activitypub', 'akkoma', 'andstatus', 'atprotocol', 'blacksky', 'bluesky', 'bonfire', 'bookwyrm', 'bridgy_fed',
@@ -247,7 +247,7 @@ class ContactSelector
 				'lemmy', 'loforo', 'loops', 'mastodon', 'mbin', 'microblog', 'minds', 'misskey', 'mobilizon',
 				'nextcloud', 'northsky', 'owncast', 'peertube', 'phanpy', 'pixelfed', 'pleroma', 'plume', 'rss', 'shark',
 				'soapbox', 'socialhome', 'streams', 'takahē', 'threads', 'tumblr', 'wordpress', 'write.as',
-				'writefreely', 'xwiki', 'zap'];
+				'writefreely', 'wsocial', 'xwiki', 'zap'];
 		}
 
 		if (!empty($platform)) {
@@ -278,7 +278,7 @@ class ContactSelector
 		$color = ['aardwolf', 'activitypods', 'activitypub', 'akkoma', 'atprotocol', 'bluesky', 'chuckya', 'decodon',
 			'discourse', 'eurosky', 'fedify', 'firefish', 'flipboard', 'friendica', 'gitlab', 'gnusocial', 'iceshrimp', 'kookie',
 			'loops', 'mastodon', 'mbin', 'misskey', 'neodb', 'newsmast', 'nodebb', 'northsky', 'peertube', 'pixelfed',
-			'pleroma', 'rss', 'sharky', 'tumblr', 'vervis', 'vocata', 'wordpress'];
+			'pleroma', 'rss', 'sharky', 'tumblr', 'vervis', 'vocata', 'wsocial', 'wordpress'];
 
 		if (in_array($platform_icon_style, [self::SVG_COLOR_BLACK, self::SVG_COLOR_WHITE]) && in_array($network_svg, $color)) {
 			return 'images/platforms/color/' . $network_svg . '.svg';

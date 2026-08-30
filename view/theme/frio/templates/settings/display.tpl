@@ -10,16 +10,9 @@
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
 		<div class="panel-group panel-group-settings" id="settings" role="tablist" aria-multiselectable="true">
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="theme-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#theme-settings-content" aria-expanded="true" aria-controls="theme-settings-content">
-							{{$themes_title}}
-						</button>
-					</h2>
-				</div>
-
-				<div id="theme-settings-content" class="panel-collapse collapse" role="tabpanel" aria-labelledby="theme-settings">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="theme-settings-title"><h2>{{$themes_title}}</h2></summary>
+				<div id="theme-settings-content">
 					<div class="panel-body">
 						{{include file="field_themeselect.tpl" field=$theme}}
 
@@ -41,17 +34,11 @@
 						<button type="submit" name="{{$theme.2}}-settings-submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="content-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#content-settings-content" aria-expanded="false" aria-controls="content-settings-content">
-							{{$d_cset}}
-						</button>
-					</h2>
-				</div>
-				<div id="content-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="content-settings">
+			<details class="panel"{{if !$theme && !$mobile_theme && !$theme_config}} open{{/if}}>
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="content-settings-title"><h2>{{$d_cset}}</h2></summary>
+				<div id="content-settings-content">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$itemspage_network}}
 						{{include file="field_input.tpl" field=$itemspage_mobile_network}}
@@ -77,17 +64,11 @@
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="timeline-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#timeline-settings-content" aria-expanded="false" aria-controls="timeline-settings-content">
-							{{$timeline_title}}
-						</button>
-					</h2>
-				</div>
-				<div id="timeline-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="timeline-settings">
+			<details class="panel"{{if !$theme && !$mobile_theme && !$theme_config}} open{{/if}}>
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="timeline-settings-title"><h2>{{$timeline_title}}</h2></summary>
+				<div id="timeline-settings-content">
 						<p tabindex="0">{{$timeline_explanation}} {{$sortable}}</p>
 						<h3 tabindex="0">{{$timeline_enable}}</h3>
 					<div class="panel-body timelines-widget sortable">
@@ -105,23 +86,18 @@
 					<div class="panel-body timelines-menu sortable">
 						{{foreach $timelines as $t}}
 							{{include file="field_checkbox.tpl" field=$t.bookmark}}
-						{{/foreach}}						
+						{{/foreach}}
+					</div>
 					<div class="panel-footer">
 						{{include file="field_checkbox.tpl" field=$reset_menu}}
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="channel-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#channel-settings-content" aria-expanded="false" aria-controls="channel-settings-content">
-							{{$channel_title}}
-						</button>
-					</h2>
-				</div>
-				<div id="channel-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="channel-settings">
+			<details class="panel"{{if !$theme && !$mobile_theme && !$theme_config}} open{{/if}}>
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="channel-settings-title"><h2>{{$channel_title}}</h2></summary>
+				<div id="channel-settings-content">
 					<div class="panel-body">
 						{{include file="field_select.tpl" field=$channel_languages}}
 					</div>
@@ -139,17 +115,11 @@
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="calendar-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#calendar-settings-content" aria-expanded="false" aria-controls="calendar-settings-content">
-							{{$calendar_title}}
-						</button>
-					</h2>
-				</div>
-				<div id="calendar-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="calendar-settings">
+			<details class="panel"{{if !$theme && !$mobile_theme && !$theme_config}} open{{/if}}>
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="calendar-settings-title"><h2>{{$calendar_title}}</h2></summary>
+				<div id="calendar-settings-content">
 					<div class="panel-body">
 						{{include file="field_select.tpl" field=$first_day_of_week}}
 						{{include file="field_select.tpl" field=$calendar_default_view}}
@@ -158,7 +128,7 @@
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 		</div>
 	</form>
 </div>

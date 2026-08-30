@@ -163,6 +163,14 @@ class UserSession implements IHandleUserSessions
 	}
 
 	/** {@inheritDoc} */
+	public function regenerateId(): IHandleSessions
+	{
+		$this->session->regenerateId();
+
+		return $this;
+	}
+
+	/** {@inheritDoc} */
 	public function exists(string $name): bool
 	{
 		return $this->session->exists($name);

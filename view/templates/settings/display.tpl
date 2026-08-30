@@ -8,77 +8,107 @@
 
 <form action="settings/display" id="settings-form" method="post" autocomplete="off">
 	<input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
-
-	{{include file="field_themeselect.tpl" field=$theme}}
-	{{include file="field_input.tpl" field=$itemspage_network}}
-
-	{{* Show the mobile theme selection only if mobile themes are available *}}
-	{{if count($mobile_theme.4) > 1}}
-		{{include file="field_themeselect.tpl" field=$mobile_theme}}
-	{{/if}}
-
-	{{include file="field_input.tpl" field=$itemspage_mobile_network}}
-	{{include file="field_checkbox.tpl" field=$enable_smile}}
-	{{include file="field_checkbox.tpl" field=$enable_spa}}
-	{{include file="field_checkbox.tpl" field=$update_content}}
-	{{include file="field_checkbox.tpl" field=$infinite_scroll}}
-	{{include file="field_checkbox.tpl" field=$enable_smart_threading}}
-	{{include file="field_checkbox.tpl" field=$enable_dislike}}
-	{{include file="field_checkbox.tpl" field=$display_resharer}}
-	{{include file="field_checkbox.tpl" field=$stay_local}}
-	{{include file="field_checkbox.tpl" field=$compact_timeline}}
-	{{include file="field_checkbox.tpl" field=$show_page_drop}}
-	{{include file="field_checkbox.tpl" field=$display_eventlist}}
-	{{include file="field_select.tpl" field=$preview_mode}}
-	{{include file="field_checkbox.tpl" field=$hide_empty_descriptions}}
-	{{include file="field_checkbox.tpl" field=$hide_custom_emojis}}
-	{{include file="field_select.tpl" field=$platform_icon_style}}
-	{{include file="field_checkbox.tpl" field=$embed_remote_media}}
-	{{include file="field_checkbox.tpl" field=$embed_media}}
-	<h2 tabindex="0">{{$timeline_title}}</h2>
-	<p tabindex="0">{{$timeline_explanation}} {{$sortable}}</p>
-	<h3 tabindex="0">{{$timeline_enable}}</h3>
-	<div class="select timelines-widget sortable">
-		<input type="hidden" id="widget_timelineorder" name="widget_timelineorder" value=""/>
-		{{foreach $timelines as $t}}
-			{{include file="field_checkbox.tpl" field=$t.enable}}
-		{{/foreach}}
+	<details class="settings-section">
+		<summary class="settings-heading"><h2>{{$themes_title}}</h2></summary>
+		{{include file="field_themeselect.tpl" field=$theme}}
 		<div class="settings-submit-wrapper">
-			{{include file="field_checkbox.tpl" field=$reset_widget}}
+			<input type="submit" name="submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
 		</div>
-	</div>
-	<h3 tabindex="0">{{$timeline_bookmark}}</h3>
-	<div class="select timelines-menu sortable">
-		<input type="hidden" id="menu_timelineorder" name="menu_timelineorder" value=""/>
-		{{foreach $timelines as $t}}
-			{{include file="field_checkbox.tpl" field=$t.bookmark}}
-		{{/foreach}}
-		<div class="settings-submit-wrapper">
-			{{include file="field_checkbox.tpl" field=$reset_menu}}
-		</div>
-	</div>
-
-	<h2>{{$channel_title}}</h2>
-	{{include file="field_select.tpl" field=$channel_languages}}
-
-	{{if $has_timeline_channels}}
-		{{include file="field_select.tpl" field=$timeline_channels}}
-	{{/if}}
-	{{if $has_filter_channels}}
-		{{include file="field_select.tpl" field=$filter_channels}}
-	{{/if}}
-
-	<h2>{{$calendar_title}}</h2>
-	{{include file="field_select.tpl" field=$first_day_of_week}}
-	{{include file="field_select.tpl" field=$calendar_default_view}}
-
-	<div class="settings-submit-wrapper">
-		<input type="submit" name="submit" class="settings-submit" value="{{$submit}}"/>
-	</div>
+	</details>
 
 	{{if $theme_config}}
-		<h2>{{$stitle}}</h2>
+	<details class="settings-section">
+		<summary class="settings-heading"><h2>{{$stitle}}</h2></summary>
 		{{$theme_config nofilter}}
+	</details>
 	{{/if}}
 
+	<details class="settings-section">
+		<summary class="settings-heading"><h2>{{$d_cset}}</h2></summary>
+		{{include file="field_input.tpl" field=$itemspage_network}}
+
+		{{* Show the mobile theme selection only if mobile themes are available *}}
+		{{if count($mobile_theme.4) > 1}}
+			{{include file="field_themeselect.tpl" field=$mobile_theme}}
+		{{/if}}
+
+		{{include file="field_input.tpl" field=$itemspage_mobile_network}}
+		{{include file="field_checkbox.tpl" field=$enable_smile}}
+		{{include file="field_checkbox.tpl" field=$enable_spa}}
+		{{include file="field_checkbox.tpl" field=$update_content}}
+		{{include file="field_checkbox.tpl" field=$infinite_scroll}}
+		{{include file="field_checkbox.tpl" field=$enable_smart_threading}}
+		{{include file="field_checkbox.tpl" field=$enable_dislike}}
+		{{include file="field_checkbox.tpl" field=$display_resharer}}
+		{{include file="field_checkbox.tpl" field=$stay_local}}
+		{{include file="field_checkbox.tpl" field=$compact_timeline}}
+		{{include file="field_checkbox.tpl" field=$show_page_drop}}
+		{{include file="field_checkbox.tpl" field=$display_eventlist}}
+		{{include file="field_select.tpl" field=$preview_mode}}
+		{{include file="field_checkbox.tpl" field=$hide_empty_descriptions}}
+		{{include file="field_checkbox.tpl" field=$hide_custom_emojis}}
+		{{include file="field_select.tpl" field=$platform_icon_style}}
+		{{include file="field_checkbox.tpl" field=$embed_remote_media}}
+		{{include file="field_checkbox.tpl" field=$embed_media}}
+		<div class="settings-submit-wrapper">
+			<input type="submit" name="submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
+		</div>
+	</details>
+
+	<details class="settings-section">
+	<summary class="settings-heading" tabindex="0"><h2>{{$timeline_title}}</h2></summary>
+	<p tabindex="0">{{$timeline_explanation}} {{$sortable}}</p>
+		<details class="settings-subsection">
+			<summary class="settings-subheading" tabindex="0"><h3>{{$timeline_enable}}</h3></summary>
+			<div class="select timelines-widget sortable">
+				<input type="hidden" id="widget_timelineorder" name="widget_timelineorder" value=""/>
+				{{foreach $timelines as $t}}
+					{{include file="field_checkbox.tpl" field=$t.enable}}
+				{{/foreach}}
+				<div class="settings-submit-wrapper">
+					{{include file="field_checkbox.tpl" field=$reset_widget}}
+				</div>
+			</div>
+		</details>
+		<details class="settings-subsection">
+			<summary class="settings-subheading" tabindex="0"><h3>{{$timeline_bookmark}}</h3></summary>
+		<div class="select timelines-menu sortable">
+			<input type="hidden" id="menu_timelineorder" name="menu_timelineorder" value=""/>
+			{{foreach $timelines as $t}}
+				{{include file="field_checkbox.tpl" field=$t.bookmark}}
+			{{/foreach}}
+			<div class="settings-submit-wrapper">
+				{{include file="field_checkbox.tpl" field=$reset_menu}}
+			</div>
+		</div>
+		</details>
+		<div class="settings-submit-wrapper">
+			<input type="submit" name="submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
+		</div>
+	</details>		
+
+	<details class="settings-section">
+		<summary class="settings-heading"><h2>{{$channel_title}}</h2></summary>
+		{{include file="field_select.tpl" field=$channel_languages}}
+
+		{{if $has_timeline_channels}}
+			{{include file="field_select.tpl" field=$timeline_channels}}
+		{{/if}}
+		{{if $has_filter_channels}}
+			{{include file="field_select.tpl" field=$filter_channels}}
+		{{/if}}
+		<div class="settings-submit-wrapper">
+			<input type="submit" name="submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
+		</div>	
+	</details>
+
+	<details class="settings-section">
+		<summary class="settings-heading"><h2>{{$calendar_title}}</h2></summary>
+		{{include file="field_select.tpl" field=$first_day_of_week}}
+		{{include file="field_select.tpl" field=$calendar_default_view}}
+
+		<div class="settings-submit-wrapper">
+			<input type="submit" name="submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
+		</div>
+	</details>
 </form>

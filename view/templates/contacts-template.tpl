@@ -35,7 +35,7 @@
  </div>
 </form>
 <script>
- $(document).ready(function() {
+ window.onDocumentReady('body', function() {
   // javascript dialog to batch actions
   $(".batch-action").click(function(e){
     if (confirm($(this).attr('value')+" ?")) {

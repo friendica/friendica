@@ -8,7 +8,6 @@
 namespace Friendica\Test;
 
 use Friendica\Core\Cache\Capability\ICanCache;
-use Friendica\Util\PidFile;
 
 abstract class CacheTestCase extends MockedTestCase
 {
@@ -41,7 +40,7 @@ abstract class CacheTestCase extends MockedTestCase
 			'boolFalse' => ['data' => false],
 			'float'     => ['data' => 4.6634234],
 			'array'     => ['data' => ['1', '2', '3', '4', '5']],
-			'object'    => ['data' => new PidFile()],
+			'object'    => ['data' => new \stdClass()],
 			'null'      => ['data' => null],
 		];
 	}

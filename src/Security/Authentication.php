@@ -293,6 +293,13 @@ class Authentication
 	{
 		$my_url = $this->baseUrl . '/profile/' . $user_record['nickname'];
 
+		// The privilege level of this session changes here, so an id handed out
+		// before this point must not stay valid. Sessions that are only being
+		// restored from a cookie or an API credential keep their id.
+		if ($login_initial) {
+			$this->session->regenerateId();
+		}
+
 		$this->session->setMultiple([
 			'uid'           => $user_record['uid'],
 			'theme'         => $user_record['theme'],

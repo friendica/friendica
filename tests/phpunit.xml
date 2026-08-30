@@ -11,7 +11,7 @@
 		beStrictAboutOutputDuringTests="true"
 		displayDetailsOnAllIssues="true"
 		displayDetailsOnPhpunitDeprecations="true"
-		failOnDeprecation="false"
+		failOnDeprecation="true"
 		failOnEmptyTestSuite="true"
 		failOnIncomplete="false"
 		failOnNotice="false"

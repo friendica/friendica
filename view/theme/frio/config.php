@@ -39,6 +39,8 @@ function theme_post(AppHelper $appHelper): void
 			'login_bg_color',
 			'always_open_compose',
 			'enable_advancedcomposer',
+			'show_nav_labels',
+			'show_action_labels',
 		] as $field) {
 			if (isset($_POST['frio_' . $field])) {
 				DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'frio', $field, $_POST['frio_' . $field]);
@@ -85,6 +87,8 @@ function theme_admin_post(): void
 			'login_bg_color',
 			'always_open_compose',
 			'enable_advancedcomposer',
+			'show_nav_labels',
+			'show_action_labels',
 		] as $field) {
 			if (isset($_POST['frio_' . $field])) {
 				DI::config()->set('frio', $field, $_POST['frio_' . $field]);
@@ -114,6 +118,8 @@ function theme_content(AppHelper $appHelper): string
 		'bg_image_option'         => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'bg_image_option', DI::config()->get('frio', 'bg_image_option')),
 		'always_open_compose'     => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'always_open_compose', DI::config()->get('frio', 'always_open_compose', false)),
 		'enable_advancedcomposer' => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'enable_advancedcomposer', DI::config()->get('frio', 'enable_advancedcomposer', false)),
+		'show_nav_labels'         => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_nav_labels', DI::config()->get('frio', 'show_nav_labels', false)),
+		'show_action_labels'      => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_action_labels', DI::config()->get('frio', 'show_action_labels', false)),
 	];
 
 	return frio_form($arr);
@@ -141,6 +147,8 @@ function theme_admin(AppHelper $appHelper): string
 		'login_bg_color'          => DI::config()->get('frio', 'login_bg_color'),
 		'always_open_compose'     => DI::config()->get('frio', 'always_open_compose', false),
 		'enable_advancedcomposer' => DI::config()->get('frio', 'enable_advancedcomposer', false),
+		'show_nav_labels'         => DI::config()->get('frio', 'show_nav_labels', false),
+		'show_action_labels'      => DI::config()->get('frio', 'show_action_labels', false),
 	];
 
 	return frio_form($arr);
@@ -175,6 +183,8 @@ function frio_form($arr)
 
 		'$always_open_compose'     => ['frio_always_open_compose', DI::l10n()->t('Always open Compose page'), $arr['always_open_compose'], DI::l10n()->t('If enabled, the button to make a new post always opens a dedicated page (the <a href="/compose">Compose page</a>) instead of a small window on top of the current page. When disabled, the "Compose page" can be accessed with a middle click on the button to make a new post, or via a button in the small window.')],
 		'$enable_advancedcomposer' => ['frio_enable_advancedcomposer', DI::l10n()->t('Enable Advanced Composer'), $arr['enable_advancedcomposer'], DI::l10n()->t('When enabled, the Advanced Composer writing assistant will be available in the compose view.')],
+		'$show_nav_labels'         => ['frio_show_nav_labels',  DI::l10n()->t('Show Navbar Button Labels'),$arr['show_nav_labels'],  DI::l10n()->t('Shows or hides the button labels under the main navigation bar buttons.')],
+		'$show_action_labels'      => ['frio_show_action_labels',  DI::l10n()->t('Show Action Button Labels'),$arr['show_action_labels'],  DI::l10n()->t('Shows or hides the button labels under posts and replies.')],
 	];
 
 	if (array_key_exists('login_bg_image', $arr) && !array_key_exists('login_bg_image', $disable)) {

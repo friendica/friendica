@@ -379,6 +379,32 @@ It is likely that your web server reported the source of the problem in its erro
 Please review these system error logs to determine what caused the problem.
 Often this will need to be resolved with your hosting provider or (if self-hosted) your web server configuration.
 
+### Empty navigation bar, "blocked due to a disallowed MIME type" in the browser console
+
+Friendica loads some of its JavaScript as ES modules, one of them from a `.mjs` file.
+Browsers reject a module that is not served with a JavaScript MIME type.
+nginx and older Apache versions have no `.mjs` entry in their MIME type table.
+
+For nginx, add this to your Friendica server block:
+
+```nginx
+  # The include has to stay, a bare types block would replace the whole table.
+  include mime.types;
+
+  types {
+    text/javascript mjs;
+  }
+```
+
+For Apache, add this to your `.htaccess`:
+
+```apache
+AddType text/javascript .mjs
+```
+
+Both ship with `.htaccess-dist` and `mods/sample-nginx.config` since Friendica 2026.08.
+An existing configuration is never updated automatically.
+
 ### 400 and 4xx "File not found" errors
 
 First check your file permissions.

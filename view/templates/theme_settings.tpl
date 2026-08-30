@@ -14,6 +14,6 @@
 {{include file="field_select.tpl" field=$show_lastusers}}
 
 <div class="settings-submit-wrapper">
-	<input type="submit" value="{{$submit}}" class="settings-submit" name="vier-settings-submit" />
+	<input type="submit" value="{{$submit}}" class="settings-submit btn btn-default" name="vier-settings-submit" />
 </div>
 

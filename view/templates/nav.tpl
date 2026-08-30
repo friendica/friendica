@@ -56,10 +56,10 @@
 			</li>
 		{{/if}}
 
-		{{if $nav.my_profile}}
+		{{if $profile_link}}
 			<li role="menuitem" id="nav-my-profile-link" class="nav-menu {{$sel.my_profile}}">
-				<a accesskey="p" class="{{$nav.my_profile.2}}" href="{{$nav.my_profile.0}}" title="{{$nav.my_profile.3}}">
-					<span class="desktop-view">{{$nav.my_profile.1}}</span>
+				<a accesskey="p" class="" href="{{$profile_link}}" title="{{$profile_link_title}}">
+					<span class="desktop-view">{{$profile_link_title}}</span>
 					<i class="ri ri-xl ri-user-line ri-fw mobile-view" aria-hidden="true"></i>
 					<span id="my-profile-update" class="nav-notification"></span>
 				</a>
@@ -100,16 +100,18 @@
 		{{/if}}
 
 		{{if $userinfo}}
-			<li role="menu" aria-haspopup="true" id="nav-user-linkmenu" class="nav-menu">
+			<li role="menu" aria-haspopup="true" id="nav-user-linkmenu" class="nav-menu" tabindex="0">
 				<a accesskey="u" title="{{$sitelocation}}"><img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"><span id="nav-user-linklabel">{{$userinfo.name}}</span><span id="intro-update" class="nav-notification"></span></a>
 				<ul id="nav-user-menu" class="menu-popup">
+					{{if $nav.delegation}}<li role="menuitem"><a class="{{$nav.delegation.2}}" href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}">{{$nav.delegation.1}}</a></li>{{/if}}
 					<li role="menuitem"> <a  class="{{$nav.search.2}}" href="{{$nav.search.0}}" title="{{$nav.search.3}}">{{$nav.search.1}}</a> </li>
 					{{if $nav.introductions}}<li role="menuitem"><a class="{{$nav.introductions.2}}" href="{{$nav.introductions.0}}" title="{{$nav.introductions.3}}">{{$nav.introductions.1}}<span id="intro-update-li" class="nav-notification"></span></a></li>{{/if}}
 					{{if $nav.contacts}}<li role="menuitem"><a class="{{$nav.contacts.2}}" href="{{$nav.contacts.0}}" title="{{$nav.contacts.3}}">{{$nav.contacts.1}}</a></li>{{/if}}
 					{{if $nav.messages}}<li role="menuitem"><a class="{{$nav.messages.2}}" href="{{$nav.messages.0}}" title="{{$nav.messages.3}}">{{$nav.messages.1}} <span id="mail-update-li" class="nav-notification"></span></a></li>{{/if}}
-					{{if $nav.delegation}}<li role="menuitem"><a class="{{$nav.delegation.2}}" href="{{$nav.delegation.0}}" title="{{$nav.delegation.3}}">{{$nav.delegation.1}}</a></li>{{/if}}
-					{{* This is a link to Photos: *}}
-					{{if $nav.usermenu.0}}<li role="menuitem"><a class="{{$nav.usermenu.0.2}}" href="{{$nav.usermenu.0.0}}" title="{{$nav.usermenu.0.3}}">{{$nav.usermenu.0.1}}</a></li>{{/if}}
+					{{* Links to Profile: *}}
+					{{foreach $nav.usermenu as $usermenu}}
+					<li role="menuitem"><a role="menuitem" class="{{$usermenu.2}}" href="{{$usermenu.0}}" title="{{$usermenu.3}}">{{$usermenu.1}}</a></li>
+					{{/foreach}}
 					{{if $nav.settings}}<li role="menuitem"><a class="{{$nav.settings.2}}" href="{{$nav.settings.0}}" title="{{$nav.settings.3}}">{{$nav.settings.1}}</a></li>{{/if}}
 					{{if $nav.admin}}
 					<li role="menuitem">

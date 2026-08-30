@@ -281,9 +281,10 @@ final class PostTemplateBuilder
 		$ago          = $temporalData['ago'];
 
 		// process action responses - e.g. like/dislike/attend/agree/whatever
-		$eventData = $this->buildEventData($item, $writable);
-		$isevent   = $eventData['isevent'];
-		$attend    = $eventData['attend'];
+		$eventData    = $this->buildEventData($item, $writable);
+		$isevent      = $eventData['isevent'];
+		$attend       = $eventData['attend'];
+		$attend_label = $eventData['attend_label'];
 
 		$reactionData = $this->buildReactionData($item, $convResponses);
 		$emojis       = $reactionData['emojis'];
@@ -319,6 +320,7 @@ final class PostTemplateBuilder
 			'guid'                   => urlencode((string) $item['guid']),
 			'isevent'                => $isevent,
 			'attend'                 => $attend,
+			'attend_label'           => $attend_label,
 			'linktitle'              => $this->l10n->t('View %s\'s profile @ %s', $profileName, $item['author-link'] ?? ''),
 			'olinktitle'             => $this->l10n->t('View %s\'s profile @ %s', $owner_name, $item['owner-link'] ?? ''),
 			'to'                     => $this->l10n->t('to'),
@@ -423,6 +425,7 @@ final class PostTemplateBuilder
 			'isunknown_label'    => $this->l10n->t('Parent is probably private or not federated.'),
 			'show_text'          => $this->l10n->t('Show comments'),
 			'hide_text'          => $this->l10n->t('Close comments'),
+			'smart_threading'    => $this->uid ? !$this->pConfig->get($this->uid, 'system', 'no_smart_threading', false) : false,
 		];
 
 		$arr    = ['item' => $item, 'output' => $tmpItem];
@@ -567,12 +570,13 @@ final class PostTemplateBuilder
 	 *
 	 * @param array<string, mixed> $item
 	 * @param bool $writable
-	 * @return array{isevent: bool, attend: array}
+	 * @return array{isevent: bool, attend: array, attend_label: array}
 	 */
 	private function buildEventData(array $item, bool $writable): array
 	{
-		$isevent = false;
-		$attend  = [];
+		$isevent      = false;
+		$attend       = [];
+		$attend_label = [];
 
 		if (($item['object-type'] ?? '') === Activity\ObjectType::EVENT
 			&& in_array($item['network'] ?? '', [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA])) {
@@ -583,10 +587,15 @@ final class PostTemplateBuilder
 					$this->l10n->t('I will not attend'),
 					$this->l10n->t('I might attend'),
 				];
+				$attend_label = [
+					$this->l10n->t('Going'),
+					$this->l10n->t('Can\'t Go'),
+					$this->l10n->t('Maybe'),
+				];
 			}
 		}
 
-		return ['isevent' => $isevent, 'attend' => $attend];
+		return ['isevent' => $isevent, 'attend' => $attend, 'attend_label' => $attend_label];
 	}
 
 	/**

@@ -202,6 +202,30 @@ class Installer
 	}
 
 	/**
+	 * Sanitizes and validates the PHP executable path to prevent command injection
+	 *
+	 * @param string $phppath The PHP path to sanitize
+	 * @return string The sanitized PHP path
+	 */
+	private function sanitizePHPPath(string $phppath): string
+	{
+		$phppath = trim($phppath);
+		if (empty($phppath)) {
+			return 'php';
+		}
+
+		if (preg_match('/[^a-zA-Z0-9\/_\-.]/', $phppath)) {
+			if (preg_match('/^[a-zA-Z0-9\/_\-.]+/', $phppath, $matches)) {
+				$phppath = $matches[0];
+			} else {
+				$phppath = 'php';
+			}
+		}
+
+		return $phppath;
+	}
+
+	/**
 	 * PHP Check
 	 *
 	 * Checks the PHP environment.
@@ -224,9 +248,11 @@ class Installer
 			$phppath = 'php';
 		}
 
+		$phppath = $this->sanitizePHPPath($phppath);
+
 		$passed = file_exists($phppath);
 		if (!$passed) {
-			$phppath = trim(shell_exec('which ' . $phppath));
+			$phppath = trim(shell_exec('which ' . escapeshellarg($phppath)));
 			$passed  = strlen($phppath);
 		}
 
@@ -246,7 +272,7 @@ class Installer
 		$this->addCheck(DI::l10n()->t('Command line PHP') . ($passed ? " (<tt>$phppath</tt>)" : ""), $passed, false, $help);
 
 		if ($passed) {
-			$cmd      = "$phppath -v";
+			$cmd      = escapeshellarg($phppath) . ' -v';
 			$result   = trim(shell_exec($cmd));
 			$passed2  = (str_contains($result, "(cli)"));
 			[$result] = explode("\n", $result);
@@ -263,7 +289,7 @@ class Installer
 
 		if ($passed2) {
 			$str     = Strings::getRandomName(8);
-			$cmd     = "$phppath bin/testargs.php $str";
+			$cmd     = escapeshellarg($phppath) . ' bin/testargs.php ' . escapeshellarg($str);
 			$result  = trim(shell_exec($cmd));
 			$passed3 = $result == $str;
 			$help    = "";

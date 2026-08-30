@@ -44,9 +44,9 @@ class Instance extends BaseDataTransferObject
 		$register_policy = Register::getPolicy();
 
 		$this->uri               = $baseUrl->getHost();
-		$this->title             = $config->get('config', 'sitename');
-		$this->short_description = $this->description = $config->get('config', 'info');
-		$this->email             = $config->get('config', 'sender_email');
+		$this->title             = $config->get('config', 'sitename')                  ?? '';
+		$this->short_description = $this->description = $config->get('config', 'info') ?? '';
+		$this->email             = $config->get('config', 'sender_email')              ?? '';
 		$this->version           = '2.8.0 (compatible; Friendica ' . App::VERSION . ')';
 		$this->urls              = ['streaming_api' => '']; // Not supported
 		$this->stats             = new Stats($config, $database);

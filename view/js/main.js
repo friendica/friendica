@@ -20,25 +20,82 @@ if (!Element.prototype.matches) {
 		};
 }
 
-/**
- * Register a function to be called on initial page load and after SPA navigation
- * This provides a unified way to handle initialization for both traditional page loads
- * and Single Page Application (SPA) content updates.
- *
- * @param {Function} fn - The function to execute on page load and SPA navigation
- * @example
- * function initMyModule() {
- *     // Initialization code
- * }
- * onPageLoad(initMyModule);
- */
-function onPageLoad(fn) {
-	if (typeof fn !== 'function') {
-		return;
+const ModuleLifecycleReadyEvent = Object.freeze({
+	DOCUMENT: 'document',
+	WINDOW: 'window'
+});
+
+const registerModuleLifecycle = function (target, initialize, readyEvent) {
+	if (typeof target !== 'string' || target === '') {
+		return null;
 	}
-	$(document).ready(fn);
-	window.addEventListener('theme:reload', fn);
-}
+
+	if (!window.__friendica_unpoly_lifecycle_registry) {
+		window.__friendica_unpoly_lifecycle_registry = new Map();
+	}
+
+	const initializerFingerprint = (function () {
+		if (typeof initialize !== 'function') {
+			return 'init';
+		}
+
+		if (initialize.name) {
+			return initialize.name;
+		}
+
+		try {
+			return initialize.toString().replace(/\s+/g, ' ').trim().substring(0, 240);
+		} catch (error) {
+			return 'anonymous';
+		}
+	})();
+
+	const registryKey = target + '::' + initializerFingerprint + '::' + readyEvent;
+	if (window.__friendica_unpoly_lifecycle_registry.has(registryKey)) {
+		return window.__friendica_unpoly_lifecycle_registry.get(registryKey);
+	}
+
+	const refresh = function () {
+		const targetElement = document.querySelector(target);
+		if (!targetElement || typeof initialize !== 'function') {
+			return null;
+		}
+		return initialize(targetElement);
+	};
+
+	if (window.addEventListener) {
+		window.addEventListener('spa:navigate', refresh, { passive: true });
+
+		if (readyEvent === ModuleLifecycleReadyEvent.WINDOW) {
+			if (spaEnabled) {
+				window.addEventListener('spa:window:load', refresh, { passive: true });
+			} else {
+				$(window).load(refresh);
+			}
+		} else {
+			if (spaEnabled) {
+				window.addEventListener('spa:document:ready', refresh, { passive: true });
+			} else {
+				$(document).ready(refresh);
+			}
+		}
+
+		if ((document.readyState === 'complete' || document.readyState === 'interactive') && !window.__spa_reinit_phase) {
+			setTimeout(refresh, 0);
+		}
+	}
+
+	window.__friendica_unpoly_lifecycle_registry.set(registryKey, null);
+	return null;
+};
+
+window.onDocumentReady = function (target, initialize) {
+	return registerModuleLifecycle(target, initialize, ModuleLifecycleReadyEvent.DOCUMENT);
+};
+
+window.onWindowLoad = function (target, initialize) {
+	return registerModuleLifecycle(target, initialize, ModuleLifecycleReadyEvent.WINDOW);
+};
 
 function resizeIframe(obj) {
 	_resizeIframe(obj, 0);
@@ -155,13 +212,20 @@ var last_popup_button = null;
 var lockLoadContent = false;
 var originalTitle = document.title;
 
+// Update original title on SPA navigation to prevent ping handler from resetting to stale title
+if (window.addEventListener) {
+	window.addEventListener('spa:navigate', function () {
+		originalTitle = document.title;
+	});
+}
+
 // Scroll to item deduplication flags
 var scrollToItemInProgress = false;
 var lastScrollToItemId = null;
 
 const urlRegex = /^(?:https?:\/\/|\s)[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})(?:\/+[a-z0-9_.:;-]*)*(?:\?[&%|+a-z0-9_=,.:;-]*)?(?:[&%|+&a-z0-9_=,:;.-]*)(?:[!#\/&%|+a-z0-9_=,:;.-]*)}*$/i;
 
-$(function() {
+window.onDocumentReady('body', function() {
 	$.ajaxSetup({cache: false});
 
 	/* setup comment textarea buttons */
@@ -170,7 +234,7 @@ $(function() {
 	 * 		data-bbcode="<string>" : name of the bbcode element to insert. insertFormatting() will insert it as "[name][/name]"
 	 * 		data-id="<string>" : id of the comment, used to find other comment-related element, like the textarea
 	 * */
-	$('body').on('click','[data-role="insert-formatting"]', function(e) {
+	$('body').off('click.friendica-main', '[data-role="insert-formatting"]').on('click.friendica-main', '[data-role="insert-formatting"]', function(e) {
 		e.preventDefault();
 		var o = $(this);
 		var bbcode = o.data('bbcode');
@@ -259,11 +323,6 @@ $(function() {
 		'maxWidth' : '100%'
 	});
 
-	/* notifications template */
-	var notifications_all = unescape($('<div>').append($("#nav-notifications-see-all").clone()).html()); //outerHtml hack
-	var notifications_mark = unescape($('<div>').append($("#nav-notifications-mark-all").clone()).html()); //outerHtml hack
-	var notifications_empty = unescape($("#nav-notifications-menu").html());
-
 	/* Ensure loading is visible when notifications menu is opened (if no notifications loaded yet)*/
 	$('#nav-notifications-linkmenu, #nav-notifications-menu-btn').on('click', function() {
 		if ($("#nav-notifications-loading").length && $("#nav-notifications-empty").length) {
@@ -335,18 +394,27 @@ $(function() {
 		// Hide loading state when we receive notification data
 		$("#nav-notifications-loading").hide();
 
-		if (data.notifications.length == 0) {
+		var navNotifications = Array.isArray(data.notifications) ? data.notifications : [];
+		if (navNotifications.length == 0) {
 			$("#nav-notifications-empty").show();
 		} else {
 			$("#nav-notifications-empty").hide();
 			var nnm = $("#nav-notifications-menu");
-			// Preserve the loading and empty state elements when rebuilding the menu
+			// Preserve control/state elements from the current DOM to avoid stale template snapshots
+			var seeAllElement = nnm.find("#nav-notifications-see-all");
+			var markAllElement = nnm.find("#nav-notifications-mark-all");
 			var loadingElement = nnm.find("#nav-notifications-loading");
 			var emptyElement = nnm.find("#nav-notifications-empty");
 
-			nnm.html(notifications_all + notifications_mark);
+			nnm.empty();
+			if (seeAllElement.length > 0) {
+				nnm.append(seeAllElement);
+			}
+			if (markAllElement.length > 0) {
+				nnm.append(markAllElement);
+			}
 
-			// Re-add the loading and empty elements if they existed
+			// Re-add loading and empty state elements if they existed
 			if (loadingElement.length > 0) {
 				nnm.append(loadingElement);
 			}
@@ -359,12 +427,12 @@ $(function() {
 			var notification_id = 0;
 
 			// Insert notifs into the notifications-menu
-			$(data.notifications).each(function(key, navNotif) {
+			$(navNotifications).each(function(key, navNotif) {
 				nnm.append(navNotif.html);
 			});
 
 			// Desktop Notifications
-			$(data.notifications.reverse()).each(function(key, navNotif) {
+			$(navNotifications.slice().reverse()).each(function(key, navNotif) {
 				notification_id = parseInt(navNotif.timestamp);
 				if (notification_lastitem !== null && notification_id > notification_lastitem && Number(navNotif.seen) === 0) {
 					if (getNotificationPermission() === "granted") {
@@ -414,15 +482,19 @@ $(function() {
 	});
 
 	// Asynchronous calls are deferred until the very end of the page load to ease on slower connections
-	window.addEventListener("load", function(){
-		NavUpdate();
-		if (typeof acl !== 'undefined') {
-			acl.get(0, 100);
-		}
-	});
+	// Only register once, not on every SPA navigation
+	if (typeof window.__friendica_main_load_handler === 'undefined') {
+		window.__friendica_main_load_handler = true;
+		window.addEventListener("load", function(){
+			NavUpdate();
+			if (typeof acl !== 'undefined') {
+				acl.get(0, 100);
+			}
+		});
+	}
 
 	// Allow folks to stop the ajax page updates with the pause/break key
-	$(document).keydown(function(event) {
+	$(document).off('keydown.friendica-main-pause').on('keydown.friendica-main-pause', function(event) {
 		// Pause/Break or Ctrl + Space
 		if (event.which === 19 || (!event.metaKey && !event.shiftKey && !event.altKey && event.ctrlKey && event.which === 32)) {
 			event.preventDefault();
@@ -441,7 +513,7 @@ $(function() {
 	});
 
 	// Scroll to the next/previous thread when pressing J and K
-	$(document).keydown(function (event) {
+	$(document).off('keydown.friendica-main-nav').on('keydown.friendica-main-nav', function (event) {
 		var threads = $('.thread_level_1');
 		if ((event.keyCode === 74 || event.keyCode === 75) && !$(event.target).is('textarea, input')) {
 			var scrollTop = $(window).scrollTop();
@@ -464,43 +536,39 @@ $(function() {
 		}
 	});
 
-	// Function to initialize infinite scroll - can be called multiple times
-	function initInfiniteScroll() {
-		console.debug('[Main] initInfiniteScroll called');
-		console.debug('[Main] typeof infinite_scroll:', typeof infinite_scroll);
-		console.debug('[Main] #scroll-loader length:', $('#scroll-loader').length);
-		
-		// Only initialize if infinite_scroll is defined
-		if (typeof infinite_scroll !== 'undefined') {
-			// Remove any existing scroll handler to prevent duplicates
-			$(window).off('scroll.infinite');
-			
-			$(window).on('scroll.infinite', function(e) {
-				if ($(document).height() != $(window).height()) {
-					// First method that is expected to work - but has problems with Chrome
-					if ($(window).scrollTop() > ($(document).height() - $(window).height() * 1.5))
-						loadScrollContent();
-				} else {
-					// This method works with Chrome - but seems to be much slower in Firefox
-					if ($(window).scrollTop() > (($("section").height() + $("header").height() + $("footer").height()) - $(window).height() * 1.5)) {
-						loadScrollContent();
-					}
-				}
-			});
-			console.debug('[Main] Infinite scroll initialized - scroll handler attached');
-		} else {
-			console.debug('[Main] Infinite scroll NOT initialized - missing infinite_scroll object');
-		}
-	}
-	
-	// Register event listener for SPA navigation - do this immediately so it's available even before DOM ready
-	if (window.addEventListener) {
-		window.addEventListener('spa:initInfiniteScroll', initInfiniteScroll);
-	}
-	
 	// Initialize infinite scroll on first page load
-	initInfiniteScroll();
+	if (typeof initInfiniteScroll === 'function') {
+		initInfiniteScroll();
+	}
 });
+
+// Function to initialize infinite scroll - can be called multiple times
+function initInfiniteScroll() {
+	
+	// Only initialize if infinite_scroll is defined
+	if (typeof infinite_scroll !== 'undefined') {
+		// Remove any existing scroll handler to prevent duplicates
+		$(window).off('scroll.infinite');
+		
+		$(window).on('scroll.infinite', function(e) {
+			if ($(document).height() != $(window).height()) {
+				// First method that is expected to work - but has problems with Chrome
+				if ($(window).scrollTop() > ($(document).height() - $(window).height() * 1.5))
+					loadScrollContent();
+			} else {
+				// This method works with Chrome - but seems to be much slower in Firefox
+				if ($(window).scrollTop() > (($("section").height() + $("header").height() + $("footer").height()) - $(window).height() * 1.5)) {
+					loadScrollContent();
+				}
+			}
+		});
+	}
+}
+
+// Register event listener for SPA navigation - do this immediately
+if (window.addEventListener) {
+	window.addEventListener('spa:initInfiniteScroll', initInfiniteScroll);
+}
 
 /**
  * Inserts a BBCode tag in the comment textarea identified by id
@@ -564,11 +632,8 @@ function triggerLiveUpdates(force, guid) {
 		showProcessing();
 	}
 	force_update = force;
-	console.debug('[Main] triggerLiveUpdates called with force:', force, 'guid:', guid);
 	['network', 'profile', 'channel', 'community', 'notes', 'display', 'contact'].forEach(function (src) {
-		console.debug('[Main] Checking live-' + src + ', exists=' + $('#live-' + src).length + ', force=' + force + ', updateContent=' + updateContent + ', isDisplay=' + $('#live-display').length);
 		if ($('#live-' + src).length && (force || (updateContent && src !== 'display'))) {
-			console.debug('[Main] Triggering liveUpdate for: ' + src + ', guid=' + guid);
 			liveUpdate(src, force, guid);
 		}
 	});
@@ -592,7 +657,6 @@ function scrollToItem(elementId) {
 	
 	// Prevent multiple calls for the same element
 	if (scrollToItemInProgress && lastScrollToItemId === elementId) {
-		console.debug('[Main] scrollToItem: Already in progress for ' + elementId + ', skipping duplicate call');
 		return false;
 	}
 	
@@ -655,14 +719,11 @@ function NavUpdate() {
 					}
 
 					// start live update
-					console.debug('[Main] Starting live updates for sources: network, profile, channel, community, notes, display, contact');
 					triggerLiveUpdates(force_update);
 
 					if ($('#live-network').length && !$('#live-display').length) {
-						console.debug('[Main] Triggering networkUpdate');
 						networkUpdate(force_update);
 					} else if (!$('#live-display').length) {
-						console.debug('[Main] No live-network element or on display page, using ping_network fallback');
 						var update_url = 'ping_network?ping=1';
 						if (force_update) {
 							showFetching();
@@ -699,7 +760,6 @@ function NavUpdate() {
 }
 
 function updateConvItems(data, guid) {
-	console.debug('[Main] updateConvItems called, guid:', guid);
 	// add a new thread
 	$('.toplevel_item',data).each(function() {
 		var ident = $(this).attr('id');
@@ -744,13 +804,11 @@ function updateConvItems(data, guid) {
 
 function getUpdateUrl(src)
 {
-	console.debug('[Main] getUpdateUrl called for src=' + src + ', profile_uid=' + (typeof profile_uid !== 'undefined' ? profile_uid : 'undefined') + ', netargs=' + netargs + ', update_item=' + update_item);
 	let force = force_update || $(document).scrollTop() === 0;
 
 	var udargs = ((netargs.length) ? '/' + netargs : '');
 
 	var update_url = src + udargs + '&p=' + profile_uid + '&force=' + (force ? 1 : 0) + '&item=' + update_item;
-	console.debug('[Main] getUpdateUrl: generated url=' + update_url);
 
 	if (getUrlParameter('page')) {
 		update_url += '&page=' + getUrlParameter('page');
@@ -785,14 +843,11 @@ function getUpdateUrl(src)
 }
 
 function liveUpdate(src, force, guid) {
-	console.debug('[Main] liveUpdate called for src:', src, 'guid:', guid, 'stopped:', stopped, 'profile_uid:', (typeof profile_uid !== 'undefined' ? profile_uid : 'undefined'), 'in_progress:', in_progress);
 	if ((src == null) || stopped || !profile_uid) {
-		console.debug('[Main] liveUpdate skipped: src=null or stopped or no profile_uid');
 		$('.like-rotator').hide(); return;
 	}
 
 	if (($('.comment-edit-text-full').length) || in_progress) {
-		console.debug('[Main] liveUpdate delayed: comment edit in progress or in_progress=true');
 		if (livetime) {
 			clearTimeout(livetime);
 		}
@@ -810,7 +865,6 @@ function liveUpdate(src, force, guid) {
 	var orgHeight = $("section").height();
 
 	var update_url = getUpdateUrl(src);
-	console.debug('[Main] liveUpdate: calling getUpdateUrl for src=' + src + ', result url=' + update_url);
 
 	if (force_update) {
 		force_update = false;
@@ -1091,17 +1145,13 @@ function lockview(event, type, id) {
 }
 
 function post_comment(id) {
-	console.debug('[Main] post_comment called for item id:', id);
-	console.debug('[Main] commentBusy before:', commentBusy);
 	
 	if (commentBusy) {
-		console.debug('[Main] post_comment: Already busy, ignoring duplicate call');
 		return false;
 	}
 	
 	unpause();
 	commentBusy = true;
-	console.debug('[Main] post_comment: Setting commentBusy=true, starting post');
 	showPosting();
 	$('body').css('cursor', 'wait');
 	$.post(
@@ -1110,9 +1160,7 @@ function post_comment(id) {
 	)
 		.done(function(data) {
 			showProcessing();
-			console.debug('[Main] post_comment: AJAX response received for id:', id);
 			if (data.success) {
-				console.debug('[Main] post_comment: Comment posted successfully');
 				$("#comment-edit-wrapper-" + id).hide();
 				$("#comment-edit-text-" + id).val('');
 				var textarea = document.getElementById("comment-edit-text-" + id);
@@ -1122,16 +1170,13 @@ function post_comment(id) {
 				if (timer) {
 					clearTimeout(timer);
 				}
-				console.debug('[Main] post_comment: Calling triggerLiveUpdates with guid:', data.guid ?? null);
 				updateItem(id, data.guid ?? null);
 			}
 			if (data.reload) {
-				console.debug('[Main] post_comment: Server requested reload');
 				window.location.href=data.reload;
 			}
 		})
 		.always(function() {
-		console.debug('[Main] post_comment: AJAX completed, setting commentBusy=false');
 		hideLoading();
 		commentBusy = false;
 		$('body').css('cursor', 'auto');
@@ -1555,7 +1600,6 @@ function loadScrollContent() {
 	
 	// Guard: Check if scroll-loader element and infinite_scroll are available
 	if ($('#scroll-loader').length === 0 || typeof infinite_scroll === 'undefined' || typeof infinite_scroll.reload_uri === 'undefined') {
-		console.debug('[Main] loadScrollContent: missing requirements (scroll-loader or infinite_scroll)');
 		lockLoadContent = false;
 		return;
 	}

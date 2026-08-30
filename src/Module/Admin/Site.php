@@ -160,8 +160,6 @@ class Site extends BaseAdmin
 		$max_posts_per_author    = (!empty($_POST['max_posts_per_author'])    ? intval($_POST['max_posts_per_author']) : 0);
 		$sharer_interaction_days = (!empty($_POST['sharer_interaction_days']) ? intval($_POST['sharer_interaction_days']) : 0);
 
-		$active_panel = (!empty($_POST['active_panel'])      ? "#" . trim((string) $_POST['active_panel']) : '');
-
 		$transactionConfig = DI::config()->beginTransaction();
 
 		// Has the directory url changed? If yes, then resubmit the existing profiles there
@@ -344,7 +342,7 @@ class Site extends BaseAdmin
 
 		$transactionConfig->commit();
 
-		DI::baseUrl()->redirect('admin/site' . $active_panel);
+		DI::baseUrl()->redirect('admin/site');
 	}
 
 	protected function content(array $request = []): string

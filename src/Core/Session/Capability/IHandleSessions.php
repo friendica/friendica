@@ -20,6 +20,17 @@ interface IHandleSessions
 	public function start(): IHandleSessions;
 
 	/**
+	 * Assign a new id to the current session, keeping its content
+	 *
+	 * Called whenever the privilege level of a session changes, so that an id
+	 * known before that change cannot be used afterwards. Session types without
+	 * a client-supplied id have nothing to rotate and do nothing here.
+	 *
+	 * @return self The own Session instance
+	 */
+	public function regenerateId(): IHandleSessions;
+
+	/**
 	 * Checks if the key exists in this session
 	 *
 	 * @param string $name

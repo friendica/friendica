@@ -527,9 +527,14 @@ aside .help-aside-wrapper h1 {
     margin: 0 0 20px 30px;
 }
 
-.settings-heading a:after{
-  content: ' »';
+summary.settings-heading > h2,
+summary.settings-subheading > h3 {
+  display: inline;
+  font-size: inherit;
+  font-weight: inherit;
+  margin: 0;
 }
+
 .settings-widget {
 	line-height: 2.2;
 }
@@ -962,6 +967,7 @@ summary.wall-item-summary {
 	pointer-events: none;
 }
 /* ...omit alt tags on images in these cases: profile description */
+.attachment .photo-album-image-wrapper::after,
 .profile-header a:has(img.has-alt-description)::after {
 	display: none;
 }

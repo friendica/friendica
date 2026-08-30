@@ -29,6 +29,8 @@ $frio                = "view/theme/frio";
 $view_mode_class     = (DI::mode()->isMobile() || DI::mode()->isMobile()) ? 'mobile-view' : 'desktop-view';
 $is_singleuser       = DI::config()->get('system', 'singleuser');
 $is_singleuser_class = $is_singleuser ? "is-singleuser" : "is-not-singleuser";
+$show_action_labels  = (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_action_labels', DI::config()->get('frio', 'show_action_labels', false))) ? 'show-action-labels' : '';
+$show_nav_labels     = (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_nav_labels', DI::config()->get('frio', 'show_nav_labels', false))) ? 'show-nav-labels' : '';
 ?>
 <html lang="<?php echo DI::l10n()->getCurrentLang(); ?>">
 	<head>
@@ -67,7 +69,7 @@ echo '<meta name="theme-color" content="' . $nav_bg . '" />';
 ?>
 	</head>
 
-	<body id="top" class="mod-<?php echo $page['module'] . " " . $is_singleuser_class . " " . $view_mode_class;?>">
+	<body id="top" class="mod-<?php echo $page['module'] . " " . $is_singleuser_class . " " . $view_mode_class . " " . $show_action_labels . " " . $show_nav_labels;?>">
 <?php
 	if (!empty($page['nav']) && !$minimal) {
 		echo str_replace(
@@ -143,7 +145,7 @@ if ($minimal) {
 				</div><!--row-->
 			</div><!-- container -->
 
-			<button id="back-to-top" class="btn btn-primary" data-toggle="tooltip" title="<?php echo DI::l10n()->t('Back to top')?>">⇧</button>
+			<button id="back-to-top" class="btn btn-primary" data-toggle="tooltip" title="<?php echo DI::l10n()->t('Back to top')?>" onclick="$('body,html').animate({scrollTop: 0}, 400); return false;">⇧</button>
 		</main>
 
 		<footer id="page-footer">

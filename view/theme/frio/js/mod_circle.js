@@ -9,9 +9,8 @@
  * The javascript for the circle module
  */
 
-$(document).ready(function () {
-	// Add an event listeners on buttons for switching the contact list view
-	$("body").on("click", ".circle-list-switcher", function () {
+window.onDocumentReady('body', function () {
+	$("body").off(".friendicaCircle").on("click.friendicaCircle", ".circle-list-switcher", function () {
 		switchCircleViewMode(this);
 	});
 });

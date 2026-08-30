@@ -7,6 +7,7 @@
 
 <div id='adminpage'>
 	<h1>{{$title}} - {{$page}}</h1>
+	<div class="settings-section">
 {{if $warningtext|count}}
 	<div id="admin-warning-message-wrapper">
 		{{foreach $warningtext as $wt}}
@@ -51,5 +52,5 @@
 			</table>
 		</dd>
 	</dl>
-
+	</div>
 </div>

@@ -33,6 +33,7 @@ const injectedGlobals = {
 	localUser: "readonly",
 	netargs: "writable",
 	profile_uid: "readonly",
+	spaEnabled: "readonly", // view/templates/head.tpl, view/theme/frio/templates/head.tpl
 	theme: "writable", // reassigned by previewTheme() in view/js/main.js
 };
 
@@ -48,6 +49,7 @@ const friendicaGlobals = {
 	commentCloseUI: "readonly",
 	hideLoading: "readonly",
 	htmlToText: "readonly",
+	initInfiniteScroll: "readonly", // view/js/main.js
 	insertBBCodeInTextarea: "readonly",
 	jotShow: "readonly",
 	NavUpdate: "readonly",
@@ -68,6 +70,7 @@ export default [
 	{
 		ignores: [
 			"addon/**",
+			"local/**",
 			"node_modules/**",
 			"vendor/**",
 			"**/.venv/**",
@@ -92,7 +95,7 @@ export default [
 	},
 	js.configs.recommended,
 	{
-		files: ["view/**/*.js", "mods/**/*.js"],
+		files: ["view/**/*.js", "view/**/*.mjs", "mods/**/*.js"],
 		languageOptions: {
 			ecmaVersion: 2022,
 			sourceType: "script",
@@ -132,6 +135,12 @@ export default [
 			"no-unreachable-loop": "error",
 			"no-use-before-define": ["error", { functions: false, classes: false }],
 			"require-atomic-updates": "error",
+		},
+	},
+	{
+		files: ["view/js/spa/**/*.js"],
+		languageOptions: {
+			sourceType: "module",
 		},
 	},
 ];

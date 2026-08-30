@@ -10,7 +10,7 @@
       parent.postMessage({type:'resize-{{$id}}',height:document.body.scrollHeight},'*');
       setTimeout(function() {parent.postMessage({type:'resize-{{$id}}',height:document.body.scrollHeight},'*');}, 2000);
   };
-  &lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" width="{{$width}}" scrolling="no" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-same-origin allow-scripts allow-popups"></iframe>
+  &lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" width="{{$width}}" scrolling="no" frameborder="0" allow="fullscreen, picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen sandbox="allow-scripts allow-popups"></iframe>
   <script>
     window.addEventListener('message', function(event) {
       if (event.data && event.data.type === 'resize-{{$id}}') {

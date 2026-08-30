@@ -241,6 +241,58 @@ class Network
 		return false;
 	}
 
+	/** Checks whether an outbound request targets a non-public address. */
+	public static function isPrivateTarget(UriInterface $uri): bool
+	{
+		if (!DI::config()->get('system', 'block_private_addresses', true)) {
+			return false;
+		}
+
+		$host = $uri->getHost();
+		if ($host === '') {
+			return false;
+		}
+
+		if (strcasecmp($host, DI::baseUrl()->getHost()) === 0) {
+			return false;
+		}
+
+		foreach (DI::config()->get('system', 'allowed_internal_hosts', []) as $allowed) {
+			if (!empty($allowed) && fnmatch(strtolower((string) $allowed), strtolower($host))) {
+				return false;
+			}
+		}
+
+		foreach (self::resolveHost($host) as $address) {
+			if (IpAddress::isNonPublic($address)) {
+				DI::logger()->info('Target is not on the public internet.', ['host' => $host, 'address' => $address]);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/** @return string[] All resolved addresses for the host. */
+	private static function resolveHost(string $host): array
+	{
+		$host = trim($host, '[]');
+
+		if (filter_var($host, FILTER_VALIDATE_IP)) {
+			return [$host];
+		}
+
+		$addresses = @gethostbynamel($host) ?: [];
+
+		foreach (@dns_get_record($host . '.', DNS_AAAA) ?: [] as $record) {
+			if (!empty($record['ipv6'])) {
+				$addresses[] = $record['ipv6'];
+			}
+		}
+
+		return $addresses;
+	}
+
 	/**
 	 * Check if email address is allowed to register here.
 	 *

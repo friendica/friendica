@@ -36,7 +36,7 @@ class Delete extends BaseApi
 		}
 
 		// error message if specified gid is not in database
-		if (!DBA::exists('group', ['uid' => $uid, 'id' => $request['gid']])) {
+		if (!Circle::exists((int) $request['gid'], $uid)) {
 			throw new BadRequestException('gid not available');
 		}
 

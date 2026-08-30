@@ -54,7 +54,7 @@ parameters:
             message: '#^Call to deprecated method run\(\) of class#'
             identifier: method.deprecated
             path: tests/
-            count: 53
+            count: 40
 
         # vfsStream v1.6.12: getChild() returns vfsStreamContent, but at() expects
         # vfsStreamContainer. vfsStreamContainer does NOT extend vfsStreamContent,

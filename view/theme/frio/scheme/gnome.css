@@ -165,6 +165,19 @@ nav.navbar {
   }
 }
 
+#nav-profile-link {
+	border: 1px solid var(--accent-color) !important;
+}
+
+#nav-delegation-link {
+	color: var(--text-primary) !important;
+	background-color: var(--bg-secondary);
+	border: 1px solid var(--accent-color) !important;
+	&:hover {
+		background: var(--bg-tertiary) !important;
+	}
+}
+
 a {
   color: var(--accent-color);
   transition: color 0.2s;
@@ -410,7 +423,7 @@ aside {
     color: var(--text-primary) !important;
 
     &:hover {
-      background: var(--bg-tertiary)
+      background: var(--bg-tertiary) !important;
     }
   }
 

@@ -2633,19 +2633,20 @@ ul.tabs li .active, span.pager_current a {
 	overflow: auto;
 	width: 100%;
 }
-.field label {
-	float: left;
-	width: 200px;
-}
-.field input, .field textarea {
-	max-width: 400px;
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="number"],
+.field textarea {
+	max-width: 100%;
+	width: 100%;
+	box-sizing: border-box;
 }
 .field textarea {
 	height: 100px;
 }
 .field .field_help {
 	display: block;
-	margin-left: 200px;
 	color: #666666;
 }
 .field .hidden {
@@ -2653,6 +2654,39 @@ ul.tabs li .active, span.pager_current a {
 }
 .field.radio .field_help {
 	margin-left: 0px;
+}
+.settings-section .field.custom label,
+.settings-subsection .field.custom label,
+.settings-section .field.select label,
+.settings-subsection .field.select label {
+	display: block;
+	font-weight: bold;
+}
+.settings-section .field.custom select,
+.settings-subsection .field.custom select,
+.settings-section .field.select select,
+.settings-subsection .field.select select {
+	width: 100%;
+	box-sizing: border-box;
+}
+#profpic-left {
+	width: 50%;
+	float: left;
+}
+#profpic-right{
+	width: 50%;
+	float: right;
+}
+.settings-row::after {
+	content: '';
+	display: block;
+	clear: both;
+}
+@media (max-width: 720px){
+	#profpic-left, #profpic-right {
+		width: auto;
+		float: none;
+	}
 }
 aside form {
 	overflow-x: hidden;
@@ -3149,7 +3183,54 @@ a.mail-list-link {
 	margin-bottom: 10px;
 	margin-top: 20px;
 }
-
+.settings-section,
+.settings-subsection {
+	background-color: #fff;
+	margin-bottom: 10px;
+	border-radius: 4px;
+	padding: 10px;
+}
+	details[open].settings-section,
+	.settings-section:open {
+		padding-bottom: 20px;
+	}
+.settings-heading {
+	font-size: 24.5px;
+	list-style: none;
+}
+.settings-subheading {
+	font-size: 20.5px;
+	list-style: none;
+}
+	details[open].settings-section > summary,
+	details[open].settings-subsection > summary {
+		margin-bottom: 10px;
+	}
+	details.settings-section > summary::before,
+	details.settings-subsection > summary::before {
+		font-family: remixicon;
+		content: "\ea6e";
+		padding-right: 5px;
+	}
+	details[open].settings-section > summary::before,
+	details[open].settings-subsection > summary::before {
+		font-family: remixicon;
+		content: "\ea4e";
+		padding-right: 5px;
+	}
+	details[open].settings-section::details-content,
+	details[open].settings-subsection::details-content {
+		animation: sweep .5s ease-in-out;
+		padding-bottom: 10px;
+	}
+.settings-submit-wrapper {
+	padding-top: 10px;
+	clear: both;
+}
+@keyframes sweep {
+	0% {opacity: 0; margin-left: -10px}
+	100% {opacity: 1; margin-left: 0px}
+}
 .settings-block {
 	border-bottom: 1px solid #898989;
 	/* border: 1px solid #AAA; */
@@ -3710,6 +3791,7 @@ img.photo-album-photo {
 
 #profile-edit-wrapper {
 	line-height: 30px;
+	margin-bottom: 15px;
 }
 #profile-edit-wrapper .field {
 	margin-bottom:0;
@@ -3722,10 +3804,6 @@ img.photo-album-photo {
 #profile-edit-wrapper #profile-edit-dob select {
 	width:auto;
 }
-#profile-edit-wrapper,
-#profile-edit-wrapper .toggle-section-content {
-	margin-bottom:15px;
-}
 .profile-edit-submit-wrapper {
 	margin-top:15px;
 }
@@ -3734,10 +3812,6 @@ img.photo-album-photo {
 	padding:15px;
 	width:auto;
 	border:1px solid #511919;
-}
-#profile-edit-wrapper .toggle-section-content {
-	background:#ededed;
-	padding:5px;
 }
 
 .btn {

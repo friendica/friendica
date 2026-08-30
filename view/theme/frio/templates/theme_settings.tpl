@@ -65,7 +65,7 @@
 {{if $login_bg_color}}{{include file="field_colorinput.tpl" field=$login_bg_color}}{{/if}}
 
 <script type="text/javascript">
-	$(document).ready(function() {
+	window.onDocumentReady('body', function() {
 
 		function GenerateShareString() {
 			var theme = {};
@@ -207,6 +207,8 @@
 
 {{include file="field_checkbox.tpl" field=$always_open_compose}}
 {{include file="field_checkbox.tpl" field=$enable_advancedcomposer}}
+{{include file="field_checkbox.tpl" field=$show_nav_labels}}
+{{include file="field_checkbox.tpl" field=$show_action_labels}}
 
 {{if $admin_theme_settings}}
 <div class="settings-submit-wrapper pull-right">

@@ -17,6 +17,8 @@ abstract class ConsoleTestCase extends MockedTestCase
 	 */
 	protected $consoleArgv = [ 'consoleTest.php' ];
 
+	protected ?int $consoleExecReturn = null;
+
 	protected function setUp(): void
 	{
 		parent::setUp();
@@ -34,8 +36,8 @@ abstract class ConsoleTestCase extends MockedTestCase
 	protected function dumpExecute(Console $console)
 	{
 		Intercept::reset();
-		$console->execute();
-		$returnStr = Intercept::$cache;
+		$this->consoleExecReturn = $console->execute();
+		$returnStr               = Intercept::$cache;
 		Intercept::reset();
 
 		return $returnStr;

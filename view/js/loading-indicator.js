@@ -123,7 +123,8 @@ function createLoadingIndicator() {
   var sourceElement = document.getElementById('topbar-first');
   if (sourceElement) {
     var bgColor = getComputedStyleValue(sourceElement, 'background-color');
-    var textColor = getComputedStyleValue(sourceElement, 'color');
+    var iconElement = document.querySelector('nav#topbar-first .icon');
+    var textColor = iconElement ? getComputedStyleValue(iconElement, 'color') : getComputedStyleValue(sourceElement, 'color');
 
     if (bgColor === '' || bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
       var parent = sourceElement.parentElement;
@@ -166,7 +167,6 @@ function initLoadingIndicator() {
  * @param {string} text
  */
 function setLoadingState(state, text) {
-  console.debug('[Loading] Setting state:', state, 'with text:', text);
   if (!loadingIndicator) createLoadingIndicator();
 
   Object.values(LOADING_STATES).forEach(function(s) {
@@ -204,7 +204,6 @@ function showPosting() {
 }
 
 function hideLoading() {
-  console.debug('[Loading] Hiding loading indicator');
   if (!loadingIndicator) return;
 
   // Clear message rotation interval

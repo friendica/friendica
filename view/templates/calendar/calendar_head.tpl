@@ -35,7 +35,7 @@
 			$('#id_finish_text').prop("disabled", false);
 	}
 
-	$(document).ready(function() {
+	window.onDocumentReady('#events-calendar', function() {
 		$('#events-calendar').fullCalendar({
 			defaultView: '{{$i18n.defaultView|escape:'quotes'}}',
 			firstDay: '{{$i18n.firstDay|escape:'quotes'}}',
@@ -146,7 +146,7 @@
 </script>
 
 <script language="javascript" type="text/javascript">
-	$(document).ready(function() {
+	window.onDocumentReady('body', function() {
 		$("#comment-edit-text-desc").bbco_autocomplete('bbcode');
 
 		$('#id_share').change(function() {

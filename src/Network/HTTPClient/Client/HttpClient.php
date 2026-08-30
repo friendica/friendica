@@ -84,6 +84,18 @@ class HttpClient implements ICanSendHttpRequests
 			return CurlResult::createErrorCurl($this->logger, $url);
 		}
 
+		if (!Network::isValidHttpUrl($url)) {
+			$this->logger->info('Unsupported scheme.', ['url' => $url]);
+			$this->profiler->stopRecording();
+			return CurlResult::createErrorCurl($this->logger, $url);
+		}
+
+		if (Network::isPrivateTarget(new Uri($url))) {
+			$this->logger->notice('Target is not on the public internet.', ['url' => $url]);
+			$this->profiler->stopRecording();
+			return CurlResult::createErrorCurl($this->logger, $url);
+		}
+
 		$conf = [];
 
 		if (!empty($opts[HttpClientOptions::COOKIEJAR])) {
@@ -239,6 +251,11 @@ class HttpClient implements ICanSendHttpRequests
 
 		if (Network::isRedirectBlocked($url)) {
 			$this->logger->info('Domain should not be redirected.', ['url' => $url]);
+			return $url;
+		}
+
+		if (Network::isPrivateTarget(new Uri($url))) {
+			$this->logger->notice('Target is not on the public internet.', ['url' => $url]);
 			return $url;
 		}
 

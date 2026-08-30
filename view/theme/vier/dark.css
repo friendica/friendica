@@ -112,3 +112,7 @@ li.notification-seen {
 	border: 3px solid #364e59;
 	color: #989898;
 }
+.settings-section,
+.settings-subsection {
+	background-color: #252C33;
+}

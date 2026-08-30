@@ -6,6 +6,7 @@
   *}}
 
 <script type="text/javascript" src="{{$baseurl}}/view/js/linkPreview.js?v={{$VERSION}}"></script>
+<script type="text/javascript" src="{{$baseurl}}/view/theme/frio/js/jot.js?v={{$VERSION}}"></script>
 
 <script type="text/javascript">
 	var editor = false;
@@ -77,8 +78,7 @@
 		}
 	}
 
-	$(document).ready(function() {
-
+	function initJotHeader() {
 		/* enable editor on focus and click */
 		$("#profile-jot-text").focus(enableOnUser);
 		$("#profile-jot-text").click(enableOnUser);
@@ -140,9 +140,6 @@
 				// Reset the form for jot reuse in the same page
 				e.target.reset();
 				$('#jot-modal').modal('hide');
-				// Ensure modal backdrop is removed (fixes lingering backdrop issue)
-				$(".modal-backdrop").remove();
-				$("body").removeClass("modal-open");
 				resetFormModifiedFlag(); // Reset formModified after successful submission
 			})
 			.always(function() {
@@ -228,7 +225,9 @@
 				});
 			}
 		});
-	});
+	}
+
+	window.onDocumentReady('body', initJotHeader);
 
 	function deleteCheckedItems() {
 		if (confirm('{{$delitems}}')) {
@@ -422,5 +421,34 @@
 	}
 
 	{{$geotag nofilter}}
+
+	function jotShow() {
+		var modal = $('#jot-modal').modal();
+		jotcache = $("#jot-sections");
+
+		// Auto focus on the first enabled field in the modal
+		modal.on('shown.bs.modal', function (e) {
+			$('#jot-modal-content').find('select:not([disabled]), input:not([type=hidden]):not([disabled]), textarea:not([disabled])').first().focus();
+		})
+
+		modal
+			.find('#jot-modal-content')
+			.append(jotcache)
+			.modal.show;
+
+		// Jot attachment live preview.
+		linkPreview = $('#profile-jot-text').linkPreview();
+	}
+
+	// Activate the jot text section in the jot modal
+	function jotActive() {
+		// Make sure jot text does have really the active class (we do this because there are some
+		// other events which trigger jot text (we need to do this for the desktop and mobile
+		// jot nav
+		var elem = $("#jot-modal .jot-nav #jot-text-lnk");
+		var elemMobile = $("#jot-modal .jot-nav #jot-text-lnk-mobile")
+		toggleJotNav(elem[0]);
+		toggleJotNav(elemMobile[0]);
+	}
 </script>
 

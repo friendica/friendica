@@ -27,15 +27,9 @@
 
 	<div class="panel-group panel-group-settings" id="profile-photo-edit-wrapper" role="tablist" aria-multiselectable="false">
 		{{* Change profile picture *}}
-		<div class="panel">
-			<div class="section-subtitle-wrapper panel-heading" role="tab" id="photo-upload">
-				<h2>
-					<button class="btn-link accordion-toggle {{if !$change_profile_picture}}collapsed{{/if}}" data-toggle="collapse" data-parent="#profile-photo-edit-wrapper" href="#photo-upload-collapse" aria-expanded="true" aria-controls="photo-upload-collapse">
-						{{$l10n.profpic_header}}
-					</button>
-				</h2>
-			</div>
-			<div id="photo-upload-collapse" class="panel-collapse collapse {{if $change_profile_picture}}in{{/if}}" role="tabpanel" aria-labelledby="photo-upload">
+		<details class="panel"{{if $change_profile_picture}} open{{/if}}>
+			<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="photo-upload"><h2>{{$l10n.profpic_header}}</h2></summary>
+			<div id="photo-upload-collapse">
 				<div class="panel-body">
 					<p id="profpic-intro-description">{{$l10n.profpic_intro}}</p>
 					<div class="row">
@@ -61,7 +55,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</details>
 	</div>
 
 	<form id="profile-edit-form" name="form1" action="" method="post">
@@ -69,16 +63,10 @@
 
 		<div class="panel-group panel-group-settings" id="profile-edit-wrapper" role="tablist" aria-multiselectable="false">
 			{{* The personal settings *}}
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="personal">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#personal-collapse" aria-expanded="false" aria-controls="personal-collapse">
-							{{$l10n.personal_section}}
-						</button>
-					</h2>
-				</div>
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="personal"><h2>{{$l10n.personal_section}}</h2></summary>
 				{{* for the $detailed_profile we use bootstraps collapsable panel-groups to have expandable groups *}}
-				<div id="personal-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="personal">
+				<div id="personal-collapse">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$username}}
 
@@ -92,18 +80,12 @@
 						<button type="submit" name="submit" class="btn btn-primary">{{$l10n.submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
 			{{* The location settings *}}
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="location">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#location-collapse" aria-expanded="false" aria-controls="location-collapse">
-							{{$l10n.location_section}}
-						</button>
-					</h2>
-				</div>
-				<div id="location-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="location">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="location"><h2>{{$l10n.location_section}}</h2></summary>
+				<div id="location-collapse">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$address}}
 
@@ -132,18 +114,12 @@
 						<button type="submit" name="submit" class="btn btn-primary">{{$l10n.submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
 			{{* The miscellaneous other settings *}}
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="miscellaneous">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#miscellaneous-collapse" aria-expanded="false" aria-controls="miscellaneous-collapse">
-							{{$l10n.miscellaneous_section}}
-						</button>
-					</h2>
-				</div>
-				<div id="miscellaneous-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="miscellaneous">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="miscellaneous"><h2>{{$l10n.miscellaneous_section}}</h2></summary>
+				<div id="miscellaneous-collapse">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$homepage}}
 
@@ -159,18 +135,12 @@
 						<button type="submit" name="submit" class="btn btn-primary">{{$l10n.submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
 			{{* The miscellaneous other settings *}}
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="custom-fields">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#profile-edit-wrapper" href="#custom-fields-collapse" aria-expanded="false" aria-controls="custom-fields-collapse">
-							{{$l10n.custom_fields_section}}
-						</button>
-					</h2>
-				</div>
-				<div id="custom-fields-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="custom-fields">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="custom-fields"><h2>{{$l10n.custom_fields_section}}</h2></summary>
+				<div id="custom-fields-collapse">
 					<div class="panel-body">
 						{{$custom_fields_description nofilter}}
 						<div id="profile-custom-fields">
@@ -183,7 +153,7 @@
 						<button type="submit" name="submit" class="btn btn-primary">{{$l10n.submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 		</div>
 	</form>
 </div>

@@ -7,6 +7,7 @@
 
 <div id="adminpage">
 	<h1>{{$title}} - {{$page}}</h1>
+	<div class="settings-section">
 {{if $pcount eq 0}}
 	<div class="error-message">
 	{{$noplugshint}}
@@ -27,4 +28,5 @@
 	{{/foreach}}
 	</ul>
 {{/if}}
+	</div>
 </div>

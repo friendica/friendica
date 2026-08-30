@@ -91,6 +91,11 @@ return [
 		// Days of inactivity after which an admin is considered inactive. "0" means that there will be no check for inactivity.
 		'admin_inactivity_limit' => 30,
 
+		// allowed_internal_hosts (Array)
+		// Internal hosts that server-side requests may reach. Wildcards are allowed.
+		// See block_private_addresses.
+		'allowed_internal_hosts' => [],
+
 		// allowed_link_protocols (Array)
 		// Allowed protocols in links URLs, add at your own risk. http(s) is always allowed.
 		'allowed_link_protocols' => ['ftp://', 'ftps://', 'mailto:', 'cid:', 'gopher://'],
@@ -138,6 +143,11 @@ return [
 		// bulk_delivery (Boolean)
 		// Delivers AP messages in a bulk (experimental)
 		'bulk_delivery' => false,
+
+		// block_private_addresses (Boolean)
+		// Refuse server-side requests to non-public IP addresses, including redirects.
+		// The node's base URL and allowed_internal_hosts are exempt.
+		'block_private_addresses' => true,
 
 		// block_local_dir (Boolean)
 		// Deny public access to the local user directory.
@@ -726,9 +736,12 @@ return [
 		// debug (Boolean)
 		// Enable debug level for the jabber account synchronisation.
 		'debug' => false,
-		// lockpath (Path)
-		// Must be writable by the ejabberd process. if set then it will prevent the running of multiple processes.
-		'lockpath' => '',
+		// auth_http_timeout (Integer)
+		// Timeout in seconds for the outgoing HTTP requests the ejabberd external auth daemon
+		// (bin/console auth_ejabberd) performs against remote hosts. Must stay well below
+		// ejabberd's own extauth call timeout so a slow remote host cannot keep a pooled auth
+		// worker busy long enough to be orphaned.
+		'auth_http_timeout' => 5,
 	],
 	'diaspora' => [
 		// native_photos (Boolean)

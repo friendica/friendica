@@ -8,173 +8,255 @@
  * Initialization of the fullCalendar and format the output.
  */
 
-$(document).ready(function () {
-	let $body = $("body");
+(function () {
+	const calendarEventNS = '.friendicaEventCalendar';
 
-	// start the fullCalendar
-	$("#events-calendar").fullCalendar({
-		firstDay: aStr.firstDay,
-		monthNames: aStr["monthNames"],
-		monthNamesShort: aStr["monthNamesShort"],
-		dayNames: aStr["dayNames"],
-		dayNamesShort: aStr["dayNamesShort"],
-		allDayText: aStr.allday,
-		noEventsMessage: aStr.noevent,
-		buttonText: {
-			today: aStr.today,
-			month: aStr.month,
-			week: aStr.week,
-			day: aStr.day,
-		},
-		events: calendar_api,
-		header: {
-			left: "",
-			//	center: 'title',
-			right: "",
-		},
-		timeFormat: "H:mm",
-		eventClick: function (calEvent, jsEvent, view) {
-			showEvent(calEvent.id);
-		},
-		loading: function (isLoading, view) {
-			if (!isLoading) {
-				$("td.fc-day").dblclick(function () {
-					addToModal("calendar/event/new?start=" + $(this).data("date"));
+	function destroyCalendarWidget($calendar) {
+		if (!$calendar || !$calendar.length) {
+			return;
+		}
+
+		if (typeof $.fn.fullCalendar === 'function') {
+			try {
+				$calendar.fullCalendar('destroy');
+			} catch (e) {
+				// ignore stale instances
+			}
+		}
+
+		$calendar.removeData('friendicaCalendarInitialized');
+		$('body')
+			.off('click' + calendarEventNS, '#id_share')
+			.off('change' + calendarEventNS, '#id_nofinish')
+			.off('click' + calendarEventNS, '#event-nav > li > a')
+			.off('click' + calendarEventNS, '#event-nav a')
+			.off('dblclick' + calendarEventNS, 'td.fc-day');
+		$('#contact_allow, #contact_deny, #circle_allow, #circle_deny')
+			.off('change' + calendarEventNS);
+		$('.popover.event-card, .popover.hovercard').remove();
+	}
+
+	function initializeCalendarWidget($calendar) {
+		if (!$calendar || !$calendar.length) {
+			return function () {};
+		}
+
+		if (typeof $.fn.fullCalendar !== 'function') {
+			return function () {};
+		}
+
+		if ($calendar.data('friendicaCalendarInitialized')) {
+			return function () {};
+		}
+
+		const $body = $('body');
+		const cleanup = function () {
+			destroyCalendarWidget($calendar);
+		};
+
+		if (typeof $.fn.fullCalendar === 'function') {
+			try {
+				$calendar.fullCalendar('destroy');
+			} catch (e) {
+				// ignore stale instances
+			}
+		}
+
+		$calendar.fullCalendar({
+			firstDay: aStr.firstDay,
+			monthNames: aStr["monthNames"],
+			monthNamesShort: aStr["monthNamesShort"],
+			dayNames: aStr["dayNames"],
+			dayNamesShort: aStr["dayNamesShort"],
+			allDayText: aStr.allday,
+			noEventsMessage: aStr.noevent,
+			buttonText: {
+				today: aStr.today,
+				month: aStr.month,
+				week: aStr.week,
+				day: aStr.day,
+			},
+			events: calendar_api,
+			header: {
+				left: "",
+				right: "",
+			},
+			timeFormat: "H:mm",
+			eventClick: function (calEvent, jsEvent, view) {
+				showEvent(calEvent.id);
+			},
+			loading: function (isLoading, view) {
+				if (!isLoading) {
+					$body.off('dblclick' + calendarEventNS, 'td.fc-day')
+						.on('dblclick' + calendarEventNS, 'td.fc-day', function () {
+							addToModal("calendar/event/new?start=" + $(this).data("date"));
+						});
+				}
+			},
+			defaultView: aStr.defaultView,
+			aspectRatio: 1,
+			eventRender: function (event, element, view) {
+				switch (view.name) {
+					case "month":
+						element
+							.find(".fc-title")
+							.html(
+								"<span class='item-desc'>{2}</span>".format(
+									event.item["author-avatar"],
+									event.item["author-name"],
+									event.title,
+									event.desc,
+									event.location,
+								),
+							);
+						break;
+					case "agendaWeek":
+						if (event.item["author-name"] == null) return;
+						element
+							.find(".fc-title")
+							.html(
+								"<img src='{0}' style='height:12px; width:12px'>{1}<p>{2}</p><p>{3}</p>".format(
+									event.item["author-avatar"],
+									event.item["author-name"],
+									event.desc,
+									htmlToText(event.location),
+								),
+							);
+						break;
+					case "agendaDay":
+						if (event.item["author-name"] == null) return;
+						element
+							.find(".fc-title")
+							.html(
+								"<img src='{0}' style='height:24px;width:24px'>{1}<p>{2}</p><p>{3}</p>".format(
+									event.item["author-avatar"],
+									event.item["author-name"],
+									event.desc,
+									htmlToText(event.location),
+								),
+							);
+						break;
+					case "listMonth":
+						element.find(".fc-list-item-title").html(formatListViewEvent(event));
+						break;
+				}
+			},
+			eventAfterRender: function (event, element) {
+				$(element).popover({
+					content: eventHoverHtmlContent(event),
+					container: "body",
+					html: true,
+					trigger: "hover",
+					placement: "auto",
+					template:
+						'<div class="popover hovercard event-card"><div class="arrow"></div><div class="popover-content hovercard-content"></div></div>',
+					sanitizeFn: function (content) {
+						return DOMPurify.sanitize(content);
+					},
 				});
-			}
-		},
-		defaultView: aStr.defaultView,
-		aspectRatio: 1,
-		eventRender: function (event, element, view) {
-			switch (view.name) {
-				case "month":
-					element
-						.find(".fc-title")
-						.html(
-							"<span class='item-desc'>{2}</span>".format(
-								event.item["author-avatar"],
-								event.item["author-name"],
-								event.title,
-								event.desc,
-								event.location,
-							),
-						);
-					break;
-				case "agendaWeek":
-					if (event.item["author-name"] == null) return;
-					element
-						.find(".fc-title")
-						.html(
-							"<img src='{0}' style='height:12px; width:12px'>{1}<p>{2}</p><p>{3}</p>".format(
-								event.item["author-avatar"],
-								event.item["author-name"],
-								event.desc,
-								htmlToText(event.location),
-							),
-						);
-					break;
-				case "agendaDay":
-					if (event.item["author-name"] == null) return;
-					element
-						.find(".fc-title")
-						.html(
-							"<img src='{0}' style='height:24px;width:24px'>{1}<p>{2}</p><p>{3}</p>".format(
-								event.item["author-avatar"],
-								event.item["author-name"],
-								event.desc,
-								htmlToText(event.location),
-							),
-						);
-					break;
-				case "listMonth":
-					element.find(".fc-list-item-title").html(formatListViewEvent(event));
-					break;
-			}
-		},
-		eventAfterRender: function (event, element) {
-			$(element).popover({
-				content: eventHoverHtmlContent(event),
-				container: "body",
-				html: true,
-				trigger: "hover",
-				placement: "auto",
-				template:
-					'<div class="popover hovercard event-card"><div class="arrow"></div><div class="popover-content hovercard-content"></div></div>',
-				sanitizeFn: function (content) {
-					return DOMPurify.sanitize(content);
-				},
+			},
+		});
+
+		var view = $calendar.fullCalendar("getView");
+		$("#fc-title").text(view.title);
+
+		var hash = location.hash.split("-");
+		if (hash.length == 2 && hash[0] == "#link") {
+			showEvent(hash[1]);
+		}
+
+		$body
+			.off('click' + calendarEventNS, '#id_share')
+			.on('click' + calendarEventNS, '#id_share', function () {
+				if ($("#id_share").is(":checked") && !$("#id_share").attr("disabled")) {
+					$("#acl-wrapper").show();
+					$("a#event-perms-lnk").parent("li").show();
+					toggleEventNav("a#event-perms-lnk");
+					eventAclActive();
+				} else {
+					$("#acl-wrapper").hide();
+					$("a#event-perms-lnk").parent("li").hide();
+				}
+			})
+			.trigger('change');
+
+		$body
+			.off('change' + calendarEventNS, '#id_nofinish')
+			.on('change' + calendarEventNS, '#id_nofinish', function () {
+				enableDisableFinishDate();
+			})
+			.trigger('change');
+
+		$('#contact_allow, #contact_deny, #circle_allow, #circle_deny')
+			.off('change' + calendarEventNS)
+			.on('change' + calendarEventNS, function () {
+				var selstr;
+				$('#contact_allow option:selected, #contact_deny option:selected, #circle_allow option:selected, #circle_deny option:selected').each(function () {
+					selstr = $(this).html();
+					$('#jot-public').hide();
+				});
+				if (selstr == null) {
+					$('#jot-public').show();
+				}
+			})
+			.trigger('change');
+
+		$body
+			.off('click' + calendarEventNS, '#event-nav > li > a')
+			.on('click' + calendarEventNS, '#event-nav > li > a', function (e) {
+				e.preventDefault();
+				toggleEventNav(this);
 			});
-		},
-	});
 
-	// echo the title
-	var view = $("#events-calendar").fullCalendar("getView");
-	$("#fc-title").text(view.title);
-
-	// show event popup
-	var hash = location.hash.split("-");
-	if (hash.length == 2 && hash[0] == "#link") showEvent(hash[1]);
-
-	// event_edit
-
-	// Go to the permissions tab if the checkbox is checked.
-	$body
-		.on("click", "#id_share", function () {
-			if ($("#id_share").is(":checked") && !$("#id_share").attr("disabled")) {
-				$("#acl-wrapper").show();
-				$("a#event-perms-lnk").parent("li").show();
-				toggleEventNav("a#event-perms-lnk");
-				eventAclActive();
-			} else {
-				$("#acl-wrapper").hide();
-				$("a#event-perms-lnk").parent("li").hide();
-			}
-		})
-		.trigger("change");
-
-	// Disable the finish time input if the user disable it.
-	$body
-		.on("change", "#id_nofinish", function () {
-			enableDisableFinishDate();
-		})
-		.trigger("change");
-
-	// JS for the permission section.
-	$("#contact_allow, #contact_deny, #circle_allow, #circle_deny")
-		.change(function () {
-			var selstr;
-			$(
-				"#contact_allow option:selected, #contact_deny option:selected, #circle_allow option:selected, #circle_deny option:selected",
-			).each(function () {
-				selstr = $(this).html();
-				$("#jot-public").hide();
+		$body
+			.off('click' + calendarEventNS, '#event-nav a')
+			.on('click' + calendarEventNS, '#event-nav a', function (e) {
+				$('#event-preview').empty();
+				e.preventDefault();
 			});
-			if (selstr == null) {
-				$("#jot-public").show();
+
+		const reflowCalendar = function () {
+			if (!$calendar || !$calendar.length) {
+				return;
 			}
-		})
-		.trigger("change");
 
-	// Change the event nav menu.tabs on click.
-	$body.on("click", "#event-nav > li > a", function (e) {
-		e.preventDefault();
-		toggleEventNav(this);
+			try {
+				if (typeof $calendar.fullCalendar === 'function') {
+					$calendar.fullCalendar('render');
+				}
+			} catch (e) {
+				// ignore stale render calls during SPA swaps
+			}
+
+			try {
+				$(window).trigger('resize');
+			} catch (e) {
+				// ignore resize-trigger issues on hidden containers
+			}
+		};
+
+		if (typeof window.requestAnimationFrame === 'function') {
+			window.requestAnimationFrame(reflowCalendar);
+		} else {
+			reflowCalendar();
+		}
+
+		$calendar.data('friendicaCalendarInitialized', true);
+		return cleanup;
+	}
+
+	function startCalendarInitialization($calendar) {
+		if (typeof $.fn.fullCalendar !== 'function') {
+			return function () {};
+		}
+
+		return initializeCalendarWidget($calendar);
+	}
+
+	window.onDocumentReady('#events-calendar', function (element) {
+		return startCalendarInitialization($(element));
 	});
-
-	// This is experimental. We maybe can make use of it to inject
-	// some js code while the event modal opens.
-	//$body.on('show.bs.modal', function () {
-	//	enableDisableFinishDate();
-	//});
-
-	// Clear some elements (e.g. the event-preview container) when
-	// selecting a event nav link so it don't appear more than once.
-	$body.on("click", "#event-nav a", function (e) {
-		$("#event-preview").empty();
-		e.preventDefault();
-	});
-
-});
+})();
 
 // loads the event into a modal
 function showEvent(eventid) {

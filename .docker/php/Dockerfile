@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     mariadb-client \
     gettext \
     reuse \
+    socat \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions with docker-php-extension-installer

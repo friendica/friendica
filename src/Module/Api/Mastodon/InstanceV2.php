@@ -131,7 +131,7 @@ class InstanceV2 extends BaseApi
 
 	private function buildContactInfo(): InstanceEntity\Contact
 	{
-		$email         = $this->config->get('config', 'sender_email');
+		$email         = $this->config->get('config', 'sender_email') ?? '';
 		$administrator = User::getFirstAdmin();
 		$account       = null;
 

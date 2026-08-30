@@ -55,7 +55,7 @@
 		<div id="photo-photo" class="center-block">
 			{{* The photo *}}
 			<div class="photo-container">
-				<a href="{{$photo.href}}" title="{{$photo.title}}"><img src="{{$photo.src}}" alt="{{$photo.filename}}"/></a>
+				<a href="{{$photo.href}}" title="{{$photo.title}}"><img src="{{$photo.src}}" alt="{{$photo.filename}}" width="{{$photo.lwidth}}" height="{{$photo.lheight}}"/></a>
 			</div>
 
 			{{* Overlay buttons for previous and next photo *}}

@@ -8,12 +8,12 @@
 <div id="prvmail-wrapper">
 <form id="prvmail-form" action="message" method="post">
 
-	{{$parent nofilter}}
+	{{if $replyto}}<input type="hidden" name="replyto" value="{{$replyto}}" />{{/if}}
 
 	{{* The To: form-group which contains the message recipient *}}
 	<div id="prvmail-to-label" class="form-group">
 		<label for="recipient">{{$to}}</label><br>
-		{{$select nofilter}}
+		{{if $recipient}}{{$recipient.name}}<input type="hidden" name="recipient" value="{{$recipient.id}}" />{{else}}{{$select nofilter}}{{/if}}
 		 <small>{{$to_desc}}</small>
 	</div>
 
