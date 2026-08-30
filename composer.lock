@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe242e5d9a8f125df2a9f3f0833959b4",
+    "content-hash": "7d2f3fc10ff2a18825241039a59f6db1",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -1803,18 +1803,6 @@
                 "source": "https://github.com/nikic/FastRoute/tree/master"
             },
             "time": "2018-02-13T20:26:39+00:00"
-        },
-        {
-            "name": "npm-asset/acorn",
-            "version": "8.18.0",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/acorn/-/acorn-8.18.0.tgz"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
         },
         {
             "name": "npm-asset/chart.js",
@@ -9942,9 +9930,9 @@
         "ext-simplexml": "*",
         "ext-xml": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "php": "8.2"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.3.0"
 }

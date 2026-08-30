@@ -231,8 +231,7 @@ ul#nav-user-menu {
 	}
 	#nav-delegation-link:hover,
 	#nav-delegation-link:focus {
-		background-color: $background_color;
-		color: $font_color;
+		background-color: $nav_icon_hover_color;
 	}
 	/* prevent XMPP chat add-on button appearing in modals and iframes */
 	body.minimal #toggle-controlbox {
@@ -612,7 +611,7 @@ header #banner {
 header #banner #logo-img,
 .navbar-brand #logo-img {
 	font-size: 36px;
-	color: White;
+	color: $nav_icon_color;
 }
 
 #navbrand-container {
@@ -1567,7 +1566,7 @@ div.sidebar-widget-list {
 	transition: all 0.1s ease-in-out;
 }
 .faded-icon:hover {
-	color: $font_color_darker;
+	color: $link_color;
 	opacity: 1;
 }
 .icon-padding {

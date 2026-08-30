@@ -7,7 +7,7 @@
 
 <script>
 window.onDocumentReady('body', function() {
-	$("#contacts-search").contact_autocomplete(baseurl + '/search/acl', 'a', true);
+	$("#contacts-search").name_autocomplete(baseurl + '/search/acl', 'a', true);
 });
 </script>
 

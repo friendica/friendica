@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-27 12:31+0200\n"
+"POT-Creation-Date: 2026-08-28 12:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -158,7 +158,7 @@ msgstr ""
 msgid "Insert web link"
 msgstr ""
 
-#: mod/message.php:192 mod/message.php:348 src/App/Page.php:280
+#: mod/message.php:192 mod/message.php:348 src/App/Page.php:278
 #: src/Content/Conversation/ConversationRenderer.php:539
 #: src/Content/Conversation/PostTemplateBuilder.php:405
 #: src/Content/Conversation/StatusEditor.php:182
@@ -567,14 +567,14 @@ msgstr ""
 msgid "The request took too long. Please try again."
 msgstr ""
 
-#: src/App/Page.php:279 src/App/Page.php:367 src/Module/Admin/Logs/View.php:91
+#: src/App/Page.php:354
+msgid "toggle mobile"
+msgstr ""
+
+#: src/App/Page.php:365 src/Module/Admin/Logs/View.php:91
 #: src/Module/Item/Compose.php:336 src/Module/Media/Attachment/Browser.php:69
 #: src/Module/Media/Photo/Browser.php:81 view/theme/frio/php/minimal.php:39
 msgid "Close"
-msgstr ""
-
-#: src/App/Page.php:356
-msgid "toggle mobile"
 msgstr ""
 
 #: src/App/Router.php:259
@@ -2531,11 +2531,11 @@ msgstr ""
 msgid "Encrypted content"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:2183
+#: src/Content/Text/BBCode.php:2186
 msgid "Invalid source protocol"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:2202
+#: src/Content/Text/BBCode.php:2205
 msgid "Invalid link protocol"
 msgstr ""
 

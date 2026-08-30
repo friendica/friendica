@@ -6,74 +6,45 @@
 
 // @type {module}
 
+// Tracks the currently open timeout overlay so a second 504 doesn't stack
+// another modal on top of it.
+let timeoutLayer = null;
+
 /**
- * Show timeout modal overlay.
- * Displays a modal dialog that can be clicked away.
+ * Show a timeout modal via Unpoly's overlay system.
+ * Used for 504 responses, which come from the reverse proxy rather than
+ * Friendica and therefore aren't valid Unpoly fragments to render normally.
  */
 function showTimeoutModal() {
-  hideLoading();
+  // hideLoading() is a global defined by loading-indicator.js, a classic
+  // (non-module) script loaded before this one; guard like spa-unpoly-nav.js
+  // does rather than importing a global.
+  if (typeof hideLoading === 'function') {
+    hideLoading();
+  }
 
-  // Check if modal already exists
-  if (document.getElementById('spa-timeout-modal')) {
+  if (timeoutLayer) {
     return;
   }
 
   // Get translated texts from PHP
   const title = window.spaErrorTexts?.timeout || 'Timeout';
   const message = window.spaErrorTexts?.timeout_message || 'Request timed out';
-  const closeText = window.spaErrorTexts?.close || 'Close';
 
-  // Create modal overlay
-  const modal = document.createElement('div');
-  modal.id = 'spa-timeout-modal';
-  modal.className = 'spa-modal-overlay';
-
-  // Create modal content
-  const content = document.createElement('div');
-  content.className = 'spa-modal-content';
-
-  // Create heading
   const heading = document.createElement('h2');
   heading.textContent = title;
 
-  // Create message paragraph
   const messageElement = document.createElement('p');
   messageElement.textContent = message;
 
-  // Create close button
-  const closeButton = document.createElement('button');
-  closeButton.textContent = closeText;
-  closeButton.className = 'btn btn-primary spa-modal-close-btn';
-  closeButton.onclick = dismissTimeoutModal;
-
-  content.append(heading, messageElement, closeButton);
-  modal.appendChild(content);
-
-  // Close modal when clicking on overlay (outside content)
-  modal.addEventListener('click', (e) => { if (e.target === modal) dismissTimeoutModal(); });
-
-  // Add modal to body
-  document.body.appendChild(modal);
-
-  // Also listen for Escape key
-  const escapeHandler = (e) => { if (e.key === 'Escape' || e.keyCode === 27) dismissTimeoutModal(); };
-  document.addEventListener('keydown', escapeHandler);
-
-  // Store reference to clean up
-  modal._escapeHandler = escapeHandler;
-}
-
-/**
- * Dismiss the timeout modal.
- */
-function dismissTimeoutModal() {
-  const modal = document.getElementById('spa-timeout-modal');
-  if (modal) {
-    if (modal._escapeHandler) {
-      document.removeEventListener('keydown', modal._escapeHandler);
-    }
-    modal.remove();
-  }
+  // Modal mode is dismissible by close button, Escape and outside click by
+  // default, so no manual event wiring is needed here.
+  timeoutLayer = up.layer.open({
+    mode: 'modal',
+    class: 'spa-timeout-modal',
+    content: [heading, messageElement],
+    onDismissed: () => { timeoutLayer = null; },
+  });
 }
 
 /**
@@ -102,6 +73,5 @@ function cleanupTooltips() {
 
 export {
   showTimeoutModal,
-  dismissTimeoutModal,
   cleanupTooltips
 };

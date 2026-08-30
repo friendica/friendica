@@ -11,7 +11,7 @@
 
 	{{foreach $options as $o}}
 	<dl>
-		<dt><a href="{{$o.0}}">{{$o.1}}</a></dt>
+		<dt><a href="{{$o.0}}" download>{{$o.1}}</a></dt>
 		<dd>{{$o.2}}</dd>
 	</dl>
 	{{/foreach}}

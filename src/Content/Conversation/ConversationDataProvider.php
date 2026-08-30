@@ -291,7 +291,7 @@ final readonly class ConversationDataProvider
 
 		// Initialize items array with parent items, ensuring they have pagedrop set
 		$items = [];
-		foreach ($this->addMissingRows($parents, $uid) as $parent) {
+		foreach ($this->addMissingFields($parents, $uid) as $parent) {
 			$items[$parent['uri-id']] = $parent;
 			if (!empty($parent['thr-parent-id']) && !empty($parent['gravity']) && ($parent['gravity'] === ItemModel::GRAVITY_ACTIVITY)) {
 				$uriId = $parent['thr-parent-id'];
@@ -489,13 +489,13 @@ final readonly class ConversationDataProvider
 	}
 
 	/**
-	 * Add missing rows to the given array of rows.
+	 * Add missing fields to the given array of rows.
 	 *
 	 * @param array<int, array> $rows The rows to add missing data to
 	 * @param int $uid The user ID of the viewer
 	 * @return array<int, array> The rows with missing data added
 	 */
-	private function addMissingRows(array $rows, int $uid): array
+	private function addMissingFields(array $rows, int $uid): array
 	{
 		$posts = Post::select(ItemModel::DISPLAY_FIELDLIST, ['uri-id' => array_column($rows, 'uri-id'), 'uid' => [0, $uid]]);
 
@@ -510,7 +510,10 @@ final readonly class ConversationDataProvider
 
 		$added = [];
 		foreach ($rows as $row) {
-			$added[$row['uri-id']] = array_merge($row, $filler[$row['uri-id']] ?? []);
+			if (!isset($filler[$row['uri-id']])) {
+				continue;
+			}
+			$added[$row['uri-id']] = array_merge($row, $filler[$row['uri-id']]);
 		}
 
 		return $added;

@@ -5,6 +5,7 @@
 // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPLv3-or-later
 
 var jotcache = ""; //The jot cache. We use it as cache to restore old/original jot content
+var stickyAside = null; //The aside currently handled by sticky-kit, see initTheme()
 
 function syncSecondNavTabmenu() {
 	// Move page tabbar into second navbar after initial load and SPA navigations
@@ -351,7 +352,13 @@ function initTheme() {
 	 * since is enabled or not at page loading time.
 	 */
 	if ($(window).width() > 976) {
-		$("aside").stick_in_parent({
+		// Detach the previous aside first: SPA navigation replaces the element,
+		// and its window/body handlers stay bound until sticky_kit:detach.
+		if (stickyAside) {
+			stickyAside.trigger("sticky_kit:detach");
+		}
+		stickyAside = $("aside");
+		stickyAside.stick_in_parent({
 			offset_top: 100, // px, header + tab bar + spacing
 			recalc_every: 10,
 		});

@@ -253,7 +253,7 @@ window.onDocumentReady('body', function() {
 
 	/* event from comment textarea button popups */
 	/* insert returned bbcode at cursor position or replace selected text */
-	$('body').on('fbrowser.photo.comment', function(e, filename, bbcode, id) {
+	$('body').off('fbrowser.photo.comment').on('fbrowser.photo.comment', function(e, filename, bbcode, id) {
 		$.colorbox.close();
 		// Support both receiving an ID postfix appended to comment-edit-id or the full ID
 		var textarea = document.getElementById('comment-edit-text-' + id) || document.getElementById(id);
@@ -268,11 +268,15 @@ window.onDocumentReady('body', function() {
 		.bbco_autocomplete('bbcode');
 
 	// Ensures asynchronously-added comment forms recognize mentions, tags and BBCodes as well
-	document.addEventListener("postprocess_liveupdate", function() {
+	if (window.__friendica_postprocess_liveupdate_autocomplete) {
+		document.removeEventListener("postprocess_liveupdate", window.__friendica_postprocess_liveupdate_autocomplete);
+	}
+	window.__friendica_postprocess_liveupdate_autocomplete = function() {
 		$(".comment-edit-wrapper textarea, .wall-item-comment-wrapper textarea")
 			.editor_autocomplete(baseurl + '/search/acl')
 			.bbco_autocomplete('bbcode');
-	});
+	};
+	document.addEventListener("postprocess_liveupdate", window.__friendica_postprocess_liveupdate_autocomplete);
 
 	/* popup menus */
 	function close_last_popup_menu() {
@@ -284,7 +288,7 @@ window.onDocumentReady('body', function() {
 			last_popup_button = null;
 		}
 	}
-	$('a[rel^="#"]').click(function(e) {
+	$('a[rel^="#"]').off('click.friendica-main').on('click.friendica-main', function(e) {
 		e.preventDefault();
 		var parent = $(this).parent();
 		var isSelected = (last_popup_button && parent.attr('id') == last_popup_button.attr('id'));
@@ -311,7 +315,7 @@ window.onDocumentReady('body', function() {
 		}
 		return false;
 	});
-	$('html').click(function() {
+	$('html').off('click.friendica-main').on('click.friendica-main', function() {
 		close_last_popup_menu();
 	});
 

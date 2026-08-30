@@ -226,8 +226,10 @@ Some slots — typically the label, help text, and extra-attributes slots — ar
 
 Security rules that hold regardless of the exact slot layout:
 
-- Put only **trusted, server-generated** values into a raw slot — a `$this->t()` literal or a hardcoded attribute string. Never user- or remote-derived data.
-- **A translated string is not automatically safe.** `t()` with substitution does **not** HTML-escape the substituted value:
+- Put only **trusted, server-generated** values into a raw slot — a `$this->t()` literal or a hardcoded attribute string.
+  Never user- or remote-derived data.
+- **A translated string is not automatically safe.**
+  `t()` with substitution does **not** HTML-escape the substituted value:
 
   ```php
   // ✗ Unsafe in a nofilter slot — $remoteName is not escaped by t()
@@ -332,11 +334,13 @@ protected function content(array $request = []): string
 
 **Strategy B: Frio-specific CSS fix**
 
-Edit `view/theme/frio/css/style.css`. This does not affect vier.
+Edit `view/theme/frio/css/style.css`.
+This does not affect vier.
 
 **Strategy C: Vier-specific CSS fix**
 
-Edit `view/theme/vier/style.css`. This does not affect frio.
+Edit `view/theme/vier/style.css`.
+This does not affect frio.
 
 ### 5.3 Frio colors and schemes
 
@@ -352,7 +356,8 @@ Test color changes across all four frio schemes, the custom scheme, and the acce
 
 ### 5.4 Static presentation styles belong in CSS, not inline
 
-Inline `style=""` attributes are hard to theme and maintain. Use CSS classes instead.
+Inline `style=""` attributes are hard to theme and maintain.
+Use CSS classes instead.
 
 ---
 
@@ -370,8 +375,8 @@ Inline `style=""` attributes are hard to theme and maintain. Use CSS classes ins
 
 ### 6.2 Use the existing IIFE pattern — not ES modules
 
-Scripts load as `<script type="text/javascript" src="...">`. Wrap your code in an
-[IIFE](#abbreviations) — the `(function () { ... })()` wrapper shown below.
+Scripts load as `<script type="text/javascript" src="...">`.
+Wrap your code in an [IIFE](#abbreviations) — the `(function () { ... })()` wrapper shown below.
 [ES](#abbreviations) module syntax (`export` / `import`) is not supported and causes errors.
 
 ```javascript
@@ -404,11 +409,15 @@ if ($script !== '') {
 }
 ```
 
+This applies to page-specific and addon scripts.
+The SPA core itself (`view/js/spa/spa-unpoly-nav.js` and `spa-ui-helpers.js`) is the one deliberate exception: it's loaded via `<script type="module" src="...">` (see `head.tpl`/frio's `head.tpl`) and uses real `import`/`export`.
+Don't follow that example for page-specific code — it exists only because the SPA core is split across those two files, which share code through `import`/`export`.
+
 ### 6.3 SPA lifecycle initialization
 
-Friendica can navigate between pages without a full browser reload when the SPA
-mode is enabled. Page-specific JavaScript must therefore be initialized through
-the lifecycle helpers from `view/js/main.js`:
+Friendica can navigate between pages without a full browser reload when the SPA mode is enabled.
+Navigation itself — link interception, history, fetching, and swapping the page's containers — is handled by [Unpoly](https://unpoly.com/), configured in `view/js/spa/spa-unpoly-nav.js`.
+Page-specific JavaScript must still be initialized through the lifecycle helpers from `view/js/main.js`, which work the same whether SPA mode is on or off:
 
 ```javascript
 window.onDocumentReady('#my-widget', function (element) {
@@ -420,34 +429,36 @@ window.onWindowLoad('#my-widget', function (element) {
 });
 ```
 
-Do not use `$(document).ready(...)`, `$(window).load(...)`,
-`DOMContentLoaded`, or direct `load` listeners for page-specific initialization
-that must work with SPA navigation. Those handlers are tied to the initial
-document load and are not reliably repeated when the SPA replaces page content.
+Do not use `$(document).ready(...)`, `$(window).load(...)`, `DOMContentLoaded`, or direct `load` listeners for page-specific initialization that must work with SPA navigation.
+Those handlers are tied to the initial document load and are not reliably repeated when the SPA replaces page content.
 
 Both helpers take the same two parameters:
 
-- `target` — the initialization target. A CSS selector such as `'#my-widget'`
-    is resolved against the current document. A DOM element or jQuery object is
-    also accepted. The callback is skipped when the target does not exist on the
-    current page.
-- `initialize` — the callback that initializes the target. It receives the
-    resolved DOM element as its first argument.
+- `target` — the initialization target.
+    A CSS selector such as `'#my-widget'` is resolved against the current document.
+    A DOM element or jQuery object is also accepted.
+    The callback is skipped when the target does not exist on the current page.
+- `initialize` — the callback that initializes the target.
+    It receives the resolved DOM element as its first argument.
 
-Use `onDocumentReady` for normal DOM initialization and `onWindowLoad` when the
-initialization depends on resources that finish loading with the window. The
-helpers take care of both the normal page lifecycle and the corresponding SPA
-lifecycle events.
+Use `onDocumentReady` for normal DOM initialization and `onWindowLoad` when the initialization depends on resources that finish loading with the window.
+The helpers take care of both the normal page lifecycle and the corresponding SPA lifecycle events.
+
+Links are followed via SPA automatically.
+Forms with `method="get"` (search, filters) are submitted via SPA the same way, since a GET submission is pure navigation.
+Forms with `method="post"` are never auto-submitted via Unpoly — none has an `up-submit` attribute (see the `submitSelectors` comment in `configureUnpoly()` in `spa-unpoly-nav.js` for why).
+That does not mean every POST form causes a full page load, though: some (the jot form in `jot-header.tpl`, comment forms handled in `theme.js`, the compose form in `compose.js`) have their own pre-existing `submit` handler that does a plain `$.post()`/`$.ajax()` call and calls `e.preventDefault()` — unrelated to Unpoly, and older than the SPA work.
+A POST form with no such handler and no `up-submit` does cause a full page load.
 
 ### 6.4 SPA implementation details
 
 The lifecycle helpers are necessary but not sufficient for SPA-compatible code.
 Keep the following details in mind when adding or changing frontend code:
 
-- **Make initialization repeatable.** A lifecycle callback can run again after
-    navigation. Avoid registering duplicate handlers or starting duplicate
-    processes. Use namespaced events and remove the previous handler before
-    registering it again:
+- **Make initialization repeatable.**
+    A lifecycle callback can run again after navigation.
+    Avoid registering duplicate handlers or starting duplicate processes.
+    Use namespaced events and remove the previous handler before registering it again:
 
     ```javascript
     window.onDocumentReady('#my-widget', function (element) {
@@ -457,59 +468,69 @@ Keep the following details in mind when adding or changing frontend code:
     });
     ```
 
-- **Do not retain stale DOM references.** SPA navigation replaces central
-    containers such as `main`. Look up page elements inside the lifecycle
-    callback or use the callback's `element` argument instead of keeping a
-    reference to an element from the previous page.
-
-- **Control timers and polling.** `setTimeout`, `setInterval`, and polling can
-    outlive a navigation. Store their handles and clear them before starting a
-    replacement, or guard against starting the same process more than once.
-
-- **Handle dynamically inserted content explicitly.** Content added by live
-    updates or infinite scroll does not automatically go through the initial
-    page setup. Register a single `postprocess_liveupdate` handler when such
-    content needs additional processing:
+    This applies to native (non-jQuery) listeners too — store a reference and remove it before adding a new one:
 
     ```javascript
-    document.addEventListener('postprocess_liveupdate', function () {
+    if (window.__myFeatureHandler) {
+            document.removeEventListener('postprocess_liveupdate', window.__myFeatureHandler);
+    }
+    window.__myFeatureHandler = function () {
             initializeDynamicContent();
-    });
+    };
+    document.addEventListener('postprocess_liveupdate', window.__myFeatureHandler);
     ```
 
-    The handler itself must not be registered repeatedly during navigation.
+    This is not a theoretical concern: missing `.off()` guards on delegated handlers (mainly ones bound to `body`) have caused real double-submission and duplicate-handler bugs in production code.
 
-- **Separate global definitions from page initialization.** External scripts
-    are managed by the SPA router and page-specific scripts can be loaded and
-    executed again. Keep reusable definitions separate from initialization code,
-    and do not rely on page-specific global state surviving navigation.
+- **Do not retain stale DOM references.**
+    SPA navigation replaces the page's main containers — `main` in the frio theme; themes using the core page skeleton instead (any theme without its own `php/default.php`, e.g. Vier) swap `#content-section`/`#aside-section`/`#right-aside-section`.
+    See `MAIN_TARGETS` in `spa-unpoly-nav.js` for the exact list.
+    Look up page elements inside the lifecycle callback or use the callback's `element` argument instead of keeping a reference to an element from the previous page.
 
-- **Mark persistent external scripts explicitly.** An external script that
-    must remain loaded across SPA navigation needs the `data-spa-persistent`
-    attribute:
+- **Control timers and polling.**
+    `setTimeout`, `setInterval`, and polling can outlive a navigation.
+    Store their handles and clear them before starting a replacement, or guard against starting the same process more than once.
 
-    ```html
-    <script src="/view/js/my-global-module.js" data-spa-persistent></script>
+- **Handle dynamically inserted content explicitly.**
+    Content added by live updates or infinite scroll does not automatically go through the initial page setup.
+    Register a `postprocess_liveupdate` handler when such content needs additional processing, following the repeatable-registration pattern shown above — the handler itself must not be registered repeatedly during navigation.
+
+- **Scripts loaded from `<head>` or the page footer may run again — keep them redeclaration-safe.**
+    Unpoly only swaps the page's main containers (see above); it never touches `<head>` or content outside them.
+    Page-specific scripts registered via a `*_head.tpl` include or `App\Page::registerFooterScript()` (e.g. a page-specific library like FullCalendar) are synced separately by `spa-unpoly-nav.js`'s `syncOutOfBandScripts()`/`syncStylesheets()` so they still load when navigating to that page via SPA for the first time in a session.
+    External `<script src>` files and stylesheets are deduplicated by URL: one already present is left alone, one that's missing is added.
+    If a later navigation lands on a page that does *not* include a previously-loaded one, it is removed — and reloaded (re-executed) if the user navigates back to a page that has it again.
+    Mark the tag `data-spa-persistent` to opt out of that removal for state that must survive regardless of the current page, such as a persistent chat widget holding an open connection — removing and re-adding its `<script>` would otherwise tear that connection down and rebuild it from scratch.
+    Inline `<script>` blocks may run again on a later navigation to the same kind of page, so avoid a **top-level** (not nested in a function) `const`, `let`, or `class` declaration in them: classic `<script>` tags share one lexical scope, and redeclaring one throws a `SyntaxError`.
+    `let`/`const` inside a function body are fine, since each call gets a fresh scope.
+    `var` and function declarations are always safe to repeat.
+
+- **Avoid competing with SPA navigation.**
+    Do not add custom navigation logic to links that should be handled automatically.
+    Links with `onclick`, `modal-open`, or `data-fancybox` are excluded from SPA navigation and keep working as plain links; use semantic links and buttons and keep custom behavior explicit.
+    To exclude a specific link yourself, use Unpoly's own `up-follow="false"` attribute rather than inventing a custom one.
+
+- **Mark links that return a non-HTML response with `download`.**
+    Unpoly fetches followed links via `fetch()` and tries to render the response as HTML.
+    A link whose target always returns something else — a CSV/JSON/iCal export, a raw image, an OAuth redirect to a third-party URL — must not go through that path.
+    Add the plain HTML5 `download` attribute to the `<a>` tag; Unpoly already excludes `a[download]` from SPA navigation by default, so the browser handles the response natively (a save dialog), exactly as it would without SPA mode:
+
+    ```smarty
+    <a href="{{$export_url}}" download>{{$export_label}}</a>
     ```
 
-    Use this only for scripts that are genuinely global. Page-specific scripts
-    should be able to load again and reinitialize safely.
+    Use `up-follow="false"` instead when the link should be excluded from SPA navigation but a forced download is the wrong UX — e.g. a feed subscription link or a link that opens a raw image for viewing.
 
-- **Avoid competing with the SPA router.** Do not add custom navigation logic
-    to links that should be handled by the router. Links with `onclick`,
-    `data-spa-ignore`, `modal-open`, or `data-fancybox` are handled specially;
-    use semantic links and buttons and keep custom behavior explicit.
+    If a link is missed, `spa-unpoly-nav.js` falls back to detecting the non-HTML response after the fact and redirects to a plain page load, but logs `console.warn('[spa-unpoly-nav] Non-HTML response for a SPA-followed link...')` when it does — this fallback costs an extra round trip (Unpoly fetches first, then a second real navigation fires), so treat that warning as a signal to add `download` (or `up-follow="false"`) to the reported link instead of relying on the fallback.
 
-- **Expect missing targets and incomplete responses.** Error pages, redirects,
-    and pages without a particular module target may not contain the expected
-    containers. Check for the required element before accessing it. The
-    lifecycle helpers skip the callback automatically when their `target` is not
-    present.
+- **Expect missing targets and incomplete responses.**
+    Error pages, redirects, and pages without a particular module target may not contain the expected containers.
+    Check for the required element before accessing it.
+    The lifecycle helpers skip the callback automatically when their `target` is not present.
 
-- **Reinitialize plugins on the current element.** Widgets such as calendars,
-    scrollbars, autocomplete, and Masonry may need initialization after every
-    navigation. Check whether a plugin is already active before initializing it
-    again, and clean up plugin-specific state when the plugin requires it.
+- **Reinitialize plugins on the current element.**
+    Widgets such as calendars, scrollbars, autocomplete, and Masonry may need initialization after every navigation.
+    Check whether a plugin is already active before initializing it again, and clean up plugin-specific state when the plugin requires it.
 
 ### 6.5 Pass data and translations to JS via a JSON block
 
@@ -577,9 +598,9 @@ var html = '<span>' + config.name + '</span>';
 element.innerHTML = html;
 ```
 
-**Rule:** Use `textContent` for text. Use `createElement` + `setAttribute` +
-`appendChild` when you need to build elements. Never use `innerHTML`,
-`insertAdjacentHTML`, or string concatenation into HTML with untrusted data.
+**Rule:** Use `textContent` for text.
+Use `createElement` + `setAttribute` + `appendChild` when you need to build elements.
+Never use `innerHTML`, `insertAdjacentHTML`, or string concatenation into HTML with untrusted data.
 
 For content that is intentionally pre-rendered HTML (e.g. from `Item::prepareBody()` fetched via API), use a specifically approved sanitizer before setting `innerHTML`.
 
@@ -604,7 +625,8 @@ document.querySelectorAll('.my-action').forEach(function (btn) {
 <a name="accessibility" id="accessibility"></a>
 ## 7. Accessibility
 
-Target [WCAG 2.1 AA](https://www.w3.org/WAI/WCAG21/quickref/). The rules below come up most in Friendica frontend work; the §8 checklist enforces them.
+Target [WCAG 2.1 AA](https://www.w3.org/WAI/WCAG21/quickref/).
+The rules below come up most in Friendica frontend work; the §8 checklist enforces them.
 
 | Rule                                         | Do                                                          | Avoid                                                               |
 |----------------------------------------------|-------------------------------------------------------------|---------------------------------------------------------------------|
@@ -619,7 +641,8 @@ Target [WCAG 2.1 AA](https://www.w3.org/WAI/WCAG21/quickref/). The rules below c
 <div role="status" aria-live="polite" id="notification-count">{{$notification_count}}</div>
 ```
 
-**Contrast** — verify ≥ 4.5:1 (normal text) / 3:1 (large) in **every** scheme your change touches: frio light/dark/black/gnome (plus the custom scheme and accent colours for colour changes) and vier. Reusing a theme variable does not guarantee contrast.
+**Contrast** — verify ≥ 4.5:1 (normal text) / 3:1 (large) in **every** scheme your change touches: frio light/dark/black/gnome (plus the custom scheme and accent colours for colour changes) and vier.
+Reusing a theme variable does not guarantee contrast.
 
 ---
 

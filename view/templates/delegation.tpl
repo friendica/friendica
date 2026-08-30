@@ -43,6 +43,6 @@
 	</div>
 
 	<p>
-		<a href="settings/delegation" class="btn btn-primary"><i class="ri ri-settings-3-line"></i> {{$l10n.settings_label}}</a>
+		<a href="settings/delegation" class="btn btn-primary" up-follow="false"><i class="ri ri-settings-3-line"></i> {{$l10n.settings_label}}</a>
 	</p>
 </div>

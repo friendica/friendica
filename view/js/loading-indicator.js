@@ -5,7 +5,7 @@
 // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPLv3-or-later
 
 /**
- * Loading Indicator - Shared module for main.js and spa-router.js
+ * Loading Indicator - Shared module for main.js and spa-unpoly-nav.js
  * Provides consistent loading indicator across the application
  * All texts must be provided by PHP via window.spaLoadingTexts
  */
@@ -25,11 +25,19 @@ var loadingIndicator = null;
 var currentLoadingState = null;
 var messageRotationInterval = null;
 
+// Unpoly's up.ProgressBar instance (the thin bar at the top of the viewport)
+// and the timer that defers showing the whole indicator, see setLoadingState().
+var progressBar = null;
+var showTimer = null;
+var pendingState = null;
+
 var LOADING_CONFIG = {
   indicatorId: 'spa-loading-indicator',
   barHeight: 3,
   fadeOutDuration: 180,
-  messageRotationDelay: 2000 // 2 seconds for message rotation
+  messageRotationDelay: 2000, // 2 seconds for message rotation
+  showDelay: 400 // mirror Unpoly's up.network.config.badResponseTime: don't
+                 // show anything for actions that finish quicker than this
 };
 
 // ============================================
@@ -162,11 +170,44 @@ function initLoadingIndicator() {
 // ============================================
 
 /**
- * Set loading state with optional text and start message rotation
+ * Start Unpoly's original progress bar (the thin bar at the top of the
+ * viewport). No-op when Unpoly is not loaded (non-SPA mode) or when a bar is
+ * already running - the status-text strip below is the fallback in that case.
+ */
+function startProgressBar() {
+  if (progressBar) return;
+  if (typeof window.up === 'undefined' || typeof up.ProgressBar !== 'function') return;
+
+  try {
+    progressBar = new up.ProgressBar();
+  } catch (e) {
+    console.warn('[Loading] Could not start Unpoly progress bar', e);
+    progressBar = null;
+  }
+}
+
+/**
+ * Finish the progress bar: animate it to 100% and let it fade out, same as
+ * Unpoly does when a real request completes.
+ */
+function concludeProgressBar() {
+  if (!progressBar) return;
+
+  try {
+    progressBar.conclude();
+  } catch (e) {
+    console.warn('[Loading] Could not conclude Unpoly progress bar', e);
+  }
+  progressBar = null;
+}
+
+/**
+ * Apply a loading state to the DOM: swap state classes, set the status text,
+ * start message rotation, show the strip and start the progress bar.
  * @param {string} state
  * @param {string} text
  */
-function setLoadingState(state, text) {
+function applyLoadingState(state, text) {
   if (!loadingIndicator) createLoadingIndicator();
 
   Object.values(LOADING_STATES).forEach(function(s) {
@@ -185,6 +226,35 @@ function setLoadingState(state, text) {
   }
 
   loadingIndicator.classList.add('active');
+  startProgressBar();
+}
+
+/**
+ * Request a loading state. Nothing is shown until LOADING_CONFIG.showDelay has
+ * passed, so actions that finish quickly (a fast comment reload, a cached SPA
+ * navigation) never flash an indicator. Once visible, further state changes
+ * (e.g. fetching -> processing) apply immediately.
+ * @param {string} state
+ * @param {string} text
+ */
+function setLoadingState(state, text) {
+  pendingState = { state: state, text: text };
+
+  if (loadingIndicator && loadingIndicator.classList.contains('active')) {
+    applyLoadingState(state, text);
+    return;
+  }
+
+  // A show is already scheduled - keep its original deadline so the total
+  // delay stays ~showDelay regardless of how many states are requested.
+  if (showTimer) return;
+
+  showTimer = setTimeout(function() {
+    showTimer = null;
+    if (pendingState) {
+      applyLoadingState(pendingState.state, pendingState.text);
+    }
+  }, LOADING_CONFIG.showDelay);
 }
 
 function showFetching() {
@@ -204,6 +274,16 @@ function showPosting() {
 }
 
 function hideLoading() {
+  // Cancel a still-pending show: the action finished within showDelay, so no
+  // indicator was ever shown and nothing needs to be torn down.
+  pendingState = null;
+  if (showTimer) {
+    clearTimeout(showTimer);
+    showTimer = null;
+  }
+
+  concludeProgressBar();
+
   if (!loadingIndicator) return;
 
   // Clear message rotation interval

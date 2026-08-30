@@ -48,7 +48,7 @@ a:hover, button:hover, .btn-link:hover, .btn-primary:hover,
 }
 header #banner #logo-img:focus,
 header #banner #logo-img:hover {
-		background-color: $font_color;
+		color: $font_color;
 }
 
 .dropdown-menu,

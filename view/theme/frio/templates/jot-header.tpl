@@ -80,12 +80,14 @@
 
 	function initJotHeader() {
 		/* enable editor on focus and click */
-		$("#profile-jot-text").focus(enableOnUser);
-		$("#profile-jot-text").click(enableOnUser);
+		$("#profile-jot-text").off('focus.jot-header').on('focus.jot-header', enableOnUser);
+		$("#profile-jot-text").off('click.jot-header').on('click.jot-header', enableOnUser);
 
 		// When clicking on a group in acl we should remove the profile jot textarea
 		// default value before inserting the group mention
-		$("body").on('click', '#jot-modal .acl-list-item.group', function(){
+		$("body")
+		.off('click.frio-jot', '#jot-modal .acl-list-item.group')
+		.on('click.frio-jot', '#jot-modal .acl-list-item.group', function(){
 			jotTextOpenUI(document.getElementById("profile-jot-text"));
 		});
 
@@ -94,19 +96,23 @@
 		 **/
 
 		/* callback */
-		$('body').on('fbrowser.photo.main', function(e, filename, embedcode, id) {
+		$('body')
+		.off('fbrowser.photo.main')
+		.on('fbrowser.photo.main', function(e, filename, embedcode, id) {
 			///@todo this part isn't ideal and need to be done in a better way
 			jotTextOpenUI(document.getElementById("profile-jot-text"));
 			jotActive();
 			addeditortext(embedcode);
 		})
+		.off('fbrowser.attachment.main')
 		.on('fbrowser.attachment.main', function(e, filename, embedcode, id) {
 			jotTextOpenUI(document.getElementById("profile-jot-text"));
 			jotActive();
 			addeditortext(embedcode);
 		})
 		// Asynchronous jot submission
-		.on('submit', '#profile-jot-form', function (e) {
+		.off('submit.frio-jot', '#profile-jot-form')
+		.on('submit.frio-jot', '#profile-jot-form', function (e) {
 			e.preventDefault();
 
 			// Disable jot submit buttons during processing
@@ -197,17 +203,17 @@
 			});
 		});
 
-		$('#wall-image-upload').on('click', function(){
+		$('#wall-image-upload').off('click.frio-jot').on('click.frio-jot', function(){
 			Dialog.doImageBrowser("main");
 			jotActive();
 		});
 
-		$('#wall-file-upload').on('click', function(){
+		$('#wall-file-upload').off('click.frio-jot').on('click.frio-jot', function(){
 			Dialog.doFileBrowser("main");
 			jotActive();
 		});
 
-		$('body').on('click', '.tag .filerm', function(e){
+		$('body').off('click.frio-jot', '.tag .filerm').on('click.frio-jot', '.tag .filerm', function(e){
 			e.preventDefault();
 
 			let t = e.currentTarget

@@ -121,9 +121,8 @@
 	{{if $spa_mode}}
 		<link rel="stylesheet" href="view/asset/unpoly/unpoly.min.css?v={{$VERSION}}" type="text/css" media="all" />
 		<script type="text/javascript" src="view/asset/unpoly/unpoly.min.js?v={{$VERSION}}"></script>
-		<script type="module" src="view/js/spa/spa-router.js?v={{$VERSION}}"></script>
-		<script type="module" src="view/js/spa/spa-unpoly-bridge.js?v={{$VERSION}}"></script>
-		<script data-spa-version="{{$spa_router_ts}}">window.__spa_router_version = "{{$spa_router_ts}}";</script>
+		<script type="module" src="view/js/spa/spa-unpoly-nav.js?v={{$VERSION}}"></script>
+		<script data-spa-version="{{$spa_router_ts}}" data-update-content="{{$update_content}}" data-local-user="{{if $local_user}}{{$local_user}}{{else}}false{{/if}}">window.__spa_router_version = "{{$spa_router_ts}}";</script>
 	{{/if}}
 	<script>
 	// Loading indicator translations with delay messages
@@ -139,7 +138,6 @@
 	window.spaErrorTexts = {
 		timeout: "{{$spaErrors.timeout nofilter}}",
 		timeout_message: "{{$spaErrors.timeout_message nofilter}}",
-		close: "{{$spaErrors.close nofilter}}",
 		delay_title: "{{$spaErrors.delay_title nofilter}}"
 	};
 	</script>

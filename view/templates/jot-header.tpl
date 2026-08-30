@@ -59,28 +59,28 @@ function enableOnUser(){
 	window.onDocumentReady('body', function() {
 
 		/* enable editor on focus and click */
-		$("#profile-jot-text").focus(enableOnUser);
-		$("#profile-jot-text").click(enableOnUser);
+		$("#profile-jot-text").off('focus.jot-header').on('focus.jot-header', enableOnUser);
+		$("#profile-jot-text").off('click.jot-header').on('click.jot-header', enableOnUser);
 
 		/* show images / file browser window
 		 *
 		 **/
 
 		/* callback */
-		$('body').on('fbrowser.photo.main', function(e, filename, embedcode, id) {
+		$('body').off('fbrowser.photo.main').on('fbrowser.photo.main', function(e, filename, embedcode, id) {
 			$.colorbox.close();
 			addeditortext(embedcode);
 		});
-		$('body').on('fbrowser.attachment.main', function(e, filename, embedcode, id) {
+		$('body').off('fbrowser.attachment.main').on('fbrowser.attachment.main', function(e, filename, embedcode, id) {
 			$.colorbox.close();
 			addeditortext(embedcode);
 		});
 
-		$('#wall-image-upload').on('click', function(){
+		$('#wall-image-upload').off('click.jot-header').on('click.jot-header', function(){
 			Dialog.doImageBrowser("main");
 		});
 
-		$('#wall-file-upload').on('click', function(){
+		$('#wall-file-upload').off('click.jot-header').on('click.jot-header', function(){
 			Dialog.doFileBrowser("main");
 		});
 	});

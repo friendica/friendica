@@ -276,7 +276,6 @@ class Page implements ArrayAccess
 			'$spaErrors' => [
 				'timeout'         => $l10n->t('Timeout'),
 				'timeout_message' => $l10n->t('The request took too long. Please try again.'),
-				'close'           => $l10n->t('Close'),
 				'delay_title'     => $l10n->t('Please wait'),
 			],
 

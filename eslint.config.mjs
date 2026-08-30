@@ -17,6 +17,7 @@ const vendorGlobals = {
 	DOMPurify: "readonly",  // view/asset/dompurify/dist/purify.min.js
 	Dropzone: "readonly",   // vendor/enyo/dropzone/dist/min/dropzone.min.js
 	moment: "readonly",     // view/asset/moment/min/moment-with-locales.min.js
+	up: "readonly",         // view/asset/unpoly/unpoly.min.js
 };
 
 // Page variables injected by PHP or by inline <script> blocks in the templates.

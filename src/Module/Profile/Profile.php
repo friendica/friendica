@@ -255,7 +255,7 @@ class Profile extends BaseProfile
 		$publicCircles     = DBA::selectToArray('group', ['id', 'name'], ['uid' => $profile['uid'], 'deleted' => false, 'public' => true], ['order' => ['name']]);
 		foreach ($publicCircles as $publicCircle) {
 			$publicCircleLinks[] = sprintf(
-				'<a href="%s/profile/%s/circles/%d/download">%s</a>',
+				'<a href="%s/profile/%s/circles/%d/download" download>%s</a>',
 				$this->baseUrl,
 				urlencode((string) $profile['nickname']),
 				(int) $publicCircle['id'],

@@ -2057,7 +2057,10 @@ class BBCode
 
 		// We need no target="_blank" rel="noopener noreferrer" for local links
 		// convert links start with DI::baseUrl() as local link without the target="_blank" rel="noopener noreferrer" attribute
-		$text = preg_replace("/\[url\=(" . preg_quote(DI::baseUrl(), '/') . ".*?)\](.*?)\[\/url\]/ism", '<a href="$1">$2</a>', $text);
+		$text = preg_replace_callback("/\[url\=(" . preg_quote(DI::baseUrl(), '/') . ".*?)\](.*?)\[\/url\]/ism", function ($match) use ($simple_html) {
+			$attributes = ($simple_html == self::INTERNAL && preg_match('#/attach/\d#', $match[1])) ? ' up-follow="false"' : '';
+			return '<a href="' . $match[1] . '"' . $attributes . '>' . $match[2] . '</a>';
+		}, $text);
 
 		$text = preg_replace("/\[url\=(.*?)\](.*?)\[\/url\]/ism", '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>', (string) $text);
 
