@@ -112,9 +112,21 @@ final class PostTemplateBuilder
 		}
 
 		$sparkle = str_starts_with((string) $profileUrl, 'contact/redir/') ? ' sparkle' : '';
-		$this->item->localize($item);
-		$bodyHtml = ItemModel::prepareBody($item, true, $preview);
-		$tags     = Tag::populateFromItem($item);
+
+		// The node of an author who blocked this user is kept so that the replies of everyone
+		// else survive, but their content is never generated.
+		$blockedByAuthor = !empty($item['author-blocked-user']);
+
+		if ($blockedByAuthor) {
+			$bodyHtml = '';
+			$tags     = ['tags' => [], 'hashtags' => [], 'mentions' => [], 'implicit_mentions' => []];
+			// Blanked here rather than below, because the "ago" string embeds it.
+			$item['app'] = '';
+		} else {
+			$this->item->localize($item);
+			$bodyHtml = ItemModel::prepareBody($item, true, $preview);
+			$tags     = Tag::populateFromItem($item);
+		}
 
 		$categories = [];
 		$folders    = [];
@@ -427,6 +439,32 @@ final class PostTemplateBuilder
 			'hide_text'          => $this->l10n->t('Close comments'),
 			'smart_threading'    => $this->uid ? !$this->pConfig->get($this->uid, 'system', 'no_smart_threading', false) : false,
 		];
+
+		if ($blockedByAuthor) {
+			$tmpItem = array_merge($tmpItem, [
+				'body_html'     => $this->l10n->t('This post is not available.'),
+				'text'          => '',
+				'title'         => '',
+				'summary'       => '',
+				'location_html' => '',
+				'language'      => [],
+				'lang'          => '',
+				'app'           => '',
+				'has_cats'      => '',
+				'has_folders'   => '',
+				'categories'    => [],
+				'folders'       => [],
+				'isevent'       => false,
+				'attend'        => [],
+				'quoteshares'   => [],
+				'emojis'        => [],
+				'reactions'     => [],
+				'responses'     => [],
+				'like_html'     => '',
+				'dislike_html'  => '',
+				'vote'          => [],
+			]);
+		}
 
 		$arr    = ['item' => $item, 'output' => $tmpItem];
 		$arr    = $this->eventDispatcher->dispatch(new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr))->getArray();

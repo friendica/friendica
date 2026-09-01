@@ -257,7 +257,7 @@ class Display extends BaseModule
 			'owner-id', 'contact-id', 'uid',
 		];
 
-		$item = Post::selectFirstForUser($pageUid, $fields, $condition);
+		$item = Post::selectFirstForConversation($pageUid, $fields, $condition);
 
 		if (empty($item)) {
 			$this->page['aside'] = '';
@@ -276,7 +276,13 @@ class Display extends BaseModule
 			Item::update(['unseen' => false], $condition);
 		}
 
-		$this->addMetaTags($item);
+		$metaItem = $item;
+		if (Contact\User::isIsBlocked($item['author-id'], $pageUid)) {
+			$metaItem['body']  = '';
+			$metaItem['title'] = '';
+		}
+
+		$this->addMetaTags($metaItem);
 
 		$output = '';
 
