@@ -354,7 +354,9 @@ class Network
 					$pair = $param . '=' . $value;
 					$url  = str_replace($pair, '', $url);
 
-					$url = str_replace(['?&', '&&'], ['?', ''], $url);
+					// Removing a pair leaves the separators of both of its neighbours
+					// behind, so the leftovers are collapsed back into one separator.
+					$url = rtrim(str_replace(['?&', '&&'], ['?', '&'], $url), '&');
 				}
 			}
 
