@@ -843,7 +843,7 @@ nav.navbar .nav > li > button:focus {
 #topbar-first .nav-segment .icon-badge-container .badge {
 	position: absolute;
 	top: -8px;
-	right: -19px;
+	left: 23px;
 	background-color: #ff3535;
 }
 #topbar-first #intro-update {
