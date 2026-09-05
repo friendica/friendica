@@ -1,0 +1,192 @@
+# SPDX-FileCopyrightText: 2010-2026 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: Create messages.po
+
+on:
+  workflow_dispatch:
+    inputs:
+      pull_request:
+        description: 'Pull request number'
+        required: true
+        type: number
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+jobs:
+  update:
+    name: Update messages.po
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event_name == 'issue_comment' &&
+          github.event.issue.pull_request &&
+          startsWith(github.event.comment.body, '/create-messages.po') &&
+          contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+        )
+      }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Read pull request metadata
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_PR_NUMBER: ${{ inputs.pull_request }}
+          COMMENT_PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            PR_NUMBER="$MANUAL_PR_NUMBER"
+          else
+            PR_NUMBER="$COMMENT_PR_NUMBER"
+          fi
+
+          state="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json state --jq '.state')"
+          if [ "$state" != "OPEN" ]; then
+            echo "::error::Pull request #$PR_NUMBER is $state, only open pull requests can be updated."
+            exit 1
+          fi
+
+          head_repository="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRepository --jq '.headRepository.nameWithOwner')"
+          head_ref="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefName --jq '.headRefName')"
+          base_ref="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json baseRefName --jq '.baseRefName')"
+
+          if [ "$head_repository" = "$GITHUB_REPOSITORY" ]; then
+            same_repository=true
+          else
+            same_repository=false
+          fi
+
+          {
+            echo "number=$PR_NUMBER"
+            echo "head_repository=$head_repository"
+            echo "head_ref=$head_ref"
+            echo "base_ref=$base_ref"
+            echo "same_repository=$same_repository"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout generator from base branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pr.outputs.base_ref }}
+          path: generator
+          persist-credentials: false
+
+      - name: Checkout pull request branch
+        if: ${{ steps.pr.outputs.same_repository == 'true' }}
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pr.outputs.head_ref }}
+          path: worktree
+
+      - name: Checkout pull request fork
+        if: ${{ steps.pr.outputs.same_repository == 'false' }}
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ steps.pr.outputs.head_repository }}
+          ref: ${{ steps.pr.outputs.head_ref }}
+          path: worktree
+          persist-credentials: false
+
+      - name: Regenerate messages.po
+        run: |
+          set -euo pipefail
+
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE/worktree:/data" \
+            -v "$GITHUB_WORKSPACE/generator/bin/run_xgettext.sh:/data/bin/run_xgettext.sh:ro" \
+            -w /data \
+            friendicaci/transifex \
+            /bin/sh /data/bin/run_xgettext.sh
+
+      - name: Prepare update
+        id: update
+        working-directory: worktree
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet -- view/lang/C/messages.po; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "messages.po is already up to date." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          git diff -- view/lang/C/messages.po > "$GITHUB_WORKSPACE/messages-po-update.patch"
+          cp view/lang/C/messages.po "$GITHUB_WORKSPACE/messages.po"
+
+      - name: Commit and push update
+        id: push
+        if: ${{ steps.update.outputs.has_changes == 'true' && steps.pr.outputs.same_repository == 'true' }}
+        working-directory: worktree
+        env:
+          HEAD_REF: ${{ steps.pr.outputs.head_ref }}
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add view/lang/C/messages.po
+          git commit -m "Update messages.po"
+
+          if git push origin "HEAD:$HEAD_REF"; then
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+            echo "Committed and pushed an updated messages.po to $HEAD_REF." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Could not push the messages.po update. Uploading a patch artifact instead."
+          fi
+
+      - name: Upload update artifact
+        id: artifact
+        if: ${{ steps.update.outputs.has_changes == 'true' && (steps.pr.outputs.same_repository == 'false' || steps.push.outputs.pushed == 'false') }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: messages-po-update-pr-${{ steps.pr.outputs.number }}
+          path: |
+            messages.po
+            messages-po-update.patch
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Summarize artifact fallback
+        if: ${{ steps.update.outputs.has_changes == 'true' && (steps.pr.outputs.same_repository == 'false' || steps.push.outputs.pushed == 'false') }}
+        run: |
+          {
+            echo "messages.po was regenerated, but this workflow did not push to the pull request branch."
+            echo
+            echo "Download the messages-po-update-pr-${{ steps.pr.outputs.number }} artifact from this run and apply messages-po-update.patch, or replace view/lang/C/messages.po with the artifact copy."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Comment no-op result
+        if: ${{ github.event_name == 'issue_comment' && steps.update.outputs.has_changes == 'false' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "messages.po is already up to date."
+
+      - name: Comment push result
+        if: ${{ github.event_name == 'issue_comment' && steps.push.outputs.pushed == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "Regenerated messages.po and pushed an \`Update messages.po\` commit to this pull request branch."
+
+      - name: Comment artifact fallback
+        if: ${{ github.event_name == 'issue_comment' && steps.update.outputs.has_changes == 'true' && (steps.pr.outputs.same_repository == 'false' || steps.push.outputs.pushed == 'false') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: |
+          gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "Regenerated messages.po, but I could not push to this pull request branch. Download the messages-po-update-pr-$PR_NUMBER artifact and apply messages-po-update.patch: $ARTIFACT_URL"

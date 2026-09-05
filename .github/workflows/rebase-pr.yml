@@ -1,0 +1,156 @@
+# SPDX-FileCopyrightText: 2010-2026 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: Rebase PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      pull_request:
+        description: 'Pull request number'
+        required: true
+        type: number
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+jobs:
+  rebase:
+    name: Rebase pull request branch
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event_name == 'issue_comment' &&
+          github.event.issue.pull_request &&
+          startsWith(github.event.comment.body, '/rebase') &&
+          contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+        )
+      }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Read pull request metadata
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_PR_NUMBER: ${{ inputs.pull_request }}
+          COMMENT_PR_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            PR_NUMBER="$MANUAL_PR_NUMBER"
+          else
+            PR_NUMBER="$COMMENT_PR_NUMBER"
+          fi
+
+          state="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json state --jq '.state')"
+          if [ "$state" != "OPEN" ]; then
+            echo "::error::Pull request #$PR_NUMBER is $state, only open pull requests can be rebased."
+            exit 1
+          fi
+
+          head_repository="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRepository --jq '.headRepository.nameWithOwner')"
+          head_ref="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json headRefName --jq '.headRefName')"
+          base_ref="$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json baseRefName --jq '.baseRefName')"
+
+          if [ "$head_repository" != "$GITHUB_REPOSITORY" ]; then
+            echo "same_repository=false" >> "$GITHUB_OUTPUT"
+            echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          {
+            echo "number=$PR_NUMBER"
+            echo "head_ref=$head_ref"
+            echo "base_ref=$base_ref"
+            echo "same_repository=true"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Comment fork fallback
+        if: ${{ steps.pr.outputs.same_repository == 'false' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "I cannot automatically rebase fork pull request branches with the repository token. Please rebase the branch in the fork, then comment \`/create-messages.po\` if messages.po still needs to be regenerated."
+
+      - name: Checkout pull request branch
+        if: ${{ steps.pr.outputs.same_repository == 'true' }}
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pr.outputs.head_ref }}
+          path: worktree
+          fetch-depth: 0
+
+      - name: Rebase onto base branch
+        id: rebase
+        if: ${{ steps.pr.outputs.same_repository == 'true' }}
+        working-directory: worktree
+        env:
+          BASE_REF: ${{ steps.pr.outputs.base_ref }}
+        run: |
+          set -euo pipefail
+
+          before="$(git rev-parse HEAD)"
+          git fetch origin "$BASE_REF"
+
+          if git merge-base --is-ancestor "origin/$BASE_REF" HEAD; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Pull request branch is already based on $BASE_REF." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if git rebase "origin/$BASE_REF"; then
+            after="$(git rev-parse HEAD)"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "before=$before" >> "$GITHUB_OUTPUT"
+            echo "after=$after" >> "$GITHUB_OUTPUT"
+          else
+            git rebase --abort || true
+            echo "::error::Automatic rebase failed because of conflicts."
+            exit 1
+          fi
+
+      - name: Push rebased branch
+        id: push_rebase
+        if: ${{ steps.rebase.outputs.changed == 'true' }}
+        working-directory: worktree
+        env:
+          HEAD_REF: ${{ steps.pr.outputs.head_ref }}
+        run: git push --force-with-lease origin "HEAD:$HEAD_REF"
+
+      - name: Comment no-op result
+        if: ${{ github.event_name == 'issue_comment' && steps.rebase.outputs.changed == 'false' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "This pull request branch is already up to date with the base branch."
+
+      - name: Comment rebase result
+        if: ${{ github.event_name == 'issue_comment' && steps.rebase.outputs.changed == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          BASE_REF: ${{ steps.pr.outputs.base_ref }}
+        run: gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "Rebased this pull request branch onto \`$BASE_REF\`. If messages.po is still outdated, comment \`/create-messages.po\`."
+
+      - name: Comment conflict result
+        if: ${{ github.event_name == 'issue_comment' && failure() && steps.rebase.outcome == 'failure' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "Automatic rebase failed because of conflicts. Please resolve the rebase manually, then comment \`/create-messages.po\` if messages.po still needs to be regenerated."
+
+      - name: Comment push failure
+        if: ${{ github.event_name == 'issue_comment' && failure() && steps.push_rebase.outcome == 'failure' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: gh pr comment "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --body "The rebase completed locally, but pushing the rebased branch failed. The branch may have changed while this workflow was running. Please run \`/rebase\` again."

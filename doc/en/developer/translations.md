@@ -35,6 +35,11 @@ docker run --rm -v $PWD:/data -w /data friendicaci/transifex bin/run_xgettext.sh
 
 Once you have added new translation strings in your code changes, please run `bin/run_xgettext.sh` from the base Friendica directory and commit the updated `view/lang/C/messages.po` to your branch.
 
+If a contributor cannot run the script locally, maintainers can comment `/create-messages.po` on the pull request or start the GitHub Actions workflow `Create messages.po` and enter the pull request number.
+For branches in the main Friendica repository, the workflow commits the regenerated `view/lang/C/messages.po` directly to the pull request branch.
+For forked pull requests or branches that cannot be pushed to, the workflow uploads a `messages-po-update-pr-<number>` artifact containing the updated file and a patch.
+If the branch needs to be rebased first, maintainers can comment `/rebase` on a pull request branch in the main Friendica repository or start the GitHub Actions workflow `Rebase PR`, then run `/create-messages.po` if needed.
+
 ### Addon
 
 If you have the `friendica-addons` repository in the `addon` directory of your Friendica cloned repository, just run `bin/run_xgettext.sh -a <addon_name>` from the base Friendica directory.
