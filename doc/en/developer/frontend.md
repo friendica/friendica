@@ -631,7 +631,7 @@ The rules below come up most in Friendica frontend work; the §8 checklist enfor
 | Rule                                         | Do                                                          | Avoid                                                               |
 |----------------------------------------------|-------------------------------------------------------------|---------------------------------------------------------------------|
 | Use native elements (keyboard-accessible)    | `<button type="button">`, `<a href="…">`, `<input>`         | `<div class="clickable">` (an `<a>` without `href` isn't focusable) |
-| `alt` on every image                         | `alt="{{$display_name}}"` informative · `alt=""` decorative | missing `alt`                                                       |
+| `alt` on every image                         | `alt="{{$display_name}}"` informative · `alt=""` decorative | missing `alt` (checked by `composer run test:templates`)            |
 | Keep a visible focus ring                    | a custom focus style if you override the default            | `outline: none` with no replacement                                 |
 | Don't rely on colour alone to convey meaning | pair colour with an icon or text                            | colour as the only signal                                           |
 
@@ -656,9 +656,17 @@ The rule checklist lives at the top ([At a glance](#at-a-glance)); this section 
 composer run lint
 composer run phpstan
 
-# Note: lint and phpstan do NOT check JavaScript syntax, CSS, Smarty,
-# accessibility, or browser behaviour. Those require manual testing.
+# Template markup: missing alt texts, nested interactive elements, flow content in buttons, duplicate ids (no database needed)
+composer run test:templates
+
+# JavaScript and CSS
+npm run lint
+
+# Note: none of these check colour contrast, keyboard operation or browser behaviour. Those still require manual testing.
 ```
+
+A `test:templates` failure names the file, the line and the fix.
+Existing violations are grandfathered, so it only reports what you touched → [Tests](tests#template-tests).
 
 **Manual checks:**
 

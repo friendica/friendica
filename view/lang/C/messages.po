@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-05 15:01+0200\n"
+"POT-Creation-Date: 2026-09-05 18:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,7 +162,8 @@ msgstr ""
 #: src/Content/Conversation/ConversationRenderer.php:539
 #: src/Content/Conversation/PostTemplateBuilder.php:394
 #: src/Content/Conversation/StatusEditor.php:182
-#: src/Module/Item/Compose.php:181 src/Module/Post/Edit.php:156
+#: src/Module/Item/Compose.php:181 src/Module/Media/BaseBrowser.php:91
+#: src/Module/Post/Edit.php:156
 msgid "Please wait"
 msgstr ""
 
@@ -331,8 +332,7 @@ msgstr ""
 
 #: mod/photos.php:556 mod/photos.php:655 src/Module/Contact/Follow.php:158
 #: src/Module/Contact/Revoke.php:92 src/Module/Contact/Unfollow.php:107
-#: src/Module/Media/Attachment/Browser.php:64
-#: src/Module/Media/Photo/Browser.php:76 src/Module/Post/Edit.php:180
+#: src/Module/Media/BaseBrowser.php:86 src/Module/Post/Edit.php:180
 #: src/Module/Post/Tag/Remove.php:101 src/Module/Profile/RemoteFollow.php:110
 #: src/Module/Security/TwoFactor/SignOut.php:115
 msgid "Cancel"
@@ -572,8 +572,8 @@ msgid "toggle mobile"
 msgstr ""
 
 #: src/App/Page.php:366 src/Module/Admin/Logs/View.php:91
-#: src/Module/Item/Compose.php:336 src/Module/Media/Attachment/Browser.php:69
-#: src/Module/Media/Photo/Browser.php:81 view/theme/frio/php/minimal.php:39
+#: src/Module/Item/Compose.php:336 src/Module/Media/BaseBrowser.php:94
+#: view/theme/frio/php/minimal.php:39
 msgid "Close"
 msgstr ""
 
@@ -2252,8 +2252,7 @@ msgid "Sign in"
 msgstr ""
 
 #: src/Content/Nav.php:207 src/Module/BaseProfile.php:50
-#: src/Module/Media/Attachment/Browser.php:67
-#: src/Module/Media/Photo/Browser.php:62 src/Module/Media/Photo/Browser.php:79
+#: src/Module/Media/BaseBrowser.php:92 src/Module/Media/Photo/Browser.php:34
 #: view/theme/frio/theme.php:222
 msgid "Photos"
 msgstr ""
@@ -8077,41 +8076,14 @@ msgstr ""
 msgid "A Decentralized Social Network"
 msgstr ""
 
-#: src/Module/Media/Attachment/Browser.php:45
-#: src/Module/Media/Photo/Browser.php:47
+#: src/Module/Media/Attachment/Browser.php:22
+#: src/Module/Media/Photo/Browser.php:24
 msgid "You need to be logged in to access this page."
 msgstr ""
 
-#: src/Module/Media/Attachment/Browser.php:61
-#: src/Module/Media/Attachment/Browser.php:68
-#: src/Module/Media/Photo/Browser.php:80
+#: src/Module/Media/Attachment/Browser.php:31
+#: src/Module/Media/BaseBrowser.php:93
 msgid "Files"
-msgstr ""
-
-#: src/Module/Media/Attachment/Browser.php:66
-#: src/Module/Media/Photo/Browser.php:78
-#: src/Module/Settings/Profile/Photo/Index.php:112
-msgid "Upload"
-msgstr ""
-
-#: src/Module/Media/Attachment/Browser.php:70
-#: src/Module/Media/Photo/Browser.php:82
-msgid "Breadcrumb"
-msgstr ""
-
-#: src/Module/Media/Attachment/Browser.php:71
-#: src/Module/Media/Photo/Browser.php:83
-msgid "Switch between photo and attachment mode"
-msgstr ""
-
-#: src/Module/Media/Attachment/Browser.php:72
-#: src/Module/Media/Photo/Browser.php:84
-msgid "Album navigation"
-msgstr ""
-
-#: src/Module/Media/Attachment/Browser.php:73
-#: src/Module/Media/Photo/Browser.php:85
-msgid "Browser content"
 msgstr ""
 
 #: src/Module/Media/Attachment/Upload.php:77
@@ -8129,6 +8101,27 @@ msgstr ""
 
 #: src/Module/Media/Attachment/Upload.php:94
 msgid "File upload failed."
+msgstr ""
+
+#: src/Module/Media/BaseBrowser.php:88
+#: src/Module/Settings/Profile/Photo/Index.php:112
+msgid "Upload"
+msgstr ""
+
+#: src/Module/Media/BaseBrowser.php:95
+msgid "Breadcrumb"
+msgstr ""
+
+#: src/Module/Media/BaseBrowser.php:96
+msgid "Switch between photo and attachment mode"
+msgstr ""
+
+#: src/Module/Media/BaseBrowser.php:97
+msgid "Album navigation"
+msgstr ""
+
+#: src/Module/Media/BaseBrowser.php:98
+msgid "Browser content"
 msgstr ""
 
 #: src/Module/Media/Photo/Upload.php:130 src/Module/Media/Photo/Upload.php:131

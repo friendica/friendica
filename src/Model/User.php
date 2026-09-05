@@ -2072,7 +2072,7 @@ class User
 	 */
 	public static function getAdminEmailList(): array
 	{
-		$adminEmails = strtolower(str_replace(' ', '', DI::config()->get('config', 'admin_email')));
+		$adminEmails = strtolower(str_replace(' ', '', DI::config()->get('config', 'admin_email') ?? ''));
 		if (!$adminEmails) {
 			return [];
 		}

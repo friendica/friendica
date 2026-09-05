@@ -10,6 +10,7 @@ path = [
      "package.json",
      "package-lock.json",
      "eslint-suppressions.json",
+     "template-invariants-baseline.json",
      "doc/**",
      "spec/*",
      "tests/**",
