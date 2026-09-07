@@ -193,7 +193,7 @@ class Edit extends BaseModule
 			'$edquote'  => $this->t('Quote'),
 			'$edemojis' => $this->t('Add emojis'),
 			'$edcode'   => $this->t('Code'),
-			'$edurl'    => $this->t('Link'),
+			'$edurl'    => $this->t('Web link'),
 			'$edattach' => $this->t('Link or Media'),
 
 			//jot nav tab (used in some themes)

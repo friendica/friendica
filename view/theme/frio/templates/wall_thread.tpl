@@ -171,10 +171,12 @@ as the value of $top_child_total (this is done at the end of this file)
 						{{if $item.connector}}
 							<span aria-hidden="true">&bull;</span>
 							<i class="ri ri-plug-line" title="{{$item.connector}}" aria-hidden="true"></i>
+							<span class="sr-only">{{$item.connector}}</span>
 						{{else}}
 							<span aria-hidden="true">&bull;</span>
 							<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
 								<i class="ri {{if $item.private == 1}}ri-lock-line{{elseif $item.private == 0}}ri-global-line{{else}}ri-eye-off-line{{/if}}" aria-hidden="true"></i>
+								<span class="sr-only">{{$item.privacy}}</span>
 							</span>
 						{{/if}}
 					</div>
@@ -195,7 +197,7 @@ as the value of $top_child_total (this is done at the end of this file)
 					<p class="text-muted">
 						<small>
 							<a href="{{$item.plink.orig}}">
-								<time class="time" class="wall-item-ago" datetime="{{$item.utc}}">{{$item.ago}}</time>
+								<time class="time wall-item-ago" title="{{$item.localtime}}" datetime="{{$item.utc}}">{{$item.ago}}</time>
 							</a>
 							{{if $item.location_html}}&nbsp;&mdash;&nbsp;({{$item.location_html nofilter}}){{/if}}
 							{{if $item.owner_self}}
@@ -209,11 +211,13 @@ as the value of $top_child_total (this is done at the end of this file)
 								<span title="{{$item.connector}}">
 									<i class="ri ri-plug-line" aria-hidden="true"></i>
 								</span>
+								<span class="sr-only">{{$item.connector}}</span>
 							{{else}}
 								<span aria-hidden="true">&bull;</span>
 								<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
 								<i class="ri {{if $item.private == 1}}ri-lock-line{{elseif $item.private == 0}}ri-global-line{{else}}ri-eye-off-line{{/if}}" aria-hidden="true"></i>
 								</span>
+								<span class="sr-only">{{$item.privacy}}</span>
 							{{/if}}
 						</small>
 					</p>
@@ -255,11 +259,13 @@ as the value of $top_child_total (this is done at the end of this file)
 							<span aria-hidden="true">&bull;</span>
 							<i class="ri ri-plug-line" aria-hidden="true"></i>
 						</span>
+						<span class="sr-only">{{$item.connector}}</span>
 					{{else}}
 						<span class="navicon lock fakelink" onClick="lockview(event, 'item', {{$item.id}});" title="{{$item.privacy}}" data-toggle="tooltip">
 							<span aria-hidden="true">&bull;</span>
 							<i class="ri {{if $item.private == 1}}ri-lock-line{{elseif $item.private == 0}}ri-global-line{{else}}ri-eye-off-line{{/if}}" aria-hidden="true"></i>
 						</span>
+						<span class="sr-only">{{$item.privacy}}</span>
 					{{/if}}
 				</small>
 			</span>

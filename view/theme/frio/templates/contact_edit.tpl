@@ -6,7 +6,7 @@
   *}}
 
 <div class="generic-page-wrapper">
-	{{if $header}}<h3>{{$header}}:&nbsp;{{$name}}{{if $account_type}}&nbsp;<small>({{$account_type}})</small>{{/if}}</h3>{{/if}}
+	{{if $header}}<h3 class="heading">{{$header}}:&nbsp;{{$name}}{{if $account_type}}&nbsp;<small>({{$account_type}})</small>{{/if}}</h3>{{/if}}
 
 	<div id="contact-edit-wrapper">
 
@@ -74,18 +74,18 @@
 
 				<div id="contact-edit-links-end"></div>
 
-				<div class="panel-group" id="contact-edit-tools" role="tablist" aria-multiselectable="true">
+				<div class="panel-group" id="contact-edit-tools">
 
 					{{* Some information about the contact from the profile *}}
 					<div class="panel">
-						<div class="section-subtitle-wrapper panel-heading" role="tab" id="contact-edit-profile">
+						<div class="section-subtitle-wrapper panel-heading" id="contact-edit-profile">
 							<h4>
 								<button class="btn-link accordion-toggle" data-toggle="collapse" data-parent="#contact-edit-tools" href="#contact-edit-profile-collapse" aria-expanded="true" aria-controls="contact-edit-profile-collapse">
 									{{$contact_profile_label}}
 								</button>
 							</h4>
 						</div>
-						<div id="contact-edit-profile-collapse" class="panel-body panel-collapse collapse in" role="tabpanel" aria-labelledby="contact-edit-profile">
+						<div id="contact-edit-profile-collapse" class="panel-body panel-collapse collapse in" aria-labelledby="contact-edit-profile">
 							<div class="section-content-tools-wrapper">
 								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 text-muted">{{$profileurllabel}}</div><a target="blank" href="{{$profileurl}}">{{$profileurl}}</a>
@@ -137,14 +137,14 @@
 
 					{{if $contact_settings_label}}
 					<div class="panel">
-						<div class="section-subtitle-wrapper panel-heading" role="tab" id="contact-edit-settings">
+						<div class="section-subtitle-wrapper panel-heading" id="contact-edit-settings">
 							<h4>
 								<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#contact-edit-tools" href="#contact-edit-settings-collapse" aria-expanded="false" aria-controls="contact-edit-settings-collapse">
 									{{$contact_settings_label}}
 								</button>
 							</h4>
 						</div>
-						<div id="contact-edit-settings-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="contact-edit-settings">
+						<div id="contact-edit-settings-collapse" class="panel-body panel-collapse collapse" aria-labelledby="contact-edit-settings">
 							<div class="section-content-tools-wrapper">
 
 								<input type="hidden" name="contact_id" value="{{$contact_id}}">
@@ -171,14 +171,14 @@
 
 					{{if $lbl_info1}}
 					<div class="panel">
-						<div class="section-subtitle-wrapper panel-heading" role="tab" id="contact-edit-info">
+						<div class="section-subtitle-wrapper panel-heading" id="contact-edit-info">
 							<h4>
 								<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#contact-edit-tools" href="#contact-edit-info-collapse" aria-expanded="false" aria-controls="contact-edit-info-collapse">
 									{{$lbl_info1}}
 								</button>
 							</h4>
 						</div>
-						<div id="contact-edit-info-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="contact-edit-info">
+						<div id="contact-edit-info-collapse" class="panel-body panel-collapse collapse" aria-labelledby="contact-edit-info">
 							<div class="section-content-tools-wrapper">
 
 								{{include file="field_textarea.tpl" field=$cinfo}}
@@ -198,14 +198,14 @@
 					{{/if}}
 					{{if $channel_settings_label}}
 						<div class="panel">
-							<div class="section-subtitle-wrapper panel-heading" role="tab" id="contact-edit-channel">
+							<div class="section-subtitle-wrapper panel-heading" id="contact-edit-channel">
 								<h4>
 									<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#contact-edit-tools" href="#contact-edit-channel-collapse" aria-expanded="false" aria-controls="contact-edit-channel-collapse">
 										{{$channel_settings_label}}
 									</button>
 								</h4>
 							</div>
-							<div id="contact-edit-channel-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="contact-edit-channel">
+							<div id="contact-edit-channel-collapse" class="panel-body panel-collapse collapse" aria-labelledby="contact-edit-channel">
 								<div class="section-content-tools-wrapper">
 									{{include file="field_checkbox.tpl" field=$channel_only}}
 									<label>{{$frequency_label}}</label>

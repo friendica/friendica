@@ -12,9 +12,9 @@
 	<p>{{$l10n.intro}}</p>
 	<p>{{$l10n.public nofilter}}</p>
 
-	<div class="panel-group panel-group-settings" id="admin-settings" role="tablist" aria-multiselectable="true">
+	<div class="panel-group panel-group-settings" id="admin-settings">
 		<div class="panel">
-			<div class="panel-heading section-subtitle-wrapper" role="tab" id="admin-settings-serverblocklist-import">
+			<div class="panel-heading section-subtitle-wrapper" id="admin-settings-serverblocklist-import">
 				<h4>
 					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-serverblocklist-import-collapse" aria-expanded="false" aria-controls="admin-settings-serverblocklist-import-collapse">
 						{{$l10n.importtitle}}
@@ -22,7 +22,7 @@
 				</h4>
 			</div>
 
-			<div id="admin-settings-serverblocklist-import-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-serverblocklist-import">
+			<div id="admin-settings-serverblocklist-import-collapse" class="panel-body panel-collapse collapse" aria-labelledby="admin-settings-serverblocklist-import">
 				<div class="panel panel-body">
 					{{$l10n.download nofilter}}
 				</div>
@@ -39,7 +39,7 @@
 		</div>
 
 		<div class="panel">
-			<div class="panel-heading section-subtitle-wrapper" role="tab" id="admin-settings-serverblocklist-add">
+			<div class="panel-heading section-subtitle-wrapper" id="admin-settings-serverblocklist-add">
 				<h4>
 					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-serverblocklist-add-collapse" aria-expanded="false" aria-controls="admin-settings-serverblocklist-add-collapse">
 						{{$l10n.addtitle}}
@@ -47,7 +47,7 @@
 				</h4>
 			</div>
 
-			<div id="admin-settings-serverblocklist-add-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-serverblocklist-add">
+			<div id="admin-settings-serverblocklist-add-collapse" class="panel-body panel-collapse collapse" aria-labelledby="admin-settings-serverblocklist-add">
 				<div class="panel panel-body">
 					{{$l10n.syntax nofilter}}
 				</div>
@@ -63,7 +63,7 @@
 		</div>
 
 		<div class="panel">
-			<div class="panel-heading section-subtitle-wrapper" role="tab" id="admin-settings-serverblocklist-search">
+			<div class="panel-heading section-subtitle-wrapper" id="admin-settings-serverblocklist-search">
 				<h4>
 					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-serverblocklist-search-collapse" aria-expanded="false" aria-controls="admin-settings-serverblocklist-search-collapse">
 						{{$l10n.search_label}}
@@ -71,7 +71,7 @@
 				</h4>
 			</div>
 
-			<div id="admin-settings-serverblocklist-search-collapse" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-serverblocklist-search">
+			<div id="admin-settings-serverblocklist-search-collapse" class="panel-body panel-collapse collapse" aria-labelledby="admin-settings-serverblocklist-search">
 				<form action="{{$baseurl}}/moderation/blocklist/server" method="get">
 					<div class="form-group">
 						<label for="serverblocklist_search">{{$l10n.search_label}}</label>
@@ -87,7 +87,7 @@
 		</div>
 
 		<div class="panel">
-			<div class="panel-heading section-subtitle-wrapper" role="tab" id="admin-settings-serverblocklist-current">
+			<div class="panel-heading section-subtitle-wrapper" id="admin-settings-serverblocklist-current">
 				<h4>
 					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-serverblocklist-current-collapse" aria-expanded="{{if $entries || $search}}true{{else}}false{{/if}}" aria-controls="admin-settings-serverblocklist-current-collapse">
 						{{$l10n.currenttitle}}
@@ -95,7 +95,7 @@
 				</h4>
 			</div>
 
-			<div id="admin-settings-serverblocklist-current-collapse" class="panel-body panel-collapse collapse {{if $entries || $search}}in{{/if}}" role="tabpanel" aria-labelledby="admin-settings-serverblocklist-current">
+			<div id="admin-settings-serverblocklist-current-collapse" class="panel-body panel-collapse collapse {{if $entries || $search}}in{{/if}}" aria-labelledby="admin-settings-serverblocklist-current">
 				{{if $entries}}
 				<form action="{{$baseurl}}/moderation/blocklist/server" method="post">
 					<input type="hidden" name="form_security_token" value="{{$form_security_token}}">

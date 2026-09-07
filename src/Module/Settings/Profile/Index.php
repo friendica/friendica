@@ -252,7 +252,7 @@ class Index extends BaseSettings
 			'edcode'   => $this->t('Code'),
 			'edimg'    => $this->t('Image'),
 			'edemb'    => $this->t('Image'),
-			'edurl'    => $this->t('Link'),
+			'edurl'    => $this->t('Web link'),
 			'edattach' => $this->t('Link or Media'),
 		];
 

@@ -22,8 +22,8 @@
 
 					<div id="site-location" aria-hidden="true">{{$sitelocation}}</div>
 					<div id="banner" class="hidden-sm hidden-xs">
-						<a href="{{$baseurl}}/" aria-hidden="true">
-							<i id="logo-img" aria-label="{{$home}}" class="ri ri-friendica-fill ri-fw ri-lg" aria-hidden="true"></i>
+						<a href="{{$baseurl}}/" aria-label="{{$home}}">
+							<i id="logo-img" class="ri ri-friendica-fill ri-fw ri-lg" aria-hidden="true"></i>
 						</a>
 					</div>
 					{{* The search box *}}
@@ -382,9 +382,9 @@
 				<span class="sr-only">Toggle navigation</span>
 				<i class="ri ri-more-2-line ri-fw ri-lg" aria-hidden="true"></i>
 			</button>
-			<a class="navbar-brand" href="#">
+			<a class="navbar-brand" href="{{$baseurl}}/">
 				<div id="navbrand-container">
-					<i id="logo-img" aria-label="{{$home}}" class="ri ri-friendica-fill ri-fw ri-lg" aria-hidden="true"></i>
+					<i id="logo-img" class="ri ri-friendica-fill ri-fw ri-lg" aria-hidden="true"></i>
 					<div id="navbar-brand-text"> Friendica</div>
 				</div>
 			</a>
