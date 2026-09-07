@@ -20,6 +20,14 @@ if (!Element.prototype.matches) {
 		};
 }
 
+// Announce jGrowl toasts to screen readers instead of only showing them visually.
+// Set once on the shared prototype so every $.jGrowl() call across the theme picks it up.
+if (typeof $ !== 'undefined' && $.fn.jGrowl) {
+	$.fn.jGrowl.prototype.defaults.open = function (e, m, o) {
+		$(e).attr('role', o.theme === 'notice' ? 'alert' : 'status');
+	};
+}
+
 const ModuleLifecycleReadyEvent = Object.freeze({
 	DOCUMENT: 'document',
 	WINDOW: 'window'

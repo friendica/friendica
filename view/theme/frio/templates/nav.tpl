@@ -171,13 +171,13 @@
 									<li id="nav-notifications-mark-all" class="dropdown-header">
 										<div class="arrow"></div>
 										<header id="notifications-header">
-											<p id="notifications-title">{{$nav.notifications.1}}</p>
-											<header id="notifications-subheader">
+											<h3 id="notifications-title">{{$nav.notifications.1}}</h3>
+											<div id="notifications-subheader">
 												<a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a>
 												<button role="menuitem" type="button" id="notifications-mark-as-read" class="btn-link"
 													onclick="notificationMarkAll();" data-toggle="tooltip">{{$nav.notifications.mark.1}}
 												</button>
-											</header>
+											</div>
 										</header>
 									</li>
 

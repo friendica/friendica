@@ -1791,7 +1791,7 @@ msgstr ""
 #: src/Content/Conversation/StatusEditor.php:172
 #: src/Module/Item/Compose.php:181 src/Module/Post/Edit.php:196
 #: src/Module/Settings/Profile/Index.php:255
-msgid "Link"
+msgid "Web link"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1087
