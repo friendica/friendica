@@ -9,7 +9,7 @@
 	<div id="site-location">{{$sitelocation}}</div>
 	<div id="banner">{{$banner nofilter}}</div>
 </header>
-<nav id="topbar-first" role="menubar">
+<nav id="topbar-first">
 	<ul>
 		<li class="mobile-aside-toggle" style="display:none;">
 			<a href="#">
@@ -19,7 +19,7 @@
 
 		{{if $nav.back}}
 			<!-- Link back home to one's own instance, only visible to visitors -->
-			<li role="menuitem" id="nav-back-link" class="nav-menu">
+			<li id="nav-back-link" class="nav-menu">
 				<a accesskey="b" class="{{$nav.back.2}}" href="{{$nav.back.0}}" title="{{$nav.back.3}}">
 					<span class="desktop-view">{{$nav.back.1}}</span>
 					<i class="ri ri-xl ri-arrow-go-back-line ri-fw" aria-hidden="true"></i>
@@ -28,7 +28,7 @@
 			</li>
 		{{/if}}
 		{{if $nav.network}}
-			<li role="menuitem" id="nav-network-link" class="nav-menu {{$sel.network}}">
+			<li id="nav-network-link" class="nav-menu {{$sel.network}}">
 				<a accesskey="n" class="{{$nav.network.2}}" href="{{$nav.network.0}}" title="{{$nav.network.3}}">
 					<span class="desktop-view">{{$nav.network.1}}</span>
 					<i class="icon s22 icon-th mobile-view"><span class="sr-only">{{$nav.network.1}}</span></i>
@@ -43,27 +43,27 @@
 			</li>
 		{{/if}}
 		{{if $nav.calendar}}
-			<li role="menuitem" id="nav-calendar-link" class="nav-menu {{$sel.calendar}}">
+			<li id="nav-calendar-link" class="nav-menu {{$sel.calendar}}">
 				<a accesskey="e" class="{{$nav.calendar.2}} desktop-view" href="{{$nav.calendar.0}}" title="{{$nav.calendar.3}}">{{$nav.calendar.1}}</a>
 				<a class="{{$nav.calendar.2}} mobile-view" href="{{$nav.calendar.0}}" title="{{$nav.calendar.3}}"><i class="icon s22 icon-calendar"></i></a>
 			</li>
 		{{/if}}
 		{{if $nav.channel}}
 			<!-- Note: This is currently never displayed -->
-			<li role="menuitem" id="nav-channel-link" class="nav-menu {{$sel.channel}}">
+			<li id="nav-channel-link" class="nav-menu {{$sel.channel}}">
 				<a accesskey="l" class="{{$nav.channel.2}} desktop-view" href="{{$nav.channel.0}}" title="{{$nav.channel.3}}">{{$nav.channel.1}}</a>
 				<a class="{{$nav.channel.2}} mobile-view" href="{{$nav.channel.0}}" title="{{$nav.channel.3}}"><i class="icon s22 icon-bullseye"></i></a>
 			</li>
 		{{/if}}
 		{{if $nav.community}}
-			<li role="menuitem" id="nav-community-link" class="nav-menu {{$sel.community}}">
+			<li id="nav-community-link" class="nav-menu {{$sel.community}}">
 				<a accesskey="c" class="{{$nav.community.2}} desktop-view" href="{{$nav.community.0}}" title="{{$nav.community.3}}">{{$nav.community.1}}</a>
 				<a class="{{$nav.community.2}} mobile-view" href="{{$nav.community.0}}" title="{{$nav.community.3}}"><i class="icon s22 icon-bullseye"></i></a>
 			</li>
 		{{/if}}
 
 		{{if $profile_link}}
-			<li role="menuitem" id="nav-my-profile-link" class="nav-menu {{$sel.my_profile}}">
+			<li id="nav-my-profile-link" class="nav-menu {{$sel.my_profile}}">
 				<a accesskey="p" class="" href="{{$profile_link}}" title="{{$profile_link_title}}">
 					<span class="desktop-view">{{$profile_link_title}}</span>
 					<i class="ri ri-xl ri-user-line ri-fw mobile-view" aria-hidden="true"></i>
@@ -82,7 +82,7 @@
 		</li>
 
 		{{if $nav.messages}}
-			<li role="menu" aria-haspopup="true" id="nav-messages-linkmenu" class="nav-menu-icon">
+			<li id="nav-messages-linkmenu" class="nav-menu-icon">
 				<a href="{{$nav.messages.0}}" title="{{$nav.messages.1}}">
 					<span class="icon s22 icon-envelope"><span class="sr-only">{{$nav.messages.1}}</span></span>
 					<span id="mail-update" class="nav-notification"></span>
@@ -135,12 +135,12 @@
 		{{/if}}
 
 		{{if $nav.login}}
-			<li role="menuitem" id="nav-login-link" class="nav-menu">
+			<li id="nav-login-link" class="nav-menu">
 				<a class="{{$nav.login.2}}" href="{{$nav.login.0}}" title="{{$nav.login.3}}">{{$nav.login.1}}</a>
 			</li>
 		{{/if}}
 		{{if $nav.logout}}
-			<li role="menuitem" id="nav-logout-link" class="nav-menu">
+			<li id="nav-logout-link" class="nav-menu">
 				<a class="{{$nav.logout.2}}" href="{{$nav.logout.0}}" title="{{$nav.logout.3}}" up-follow="false">{{$nav.logout.1}}</a>
 			</li>
 		{{/if}}
@@ -160,13 +160,13 @@
 		{{/if}}
 
 		{{if $nav.admin}}
-			<li role="menuitem" id="nav-admin-link" class="nav-menu">
+			<li id="nav-admin-link" class="nav-menu">
 				<a accesskey="a" class="{{$nav.admin.2}} icon-sliders" href="{{$nav.admin.0}}" title="{{$nav.admin.3}}"><span class="sr-only">{{$nav.admin.3}}</span></a>
 			</li>
 		{{/if}}
 
 		{{if $nav.moderation}}
-			<li role="menuitem" id="nav-moderation-link" class="nav-menu">
+			<li id="nav-moderation-link" class="nav-menu">
 				<a accesskey="a" class="{{$nav.moderation.2}} icon-sliders" href="{{$nav.moderation.0}}" title="{{$nav.moderation.3}}"><span class="sr-only">{{$nav.moderation.3}}</span></a>
 			</li>
 		{{/if}}

@@ -5,10 +5,17 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 {{* The button to open the jot - in This theme we move the button with js to the second nav bar *}}
-<a class="action-button btn btn-primary pull-right{{if !$always_open_compose}} modal-open{{/if}}" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
+{{if $always_open_compose}}
+<a class="action-button btn btn-primary pull-right" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
 	<i class="ri ri-lg ri-pencil-line"></i>
 	<span>{{$new_post}}</span>
 </a>
+{{else}}
+<button type="button" class="action-button btn btn-primary pull-right modal-open" id="jotOpen">
+	<i class="ri ri-lg ri-pencil-line"></i>
+	<span>{{$new_post}}</span>
+</button>
+{{/if}}
 
 <div id="jot-content">
 	<div id="jot-sections">
@@ -56,9 +63,9 @@
 			</ul>
 
 			{{* The Jot navigation menu for small displays (text input, permissions, preview, filebrowser) *}}
-			<div class="dropdown dropdown-head dropdown-mobile-jot jot-nav hidden-lg hidden-md hidden-sm" role="menubar" data-tabs="tabs" style="float: left;">
+			<div class="dropdown dropdown-head dropdown-mobile-jot jot-nav hidden-lg hidden-md hidden-sm" data-tabs="tabs" style="float: left;">
 				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true">{{$message}}&nbsp;<span class="caret"></span></button>
-				<ul class="dropdown-menu nav nav-pills" aria-label="submenu">
+				<ul class="dropdown-menu nav nav-pills" role="menu" aria-label="submenu">
 					{{* mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
 					<li style="display: none;">

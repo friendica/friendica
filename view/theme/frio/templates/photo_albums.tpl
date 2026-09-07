@@ -22,15 +22,15 @@
 		{{/if}}
 	</div>
 
-	<ul role="menubar" class="sidebar-photos-albums-ul clear">
-		<li role="menuitem" class="sidebar-photos-albums-li">
+	<ul class="sidebar-photos-albums-ul clear">
+		<li class="sidebar-photos-albums-li">
 			<a href="profile/{{$nick}}/photos" class="sidebar-photos-albums-element" title="{{$title}}">{{$recent}}</a>
 		</li>
 
 		{{if $albums}}
 			{{foreach $albums as $al}}
 				{{if $al.text}}
-					<li role="menuitem" class="sidebar-photos-albums-li">
+					<li class="sidebar-photos-albums-li">
 						<a href="photos/{{$nick}}/album/{{$al.bin2hex}}" class="sidebar-photos-albums-element">
 							<span class="badge pull-right">{{$al.total}}</span>{{$al.text}}
 						</a>

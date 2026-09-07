@@ -15,7 +15,7 @@
 					{{* Buttons for the mobile view *}}
 					{{* Mobile left menu dropdown button *}}
 					<button type="button" id="mobile-left-menu" class="navbar-toggle collapsed visible-sm visible-xs"
-						data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
+						data-toggle="offcanvas" data-target="aside" aria-haspopup="true" aria-expanded="false">
 						<span class="sr-only">Toggle navigation</span>
 						<i class="ri ri-arrow-right-double-line ri-fw ri-lg" aria-hidden="true"></i>
 					</button>
@@ -31,7 +31,7 @@
 						<form id="search-box" class="navbar-form hidden-sm hidden-xs form-group form-group-search" role="search" method="get" action="{{$nav.search.0}}">
 							<div class="form-group form-group-search">
 								<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
-									type="search" name="q" placeholder="{{$search_placeholder}}">
+									type="search" name="q" placeholder="{{$search_placeholder}}" aria-label="{{$search_placeholder}}">
 								<button class="btn btn-primary form-button-search" type="submit">
 									<i class="ri ri-search-line ri-lg" aria-hidden="true"></i>
 									<span class="sr-only">{{$nav.search.1}}</span>
@@ -378,7 +378,7 @@
 		<div class="container-fluid">
 		<div class="navbar-header pull-left">
 			<button type="button" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
-					data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
+					data-toggle="offcanvas" data-target="aside" aria-haspopup="true" aria-expanded="false">
 				<span class="sr-only">Toggle navigation</span>
 				<i class="ri ri-more-2-line ri-fw ri-lg" aria-hidden="true"></i>
 			</button>
@@ -415,7 +415,7 @@
 		<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
 			<div class="form-group form-group-search">
 				<input id="nav-search-input-field-mobile" class="form-control form-search" type="search" name="q"
-					placeholder="{{$search_placeholder}}">
+					placeholder="{{$search_placeholder}}" aria-label="{{$search_placeholder}}">
 				<button class="btn btn-primary btn-sm form-button-search" type="submit">
 					<i class="ri ri-search-line ri-fw ri-lg" aria-hidden="true"></i>
 					<span class="sr-only">{{$nav.search.1}}</span>

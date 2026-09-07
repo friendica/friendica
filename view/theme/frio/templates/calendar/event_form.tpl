@@ -19,24 +19,24 @@
 	</header>
 
 	{{* The event edit navigation menu (text input, permissions, preview, filebrowser) *}}
-	<ul id="event-nav" class="nav nav-tabs event-nav" role="menubar" data-tabs="tabs">
+	<ul id="event-nav" class="nav nav-tabs event-nav" role="tablist">
 		{{* Mark the first list entry as active because it is the first which is active after opening
 			the modal. Changing of the activity status is done by js in calendar_head.tpl *}}
-		<li class="active" role="menuitem">
-			<a id="event-edit-lnk" onclick="eventEditActive(); return false;">{{$basic}}</a>
+		<li class="active">
+			<a id="event-edit-lnk" role="tab" aria-selected="true" aria-controls="event-edit-wrapper" onclick="eventEditActive(); return false;">{{$basic}}</a>
 		</li>
 		{{if $acl}}
-		<li role="menuitem" {{if !$sh_checked}} style="display: none"{{/if}}>
-			<a id="event-perms-lnk" onclick="eventAclActive(); return false;">{{$permissions}}</a>
+		<li {{if !$sh_checked}} style="display: none"{{/if}}>
+			<a id="event-perms-lnk" role="tab" aria-selected="false" aria-controls="event-acl-wrapper" onclick="eventAclActive(); return false;">{{$permissions}}</a>
 		</li>
 		{{/if}}
 		{{if $preview}}
-		<li role="menuitem">
-			<a id="event-preview-lnk" onclick="eventPreviewActive(); return false;">{{$preview}}</a>
+		<li>
+			<a id="event-preview-lnk" role="tab" aria-selected="false" aria-controls="event-preview" onclick="eventPreviewActive(); return false;">{{$preview}}</a>
 		</li>
 		{{/if}}
 		{{* commented out because it isn't implemented yet
-		<li role="menuitem"><a id="event-preview-link" onclick="fbrowserActive(); return false;"> Browser </a></li>
+		<li><a id="event-preview-link" role="tab" onclick="fbrowserActive(); return false;"> Browser </a></li>
 		*}}
 	</ul>
 
@@ -49,7 +49,7 @@
 		<input type="hidden" name="preview" id="event-edit-preview" value="0" />
 
 		{{* The tab content with the necessary basic settings *}}
-		<div id="event-edit-wrapper">
+		<div id="event-edit-wrapper" role="tabpanel" aria-labelledby="event-edit-lnk">
 
 			{{* The event title *}}
 			{{include file="field_input.tpl" field=$summary}}
@@ -130,12 +130,12 @@
 		</div>
 
 		{{* The tab for the permissions (if event sharing is enabled) *}}
-		<div id="event-acl-wrapper" style="display: none">
+		<div id="event-acl-wrapper" role="tabpanel" aria-labelledby="event-perms-lnk" style="display: none">
 			{{$acl nofilter}}
 		</div>
 
 		{{* The tab for the event preview (content is inserted by js) *}}
-		<div id="event-preview" style="display: none"></div>
+		<div id="event-preview" role="tabpanel" aria-labelledby="event-preview-lnk" style="display: none"></div>
 
 		<div class="clear"></div>
 
