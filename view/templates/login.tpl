@@ -12,6 +12,13 @@
 	{{/foreach}}
 {{/if}}
 
+{{if $register}}
+<div id="login-extra-links">
+	<h3 id="register-head" class="sr-only">{{$register.title}}</h3>
+	<button type="button" id="register-link" title="{{$register.title}}" onclick="location.href='{{$register.url|escape:'quotes'}}'">{{$register.desc}}</button>
+</div>
+{{/if}}
+
 <form id="login-form" action="{{$dest_url}}" role="form" method="post">
 <div id="login-group" role="group" aria-labelledby="login-head">
 	<input type="hidden" name="auth-params" value="login" />
@@ -44,13 +51,6 @@
 
 </div>
 </form>
-
-{{if $register}}
-<div id="login-extra-links">
-	<h3 id="login-head" class="sr-only">{{$register.title}}</h3>
-	<a href="{{$register.url}}" title="{{$register.title}}" id="register-link">{{$register.desc}}</a>
-</div>
-{{/if}}
 
 <script type="text/javascript">
 	window.onDocumentReady('body', function () {

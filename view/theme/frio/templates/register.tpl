@@ -55,12 +55,6 @@
 				<input type="text" maxlength="60" name="field1" id="register-email" class="form-control" value="{{$email}}" required>
 			</div>
 			<div id="register-email-end"></div>
-
-			<div id="register-repeat-wrapper" class="form-group">
-				<label for="register-repeat" id="label-register-repeat">{{$addrlabel2}}</label>
-				<input type="text" maxlength="60" name="repeat" id="register-repeat" class="form-control" value="" required>
-			</div>
-			<div id="register-repeat-end"></div>
 		{{/if}}
 
 		{{if $ask_password}}
@@ -110,7 +104,7 @@
 		{{if !$additional}}
 			<h3>{{$importh}}</h3>
 			<div id ="import-profile">
-				<a href="user/import">{{$importt}}</a>
+				<button type="button" class="btn btn-default" onclick="location.href='user/import'">{{$importt}}</button>
 			</div>
 		{{/if}}
 	</form>
