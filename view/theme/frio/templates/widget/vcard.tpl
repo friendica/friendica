@@ -19,7 +19,7 @@
 	{{* The short information which will appended to the second navbar by scrollspy *}}
 	<div id="vcard-short-info-wrapper" style="display: none;">
 		<div id="vcard-short-info" class="media" style="display: none">
-			<div id="vcard-short-photo-wrapper" class="pull-left">
+			<div id="vcard-short-photo-wrapper">
 				<img class="media-object" src="{{$photo}}" alt="{{$contact.name}}" />
 			</div>
 
@@ -85,7 +85,7 @@
 				</div>
 			{{/if}}
 			{{if $mention_link}}
-				<div id="jotOpen" class="pull-right" oncontextmenu="event.preventDefault();">
+				<div id="jotOpen" oncontextmenu="event.preventDefault();">
 					<button type="button" id="mention-link" class="action-button btn btn-labeled btn-primary{{if !$always_open_compose}} modal-open{{/if}}" onclick="{{if $always_open_compose}}window.location.href='{{$mention_link}}'{{else}}openWallMessage('{{$mention_link}}'){{/if}}" aria-label="{{$mention}}" oncontextmenu="openWallMessage('compose/0')">
 						<i class="ri ri-lg ri-pencil-line"></i>
 						<span>{{$mention}}</span>
@@ -101,8 +101,6 @@
 				</div>
 			{{/if}}
 		</div>
-
-		<div class="clear"></div>
 
 		{{if $contact.location}}
 		<div class="location detail">

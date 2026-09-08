@@ -18,7 +18,7 @@
 	{{* The short information which will appended to the second navbar by scrollspy *}}
 	<div id="vcard-short-info-wrapper" style="display: none;">
 		<div id="vcard-short-info" class="media" style="display: none">
-			<div id="vcard-short-photo-wrapper" class="pull-left">
+			<div id="vcard-short-photo-wrapper">
 				<img class="media-object" src="{{$profile.photo}}" alt="{{$profile.name}}"></a>
 			</div>
 
@@ -99,7 +99,7 @@
 					</div>
 				{{/if}}
 				{{if $profile.addr}}
-					<div id="jotOpen" class="pull-right">
+					<div id="jotOpen">
 						<button type="button" id="mention-link" class="action-button btn btn-labeled btn-primary" onclick="{{if $always_open_compose}}window.location.href='{{$mention_url}}'{{else}}openWallMessage('{{$mention_url}}'){{/if}}">
 							<i class="ri ri-lg ri-pencil-line"></i>
 							<span>{{$mention_label}}</span>
@@ -118,8 +118,6 @@
 				{{/if}}
 			</div>
 		{{/if}}
-
-		<div class="clear"></div>
 
 		{{if $location}}
 			<div class="location detail">
