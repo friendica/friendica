@@ -282,7 +282,7 @@ class Display extends BaseSettings
 		$enable_dislike         = !$this->pConfig->get($uid, 'system', 'hide_dislike', false);
 		$display_resharer       = $this->pConfig->get($uid, 'system', 'display_resharer', false);
 		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', true);
-		$compact_timeline       = $this->pConfig->get($uid, 'system', 'compact_timeline', false);
+		$compact_timeline       = $this->pConfig->get($uid, 'system', 'compact_timeline', true);
 		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
 		$display_eventlist      = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
 		$embed_remote_media     = $this->pConfig->get($uid, 'system', 'embed_remote_media', false);
