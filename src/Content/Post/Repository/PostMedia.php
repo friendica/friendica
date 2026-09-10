@@ -70,7 +70,7 @@ class PostMedia extends BaseRepository
 	 * @param array $params Optional positional parameters
 	 * @return PostMediasCollection Collection of PostMediaEntity objects
 	 */
-	protected function _select(array $condition, array $params = []): PostMediasCollection
+	protected function _select(array $condition, array $params = ['order' => ['id' => 'ASC']]): PostMediasCollection
 	{
 		$rows = $this->db->selectToArray(static::$table_name, [], $condition, $params);
 
