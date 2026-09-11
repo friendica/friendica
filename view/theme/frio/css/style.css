@@ -47,6 +47,7 @@
 }
 
 body {
+	overflow-x: hidden;
 	padding-top: 110px;
 	background-color: $background_color;
 	background-image: url("$background_image");
