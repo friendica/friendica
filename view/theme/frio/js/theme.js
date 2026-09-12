@@ -416,55 +416,52 @@ function initTheme() {
 		showHideEventMap(this);
 	});
 
-	// Comment form submit - only register once to prevent duplicate submissions
-	if (typeof frioCommentFormHandlerRegistered === 'undefined') {
-		frioCommentFormHandlerRegistered = true;
-		$body.off("submit.frio-theme", ".comment-edit-form").on("submit.frio-theme", ".comment-edit-form", function (e) {
-			let $form = $(this);
-			let id = $form.data("item-id");
+	// Comment form submit
+	$body.off("submit.frio-theme", ".comment-edit-form").on("submit.frio-theme", ".comment-edit-form", function (e) {
+		let $form = $(this);
+		let id = $form.data("item-id");
 
-			// Compose page form exception: id is always 0 and form must not be submitted asynchronously
-			if (id === 0) {
-				return;
-			}
+		// Compose page form exception: id is always 0 and form must not be submitted asynchronously
+		if (id === 0) {
+			return;
+		}
 
-			e.preventDefault();
+		e.preventDefault();
 
-			let $commentSubmit = $form.find(".comment-edit-submit").button("loading");
+		let $commentSubmit = $form.find(".comment-edit-submit").button("loading");
 
-			unpause();
-			commentBusy = true;
-			showPosting();
+		unpause();
+		commentBusy = true;
+		showPosting();
 
-			$.post("item", $form.serialize(), "json")
-				.done(function (data) {
-					showProcessing();
-					if (data.success) {
-						$("#comment-edit-wrapper-" + id).hide();
-						let $textarea = $("#comment-edit-text-" + id);
-						$textarea.val("");
-						if ($textarea.get(0)) {
-							commentClose($textarea.get(0), id);
-						}
-						if (timer) {
-							clearTimeout(timer);
-						}
-						if (!insertPostedComment(id, data)) {
-							timer = setTimeout(NavUpdate, 10);
-							updateItem(id, data.guid ?? null);
-						}
+		$.post("item", $form.serialize(), "json")
+			.done(function (data) {
+				showProcessing();
+				if (data.success) {
+					$("#comment-edit-wrapper-" + id).hide();
+					let $textarea = $("#comment-edit-text-" + id);
+					$textarea.val("");
+					if ($textarea.get(0)) {
+						commentClose($textarea.get(0), id);
 					}
-					if (data.reload) {
-						window.location.href = data.reload;
+					if (timer) {
+						clearTimeout(timer);
 					}
-				})
-				.always(function () {
-					hideLoading();
-					commentBusy = false;
-					$commentSubmit.button("reset");
-				});
-		});
-	}
+					if (!insertPostedComment(id, data)) {
+						timer = setTimeout(NavUpdate, 10);
+						updateItem(id, data.guid ?? null);
+					}
+				}
+				if (data.reload) {
+					window.location.href = data.reload;
+				}
+			})
+			.always(function () {
+				hideLoading();
+				commentBusy = false;
+				$commentSubmit.button("reset");
+			});
+	});
 
 	try {
 		navigator.canShare({ url: "#", });
