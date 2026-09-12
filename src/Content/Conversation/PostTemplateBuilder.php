@@ -72,7 +72,28 @@ final class PostTemplateBuilder
 		$this->uid            = $uid;
 		$this->remote_comment = $remote_comment;
 
-		return $this->buildThreadTemplateData($item, $preview, $writable, $uid, $convResponses, $formSecurityToken, 1, []);
+		return $this->buildThreadTemplateData($item, $preview, $writable, $uid, $convResponses, $formSecurityToken, $this->getThreadLevel((int) ($item['uri-id'])), []);
+	}
+
+	/**
+	 * Determine the thread level based on the URI ID.
+	 *
+	 * @param int $uriid
+	 * @return int
+	 */
+	private function getThreadLevel(int $uriid): int
+	{
+		$threadlevel = 1;
+
+		while (true) {
+			$post = Post::selectFirstPost(['thr-parent-id', 'parent-uri-id'], ['uri-id' => $uriid]);
+			if (!$post || $uriid == $post['parent-uri-id']) {
+				return $threadlevel;
+			}
+
+			$threadlevel++;
+			$uriid = $post['thr-parent-id'];
+		}
 	}
 
 	/**
