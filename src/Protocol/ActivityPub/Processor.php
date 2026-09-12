@@ -213,6 +213,14 @@ class Processor
 			$question['end-time'] = DateTimeFormat::utc($activity['question']['end-time']);
 		}
 
+		// Changed options invalidate the existing votes, the remote system resets them as well
+		$names = array_map(fn ($option) => $option['name'], $activity['question']['options']);
+		if (Post\Question::isModified($item['uri-id'], $question['multiple'], $names)) {
+			DI::logger()->info('Question has been modified, votes are reset', ['uri-id' => $item['uri-id']]);
+			Post\QuestionVote::deleteByURIId($item['uri-id']);
+			Post\QuestionOption::deleteFrom($item['uri-id'], count($names));
+		}
+
 		Post\Question::update($item['uri-id'], $question);
 
 		foreach ($activity['question']['options'] as $key => $option) {

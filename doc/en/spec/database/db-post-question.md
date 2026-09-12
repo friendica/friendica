@@ -4,13 +4,14 @@ Question
 
 ## Fields
 
-| Field    | Description                                               | Type         | Null | Key | Default             | Extra          |
-| -------- | --------------------------------------------------------- | ------------ | ---- | --- | ------------------- | -------------- |
-| id       | sequential ID                                             | int unsigned | NO   | PRI | NULL                | auto_increment |
-| uri-id   | Id of the item-uri table entry that contains the item uri | int unsigned | NO   |     | NULL                |                |
-| multiple | Multiple choice                                           | boolean      | NO   |     | 0                   |                |
-| voters   | Number of voters for this question                        | int unsigned | YES  |     | NULL                |                |
-| end-time | Question end time                                         | datetime     | YES  |     | 0001-01-01 00:00:00 |                |
+| Field       | Description                                               | Type         | Null | Key | Default             | Extra          |
+| ----------- | --------------------------------------------------------- | ------------ | ---- | --- | ------------------- | -------------- |
+| id          | sequential ID                                             | int unsigned | NO   | PRI | NULL                | auto_increment |
+| uri-id      | Id of the item-uri table entry that contains the item uri | int unsigned | NO   |     | NULL                |                |
+| multiple    | Multiple choice                                           | boolean      | NO   |     | 0                   |                |
+| voters      | Number of voters for this question                        | int unsigned | YES  |     | NULL                |                |
+| end-time    | Question end time                                         | datetime     | YES  |     | 0001-01-01 00:00:00 |                |
+| hide-totals | Hide the vote counts until the question has ended         | boolean      | NO   |     | 0                   |                |
 
 ## Indexes
 

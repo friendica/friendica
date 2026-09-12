@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1601);
+	define('DB_UPDATE_VERSION', 1602);
 }
 
 return [
@@ -1605,11 +1605,12 @@ return [
 	"post-question" => [
 		"comment" => "Question",
 		"fields"  => [
-			"id"       => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
-			"uri-id"   => ["type" => "int unsigned", "not null" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
-			"multiple" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Multiple choice"],
-			"voters"   => ["type" => "int unsigned", "comment" => "Number of voters for this question"],
-			"end-time" => ["type" => "datetime", "default" => DBA::NULL_DATETIME, "comment" => "Question end time"],
+			"id"          => ["type" => "int unsigned", "not null" => "1", "extra" => "auto_increment", "primary" => "1", "comment" => "sequential ID"],
+			"uri-id"      => ["type" => "int unsigned", "not null" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
+			"multiple"    => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Multiple choice"],
+			"voters"      => ["type" => "int unsigned", "comment" => "Number of voters for this question"],
+			"end-time"    => ["type" => "datetime", "default" => DBA::NULL_DATETIME, "comment" => "Question end time"],
+			"hide-totals" => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Hide the vote counts until the question has ended"],
 		],
 		"indexes" => [
 			"PRIMARY" => ["id"],
@@ -1626,6 +1627,19 @@ return [
 		],
 		"indexes" => [
 			"PRIMARY" => ["uri-id", "id"],
+		],
+	],
+	"post-question-vote" => [
+		"comment" => "Votes on question options by local users and remote contacts",
+		"fields"  => [
+			"uri-id"    => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the question uri"],
+			"id"        => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "comment" => "Id of the question option"],
+			"author-id" => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["contact" => "id"], "comment" => "Link to the contact table with uid=0 of the voter"],
+			"created"   => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Creation date"],
+		],
+		"indexes" => [
+			"PRIMARY"   => ["uri-id", "id", "author-id"],
+			"author-id" => ["author-id"],
 		],
 	],
 	"post-searchindex" => [

@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.11-dev (Blutwurz)
--- DB_UPDATE_VERSION 1601
+-- DB_UPDATE_VERSION 1602
 -- ------------------------------------------
 
 
@@ -1617,6 +1617,7 @@ CREATE TABLE IF NOT EXISTS `post-question` (
 	`multiple` boolean NOT NULL DEFAULT '0' COMMENT 'Multiple choice',
 	`voters` int unsigned COMMENT 'Number of voters for this question',
 	`end-time` datetime DEFAULT '0001-01-01 00:00:00' COMMENT 'Question end time',
+	`hide-totals` boolean NOT NULL DEFAULT '0' COMMENT 'Hide the vote counts until the question has ended',
 	 PRIMARY KEY(`id`),
 	 UNIQUE INDEX `uri-id` (`uri-id`),
 	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
@@ -1633,6 +1634,20 @@ CREATE TABLE IF NOT EXISTS `post-question-option` (
 	 PRIMARY KEY(`uri-id`,`id`),
 	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Question option';
+
+--
+-- TABLE post-question-vote
+--
+CREATE TABLE IF NOT EXISTS `post-question-vote` (
+	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the question uri',
+	`id` int unsigned NOT NULL COMMENT 'Id of the question option',
+	`author-id` int unsigned NOT NULL COMMENT 'Link to the contact table with uid=0 of the voter',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Creation date',
+	 PRIMARY KEY(`uri-id`,`id`,`author-id`),
+	 INDEX `author-id` (`author-id`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`author-id`) REFERENCES `contact` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Votes on question options by local users and remote contacts';
 
 --
 -- TABLE post-searchindex
