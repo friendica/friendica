@@ -344,7 +344,7 @@ final readonly class ConversationDataProvider
 		$quoteshares = $this->getQuoteShares($uriIds);
 		$counts      = $this->getCounts($uriIds);
 
-		$compactTimeline = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS]) && $this->pConfig->get($uid, 'system', 'compact_timeline');
+		$compactTimeline = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS]) && $this->pConfig->get($uid, 'system', 'compact_timeline', true);
 		$partialLoad     = $mode === ConversationRenderer::MODE_COMMENTS && $sinceId > 0;
 
 		if (!$this->config->get('system', 'legacy_activities')) {
