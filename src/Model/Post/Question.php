@@ -41,6 +41,33 @@ class Question
 	}
 
 	/**
+	 * Check if the choice type or the options of a stored question differ from the given ones
+	 *
+	 * @param integer $uri_id
+	 * @param bool    $multiple
+	 * @param array   $names    Option names in their order
+	 * @return bool false if the question isn't stored yet
+	 * @throws \Exception
+	 */
+	public static function isModified(int $uri_id, bool $multiple, array $names): bool
+	{
+		$question = DBA::selectFirst('post-question', ['multiple'], ['uri-id' => $uri_id]);
+		if (empty($question)) {
+			return false;
+		}
+
+		if ((bool) $question['multiple'] !== $multiple) {
+			return true;
+		}
+
+		$names = array_map(function ($name) {
+			return DI::dbaDefinition()->truncateFieldsForTable('post-question-option', ['name' => $name])['name'] ?? null;
+		}, array_values($names));
+
+		return array_column(QuestionOption::getByURIId($uri_id), 'name') !== $names;
+	}
+
+	/**
 	 * @param integer $id     Question ID
 	 * @param array   $fields Array of selected fields, empty for all
 	 * @return array|boolean  Question record if it exists, false otherwise

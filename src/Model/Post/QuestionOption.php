@@ -43,6 +43,19 @@ class QuestionOption
 	}
 
 	/**
+	 * Delete the options of a question from the given position on
+	 *
+	 * @param integer $uri_id
+	 * @param integer $id     First option id to delete
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public static function deleteFrom(int $uri_id, int $id): bool
+	{
+		return DBA::delete('post-question-option', ["`uri-id` = ? AND `id` >= ?", $uri_id, $id]);
+	}
+
+	/**
 	 * Retrieves the question options associated with the provided item ID.
 	 *
 	 * @param int $uri_id
@@ -54,5 +67,18 @@ class QuestionOption
 		$condition = ['uri-id' => $uri_id];
 
 		return DBA::selectToArray('post-question-option', [], $condition, ['order' => ['id']]);
+	}
+
+	/**
+	 * Retrieves a single question option by its primary key.
+	 *
+	 * @param int $uri_id
+	 * @param int $id
+	 * @return array|bool
+	 * @throws \Exception
+	 */
+	public static function getOption(int $uri_id, int $id)
+	{
+		return DBA::selectFirst('post-question-option', [], ['uri-id' => $uri_id, 'id' => $id]);
 	}
 }
