@@ -1628,6 +1628,19 @@ return [
 			"PRIMARY" => ["uri-id", "id"],
 		],
 	],
+	"post-question-voter" => [
+		"comment" => "Records which user voted for which question option, to prevent double voting",
+		"fields"  => [
+			"uri-id"  => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
+			"id"      => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "comment" => "Id of the question option"],
+			"uid"     => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => "User ID"],
+			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Creation date"],
+		],
+		"indexes" => [
+			"PRIMARY" => ["uri-id", "id", "uid"],
+			"uid"     => ["uid"],
+		],
+	],
 	"post-searchindex" => [
 		"comment" => "Content for all posts",
 		"fields"  => [

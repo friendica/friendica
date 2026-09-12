@@ -1635,6 +1635,20 @@ CREATE TABLE IF NOT EXISTS `post-question-option` (
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Question option';
 
 --
+-- TABLE post-question-voter
+--
+CREATE TABLE IF NOT EXISTS `post-question-voter` (
+	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the item uri',
+	`id` int unsigned NOT NULL COMMENT 'Id of the question option',
+	`uid` mediumint unsigned NOT NULL COMMENT 'User ID',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Creation date',
+	 PRIMARY KEY(`uri-id`,`id`,`uid`),
+	 INDEX `uid` (`uid`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Records which user voted for which question option, to prevent double voting';
+
+--
 -- TABLE post-searchindex
 --
 CREATE TABLE IF NOT EXISTS `post-searchindex` (
