@@ -6,23 +6,23 @@
   *}}
 <div id='adminpage'>
     <h1>{{$title}} - {{$page}}</h1>
+	<div class="settings-section">
+		<form action="{{$baseurl}}/admin/logs" method="post">
+	    	<input type='hidden' name='form_security_token' value="{{$form_security_token}}">
 
-	<form action="{{$baseurl}}/admin/logs" method="post">
-	    <input type='hidden' name='form_security_token' value="{{$form_security_token}}">
+	    	{{include file="field_checkbox.tpl" field=$debugging}}
+	    	{{include file="field_input.tpl" field=$logfile}}
+	    	{{include file="field_select.tpl" field=$loglevel}}
 
-	    {{include file="field_checkbox.tpl" field=$debugging}}
-	    {{include file="field_input.tpl" field=$logfile}}
-	    {{include file="field_select.tpl" field=$loglevel}}
+				<div class="submit"><button type="submit" class="btn btn-primary" name="page_logs" value="{{$submit}}">{{$submit}}</button></div>
 
-			<div class="submit"><button type"submit" class="btn btn-primary" name="page_logs" value="{{$submit}}">{{$submit}}</button></div>
+		</form>
 
-	</form>
-
-	<h2>{{$phpheader}}</h2>
-	<div>
-		<p>{{$phplogenabled}}<p>
-		<p>{{$phphint}}</p>
-		<pre>{{$phplogcode}}</pre>
+		<h2>{{$phpheader}}</h2>
+		<div>
+			<p>{{$phplogenabled}}<p>
+			<p>{{$phphint}}</p>
+			<pre>{{$phplogcode}}</pre>
+		</div>
 	</div>
-
 </div>

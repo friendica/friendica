@@ -176,6 +176,10 @@ class UserNotification
 				DI::logger()->debug('Author is blocked/ignored/collapsed by user', ['uid' => $uid, 'author' => $author_id, 'uri-id' => $item['uri-id']]);
 				return;
 			}
+			if (Contact\User::isIsBlocked($author_id, $uid)) {
+				DI::logger()->debug('Author blocked the user', ['uid' => $uid, 'author' => $author_id, 'uri-id' => $item['uri-id']]);
+				return;
+			}
 		}
 
 		foreach (array_unique([$parent['author-gsid'], $parent['owner-gsid'], $parent['causer-gsid'], $item['author-gsid'], $item['owner-gsid'], $item['causer-gsid']]) as $gsid) {
@@ -577,6 +581,7 @@ class UserNotification
 	private static function checkActivityParticipation(array $item, array $contacts): bool
 	{
 		$condition = ['parent' => $item['parent'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => Item::GRAVITY_ACTIVITY];
+		$condition = DBA::mergeConditions($condition, ["NOT `verb` IN (?, ?, ?)", Activity::FOLLOW, Activity::VIEW, Activity::READ]);
 		return Post::exists($condition);
 	}
 

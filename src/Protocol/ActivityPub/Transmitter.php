@@ -2271,6 +2271,74 @@ class Transmitter
 	}
 
 	/**
+	 * Builds a vote for a poll option, addressed to the poll's author. Pure, no I/O —
+	 * kept separate from sendQuestionVote() so the activity shape is unit-testable.
+	 *
+	 * Sent as a `Create` wrapping a contentless `Note`, per the de facto convention
+	 * shared by Mastodon and Pleroma: the object carries no "content" key at all, and
+	 * the chosen option's exact text sits in "name". Deliberately not built through
+	 * createNote(), which has no equivalent case and would need to grow one just for
+	 * this shape.
+	 *
+	 * @param string $pollUri     The poll's own ActivityPub uri
+	 * @param string $pollAuthor  The poll author's actor url
+	 * @param string $optionName  The exact text of the chosen option
+	 * @param string $voterActor  The voting user's actor url
+	 * @return array
+	 */
+	public static function createQuestionVote(string $pollUri, string $pollAuthor, string $optionName, string $voterActor): array
+	{
+		return [
+			'@context' => ActivityPub::CONTEXT,
+			'id'       => DI::baseUrl() . '/activity/' . System::createGUID(),
+			'type'     => 'Create',
+			'actor'    => $voterActor,
+			'to'       => [$pollAuthor],
+			'object'   => [
+				'id'           => DI::baseUrl() . '/activity/' . System::createGUID(),
+				'type'         => 'Note',
+				'attributedTo' => $voterActor,
+				'to'           => [$pollAuthor],
+				'inReplyTo'    => $pollUri,
+				'name'         => $optionName,
+			],
+			'instrument' => self::getService(),
+		];
+	}
+
+	/**
+	 * Transmits a vote for a poll option to the poll's author.
+	 *
+	 * @param string  $pollUri    The poll's own ActivityPub uri
+	 * @param string  $pollAuthor The poll author's actor url
+	 * @param string  $optionName The exact text of the chosen option
+	 * @param integer $uid        The voting user's id
+	 * @return bool
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public static function sendQuestionVote(string $pollUri, string $pollAuthor, string $optionName, int $uid): bool
+	{
+		$profile = APContact::getByURL($pollAuthor);
+		if (empty($profile['inbox'])) {
+			DI::logger()->warning('No inbox found for poll author', ['author' => $pollAuthor]);
+			return false;
+		}
+
+		$owner = User::getOwnerDataById($uid);
+		if (empty($owner)) {
+			DI::logger()->warning('No user found for actor, aborting', ['uid' => $uid]);
+			return false;
+		}
+
+		$data = self::createQuestionVote($pollUri, $profile['url'], $optionName, $owner['url']);
+
+		DI::logger()->info('Sending poll vote', ['option' => $optionName, 'poll' => $pollUri, 'uid' => $uid]);
+
+		$signed = LDSignature::sign($data, $owner);
+		return HTTPSignature::transmit($signed, $profile['inbox'], $owner);
+	}
+
+	/**
 	 * Forwards a moderation report to the remote server of the reported account via ActivityPub Flag.
 	 *
 	 * @param int $reportId Moderation report id

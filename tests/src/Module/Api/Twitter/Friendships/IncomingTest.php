@@ -20,23 +20,12 @@ class IncomingTest extends ApiTestCase
 	 */
 	public function testApiFriendshipsIncoming(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new Incoming(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 
 		$json = $this->toJson($response);
 
 		self::assertIsArray($json->ids);
-	}
-
-	/**
-	 * Test the api_friendships_incoming() function an undefined cursor GET variable.
-	 *
-	 */
-	public function testApiFriendshipsIncomingWithUndefinedCursor(): void
-	{
-		self::markTestIncomplete('Needs refactoring of Incoming - replace filter_input() with $request parameter checks');
-
-		// $_GET['cursor'] = 'undefined';
-		// self::assertFalse(api_friendships_incoming('json'));
 	}
 }

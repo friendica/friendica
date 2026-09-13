@@ -428,7 +428,7 @@ class Item
 				$this->l10n->t('View Profile')                                => $profile_link,
 				$this->l10n->t('View Photos')                                 => $photos_link,
 				$this->l10n->t('Posts')                                       => $posts_link,
-				$this->l10n->t('View Contact')                                => $contact_url,
+				$this->l10n->t('Settings')                                    => $contact_url,
 				$this->l10n->t('Message')                                     => $pm_url,
 				$this->l10n->t('Collapse')                                    => $collapse_link,
 				$this->l10n->t('Ignore user')                                 => $ignore_link,

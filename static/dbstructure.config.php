@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1598);
+	define('DB_UPDATE_VERSION', 1599);
 }
 
 return [
@@ -197,7 +197,7 @@ return [
 			"uri-id"           => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the contact url"],
 			"addr"             => ["type" => "varchar(255)", "not null" => "1", "default" => "", "comment" => ""],
 			"alias"            => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
-			"pubkey"           => ["type" => "text", "comment" => "RSA public key 4096 bit"],
+			"pubkey"           => ["type" => "text", "comment" => "RSA public key 4096 bit, or, for Ed25519 only ActivityPub actors, the Multikey in multibase form"],
 			"prvkey"           => ["type" => "text", "comment" => "RSA private key 4096 bit"],
 			"batch"            => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],
 			"notify"           => ["type" => "varbinary(383)", "comment" => ""],
@@ -450,7 +450,7 @@ return [
 			"header"             => ["type" => "varbinary(383)", "comment" => "Header picture"],
 			"addr"               => ["type" => "varchar(255)", "comment" => ""],
 			"alias"              => ["type" => "varbinary(383)", "comment" => ""],
-			"pubkey"             => ["type" => "text", "comment" => ""],
+			"pubkey"             => ["type" => "text", "comment" => "RSA public key in PEM format or, for Ed25519 only actors, the Multikey in multibase form"],
 			"subscribe"          => ["type" => "varbinary(383)", "comment" => ""],
 			"baseurl"            => ["type" => "varbinary(383)", "comment" => "baseurl of the ap contact"],
 			"gsid"               => ["type" => "int unsigned", "foreign" => ["gserver" => "id", "on delete" => "restrict"], "comment" => "Global Server ID"],
@@ -1626,6 +1626,19 @@ return [
 		],
 		"indexes" => [
 			"PRIMARY" => ["uri-id", "id"],
+		],
+	],
+	"post-question-voter" => [
+		"comment" => "Records which user voted for which question option, to prevent double voting",
+		"fields"  => [
+			"uri-id"  => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
+			"id"      => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "comment" => "Id of the question option"],
+			"uid"     => ["type" => "mediumint unsigned", "not null" => "1", "primary" => "1", "foreign" => ["user" => "uid"], "comment" => "User ID"],
+			"created" => ["type" => "datetime", "not null" => "1", "default" => DBA::NULL_DATETIME, "comment" => "Creation date"],
+		],
+		"indexes" => [
+			"PRIMARY" => ["uri-id", "id", "uid"],
+			"uid"     => ["uid"],
 		],
 	],
 	"post-searchindex" => [

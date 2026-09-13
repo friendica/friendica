@@ -159,7 +159,7 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
+    window.onDocumentReady("body", function() {
         var textareas = document.querySelectorAll(".expandable-textarea");
 
         textareas.forEach(function(textarea) {
@@ -183,13 +183,9 @@
         }
     }
 
-    var formSubmitting = false;
+    window.composeFormSubmitting = false;
 
-    function setFormSubmitting() {
-        formSubmitting = true;
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
+    window.onDocumentReady("body", function() {
         var textareas = document.querySelectorAll(".expandable-textarea");
 
         textareas.forEach(function(textarea) {
@@ -215,36 +211,43 @@
         });
     });
 
-    setInterval(() => {
-        var textareas = document.querySelectorAll(".expandable-textarea");
-        textareas.forEach(function(textarea) {
+    // The inline script re-runs on every SPA navigation, so replace the previous timer and handler
+    if (window.composeDraftSaver) {
+        clearInterval(window.composeDraftSaver);
+    }
+    window.composeDraftSaver = setInterval(function () {
+        document.querySelectorAll(".expandable-textarea").forEach(function(textarea) {
             if (textarea.value.trim() !== "") {
                 localStorage.setItem(`comment-edit-text-${textarea.id}`, textarea.value);
-                const currentTime = new Date().getTime();
-                localStorage.setItem(`last-saved-${textarea.id}`, currentTime.toString());
+                localStorage.setItem(`last-saved-${textarea.id}`, new Date().getTime().toString());
             }
         });
     }, 5000);
 
     function setFormSubmitting() {
-        formSubmitting = true;
-        var textareas = document.querySelectorAll(".expandable-textarea");
-        textareas.forEach(function(textarea) {
+        window.composeFormSubmitting = true;
+        document.querySelectorAll(".expandable-textarea").forEach(function(textarea) {
             localStorage.removeItem(`comment-edit-text-${textarea.id}`);
             localStorage.removeItem(`last-saved-${textarea.id}`);
         });
     }
 
-    window.addEventListener("beforeunload", function (event) {
-        if (!formSubmitting) {
-            var textField = document.getElementById('comment-edit-text-{{$id}}').value.trim();
-            if (textField.length > 0) {
-                var confirmationMessage = 'Are you sure you want to reload the page? All unsaved changes will be lost.';
-                event.returnValue = confirmationMessage;
-                return confirmationMessage;
-            }
+    if (window.composeConfirmUnload) {
+        window.removeEventListener("beforeunload", window.composeConfirmUnload);
+    }
+    window.composeConfirmUnload = function (event) {
+        if (window.composeFormSubmitting) {
+            return;
         }
-    });
+        var unsaved = Array.from(document.querySelectorAll(".expandable-textarea")).some(function(textarea) {
+            return textarea.value.trim().length > 0;
+        });
+        if (unsaved) {
+            event.preventDefault();
+            event.returnValue = "";
+        }
+    };
+    window.addEventListener("beforeunload", window.composeConfirmUnload);
 
     document.getElementById('comment-edit-form-{{$id}}').addEventListener('submit', setFormSubmitting);
 </script>

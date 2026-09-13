@@ -63,14 +63,14 @@ nav#topbar-first a:hover,
 .delegation-notify {
   background-color: #CB4437;
   border-radius: 10px;
-  font: bold 11px/16px Arial;
+  font: bold 11px/16px Arial, sans-serif;
 }
 
 nav#topbar-first .nav-notification {
   background-color: #CB4437;
   top: -3px;
   right: -4px;
-  font: bold 11px/16px Arial;
+  font: bold 11px/16px Arial, sans-serif;
   padding: 1px;
   border-radius: 10px;
 }
@@ -135,9 +135,7 @@ div.jGrowl div.info {
   background: #fff url("../../../images/icons/48/info.png") no-repeat 5px center;
 }
 
-div.jGrowl div.notice {
-  color: #737373;
-}
+div.jGrowl div.notice,
 div.jGrowl div.info {
   color: #737373;
 }
@@ -168,15 +166,7 @@ div.jGrowl div.info {
   background-color: white;
 }
 
-div.pager, ul.tabs {
-  font-weight: initial;
-}
-
 nav#topbar-first .nav-menu-icon.selected {
-  background-color: #fff;
-}
-
-#jot #jot-tools li:hover {
   background-color: #fff;
 }
 
@@ -210,7 +200,7 @@ aside {
   height: calc(100% - 54px);
 }
 
-right_aside {
+#right-aside-section {
   top: 44px;
 }
 
@@ -230,7 +220,6 @@ nav#topbar-first #nav-search-box #nav-search-text {
   margin: 0px;
   border-radius:5px;
   font-size: 14px;
-  font-weight: initial;
   background-color: #EEEEEE;
   color: #505050;
   font-weight: bolder;
@@ -256,6 +245,7 @@ nav#topbar-first #nav-search-box #nav-search-text {
 }
 
 div.pager, ul.tabs {
+  font-weight: initial;
   border-radius:5px;
 }
 
@@ -298,10 +288,6 @@ div.pager, ul.tabs {
 
 
 /* Post content */
-.mention {
-  font-weight: bold;
-}
-
 .wall-item-content blockquote {
   border-left: 0px;
   margin-top: 10px;
@@ -323,7 +309,10 @@ div.pager, ul.tabs {
 
 .shared-time { font-size: 10px; }
 
-.mention { font-size:12px;}
+.mention {
+  font-weight: bold;
+  font-size: 12px;
+}
 
 .tag { font-size:12px; }
 
@@ -346,8 +335,6 @@ div.pager, ul.tabs {
 }
 
 /* Post footer */
-.wall-item-like { font-size:12px; }
-
 .wall-item-actions{
   font-size:10px;
   font-weight:normal;
@@ -378,12 +365,6 @@ div.pager, ul.tabs {
   background: #000;
   position: relative;
   border-radius: 9px;
-}
-
-.contact-menu {
-  font-size:12px;
-  padding-top:0px;
-  padding-bottom:0px;
 }
 
 .wall-item-bottom { font-size: 14px; }
@@ -495,14 +476,6 @@ div.pager, ul.tabs {
 
 /* remove standard-styles */
 
-select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border:1px;
-  border-radius: 5px;
-}
-
 option {
   background:white;
   border-top:0px solid #000;
@@ -512,7 +485,11 @@ option {
 
 /* styling */
 
-select{
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 5px;
   background-image:
     linear-gradient(45deg, transparent 50%, gray 50%),
     linear-gradient(135deg, gray 50%, transparent 50%),
@@ -672,6 +649,8 @@ td.checkbox, td.tools{
   left: 35px;
   width: 24em;
   margin-top: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
   font-size: 12px;
   border: 0px solid lightgrey;
 }

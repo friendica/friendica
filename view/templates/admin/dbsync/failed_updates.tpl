@@ -7,7 +7,7 @@
 
 <div id="adminpage">
 	<h2>{{$banner}}</h2>
-
+	<div class="settings-section">
 	<div id="failed_updates_desc">{{$desc nofilter}}</div>
 
 	{{if $failed}}
@@ -22,4 +22,5 @@
 		<hr />
 	{{/foreach}}
 	{{/if}}
+	</div>
 </div>

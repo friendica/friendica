@@ -84,6 +84,8 @@ class InstallerTest extends MockedTestCase
 		$this->mockL10nT('Error: GD graphics PHP module with JPEG support required but not installed.', 1);
 		$this->mockL10nT('OpenSSL PHP module', 1);
 		$this->mockL10nT('Error: openssl PHP module required but not installed.', 1);
+		$this->mockL10nT('Sodium PHP module', 1);
+		$this->mockL10nT('Error: Sodium PHP module required but not installed.', 1);
 		$this->mockL10nT('mb_string PHP module', 1);
 		$this->mockL10nT('Error: mb_string PHP module required but not installed.', 1);
 		$this->mockL10nT('iconv PHP module', 1);
@@ -237,6 +239,30 @@ class InstallerTest extends MockedTestCase
 		);
 	}
 
+	public function testCheckFunctionsWithoutSodium(): void
+	{
+		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
+		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+			if ($function_name === 'sodium_crypto_sign_verify_detached') {
+				return false;
+			}
+			return call_user_func_array(\function_exists(...), func_get_args());
+		});
+
+		$this->mockFunctionL10TCalls(true);
+
+		$install = new Installer();
+		self::assertFalse($install->checkFunctions());
+		self::assertCheckExist(
+			7,
+			'Sodium PHP module',
+			'Error: Sodium PHP module required but not installed.',
+			false,
+			true,
+			$install->getChecks(),
+		);
+	}
+
 	public function testCheckFunctionsWithoutMbStrlen(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
@@ -252,7 +278,7 @@ class InstallerTest extends MockedTestCase
 		$install = new Installer();
 		self::assertFalse($install->checkFunctions());
 		self::assertCheckExist(
-			7,
+			8,
 			'mb_string PHP module',
 			'Error: mb_string PHP module required but not installed.',
 			false,
@@ -276,7 +302,7 @@ class InstallerTest extends MockedTestCase
 		$install = new Installer();
 		self::assertFalse($install->checkFunctions());
 		self::assertCheckExist(
-			8,
+			9,
 			'iconv PHP module',
 			'Error: iconv PHP module required but not installed.',
 			false,
@@ -300,7 +326,7 @@ class InstallerTest extends MockedTestCase
 		$install = new Installer();
 		self::assertFalse($install->checkFunctions());
 		self::assertCheckExist(
-			9,
+			10,
 			'POSIX PHP module',
 			'Error: POSIX PHP module required but not installed.',
 			false,
@@ -324,7 +350,7 @@ class InstallerTest extends MockedTestCase
 		$install = new Installer();
 		self::assertFalse($install->checkFunctions());
 		self::assertCheckExist(
-			10,
+			11,
 			'Program execution functions',
 			'Error: Program execution functions (proc_open) required but not enabled.',
 			false,
@@ -348,7 +374,7 @@ class InstallerTest extends MockedTestCase
 		$install = new Installer();
 		self::assertFalse($install->checkFunctions());
 		self::assertCheckExist(
-			11,
+			12,
 			'JSON PHP module',
 			'Error: JSON PHP module required but not installed.',
 			false,
@@ -372,7 +398,7 @@ class InstallerTest extends MockedTestCase
 		$install = new Installer();
 		self::assertFalse($install->checkFunctions());
 		self::assertCheckExist(
-			12,
+			13,
 			'File Information PHP module',
 			'Error: File Information PHP module required but not installed.',
 			false,
@@ -396,7 +422,7 @@ class InstallerTest extends MockedTestCase
 		$install = new Installer();
 		self::assertFalse($install->checkFunctions());
 		self::assertCheckExist(
-			13,
+			14,
 			'GNU Multiple Precision PHP module',
 			'Error: GNU Multiple Precision PHP module required but not installed.',
 			false,
@@ -415,6 +441,7 @@ class InstallerTest extends MockedTestCase
 					'curl_init',
 					'imagecreatefromjpeg',
 					'openssl_public_encrypt',
+					'sodium_crypto_sign_verify_detached',
 					'mb_strlen',
 					'iconv_strlen',
 					'posix_kill',

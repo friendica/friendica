@@ -63,7 +63,7 @@ class Cron
 	{
 		$entries = DBA::select(
 			'workerqueue',
-			['id', 'pid', 'executed', 'priority', 'command', 'parameter'],
+			['id', 'pid', 'executed', 'priority', 'command', 'parameter', 'created', 'retrial'],
 			['NOT `done` AND `pid` != ? AND `executed` > ?', 0, DBA::NULL_DATETIME],
 			['order' => ['priority', 'retrial', 'created']],
 		);
@@ -72,7 +72,12 @@ class Cron
 
 		while ($entry = DBA::fetch($entries)) {
 			if (!posix_kill($entry["pid"], 0)) {
-				DBA::update('workerqueue', ['executed' => DBA::NULL_DATETIME, 'pid' => 0], ['id' => $entry["id"]]);
+				// The worker process is gone without having deferred the task itself.
+				// Defer it here, otherwise a task that reliably kills its worker would be retried forever.
+				if (!Worker::deferQueueEntry($entry)) {
+					DI::logger()->warning('Worker process died repeatedly - task dropped', ['id' => $entry['id'], 'created' => $entry['created'], 'retrial' => $entry['retrial'], 'command' => $entry['command'], 'parameter' => $entry['parameter']]);
+					DBA::update('workerqueue', ['done' => true], ['id' => $entry['id']]);
+				}
 			} else {
 				// Kill long running processes
 

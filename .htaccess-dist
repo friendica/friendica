@@ -11,6 +11,8 @@ Options -Multiviews
 Options -Indexes
 AddType application/x-java-archive .jar
 AddType audio/ogg .oga
+# Older Apache versions don't know .mjs.
+AddType text/javascript .mjs
 
 # deny access to log files (friendica.log or php.out)
 <FilesMatch "\.(out|log)$">

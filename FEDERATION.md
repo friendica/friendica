@@ -4,7 +4,7 @@
 
 - [ActivityPub](https://www.w3.org/TR/activitypub/) (Server-to-Server, Server-to-Client)
 - [WebFinger](https://webfinger.net/)
-- [Http Signatures](https://datatracker.ietf.org/doc/html/draft-cavage-http-signatures)
+- [HTTP Message Signatures](https://www.rfc-editor.org/rfc/rfc9421) and the older [draft-cavage-http-signatures](https://datatracker.ietf.org/doc/html/draft-cavage-http-signatures)
 - [NodeInfo](https://nodeinfo.diaspora.software/)
 - [Diaspora* Protocol](https://diaspora.github.io/diaspora_federation/)
 - [DFRN](https://git.friendi.ca/friendica/friendica/src/branch/develop/spec)

@@ -11,24 +11,17 @@ use Friendica\App\BaseURL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
-use Friendica\Object\EMail\IEmail;
+use Friendica\Event\EventDispatcher;
 use Friendica\Test\MockedTestCase;
 use Friendica\Test\Util\EmailerSpy;
-use Friendica\Test\Util\HookMockTrait;
 use Friendica\Test\Util\SampleMailBuilder;
 use Friendica\Test\Util\VFSTrait;
 use Mockery\MockInterface;
 use Psr\Log\NullLogger;
 
-/**
- * Annotation necessary because of Hook calls
- */
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 class EMailerTest extends MockedTestCase
 {
 	use VFSTrait;
-	use HookMockTrait;
 
 	/** @var IManageConfigValues|MockInterface */
 	private $config;
@@ -78,7 +71,7 @@ class EMailerTest extends MockedTestCase
 			->addHeader('Message-ID', 'first Id')
 			->build(true);
 
-		$emailer = new EmailerSpy($this->config, $this->pConfig, $this->baseUrl, new NullLogger(), $this->l10n);
+		$emailer = new EmailerSpy($this->config, $this->pConfig, $this->baseUrl, new NullLogger(), $this->l10n, new EventDispatcher());
 
 		self::assertTrue($emailer->send($testEmail));
 
@@ -101,14 +94,6 @@ class EMailerTest extends MockedTestCase
 	{
 		$this->pConfig->shouldReceive('get')->withArgs(['1', 'system', 'email_textonly'])->andReturn(false)->once();
 
-		/** @var IEmail|null $preparedEmail */
-		$preparedEmail = null;
-		/** @var IEmail|null $sentEMail */
-		$sentEMail = null;
-
-		$this->mockHookCallAll('emailer_send_prepare', $preparedEmail);
-		$this->mockHookCallAll('emailer_send', $sentEMail);
-
 		$builder = new SampleMailBuilder($this->l10n, $this->baseUrl, $this->config, new NullLogger());
 
 		$testEmail = $builder
@@ -120,7 +105,7 @@ class EMailerTest extends MockedTestCase
 			->addHeader('Message-Id', 'second Id')
 			->build(true);
 
-		$emailer = new EmailerSpy($this->config, $this->pConfig, $this->baseUrl, new NullLogger(), $this->l10n);
+		$emailer = new EmailerSpy($this->config, $this->pConfig, $this->baseUrl, new NullLogger(), $this->l10n, new EventDispatcher());
 
 		// even in case there are two message ids, send the mail anyway
 		self::assertTrue($emailer->send($testEmail));

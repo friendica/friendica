@@ -44,7 +44,7 @@ a.on {
 	background-color: #2C77AE !important
 }
 
-aside, right_aside, .menu-popup, .fc-state-highlight, a.off, .autocomplete {
+aside, #right-aside-section, .menu-popup, .fc-state-highlight, a.off, .autocomplete {
 	color: #989898 !important;
 	background-color: #252C33 !important;
 	border-right: 1px solid #D2D2D2;
@@ -111,4 +111,8 @@ li.notification-seen {
 	background-color: #252C33;
 	border: 3px solid #364e59;
 	color: #989898;
+}
+.settings-section,
+.settings-subsection {
+	background-color: #252C33;
 }

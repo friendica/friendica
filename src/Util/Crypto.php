@@ -61,6 +61,66 @@ class Crypto
 	}
 
 	/**
+	 * Decode a base58 (Bitcoin alphabet) string
+	 *
+	 * @param string $string
+	 * @return string The decoded bytes, empty on an invalid character
+	 */
+	public static function base58Decode(string $string): string
+	{
+		if ($string === '') {
+			return '';
+		}
+
+		$alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
+		$number = gmp_init(0);
+		for ($i = 0; $i < strlen($string); $i++) {
+			$position = strpos($alphabet, $string[$i]);
+			if ($position === false) {
+				return '';
+			}
+			$number = gmp_add(gmp_mul($number, 58), $position);
+		}
+
+		$bytes = '';
+		while (gmp_cmp($number, 0) > 0) {
+			$bytes  = chr((int) gmp_intval(gmp_mod($number, 256))) . $bytes;
+			$number = gmp_div_q($number, 256);
+		}
+
+		// Leading "1" characters are leading zero bytes
+		for ($i = 0; ($i < strlen($string)) && ($string[$i] === '1'); $i++) {
+			$bytes = "\x00" . $bytes;
+		}
+
+		return $bytes;
+	}
+
+	/**
+	 * Extract the raw Ed25519 public key from a multibase value
+	 *
+	 * Expects the multibase-base58btc form ("z" prefix) of a multicodec
+	 * "ed25519-pub" key (prefix bytes 0xed 0x01), as published in a "Multikey".
+	 *
+	 * @param string $multibase
+	 * @return string The 32 raw key bytes, empty when the value is not an Ed25519 Multikey
+	 */
+	public static function ed25519PublicKeyFromMultibase(string $multibase): string
+	{
+		if (($multibase === '') || ($multibase[0] !== 'z')) {
+			return '';
+		}
+
+		$bytes = self::base58Decode(substr($multibase, 1));
+		if ((strlen($bytes) !== 34) || (!str_starts_with($bytes, "\xed\x01"))) {
+			return '';
+		}
+
+		return substr($bytes, 2);
+	}
+
+	/**
 	 * @param integer $bits number of bits
 	 * @return mixed
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException

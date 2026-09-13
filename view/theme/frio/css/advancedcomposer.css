@@ -529,10 +529,6 @@ textarea.profile-jot-text,
 	color: var(--text-color-muted, #99aab5) !important;
 }
 
-.easy-compose-panel.dark-theme .ec-help-summary:hover {
-	color: var(--text-color, #ffffff) !important;
-}
-
 .easy-compose-panel.dark-theme .ec-help-privacy-text {
 	color: var(--text-color, #e1e8ed) !important;
 }
@@ -541,9 +537,6 @@ textarea.profile-jot-text,
 	color: var(--text-color, #ffffff) !important;
 }
 
-.easy-compose-panel.dark-theme .ec-help-criteria dd {
-	color: var(--text-color-muted, #99aab5) !important;
-}
 /* Dark theme detail overrides — see individual dark-theme rules below */
 
 /* Standalone Compose Page layout enhancements */
@@ -1458,6 +1451,7 @@ details[open] > .ec-help-summary::after {
 
 /* Dark theme adjustments */
 .easy-compose-panel.dark-theme .ec-help-summary:hover {
+	color: var(--text-color, #ffffff) !important;
 	background: rgba(255,255,255,0.05);
 }
 
@@ -1472,6 +1466,7 @@ details[open] > .ec-help-summary::after {
 }
 
 .easy-compose-panel.dark-theme .ec-help-criteria dd {
+	color: var(--text-color-muted, #99aab5) !important;
 	border-color: rgba(255,255,255,0.12);
 }
 
@@ -1784,14 +1779,10 @@ details[open] > .ec-help-summary::after {
 	font-size: 15px !important;
 	line-height: 1.75 !important;
 	color: #2c3e50 !important;
-	word-wrap: break-word !important;
-	word-break: break-word !important;
 	overflow-wrap: anywhere !important;
 }
 
 .ec-preview-card-body * {
-	word-wrap: break-word !important;
-	word-break: break-word !important;
 	overflow-wrap: anywhere !important;
 }
 
@@ -1816,7 +1807,6 @@ details[open] > .ec-help-summary::after {
    ========================================================================== */
 
 .ec-bbcode-body {
-	word-break: break-word !important;
 	overflow-wrap: anywhere !important;
 }
 

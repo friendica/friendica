@@ -45,7 +45,7 @@ function vier_init(): void
 		DI::page()['htmlhead'] .= "<link rel='stylesheet' type='text/css' href='view/theme/vier/wide.css' media='screen and (min-width: 1300px)'/>\n";
 	}
 
-	if (DI::mode()->isMobile() || DI::mode()->isMobile()) {
+	if (DI::mode()->isMobile() || DI::mode()->isTablet()) {
 		DI::page()['htmlhead'] .= '<meta name=viewport content="width=device-width, initial-scale=1">' . "\n";
 		DI::page()['htmlhead'] .= '<link rel="stylesheet" type="text/css" href="view/theme/vier/mobile.css" media="screen"/>' . "\n";
 	}
@@ -73,10 +73,10 @@ function cmtBbClose(id) {
 </script>
 EOT;
 
-	if (DI::mode()->isMobile() || DI::mode()->isMobile()) {
+	if (DI::mode()->isMobile() || DI::mode()->isTablet()) {
 		DI::page()['htmlhead'] .= <<< EOT
 <script>
-	$(document).ready(function() {
+	window.onDocumentReady('body', function() {
 		$(".mobile-aside-toggle a").click(function(e){
 			e.preventDefault();
 			$("aside").toggleClass("show");

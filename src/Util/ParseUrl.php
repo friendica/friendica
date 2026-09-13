@@ -298,7 +298,7 @@ class ParseUrl
 			$body = iconv($charset, 'UTF-8//TRANSLIT', $body);
 		}
 
-		$body = mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8');
+		$body = HTML::toNumericEntities($body);
 
 		if (empty($body)) {
 			return $siteinfo;

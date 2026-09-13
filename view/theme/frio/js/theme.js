@@ -5,6 +5,7 @@
 // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPLv3-or-later
 
 var jotcache = ""; //The jot cache. We use it as cache to restore old/original jot content
+var stickyAside = null; //The aside currently handled by sticky-kit, see initTheme()
 
 function syncSecondNavTabmenu() {
 	// Move page tabbar into second navbar after initial load and SPA navigations
@@ -61,7 +62,7 @@ function initTheme() {
 	//fade in/out based on scrollTop value
 	var scrollStart;
 
-	$(window).scroll(function () {
+	$(window).off("scroll.frio-theme").on("scroll.frio-theme", function () {
 		let currentScroll = $(this).scrollTop();
 
 		// Top of the page or going up = hide the button
@@ -75,17 +76,6 @@ function initTheme() {
 			$("#back-to-top").fadeIn();
 			scrollStart = currentScroll;
 		}
-	});
-
-	// scroll body to 0px on click
-	$("#back-to-top").click(function () {
-		$("body,html").animate(
-			{
-				scrollTop: 0,
-			},
-			400,
-		);
-		return false;
 	});
 
 	// add the class "active" to tabmenuli if li > a does have the class active
@@ -107,7 +97,7 @@ function initTheme() {
 	let $body = $("body");
 
 	// show bulk deletion button at network page if checkbox is checked
-	$body.change("input.item-select", function () {
+	$body.off("change.frio-theme", "input.item-select").on("change.frio-theme", "input.item-select", function () {
 		var checked = false;
 
 		// We need to get all checked items, so it would close the delete button
@@ -131,7 +121,7 @@ function initTheme() {
 	});
 
 	// initialize the Bootstrap tooltips
-	$body.tooltip({
+	$body.off("mouseenter.frio-theme mouseleave.frio-theme").tooltip({
 		selector: '[data-toggle="tooltip"]',
 		container: "body",
 		animation: true,
@@ -148,7 +138,7 @@ function initTheme() {
 	});
 
 	// initialize the bootstrap-select
-	$(".selectpicker").selectpicker();
+	$(".selectpicker").off("change.frio-theme").selectpicker();
 
 	// add search-heading to the second navbar
 	if ($(".search-heading").length) {
@@ -255,12 +245,12 @@ function initTheme() {
 
 	// Dropdown menus with the class "dropdown-head" will display the active tab
 	// as button text
-	$body.on("click", ".dropdown-head .dropdown-menu li a, .dropdown-head .dropdown-menu li button", function () {
+	$body.off("click.frio-theme", ".dropdown-head .dropdown-menu li a, .dropdown-head .dropdown-menu li button").on("click.frio-theme", ".dropdown-head .dropdown-menu li a, .dropdown-head .dropdown-menu li button", function () {
 		toggleDropdownText(this);
 	});
 
 	// Change the css class while clicking on the switcher elements
-	$(".toggle label, .toggle .toggle-handle").click(function (event) {
+	$(".toggle label, .toggle .toggle-handle").off("click.frio-theme").on("click.frio-theme", function (event) {
 		event.preventDefault();
 		// Get the value of the input element
 		var input = $(this).siblings("input");
@@ -291,7 +281,7 @@ function initTheme() {
 	// to the input element where the padding value would be at least the width
 	// of the button. Otherwise long user input would be invisible because it is
 	// behind the button.
-	$body.on("click", ".form-group-search > input", function () {
+	$body.off("click.frio-theme", ".form-group-search > input").on("click.frio-theme", ".form-group-search > input", function () {
 		// Get the width of the button (if the button isn't available
 		// buttonWidth will be null
 		var buttonWidth = $(this).next(".form-button-search").outerWidth();
@@ -312,12 +302,16 @@ function initTheme() {
 	 * We are making an exception for buttons because of a race condition with the
 	 * comment opening button that results in an already closed comment UI.
 	 */
-	$(document).on("mousedown", function (event) {
+	$(document).off("mousedown.frio-theme").on("mousedown.frio-theme", function (event) {
 		if (event.target.type === "button") {
 			return true;
 		}
 
 		if ($(event.target).closest(".fg-emoji-container").length) {
+			return true;
+		}
+
+		if ($(event.target).closest(".modal").length) {
 			return true;
 		}
 
@@ -337,7 +331,7 @@ function initTheme() {
 	// Customize some elements when the app is used in standalone mode on Android
 	if (window.matchMedia("(display-mode: standalone)").matches) {
 		// Open links to source outside of the webview
-		$("body").on("click", ".plink", function (e) {
+		$("body").off("click.frio-theme", ".plink").on("click.frio-theme", ".plink", function (e) {
 			$(e.target).attr("target", "_blank");
 		});
 	}
@@ -346,7 +340,7 @@ function initTheme() {
 	 * This event listeners ensures that the textarea size is updated event if the
 	 * value is changed externally (textcomplete, insertFormatting, fbrowser...)
 	 */
-	$(document).on("change", "textarea", function (event) {
+	$(document).off("change.frio-theme").on("change.frio-theme", "textarea", function (event) {
 		autosize.update(event.target);
 	});
 
@@ -362,13 +356,19 @@ function initTheme() {
 	 * since is enabled or not at page loading time.
 	 */
 	if ($(window).width() > 976) {
-		$("aside").stick_in_parent({
+		// Detach the previous aside first: SPA navigation replaces the element,
+		// and its window/body handlers stay bound until sticky_kit:detach.
+		if (stickyAside) {
+			stickyAside.trigger("sticky_kit:detach");
+		}
+		stickyAside = $("aside");
+		stickyAside.stick_in_parent({
 			offset_top: 100, // px, header + tab bar + spacing
 			recalc_every: 10,
 		});
 		// recalculate sticky aside on clicks on <a> elements
 		// this handle height changes on expanding submenus
-		$("aside").on("click", "a", function () {
+		$("aside").off("click.frio-theme", "a").on("click.frio-theme", "a", function () {
 			$(document.body).trigger("sticky_kit:recalc");
 		});
 	}
@@ -380,10 +380,11 @@ function initTheme() {
 	 * is shown.
 	 */
 	$("aside")
-		.on("shown.bs.offcanvas", function () {
+		.off("shown.bs.offcanvas.frio-theme hidden.bs.offcanvas.frio-theme")
+		.on("shown.bs.offcanvas.frio-theme", function () {
 			$body.addClass("aside-out");
 		})
-		.on("hidden.bs.offcanvas", function () {
+		.on("hidden.bs.offcanvas.frio-theme", function () {
 			$body.removeClass("aside-out");
 		});
 
@@ -391,13 +392,13 @@ function initTheme() {
 	let $offcanvas_right_toggle = $(".offcanvas-right-toggle");
 	let $offcanvas_right_container = $("#offcanvasUsermenu"); // Use ID for faster lookup, class is .offcanvas-right
 
-	$offcanvas_right_toggle.on("click", function (event) {
+	$offcanvas_right_toggle.off("click.frio-theme").on("click.frio-theme", function (event) {
 		event.preventDefault();
 		$("body").toggleClass("offcanvas-right-active");
 	});
 
 	// Close the right offcanvas menu when clicking somewhere
-	$(document).on("mouseup touchend", function (event) {
+	$(document).off("mouseup.frio-theme touchend.frio-theme").on("mouseup.frio-theme touchend.frio-theme", function (event) {
 		if (
 			// Clicked element is not inside the menu
 			!$offcanvas_right_container.is(event.target) &&
@@ -411,68 +412,56 @@ function initTheme() {
 	});
 
 	// Event listener for 'Show & hide event map' button in the network stream.
-	$body.on("click", ".event-map-btn", function () {
+	$body.off("click.frio-theme", ".event-map-btn").on("click.frio-theme", ".event-map-btn", function () {
 		showHideEventMap(this);
 	});
 
-	// Comment form submit - only register once to prevent duplicate submissions
-	if (typeof frioCommentFormHandlerRegistered === 'undefined') {
-		frioCommentFormHandlerRegistered = true;
-		console.log('[Theme] Registering comment form submit handler (once)');
-		$body.on("submit", ".comment-edit-form", function (e) {
-			console.log('[Theme] Comment form submit handler triggered for form with data-item-id:', $(this).data("item-id"));
-			let $form = $(this);
-			let id = $form.data("item-id");
+	// Comment form submit
+	$body.off("submit.frio-theme", ".comment-edit-form").on("submit.frio-theme", ".comment-edit-form", function (e) {
+		let $form = $(this);
+		let id = $form.data("item-id");
 
-			// Compose page form exception: id is always 0 and form must not be submitted asynchronously
-			if (id === 0) {
-				console.log('[Theme] Comment form: Compose page (id=0), skipping async submit');
-				return;
-			}
+		// Compose page form exception: id is always 0 and form must not be submitted asynchronously
+		if (id === 0) {
+			return;
+		}
 
-			e.preventDefault();
+		e.preventDefault();
 
-			let $commentSubmit = $form.find(".comment-edit-submit").button("loading");
+		let $commentSubmit = $form.find(".comment-edit-submit").button("loading");
 
-			unpause();
-			commentBusy = true;
-			console.log('[Theme] Comment form: Starting AJAX post for id:', id);
-			showPosting();
+		unpause();
+		commentBusy = true;
+		showPosting();
 
-			$.post("item", $form.serialize(), "json")
-				.done(function (data) {
-					showProcessing();
-					console.log('[Theme] Comment form: AJAX response received for id:', id);
-					if (data.success) {
-						console.log('[Theme] Comment form: Comment posted successfully');
-						$("#comment-edit-wrapper-" + id).hide();
-						let $textarea = $("#comment-edit-text-" + id);
-						$textarea.val("");
-						if ($textarea.get(0)) {
-							commentClose($textarea.get(0), id);
-						}
-						if (timer) {
-							clearTimeout(timer);
-						}
+		$.post("item", $form.serialize(), "json")
+			.done(function (data) {
+				showProcessing();
+				if (data.success) {
+					$("#comment-edit-wrapper-" + id).hide();
+					let $textarea = $("#comment-edit-text-" + id);
+					$textarea.val("");
+					if ($textarea.get(0)) {
+						commentClose($textarea.get(0), id);
+					}
+					if (timer) {
+						clearTimeout(timer);
+					}
+					if (!insertPostedComment(id, data)) {
 						timer = setTimeout(NavUpdate, 10);
-						console.debug('[Theme] Comment form: Calling triggerLiveUpdates with guid:', data.guid ?? null);
 						updateItem(id, data.guid ?? null);
 					}
-					if (data.reload) {
-						console.log('[Theme] Comment form: Server requested reload');
-						window.location.href = data.reload;
-					}
-				})
-				.always(function () {
-					console.log('[Theme] Comment form: AJAX completed, resetting button and commentBusy');
-					hideLoading();
-					commentBusy = false;
-					$commentSubmit.button("reset");
-				});
-		});
-	} else {
-		console.log('[Theme] Comment form submit handler already registered, skipping duplicate registration');
-	}
+				}
+				if (data.reload) {
+					window.location.href = data.reload;
+				}
+			})
+			.always(function () {
+				hideLoading();
+				commentBusy = false;
+				$commentSubmit.button("reset");
+			});
+	});
 
 	try {
 		navigator.canShare({ url: "#", });
@@ -485,8 +474,7 @@ function initTheme() {
 }
 
 // Register theme initialization for initial page load and SPA navigation
-$(document).ready(initTheme);
-window.addEventListener("theme:reload", initTheme);
+window.onDocumentReady('body', initTheme);
 
 // Keep existing spa:navigate handler for tabmenu syncing
 window.addEventListener("spa:navigate", function () {
@@ -628,10 +616,6 @@ function cleanContactUrl(url) {
 	if ("path" in parts) {
 		newUrl += parts["path"];
 	}
-
-	//	if(url != newUrl) {
-	//		console.log("Cleaned contact url " + url + " to " + newUrl);
-	//	}
 
 	return newUrl;
 }
@@ -854,7 +838,9 @@ function doActivityItemAction(ident, verb, un) {
 						$('button[id^=shareMenuOptions-' + ident.toString() + ']').addClass('active');
 					}
 				}
-				updateItem(ident.toString());
+				if (!refreshItemActivity(ident, data)) {
+					updateItem(ident.toString());
+				}
 			} else {
 				/* server-response was not ok. Database-problems or some changes in
 				 * data?
@@ -955,7 +941,6 @@ function hasClass(elem, cls) {
 // submit: the id of the submitbutton
 function sendOnCtrlEnter(e, submit) {
 	if ((e.ctrlKey || e.metaKey) && (e.keyCode == 13 || e.keyCode == 10)) {
-		console.log("Ctrl + Enter");
 		showPosting();
 		$("#" + submit).trigger('click');
 		hideLoading();

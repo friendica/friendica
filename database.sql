@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 2026.08-dev (Blutwurz)
--- DB_UPDATE_VERSION 1598
+-- Friendica 2026.08-rc (Blutwurz)
+-- DB_UPDATE_VERSION 1599
 -- ------------------------------------------
 
 
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`uri-id` int unsigned COMMENT 'Id of the item-uri table entry that contains the contact url',
 	`addr` varchar(255) NOT NULL DEFAULT '' COMMENT '',
 	`alias` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`pubkey` text COMMENT 'RSA public key 4096 bit',
+	`pubkey` text COMMENT 'RSA public key 4096 bit, or, for Ed25519 only ActivityPub actors, the Multikey in multibase form',
 	`prvkey` text COMMENT 'RSA private key 4096 bit',
 	`batch` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
 	`notify` varbinary(383) COMMENT '',
@@ -405,7 +405,7 @@ CREATE TABLE IF NOT EXISTS `apcontact` (
 	`header` varbinary(383) COMMENT 'Header picture',
 	`addr` varchar(255) COMMENT '',
 	`alias` varbinary(383) COMMENT '',
-	`pubkey` text COMMENT '',
+	`pubkey` text COMMENT 'RSA public key in PEM format or, for Ed25519 only actors, the Multikey in multibase form',
 	`subscribe` varbinary(383) COMMENT '',
 	`baseurl` varbinary(383) COMMENT 'baseurl of the ap contact',
 	`gsid` int unsigned COMMENT 'Global Server ID',
@@ -1633,6 +1633,20 @@ CREATE TABLE IF NOT EXISTS `post-question-option` (
 	 PRIMARY KEY(`uri-id`,`id`),
 	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Question option';
+
+--
+-- TABLE post-question-voter
+--
+CREATE TABLE IF NOT EXISTS `post-question-voter` (
+	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the item uri',
+	`id` int unsigned NOT NULL COMMENT 'Id of the question option',
+	`uid` mediumint unsigned NOT NULL COMMENT 'User ID',
+	`created` datetime NOT NULL DEFAULT '0001-01-01 00:00:00' COMMENT 'Creation date',
+	 PRIMARY KEY(`uri-id`,`id`,`uid`),
+	 INDEX `uid` (`uid`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE,
+	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Records which user voted for which question option, to prevent double voting';
 
 --
 -- TABLE post-searchindex

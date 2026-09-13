@@ -436,12 +436,11 @@ class Relay
 	 */
 	public static function updateTagRelaySubscriptions()
 	{
-		if (!DI::config()->get('system', 'relay_auto_subscribe_tags')) {
+		$currentTags = DI::config()->get('system', 'relay_auto_subscribe_tags') ? Relay::getSubscribedTags() : [];
+		$oldTags     = json_decode(DI::keyValue()->get('relay_subscribed_tags') ?? '[]', true) ?? [];
+		if (!$currentTags && !$oldTags) {
 			return;
 		}
-
-		$currentTags = Relay::getSubscribedTags();
-		$oldTags     = json_decode(DI::keyValue()->get('relay_subscribed_tags') ?? '[]', true) ?? [];
 
 		// Follow new tags
 		foreach ($currentTags as $tag) {

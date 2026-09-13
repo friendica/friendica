@@ -46,6 +46,8 @@ class Circle
 	/**
 	 * Checks whether given circle id is found in database
 	 *
+	 * When a user id is passed, the circle additionally has to belong to that user.
+	 *
 	 * @param int $circle_id Circle id
 	 * @param int $uid Optional user id
 	 * @return bool
@@ -56,9 +58,7 @@ class Circle
 		$condition = ['id' => $circle_id, 'deleted' => false];
 
 		if (!is_null($uid)) {
-			$condition = [
-				'uid' => $uid,
-			];
+			$condition['uid'] = $uid;
 		}
 
 		return DBA::exists('group', $condition);

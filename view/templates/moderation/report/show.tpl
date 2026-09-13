@@ -29,6 +29,7 @@
 			<div class="panel-heading"><strong>{{$category_and_rules}}</strong></div>
 			<div class="panel-body">
 				<form method="post">
+					<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 					<input type="hidden" name="report_id" value="{{$report.id}}">
 					<input type="hidden" name="report_action" value="save_metadata">
 					<div class="form-group">
@@ -97,6 +98,7 @@
 					{{if $post.title}}<br>{{$post.title}}{{/if}}
 					{{if !$report.is_final}}
 					<form method="post" style="margin-top: 0.4em;">
+						<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 						<input type="hidden" name="report_id" value="{{$report.id}}">
 						<input type="hidden" name="uri_id" value="{{$post.uri_id}}">
 						<button type="submit" name="report_action" value="delete_reported_post" class="btn btn-danger btn-xs">{{$delete_post}}</button>
@@ -114,6 +116,7 @@
 		<div class="panel-body">
 			{{if !$report.is_final}}
 			<form method="post" class="form-inline" style="margin-bottom: 1em;">
+				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 				<input type="hidden" name="report_id" value="{{$report.id}}">
 				<button type="submit" name="report_action" value="assign_self" class="btn btn-primary">{{$assign_self}}</button>
 				<button type="submit" name="report_action" value="unassign" class="btn btn-default">{{$unassign}}</button>
@@ -121,6 +124,7 @@
 			</form>
 
 			<form method="post" class="form-inline" style="margin-bottom: 1em;">
+				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 				<input type="hidden" name="report_id" value="{{$report.id}}">
 				<button type="submit" name="report_action" value="delete_reported_posts" class="btn btn-danger">{{$delete_posts}}</button>
 				{{if $report.target}}
@@ -136,6 +140,7 @@
 
 			{{if $report.target && $report.target_is_local}}
 			<form method="post" style="margin-bottom: 1em;">
+				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 				<input type="hidden" name="report_id" value="{{$report.id}}">
 				<input type="hidden" name="report_action" value="warn_target">
 				<div class="form-group">
@@ -147,6 +152,7 @@
 			{{/if}}
 
 			<form method="post">
+				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 				<input type="hidden" name="report_id" value="{{$report.id}}">
 				<input type="hidden" name="report_action" value="save_remarks">
 				<div class="form-group">

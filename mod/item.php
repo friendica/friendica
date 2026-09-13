@@ -360,6 +360,11 @@ function item_post_return(string $baseurl, string $return_path, array $item = []
 		$json['guid'] = $item['guid'];
 	}
 
+	if ($item && ($item['gravity'] === Item::GRAVITY_COMMENT) && ($item['thr-parent-id'] !== $item['parent-uri-id'])) {
+		$json['comment-uri-id'] = $item['uri-id'];
+		$json['parent-uri-id']  = $item['thr-parent-id'];
+	}
+
 	DI::logger()->debug('post_json', ['json' => $json]);
 
 	System::jsonExit($json);

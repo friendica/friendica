@@ -17,6 +17,7 @@ const vendorGlobals = {
 	DOMPurify: "readonly",  // view/asset/dompurify/dist/purify.min.js
 	Dropzone: "readonly",   // vendor/enyo/dropzone/dist/min/dropzone.min.js
 	moment: "readonly",     // view/asset/moment/min/moment-with-locales.min.js
+	up: "readonly",         // view/asset/unpoly/unpoly.min.js
 };
 
 // Page variables injected by PHP or by inline <script> blocks in the templates.
@@ -33,6 +34,7 @@ const injectedGlobals = {
 	localUser: "readonly",
 	netargs: "writable",
 	profile_uid: "readonly",
+	spaEnabled: "readonly", // view/templates/head.tpl, view/theme/frio/templates/head.tpl
 	theme: "writable", // reassigned by previewTheme() in view/js/main.js
 };
 
@@ -48,11 +50,14 @@ const friendicaGlobals = {
 	commentCloseUI: "readonly",
 	hideLoading: "readonly",
 	htmlToText: "readonly",
+	initInfiniteScroll: "readonly", // view/js/main.js
 	insertBBCodeInTextarea: "readonly",
+	insertPostedComment: "readonly", // view/js/main.js
 	jotShow: "readonly",
 	NavUpdate: "readonly",
 	openMenu: "readonly",
 	originalTitle: "writable",
+	refreshItemActivity: "readonly", // view/js/main.js
 	scrollToItem: "readonly",
 	showFetching: "readonly",
 	showPosting: "readonly",
@@ -68,6 +73,7 @@ export default [
 	{
 		ignores: [
 			"addon/**",
+			"local/**",
 			"node_modules/**",
 			"vendor/**",
 			"**/.venv/**",
@@ -92,7 +98,7 @@ export default [
 	},
 	js.configs.recommended,
 	{
-		files: ["view/**/*.js", "mods/**/*.js"],
+		files: ["view/**/*.js", "view/**/*.mjs", "mods/**/*.js"],
 		languageOptions: {
 			ecmaVersion: 2022,
 			sourceType: "script",
@@ -132,6 +138,12 @@ export default [
 			"no-unreachable-loop": "error",
 			"no-use-before-define": ["error", { functions: false, classes: false }],
 			"require-atomic-updates": "error",
+		},
+	},
+	{
+		files: ["view/js/spa/**/*.js"],
+		languageOptions: {
+			sourceType: "module",
 		},
 	},
 ];

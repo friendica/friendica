@@ -28,6 +28,29 @@ class CryptoTest extends TestCase
 		self::assertSame('11111111', Crypto::randomDigits(8));
 	}
 
+	public function testEd25519PublicKeyFromMultibase(): void
+	{
+		// RFC 9421 appendix B.1.4 test-key-ed25519, as a multibase Multikey value
+		$raw       = base64_decode('JrQLj5P/89iXES9+vFgrIy29clF9CC/oPPsw3c5D0bs=');
+		$multibase = 'z6Mkh4LmfP1ev9MNPGr7JbEbtD6BD4fsu1duEj83PMCs3xHG';
+
+		self::assertSame($raw, Crypto::ed25519PublicKeyFromMultibase($multibase));
+
+		// Not an Ed25519 Multikey
+		self::assertSame('', Crypto::ed25519PublicKeyFromMultibase(''));
+		self::assertSame('', Crypto::ed25519PublicKeyFromMultibase('f6Mkh4LmfP1ev9MNPGr7JbEbtD6BD4fsu1duEj83PMCs3xHG'));
+		self::assertSame('', Crypto::ed25519PublicKeyFromMultibase('z111111'));
+		self::assertSame('', Crypto::ed25519PublicKeyFromMultibase('z6MkO0'));
+	}
+
+	public function testBase58Decode(): void
+	{
+		self::assertSame('', Crypto::base58Decode(''));
+		self::assertSame('hello world', Crypto::base58Decode('StV1DL6CwTryKyV'));
+		self::assertSame("\x00\x00abc", Crypto::base58Decode('11ZiCa'));
+		self::assertSame('', Crypto::base58Decode('invalid_0OIl'));
+	}
+
 	public function testDiasporaPubRsaToMe(): void
 	{
 		$key = 'LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tDQpNSUdKQW9HQkFORjVLTmJzN2k3aTByNVFZckNpRExEZ09pU1BWbmgvdlFnMXpnSk9VZVRheWVETk5yZTR6T1RVDQpSVDcyZGlLQ294OGpYOE5paElJTFJtcUtTOWxVYVNzd21QcVNFenVpdE5xeEhnQy8xS2ZuaXM1Qm96NnRwUUxjDQpsZDMwQjJSMWZIVWdFTHZWd0JkV29pRDhSRUt1dFNuRVBGd1RwVmV6aVlWYWtNY25pclRWQWdNQkFBRT0NCi0tLS0tRU5EIFJTQSBQVUJMSUMgS0VZLS0tLS0';

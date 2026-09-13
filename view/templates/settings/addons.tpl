@@ -10,7 +10,9 @@
 
 <form action="settings/addons/{{$addon}}" method="post" autocomplete="off">
 	<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-	{{$addon_settings_form nofilter}}
+	<details class="settings-section">
+		{{$addon_settings_form nofilter}}
+	</details>
 </form>
 
 {{foreachelse}}

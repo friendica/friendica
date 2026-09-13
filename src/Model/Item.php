@@ -1975,9 +1975,13 @@ class Item
 
 		if ($update) {
 			// The "self" contact id is used (for example in the connectors) when the contact is unknown
-			// So we have to ensure to only update the last item when it had been our own post,
+			// So we have to ensure to only update the last item when it had been our own content,
 			// or it had been done by a "regular" contact.
-			if (!empty($arr['wall'])) {
+			// Our own content is a post or activity we created for a federated network, but not a technical activity like "view".
+			$own_content = !empty($arr['origin'])
+				&& in_array($arr['network'], Protocol::FEDERATED)
+				&& !in_array($arr['verb'], Activity::TECHNICAL_ACTIVITIES);
+			if ($own_content) {
 				$condition = ['id' => $arr['contact-id']];
 			} else {
 				$condition = ['id' => $arr['contact-id'], 'self' => false];
@@ -3131,7 +3135,7 @@ class Item
 		$s = self::addLinkAttachment($item['uri-id'], $itemSplitAttachments, $body, $s, false, $shared_links, $uid, $item);
 		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s);
 		$s = self::addHiddenAttachments($itemSplitAttachments['hidden'], $item, $s);
-		$s = self::addQuestions($item, $s);
+		$s = self::addQuestions($item, $s, $uid);
 
 		// Map.
 		if (str_contains($s, '<div class="map">') && !empty($item['coord'])) {
@@ -3616,7 +3620,7 @@ class Item
 		return $media . $content;
 	}
 
-	private static function addQuestions(array $item, string $content): string
+	private static function addQuestions(array $item, string $content, int $uid): string
 	{
 		DI::profiler()->startRecording('rendering');
 		if (!empty($item['question-id'])) {
@@ -3627,13 +3631,18 @@ class Item
 				'endtime'  => $item['question-end-time'],
 			];
 
+			$isOpen   = empty($question['endtime']) || $question['endtime'] == DBA::NULL_DATETIME || $question['endtime'] > DateTimeFormat::utcNow();
+			$hasVoted = $uid ? Post\QuestionVoter::hasVoted($item['uri-id'], $uid) : false;
+
 			$options = Post\QuestionOption::getByURIId($item['uri-id']);
 			foreach ($options as $key => $option) {
 				if ($question['voters'] > 0) {
-					$percent               = $option['replies'] / $question['voters'] * 100;
-					$options[$key]['vote'] = DI::l10n()->tt('%2$s (%3$d%%, %1$d vote)', '%2$s (%3$d%%, %1$d votes)', $option['replies'] ?? 0, $option['name'], round($percent, 1));
+					$percent                  = $option['replies'] / $question['voters'] * 100;
+					$options[$key]['vote']    = DI::l10n()->tt('%2$s (%3$d%%, %1$d vote)', '%2$s (%3$d%%, %1$d votes)', $option['replies'] ?? 0, $option['name'], round($percent, 1));
+					$options[$key]['percent'] = round($percent, 1);
 				} else {
-					$options[$key]['vote'] = DI::l10n()->tt('%2$s (%1$d vote)', '%2$s (%1$d votes)', $option['replies'] ?? 0, $option['name']);
+					$options[$key]['vote']    = DI::l10n()->tt('%2$s (%1$d vote)', '%2$s (%1$d votes)', $option['replies'] ?? 0, $option['name']);
+					$options[$key]['percent'] = 0;
 				}
 			}
 
@@ -3648,9 +3657,15 @@ class Item
 			}
 
 			$content .= Renderer::replaceMacros(Renderer::getMarkupTemplate('content/question.tpl'), [
-				'$question' => $question,
-				'$options'  => $options,
-				'$summary'  => $summary,
+				'$item_id'       => $item['id'] ?? 0,
+				'$question'      => $question,
+				'$options'       => $options,
+				'$summary'       => $summary,
+				'$can_vote'      => $uid && $isOpen && !$hasVoted,
+				'$multiple'      => (bool) $question['multiple'],
+				'$vote_label'    => DI::l10n()->t('Vote'),
+				'$vote_recorded' => DI::l10n()->t('Your vote has been recorded.'),
+				'$vote_failed'   => DI::l10n()->t('Your vote could not be recorded. Please try again.'),
 			]);
 		}
 		DI::profiler()->stopRecording();

@@ -21,7 +21,6 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
-use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
@@ -131,8 +130,7 @@ final readonly class ConversationRenderer
 
 		$viewerUid = $this->resolveViewerUid($uid);
 
-		$selected = array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']);
-		$item     = Post::selectFirst($selected, ['uri-id' => $uriId, 'uid' => [0, $viewerUid]], ['order' => ['uid' => true]]);
+		$item = $this->dataProvider->fetchItemByUriId($uriId, $viewerUid);
 		if (empty($item)) {
 			$this->profiler->stopRecording();
 			return '';
@@ -153,6 +151,115 @@ final readonly class ConversationRenderer
 
 		$this->profiler->stopRecording();
 		return $html;
+	}
+
+	/**
+	 * Render a freshly posted reply together with the subtree of its immediate
+	 * parent comment, so the client can replace that one subtree instead of
+	 * rebuilding the whole thread (which drops loaded and among-strangers
+	 * comments in the compact timeline).
+	 *
+	 * Returns an empty string for anything that should go through the regular
+	 * thread update: a missing item, a non-comment, or a reply to the thread
+	 * starter.
+	 *
+	 * @param int $commentUriId The URI ID of the freshly posted comment
+	 * @param int $uid The user ID of the viewer, or null for public view
+	 * @return string The rendered HTML of the immediate parent's subtree
+	 * @throws ImagickException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public function renderCommentByUriId(int $commentUriId, int $uid): string
+	{
+		$this->profiler->startRecording('rendering');
+		$this->statusEditor->registerAssets();
+
+		$viewerUid = $this->resolveViewerUid($uid);
+
+		$comment = $this->dataProvider->fetchItemByUriId($commentUriId, $viewerUid);
+		if (empty($comment) || ($comment['gravity'] !== ItemModel::GRAVITY_COMMENT) || ($comment['thr-parent-id'] == $comment['parent-uri-id'])) {
+			$this->profiler->stopRecording();
+			return '';
+		}
+
+		// Match the surrounding conversation: the compact timeline never flattens,
+		// so a flattened subtree would move the new reply out of its parent.
+		$smartThreading = !$this->pConfig->get($viewerUid, 'system', 'compact_timeline');
+
+		$page_dropping = $viewerUid && $this->pConfig->get($viewerUid, 'system', 'show_page_drop', true);
+		$root          = $this->dataProvider->getRootTemplateDataFromItem($comment, $viewerUid, self::MODE_DISPLAY, [], $page_dropping, $smartThreading);
+
+		$parent = $root ? $this->findNodeByUriId($root, (int) $comment['thr-parent-id']) : null;
+		$html   = $parent ? $this->renderItemHtml($parent, self::MODE_DISPLAY) : '';
+
+		$this->profiler->stopRecording();
+
+		return $html;
+	}
+
+	/**
+	 * Render a single conversation item (post or comment) without its replies,
+	 * so the client can refresh it in place after an activity (like, dislike,
+	 * announce, attendance) instead of rebuilding (and thereby collapsing) the
+	 * whole thread.
+	 *
+	 * @param int $uriId The URI ID of the item to render
+	 * @param int $uid The user ID of the viewer, or null for public view
+	 * @return string The rendered HTML of the single item node
+	 * @throws ImagickException
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public function renderItemByUriId(int $uriId, int $uid): string
+	{
+		$this->profiler->startRecording('rendering');
+		$this->statusEditor->registerAssets();
+
+		$viewerUid = $this->resolveViewerUid($uid);
+
+		$item = $this->dataProvider->fetchItemByUriId($uriId, $viewerUid);
+		if (empty($item)) {
+			$this->profiler->stopRecording();
+			return '';
+		}
+
+		$smartThreading = !$this->pConfig->get($viewerUid, 'system', 'compact_timeline');
+
+		$page_dropping = $viewerUid && $this->pConfig->get($viewerUid, 'system', 'show_page_drop', true);
+		$root          = $this->dataProvider->getRootTemplateDataFromItem($item, $viewerUid, self::MODE_DISPLAY, [], $page_dropping, $smartThreading);
+
+		$node = $root ? $this->findNodeByUriId($root, $uriId) : null;
+		if ($node !== null) {
+			$node['children'] = [];
+		}
+
+		$html = $node !== null ? $this->renderItemHtml($node, self::MODE_DISPLAY) : '';
+
+		$this->profiler->stopRecording();
+
+		return $html;
+	}
+
+	/**
+	 * Recursively look for a thread node by its URI ID.
+	 *
+	 * @param array $node The node to start from (thread root or any child)
+	 * @param int $uriId The URI ID to look for
+	 * @return array|null The matching node, or null when it isn't in the tree
+	 */
+	private function findNodeByUriId(array $node, int $uriId): ?array
+	{
+		if ((int) ($node['uriid'] ?? 0) === $uriId) {
+			return $node;
+		}
+
+		foreach ($node['children'] ?? [] as $child) {
+			$found = $this->findNodeByUriId($child, $uriId);
+			if ($found !== null) {
+				return $found;
+			}
+		}
+
+		return null;
 	}
 
 	/**

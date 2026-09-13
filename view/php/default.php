@@ -26,19 +26,19 @@
 	<?php if (!empty($page['nav'])) {
 		echo $page['nav'];
 	} ?>
-	<aside><?php if (!empty($page['aside'])) {
+	<aside id="aside-section"><?php if (!empty($page['aside'])) {
 		echo $page['aside'];
 	} ?></aside>
-	<section>
+	<section id="content-section">
 		<?php if (!empty($page['content'])) {
 			echo $page['content'];
 		} ?>
 		<div id="pause"></div> <!-- The pause/resume Ajax indicator -->
 		<div id="page-footer"></div>
 	</section>
-	<right_aside><?php if (!empty($page['right_aside'])) {
+	<div id="right-aside-section"><?php if (!empty($page['right_aside'])) {
 		echo $page['right_aside'];
-	} ?></right_aside>
+	} ?></div>
 	<footer><?php if (!empty($page['footer'])) {
 		echo $page['footer'];
 	} ?></footer>

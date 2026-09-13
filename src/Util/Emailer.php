@@ -36,7 +36,7 @@ class Emailer
 		private readonly BaseURL $baseUrl,
 		private readonly LoggerInterface $logger,
 		private readonly L10n $l10n,
-		private readonly ?EventDispatcherInterface $eventDispatcher = null,
+		private readonly EventDispatcherInterface $eventDispatcher,
 	) {
 		$this->siteEmailAddress = $this->config->get('config', 'sender_email');
 		if (empty($this->siteEmailAddress)) {
@@ -115,12 +115,10 @@ class Emailer
 	 */
 	public function send(IEmail $email): bool
 	{
-		if ($this->eventDispatcher) {
-			$emailData = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::EMAILER_SEND_PREPARE, ['email' => $email]),
-			)->getArray();
-			$email = $emailData['email'] ?? null;
-		}
+		$emailData = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::EMAILER_SEND_PREPARE, ['email' => $email]),
+		)->getArray();
+		$email = $emailData['email'] ?? null;
 
 		if (! ($email instanceof IEmail)) {
 			return true;
@@ -199,11 +197,9 @@ class Emailer
 			'sent'       => false,
 		];
 
-		if ($this->eventDispatcher) {
-			$hookdata = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::EMAILER_SEND, $hookdata),
-			)->getArray();
-		}
+		$hookdata = $this->eventDispatcher->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::EMAILER_SEND, $hookdata),
+		)->getArray();
 
 		if ($hookdata['sent']) {
 			return true;

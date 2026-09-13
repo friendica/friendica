@@ -4,13 +4,7 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<span id="settings_{{$addon}}_inflated" class="settings-block fakelink" style="display: {{if $open}}none{{else}}block{{/if}};" onclick="openClose('settings_{{$addon}}_expanded'); openClose('settings_{{$addon}}_inflated');">
-	<h3>{{$title}}</h3>
-</span>
-<div id="settings_{{$addon}}_expanded" class="settings-block" style="display: {{if $open}}block{{else}}none{{/if}};">
-	<span class="fakelink" onclick="openClose('settings_{{$addon}}_expanded'); openClose('settings_{{$addon}}_inflated');">
-		<h3>{{$title}}</h3>
-	</span>
+<summary class="settings-heading"><h2>{{$title}}</h2></summary>
 	{{$html nofilter}}
 {{if $submit}}
 	<div class="settings-submit-wrapper panel-footer">
@@ -36,4 +30,3 @@
     {{/if}}
 	</div>
 {{/if}}
-</div>

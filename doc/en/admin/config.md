@@ -314,3 +314,25 @@ If you want to have a more personalized closing line for the notification emails
     'config' => [
         'admin_name' => 'Marvin',
     ]
+
+## Outbound request restrictions
+
+Friendica rejects outbound requests to non-public IP addresses, including redirect targets.
+The node's own base URL is exempt.
+To allow other internal services, list their hostnames as a comma-separated string.
+Wildcards are allowed.
+
+    'system' => [
+        'allowed_internal_hosts' => 'media-proxy.internal, *.svc.cluster.local',
+    ]
+
+The same value can be set from the environment (`FRIENDICA_ALLOWED_INTERNAL_HOSTS`)
+or the console (`bin/console config system allowed_internal_hosts "media-proxy.internal, *.svc.cluster.local"`).
+
+The check can be disabled, but this is not recommended on public nodes:
+
+    'system' => [
+        'block_private_addresses' => false,
+    ]
+
+The environment equivalent is `FRIENDICA_BLOCK_PRIVATE_ADDRESSES` (`true`/`false`/`1`/`0`).

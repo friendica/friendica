@@ -6,7 +6,7 @@
   *}}
 <div id="adminpage">
 	<h1>{{$title}} - {{$page}}</h1>
-
+	<div class="settings-section">
 	<p>{{$logname}}</p>
 	{{if $error }}
 		<div id="admin-error-message-wrapper" class="alert alert-warning">
@@ -81,4 +81,5 @@
 			</table>
 		</form>
 	{{/if}}
+	</div>
 </div>

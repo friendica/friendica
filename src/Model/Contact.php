@@ -1295,7 +1295,7 @@ class Contact
 			$menu = [
 				'profile'  => [DI::l10n()->t('View Profile'), $profile_link, true],
 				'network'  => [$network_label, $network_url, false],
-				'edit'     => [DI::l10n()->t('View Contact'), $contact_url, false],
+				'edit'     => [DI::l10n()->t('Settings'), $contact_url, false],
 				'follow'   => [DI::l10n()->t('Connect/Follow'), $follow_link, true],
 				'unfollow' => [DI::l10n()->t('Unfollow'), $unfollow_link, true],
 				'mention'  => [$mention_label, $mention_url, false],
@@ -1306,7 +1306,7 @@ class Contact
 				'profile'  => [DI::l10n()->t('View Profile'), $profile_link, true],
 				'photos'   => [DI::l10n()->t('View Photos'), $photos_link, true],
 				'network'  => [$network_label, $network_url, false],
-				'edit'     => [DI::l10n()->t('View Contact'), $contact_url, false],
+				'edit'     => [DI::l10n()->t('Settings'), $contact_url, false],
 				'pm'       => [DI::l10n()->t('Message'), $pm_url, false],
 				'follow'   => [DI::l10n()->t('Connect/Follow'), $follow_link, true],
 				'unfollow' => [DI::l10n()->t('Unfollow'), $unfollow_link, true],

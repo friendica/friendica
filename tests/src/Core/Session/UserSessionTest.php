@@ -297,4 +297,12 @@ class UserSessionTest extends MockedTestCase
 		$userSession = new UserSession(new ArraySession($data));
 		$this->assertEquals($expected, $userSession->isUnauthenticated());
 	}
+
+	public function testRegenerateIdKeepsTheSessionContent(): void
+	{
+		$userSession = new UserSession(new ArraySession(['authenticated' => true, 'uid' => 21]));
+
+		self::assertInstanceOf(UserSession::class, $userSession->regenerateId());
+		self::assertEquals(21, $userSession->getLocalUserId());
+	}
 }

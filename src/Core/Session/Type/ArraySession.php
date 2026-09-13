@@ -24,6 +24,11 @@ class ArraySession implements IHandleSessions
 		return $this;
 	}
 
+	public function regenerateId(): IHandleSessions
+	{
+		return $this;
+	}
+
 	public function exists(string $name): bool
 	{
 		return !empty($this->data[$name]);

@@ -358,6 +358,18 @@ class APContact
 			}
 		}
 
+		// When there is no RSA key, look for an Ed25519 key published as a "Multikey"
+		// in "assertionMethod" and store its multibase form instead.
+		if (empty($apcontact['pubkey']) && !empty($compacted['w3id:assertionMethod'])) {
+			foreach (JsonLD::fetchElementArray($compacted, 'w3id:assertionMethod') ?? [] as $method) {
+				$multibase = JsonLD::fetchElement($method, 'w3id:publicKeyMultibase', '@value');
+				if (is_string($multibase) && str_starts_with($multibase, 'z6Mk')) {
+					$apcontact['pubkey'] = $multibase;
+					break;
+				}
+			}
+		}
+
 		$apcontact['manually-approve']   = (int) JsonLD::fetchElement($compacted, 'as:manuallyApprovesFollowers');
 		$apcontact['posting-restricted'] = (int) JsonLD::fetchElement($compacted, 'lemmy:postingRestrictedToMods');
 		$apcontact['suspended']          = (int) JsonLD::fetchElement($compacted, 'toot:suspended');

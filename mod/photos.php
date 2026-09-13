@@ -768,6 +768,8 @@ function photos_content()
 			'href'     => 'photo/' . $hires['resource-id'] . '-' . $hires['scale'] . Images::getExtensionByMimeType($hires['type']),
 			'title'    => DI::l10n()->t('View Full Size'),
 			'src'      => 'photo/' . $lores['resource-id'] . '-' . $lores['scale'] . Images::getExtensionByMimeType($lores['type']) . '?_u=' . DateTimeFormat::utcNow('ymdhis'),
+			'lheight'  => $lores['height'],
+			'lwidth'   => $lores['width'],
 			'height'   => $hires['height'],
 			'width'    => $hires['width'],
 			'album'    => $hires['album'],

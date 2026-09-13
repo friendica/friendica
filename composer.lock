@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5ae98cb26982cdb34599a8cec57de4b9",
+    "content-hash": "727ad7c510999316d4cbfcccca2fcbec",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -634,6 +634,78 @@
                 "jsonld"
             ],
             "time": "2026-05-19T21:13:39+00:00"
+        },
+        {
+            "name": "gapple/structured-fields",
+            "version": "v2.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gapple/structured-fields.git",
+                "reference": "4c6936249482d100cc56732aed8c163a76c10dd3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gapple/structured-fields/zipball/4c6936249482d100cc56732aed8c163a76c10dd3",
+                "reference": "4c6936249482d100cc56732aed8c163a76c10dd3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "httpwg/structured-field-tests": "*@dev",
+                "paragonie/constant_time_encoding": "^3.0.0",
+                "phpcompatibility/php-compatibility": "^10@dev",
+                "phpmd/phpmd": "^2.15",
+                "phpstan/phpstan": "^2.1",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpunit/phpunit": "^10.5",
+                "slevomat/coding-standard": "^8.15",
+                "squizlabs/php_codesniffer": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-develop": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "gapple\\StructuredFields\\": "src/",
+                    "gapple\\Tests\\StructuredFields\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT",
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Geoff Appleby"
+                }
+            ],
+            "description": "Library for Structured Field Values for HTTP",
+            "keywords": [
+                "http",
+                "rfc8941",
+                "rfc9651"
+            ],
+            "support": {
+                "issues": "https://github.com/gapple/structured-fields/issues",
+                "source": "https://github.com/gapple/structured-fields"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/gapple",
+                    "type": "github"
+                },
+                {
+                    "url": "https://ko-fi.com/gapple",
+                    "type": "ko_fi"
+                }
+            ],
+            "time": "2026-06-12T23:47:46+00:00"
         },
         {
             "name": "geekwright/po",
@@ -2098,6 +2170,18 @@
                 "npm-asset/jquery": ">=1.7"
             },
             "type": "npm-asset"
+        },
+        {
+            "name": "npm-asset/unpoly",
+            "version": "3.14.3",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/unpoly/-/unpoly-3.14.3.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
         },
         {
             "name": "oomphinc/composer-installers-extender",
@@ -9916,6 +10000,7 @@
         "ext-openssl": "*",
         "ext-posix": "*",
         "ext-simplexml": "*",
+        "ext-sodium": "*",
         "ext-xml": "*"
     },
     "platform-dev": {},

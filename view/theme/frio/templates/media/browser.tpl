@@ -53,7 +53,7 @@
 					{{foreach $files as $f}}
 					<div class="photo-album-image-wrapper">
 						<a href="#" class="photo-album-photo-link" data-link="{{$f.0}}" data-filename="{{$f.1}}" data-img="{{$f.2}}" data-alt="{{$f.3}}">
-							<img src="{{$f.2}}" alt="{{if $f.3}}{{$f.3}}{{else}}{{$f.1}}{{/if}}" {{if $f.3}}class="has-alt-description" title="{{$f.3}}"{{else}}class="empty-description" title="{{$f.1}}"{{/if}}/>
+							<img src="{{$f.2}}" alt="{{$f.3}}" {{if $f.3}}class="has-alt-description" title="{{$f.3}}"{{else}}class="empty-description"{{/if}}/>
 							<p>{{$f.1}}</p>
 						</a>
 					</div>

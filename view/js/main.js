@@ -20,25 +20,82 @@ if (!Element.prototype.matches) {
 		};
 }
 
-/**
- * Register a function to be called on initial page load and after SPA navigation
- * This provides a unified way to handle initialization for both traditional page loads
- * and Single Page Application (SPA) content updates.
- *
- * @param {Function} fn - The function to execute on page load and SPA navigation
- * @example
- * function initMyModule() {
- *     // Initialization code
- * }
- * onPageLoad(initMyModule);
- */
-function onPageLoad(fn) {
-	if (typeof fn !== 'function') {
-		return;
+const ModuleLifecycleReadyEvent = Object.freeze({
+	DOCUMENT: 'document',
+	WINDOW: 'window'
+});
+
+const registerModuleLifecycle = function (target, initialize, readyEvent) {
+	if (typeof target !== 'string' || target === '') {
+		return null;
 	}
-	$(document).ready(fn);
-	window.addEventListener('theme:reload', fn);
-}
+
+	if (!window.__friendica_unpoly_lifecycle_registry) {
+		window.__friendica_unpoly_lifecycle_registry = new Map();
+	}
+
+	const initializerFingerprint = (function () {
+		if (typeof initialize !== 'function') {
+			return 'init';
+		}
+
+		if (initialize.name) {
+			return initialize.name;
+		}
+
+		try {
+			return initialize.toString().replace(/\s+/g, ' ').trim().substring(0, 240);
+		} catch (error) {
+			return 'anonymous';
+		}
+	})();
+
+	const registryKey = target + '::' + initializerFingerprint + '::' + readyEvent;
+	if (window.__friendica_unpoly_lifecycle_registry.has(registryKey)) {
+		return window.__friendica_unpoly_lifecycle_registry.get(registryKey);
+	}
+
+	const refresh = function () {
+		const targetElement = document.querySelector(target);
+		if (!targetElement || typeof initialize !== 'function') {
+			return null;
+		}
+		return initialize(targetElement);
+	};
+
+	if (window.addEventListener) {
+		window.addEventListener('spa:navigate', refresh, { passive: true });
+
+		if (readyEvent === ModuleLifecycleReadyEvent.WINDOW) {
+			if (spaEnabled) {
+				window.addEventListener('spa:window:load', refresh, { passive: true });
+			} else {
+				$(window).load(refresh);
+			}
+		} else {
+			if (spaEnabled) {
+				window.addEventListener('spa:document:ready', refresh, { passive: true });
+			} else {
+				$(document).ready(refresh);
+			}
+		}
+
+		if ((document.readyState === 'complete' || document.readyState === 'interactive') && !window.__spa_reinit_phase) {
+			setTimeout(refresh, 0);
+		}
+	}
+
+	window.__friendica_unpoly_lifecycle_registry.set(registryKey, null);
+	return null;
+};
+
+window.onDocumentReady = function (target, initialize) {
+	return registerModuleLifecycle(target, initialize, ModuleLifecycleReadyEvent.DOCUMENT);
+};
+
+window.onWindowLoad = function (target, initialize) {
+	return registerModuleLifecycle(target, initialize, ModuleLifecycleReadyEvent.WINDOW);
+};
 
 function resizeIframe(obj) {
 	_resizeIframe(obj, 0);
@@ -155,13 +212,20 @@ var last_popup_button = null;
 var lockLoadContent = false;
 var originalTitle = document.title;
 
+// Update original title on SPA navigation to prevent ping handler from resetting to stale title
+if (window.addEventListener) {
+	window.addEventListener('spa:navigate', function () {
+		originalTitle = document.title;
+	});
+}
+
 // Scroll to item deduplication flags
 var scrollToItemInProgress = false;
 var lastScrollToItemId = null;
 
 const urlRegex = /^(?:https?:\/\/|\s)[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})(?:\/+[a-z0-9_.:;-]*)*(?:\?[&%|+a-z0-9_=,.:;-]*)?(?:[&%|+&a-z0-9_=,:;.-]*)(?:[!#\/&%|+a-z0-9_=,:;.-]*)}*$/i;
 
-$(function() {
+window.onDocumentReady('body', function() {
 	$.ajaxSetup({cache: false});
 
 	/* setup comment textarea buttons */
@@ -170,7 +234,7 @@ $(function() {
 	 * 		data-bbcode="<string>" : name of the bbcode element to insert. insertFormatting() will insert it as "[name][/name]"
 	 * 		data-id="<string>" : id of the comment, used to find other comment-related element, like the textarea
 	 * */
-	$('body').on('click','[data-role="insert-formatting"]', function(e) {
+	$('body').off('click.friendica-main', '[data-role="insert-formatting"]').on('click.friendica-main', '[data-role="insert-formatting"]', function(e) {
 		e.preventDefault();
 		var o = $(this);
 		var bbcode = o.data('bbcode');
@@ -189,7 +253,7 @@ $(function() {
 
 	/* event from comment textarea button popups */
 	/* insert returned bbcode at cursor position or replace selected text */
-	$('body').on('fbrowser.photo.comment', function(e, filename, bbcode, id) {
+	$('body').off('fbrowser.photo.comment').on('fbrowser.photo.comment', function(e, filename, bbcode, id) {
 		$.colorbox.close();
 		// Support both receiving an ID postfix appended to comment-edit-id or the full ID
 		var textarea = document.getElementById('comment-edit-text-' + id) || document.getElementById(id);
@@ -204,11 +268,15 @@ $(function() {
 		.bbco_autocomplete('bbcode');
 
 	// Ensures asynchronously-added comment forms recognize mentions, tags and BBCodes as well
-	document.addEventListener("postprocess_liveupdate", function() {
+	if (window.__friendica_postprocess_liveupdate_autocomplete) {
+		document.removeEventListener("postprocess_liveupdate", window.__friendica_postprocess_liveupdate_autocomplete);
+	}
+	window.__friendica_postprocess_liveupdate_autocomplete = function() {
 		$(".comment-edit-wrapper textarea, .wall-item-comment-wrapper textarea")
 			.editor_autocomplete(baseurl + '/search/acl')
 			.bbco_autocomplete('bbcode');
-	});
+	};
+	document.addEventListener("postprocess_liveupdate", window.__friendica_postprocess_liveupdate_autocomplete);
 
 	/* popup menus */
 	function close_last_popup_menu() {
@@ -220,7 +288,7 @@ $(function() {
 			last_popup_button = null;
 		}
 	}
-	$('a[rel^="#"]').click(function(e) {
+	$('a[rel^="#"]').off('click.friendica-main').on('click.friendica-main', function(e) {
 		e.preventDefault();
 		var parent = $(this).parent();
 		var isSelected = (last_popup_button && parent.attr('id') == last_popup_button.attr('id'));
@@ -247,7 +315,7 @@ $(function() {
 		}
 		return false;
 	});
-	$('html').click(function() {
+	$('html').off('click.friendica-main').on('click.friendica-main', function() {
 		close_last_popup_menu();
 	});
 
@@ -258,11 +326,6 @@ $(function() {
 		'transition' : 'elastic',
 		'maxWidth' : '100%'
 	});
-
-	/* notifications template */
-	var notifications_all = unescape($('<div>').append($("#nav-notifications-see-all").clone()).html()); //outerHtml hack
-	var notifications_mark = unescape($('<div>').append($("#nav-notifications-mark-all").clone()).html()); //outerHtml hack
-	var notifications_empty = unescape($("#nav-notifications-menu").html());
 
 	/* Ensure loading is visible when notifications menu is opened (if no notifications loaded yet)*/
 	$('#nav-notifications-linkmenu, #nav-notifications-menu-btn').on('click', function() {
@@ -300,6 +363,7 @@ $(function() {
 			updateCounter(type, number);
 		});
 
+		/* NOTE: frio does not have intro-update-li or mail-update-li */
 		var intro = data['intro'];
 		if (intro == 0) {
 			intro = ''; $('#intro-update-li').removeClass('show')
@@ -335,18 +399,27 @@ $(function() {
 		// Hide loading state when we receive notification data
 		$("#nav-notifications-loading").hide();
 
-		if (data.notifications.length == 0) {
+		var navNotifications = Array.isArray(data.notifications) ? data.notifications : [];
+		if (navNotifications.length == 0) {
 			$("#nav-notifications-empty").show();
 		} else {
 			$("#nav-notifications-empty").hide();
 			var nnm = $("#nav-notifications-menu");
-			// Preserve the loading and empty state elements when rebuilding the menu
+			// Preserve control/state elements from the current DOM to avoid stale template snapshots
+			var seeAllElement = nnm.find("#nav-notifications-see-all");
+			var markAllElement = nnm.find("#nav-notifications-mark-all");
 			var loadingElement = nnm.find("#nav-notifications-loading");
 			var emptyElement = nnm.find("#nav-notifications-empty");
 
-			nnm.html(notifications_all + notifications_mark);
+			nnm.empty();
+			if (seeAllElement.length > 0) {
+				nnm.append(seeAllElement);
+			}
+			if (markAllElement.length > 0) {
+				nnm.append(markAllElement);
+			}
 
-			// Re-add the loading and empty elements if they existed
+			// Re-add loading and empty state elements if they existed
 			if (loadingElement.length > 0) {
 				nnm.append(loadingElement);
 			}
@@ -359,12 +432,12 @@ $(function() {
 			var notification_id = 0;
 
 			// Insert notifs into the notifications-menu
-			$(data.notifications).each(function(key, navNotif) {
+			$(navNotifications).each(function(key, navNotif) {
 				nnm.append(navNotif.html);
 			});
 
 			// Desktop Notifications
-			$(data.notifications.reverse()).each(function(key, navNotif) {
+			$(navNotifications.slice().reverse()).each(function(key, navNotif) {
 				notification_id = parseInt(navNotif.timestamp);
 				if (notification_lastitem !== null && notification_id > notification_lastitem && Number(navNotif.seen) === 0) {
 					if (getNotificationPermission() === "granted") {
@@ -414,15 +487,19 @@ $(function() {
 	});
 
 	// Asynchronous calls are deferred until the very end of the page load to ease on slower connections
-	window.addEventListener("load", function(){
-		NavUpdate();
-		if (typeof acl !== 'undefined') {
-			acl.get(0, 100);
-		}
-	});
+	// Only register once, not on every SPA navigation
+	if (typeof window.__friendica_main_load_handler === 'undefined') {
+		window.__friendica_main_load_handler = true;
+		window.addEventListener("load", function(){
+			NavUpdate();
+			if (typeof acl !== 'undefined') {
+				acl.get(0, 100);
+			}
+		});
+	}
 
 	// Allow folks to stop the ajax page updates with the pause/break key
-	$(document).keydown(function(event) {
+	$(document).off('keydown.friendica-main-pause').on('keydown.friendica-main-pause', function(event) {
 		// Pause/Break or Ctrl + Space
 		if (event.which === 19 || (!event.metaKey && !event.shiftKey && !event.altKey && event.ctrlKey && event.which === 32)) {
 			event.preventDefault();
@@ -441,7 +518,7 @@ $(function() {
 	});
 
 	// Scroll to the next/previous thread when pressing J and K
-	$(document).keydown(function (event) {
+	$(document).off('keydown.friendica-main-nav').on('keydown.friendica-main-nav', function (event) {
 		var threads = $('.thread_level_1');
 		if ((event.keyCode === 74 || event.keyCode === 75) && !$(event.target).is('textarea, input')) {
 			var scrollTop = $(window).scrollTop();
@@ -464,43 +541,39 @@ $(function() {
 		}
 	});
 
-	// Function to initialize infinite scroll - can be called multiple times
-	function initInfiniteScroll() {
-		console.debug('[Main] initInfiniteScroll called');
-		console.debug('[Main] typeof infinite_scroll:', typeof infinite_scroll);
-		console.debug('[Main] #scroll-loader length:', $('#scroll-loader').length);
-		
-		// Only initialize if infinite_scroll is defined
-		if (typeof infinite_scroll !== 'undefined') {
-			// Remove any existing scroll handler to prevent duplicates
-			$(window).off('scroll.infinite');
-			
-			$(window).on('scroll.infinite', function(e) {
-				if ($(document).height() != $(window).height()) {
-					// First method that is expected to work - but has problems with Chrome
-					if ($(window).scrollTop() > ($(document).height() - $(window).height() * 1.5))
-						loadScrollContent();
-				} else {
-					// This method works with Chrome - but seems to be much slower in Firefox
-					if ($(window).scrollTop() > (($("section").height() + $("header").height() + $("footer").height()) - $(window).height() * 1.5)) {
-						loadScrollContent();
-					}
-				}
-			});
-			console.debug('[Main] Infinite scroll initialized - scroll handler attached');
-		} else {
-			console.debug('[Main] Infinite scroll NOT initialized - missing infinite_scroll object');
-		}
-	}
-	
-	// Register event listener for SPA navigation - do this immediately so it's available even before DOM ready
-	if (window.addEventListener) {
-		window.addEventListener('spa:initInfiniteScroll', initInfiniteScroll);
-	}
-	
 	// Initialize infinite scroll on first page load
-	initInfiniteScroll();
+	if (typeof initInfiniteScroll === 'function') {
+		initInfiniteScroll();
+	}
 });
+
+// Function to initialize infinite scroll - can be called multiple times
+function initInfiniteScroll() {
+
+	// Only initialize if infinite_scroll is defined
+	if (typeof infinite_scroll !== 'undefined') {
+		// Remove any existing scroll handler to prevent duplicates
+		$(window).off('scroll.infinite');
+
+		$(window).on('scroll.infinite', function(e) {
+			if ($(document).height() != $(window).height()) {
+				// First method that is expected to work - but has problems with Chrome
+				if ($(window).scrollTop() > ($(document).height() - $(window).height() * 1.5))
+					loadScrollContent();
+			} else {
+				// This method works with Chrome - but seems to be much slower in Firefox
+				if ($(window).scrollTop() > (($("section").height() + $("header").height() + $("footer").height()) - $(window).height() * 1.5)) {
+					loadScrollContent();
+				}
+			}
+		});
+	}
+}
+
+// Register event listener for SPA navigation - do this immediately
+if (window.addEventListener) {
+	window.addEventListener('spa:initInfiniteScroll', initInfiniteScroll);
+}
 
 /**
  * Inserts a BBCode tag in the comment textarea identified by id
@@ -564,11 +637,8 @@ function triggerLiveUpdates(force, guid) {
 		showProcessing();
 	}
 	force_update = force;
-	console.debug('[Main] triggerLiveUpdates called with force:', force, 'guid:', guid);
 	['network', 'profile', 'channel', 'community', 'notes', 'display', 'contact'].forEach(function (src) {
-		console.debug('[Main] Checking live-' + src + ', exists=' + $('#live-' + src).length + ', force=' + force + ', updateContent=' + updateContent + ', isDisplay=' + $('#live-display').length);
 		if ($('#live-' + src).length && (force || (updateContent && src !== 'display'))) {
-			console.debug('[Main] Triggering liveUpdate for: ' + src + ', guid=' + guid);
 			liveUpdate(src, force, guid);
 		}
 	});
@@ -585,18 +655,25 @@ function triggerLiveUpdates(force, guid) {
  * @param {string} elementId The item element id
  * @returns {undefined}
  */
-function scrollToItem(elementId) {
+function scrollToItem(elementId, fallbackId) {
 	if (typeof elementId === "undefined") {
 		return false;
 	}
-	
+
 	// Prevent multiple calls for the same element
 	if (scrollToItemInProgress && lastScrollToItemId === elementId) {
-		console.debug('[Main] scrollToItem: Already in progress for ' + elementId + ', skipping duplicate call');
 		return false;
 	}
-	
+
 	var $el = $("#" + elementId + " > .media");
+	// Themes without a .media wrapper (e.g. the base theme) still scroll to the item itself
+	if (!$el.length) {
+		$el = $("#" + elementId);
+	}
+	// Fall back to the nearest existing ancestor when the target is gone
+	if (!$el.length && fallbackId) {
+		return scrollToItem(fallbackId);
+	}
 	// Test if the Item exists
 	if (!$el.length) {
 		return false;
@@ -625,7 +702,7 @@ function scrollToItem(elementId) {
 		.done(function () {
 			// Highlight post/comment with ID  (GUID)
 			$el.animate(colWhite, 1000).animate(colShiny).animate({ backgroundColor: "transparent" }, 600);
-			
+
 			// Reset flags after animation completes
 			setTimeout(function() {
 				scrollToItemInProgress = false;
@@ -655,14 +732,11 @@ function NavUpdate() {
 					}
 
 					// start live update
-					console.debug('[Main] Starting live updates for sources: network, profile, channel, community, notes, display, contact');
 					triggerLiveUpdates(force_update);
 
 					if ($('#live-network').length && !$('#live-display').length) {
-						console.debug('[Main] Triggering networkUpdate');
 						networkUpdate(force_update);
 					} else if (!$('#live-display').length) {
-						console.debug('[Main] No live-network element or on display page, using ping_network fallback');
 						var update_url = 'ping_network?ping=1';
 						if (force_update) {
 							showFetching();
@@ -695,11 +769,11 @@ function NavUpdate() {
 				}
 			});
 	}
+	clearTimeout(timer);
 	timer = setTimeout(NavUpdate, 30000);
 }
 
 function updateConvItems(data, guid) {
-	console.debug('[Main] updateConvItems called, guid:', guid);
 	// add a new thread
 	$('.toplevel_item',data).each(function() {
 		var ident = $(this).attr('id');
@@ -744,13 +818,11 @@ function updateConvItems(data, guid) {
 
 function getUpdateUrl(src)
 {
-	console.debug('[Main] getUpdateUrl called for src=' + src + ', profile_uid=' + (typeof profile_uid !== 'undefined' ? profile_uid : 'undefined') + ', netargs=' + netargs + ', update_item=' + update_item);
 	let force = force_update || $(document).scrollTop() === 0;
 
 	var udargs = ((netargs.length) ? '/' + netargs : '');
 
 	var update_url = src + udargs + '&p=' + profile_uid + '&force=' + (force ? 1 : 0) + '&item=' + update_item;
-	console.debug('[Main] getUpdateUrl: generated url=' + update_url);
 
 	if (getUrlParameter('page')) {
 		update_url += '&page=' + getUrlParameter('page');
@@ -785,14 +857,11 @@ function getUpdateUrl(src)
 }
 
 function liveUpdate(src, force, guid) {
-	console.debug('[Main] liveUpdate called for src:', src, 'guid:', guid, 'stopped:', stopped, 'profile_uid:', (typeof profile_uid !== 'undefined' ? profile_uid : 'undefined'), 'in_progress:', in_progress);
 	if ((src == null) || stopped || !profile_uid) {
-		console.debug('[Main] liveUpdate skipped: src=null or stopped or no profile_uid');
 		$('.like-rotator').hide(); return;
 	}
 
 	if (($('.comment-edit-text-full').length) || in_progress) {
-		console.debug('[Main] liveUpdate delayed: comment edit in progress or in_progress=true');
 		if (livetime) {
 			clearTimeout(livetime);
 		}
@@ -807,10 +876,9 @@ function liveUpdate(src, force, guid) {
 
 	in_progress = true;
 
-	var orgHeight = $("section").height();
+	var orgHeight = $(document).height();
 
 	var update_url = getUpdateUrl(src);
-	console.debug('[Main] liveUpdate: calling getUpdateUrl for src=' + src + ', result url=' + update_url);
 
 	if (force_update) {
 		force_update = false;
@@ -835,6 +903,10 @@ function liveUpdate(src, force, guid) {
 				// Update the scroll position.
 				if (guid) {
 					scrollToItem("item-" + guid);
+				} else if (!force) {
+					// Keep the current reading position when new items are inserted above it.
+					var delta = $(document).height() - orgHeight;
+					$('html, body').animate({scrollTop: $(window).scrollTop() + delta}, 200);
 				}
 			})
 		})
@@ -910,9 +982,11 @@ function doActivityItem(ident, verb, un) {
 	showPosting();
 	verb = un ? 'un' + verb : verb;
 	$.post('item/' + ident.toString() + '/activity/' + verb)
-		.done(function() { 
+		.done(function(data) {
 			showProcessing();
-			updateItem(ident.toString()); 
+			if (!refreshItemActivity(ident, data)) {
+				updateItem(ident.toString());
+			}
 		})
 		.always(function() { hideLoading(); });
 	liking = 1;
@@ -923,9 +997,9 @@ function doFollowThread(ident) {
 	$('#like-rotator-' + ident.toString()).show();
 	showPosting();
 	$.post('item/' + ident.toString() + '/follow')
-		.done(function() { 
+		.done(function() {
 			showProcessing();
-			updateItem(ident.toString()); 
+			updateItem(ident.toString());
 		})
 		.always(function() { hideLoading(); });
 	liking = 1;
@@ -936,9 +1010,9 @@ function doCompleteThread(ident) {
 	$('#like-rotator-' + ident.toString()).show();
 	showPosting();
 	$.post('item/' + ident.toString() + '/complete')
-		.done(function() { 
+		.done(function() {
 			showProcessing();
-			updateItem(ident.toString()); 
+			updateItem(ident.toString());
 		})
 		.always(function() { hideLoading(); });
 	liking = 1;
@@ -1023,6 +1097,65 @@ function doIgnoreThread(ident) {
 		});
 }
 
+/**
+ * Submits one vote request per checked option (multiple-choice polls need
+ * one Create activity per option, same as Mastodon's own client behavior),
+ * then reports success or failure with a toast, matching how sysmsgs
+ * notices/info are already shown above.
+ */
+function doPollVote(ident, votedMessage, failedMessage) {
+	ident = ident.toString();
+	var $button = $('#poll-form-' + ident + ' .poll-vote-button');
+	if ($button.prop('disabled')) {
+		// Already submitting — ignore a rapid re-click/re-submit instead of
+		// sending duplicate vote activities before the first request returns.
+		return;
+	}
+
+	var options = [];
+	$('input[name="poll-option-' + ident + '"]:checked').each(function() {
+		options.push($(this).val());
+	});
+	if (options.length === 0) {
+		return;
+	}
+
+	$button.prop('disabled', true);
+	showPosting();
+
+	// Tracked individually rather than via $.when.apply(), which rejects the whole
+	// batch as soon as one option fails — that would misreport a partial success
+	// (e.g. 2 of 3 options recorded) as a total failure.
+	var total = options.length;
+	var succeeded = 0;
+	var settled = 0;
+
+	function onSettled() {
+		settled++;
+		if (settled < total) {
+			return;
+		}
+		hideLoading();
+		if (succeeded > 0) {
+			// At least one vote landed — the form is done, same as a single-choice vote.
+			$('#poll-form-' + ident).addClass('hidden');
+			$.jGrowl(votedMessage, {sticky: false, theme: 'info', life: 5000});
+		}
+		if (succeeded < total) {
+			$button.prop('disabled', succeeded > 0);
+			$.jGrowl(failedMessage, {sticky: false, theme: 'info', life: 5000});
+		}
+	}
+
+	options.forEach(function(option) {
+		$.post('item/' + ident + '/vote/' + option)
+			.done(function() {
+				succeeded++;
+			})
+			.always(onSettled);
+	});
+}
+
 function getPosition(e) {
 	var cursor = {x:0, y:0};
 
@@ -1091,17 +1224,13 @@ function lockview(event, type, id) {
 }
 
 function post_comment(id) {
-	console.debug('[Main] post_comment called for item id:', id);
-	console.debug('[Main] commentBusy before:', commentBusy);
-	
+
 	if (commentBusy) {
-		console.debug('[Main] post_comment: Already busy, ignoring duplicate call');
 		return false;
 	}
-	
+
 	unpause();
 	commentBusy = true;
-	console.debug('[Main] post_comment: Setting commentBusy=true, starting post');
 	showPosting();
 	$('body').css('cursor', 'wait');
 	$.post(
@@ -1110,9 +1239,7 @@ function post_comment(id) {
 	)
 		.done(function(data) {
 			showProcessing();
-			console.debug('[Main] post_comment: AJAX response received for id:', id);
 			if (data.success) {
-				console.debug('[Main] post_comment: Comment posted successfully');
 				$("#comment-edit-wrapper-" + id).hide();
 				$("#comment-edit-text-" + id).val('');
 				var textarea = document.getElementById("comment-edit-text-" + id);
@@ -1122,16 +1249,15 @@ function post_comment(id) {
 				if (timer) {
 					clearTimeout(timer);
 				}
-				console.debug('[Main] post_comment: Calling triggerLiveUpdates with guid:', data.guid ?? null);
-				updateItem(id, data.guid ?? null);
+				if (!insertPostedComment(id, data)) {
+					updateItem(id, data.guid ?? null);
+				}
 			}
 			if (data.reload) {
-				console.debug('[Main] post_comment: Server requested reload');
 				window.location.href=data.reload;
 			}
 		})
 		.always(function() {
-		console.debug('[Main] post_comment: AJAX completed, setting commentBusy=false');
 		hideLoading();
 		commentBusy = false;
 		$('body').css('cursor', 'auto');
@@ -1176,20 +1302,20 @@ function showHideComments(id) {
 function loadMoreComments(uriId, itemId, existing) {
 	var button = $('#load-more-comments-' + itemId);
 	var loadingText = $('#load-more-loading-' + itemId);
-	
+
 	if (button.hasClass('loading') || commentBusy) {
 		return;
 	}
-	
+
 	// Hide button, show loading text (which contains the rotator)
 	button.addClass('loading').prop('disabled', true).hide();
 	loadingText.show();
 	commentBusy = true;
 	showFetching();
-	
+
 	// Parse existing JSON string if it's a string, or use as-is if already an array
 	var existingArray = typeof existing === 'string' ? JSON.parse(existing) : existing;
-	
+
 	$.get({
 		url: 'item/' + uriId + '/comments',
 		data: {
@@ -1204,13 +1330,13 @@ function loadMoreComments(uriId, itemId, existing) {
 			var $data = $(data);
 			// Find all elements with id starting with "item-comments-" or "item-"
 			var allItems = $data.find('[id^="item-comments-"], [id^="item-"]').addBack('[id^="item-comments-"], [id^="item-"]');
-			
+
 			// Filter to only keep items that don't already exist on the page
 			var newItems = allItems.filter(function() {
 				var id = $(this).attr('id');
 				return id && $('#' + id).length === 0;
 			});
-			
+
 			if (newItems.length > 0) {
 				// Replace the button with the new comments
 				button.replaceWith(newItems);
@@ -1233,6 +1359,116 @@ function loadMoreComments(uriId, itemId, existing) {
 	.always(function() {
 		commentBusy = false;
 	});
+}
+
+// Splice a freshly posted reply into an already loaded thread instead of
+// rebuilding it. Rebuilding drops loaded and among-strangers comments in the
+// compact conversation view, so scrollToItem would land nowhere. Returns false
+// when this can't be handled here and the caller should fall back.
+function insertPostedComment(parentItemId, data) {
+	if (!data || !data.guid || !data['comment-uri-id'] || !data['parent-uri-id']) {
+		return false;
+	}
+
+	// data-uri-id avoids escaping guids that aren't valid selectors
+	var parent = '[data-uri-id="' + data['parent-uri-id'] + '"]';
+	if (!$(parent).length) {
+		return false;
+	}
+
+	$.get('item/' + data['comment-uri-id'] + '/comment')
+		.done(function(html) {
+			// keepScripts: the comment form carries an inline <script> that wires up its dropzone
+			var $new = $('<div>').append($.parseHTML(html, document, true)).find(parent).first();
+			if (!$new.length || !$new.find('[data-uri-id="' + data['comment-uri-id'] + '"]').length) {
+				updateItem(parentItemId, data.guid);
+				return;
+			}
+
+			// The base theme wraps a comment and its children in a .children div
+			var $old     = $(parent);
+			var $oldWrap = $old.closest('.children');
+			var $newWrap = $new.closest('.children');
+
+			if ($oldWrap.length && $newWrap.length) {
+				$oldWrap.replaceWith($newWrap);
+			} else {
+				$old.replaceWith($new);
+			}
+
+			document.dispatchEvent(new Event('postprocess_liveupdate'));
+			scrollToItem('item-' + data.guid);
+
+			// Keep the notification poll going without forcing a thread rebuild now
+			clearTimeout(timer);
+			timer = setTimeout(NavUpdate, 30000);
+		})
+		.fail(function() {
+			updateItem(parentItemId, data.guid);
+		});
+
+	return true;
+}
+
+// Refresh the reaction/response counters of a single item after an activity
+// (like, dislike, announce, attendance) so the thread isn't rebuilt - and, in
+// the compact conversation view, collapsed - just to bump a number. Only the
+// counter blocks are swapped; the action buttons are already updated by the
+// caller, but not the counters on them. The post body and comment box are left
+// alone. Returns false when the caller should fall back to updateItem() (e.g.
+// the base theme, which has no <article> wrapper).
+function refreshItemActivity(itemId, data) {
+	if (!data || data.status !== 'ok' || !data['uri-id']) {
+		return false;
+	}
+
+	// data-uri-id avoids escaping guids that aren't valid selectors
+	var item = '[data-uri-id="' + data['uri-id'] + '"]';
+	var $liveArticle = $(item + ' > article.media');
+	if (!$liveArticle.length) {
+		return false;
+	}
+
+	$.get('item/' + data['uri-id'] + '/node')
+		.done(function(html) {
+			var $newArticle = $('<div>').append($.parseHTML(html)).find(item + ' > article.media').first();
+			if (!$newArticle.length) {
+				updateItem(itemId.toString());
+				return;
+			}
+
+			// Swap the per-button counters (the caller only toggled the pressed
+			// state) plus the two response blocks - but not the buttons, body or
+			// comment box, which carry state and init the fresh markup would lose.
+			// A like can promote the viewer's own copy of a public post, changing
+			// its item id, so match the buttons by their stable verb prefix.
+			$newArticle.find('.wall-item-actions [id] > span.total').each(function() {
+				var $fresh = $(this);
+				var prefix = $fresh.parent().attr('id').replace(/\d+$/, '');
+				var $shown = $liveArticle.find('.wall-item-actions [id^="' + prefix + '"] > span.total').first();
+				$shown.replaceWith($fresh);
+			});
+
+			var $shownEmoji = $liveArticle.find('.wall-emoji-responses').first();
+			var $freshEmoji = $newArticle.find('.wall-emoji-responses').first();
+			if ($shownEmoji.length && $freshEmoji.length) {
+				$shownEmoji.replaceWith($freshEmoji);
+			}
+
+			var $shownResponses = $liveArticle.find('div.wall-item-responses').first();
+			var $freshResponses = $newArticle.find('div.wall-item-responses').first();
+			if ($shownResponses.length && $freshResponses.length) {
+				$shownResponses.replaceWith($freshResponses);
+			}
+
+			clearTimeout(timer);
+			timer = setTimeout(NavUpdate, 30000);
+		})
+		.fail(function(xhr) {
+			updateItem(itemId.toString());
+		});
+
+	return true;
 }
 
 function preview_post() {
@@ -1259,11 +1495,11 @@ function preview_post() {
 function fix_preview_img_wrap(index){
 	/* We don't know how long it will take the server to do the ajax request
 	   so we need to monitor the preview pane for a DOM mutation.
-	   
+
 	   We also do not want to attach the mutation observer unless previewing
 	   and we do not need this on pages without the jot composer. This might
-	   be in feed, in modal, or on a separate page so check for parent obj.	   
-	   
+	   be in feed, in modal, or on a separate page so check for parent obj.
+
 	   We only want ot use a Mutation Observer if the browser supports it
 	   (and most do) but just in case there is a fallback to a timeOut method.
 	*/
@@ -1271,7 +1507,7 @@ function fix_preview_img_wrap(index){
 	if ("MutationObserver" in window){
 		const targetElement = (!index && $('#jot-preview-content .tread-wrapper')) ? $('#jot-preview-content .tread-wrapper') : $('#comment-edit-preview-'+index+' .tread-wrapper');
 		const parentToWatch = (!index && document.getElementById('jot-preview-content')) ? document.getElementById('jot-preview-content') : document.getElementById('comment-edit-preview-'+index);	/* jQuery obj will not work! */
-		
+
 		const observer = new MutationObserver((mutationList, observer) => {
 			for (const mutation of mutationList) {
 				if (mutation.type === "childList") {
@@ -1299,14 +1535,14 @@ function masonry_or_not(parentElement){
 	/* This convoluted function grabs the preview contents as rendered by Friendica
 	   and then tries to determine if it is one of the scenarios in which masonry
 	   layout will not be shown and returns boolean true|false to the caller.
-	   
+
 	   Normally the masonry layout is only shown if:
 	   * There are multiple images in the post
 	   * The images are consecutive
 	   * There are no other elements in between them.
 	   * There are no raw text nodes immediately before or after any of them.
 	   * There is no paragraph after the last one (a DIV is okay though)
-	   
+
 	   This function assumes a masonry layout could be shown, unless it should find
 	   one of the above conditions is not met.
 	*/
@@ -1339,7 +1575,7 @@ function masonry_or_not(parentElement){
 				} else {
 					// there is no next sibling
 				}
-					
+
 			} else if( $(element).parent('p').length > 0 ){
 				// check if img has other stuff in with it
 				$(element).parent().contents().filter(function(){
@@ -1348,7 +1584,7 @@ function masonry_or_not(parentElement){
 						gallery = false;
 						return;
 					}
-				});	
+				});
 				// if this element has a next sibling and it has an image in it
 				if ( $(element).parent().next().length > 0 ){
 					// there IS a next sibling
@@ -1365,7 +1601,7 @@ function masonry_or_not(parentElement){
 					}
 				} else {
 					// there is no next sibling
-				}			
+				}
 			} else {
 				// no clue what element this is inside of so NOT a gallery
 				gallery = false;
@@ -1417,8 +1653,8 @@ function preview_post_img(index){
 			   jQuery promise().done() or count tracking or MutationObserver
 			   all cause infinite loops. The ONLY way to know if the above is
 			   done manipulating the DOM is to compare the number of FIGURE
-			   tags to the original IMAGE count. If they match, it's done.			
-			*/ 
+			   tags to the original IMAGE count. If they match, it's done.
+			*/
 			var condition = setInterval(function(){
 				if( $(parentElement+" figure").length === $images.length ){
 					clearInterval(condition);
@@ -1448,7 +1684,7 @@ function preview_masonry_rows(index) {
 		$(parentElement+" .wall-item-body").css({visibility: 'visible'});
 		return;
 	}
-	else if ($images.length === 1){ 
+	else if ($images.length === 1){
 		$images.parent().wrap('<div class="body-attach"></div>');
 		$(parentElement+" .wall-item-decor img").hide();
 		$(parentElement+" .wall-item-body").removeClass('img-processing');
@@ -1504,9 +1740,9 @@ function preview_masonry_rows(index) {
 			// This magic value will stay constant for each image of any given row and is ultimately
 			// used to determine the height of the row container relative to the available width
 			var commonHeightRatio = (100 * correctedWidths[0] / totalWidth / (widths[0] / heights[0]));
-			
+
 			var first_image = [couples[c][0], (100 * correctedWidths[0]/totalWidth), (100 * maxHeight/correctedWidths[0])];
-			
+
 			var second_image;
 			if (couples[c].length === 1){ // single image
 				second_image = [];
@@ -1534,7 +1770,7 @@ function preview_masonry_rows(index) {
 			$attachbox.append($newRow);
 		}
 		$(parentElement+" .wall-item-body div:empty").remove();				// clean up now empty divs that used to wrap images
-		$(parentElement+" .wall-item-body").append($attachbox);				
+		$(parentElement+" .wall-item-body").append($attachbox);
 		$(parentElement+" .wall-item-decor img").hide();						// hide spinner
 		$(parentElement+" .wall-item-body").removeClass('img-processing');
 		$(parentElement+" .wall-item-body").css({visibility: 'visible'});	// make container visible
@@ -1552,14 +1788,13 @@ function loadScrollContent() {
 	if (lockLoadContent) {
 		return;
 	}
-	
+
 	// Guard: Check if scroll-loader element and infinite_scroll are available
 	if ($('#scroll-loader').length === 0 || typeof infinite_scroll === 'undefined' || typeof infinite_scroll.reload_uri === 'undefined') {
-		console.debug('[Main] loadScrollContent: missing requirements (scroll-loader or infinite_scroll)');
 		lockLoadContent = false;
 		return;
 	}
-	
+
 	lockLoadContent = true;
 
 	$("#scroll-loader").fadeIn('normal');

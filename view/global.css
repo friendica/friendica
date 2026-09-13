@@ -128,9 +128,6 @@ span.connector {
   line-height: normal;
 }
 
-.type-link img, .type-video img {
-}
-
 .type-video .embed_video {
   margin: 0em;
 }
@@ -251,6 +248,7 @@ h3 {
 
 h4 {
   font-size: 18px;
+  margin: 0px 0px 0px 0px;
 }
 
 h5 {
@@ -261,11 +259,7 @@ h6 {
   font-size: 14.95px;
 }
 
-h4 {
-  margin: 0px 0px 0px 0px;
-}
-
-code, key {
+code {
   display: inline;
   background-color: #eee;
   color: #666;
@@ -363,7 +357,7 @@ a {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0,0,0,0);
+  clip-path: inset(50%);
   border: 0;
 }
 
@@ -527,9 +521,14 @@ aside .help-aside-wrapper h1 {
     margin: 0 0 20px 30px;
 }
 
-.settings-heading a:after{
-  content: ' »';
+summary.settings-heading > h2,
+summary.settings-subheading > h3 {
+  display: inline;
+  font-size: inherit;
+  font-weight: inherit;
+  margin: 0;
 }
+
 .settings-widget {
 	line-height: 2.2;
 }
@@ -561,7 +560,7 @@ img.invalid-src:after { vertical-align: top;}
 
 /* Tag cloud */
 .tagblock .tag-cloud {
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .tagblock .tag-cloud .tag {
 	display: flex;
@@ -710,7 +709,6 @@ img {
  * Image grid settings START
  **/
 .imagegrid-row {
-	display: -ms-flexbox; /* IE10 */
 	display: flex;
 	margin-top: 1em;
 	column-gap: 5px;
@@ -763,11 +761,13 @@ figure.img-allocated-height img{
  * Horizontal masonry settings START
  **/
 .masonry-row {
-	display: -ms-flexbox; /* IE10 */
 	display: flex;
 	/* Both the following values should be the same to ensure consistent margins between images in the grid */
 	column-gap: 5px;
 	margin-top: 5px;
+}
+.masonry-row figure a {
+	display: block !important;
 }
 /**
  * Horizontal masonry settings AND
@@ -821,8 +821,6 @@ figure.img-allocated-height img{
 /**
  * Log levels colorized in the admin panel
  **/
-.loglevel-debug {
-}
 .loglevel-info {
 	color: #0f009f; /* blue */
 }
@@ -962,6 +960,7 @@ summary.wall-item-summary {
 	pointer-events: none;
 }
 /* ...omit alt tags on images in these cases: profile description */
+.attachment .photo-album-image-wrapper::after,
 .profile-header a:has(img.has-alt-description)::after {
 	display: none;
 }
@@ -1037,7 +1036,6 @@ summary.wall-item-summary {
 /* Profile page custom fields - prevent long links from overflowing */
 #profile-page .profile-entry {
 	overflow-wrap: break-word;
-	word-break: break-word;
 }
 
 #profile-page .profile-entry a {
@@ -1046,4 +1044,36 @@ summary.wall-item-summary {
 
 .edit-profile-link-wrapper {
 	text-align: center;
+}
+
+/* Poll voting */
+.poll-options {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.poll-option {
+	position: relative;
+	overflow: hidden;
+	margin-bottom: 0.3em;
+	padding: 0.3em 0.5em;
+}
+
+.poll-option-bar {
+	position: absolute;
+	z-index: 0;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba(49, 112, 143, 0.15);
+}
+
+.poll-option label {
+	position: relative;
+	z-index: 1;
+}
+
+.poll-vote-button {
+	margin-top: 0.5em;
 }

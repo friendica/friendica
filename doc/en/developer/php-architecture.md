@@ -659,7 +659,7 @@ Use domain-specific exception classes from `src/{Domain}/Exception/`, not generi
 | Repository            | Integration test            |
 | HTTP Client Adapter   | Integration / Contract test |
 | Module                | Functional test             |
-| Template              | Functional / Browser test   |
+| Template              | Template test ([Tests](tests#template-tests)) |
 
 Not every class needs a test. Marker interfaces, configuration objects,
 and simple DTOs with no logic do not need dedicated tests.

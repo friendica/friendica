@@ -31,7 +31,8 @@ RUN install-php-extensions \
     posix \
     curl \
     intl \
-    opcache
+    opcache \
+    xdebug
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

@@ -28,7 +28,7 @@
 					<a href="{{$baseurl}}/moderation/blocklist/contact/import" class="btn btn-primary">{{$import_csv}}</a>
 				</div>
 				<div class="form-group">
-					<a href="{{$baseurl}}/moderation/blocklist/contact/export" class="btn btn-default">{{$export_csv}}</a>
+					<a href="{{$baseurl}}/moderation/blocklist/contact/export" class="btn btn-default" download>{{$export_csv}}</a>
 				</div>
 			</div>
 		</div>

@@ -132,8 +132,6 @@ var Browser = {
 				}
 			}
 
-			console.log(Browser.event, this.dataset.filename, embed, Browser.id);
-
 			$('body').trigger(Browser.event, [this.dataset.filename, embed, Browser.id, this.dataset.img]);
 
 			// Close model

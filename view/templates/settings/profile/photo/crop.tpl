@@ -37,25 +37,31 @@
 	</form>
 
 	<script type="text/javascript" language="javascript">
+		window.onDocumentReady('#croppa', function (image) {
+			if (typeof Cropper !== 'function') {
+				return;
+			}
 
-		var image = document.getElementById('croppa');
-		var cropper = new Cropper(image, {
-			aspectRatio: 1,
-			viewMode: 1,
-			preview: '#profile-photo-wrapper, .crop-preview',
-			crop: function(e) {
-				$('#x1').val(e.detail.x);
-				$('#y1').val(e.detail.y);
-				$('#width').val(e.detail.width);
-				$('#height').val(e.detail.height);
-			},
+			var cropper = new Cropper(image, {
+				aspectRatio: 1,
+				viewMode: 1,
+				preview: '#profile-photo-wrapper, .crop-preview',
+				crop: function(e) {
+					$('#x1').val(e.detail.x);
+					$('#y1').val(e.detail.y);
+					$('#width').val(e.detail.width);
+					$('#height').val(e.detail.height);
+				},
+			});
+
+			var skip_button = document.getElementById('settings-profile-photo-crop-skip');
+
+			if (skip_button) {
+				skip_button.addEventListener('click', function() {
+					let image_data = cropper.getImageData();
+					cropper.setData({x: 0, y: 0, width: image_data.width, height: image_data.height});
+				});
+			}
 		});
-
-		var skip_button = document.getElementById('settings-profile-photo-crop-skip');
-
-		skip_button.addEventListener('click', function() {
-			let image_data = cropper.getImageData();
-			cropper.setData({x: 0, y: 0, width: image_data.width, height: image_data.height});
-		})
 	</script>
 </div>

@@ -4,10 +4,9 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<script src="{{$baseurl}}/view/asset/chart.js/dist/Chart.min.js?v={{$VERSION}}"></script>
 <div id="adminpage">
 	<h1>{{$title}} - {{$page}}</h1>
-
+	<div class="settings-section">
 	<canvas id="FederationChart" class="federation-graph" width="320" height="320"></canvas>
 	<p>{{$intro}}</p>
 
@@ -21,42 +20,6 @@
 		{{/foreach}}
 	</ul>
 
-	<script>
-	var FedData = {
-		datasets: [{
-			data: [
-				{{foreach $counts as $c}}
-					{{$c[0]['total']}},
-				{{/foreach}}
-			],
-			backgroundColor: [
-				{{foreach $counts as $c}}
-					'{{$c[3]}}',
-				{{/foreach}}
-				],
-			hoverBackgroundColor: [
-				{{foreach $counts as $c}}
-					'#EE90A1',
-				{{/foreach}}
-			]
-		}],
-		labels: [
-			{{foreach $counts as $c}}
-				"{{$c[0]['platform']}}",
-			{{/foreach}}
-		]
-	};
-	var ctx = document.getElementById("FederationChart").getContext("2d");
-	var myDoughnutChart = new Chart(ctx, {
-		type: 'doughnut',
-		data: FedData,
-		options: {
-		    legend: {display: false},
-		    animation: {animateRotate: false},
-		    responsive: false
-		}
-	});
-	</script>
 	<hr>
 	<table id="federation-stats">
 	{{foreach $counts as $c}}
@@ -83,42 +46,6 @@
 		<tr>
 			<td colspan="4" class="federation-data">
 				<canvas id="{{$c[2]}}Chart" class="federation-network-graph" width="240" height="240"></canvas>
-				<script>
-					var {{$c[2]}}data = {
-						datasets: [{
-							data: [
-							{{foreach $c[1] as $v}}
-								{{$v['total']}},
-							{{/foreach}}
-							],
-							backgroundColor: [
-							{{foreach $c[1] as $v}}
-								'{{$c[3]}}',
-							{{/foreach}}
-							],
-							hoverBackgroundColor: [
-							{{foreach $c[1] as $v}}
-								'#EE90A1',
-							{{/foreach}}
-							]
-						}],
-						labels: [
-							{{foreach $c[1] as $v}}
-								'{{$v['version']}}',
-							{{/foreach}}
-						]
-					};
-					var ctx = document.getElementById("{{$c[2]}}Chart").getContext("2d");
-					var my{{$c[2]}}DoughnutChart = new Chart(ctx, {
-						type: 'doughnut',
-						data: {{$c[2]}}data,
-						options: {
-						legend: {display: false},
-							animation: {animateRotate: false},
-							responsive: false
-						}
-					});
-				</script>
 				<ul class="federation-stats">
 				{{foreach $c[1] as $v}}
 					<li>
@@ -136,4 +63,5 @@
 		{{/if}}
 	{{/foreach}}
 	</table>
+	</div>
 </div>

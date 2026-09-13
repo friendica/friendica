@@ -13,9 +13,11 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\System;
 use Friendica\Network\HTTPClient\Client;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
+use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use GuzzleHttp;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
 use mattwright\URLResolver;
@@ -64,6 +66,12 @@ class HttpClient extends BaseFactory
 			UriInterface $uri,
 		) use ($logger): void {
 			$logger->info('Curl redirect.', ['url' => $request->getUri(), 'to' => $uri, 'method' => $request->getMethod()]);
+
+			// Apply the outbound restrictions to every redirect target.
+			if (Network::isUriBlocked($uri) || !Network::isValidHttpUrl((string) $uri) || Network::isPrivateTarget($uri)) {
+				$logger->notice('Redirect target is not allowed.', ['url' => $request->getUri(), 'to' => $uri]);
+				throw new TransferException('Redirect to a disallowed target: ' . $uri);
+			}
 		};
 
 		$guzzle = new GuzzleHttp\Client([

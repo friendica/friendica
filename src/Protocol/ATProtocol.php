@@ -447,11 +447,44 @@ final class ATProtocol
 
 		foreach ($data->service as $service) {
 			if (($service->id == '#atproto_pds') && ($service->type == 'AtprotoPersonalDataServer') && !empty($service->serviceEndpoint)) {
+				if (!$this->isValidPdsEndpoint($service->serviceEndpoint)) {
+					$this->logger->notice('Invalid PDS endpoint', ['did' => $did, 'endpoint' => $service->serviceEndpoint]);
+					return null;
+				}
 				return $service->serviceEndpoint;
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Checks whether a PDS endpoint taken from a DID document is safe to send requests to.
+	 *
+	 * The endpoint is stored per user and gets the bearer token attached on every API call.
+	 * It therefore has to be a plain https origin.
+	 * A query or fragment would swallow the '/xrpc/...' path that is appended to it.
+	 *
+	 * @param mixed $endpoint The serviceEndpoint value of the DID document
+	 * @return bool
+	 */
+	private function isValidPdsEndpoint($endpoint): bool
+	{
+		if (!is_string($endpoint)) {
+			return false;
+		}
+
+		$parts = parse_url($endpoint);
+		if (!is_array($parts)) {
+			return false;
+		}
+
+		return (($parts['scheme'] ?? '') === 'https')
+			&& !empty($parts['host'])
+			&& empty($parts['user'])
+			&& empty($parts['pass'])
+			&& empty($parts['query'])
+			&& empty($parts['fragment']);
 	}
 
 	/**

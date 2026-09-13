@@ -173,7 +173,15 @@
 			</form>
 			<div id="dz-preview-jot" class="dropzone-preview"></div>
 
-			{{if $content}}<script type="text/javascript">initEditor();</script>{{/if}}
+			{{if $content}}
+			<script type="text/javascript">
+				window.onDocumentReady('#profile-jot-form', function () {
+					if (typeof initEditor === 'function') {
+						initEditor();
+					}
+				});
+			</script>
+			{{/if}}
 		</div>
 	</div>
 </div>

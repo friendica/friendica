@@ -124,7 +124,7 @@ HELP;
 
 		$output = [];
 		$ret    = 0;
-		exec("$php_path -l $file", $output, $ret);
+		exec(escapeshellarg((string) $php_path) . ' -l ' . escapeshellarg((string) $file), $output, $ret);
 		if ($ret !== 0) {
 			throw new \RuntimeException('Parse error found in ' . $file . ', scan stopped.');
 		}

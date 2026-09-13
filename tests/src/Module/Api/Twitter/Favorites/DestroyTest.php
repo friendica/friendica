@@ -31,6 +31,7 @@ class DestroyTest extends ApiTestCase
 	{
 		$this->expectException(BadRequestException::class);
 
+		// @phpstan-ignore method.deprecated
 		(new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 	}
@@ -42,6 +43,7 @@ class DestroyTest extends ApiTestCase
 	 */
 	public function testApiFavoritesCreateDestroyWithDestroyAction(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'id' => 3,
@@ -50,22 +52,5 @@ class DestroyTest extends ApiTestCase
 		$json = $this->toJson($response);
 
 		self::assertStatus($json);
-	}
-
-	/**
-	 * Test the api_favorites_create_destroy() function without an authenticated user.
-	 *
-	 */
-	public function testApiFavoritesCreateDestroyWithoutAuthenticatedUser(): void
-	{
-		self::markTestIncomplete('Needs refactoring of Lists - replace filter_input() with $request parameter checks');
-
-		/*
-		$this->expectException(\Friendica\Network\HTTPException\UnauthorizedException::class);
-		DI::args()->setArgv(['api', '1.1', 'favorites', 'create.json']);
-		BasicAuth::setCurrentUserID();
-		$_SESSION['authenticated'] = false;
-		api_favorites_create_destroy('json');
-		*/
 	}
 }
