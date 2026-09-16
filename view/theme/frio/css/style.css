@@ -257,8 +257,10 @@ ul#nav-user-menu {
 		padding-right: 5px;
 	}
 	#topbar-first .topbar-nav .nav-segment > a,
+	#topbar-first .topbar-actions .nav-segment > a,
+	#topbar-first .topbar-actions .nav-segment > button,
 	button#main-menu {
-		min-width: 35px;
+		min-width: 44px;
 	}
 }
 
@@ -315,6 +317,25 @@ ul#nav-user-menu {
 	#topbar-first > .container-fluid, #topbar-second > .container-fluid {
 		padding-inline: 2px;
 	}
+
+	/* Allow horizontal scrolling so the icon rows never overflow on narrow screens */
+	#topbar-first .topbar-nav,
+	#topbar-first .topbar-actions {
+		min-width: 0;
+	}
+	#topbar-first .topbar-nav .nav,
+	#topbar-first .topbar-actions .nav {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+	#topbar-first .topbar-nav .nav::-webkit-scrollbar,
+	#topbar-first .topbar-actions .nav::-webkit-scrollbar {
+		display: none;
+	}
+
 #nav-user-menu {
 	width: clamp(200px, 50vw, 275px);
 	position: fixed;
@@ -912,6 +933,10 @@ nav.navbar .nav > li > button:focus,
 	}
 #topbar-first .topbar-actions .dropdown-menu {
 	margin-left: -200px;
+}
+#topbar-first .topbar-actions #nav-more-menu {
+	margin-left: 0;
+	min-width: 180px;
 }
 #topbar-first .topbar-actions .dropdown-menu ul.media-list {
 	max-height: 400px;
@@ -4688,10 +4713,7 @@ div.login-form, .login-content-wrapper,
 
 	/* Even smaller mobile displays */
 @media (width < 382px) {
-	.topbar-nav .nav-segment a.nav-menu, .topbar-actions .nav-segment a.nav-menu, .topbar-actions .nav-segment button, .topbar-actions .navbar-toggle {
-		padding-left: 6px!important;
-		padding-right: 6px!important;
-	}
+	/* The nav rows scroll horizontally if needed, so the icon spacing stays touch-friendly */
 	#topbar-first .offcanvas-right-toggle,
 	#topbar-first #mobile-left-menu {
 		padding-inline-end: 3px;
