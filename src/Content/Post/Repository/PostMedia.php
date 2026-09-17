@@ -17,6 +17,7 @@ use Friendica\Content\Post\Entity\PostMedia as PostMediaEntity;
 use Friendica\Content\Post\Factory\PostMedia as PostMediaFactory;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Database\Database;
@@ -50,6 +51,7 @@ class PostMedia extends BaseRepository
 		private readonly IManagePersonalConfigValues $pConfig,
 		private readonly IManageConfigValues $config,
 		private readonly BaseURL $baseURL,
+		private readonly L10n $l10n,
 	) {
 		parent::__construct($database, $logger, $entityFactory);
 	}
@@ -441,8 +443,6 @@ class PostMedia extends BaseRepository
 			return $html;
 		}
 
-		$allow_embed = $this->pConfig->get($uid, 'system', 'embed_remote_media', false);
-
 		$changed = false;
 
 		$tmp = new DOMDocument();
@@ -482,12 +482,12 @@ class PostMedia extends BaseRepository
 			if (!$local_visitor && !$this->displayMedia($media)) {
 				$player = '<span></span>';
 			} elseif ($media->type === PostMediaEntity::TYPE_AUDIO) {
-				$player = $this->getAudioAttachment($media);
+				$player = $this->getAudioAttachment($media, $uid);
 			} elseif (in_array($media->type, [PostMediaEntity::TYPE_VIDEO, PostMediaEntity::TYPE_HLS])) {
 				$player = $this->getVideoAttachment($media, $uid);
-			} elseif ($allow_embed && $media->hasPlayerUrl() && $media->hasPlayerHeight()) {
+			} elseif ($media->hasPlayerUrl() && $media->hasPlayerHeight()) {
 				$player = $this->getPlayerIframe($media);
-			} elseif ($allow_embed && $media->hasEmbedHtml() && !$media->isPhoto()) {
+			} elseif ($media->hasEmbedHtml() && !$media->isPhoto()) {
 				$player = $this->getEmbedIframe($media);
 			} else {
 				$player = $this->getLinkAttachment($media);
@@ -534,13 +534,14 @@ class PostMedia extends BaseRepository
 			$media = $this->getEmbedIframe($postMedia);
 		} else {
 			if ($postMedia->width === 0 && $postMedia->height === 0) {
-				return $this->getAudioAttachment($postMedia);
+				return $this->getAudioAttachment($postMedia, $uid);
 			}
 			if ($this->config->get('system', 'videojs')) {
 				$template = 'content/videojs.tpl';
 			} else {
 				$template = $postMedia->type == PostMediaEntity::TYPE_HLS ? 'content/hls.tpl' : 'content/video.tpl';
 			}
+			$style = 'aspect-ratio:' . $postMedia->width . '/' . $postMedia->height . ';';
 			$media = Renderer::replaceMacros(Renderer::getMarkupTemplate($template), [
 				'$video' => [
 					'id'  => $postMedia->id,
@@ -552,10 +553,11 @@ class PostMedia extends BaseRepository
 					'mime'        => (string) $postMedia->mimetype,
 					'height'      => 'auto',
 					'width'       => '100%',
-					'style'       => 'aspect-ratio:' . $postMedia->width . '/' . $postMedia->height . ';',
+					'style'       => $style,
 					'description' => $postMedia->description,
 				],
 			]);
+			$media = $this->gateExternalMedia($media, $postMedia, $uid, $style, 'auto', '100%', $preview_url);
 		}
 		return $media;
 	}
@@ -600,6 +602,8 @@ class PostMedia extends BaseRepository
 			'height'       => $height,
 			'width'        => $width,
 			'iframe_style' => $iframe_style,
+			'host'         => $postMedia->url->getHost(),
+			'preview'      => $postMedia->preview ? $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_MEDIUM) : '',
 		]);
 	}
 
@@ -644,6 +648,136 @@ class PostMedia extends BaseRepository
 			'height'       => $height,
 			'width'        => $width,
 			'iframe_style' => $iframe_style,
+			'host'         => $postMedia->url->getHost(),
+			'preview'      => $postMedia->preview ? $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_MEDIUM) : '',
+		]);
+	}
+
+	/**
+	 * Replaces iframes from untrusted hosts with a consent placeholder.
+	 *
+	 * Runs after item bodies are cached (like addEmbed()), because both cached
+	 * attachment iframes and freshly rendered embeds need to be gated per
+	 * viewer instead of once for whoever happened to fill the render cache.
+	 *
+	 * @param string $html HTML that may contain `<iframe class="embed">` tags carrying a `data-host` attribute
+	 * @param int $uid Viewer user id used for the trusted host list
+	 * @return string Modified HTML with untrusted iframes replaced by a placeholder
+	 */
+	public function gateEmbeddedIframes(string $html, int $uid): string
+	{
+		if ($html == '' || !str_contains($html, '<iframe')) {
+			return $html;
+		}
+
+		$changed = false;
+
+		$tmp = new DOMDocument();
+		$doc = new DOMDocument();
+		@$doc->loadHTML(HTML::toNumericEntities('<span>' . $html . '</span>'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		$xpath = new DOMXPath($doc);
+		$list  = $xpath->query('//iframe[@class="embed"]');
+		foreach ($list as $iframe) {
+			$host = $this->getNodeAttribute($iframe, 'data-host');
+			if ($host === '' || $this->isTrustedHost($uid, $host)) {
+				continue;
+			}
+
+			$target = $iframe->parentNode;
+			if ($target->nodeName !== 'span' || $this->getNodeAttribute($target, 'class') !== 'embedded-media') {
+				$target = $iframe;
+			}
+
+			$placeholder = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/iframe-placeholder.tpl'), [
+				'host'         => $host,
+				'preview'      => $this->getNodeAttribute($iframe, 'data-preview'),
+				'iframe'       => $doc->saveHTML($target),
+				'iframe_style' => $this->getNodeAttribute($iframe, 'style'),
+				'height'       => $this->getNodeAttribute($iframe, 'height'),
+				'width'        => $this->getNodeAttribute($iframe, 'width'),
+				'question'     => $this->l10n->t('Show external content from %s?', $host),
+				'once'         => $this->l10n->t('Once'),
+				'always'       => $this->l10n->t('Always'),
+			]);
+
+			@$tmp->loadHTML(HTML::toNumericEntities($placeholder), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+			$imported = $doc->importNode($tmp->documentElement, true);
+			$target->parentNode->replaceChild($imported, $target);
+			$changed = true;
+		}
+
+		if (!$changed) {
+			return $html;
+		}
+
+		$html = trim($doc->saveHTML());
+		if (str_starts_with($html, '<span>') && str_ends_with($html, '</span>')) {
+			$html = substr($html, 6, -7);
+		}
+		return $html;
+	}
+
+	/**
+	 * Reads an attribute value off a DOM node without requiring it to be typed as DOMElement.
+	 *
+	 * @param mixed $node Node to read the attribute from
+	 * @param string $name Attribute name
+	 * @return string Attribute value, or an empty string if absent
+	 */
+	private function getNodeAttribute($node, string $name): string
+	{
+		return $node->attributes?->getNamedItem($name)->nodeValue ?? '';
+	}
+
+	/**
+	 * Checks whether the given host is on the viewer's trusted iframe host list.
+	 *
+	 * @param int $uid Viewer user id
+	 * @param string $host Hostname to check
+	 * @return bool
+	 */
+	private function isTrustedHost(int $uid, string $host): bool
+	{
+		$trusted = $this->pConfig->get($uid, 'system', 'trusted_iframe_hosts', []);
+
+		return in_array(strtolower($host), array_map(strtolower(...), (array) $trusted), true);
+	}
+
+	/**
+	 * Wraps a rendered video/audio tag in a consent placeholder, unless it points to a local or trusted host.
+	 *
+	 * Unlike the iframe attachment path, getVideoAttachment() and getAudioAttachment() only ever run after
+	 * the item body has been cached (see addVisualAttachments() in Item::prepareBody()), so gating here
+	 * directly is safe and doesn't need the generic post-cache pass that gateEmbeddedIframes() uses.
+	 *
+	 * @param string $media Rendered <video>/<audio> markup to gate
+	 * @param PostMediaEntity $postMedia Media entity the markup was built from
+	 * @param int $uid Viewer user id
+	 * @param string $iframe_style Inline style applied to the video wrapper, mirrored on the placeholder
+	 * @param string $height Height applied to the video wrapper, mirrored on the placeholder
+	 * @param string $width Width applied to the video wrapper, mirrored on the placeholder
+	 * @param string $preview Preview image URL
+	 * @return string Either the unchanged markup or a consent placeholder
+	 */
+	private function gateExternalMedia(string $media, PostMediaEntity $postMedia, int $uid, string $iframe_style = '', string $height = '', string $width = '', string $preview = ''): string
+	{
+		$host = $postMedia->url->getHost();
+
+		if ($host === '' || $this->baseURL->isLocalUri($postMedia->url) || $this->isTrustedHost($uid, $host)) {
+			return $media;
+		}
+
+		return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/iframe-placeholder.tpl'), [
+			'host'         => $host,
+			'preview'      => $preview,
+			'contain'      => true,
+			'iframe'       => $media,
+			'iframe_style' => $iframe_style,
+			'height'       => $height,
+			'width'        => $width,
+			'question'     => $this->l10n->t('Show external content from %s?', $host),
+			'once'         => $this->l10n->t('Once'),
+			'always'       => $this->l10n->t('Always'),
 		]);
 	}
 
@@ -651,11 +785,12 @@ class PostMedia extends BaseRepository
 	 * Render an audio attachment as HTML.
 	 *
 	 * @param PostMediaEntity $postMedia Media entity to render
+	 * @param int $uid Viewer user id
 	 * @return string HTML snippet for the audio player
 	 */
-	public function getAudioAttachment(PostMediaEntity $postMedia): string
+	public function getAudioAttachment(PostMediaEntity $postMedia, int $uid): string
 	{
-		return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/audio.tpl'), [
+		$media = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/audio.tpl'), [
 			'$audio' => [
 				'id'   => $postMedia->id,
 				'src'  => (string) $postMedia->url,
@@ -663,6 +798,8 @@ class PostMedia extends BaseRepository
 				'mime' => (string) $postMedia->mimetype,
 			],
 		]);
+
+		return $this->gateExternalMedia($media, $postMedia, $uid);
 	}
 
 	/**

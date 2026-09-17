@@ -343,6 +343,7 @@ msgstr ""
 
 #: mod/photos.php:577 mod/photos.php:811 src/Module/Calendar/Event/Form.php:124
 #: src/Module/Settings/Server/Index.php:104
+#: src/Module/Settings/TrustedHosts/Index.php:82
 msgid "Save changes"
 msgstr ""
 
@@ -439,6 +440,7 @@ msgstr ""
 #: src/Module/Settings/Attachments.php:99
 #: src/Module/Settings/Connectors.php:232
 #: src/Module/Settings/Server/Index.php:102
+#: src/Module/Settings/TrustedHosts/Index.php:81
 msgid "Delete"
 msgstr ""
 
@@ -2151,7 +2153,7 @@ msgstr ""
 #: src/Content/Item.php:431 src/Content/Nav.php:298 src/Model/Contact.php:1298
 #: src/Model/Contact.php:1309 src/Module/Admin/Addons/Details.php:140
 #: src/Module/Admin/Themes/Details.php:85 src/Module/BaseAdmin.php:89
-#: src/Module/BaseSettings.php:184 src/Module/Welcome.php:39
+#: src/Module/BaseSettings.php:191 src/Module/Welcome.php:39
 #: view/theme/frio/theme.php:231
 msgid "Settings"
 msgstr ""
@@ -2249,7 +2251,7 @@ msgstr ""
 msgid "My photos"
 msgstr ""
 
-#: src/Content/Nav.php:209 src/Module/BaseSettings.php:148
+#: src/Content/Nav.php:209 src/Module/BaseSettings.php:155
 #: src/Module/Media/Attachment/Browser.php:31
 #: src/Module/Media/BaseBrowser.php:93 src/Module/Settings/Attachments.php:95
 msgid "Files"
@@ -2497,6 +2499,22 @@ msgstr ""
 
 #: src/Content/PagesManager.php:105
 msgid "Find pages to follow"
+msgstr ""
+
+#: src/Content/Post/Repository/PostMedia.php:698
+#: src/Content/Post/Repository/PostMedia.php:778
+#, php-format
+msgid "Show external content from %s?"
+msgstr ""
+
+#: src/Content/Post/Repository/PostMedia.php:699
+#: src/Content/Post/Repository/PostMedia.php:779
+msgid "Once"
+msgstr ""
+
+#: src/Content/Post/Repository/PostMedia.php:700
+#: src/Content/Post/Repository/PostMedia.php:780
+msgid "Always"
 msgstr ""
 
 #: src/Content/SpaBackButton.php:34
@@ -4136,7 +4154,7 @@ msgid "Administration"
 msgstr ""
 
 #: src/Module/Admin/Addons/Details.php:138 src/Module/Admin/Addons/Index.php:84
-#: src/Module/BaseAdmin.php:78 src/Module/BaseSettings.php:127
+#: src/Module/BaseAdmin.php:78 src/Module/BaseSettings.php:134
 msgid "Addons"
 msgstr ""
 
@@ -6213,33 +6231,38 @@ msgstr ""
 msgid "Display"
 msgstr ""
 
-#: src/Module/BaseSettings.php:120 src/Module/Settings/Connectors.php:194
+#: src/Module/BaseSettings.php:113
+#: src/Module/Settings/TrustedHosts/Index.php:78
+msgid "External content"
+msgstr ""
+
+#: src/Module/BaseSettings.php:127 src/Module/Settings/Connectors.php:194
 msgid "Social Networks"
 msgstr ""
 
-#: src/Module/BaseSettings.php:134 src/Module/Settings/Delegation.php:172
+#: src/Module/BaseSettings.php:141 src/Module/Settings/Delegation.php:172
 msgid "Manage Accounts"
 msgstr ""
 
-#: src/Module/BaseSettings.php:141
+#: src/Module/BaseSettings.php:148
 msgid "Connected apps"
 msgstr ""
 
-#: src/Module/BaseSettings.php:155
+#: src/Module/BaseSettings.php:162
 msgid "Remote servers"
 msgstr ""
 
-#: src/Module/BaseSettings.php:162
+#: src/Module/BaseSettings.php:169
 #: src/Module/Moderation/Blocklist/Contact/Import.php:108
 #: src/Module/Settings/ContactImport.php:117
 msgid "Import Contacts"
 msgstr ""
 
-#: src/Module/BaseSettings.php:169 src/Module/Settings/UserExport.php:95
+#: src/Module/BaseSettings.php:176 src/Module/Settings/UserExport.php:95
 msgid "Export personal data"
 msgstr ""
 
-#: src/Module/BaseSettings.php:176
+#: src/Module/BaseSettings.php:183
 msgid "Remove account"
 msgstr ""
 
@@ -11767,6 +11790,18 @@ msgstr ""
 
 #: src/Module/Settings/Server/Index.php:108
 msgid "You have not taken individual moderation actions against any servers."
+msgstr ""
+
+#: src/Module/Settings/TrustedHosts/Index.php:79
+msgid "These are the hostnames you chose to always show embedded content from without being asked again. Remove an entry to be asked again the next time."
+msgstr ""
+
+#: src/Module/Settings/TrustedHosts/Index.php:80
+msgid "Hostname"
+msgstr ""
+
+#: src/Module/Settings/TrustedHosts/Index.php:86
+msgid "You haven't marked any hostname to always show its embedded content."
 msgstr ""
 
 #: src/Module/Settings/TwoFactor/AppSpecific.php:67

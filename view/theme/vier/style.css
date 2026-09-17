@@ -3657,3 +3657,24 @@ video {
 	max-width: 100%;
 	max-height: calc(100vh - 150px);
 }
+
+.iframe-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 100%;
+	max-height: calc(100vh - 150px);
+	background-color: #333;
+	background-size: cover;
+	background-position: center;
+}
+.iframe-placeholder-contain {
+	background-size: contain;
+	background-repeat: no-repeat;
+}
+.iframe-placeholder-dialog {
+	padding: 15px 20px;
+	background-color: rgba(0, 0, 0, .65);
+	color: #fff;
+	text-align: center;
+}

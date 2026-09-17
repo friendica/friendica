@@ -3189,6 +3189,7 @@ class Item
 		}
 
 		$s = DI::postMediaRepository()->addEmbed($s, $uid, $item['uri-id'], $uid != 0);
+		$s = DI::postMediaRepository()->gateEmbeddedIframes($s, $uid);
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
@@ -3448,7 +3449,7 @@ class Item
 					$trailing .= $media;
 				}
 			} elseif ($PostMedia->type == PostMedia::TYPE_AUDIO) {
-				$media = DI::postMediaRepository()->getAudioAttachment($PostMedia);
+				$media = DI::postMediaRepository()->getAudioAttachment($PostMedia, $uid);
 				if (($item['post-type'] ?? null) == Item::PT_AUDIO) {
 					$leading .= $media;
 				} else {
@@ -3552,7 +3553,7 @@ class Item
 					$preview_mode = $attachment->isArticle() ? BBCode::PREVIEW_SMALL : BBCode::PREVIEW_LARGE;
 				}
 				if (!$has_media && $preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $attachment->url)) {
-					$rendered = BBCode::convertAttachmentFromPostMedia($attachment, BBCode::INTERNAL, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false), self::hideDescription($attachment, $content));
+					$rendered = BBCode::convertAttachmentFromPostMedia($attachment, BBCode::INTERNAL, $uriid, $preview_mode, true, self::hideDescription($attachment, $content));
 				} elseif (!self::containsLink($content, $attachment->url, PostMedia::TYPE_HTML)) {
 					$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
 						'$url'   => $attachment->url,
