@@ -7,10 +7,10 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
-use Friendica\App\Router;
 use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
 use Friendica\Module\BaseApi;
@@ -81,8 +81,34 @@ class Media extends BaseApi
 	protected function delete(array $request = [])
 	{
 		$this->checkAllowedScope(self::SCOPE_WRITE);
+		$uid = self::getCurrentUserID();
 
-		$this->response->unsupported(Router::DELETE, $request);
+		if (empty($this->parameters['id'])) {
+			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+		}
+
+		$id = $this->parameters['id'];
+
+		if (DI::mstdnAttachment()->isAttach($id)) {
+			$attachId = (int) substr((string) $id, 7);
+			if (!Attach::exists(['id' => $attachId, 'uid' => $uid])) {
+				$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
+			}
+
+			Attach::delete(['id' => $attachId, 'uid' => $uid]);
+			$this->earlyJsonExit([]);
+		}
+
+		$photo = Photo::selectFirst(['resource-id'], ['id' => $id, 'uid' => $uid]);
+		if (empty($photo['resource-id'])) {
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
+		}
+
+		Photo::delete(['uid' => $uid, 'resource-id' => $photo['resource-id']]);
+		Item::deleteForUser(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true], $uid);
+		Photo::clearAlbumCache($uid);
+
+		$this->earlyJsonExit([]);
 	}
 
 	public function put(array $request = [])
