@@ -174,6 +174,11 @@
 											<p id="notifications-title">{{$nav.notifications.1}}</p>
 											<header id="notifications-subheader">
 												<a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a>
+												<button role="menuitem" type="button" id="notifications-pause" class="btn-link"
+													aria-pressed="false" onclick="toggleDoNotDisturb();" data-toggle="tooltip"
+													data-label-pause="{{$nav.notifications.pause.1}}" data-label-resume="{{$nav.notifications.resume.1}}"
+													title="{{$nav.notifications.pause.1}}"><i class="ri ri-notification-off-line" aria-hidden="true"></i>
+												</button>
 												<button role="menuitem" type="button" id="notifications-mark-as-read" class="btn-link"
 													onclick="notificationMarkAll();" data-toggle="tooltip">{{$nav.notifications.mark.1}}
 												</button>

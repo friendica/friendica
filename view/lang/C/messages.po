@@ -88,7 +88,7 @@ msgstr ""
 msgid "Messages"
 msgstr ""
 
-#: mod/message.php:35 mod/message.php:117 src/Content/Nav.php:292
+#: mod/message.php:35 mod/message.php:117 src/Content/Nav.php:294
 msgid "New Message"
 msgstr ""
 
@@ -2194,7 +2194,7 @@ msgstr ""
 msgid "Posts"
 msgstr ""
 
-#: src/Content/Item.php:431 src/Content/Nav.php:304 src/Model/Contact.php:1314
+#: src/Content/Item.php:431 src/Content/Nav.php:306 src/Model/Contact.php:1314
 #: src/Model/Contact.php:1325 src/Module/Admin/Addons/Details.php:140
 #: src/Module/Admin/Themes/Details.php:85 src/Module/BaseAdmin.php:89
 #: src/Module/BaseSettings.php:191 src/Module/Welcome.php:39
@@ -2368,7 +2368,7 @@ msgstr ""
 msgid "Tags"
 msgstr ""
 
-#: src/Content/Nav.php:245 src/Content/Nav.php:307
+#: src/Content/Nav.php:245 src/Content/Nav.php:309
 #: src/Content/Text/HTML.php:898 src/Module/BaseProfile.php:60
 #: src/Module/Contact.php:198 src/Module/Contact.php:416
 #: src/Module/Contact.php:510 view/theme/frio/theme.php:233
@@ -2452,31 +2452,47 @@ msgstr ""
 msgid "Mark all system notifications as seen"
 msgstr ""
 
-#: src/Content/Nav.php:289
-msgid "Private mail"
+#: src/Content/Nav.php:287
+msgid "Do not disturb"
 msgstr ""
 
-#: src/Content/Nav.php:290
-msgid "Inbox"
+#: src/Content/Nav.php:287
+msgid "Pause notifications until you turn this back on"
+msgstr ""
+
+#: src/Content/Nav.php:288
+msgid "Notifications paused"
+msgstr ""
+
+#: src/Content/Nav.php:288
+msgid "Click to resume receiving notifications"
 msgstr ""
 
 #: src/Content/Nav.php:291
+msgid "Private mail"
+msgstr ""
+
+#: src/Content/Nav.php:292
+msgid "Inbox"
+msgstr ""
+
+#: src/Content/Nav.php:293
 msgid "Outbox"
 msgstr ""
 
-#: src/Content/Nav.php:294
+#: src/Content/Nav.php:296
 msgid "Manage other accounts, including groups and pages"
 msgstr ""
 
-#: src/Content/Nav.php:296
+#: src/Content/Nav.php:298
 msgid "Switch Accounts"
 msgstr ""
 
-#: src/Content/Nav.php:299
+#: src/Content/Nav.php:301
 msgid "Add Account"
 msgstr ""
 
-#: src/Content/Nav.php:304
+#: src/Content/Nav.php:306
 msgid "Account settings"
 msgstr ""
 
@@ -2484,15 +2500,15 @@ msgstr ""
 msgid "Manage/edit friends and contacts"
 msgstr ""
 
-#: src/Content/Nav.php:312 src/Module/BaseAdmin.php:115
+#: src/Content/Nav.php:314 src/Module/BaseAdmin.php:115
 msgid "Admin"
 msgstr ""
 
-#: src/Content/Nav.php:312
+#: src/Content/Nav.php:314
 msgid "Site setup and configuration"
 msgstr ""
 
-#: src/Content/Nav.php:316 src/Module/BaseModeration.php:117
+#: src/Content/Nav.php:318 src/Module/BaseModeration.php:117
 #: src/Module/Moderation/Blocklist/Contact.php:99
 #: src/Module/Moderation/Blocklist/Contact/Import.php:101
 #: src/Module/Moderation/Blocklist/Server/Add.php:105
@@ -2510,15 +2526,15 @@ msgstr ""
 msgid "Moderation"
 msgstr ""
 
-#: src/Content/Nav.php:316
+#: src/Content/Nav.php:318
 msgid "Content and user moderation"
 msgstr ""
 
-#: src/Content/Nav.php:319
+#: src/Content/Nav.php:321
 msgid "Navigation"
 msgstr ""
 
-#: src/Content/Nav.php:319
+#: src/Content/Nav.php:321
 msgid "Site map"
 msgstr ""
 

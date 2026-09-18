@@ -279,11 +279,13 @@ class Nav
 
 			// Don't show groups and notifications for public communities
 			if ($this->session->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {
-				$nav['groups']                = ['groups', $this->l10n->t('Groups'), '', $this->l10n->t('Overview of your groups')];
-				$nav['introductions']         = ['notifications/intros', $this->l10n->t('Introductions'), '', $this->l10n->t('Friend Requests')];
-				$nav['notifications']         = ['notifications', $this->l10n->t('Notifications'), '', $this->l10n->t('Notifications')];
-				$nav['notifications']['all']  = ['notifications/stream', $this->l10n->t('View all'), '', ''];
-				$nav['notifications']['mark'] = ['', $this->l10n->t('Mark as read'), '', $this->l10n->t('Mark all system notifications as seen')];
+				$nav['groups']                  = ['groups', $this->l10n->t('Groups'), '', $this->l10n->t('Overview of your groups')];
+				$nav['introductions']           = ['notifications/intros', $this->l10n->t('Introductions'), '', $this->l10n->t('Friend Requests')];
+				$nav['notifications']           = ['notifications', $this->l10n->t('Notifications'), '', $this->l10n->t('Notifications')];
+				$nav['notifications']['all']    = ['notifications/stream', $this->l10n->t('View all'), '', ''];
+				$nav['notifications']['mark']   = ['', $this->l10n->t('Mark as read'), '', $this->l10n->t('Mark all system notifications as seen')];
+				$nav['notifications']['pause']  = ['', $this->l10n->t('Do not disturb'), '', $this->l10n->t('Pause notifications until you turn this back on')];
+				$nav['notifications']['resume'] = ['', $this->l10n->t('Notifications paused'), '', $this->l10n->t('Click to resume receiving notifications')];
 			}
 
 			$nav['messages']           = ['message', $this->l10n->t('Messages'), '', $this->l10n->t('Private mail')];
