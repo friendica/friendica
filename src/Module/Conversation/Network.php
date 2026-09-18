@@ -492,6 +492,14 @@ class Network extends Timeline
 		if ($this->mention) {
 			$timelineCondition['mention'] = true;
 		}
+
+		$timelinelanguages = $this->pConfig->get($this->session->getLocalUserId(), 'system', 'filter_timeline_language', false)
+			? $this->pConfig->get($this->session->getLocalUserId(), 'system', 'timeline_languages') ?? []
+			: [];
+		if ($timelinelanguages) {
+			$commonCondition = DBA::mergeConditions($commonCondition, $this->getLanguageCondition($timelinelanguages));
+		}
+
 		if ($this->network) {
 			$commonCondition['network'] = $this->network;
 		}
@@ -565,7 +573,7 @@ class Network extends Timeline
 
 		$fields    = ['uri-id', 'created', 'received', 'commented', 'channel', 'contact-id'];
 		$condition = DBA::mergeConditions($timelineCondition, $commonCondition);
-
+		$this->logger->debug('Timeline condition: ', ['timelineCondition' => $timelineCondition, 'commonCondition' => $commonCondition]);
 		$timeline = $this->database->getSQL($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', $fields, $condition, $params);
 		array_shift($condition);
 		$sql = '(' . $timeline . ')';
@@ -623,6 +631,23 @@ class Network extends Timeline
 		$this->setItemsSeenForUser($this->session->getLocalUserId());
 
 		return $items;
+	}
+
+	/**
+	 * Returns the condition for the wanted timeline languages
+	 *
+	 * @param array $languages
+	 * @return array
+	 */
+	private function getLanguageCondition(array $languages): array
+	{
+		$query  = [];
+		$params = [];
+		foreach ($languages as $language) {
+			$query[]  = '`language` LIKE ?';
+			$params[] = '{"' . $language . '":%';
+		}
+		return array_merge(['(' . implode(' OR ', $query) . ' OR `language` IS NULL)'], $params);
 	}
 
 	/**

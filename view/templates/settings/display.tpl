@@ -53,10 +53,28 @@
 		{{include file="field_select.tpl" field=$text_spacing}}
 		{{include file="field_select.tpl" field=$attachment_icons}}
 		{{include file="field_checkbox.tpl" field=$embed_media}}
+		{{include file="field_checkbox.tpl" field=$filter_timeline_language}}
+		<div id="timeline-languages-wrapper">
+			{{include file="field_select.tpl" field=$timeline_languages}}
+		</div>
 		<div class="settings-submit-wrapper">
 			<input type="submit" name="submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
 		</div>
 	</details>
+
+	<script>
+		(function () {
+			let $filterTimelineLanguage = $("#id_{{$filter_timeline_language.0}}");
+			let $timelineLanguages      = $("#timeline-languages-wrapper select");
+
+			function toggleTimelineLanguages() {
+				$timelineLanguages.prop('disabled', !$filterTimelineLanguage.is(':checked'));
+			}
+
+			toggleTimelineLanguages();
+			$filterTimelineLanguage.on('change', toggleTimelineLanguages);
+		})();
+	</script>
 
 	<details class="settings-section">
 	<summary class="settings-heading" tabindex="0"><h2>{{$timeline_title}}</h2></summary>
