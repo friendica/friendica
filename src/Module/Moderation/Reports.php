@@ -179,9 +179,11 @@ class Reports extends BaseModeration
 		WHERE `report-rule`.`rid` = `report`.`id`
 		GROUP BY `report-rule`.`rid`
 	) AS `rules`,
-	`contact`.`micro`, `contact`.`name`, `contact`.`nick`, `contact`.`url`, `contact`.`addr`
+	`contact`.`micro`, `contact`.`name`, `contact`.`nick`, `contact`.`url`, `contact`.`addr`,
+	`reporter`.`name` AS `reporter_name`, `reporter`.`nick` AS `reporter_nick`, `reporter`.`addr` AS `reporter_addr`
 FROM report
 INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
+LEFT JOIN `contact` `reporter` ON `reporter`.`id` = `report`.`reporter-id`
 		";
 		$reportParams = [];
 		$whereParts   = [];
@@ -210,6 +212,7 @@ INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
 		$reports = [];
 		while ($report = $this->database->fetch($query)) {
 			$report['posts']        = [];
+			$report['reporter_cid'] = $report['reporter-id'];
 			$report['created']      = DateTimeFormat::local($report['created'], DateTimeFormat::MYSQL);
 			$report['category']     = $this->reportUtil->getReportCategoryName($report['category-id']);
 			$report['status_label'] = $report['status'] == ReportEntity::STATUS_CLOSED ? $this->t('Closed') : $this->t('Open');
@@ -242,7 +245,7 @@ INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
 			'$no_data'     => $this->t('No report exists at this node.'),
 
 			'$h_reports'             => $this->t('Reports'),
-			'$th_reports'            => [$this->t('Created'), $this->t('Photo'), $this->t('Name'), $this->t('Comment'), $this->t('Category'), $this->t('Status')],
+			'$th_reports'            => [$this->t('Created'), $this->t('Photo'), $this->t('Name'), $this->t('Reporter'), $this->t('Comment'), $this->t('Category'), $this->t('Status')],
 			'$select_all'            => $this->t('Select all'),
 			'$close_reports'         => $this->t('Close selected reports'),
 			'$open_reports'          => $this->t('Open reports'),
