@@ -8,6 +8,7 @@
 namespace Friendica\Model;
 
 use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
+use Friendica\Content\AttachType;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Image;
 use Friendica\Content\Post\Collection\PostMedias;
@@ -3155,7 +3156,7 @@ class Item
 			$s    = self::addGallery($s, $sharedSplitAttachments['visual']);
 			$s    = self::addVisualAttachments($sharedSplitAttachments['visual'], $shared_item, $s, true, $uid);
 			$s    = self::addLinkAttachment($shared_uri_id ?: $item['uri-id'], $sharedSplitAttachments, $body, $s, true, $quote_shared_links, $uid, $shared_item);
-			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s);
+			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s, $uid);
 			$s    = self::addHiddenAttachments($sharedSplitAttachments['hidden'], $item, $s);
 			$body = BBCode::removeSharedData($body);
 		}
@@ -3169,7 +3170,7 @@ class Item
 		$s = self::addGallery($s, $itemSplitAttachments['visual']);
 		$s = self::addVisualAttachments($itemSplitAttachments['visual'], $item, $s, false, $uid);
 		$s = self::addLinkAttachment($item['uri-id'], $itemSplitAttachments, $body, $s, false, $shared_links, $uid, $item);
-		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s);
+		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s, $uid);
 		$s = self::addHiddenAttachments($itemSplitAttachments['hidden'], $item, $s);
 		$s = self::addQuestions($item, $s);
 
@@ -3607,14 +3608,17 @@ class Item
 	 * @param PostMedias $PostMedias
 	 * @param array      $item
 	 * @param string     $content
+	 * @param int        $uid
 	 * @return string modified content
 	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content): string
+	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content, int $uid): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$trailing = '';
+		$style       = AttachType::iconStyle($uid);
+		$attachments = [];
+
 		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if (strpos((string) $item['body'], (string) $PostMedia->url)) {
@@ -3630,19 +3634,21 @@ class Item
 			];
 			$the_url = Contact::magicLinkByContact($author, $PostMedia->url);
 
-			$title = Strings::escapeHtml(trim($PostMedia->description ?? '' ?: $PostMedia->url));
+			$name = trim($PostMedia->description ?? '' ?: $PostMedia->name ?? '' ?: basename(parse_url($PostMedia->url, PHP_URL_PATH) ?: $PostMedia->url));
 
-			if ($PostMedia->size) {
-				$title .= ' ' . $PostMedia->size . ' ' . DI::l10n()->t('bytes');
-			}
-
-			/// @todo Use a template
-			$icon = '<div class="attachtype icon s22 type-' . $PostMedia->mimetype->type . ' subtype-' . $PostMedia->mimetype->subtype . '"></div>';
-			$trailing .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" rel="noopener noreferrer" >' . $icon . '</a>';
+			$attachments[] = [
+				'url'   => strip_tags($the_url),
+				'name'  => $name,
+				'size'  => $PostMedia->size ? Strings::formatBytes($PostMedia->size) : '',
+				'class' => AttachType::toClass($PostMedia->mimetype, $style),
+			];
 		}
 
-		if ($trailing != '') {
-			$content .= '<div class="body-attach">' . $trailing . '</div>';
+		if (!empty($attachments)) {
+			$content .= Renderer::replaceMacros(Renderer::getMarkupTemplate('content/attachments.tpl'), [
+				'$summary'     => DI::l10n()->tt('%d attachment', '%d attachments', count($attachments)),
+				'$attachments' => $attachments,
+			]);
 		}
 
 		DI::profiler()->stopRecording();

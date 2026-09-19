@@ -2266,13 +2266,152 @@ blockquote.shared_content {
 .wall-item-body > a > img {
 	border-radius: 3px;
 }
-.wall-item-body .body-attach > a {
-	color: $font_color_darker;
-	display: inline-block;
+.wall-item-body .body-attach {
+	clear: both;
+	margin-top: 10px;
 }
-.wall-item-body .body-attach > a div {
+.wall-item-body .body-attach > summary {
+	cursor: pointer;
 	color: $font_color_darker;
-	width: 20px;
+}
+.wall-item-body .body-attach > a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 8px;
+	color: $font_color_darker;
+}
+.wall-item-body .body-attach > a .attachsize {
+	font-size: 12px;
+	opacity: 0.7;
+}
+.wall-item-body .body-attach .attachtype {
+	display: inline-block;
+	flex-shrink: 0;
+	width: 32px;
+	height: 32px;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+	-webkit-mask-size: contain;
+	mask-size: contain;
+}
+.attach-pdf {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-pdf-2-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-pdf-2-fill.svg);
+}
+.attach-word {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-word-2-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-word-2-fill.svg);
+}
+.attach-excel {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-excel-2-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-excel-2-fill.svg);
+}
+.attach-ppt {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-ppt-2-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-ppt-2-fill.svg);
+}
+.attach-zip {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-zip-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-zip-fill.svg);
+}
+.attach-audio {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-music-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-music-fill.svg);
+}
+.attach-video {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-video-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-video-fill.svg);
+}
+.attach-image {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Media/image-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Media/image-fill.svg);
+}
+.attach-text {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-text-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-text-fill.svg);
+}
+.attach-torrent {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-download-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-download-fill.svg);
+}
+.attach-feed {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Device/rss-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Device/rss-fill.svg);
+}
+.attach-code {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-code-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-code-fill.svg);
+}
+.attach-calendar {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Business/calendar-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Business/calendar-fill.svg);
+}
+.attach-link {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Business/global-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Business/global-fill.svg);
+}
+.attach-markdown {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/markdown-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/markdown-fill.svg);
+}
+.attach-generic {
+	-webkit-mask-image: url(../../asset/remixicon/icons/Document/file-fill.svg);
+	mask-image: url(../../asset/remixicon/icons/Document/file-fill.svg);
+}
+.attach-black {
+	background-color: $font_color_darker;
+}
+.attach-white {
+	background-color: #fff;
+}
+.attach-color.attach-pdf {
+	background-color: #e5484d;
+}
+.attach-color.attach-word {
+	background-color: #2f6fed;
+}
+.attach-color.attach-excel {
+	background-color: #2f9e44;
+}
+.attach-color.attach-ppt {
+	background-color: #f08c00;
+}
+.attach-color.attach-zip {
+	background-color: #d4a017;
+}
+.attach-color.attach-audio {
+	background-color: #ae3ec9;
+}
+.attach-color.attach-video {
+	background-color: #e64980;
+}
+.attach-color.attach-image {
+	background-color: #15aabf;
+}
+.attach-color.attach-torrent {
+	background-color: #0ca678;
+}
+.attach-color.attach-feed {
+	background-color: #f76707;
+}
+.attach-color.attach-code {
+	background-color: #5f3dc4;
+}
+.attach-color.attach-calendar {
+	background-color: #0c8599;
+}
+.attach-color.attach-link {
+	background-color: #339af0;
+}
+.attach-color.attach-markdown {
+	background-color: #9c6644;
+}
+.attach-color.attach-text,
+.attach-color.attach-generic {
+	background-color: #868e96;
 }
 
 /* wall-item content elements */

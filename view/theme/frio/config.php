@@ -9,6 +9,7 @@
  */
 
 use Friendica\AppHelper;
+use Friendica\Content\AttachType;
 use Friendica\Content\ContactSelector;
 use Friendica\Core\Renderer;
 use Friendica\DI;
@@ -61,6 +62,13 @@ function theme_post(AppHelper $appHelper): void
 				DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'accessibility', 'platform_icon_style', ContactSelector::SVG_BLACK);
 			} elseif (in_array($current_scheme, ['light']) && in_array($icon_style, [ContactSelector::SVG_COLOR_WHITE])) {
 				DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'accessibility', 'platform_icon_style', ContactSelector::SVG_COLOR_BLACK);
+			}
+
+			$attach_icon_style = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'accessibility', 'attachment_icon_style');
+			if (in_array($current_scheme, ['dark', 'black']) && $attach_icon_style == AttachType::ICON_BLACK) {
+				DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'accessibility', 'attachment_icon_style', AttachType::ICON_WHITE);
+			} elseif (in_array($current_scheme, ['light']) && $attach_icon_style == AttachType::ICON_WHITE) {
+				DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'accessibility', 'attachment_icon_style', AttachType::ICON_BLACK);
 			}
 		}
 	}
