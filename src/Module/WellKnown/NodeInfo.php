@@ -39,6 +39,8 @@ class NodeInfo extends BaseModule
 			],
 		];
 
+		// A cache time of 3 days is a good compromise between performance and freshness of the data (the same values are used by Mastodon). 
+		header('Cache-Control: max-age=259200, public, immutable');
 		$this->earlyJsonExit($nodeinfo);
 	}
 }

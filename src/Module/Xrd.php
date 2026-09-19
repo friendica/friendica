@@ -24,8 +24,6 @@ class Xrd extends BaseModule
 {
 	protected function rawContent(array $request = [])
 	{
-		header('Vary: Accept', false);
-
 		// @TODO: Replace with parameter from router
 		if (DI::args()->getArgv()[0] == 'xrd') {
 			if (empty($_GET['uri'])) {
@@ -63,6 +61,8 @@ class Xrd extends BaseModule
 		}
 
 		header('Vary: Accept', false);
+		// A cache time of 3 days is a good compromise between performance and freshness of the data (the same values are used by Mastodon). 
+		header('Cache-Control: max-age=259200, public');
 
 		$alias = '';
 
