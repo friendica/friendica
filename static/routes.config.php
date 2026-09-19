@@ -100,6 +100,7 @@ $apiRoutes = [
 		'/photo/delete[.{extension:json|xml|rss|atom}]'      => [Module\Api\Friendica\Photo\Delete::class,           [        R::POST]],
 		'/photo/update[.{extension:json|xml|rss|atom}]'      => [Module\Api\Friendica\Photo\Update::class,           [        R::POST]],
 		'/photo[.{extension:json|xml|rss|atom}]'             => [Module\Api\Friendica\Photo::class,                  [R::GET         ]],
+		'/attach/delete[.{extension:json|xml|rss|atom}]'     => [Module\Api\Friendica\Attach\Delete::class,          [        R::POST]],
 	],
 
 	'/gnusocial/config[.{extension:json|xml|rss|atom}]'  => [Module\Api\GNUSocial\GNUSocial\Config::class,  [R::GET         ]],
@@ -693,6 +694,7 @@ return [
 			'/{open}' => [Module\Settings\Account::class,               [R::GET, R::POST]],
 		],
 		'/addons[/{addon}]'                => [Module\Settings\Addons::class,           [R::GET, R::POST]],
+		'/attachments'                     => [Module\Settings\Attachments::class,      [R::GET, R::POST]],
 		'/channels'                        => [Module\Settings\Channels::class,         [R::GET, R::POST]],
 		'/connectors[/{connector}]'        => [Module\Settings\Connectors::class,       [R::GET, R::POST]],
 		'/delegation[/{action}/{user_id}]' => [Module\Settings\Delegation::class,       [R::GET, R::POST]],
