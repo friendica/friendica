@@ -455,7 +455,10 @@ class UserNotification
 		}
 
 		// Check if the contact posted or shared something directly
-		if (DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => true])) {
+		$notify_new_posts   = [Contact::NOTIFY_NEW_POSTS_ALL];
+		$notify_new_posts[] = ($item['verb'] == Activity::ANNOUNCE) ? Contact::NOTIFY_NEW_POSTS_SHARES : Contact::NOTIFY_NEW_POSTS_POSTS;
+
+		if (DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => $notify_new_posts])) {
 			return true;
 		}
 
