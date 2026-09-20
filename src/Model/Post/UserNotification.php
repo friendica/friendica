@@ -9,6 +9,7 @@ namespace Friendica\Model\Post;
 
 use BadMethodCallException;
 use Exception;
+use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -455,7 +456,10 @@ class UserNotification
 		}
 
 		// Check if the contact posted or shared something directly
-		if (DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => true])) {
+		$notify_new_posts   = [LocalRelationship::NOTIFY_NEW_POSTS_ALL];
+		$notify_new_posts[] = ($item['verb'] == Activity::ANNOUNCE) ? LocalRelationship::NOTIFY_NEW_POSTS_SHARES : LocalRelationship::NOTIFY_NEW_POSTS_POSTS;
+
+		if (DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => $notify_new_posts])) {
 			return true;
 		}
 

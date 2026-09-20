@@ -21,7 +21,7 @@ use Friendica\Model\Contact;
  * @property-read bool   $pending
  * @property-read int    $rel
  * @property-read string $info
- * @property-read bool   $notifyNewPosts
+ * @property-read int    $notifyNewPosts
  * @property-read int    $remoteSelf
  * @property-read int    $fetchFurtherInformation
  * @property-read string $ffiKeywordDenylist
@@ -42,6 +42,12 @@ class LocalRelationship extends \Friendica\BaseEntity
 	public const MIRROR_OWN_POST       = 2;
 	public const MIRROR_NATIVE_RESHARE = 3;
 
+	// Notify New Posts options, not a binary flag
+	public const NOTIFY_NEW_POSTS_NONE   = 0;
+	public const NOTIFY_NEW_POSTS_ALL    = 1;
+	public const NOTIFY_NEW_POSTS_POSTS  = 2;
+	public const NOTIFY_NEW_POSTS_SHARES = 3;
+
 	/** @var int */
 	protected $userId;
 	/** @var int */
@@ -60,7 +66,7 @@ class LocalRelationship extends \Friendica\BaseEntity
 	protected $rel;
 	/** @var string */
 	protected $info;
-	/** @var bool */
+	/** @var int One of NOTIFY_NEW_POSTS_* */
 	protected $notifyNewPosts;
 	/** @var int One of MIRROR_* */
 	protected $remoteSelf;
@@ -77,7 +83,7 @@ class LocalRelationship extends \Friendica\BaseEntity
 	/** @var int */
 	protected $priority;
 
-	public function __construct(int $userId, int $contactId, bool $blocked = false, bool $ignored = false, bool $collapsed = false, bool $hidden = false, bool $pending = false, int $rel = Contact::NOTHING, string $info = '', bool $notifyNewPosts = false, int $remoteSelf = self::MIRROR_DEACTIVATED, int $fetchFurtherInformation = self::FFI_NONE, string $ffiKeywordDenylist = '', string $hubVerify = '', string $protocol = Protocol::PHANTOM, ?int $rating = null, ?int $priority = null)
+	public function __construct(int $userId, int $contactId, bool $blocked = false, bool $ignored = false, bool $collapsed = false, bool $hidden = false, bool $pending = false, int $rel = Contact::NOTHING, string $info = '', int $notifyNewPosts = self::NOTIFY_NEW_POSTS_NONE, int $remoteSelf = self::MIRROR_DEACTIVATED, int $fetchFurtherInformation = self::FFI_NONE, string $ffiKeywordDenylist = '', string $hubVerify = '', string $protocol = Protocol::PHANTOM, ?int $rating = null, ?int $priority = null)
 	{
 		$this->userId                  = $userId;
 		$this->contactId               = $contactId;
