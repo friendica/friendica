@@ -76,6 +76,9 @@
 	</div>
 	<div id="register-nickname-end"></div>
 
+	{{include file="field_custom.tpl" field=$timezone}}
+	{{include file="field_select.tpl" field=$language}}
+
 	<input type="input" id=tarpit" name="email" style="display: none;" placeholder="Don't enter anything here"/>
 
 	{{if $additional}}

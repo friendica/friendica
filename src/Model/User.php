@@ -1261,6 +1261,7 @@ class User
 		$blocked    = !empty($data['blocked']);
 		$verified   = !empty($data['verified']);
 		$language   = !empty($data['language'])   ? L10n::toDirectoryName((string) $data['language']) : 'en';
+		$timezone   = !empty($data['timezone'])   ? trim((string) $data['timezone'])   : DI::config()->get('system', 'default_timezone', 'UTC');
 
 		$netpublish = $publish = !empty($data['profile_publish_reg']);
 
@@ -1403,7 +1404,7 @@ class User
 			'verified'         => $verified,
 			'blocked'          => $blocked,
 			'language'         => $language,
-			'timezone'         => 'UTC',
+			'timezone'         => $timezone,
 			'register_date'    => DateTimeFormat::utcNow(),
 			'default-location' => '',
 		]);

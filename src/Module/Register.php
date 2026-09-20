@@ -24,6 +24,7 @@ use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Friendica\Util\Proxy;
+use Friendica\Util\Temporal;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
@@ -193,6 +194,9 @@ class Register extends BaseModule
 
 		$ask_password = !DBA::count('contact');
 
+		$timezone = ['timezone_select', DI::l10n()->t('Your Timezone:'), Temporal::getTimezoneSelect(DI::appHelper()->getTimeZone()), ''];
+		$language = ['language', DI::l10n()->t('Your Language:'), L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language')), DI::l10n()->t('Set the language we use to show you friendica interface and to send you emails'), DI::l10n()->getAvailableLanguages()];
+
 		// Retrieve system messages to display on the registration page
 		$notices = DI::sysmsg()->flushNotices();
 
@@ -249,6 +253,8 @@ class Register extends BaseModule
 			'$additional'            => !empty(DI::userSession()->getLocalUserId()),
 			'$parent_password'       => ['parent_password', DI::l10n()->t('Parent Password:'), '', DI::l10n()->t('Please enter the password of the parent account to legitimize your request.')],
 			'$acct_type'             => $acct_type,
+			'$timezone'              => $timezone,
+			'$language'              => $language,
 
 		]);
 
@@ -384,7 +390,9 @@ class Register extends BaseModule
 
 		$post['blocked']  = $blocked;
 		$post['verified'] = $verified;
-		$post['language'] = L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language'));
+		if (empty($post['language'])) {
+			$post['language'] = L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language'));
+		}
 
 		try {
 			$result = Model\User::create($post);
