@@ -92,7 +92,8 @@
 		"ext-imagick": "For faster image processing",
 		"ext-redis": "To use Redis as a locking or caching provider",
 		"ext-pdo": "To use PDO as a database driver, has priority over mysqli unless database.disable_pdo is set",
-		"ext-mysqli": "To use mysqli as a databse driver"
+		"ext-mysqli": "To use mysqli as a databse driver",
+		"ext-zip": "To allow downloading a whole photo album as a ZIP file"
 	},
 	"repositories": [
 		{

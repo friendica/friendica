@@ -29,6 +29,12 @@
 			{{$drop.0}}
 		</button>
 		{{/if}}
+		{{if $download}}
+		<a id="album-download-link" class="btn btn-primary page-action" href="{{$download.1}}">
+			<i class="ri ri-file-zip-line"></i>
+			{{$download.0}}
+		</a>
+		{{/if}}
 
 		{{if ! $noorder}}
 		<a class="photos-order-link page-action" href="{{$order.1}}" title="{{$order.0}}" data-toggle="tooltip">
