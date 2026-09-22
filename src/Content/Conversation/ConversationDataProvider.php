@@ -418,7 +418,11 @@ final readonly class ConversationDataProvider
 		$quoteshares = $this->getQuoteShares($uriIds);
 		$counts      = $this->getCounts($uriIds);
 
-		$compactTimeline = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS]) && $this->pConfig->get($uid, 'system', 'compact_timeline');
+		$commentsMode = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS])
+			? (int) $this->pConfig->get($uid, 'system', 'compact_timeline', ConversationRenderer::COMMENTS_MODE_ALL)
+			: ConversationRenderer::COMMENTS_MODE_ALL;
+		$compactTimeline = $commentsMode === ConversationRenderer::COMMENTS_MODE_COMPACT;
+		$hideComments    = $commentsMode === ConversationRenderer::COMMENTS_MODE_HIDDEN;
 		$partialLoad     = $mode === ConversationRenderer::MODE_COMMENTS && $sinceId > 0;
 
 		if (!$this->config->get('system', 'legacy_activities')) {
@@ -457,7 +461,7 @@ final readonly class ConversationDataProvider
 		}
 
 		$params      = ['order' => ['uri-id' => !$partialLoad && !$compactTimeline]];
-		$threadItems = Post::select(array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), $condition, $params);
+		$threadItems = $hideComments ? null : Post::select(array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), $condition, $params);
 
 		$channels = [];
 		foreach ($this->userDefinedChannel->selectByUid($uid) as $userChannel) {
@@ -467,7 +471,9 @@ final readonly class ConversationDataProvider
 			$channels[$systemChannel->code] = $systemChannel;
 		}
 
-		if ($partialLoad) {
+		if ($hideComments) {
+			$rows = [];
+		} elseif ($partialLoad) {
 			$rows = $this->getRows($threadItems, $mode, $ignoredGsids, $maxComments);
 			$rows = $this->filterCommentSubtree($rows, $sinceId);
 		} elseif ($compactTimeline) {
@@ -482,7 +488,7 @@ final readonly class ConversationDataProvider
 		}
 
 		// @todo is currently only needed in this mode, but could be helpful for the future to do it for all modes
-		if ($compactTimeline || $partialLoad) {
+		if ($compactTimeline || $partialLoad || $hideComments) {
 			$answers    = $this->getAnswersPerThread($rows);
 			$replyCount = $this->calculateMissingReplyCounts($rows, $emojis);
 		} else {

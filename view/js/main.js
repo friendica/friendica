@@ -1255,6 +1255,24 @@ function showHideComments(id) {
 	}
 }
 
+// Opens a post's display page from a click on its text, unless the click hit
+// a link, button or embedded media inside it - used when comments are hidden
+// from the feed and can only be read/written on the display page. A plain
+// element.click() on a synthesized link isn't picked up by Unpoly - it only
+// forwards clicks that either came from a real mouse hit or lack coordinates
+// entirely (keyboard activation), so up.visit() is used directly when SPA
+// mode is active.
+function clickToDisplay(event, url) {
+	if ($(event.target).closest('a, button, img, video, audio, iframe').length) {
+		return;
+	}
+	if (typeof window.up !== 'undefined' && typeof up.visit === 'function') {
+		up.error.muteUncriticalRejection(up.visit(url));
+		return;
+	}
+	window.location.href = url;
+}
+
 // Load more comments for a specific post
 function loadMoreComments(uriId, itemId, existing) {
 	var button = $('#load-more-comments-' + itemId);

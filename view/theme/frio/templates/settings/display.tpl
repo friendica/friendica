@@ -50,7 +50,23 @@
 						{{include file="field_checkbox.tpl" field=$enable_dislike}}
 						{{include file="field_checkbox.tpl" field=$display_resharer}}
 						{{include file="field_checkbox.tpl" field=$stay_local}}
-						{{include file="field_checkbox.tpl" field=$compact_timeline}}
+						{{include file="field_select.tpl" field=$compact_timeline}}
+						{{include file="field_checkbox.tpl" field=$click_to_display}}
+						<script>
+							(function () {
+								var mode = document.getElementById('id_compact_timeline');
+								var wrapper = document.getElementById('div_id_click_to_display');
+								if (!mode || !wrapper) {
+									return;
+								}
+								var toggle = function () {
+									// value "0" is ConversationRenderer::COMMENTS_MODE_ALL
+									wrapper.style.display = mode.value === '0' ? 'none' : '';
+								};
+								mode.addEventListener('change', toggle);
+								toggle();
+							})();
+						</script>
 						{{include file="field_checkbox.tpl" field=$show_page_drop}}
 						{{include file="field_checkbox.tpl" field=$display_eventlist}}
 						{{include file="field_select.tpl" field=$preview_mode}}
