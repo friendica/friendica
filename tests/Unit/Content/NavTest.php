@@ -208,7 +208,7 @@ class NavTest extends TestCase
 
 		self::assertNotNull($userinfo);
 		self::assertSame('Test User', $userinfo['name']);
-		self::assertSame('profile/' . self::NICK . '/profile', $userinfo['link'][0], 'the profile link');
+		self::assertSame('profile/' . self::NICK . '/conversations', $userinfo['link'][0], 'the profile link');
 		self::assertNotEmpty($userinfo['link'][1], 'the label shown in the menu');
 	}
 
