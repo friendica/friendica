@@ -161,7 +161,7 @@ class Image implements \Stringable
 	private function loadData(string $data): bool
 	{
 		if ($this->isImagick()) {
-			$this->image = new Imagick();
+			$this->image = DI::imagick();
 			try {
 				$this->image->readImageBlob($data);
 			} catch (Exception $e) {
@@ -822,7 +822,7 @@ class Image implements \Stringable
 		$draw   = null;
 
 		if ($this->isImagick()) {
-			$this->image = new Imagick();
+			$this->image = DI::imagick();
 			$draw        = new ImagickDraw();
 			$this->image->newImage($scaled['width'], $scaled['height'], '', 'png');
 		} else {

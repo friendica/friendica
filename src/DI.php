@@ -18,6 +18,7 @@ use Friendica\Navigation\SystemMessages;
 use Friendica\Protocol\ATProtocol;
 use Friendica\Util\BasePath;
 use Psr\Log\LoggerInterface;
+use Imagick;
 
 /**
  * This class is capable of getting all dynamic created classes
@@ -665,5 +666,21 @@ abstract class DI
 	public static function eventDispatcher(): \Psr\EventDispatcher\EventDispatcherInterface
 	{
 		return self::$dice->create(\Psr\EventDispatcher\EventDispatcherInterface::class);
+	}
+
+	//
+	// Other objects
+	//
+	public static function imagick(): Imagick
+	{
+		$resource_limits = DI::config()->get("imagemagick", "resourcelimits", []);
+		$registry = DI::config()->get("imagemagick", "registry", []);
+		foreach ($resource_limits as $key => $value) {
+			Imagick::setResourceLimit($key, $value);
+		}
+		foreach ($registry as $key => $value) {
+			Imagick::setRegistry($key, $value);
+		}
+		return new Imagick();
 	}
 }
