@@ -77,8 +77,9 @@ class Nav
 
 		$nav_info = $this->getInfo();
 
+		// NOTE: Frio does not use this link.
 		if ($this->session->getLocalUserNickname()) {
-			$profile_link = 'profile/' . $this->session->getLocalUserNickname() . '/profile';
+			$profile_link = 'profile/' . $this->session->getLocalUserNickname() . '/conversations';
 		} else {
 			$profile_link = false;
 		}
