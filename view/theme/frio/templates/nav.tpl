@@ -28,7 +28,7 @@
 					</div>
 					{{* The search box *}}
 					{{if $nav.search}}
-						<form id="search-box" class="navbar-form hidden-xs form-group form-group-search" role="search" method="get" action="{{$nav.search.0}}">
+						<form id="search-box" class="navbar-form hidden-sm hidden-xs form-group form-group-search" role="search" method="get" action="{{$nav.search.0}}">
 							<div class="form-group form-group-search">
 								<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
 									type="search" name="q" placeholder="{{$search_placeholder}}">
@@ -39,7 +39,7 @@
 							</div>
 						</form>
 					{{/if}}
-					<button type="button" id="search-mobile-btn" class="navbar-toggle collapsed" data-toggle="collapse"
+					<button type="button" id="search-mobile-btn" class="navbar-toggle collapsed visible-sm visible-xs" data-toggle="collapse"
 						data-target="#search-mobile" aria-expanded="false" aria-controls="search-mobile">
 						<span class="sr-only">Toggle Search</span>
 						<i class="ri ri-search-line ri-fw ri-lg" aria-hidden="true"></i>
@@ -82,7 +82,7 @@
 						{{/if}}
 
 						{{if $nav.community}}
-							<li class="nav-segment">
+							<li class="nav-segment hidden-xs">
 								<a accesskey="c" class="nav-menu {{$sel.community}}" href="{{$nav.community.0}}"
 									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.community.3}}" title="{{$nav.community.3}}"><i
 									  class="ri ri-xl ri-earth-{{if $sel.community}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.community.1}}</span></a>
@@ -242,6 +242,16 @@
 											</a>
 										</li>
 									{{/if}}
+									{{if $nav.community}}
+										<li class="visible-xs">
+											<a role="menuitem" id="nav-menu-community-link"
+												class="nav-link {{$nav.community.2}}" href="{{$nav.community.0}}"
+												title="{{$nav.community.3}}">
+												<i class="ri ri-earth-line ri-fw" aria-hidden="true"></i>
+												{{$nav.community.1}}
+											</a>
+										</li>
+									{{/if}}
 									<li>
 										<a role="menuitem" id="nav-directory-link" class="nav-link {{$nav.directory.2}}"
 											href="{{$nav.directory.0}}" title="{{$nav.directory.3}}">
@@ -373,7 +383,7 @@
 {{/if}}
 
 {{* provide a a search input for mobile view, which expands by pressing the search icon *}}
-<div id="search-mobile" class="hidden-lg hidden-md hidden-sm collapse row well">
+<div id="search-mobile" class="hidden-lg hidden-md collapse row well">
 	<div class="col-xs-12">
 		<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
 			<div class="form-group form-group-search">
