@@ -62,7 +62,7 @@
 						{{if $nav.back}}
 							<!-- Link back home to one's own instance, only visible to visitors -->
 							<li class="nav-segment">
-								<a accesskey="b" class="nav-menu" href="{{$nav.back.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
+								<a accesskey="b" class="nav-menu hidden-xs" href="{{$nav.back.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
 										aria-label="{{$nav.back.3}}" title="{{$nav.back.3}}"><i class="ri ri-xl ri-arrow-go-back-line ri-fw"
 										aria-hidden="true"></i> <span class="nav-label">{{$nav.back.1}}</span></a>
 							</li>
@@ -83,7 +83,7 @@
 
 						{{if $nav.community}}
 							<li class="nav-segment">
-								<a accesskey="c" class="nav-menu {{$sel.community}}" href="{{$nav.community.0}}"
+								<a accesskey="c" class="nav-menu hidden-xs {{$sel.community}}" href="{{$nav.community.0}}"
 									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.community.3}}" title="{{$nav.community.3}}"><i
 									  class="ri ri-xl ri-earth-{{if $sel.community}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.community.1}}</span></a>
 							</li>
@@ -92,7 +92,7 @@
 						{{if $nav.calendar}}
 							<li class="nav-segment">
 								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
-									aria-label="{{$nav.calendar.1}}" title="{{$nav.calendar.3}}" class="nav-menu {{$sel.calendar}}"><i
+									aria-label="{{$nav.calendar.1}}" title="{{$nav.calendar.3}}" class="nav-menu hidden-xs {{$sel.calendar}}"><i
 									class="ri ri-xl ri-calendar-2-{{if $sel.calendar}}fill{{else}}line{{/if}} ri-fw"></i> <span class="nav-label">{{$nav.calendar.1}}</span></a>
 							</li>
 						{{/if}}
@@ -174,6 +174,28 @@
 								</ul>
 							</li>
 						{{/if}}
+
+						{{* The "more" menu with the less frequently used navigation shortcuts, visible on mobile only *}}
+						<li id="nav-more" class="nav-segment dropdown visible-xs">
+							<button id="nav-more-menu-btn" class="btn-link dropdown-toggle" data-toggle="dropdown"
+								type="button" aria-haspopup="true" aria-expanded="false"
+								aria-controls="nav-more-menu">
+								<i class="ri ri-more-2-line ri-lg" aria-label="{{$nav.more.1}}"></i>
+								<span class="nav-label">{{$nav.more.1}}</span>
+							</button>
+							<ul id="nav-more-menu" class="dropdown-menu menu-popup" role="menu"
+								aria-labelledby="nav-more-menu-btn">
+								{{if $nav.back}}
+									<li><a role="menuitem" href="{{$nav.back.0}}" title="{{$nav.back.3}}"><i class="ri ri-arrow-go-back-line ri-fw" aria-hidden="true"></i> {{$nav.back.1}}</a></li>
+								{{/if}}
+								{{if $nav.community}}
+									<li><a role="menuitem" class="{{$sel.community}}" href="{{$nav.community.0}}" title="{{$nav.community.3}}"><i class="ri ri-earth-line ri-fw" aria-hidden="true"></i> {{$nav.community.1}}</a></li>
+								{{/if}}
+								{{if $nav.calendar}}
+									<li><a role="menuitem" class="{{$sel.calendar}}" href="{{$nav.calendar.0}}" title="{{$nav.calendar.1}}"><i class="ri ri-calendar-2-line ri-fw" aria-hidden="true"></i> {{$nav.calendar.1}}</a></li>
+								{{/if}}
+							</ul>
+						</li>
 
 						{{* The user dropdown menu *}}
 						{{if $userinfo}}

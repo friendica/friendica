@@ -185,6 +185,7 @@ class Nav
 			'login'         => null,
 			'logout'        => null,
 			'messages'      => null,
+			'more'          => null,
 			'network'       => null,
 			'notifications' => null,
 			'remote'        => null,
@@ -258,6 +259,8 @@ class Nav
 		if ($this->session->getLocalUserId()) {
 			$nav['calendar'] = ['calendar', $this->l10n->t('Calendar'), '', $this->l10n->t('Calendar')];
 		}
+
+		$nav['more'] = ['', $this->l10n->t('More'), '', $this->l10n->t('More')];
 
 		$nav['directory'] = [$gdirpath, $this->l10n->t('Directory'), '', $this->l10n->t('People directory')];
 
