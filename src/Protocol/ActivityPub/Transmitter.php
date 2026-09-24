@@ -390,7 +390,13 @@ class Transmitter
 			}
 		}
 
-		$data['url']                       = $owner['url'];
+		// Groups are presented by their thread overview
+		if ($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY) {
+			$data['url'] = DI::baseUrl() . '/group/' . $owner['nick'];
+		} else {
+			$data['url'] = $owner['url'];
+		}
+
 		$data['manuallyApprovesFollowers'] = in_array($owner['page-flags'], [User::PAGE_FLAGS_NORMAL, User::PAGE_FLAGS_PRVGROUP]);
 		$data['discoverable']              = (bool) $owner['net-publish'] && $full;
 		$data['indexable']                 = (bool) $owner['net-publish'] && $full;
@@ -542,6 +548,44 @@ class Transmitter
 	}
 
 	/**
+	 * Adds the receiver and the audience data of a single mention or audience term
+	 *
+	 * @param array   $term      Tag entry
+	 * @param array   $item      Item array
+	 * @param boolean $is_group  Is the item owner a group?
+	 * @param array   $data      Permission data that is extended
+	 * @param boolean $exclusive Is the post exclusively addressed to a group?
+	 * @param boolean $mention   Is a group mentioned?
+	 */
+	private static function addTermReceiver(array $term, array $item, bool $is_group, array &$data, bool &$exclusive, bool &$mention)
+	{
+		$profile = APContact::getByURL($term['url'], false);
+		if (empty($profile)) {
+			return;
+		}
+
+		if (($term['type'] == Tag::AUDIENCE) && ($profile['type'] == 'Group')) {
+			$data['audience'][] = $profile['url'];
+			// A starting post that is addressed to a group via the audience is handled like an exclusive mention
+			if (!$is_group && ($item['gravity'] == Item::GRAVITY_PARENT) && !empty($profile['followers'])) {
+				$exclusive    = true;
+				$data['cc'][] = $profile['followers'];
+				DI::logger()->debug('Group post via audience', ['uri-id' => $item['uri-id'], 'group' => $profile['url']]);
+			}
+		}
+		if ($term['type'] == Tag::EXCLUSIVE_MENTION) {
+			$exclusive = true;
+			if (!empty($profile['followers']) && ($profile['type'] == 'Group')) {
+				$data['cc'][]       = $profile['followers'];
+				$data['audience'][] = $profile['url'];
+			}
+		} elseif (($term['type'] == Tag::MENTION) && ($profile['type'] == 'Group')) {
+			$mention = true;
+		}
+		$data['to'][] = $profile['url'];
+	}
+
+	/**
 	 * Creates an array of permissions from an item thread
 	 *
 	 * @param array   $item             Item array
@@ -661,22 +705,7 @@ class Transmitter
 			}
 
 			foreach ($terms as $term) {
-				$profile = APContact::getByURL($term['url'], false);
-				if (!empty($profile)) {
-					if (($term['type'] == Tag::AUDIENCE) && ($profile['type'] == 'Group')) {
-						$data['audience'][] = $profile['url'];
-					}
-					if ($term['type'] == Tag::EXCLUSIVE_MENTION) {
-						$exclusive = true;
-						if (!empty($profile['followers']) && ($profile['type'] == 'Group')) {
-							$data['cc'][]       = $profile['followers'];
-							$data['audience'][] = $profile['url'];
-						}
-					} elseif (($term['type'] == Tag::MENTION) && ($profile['type'] == 'Group')) {
-						$mention = true;
-					}
-					$data['to'][] = $profile['url'];
-				}
+				self::addTermReceiver($term, $item, $is_group, $data, $exclusive, $mention);
 			}
 			if (!$exclusive && ($item['private'] == Item::UNLISTED)) {
 				$data['to'][] = $actor_profile['followers'];
@@ -692,22 +721,7 @@ class Transmitter
 						continue;
 					}
 
-					$profile = APContact::getByURL($term['url'], false);
-					if (!empty($profile)) {
-						if (($term['type'] == Tag::AUDIENCE) && ($profile['type'] == 'Group')) {
-							$data['audience'][] = $profile['url'];
-						}
-						if ($term['type'] == Tag::EXCLUSIVE_MENTION) {
-							$exclusive = true;
-							if (!empty($profile['followers']) && ($profile['type'] == 'Group')) {
-								$data['cc'][]       = $profile['followers'];
-								$data['audience'][] = $profile['url'];
-							}
-						} elseif (($term['type'] == Tag::MENTION) && ($profile['type'] == 'Group')) {
-							$mention = true;
-						}
-						$data['to'][] = $profile['url'];
-					}
+					self::addTermReceiver($term, $item, $is_group, $data, $exclusive, $mention);
 				}
 			}
 

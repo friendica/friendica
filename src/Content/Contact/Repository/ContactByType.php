@@ -18,14 +18,14 @@ use Friendica\Database\DBA;
  */
 class ContactByType
 {
-	private const FIELDS = ['id', 'url', 'alias', 'name', 'micro', 'thumb', 'avatar', 'network', 'uid'];
+	private const FIELDS = ['id', 'pid', 'uri-id', 'url', 'addr', 'alias', 'name', 'micro', 'thumb', 'avatar', 'network', 'uid', 'about', 'gsid'];
 
 	public function __construct(private readonly Database $database) {}
 
 	/**
 	 * Selects visible user contacts for the provided contact types.
 	 *
-	 * @return array<int, array{url: string, alias: string, name: string, id: int, micro: string, thumb: string, network: string}>
+	 * @return array<int, array{url: string, alias: string, name: string, id: int, pid: int, micro: string, thumb: string, network: string, about: string}>
 	 * @throws \Exception
 	 */
 	public function selectForUser(int $uid, array $contactTypes, bool $lastItem, bool $showHidden = true, bool $showPrivate = false): array
@@ -59,12 +59,16 @@ class ContactByType
 		foreach ($contacts as $key => $contact) {
 			$contacts[$key] = [
 				'url'     => $contact['url'],
+				'addr'    => $contact['addr'],
 				'alias'   => $contact['alias'],
 				'name'    => $contact['name'],
 				'id'      => $contact['id'],
+				'pid'     => $contact['pid'],
 				'micro'   => $contact['micro'],
 				'thumb'   => $contact['thumb'],
 				'network' => $contact['network'],
+				'about'   => $contact['about'] ?? '',
+				'gsid'    => $contact['gsid'],
 			];
 		}
 

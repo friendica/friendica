@@ -546,6 +546,26 @@ class Item
 				$this->logger->info('Post with group mention will not be converted to a group post', ['url' => $tag[2], 'mention' => $tag[1]]);
 			}
 		}
+
+		// A top-level post that is only addressed to a group is a group post, even without a mention in the body
+		if (($item['gravity'] == ItemModel::GRAVITY_PARENT) && empty($group_contact) && preg_match('/^<(\d+)>$/', $item['allow_cid'] ?? '', $matches)) {
+			$contact = Contact::selectFirst(['id', 'url', 'prv'], ['id' => $matches[1], 'uid' => $item['uid'], 'contact-type' => Contact::TYPE_COMMUNITY]);
+			if (!empty($contact)) {
+				$private_group = $contact['prv'];
+				$only_to_group = true;
+				$private_id    = $contact['id'];
+				$group_contact = $contact;
+
+				// Stored as audience after the post has been created
+				$item['audience'] = $contact['url'];
+
+				if (!empty($item['inform'])) {
+					$item['inform'] .= ',';
+				}
+				$item['inform'] .= 'cid:' . $contact['id'];
+				$this->logger->info('Post is only addressed to a group', ['url' => $contact['url'], 'private' => $private_group]);
+			}
+		}
 		$this->logger->info('Got inform', ['inform' => $item['inform']]);
 
 		if (($item['gravity'] == ItemModel::GRAVITY_PARENT) && !empty($group_contact) && ($private_group || $only_to_group)) {

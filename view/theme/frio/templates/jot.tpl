@@ -104,6 +104,9 @@
 					{{if $notes_cid}}
 					<input type="hidden" name="contact_allow[]" value="<{{$notes_cid}}>" />
 					{{/if}}
+					{{if $group_cid}}
+					<input type="hidden" name="contact_allow[]" value="<{{$group_cid}}>" />
+					{{/if}}
 					<div id="jot-title-wrap"><input name="title" id="jot-title" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdertitle}}" title="{{$placeholdertitle}}" value="{{$title}}" style="display:block;" dir="auto" /></div>
 					{{if $placeholdersummary}}
 					<div id="jot-summary-wrap"><input name="summary" id="jot-summary" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdersummary}}" title="{{$placeholdersummary}}" value="{{$summary}}" style="display:block;" dir="auto" /></div>

@@ -1045,3 +1045,267 @@ summary.wall-item-summary {
 .edit-profile-link-wrapper {
 	text-align: center;
 }
+
+/* Group overview */
+.group-list-server h2 {
+	margin-bottom: 0;
+}
+
+.group-list-server p {
+	font-size: small;
+}
+
+.group-list-server .group-list-discover {
+	margin-left: 10px;
+	font-size: small;
+}
+
+.group-list {
+	margin: 0 0 20px;
+	padding: 0;
+	list-style: none;
+}
+
+.group-list-entry {
+	display: grid;
+	grid-template-columns: 48px minmax(0, 1fr) auto minmax(0, 18em);
+	grid-template-areas: "avatar title stats latest";
+	column-gap: 15px;
+	align-items: start;
+	padding: 15px 0;
+	border-bottom: 1px solid rgba(127, 127, 127, 0.3);
+}
+
+.group-list-avatar {
+	grid-area: avatar;
+}
+
+.group-list-avatar img,
+.group-header-avatar img {
+	width: 48px;
+	height: 48px;
+	max-width: none;
+	object-fit: cover;
+	border-radius: 4px;
+}
+
+.group-list-title {
+	grid-area: title;
+	overflow-wrap: anywhere;
+}
+
+.group-list-name {
+	font-size: 1.4em;
+}
+
+.group-list-name.unseen,
+.group-list-latest.unseen {
+	font-weight: bold;
+}
+
+.group-list-about {
+	opacity: 0.8;
+}
+
+.group-list-description {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.group-list-stats {
+	grid-area: stats;
+	display: flex;
+	gap: 4px;
+}
+
+.group-list-stat {
+	min-width: 6em;
+	padding: 6px 8px;
+	font-size: small;
+	text-align: center;
+	background-color: rgba(127, 127, 127, 0.1);
+	border-radius: 4px;
+}
+
+.group-list-count {
+	display: block;
+	font-size: 1.6em;
+}
+
+.group-list-stat-unread .group-list-count {
+	font-weight: bold;
+}
+
+.group-list-latest {
+	grid-area: latest;
+	min-height: 48px;
+	padding-left: 10px;
+	font-size: small;
+	border-left: 2px solid var(--primary, rgba(127, 127, 127, 0.5));
+	overflow-wrap: anywhere;
+}
+
+.group-list-latest-meta img {
+	width: 20px;
+	height: 20px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.group-list-excerpt {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.group-header {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	margin-bottom: 10px;
+}
+
+.group-header-avatar img {
+	width: 64px;
+	height: 64px;
+}
+
+.group-header h1 {
+	margin: 0 0 5px;
+}
+
+.group-header-stat {
+	display: inline-block;
+	margin-right: 4px;
+	padding: 0 6px;
+	font-size: small;
+	border: 1px solid rgba(127, 127, 127, 0.3);
+	border-radius: 4px;
+}
+
+.group-header-about {
+	overflow-wrap: anywhere;
+}
+
+.group-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 8px;
+	margin: 15px 0;
+	padding: 8px;
+	background-color: rgba(127, 127, 127, 0.05);
+	border: 1px solid rgba(127, 127, 127, 0.3);
+	border-radius: 4px;
+}
+
+#group-discover .group-overview-avatar {
+	width: 64px;
+}
+
+#group-discover .group-overview-avatar img {
+	width: 48px;
+	height: 48px;
+	max-width: none;
+	object-fit: cover;
+	border-radius: 4px;
+}
+
+#group-discover-search {
+	margin-bottom: 15px;
+}
+
+#group-discover .group-discover-server {
+	font-size: small;
+}
+
+#group-discover .group-discover-join {
+	text-align: right;
+	white-space: nowrap;
+}
+
+@media screen and (max-width: 1199px) {
+	.group-list-entry {
+		grid-template-columns: 48px minmax(0, 1fr) auto;
+		grid-template-areas:
+			"avatar title stats"
+			"avatar latest latest";
+		row-gap: 8px;
+	}
+}
+
+@media screen and (max-width: 767px) {
+	.group-list-entry {
+		grid-template-columns: 48px minmax(0, 1fr);
+		grid-template-areas:
+			"avatar title"
+			"avatar stats"
+			"avatar latest";
+		row-gap: 8px;
+		column-gap: 10px;
+	}
+
+	.group-list-name {
+		font-size: 1.2em;
+	}
+
+	.group-list-stat {
+		min-width: 0;
+		padding: 2px 6px;
+	}
+
+	.group-list-count {
+		display: inline;
+		font-size: inherit;
+		font-weight: bold;
+	}
+
+	.group-list-latest {
+		min-height: 0;
+	}
+
+	#group-discover thead {
+		display: none;
+	}
+
+	#group-discover tr {
+		display: grid;
+		grid-template-columns: 48px 1fr auto;
+		grid-template-areas:
+			"avatar title join"
+			"avatar latest join";
+		column-gap: 10px;
+		padding: 8px 0;
+		border-top: 1px solid rgba(127, 127, 127, 0.3);
+	}
+
+	#group-discover td {
+		display: block;
+		min-width: 0;
+		padding: 0;
+		border: none;
+		overflow-wrap: anywhere;
+	}
+
+	#group-discover .group-overview-avatar {
+		grid-area: avatar;
+		width: auto;
+	}
+
+	#group-discover .group-overview-title {
+		grid-area: title;
+	}
+
+	#group-discover .group-overview-latest {
+		grid-area: latest;
+		font-size: smaller;
+	}
+
+	#group-discover .group-discover-join {
+		grid-area: join;
+		align-self: center;
+	}
+}

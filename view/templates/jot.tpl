@@ -23,6 +23,9 @@
 		{{if $notes_cid}}
 		<input type="hidden" name="contact_allow[]" value="<{{$notes_cid}}>" />
 		{{/if}}
+		{{if $group_cid}}
+		<input type="hidden" name="contact_allow[]" value="<{{$group_cid}}>" />
+		{{/if}}
 		<div id="jot-title-wrap"><input name="title" id="jot-title" type="text" placeholder="{{$placeholdertitle}}" value="{{$title}}" class="jothidden" style="display:none" dir="auto"></div>
 		{{if $placeholdersummary}}
 		<div id="jot-summary-wrap"><input name="summary" id="jot-summary" type="text" placeholder="{{$placeholdersummary}}" value="{{$summary}}" class="jothidden" style="display:none" dir="auto"></div>

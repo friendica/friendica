@@ -932,6 +932,11 @@ class Item
 			Tag::storeFromBody($item['uri-id'], $item['body']);
 		}
 
+		if (!empty($item['audience'])) {
+			DI::logger()->info('Store group audience', ['uri-id' => $item['uri-id'], 'audience' => $item['audience']]);
+			Tag::store($item['uri-id'], Tag::AUDIENCE, $item['audience'], $item['audience']);
+		}
+
 		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) && (!isset($item['sensitive']) || is_null($item['sensitive']))) {
 			$item['sensitive'] = Tag::existsTagForPost($item['uri-id'], 'nsfw');
 		}

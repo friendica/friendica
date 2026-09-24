@@ -29,6 +29,7 @@ class Nav
 	private static $selected = [
 		'global'        => null,
 		'community'     => null,
+		'groups'        => null,
 		'channel'       => null,
 		'network'       => null,
 		'profiles'      => null,
@@ -181,6 +182,7 @@ class Nav
 			'moderation'    => null,
 			'apps'          => null,
 			'community'     => null,
+			'groups'        => null,
 			'channel'       => null,
 			'calendar'      => null,
 			'login'         => null,
@@ -271,6 +273,7 @@ class Nav
 		// The following nav links are only show to logged-in users
 		if ($this->session->getLocalUserNickname()) {
 			$nav['network'] = ['network', $this->l10n->t('Home'), '', $this->l10n->t('Home')];
+			$nav['groups']  = ['groups', $this->l10n->t('Groups'), '', $this->l10n->t('Overview of your groups')];
 
 			// Don't show notifications for public communities
 			if ($this->session->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {

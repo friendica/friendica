@@ -2984,6 +2984,20 @@ body.mod-login .navbar #nav-login {
 	width: 650px;
 }
 
+@media (min-width: 992px) {
+	.mod-groups main aside,
+	.mod-group main aside {
+		display: none;
+	}
+	.mod-groups #content,
+	.mod-group #content {
+		width: 100%;
+		max-width: 1350px;
+		float: none;
+		margin: 0 auto;
+	}
+}
+
 .mod-lostpass #login-name-wrapper{
 	margin: 20px 0;
 }

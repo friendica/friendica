@@ -13,6 +13,7 @@ use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Contact\LocalRelationship\Repository\LocalRelationship;
 use Friendica\Content\Conversation\StatusEditor;
+use Friendica\Content\GroupManager;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget\VCard;
 use Friendica\Core\ACL;
@@ -32,7 +33,7 @@ use Psr\Log\LoggerInterface;
  */
 class Conversations extends BaseModule
 {
-	public function __construct(L10n $l10n, private readonly LocalRelationship $localRelationship, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private Page $page, private readonly StatusEditor $statusEditor, private readonly IHandleUserSessions $userSession, $server, array $parameters = [])
+	public function __construct(L10n $l10n, private readonly LocalRelationship $localRelationship, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private Page $page, private readonly StatusEditor $statusEditor, private readonly IHandleUserSessions $userSession, private readonly GroupManager $groupManager, $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 	}
@@ -78,13 +79,25 @@ class Conversations extends BaseModule
 		$output = '';
 
 		if (!$contact['ap-posting-restricted'] && !$raw) {
-			$options = [
-				'lockstate'            => ACL::getLockstateForUserId($this->userSession->getLocalUserId()) ? 'lock' : 'unlock',
-				'acl'                  => ACL::getFullSelectorHTML($this->page, $this->userSession->getLocalUserId(), true, []),
-				'bang'                 => '',
-				'content'              => ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY ? '!' : '@') . ($contact['addr'] ?: $contact['url']),
-				'contact_account_type' => $contact['contact-type'],
-			];
+			$ucid = 0;
+			if ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY) {
+				$ucid = ModelContact::getUserContactId($contact['id'], $this->userSession->getLocalUserId());
+			}
+
+			if ($ucid) {
+				$options = [
+					'group_cid'            => $ucid,
+					'contact_account_type' => $contact['contact-type'],
+				];
+			} else {
+				$options = [
+					'lockstate'            => ACL::getLockstateForUserId($this->userSession->getLocalUserId()) ? 'lock' : 'unlock',
+					'acl'                  => ACL::getFullSelectorHTML($this->page, $this->userSession->getLocalUserId(), true, []),
+					'bang'                 => '',
+					'content'              => ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY ? '!' : '@') . ($contact['addr'] ?: $contact['url']),
+					'contact_account_type' => $contact['contact-type'],
+				];
+			}
 			$output = $this->statusEditor->renderEditor($options);
 		}
 
@@ -93,6 +106,11 @@ class Conversations extends BaseModule
 			$output .= Contact::getTabsHTML($contact, Contact::TAB_CONVERSATIONS);
 		}
 		$output .= ModelContact::getThreadsFromId($contact['id'], $this->userSession->getLocalUserId(), 0, 0, $request);
+
+		// Group posts aren't set to seen in the timelines, so we do it here
+		if ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY) {
+			$this->groupManager->markSeen($this->userSession->getLocalUserId(), $contact['id']);
+		}
 
 		return $output;
 	}

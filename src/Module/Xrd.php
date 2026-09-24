@@ -79,7 +79,11 @@ class Xrd extends BaseModule
 				throw new NotFoundException('Owner was not found for user->uid=' . $name);
 			}
 
-			$alias = str_replace('/profile/', '/~', $owner['url']);
+			if ($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY) {
+				$alias = $this->baseUrl . '/group/' . $owner['nickname'];
+			} else {
+				$alias = str_replace('/profile/', '/~', $owner['url']);
+			}
 
 			$avatar = Photo::selectFirst(['type'], ['uid' => $owner['uid'], 'profile' => true]);
 		}
