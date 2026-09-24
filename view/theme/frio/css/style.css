@@ -4668,13 +4668,16 @@ div.login-form, .login-content-wrapper,
 		min-width: 80vw!important;
 		max-width: 95vw;
 	}
-  /* no room for one nav icon with labels shown */
-  body.show-nav-labels .navbar-left:has(a[href="community"]) #nav-calendar-link {
-  	display: none;
-  }
   body.show-nav-labels #topbar-first a.nav-menu,
   body.show-nav-labels #topbar-first button {
   	padding: 5px;
+  }
+}
+/* 576px matches Bootstrap's breakpoint between xs and sm */
+@media (width < 576px) {
+  /* no room for one nav icon with labels shown */
+  body.show-nav-labels .navbar-left:has(a[href="community"]) #nav-calendar-link {
+  	display: none;
   }
 }
 

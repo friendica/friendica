@@ -232,6 +232,17 @@
 										</li>
 									{{/foreach}}
 									<li class="divider visible-xs"><hr></li>
+									{{if $nav.calendar}}
+									  {{* This is because the calendar will be hidden from the main menu if nav labels are enabled *}}
+										<li class="visible-xs">
+											<a role="menuitem" id="nav-menu-calendar-link"
+												class="nav-link {{$nav.calendar.2}}" href="{{$nav.calendar.0}}"
+												title="{{$nav.calendar.3}}">
+												<i class="ri ri-calendar-line ri-fw" aria-hidden="true"></i>
+												{{$nav.calendar.1}}
+											</a>
+										</li>
+									{{/if}}
 									{{if $nav.contacts}}
 										<li class="visible-xs">
 											<a role="menuitem" id="nav-menu-contacts-link"
