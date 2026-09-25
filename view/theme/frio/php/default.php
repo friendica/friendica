@@ -30,7 +30,7 @@ $view_mode_class     = (DI::mode()->isMobile() || DI::mode()->isMobile()) ? 'mob
 $is_singleuser       = DI::config()->get('system', 'singleuser');
 $is_singleuser_class = $is_singleuser ? "is-singleuser" : "is-not-singleuser";
 $show_action_labels  = (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_action_labels', DI::config()->get('frio', 'show_action_labels', true))) ? 'show-action-labels' : '';
-$show_nav_labels     = (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_nav_labels', DI::config()->get('frio', 'show_nav_labels', true))) ? 'show-nav-labels' : '';
+$show_nav_labels     = (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_nav_labels', DI::config()->get('frio', 'show_nav_labels', false))) ? 'show-nav-labels' : '';
 ?>
 <html lang="<?php echo DI::l10n()->getCurrentLang(); ?>">
 	<head>
