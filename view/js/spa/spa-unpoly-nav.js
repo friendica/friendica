@@ -67,6 +67,13 @@ function configureUnpoly() {
   // so leaving this on would stack a second bar on SPA navigations.
   up.network.config.progressBar = false;
 
+  // Scripts inside the swapped fragments would run as soon as they are
+  // inserted, before the page-specific scripts they depend on are loaded by
+  // syncOutOfBandScripts() (e.g. the tagsinput plugin for the message
+  // recipient). Unpoly only marks them as blocked here, they are run by
+  // runBlockedFragmentScripts() once the out-of-band scripts are ready.
+  up.script.config.scriptElementPolicy = 'block';
+
   // Download links (CSV/JSON exports etc.) return a non-HTML content type.
   // Checking event.response.isHTML() in an up:fragment:loaded listener and
   // calling event.skip() is not enough to stop Unpoly's default
@@ -245,7 +252,8 @@ function syncStylesheets(newDoc) {
  * session. Load any external <script src> found outside the swapped
  * containers that isn't already present, then re-run inline scripts;
  * scripts no longer needed by the new page are removed. Scripts inside the
- * swapped containers are left alone - Unpoly already reruns those itself.
+ * swapped containers are left alone - runBlockedFragmentScripts() runs
+ * those afterwards.
  */
 function syncOutOfBandScripts(newDoc) {
   if (!newDoc.head && !newDoc.body) {
@@ -354,6 +362,22 @@ function syncBodyClasses(newDoc) {
   document.body.className = newDoc.body.className;
 }
 
+/**
+ * Runs the fragment scripts that Unpoly blocked on insertion (see the
+ * scriptElementPolicy setting in configureUnpoly()), in document order, same
+ * as a full page load would after the scripts in <head>.
+ */
+function runBlockedFragmentScripts() {
+  document.querySelectorAll('script[type="up-blocked-script"]').forEach((script) => {
+    const clone = document.createElement('script');
+    Array.from(script.attributes).forEach((attr) => clone.setAttribute(attr.name, attr.value));
+    clone.removeAttribute('type');
+    clone.async = false;
+    clone.textContent = script.textContent;
+    script.replaceWith(clone);
+  });
+}
+
 function focusContentAfterNavigation() {
   const contentElement = document.getElementById('content') || document.getElementById('content-section');
 
@@ -378,6 +402,8 @@ function bindNavigationCompleted() {
 
   function runCompletion(path, scriptSyncPromise) {
     Promise.resolve(scriptSyncPromise).then(() => {
+      runBlockedFragmentScripts();
+
       cleanupTooltips();
 
       focusContentAfterNavigation();
