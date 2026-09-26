@@ -240,7 +240,7 @@ ul#nav-user-menu {
 	}
 
 /* Fix parts of the main nav starting to go off screen */
-@media screen and (max-width: 1050px) {
+@media screen and (max-width: 1150px) {
 	#topbar-first .topbar-nav .nav-segment > a {
 		padding-left: 5px;
 		padding-right: 5px;
@@ -1089,8 +1089,14 @@ nav.navbar .nav > li > button:focus,
 	border-radius: 0;
 }
 
+#search-mobile .navbar-form .form-group-search,
+#search-mobile .navbar-form .form-group-search #nav-search-input-field-mobile {
+	width: 100%;
+}
+
 #search-mobile .navbar-form {
 	margin: 0;
+	padding: 10px 15px;
 }
 
 #search-mobile .form-button-search {
@@ -2825,16 +2831,6 @@ input[type="range"].form-control {
 }
 
 /* Search form */
-#search-box {
-	padding-right: 0;
-
-	@media(width < 792px) {
-		& #nav-search-input-field {
-			width: 288px!important;
-		}
-		padding-left: 7px;
-	}
-}
 body.show-nav-labels #search-box {
 	padding-right: 0;
 
@@ -2959,10 +2955,6 @@ body.mod-home nav.navbar .nav > li > a:hover {
 body.mod-home .navbar #nav-login,
 body.mod-login .navbar #nav-login {
 	display: none;
-}
-
-body.mod-home .navbar .navbar-toggle {
-	display: none!important;
 }
 
 .mod-lostpass #content {
@@ -4676,13 +4668,16 @@ div.login-form, .login-content-wrapper,
 		min-width: 80vw!important;
 		max-width: 95vw;
 	}
-  /* no room for one nav icon with labels shown */
-  body.show-nav-labels .navbar-left:has(a[href="community"]) #nav-calendar-link {
-  	display: none;
-  }
   body.show-nav-labels #topbar-first a.nav-menu,
   body.show-nav-labels #topbar-first button {
   	padding: 5px;
+  }
+}
+/* 576px matches Bootstrap's breakpoint between xs and sm */
+@media (width < 576px) {
+  /* no room for one nav icon with labels shown */
+  body.show-nav-labels .navbar-left:has(a[href="community"]) #nav-calendar-link {
+  	display: none;
   }
 }
 
