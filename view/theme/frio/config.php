@@ -118,7 +118,7 @@ function theme_content(AppHelper $appHelper): string
 		'bg_image_option'         => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'bg_image_option', DI::config()->get('frio', 'bg_image_option')),
 		'always_open_compose'     => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'always_open_compose', DI::config()->get('frio', 'always_open_compose', false)),
 		'enable_advancedcomposer' => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'enable_advancedcomposer', DI::config()->get('frio', 'enable_advancedcomposer', false)),
-		'show_nav_labels'         => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_nav_labels', DI::config()->get('frio', 'show_nav_labels', true)),
+		'show_nav_labels'         => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_nav_labels', DI::config()->get('frio', 'show_nav_labels', false)),
 		'show_action_labels'      => DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'frio', 'show_action_labels', DI::config()->get('frio', 'show_action_labels', true)),
 	];
 
@@ -147,7 +147,7 @@ function theme_admin(AppHelper $appHelper): string
 		'login_bg_color'          => DI::config()->get('frio', 'login_bg_color'),
 		'always_open_compose'     => DI::config()->get('frio', 'always_open_compose', false),
 		'enable_advancedcomposer' => DI::config()->get('frio', 'enable_advancedcomposer', false),
-		'show_nav_labels'         => DI::config()->get('frio', 'show_nav_labels', true),
+		'show_nav_labels'         => DI::config()->get('frio', 'show_nav_labels', false),
 		'show_action_labels'      => DI::config()->get('frio', 'show_action_labels', true),
 	];
 

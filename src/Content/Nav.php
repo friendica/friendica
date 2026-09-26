@@ -77,8 +77,9 @@ class Nav
 
 		$nav_info = $this->getInfo();
 
+		// NOTE: Frio does not use this link.
 		if ($this->session->getLocalUserNickname()) {
-			$profile_link = 'profile/' . $this->session->getLocalUserNickname() . '/profile';
+			$profile_link = 'profile/' . $this->session->getLocalUserNickname() . '/conversations';
 		} else {
 			$profile_link = false;
 		}
@@ -213,7 +214,7 @@ class Nav
 			$userinfo = [
 				'icon' => Contact::getMicro($contact),
 				'name' => $contact['name'],
-				'link' => ['profile/' . $this->session->getLocalUserNickname() . '/profile', $this->l10n->t('Profile'), '', $this->l10n->t('My profile')],
+				'link' => ['profile/' . $this->session->getLocalUserNickname() . '/conversations', $this->l10n->t('Profile'), '', $this->l10n->t('My profile')],
 			];
 		}
 

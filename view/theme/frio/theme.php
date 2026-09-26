@@ -213,7 +213,7 @@ function frio_remote_nav(array &$nav_info): void
 			$nav_info['userinfo'] = [
 				'icon' => Contact::getMicro($remoteUser),
 				'name' => $remoteUser['name'],
-				'link' => [$server_url . '/profile/' . $remoteUser['nick'] . '/profile', DI::l10n()->t('Profile'), '', DI::l10n()->t('My profile')],
+				'link' => [$server_url . '/profile/' . $remoteUser['nick'] . '/conversations', DI::l10n()->t('Profile'), '', DI::l10n()->t('My profile')],
 			];
 		}
 
