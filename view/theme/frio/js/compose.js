@@ -371,7 +371,7 @@
 		}
 	}
 
-	window.onDocumentReady("body", init);
+	window.onDocumentReady("body.mod-compose", init);
 
 	// Expose public API
 	window.updateLocationButtonDisplay = updateLocationButtonDisplay;
