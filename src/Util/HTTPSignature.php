@@ -638,7 +638,7 @@ class HTTPSignature
 	 *
 	 * @param string   $content      Body of the request
 	 * @param array    $http_headers array containing the HTTP headers
-	 * @param ?boolean $update true = always update, false = never update, null = update when not found or outdated
+	 * @param ?boolean $update       Unused, the key is never fetched with a signature (see issue 16137)
 	 *
 	 * @return string|null|false Signer
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
@@ -646,7 +646,7 @@ class HTTPSignature
 	public static function getSigner(string $content, array $http_headers, ?bool $update = null)
 	{
 		if (!empty($http_headers['HTTP_SIGNATURE_INPUT'])) {
-			$signer = self::getSignerRfc9421($content, $http_headers, $update);
+			$signer = self::getSignerRfc9421($content, $http_headers);
 			if ($signer !== false) {
 				return $signer;
 			}
@@ -729,7 +729,7 @@ class HTTPSignature
 			return false;
 		}
 
-		$key = self::fetchSignerKey($sig_block['keyId'], $actor, $update);
+		$key = self::fetchSignerKey($sig_block['keyId'], $actor);
 		if (is_null($key)) {
 			return null;
 		}
@@ -834,11 +834,10 @@ class HTTPSignature
 	 *
 	 * @param string   $content      Body of the request
 	 * @param array    $http_headers Server variables of the request
-	 * @param ?boolean $update       See getSigner()
 	 *
 	 * @return string|null|false Signer
 	 */
-	private static function getSignerRfc9421(string $content, array $http_headers, ?bool $update)
+	private static function getSignerRfc9421(string $content, array $http_headers)
 	{
 		$actor = self::signedActor($content);
 		if ($actor === false) {
@@ -921,7 +920,7 @@ class HTTPSignature
 				continue;
 			}
 
-			$key = self::fetchSignerKey($keyId, $actor, $update);
+			$key = self::fetchSignerKey($keyId, $actor);
 			if (is_null($key)) {
 				return null;
 			}
@@ -1223,9 +1222,9 @@ class HTTPSignature
 	 *
 	 * @return array|null The key data, an empty array when no key was found, null for a tombstone
 	 */
-	private static function fetchSignerKey(string $keyId, string $actor, ?bool $update): ?array
+	private static function fetchSignerKey(string $keyId, string $actor): ?array
 	{
-		$key = self::fetchKey($keyId, $actor, $update);
+		$key = self::fetchKey($keyId, $actor);
 		if (empty($key)) {
 			DI::logger()->info('Empty key');
 			return [];
@@ -1434,14 +1433,13 @@ class HTTPSignature
 	/**
 	 * fetches a key for a given id and actor
 	 *
-	 * @param string   $id    keyId of the signature block
-	 * @param string   $actor Actor URI
-	 * @param ?boolean $update true = always update, false = never update, null = update when not found or outdated
+	 * @param string $id    keyId of the signature block
+	 * @param string $actor Actor URI
 	 *
 	 * @return array with actor url and public key
 	 * @throws \Exception
 	 */
-	private static function fetchKey(string $id, string $actor, ?bool $update = null): array
+	private static function fetchKey(string $id, string $actor): array
 	{
 		$url = (strpos($id, '#') ? substr($id, 0, strpos($id, '#')) : $id);
 
@@ -1452,58 +1450,101 @@ class HTTPSignature
 			return [];
 		}
 
-		$profile = APContact::getByURL($url, $update);
-		if (!empty($profile)) {
-			// GoToSocial uses a path based key id ("/users/name/main-key") that return the actor document.
-			// @see https://docs.gotosocial.org/en/latest/federation/http_signatures/
-			// @see issue https://github.com/friendica/friendica/issues/16283
-			if (!empty($profile['url']) && ($profile['url'] !== $url) && (parse_url((string) $profile['url'], PHP_URL_HOST) === parse_url($url, PHP_URL_HOST))) {
-				DI::logger()->info('Using actor URL as signer instead of key ID', ['id' => $id, 'signer' => $profile['url']]);
-				$signer = $profile['url'];
-			} else {
-				DI::logger()->info('Taking key from id', ['id' => $id, 'signer' => $url]);
-				$signer = $url;
-			}
-			return ['url' => $signer, 'pubkey' => $profile['pubkey'], 'type' => $profile['type']];
+		$key = self::getKey($url);
+		if (empty($key) && ($url !== $actor) && Network::isValidHttpUrl($actor)) {
+			$key = self::getKey($actor);
 		}
 
-		// The keyId can point to a stand-alone key document instead of an actor.
-		// Follow its "owner" / "controller" to the actor that uses the key.
-		$owner = self::keyDocumentOwner($url);
-		if (($owner != '') && ($owner != $url)) {
-			$profile = APContact::getByURL($owner, $update);
-			if (!empty($profile)) {
-				DI::logger()->info('Taking key from the key document owner', ['id' => $id, 'owner' => $owner]);
-				return ['url' => $owner, 'pubkey' => $profile['pubkey'], 'type' => $profile['type']];
-			}
+		if (empty($key)) {
+			DI::logger()->notice('Key could not be fetched', ['url' => $url, 'actor' => $actor]);
 		}
-
-		if ($url != $actor) {
-			$profile = APContact::getByURL($actor);
-			if (!empty($profile)) {
-				DI::logger()->info('Taking key from actor', ['actor' => $actor]);
-				return ['url' => $actor, 'pubkey' => $profile['pubkey'], 'type' => $profile['type']];
-			}
-		}
-
-		DI::logger()->notice('Key could not be fetched', ['url' => $url, 'actor' => $actor]);
-		return [];
+		return $key;
 	}
 
 	/**
-	 * Returns the "owner" / "controller" of a stand-alone key document
+	 * Returns the key from the stored actor or, when it is missing or outdated, from the remote system
 	 *
-	 * @param string $url The key id
-	 * @return string The actor URL, empty when the document is not a key or has no owner
+	 * The stored actor is never updated from here. Fetching it with a signature ends in a loop
+	 * when the remote system verifies our key the same way.
+	 * @see https://github.com/friendica/friendica/issues/16137
+	 *
+	 * @param string $url          The key id or the actor
+	 * @param bool   $follow_owner Take the key of the owner when the url is a stand-alone key document
+	 * @return array with actor url and public key
 	 */
-	private static function keyDocumentOwner(string $url): string
+	private static function getKey(string $url, bool $follow_owner = true): array
 	{
-		$data = self::fetch($url);
-		if (empty($data) || !in_array($data['type'] ?? '', ['CryptographicKey', 'Key', 'Multikey'])) {
-			return '';
+		$profile = APContact::getByURL($url, false);
+		if (!empty($profile) && ($profile['updated'] > DateTimeFormat::utc('now - 1 month')) && (!empty($profile['pubkey']) || ($profile['type'] === 'Tombstone'))) {
+			DI::logger()->info('Taking key from the stored actor', ['url' => $url, 'actor' => $profile['url']]);
+			return ['url' => $profile['url'], 'pubkey' => $profile['pubkey'], 'type' => $profile['type']];
 		}
 
-		$owner = $data['owner'] ?? $data['controller'] ?? '';
-		return is_array($owner) ? (string) ($owner['id'] ?? '') : (string) $owner;
+		$key = self::fetchUnsignedKey($url, $follow_owner);
+		if (empty($key) && !empty($profile['pubkey'])) {
+			DI::logger()->info('Taking key from the outdated stored actor', ['url' => $url, 'actor' => $profile['url']]);
+			return ['url' => $profile['url'], 'pubkey' => $profile['pubkey'], 'type' => $profile['type']];
+		}
+		return $key;
+	}
+
+	/**
+	 * Fetches the public key from an actor or a stand-alone key document without signing the request
+	 *
+	 * @param string $url          The key id or the actor
+	 * @param bool   $follow_owner Take the key of the owner when the url is a stand-alone key document
+	 * @return array with actor url and public key, empty when the document doesn't contain a key
+	 */
+	private static function fetchUnsignedKey(string $url, bool $follow_owner): array
+	{
+		$curlResult = DI::httpClient()->get($url, HttpClientAccept::JSON_AS, [HttpClientOptions::REQUEST => HttpClientRequest::ACTIVITYPUB]);
+		if ($curlResult->isGone()) {
+			return ['url' => $url, 'pubkey' => '', 'type' => 'Tombstone'];
+		}
+
+		if (!$curlResult->isSuccess()) {
+			DI::logger()->info('Fetching the key failed', ['url' => $url, 'return-code' => $curlResult->getReturnCode()]);
+			return [];
+		}
+
+		if (!self::isValidContentType($curlResult->getContentType(), $url)) {
+			DI::logger()->info('The key document has an invalid content type', ['url' => $url, 'content-type' => $curlResult->getContentType()]);
+			return [];
+		}
+
+		$data = json_decode($curlResult->getBodyString(), true);
+		if (empty($data) || !is_array($data)) {
+			return [];
+		}
+
+		$compacted = JsonLD::compact($data);
+		if (empty($compacted['@id'])) {
+			return [];
+		}
+
+		$type = JsonLD::fetchElement($compacted, '@type');
+		if (in_array($type, ['w3id:Key', 'w3id:Multikey'])) {
+			// A stand-alone key document can claim any owner, so we only trust the key of that actor.
+			$owner = JsonLD::fetchElement($compacted, 'w3id:owner') ?? JsonLD::fetchElement($compacted, 'w3id:controller');
+			if (!$follow_owner || !is_string($owner) || ($owner === $url)) {
+				return [];
+			}
+			DI::logger()->info('Taking key from the key document owner', ['url' => $url, 'owner' => $owner]);
+			return self::getKey($owner, false);
+		}
+
+		$actor = $compacted['@id'];
+		if (parse_url((string) $actor, PHP_URL_HOST) !== parse_url($url, PHP_URL_HOST)) {
+			DI::logger()->notice('The actor of the key is on a different host', ['url' => $url, 'actor' => $actor]);
+			return [];
+		}
+
+		$pubkey = APContact::getPublicKey($compacted);
+		if (empty($pubkey)) {
+			return [];
+		}
+
+		DI::logger()->info('Taking key from the unsigned document', ['url' => $url, 'actor' => $actor]);
+		return ['url' => $actor, 'pubkey' => $pubkey, 'type' => str_replace('as:', '', $type)];
 	}
 }
