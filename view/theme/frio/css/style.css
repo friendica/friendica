@@ -4715,6 +4715,6 @@ div.login-form, .login-content-wrapper,
 	}
 	body.show-nav-labels .nav-label,
 	body.show-action-labels .action-label {
-	  	font-size: 8px; /* alternatively display:none; this is really small! */
+	  display: none;
 	}
 }
