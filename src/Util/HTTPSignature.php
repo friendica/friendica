@@ -1454,8 +1454,17 @@ class HTTPSignature
 
 		$profile = APContact::getByURL($url, $update);
 		if (!empty($profile)) {
-			DI::logger()->info('Taking key from id', ['id' => $id]);
-			return ['url' => $url, 'pubkey' => $profile['pubkey'], 'type' => $profile['type']];
+			// GoToSocial uses a path based key id ("/users/name/main-key") that return the actor document.
+			// @see https://docs.gotosocial.org/en/latest/federation/http_signatures/
+			// @see issue https://github.com/friendica/friendica/issues/16283
+			if (!empty($profile['url']) && ($profile['url'] !== $url) && (parse_url((string) $profile['url'], PHP_URL_HOST) === parse_url($url, PHP_URL_HOST))) {
+				DI::logger()->info('Using actor URL as signer instead of key ID', ['id' => $id, 'signer' => $profile['url']]);
+				$signer = $profile['url'];
+			} else {
+				DI::logger()->info('Taking key from id', ['id' => $id, 'signer' => $url]);
+				$signer = $url;
+			}
+			return ['url' => $signer, 'pubkey' => $profile['pubkey'], 'type' => $profile['type']];
 		}
 
 		// The keyId can point to a stand-alone key document instead of an actor.
