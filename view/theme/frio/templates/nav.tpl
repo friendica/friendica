@@ -384,7 +384,7 @@
 					<li>
 						<a href="{{$nav.about.0}}" id="nav-about" data-toggle="tooltip" aria-label="{{$nav.about.3}}" class="btn btn-primary"
 							title="{{$nav.about.3}}">
-							<i class="ri ri-information-line ri-fw" aria-hidden="true"></i> {{$nav.about.1}}
+							<i class="ri ri-information-line ri-2x" aria-hidden="true"></i>
 						</a>
 					</li>
 				</ul>
