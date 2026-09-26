@@ -350,25 +350,7 @@ class APContact
 			$apcontact['addr'] = JsonLD::fetchElement($compacted, 'https://webfinger.net/#');
 		}
 
-		$apcontact['pubkey'] = null;
-		if (!empty($compacted['w3id:publicKey'])) {
-			$apcontact['pubkey'] = trim(JsonLD::fetchElement($compacted['w3id:publicKey'], 'w3id:publicKeyPem', '@value') ?? '');
-			if (str_contains($apcontact['pubkey'], 'RSA ')) {
-				$apcontact['pubkey'] = Crypto::rsaToPem($apcontact['pubkey']);
-			}
-		}
-
-		// When there is no RSA key, look for an Ed25519 key published as a "Multikey"
-		// in "assertionMethod" and store its multibase form instead.
-		if (empty($apcontact['pubkey']) && !empty($compacted['w3id:assertionMethod'])) {
-			foreach (JsonLD::fetchElementArray($compacted, 'w3id:assertionMethod') ?? [] as $method) {
-				$multibase = JsonLD::fetchElement($method, 'w3id:publicKeyMultibase', '@value');
-				if (is_string($multibase) && str_starts_with($multibase, 'z6Mk')) {
-					$apcontact['pubkey'] = $multibase;
-					break;
-				}
-			}
-		}
+		$apcontact['pubkey'] = self::getPublicKey($compacted);
 
 		$apcontact['manually-approve']   = (int) JsonLD::fetchElement($compacted, 'as:manuallyApprovesFollowers');
 		$apcontact['posting-restricted'] = (int) JsonLD::fetchElement($compacted, 'lemmy:postingRestrictedToMods');
@@ -535,6 +517,37 @@ class APContact
 		DI::logger()->info('Updated profile', ['url' => $url]);
 
 		return DBA::selectFirst('apcontact', [], ['url' => $apcontact['url']]) ?: [];
+	}
+
+	/**
+	 * Fetches the public key from a compacted actor
+	 *
+	 * @param array $compacted Compacted actor
+	 * @return string|null RSA public key in PEM format or, for Ed25519 only actors, the Multikey in multibase form
+	 */
+	public static function getPublicKey(array $compacted): ?string
+	{
+		$pubkey = null;
+		if (!empty($compacted['w3id:publicKey'])) {
+			$pubkey = trim(JsonLD::fetchElement($compacted['w3id:publicKey'], 'w3id:publicKeyPem', '@value') ?? '');
+			if (str_contains($pubkey, 'RSA ')) {
+				$pubkey = Crypto::rsaToPem($pubkey);
+			}
+		}
+
+		// When there is no RSA key, look for an Ed25519 key published as a "Multikey"
+		// in "assertionMethod" and return its multibase form instead.
+		if (empty($pubkey) && !empty($compacted['w3id:assertionMethod'])) {
+			foreach (JsonLD::fetchElementArray($compacted, 'w3id:assertionMethod') ?? [] as $method) {
+				$multibase = JsonLD::fetchElement($method, 'w3id:publicKeyMultibase', '@value');
+				if (is_string($multibase) && str_starts_with($multibase, 'z6Mk')) {
+					$pubkey = $multibase;
+					break;
+				}
+			}
+		}
+
+		return $pubkey;
 	}
 
 	public static function removeCustomEmojis(string $name, array $tags): string
