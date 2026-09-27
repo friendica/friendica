@@ -1339,6 +1339,45 @@ class Media
 	}
 
 	/**
+	 * Retrieves the posts of the given user that contain the given local photo
+	 *
+	 * @param string $resource_id Resource id of the photo
+	 * @param int    $uid         User id
+	 * @return array posts, newest first
+	 * @throws \Exception
+	 */
+	public static function getPostsByPhoto(string $resource_id, int $uid): array
+	{
+		$url = '%/photo/' . $resource_id . '-%';
+		return self::getPostsByCondition(["(`url` LIKE ? OR `preview` LIKE ?)", $url, $url], $uid);
+	}
+
+	/**
+	 * Retrieves the posts of the given user that contain the given attachment
+	 *
+	 * @param int $attach_id Id of the attachment
+	 * @param int $uid       User id
+	 * @return array posts, newest first
+	 * @throws \Exception
+	 */
+	public static function getPostsByAttachment(int $attach_id, int $uid): array
+	{
+		return self::getPostsByCondition(['attach-id' => $attach_id], $uid);
+	}
+
+	private static function getPostsByCondition(array $condition, int $uid): array
+	{
+		$condition = DBA::mergeConditions($condition, ["`uri-id` IN (SELECT `uri-id` FROM `post-origin` WHERE `uid` = ?)", $uid]);
+
+		$uri_ids = array_unique(array_column(DBA::selectToArray('post-media', ['uri-id'], $condition), 'uri-id'));
+		if (empty($uri_ids)) {
+			return [];
+		}
+
+		return Post::selectToArray(['guid', 'title', 'body', 'created'], ['uri-id' => $uri_ids, 'uid' => $uid, 'deleted' => false], ['order' => ['created' => true]]);
+	}
+
+	/**
 	 * Retrieves the media attachment with the provided media id.
 	 *
 	 * @param int $id  id
