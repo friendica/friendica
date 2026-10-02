@@ -634,7 +634,7 @@ header #banner {
 }
 header #banner #logo-img,
 .navbar-brand #logo-img {
-	font-size: 36px;
+	font-size: 40px;
 	color: $nav_icon_color;
 }
 
