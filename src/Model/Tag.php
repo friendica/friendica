@@ -297,6 +297,66 @@ class Tag
 	}
 
 	/**
+	 * Replace the tags and mentions that had been derived from the old body with the ones from the new body
+	 *
+	 * Only hashtags, mentions and exclusive mentions are removed, since these are the only types that are set from the body.
+	 * All other types (implicit mentions, receivers, capabilities and so on) are set by other means and are kept.
+	 *
+	 * @param integer $uriId   URI-Id
+	 * @param string  $oldBody Body of the post before the change
+	 * @param string  $newBody Body of the post after the change
+	 * @return void
+	 */
+	public static function updateFromBody(int $uriId, string $oldBody, string $newBody)
+	{
+		foreach (self::getFromBody($oldBody) as $tag) {
+			self::removeFromBodyTag($uriId, $tag[1], $tag[3], $tag[2]);
+		}
+
+		self::storeFromBody($uriId, $newBody);
+	}
+
+	/**
+	 * Remove a tag or mention that had been found in a post body
+	 *
+	 * @param integer $uriId URI-Id
+	 * @param string  $hash  Tag character
+	 * @param string  $name  Name of the tag or mention
+	 * @param string  $url   URL of the tag or mention
+	 * @return void
+	 */
+	private static function removeFromBodyTag(int $uriId, string $hash, string $name, string $url)
+	{
+		$type = self::getTypeForHash($hash);
+
+		if ($type == self::HASHTAG) {
+			$name = preg_replace('/(^\W+)|(\W+$)/us', '', $name);
+			foreach (explode(self::TAG_CHARACTER[self::HASHTAG], (string) $name) as $hashtag) {
+				$tid = DBA::selectFirst('tag', ['id'], ['name' => substr($hashtag, 0, 96), 'url' => '']);
+				if (!empty($tid['id'])) {
+					DBA::delete('post-tag', ['uri-id' => $uriId, 'type' => self::HASHTAG, 'tid' => $tid['id'], 'cid' => 0]);
+				}
+			}
+			return;
+		}
+
+		if (!in_array($type, [self::MENTION, self::EXCLUSIVE_MENTION]) || empty($url)) {
+			return;
+		}
+
+		$cid = Contact::getIdForURL($url, 0, false);
+		if (!empty($cid)) {
+			DBA::delete('post-tag', ['uri-id' => $uriId, 'type' => [self::MENTION, self::EXCLUSIVE_MENTION], 'cid' => $cid]);
+			return;
+		}
+
+		$tag = DBA::selectFirst('tag', ['id'], ['name' => substr($name, 0, 96), 'url' => strtolower($url)]);
+		if (!empty($tag['id'])) {
+			DBA::delete('post-tag', ['uri-id' => $uriId, 'type' => [self::MENTION, self::EXCLUSIVE_MENTION], 'tid' => $tag['id'], 'cid' => 0]);
+		}
+	}
+
+	/**
 	 * Store tags and mentions from the item array
 	 *
 	 * @param array   $item    Item array
