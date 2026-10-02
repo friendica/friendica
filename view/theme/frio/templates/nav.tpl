@@ -207,8 +207,10 @@
 									<li>
 										<a role="menuitem" id="nav-profile-link" href="{{$userinfo.link.0}}" title="{{$userinfo.link.3}}">
 										<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"
-											style="max-width:15px; max-height:15px; min-width:15px; min-height:15px; width:15px; height:15px;"/>&nbsp;
-										{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}) {{/if}}
+											style="max-width:30px; max-height:30px; min-width:30px; min-height:30px; width:30px; height:30px; margin-left: -5px; border-radius: 100%;"/>&nbsp;
+											<strong>
+											{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}) {{/if}}
+											</strong>
 										</a>
 									</li>
 									{{if $nav.delegation}}
