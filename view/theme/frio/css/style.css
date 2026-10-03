@@ -1455,7 +1455,11 @@ aside .vcard #profile-photo-wrapper {
 aside .vcard img.u-photo,
 aside img.vcard-photo {
 	width: 100%;
-	border-radius: 3px;
+}
+aside .vcard img.u-photo,
+aside img.vcard-photo,
+#change-profile-picture {
+	border-radius: 100%;
 }
 aside .vcard .tool .action {
 	position: absolute;
@@ -2056,7 +2060,7 @@ aside .panel-body {
 .contact-photo {
 	height: 48px;
 	width: 48px;
-	border-radius: 3px;
+	border-radius: 100%;
 	/*maybe some adional stuff is needed for the different screen sizes */
 }
 .contact-photo-image-wrapper {
@@ -2093,7 +2097,7 @@ aside .panel-body {
 .contact-photo-xs {
 	height: 38px;
 	width: 38px;
-	border-radius: 3px;
+	border-radius: 100%;
 }
 .wwto .contact-photo {
 	width: auto;
@@ -4114,6 +4118,12 @@ body .tread-wrapper .hovercard a:hover {
 }
 body .tread-wrapper .hovercard:hover .hover-card-content a {
 	color: $link_color !important;
+}
+
+.hover-card-pic img.thumbnail {
+	border: none;
+	border-radius: 100%;
+	box-shadow: unset;
 }
 
 /* Pagination improvements */
