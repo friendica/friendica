@@ -465,6 +465,46 @@ function bindModalCleanup() {
   });
 }
 
+/**
+ * Elements with [data-spa-back] go back in the browser history when the
+ * previous entry belongs to this SPA session, links fall back to their href
+ * otherwise. With data-spa-back="hide" the element is only shown when there
+ * is a way back. The depth is kept in history.state, so it survives reloads
+ * and back/forward navigation.
+ */
+function bindBackButton() {
+  let depth = history.state?.friendicaDepth || 0;
+
+  const updateVisibility = (element) => {
+    element.hidden = depth === 0;
+  };
+
+  up.on('up:location:changed', function (event) {
+    if (event.reason === 'push') {
+      depth++;
+    } else if (event.reason === 'pop') {
+      depth = history.state?.friendicaDepth || 0;
+    }
+    if (event.reason === 'push' || event.reason === 'replace') {
+      history.replaceState({ ...history.state, friendicaDepth: depth }, '');
+    }
+    document.querySelectorAll('[data-spa-back="hide"]').forEach(updateVisibility);
+  });
+
+  up.compiler('[data-spa-back="hide"]', updateVisibility);
+
+  const goBack = function (event) {
+    if (depth > 0) {
+      event.preventDefault();
+      history.back();
+    }
+  };
+
+  // Links are followed by Unpoly before a click listener would run
+  up.on('up:link:follow', 'a[data-spa-back]', goBack);
+  up.on('click', 'button[data-spa-back]', goBack);
+}
+
 function bindLoadingIndicatorHooks() {
   up.on('up:request:load', function () {
     if (typeof showFetching === 'function') {
@@ -523,6 +563,7 @@ function initSPANavigation() {
   bindResponseHooks();
   bindNavigationCompleted();
   bindModalCleanup();
+  bindBackButton();
   bindLoadingIndicatorHooks();
   bindInitialLifecycleEvents();
 }

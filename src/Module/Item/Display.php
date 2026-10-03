@@ -13,6 +13,7 @@ use Friendica\BaseModule;
 use Friendica\Content\Conversation\StatusEditor;
 use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Item as ContentItem;
+use Friendica\Content\SpaBackButton;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -61,21 +62,24 @@ class Display extends BaseModule
 	protected $notification;
 	/** @var Notify */
 	protected $notify;
+	/** @var SpaBackButton */
+	protected $spaBackButton;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, IHandleUserSessions $session, AppHelper $appHelper, App\Page $page, ContentItem $contentItem, StatusEditor $statusEditor, ConversationRenderer $htmlRenderer, Notification $notification, Notify $notify, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, IHandleUserSessions $session, AppHelper $appHelper, App\Page $page, ContentItem $contentItem, StatusEditor $statusEditor, ConversationRenderer $htmlRenderer, Notification $notification, Notify $notify, SpaBackButton $spaBackButton, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->page         = $page;
-		$this->config       = $config;
-		$this->pConfig      = $pConfig;
-		$this->session      = $session;
-		$this->appHelper    = $appHelper;
-		$this->contentItem  = $contentItem;
-		$this->statusEditor = $statusEditor;
-		$this->htmlRenderer = $htmlRenderer;
-		$this->notification = $notification;
-		$this->notify       = $notify;
+		$this->page          = $page;
+		$this->config        = $config;
+		$this->pConfig       = $pConfig;
+		$this->session       = $session;
+		$this->appHelper     = $appHelper;
+		$this->contentItem   = $contentItem;
+		$this->statusEditor  = $statusEditor;
+		$this->htmlRenderer  = $htmlRenderer;
+		$this->notification  = $notification;
+		$this->notify        = $notify;
+		$this->spaBackButton = $spaBackButton;
 	}
 
 	protected function content(array $request = []): string
@@ -164,6 +168,8 @@ class Display extends BaseModule
 		// add the uri-id to the update_display parameter
 		if ($this->session->getLocalUserId()) {
 			$output .= "<script> var netargs = '?uri_id=" . $item['uri-id'] . "'; </script>";
+
+			$output .= $this->spaBackButton->render();
 		}
 
 		$output .= $this->getDisplayData($item, false, false);

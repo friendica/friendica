@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-27 10:19+0000\n"
+"POT-Creation-Date: 2026-10-02 14:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2510,6 +2510,10 @@ msgstr ""
 
 #: src/Content/PagesManager.php:105
 msgid "Find pages to follow"
+msgstr ""
+
+#: src/Content/SpaBackButton.php:34
+msgid "Back"
 msgstr ""
 
 #: src/Content/Text/BBCode.php:910
@@ -6766,7 +6770,7 @@ msgstr[1] ""
 #: src/Module/Contact/Redir.php:197 src/Module/Conversation/Community.php:156
 #: src/Module/Debug/ItemBody.php:30 src/Module/Diaspora/Receive.php:45
 #: src/Module/Item/Comment.php:44 src/Module/Item/Comments.php:45
-#: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:88
+#: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:92
 #: src/Module/Item/Feed.php:44 src/Module/Item/Follow.php:25
 #: src/Module/Item/Ignore.php:26 src/Module/Item/Language.php:35
 #: src/Module/Item/Node.php:44 src/Module/Item/Pin.php:26
@@ -7981,7 +7985,7 @@ msgstr ""
 msgid "Image description"
 msgstr ""
 
-#: src/Module/Item/Display.php:172
+#: src/Module/Item/Display.php:178
 #, php-format
 msgid "Post by %s"
 msgstr ""
