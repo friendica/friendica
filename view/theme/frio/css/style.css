@@ -984,7 +984,7 @@ nav.navbar .nav > li > button:focus,
 	width: 15px;
 }
 #topbar-first .dropdown-indicator svg {
-	border-radius: 100px;
+	border-radius: 100%;
 	background: rgb(0, 0, 0, 0.5);
 	color: white;
 }
@@ -1488,7 +1488,11 @@ aside .vcard #profile-photo-wrapper {
 aside .vcard img.u-photo,
 aside img.vcard-photo {
 	width: 100%;
-	border-radius: 3px;
+}
+aside .vcard img.u-photo,
+aside img.vcard-photo,
+#change-profile-picture {
+	border-radius: 100%;
 }
 aside .vcard .tool .action {
 	position: absolute;
@@ -1568,7 +1572,7 @@ aside .vcard a.btn, aside .vcard button {
 #nav-short-info .contact-wrapper img {
 	height: 34px;
 	width: 34px;
-	border-radius: 3px;
+	border-radius: 100%;
 }
 #vcard-short-desc,
 #nav-short-info .contact-wrapper .media-body {
@@ -2114,7 +2118,7 @@ aside .panel-body {
 .contact-photo {
 	height: 48px;
 	width: 48px;
-	border-radius: 3px;
+	border-radius: 100%;
 	/*maybe some adional stuff is needed for the different screen sizes */
 }
 .contact-photo-image-wrapper {
@@ -2151,7 +2155,7 @@ aside .panel-body {
 .contact-photo-xs {
 	height: 38px;
 	width: 38px;
-	border-radius: 3px;
+	border-radius: 100%;
 }
 .wwto .contact-photo {
 	width: auto;
@@ -3366,6 +3370,9 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	height: 48px;
 	width: 48px;
 }
+.contact-photo-wrapper a, .contact-photo-wrapper img {
+	border-radius: 100%;
+}
 .mail-thread #prvmail-to-label,
 .mail-thread #prvmail-subject-label {
 	display: none;
@@ -4272,6 +4279,12 @@ body .tread-wrapper .hovercard a:hover {
 }
 body .tread-wrapper .hovercard:hover .hover-card-content a {
 	color: $link_color !important;
+}
+
+.hover-card-pic img.thumbnail {
+	border: none;
+	border-radius: 100%;
+	box-shadow: unset;
 }
 
 /* Pagination improvements */
