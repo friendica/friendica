@@ -159,6 +159,8 @@ class User
 			}
 		}
 
+		self::repairSystemContact($system);
+
 		$system['name']         = App::PLATFORM . " '" . App::CODENAME . "' " . App::VERSION . '-' . DB_UPDATE_VERSION;
 		$system['uprvkey']      = $system['prvkey'];
 		$system['upubkey']      = $system['pubkey'];
@@ -209,6 +211,59 @@ class User
 	}
 
 	/**
+	 * Fetch the contact fields of the system account that depend on the host name
+	 *
+	 * @param array $system System contact (needs at least the nick)
+	 * @return array Fields, empty when the host name can't be detected
+	 */
+	private static function getSystemContactHostFields(array $system): array
+	{
+		$host = DI::baseUrl()->getHost();
+		if (empty($host) || empty($system['nick'])) {
+			DI::logger()->notice('Host name or actor name is missing, host dependent fields of the system contact are not filled.', ['host' => $host, 'nick' => $system['nick'] ?? '']);
+			return [];
+		}
+
+		$url    = DI::baseUrl() . '/friendica';
+		$avatar = Contact::getDefaultAvatar($system, Proxy::SIZE_SMALL);
+
+		return [
+			'addr'    => $system['nick'] . '@' . $host,
+			'url'     => $url,
+			'nurl'    => Strings::normaliseLink($url),
+			'uri-id'  => ItemURI::getIdByURI($url),
+			'baseurl' => (string) DI::baseUrl(),
+			'avatar'  => $avatar,
+			'photo'   => $avatar,
+			'thumb'   => Contact::getDefaultAvatar($system, Proxy::SIZE_THUMB),
+			'micro'   => Contact::getDefaultAvatar($system, Proxy::SIZE_MICRO),
+			'gsid'    => GServer::getRealID((string) DI::baseUrl()),
+		];
+	}
+
+	/**
+	 * Correct missing or wrong data of the system contact
+	 *
+	 * @param array $system System contact; it is updated by reference
+	 */
+	private static function repairSystemContact(array &$system)
+	{
+		$repair = array_diff_assoc(self::getSystemContactHostFields($system), $system);
+		if (empty($repair)) {
+			return;
+		}
+
+		DI::logger()->notice('Repair the system contact', ['id' => $system['id'], 'old' => array_intersect_key($system, $repair), 'new' => $repair]);
+		Contact::update($repair, ['id' => $system['id']]);
+
+		if (isset($repair['uri-id'])) {
+			DBA::update('account-user', ['uri-id' => $repair['uri-id']], ['uid' => 0, 'uri-id' => $system['uri-id']]);
+		}
+
+		$system = array_merge($system, $repair);
+	}
+
+	/**
 	 * Create the system account
 	 *
 	 * @return int
@@ -233,9 +288,7 @@ class User
 			'self'         => true,
 			'network'      => Protocol::ACTIVITYPUB,
 			'name'         => 'System Account',
-			'addr'         => $system_actor_name . '@' . DI::baseUrl()->getHost(),
 			'nick'         => $system_actor_name,
-			'url'          => DI::baseUrl() . '/friendica',
 			'pubkey'       => $keys['pubkey'],
 			'prvkey'       => $keys['prvkey'],
 			'blocked'      => 0,
@@ -245,14 +298,11 @@ class User
 			'uri-date'     => DateTimeFormat::utcNow(),
 			'avatar-date'  => DateTimeFormat::utcNow(),
 			'closeness'    => 0,
-			'baseurl'      => DI::baseUrl(),
 		];
 
-		$system['avatar'] = $system['photo'] = Contact::getDefaultAvatar($system, Proxy::SIZE_SMALL);
-		$system['thumb']  = Contact::getDefaultAvatar($system, Proxy::SIZE_THUMB);
-		$system['micro']  = Contact::getDefaultAvatar($system, Proxy::SIZE_MICRO);
-		$system['nurl']   = Strings::normaliseLink($system['url']);
-		$system['gsid']   = GServer::getRealID($system['baseurl']);
+		// The fields that depend on the host name are only filled when the host name is known.
+		// Otherwise they are added by "repairSystemContact" as soon as possible.
+		$system = array_merge($system, self::getSystemContactHostFields($system));
 
 		DI::logger()->info('System account to be created', ['account' => $system]);
 		return Contact::insert($system);
@@ -269,7 +319,7 @@ class User
 		$systemuser        = DBA::selectFirst('user', ['nickname'], ['uid' => 0]);
 		$system_actor_name = DI::config()->get('system', 'actor_name');
 
-		if (isset($systemuser['nickname'])) {
+		if (!empty($systemuser['nickname'])) {
 			if ($system_actor_name != $systemuser['nickname']) {
 				DI::logger()->notice('Set the actor name to the system user name', ['name' => $systemuser['nickname'], 'systemactor' => $system_actor_name]);
 				DI::config()->set('system', 'actor_name', $systemuser['nickname']);
@@ -279,7 +329,7 @@ class User
 			return $systemuser['nickname'];
 		}
 
-		if (isset($self['nick'])) {
+		if (!empty($self['nick'])) {
 			if ($system_actor_name != $self['nick']) {
 				DI::logger()->notice('Set the actor name to the system contact name', ['name' => $self['nick'], 'systemactor' => $system_actor_name]);
 				DI::config()->set('system', 'actor_name', $self['nick']);
@@ -289,7 +339,7 @@ class User
 			return $self['nick'];
 		}
 
-		if (isset($system_actor_name)) {
+		if (!empty($system_actor_name)) {
 			DI::logger()->notice('Use the stored system actor name', ['systemactor' => $system_actor_name]);
 			return $system_actor_name;
 		}

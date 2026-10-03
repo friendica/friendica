@@ -249,7 +249,9 @@ class Site extends BaseAdmin
 		$transactionConfig->set('system', 'allowed_email', $allowed_email);
 		$transactionConfig->set('system', 'disallowed_email', $disallowed_email);
 		$transactionConfig->set('system', 'forbidden_nicknames', $forbidden_nicknames);
-		$transactionConfig->set('system', 'system_actor_name', $system_actor_name);
+		if (!empty($system_actor_name) && !DBA::exists('contact', ['uid' => 0, 'self' => true])) {
+			$transactionConfig->set('system', 'actor_name', $system_actor_name);
+		}
 		$transactionConfig->set('system', 'block_public', $block_public);
 		$transactionConfig->set('system', 'publish_all', $force_publish);
 		$transactionConfig->set('system', 'newuser_private', $newuser_private);
