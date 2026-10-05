@@ -1623,6 +1623,17 @@ section.minimal {
 	border: medium none;
 }
 
+.wall-item-interactions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 1em;
+	margin: 5px 0;
+}
+.wall-item-interactions a,
+.wall-item-interactions a:hover,
+.wall-item-interactions a:focus {
+	text-decoration: none;
+}
 .wall-item-container .wall-item-item, .wall-item-container .wall-item-bottom {
 	display: table-row;
 }

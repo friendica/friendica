@@ -616,13 +616,12 @@ as the value of $top_child_total (this is done at the end of this file)
 		</div><!--./wall-item-actions-->
 
 		<div class="wall-item-links"></div>
-		{{* Display likes, dislike and attendance stats *}}
-		{{if $item.legacy_activities}}
-			<div class="wall-item-responses">
-			{{foreach $item.responses as $verb=>$response}}
-				<div class="wall-item-{{$verb}}" id="wall-item-{{$verb}}-{{$item.id}}">{{$response.output nofilter}}</div>
+		{{if $item.interactions}}
+		<div class="wall-item-interactions">
+			{{foreach $item.interactions as $interaction}}
+			<a class="wall-item-interaction wall-item-interaction-{{$interaction.type}}" href="{{$interaction.url}}" onclick="addToModal(this.href); return false;">{{$interaction.label nofilter}}</a>
 			{{/foreach}}
-			</div>
+		</div>
 		{{/if}}
 
 		{{* Insert comment box of threaded children *}}

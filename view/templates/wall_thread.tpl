@@ -213,11 +213,14 @@
 									<span class="wall-item-emoji" title="{{$emoji.title}}">{{$emoji.emoji}} {{$emoji.total}}</span>
 								{{/if}}
 							{{/foreach}}
-                        {{elseif $item.responses}}
-                            {{foreach $item.responses as $verb=>$response}}
-								<div class="wall-item-{{$verb}}" id="wall-item-{{$verb}}-{{$item.id}}">{{$response.output nofilter}}</div>
-                            {{/foreach}}
                         {{/if}}
+						{{if $item.interactions}}
+							<div class="wall-item-interactions">
+							{{foreach $item.interactions as $interaction}}
+								<a class="wall-item-interaction wall-item-interaction-{{$interaction.type}}" href="{{$interaction.url}}">{{$interaction.label nofilter}}</a>
+							{{/foreach}}
+							</div>
+						{{/if}}
 
 					</div>
 

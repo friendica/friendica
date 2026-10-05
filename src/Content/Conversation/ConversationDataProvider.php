@@ -421,9 +421,7 @@ final readonly class ConversationDataProvider
 		$compactTimeline = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS]) && $this->pConfig->get($uid, 'system', 'compact_timeline');
 		$partialLoad     = $mode === ConversationRenderer::MODE_COMMENTS && $sinceId > 0;
 
-		if (!$this->config->get('system', 'legacy_activities')) {
-			$condition = DBA::mergeConditions($condition, ["(`gravity` != ? OR `origin`)", ItemModel::GRAVITY_ACTIVITY]);
-		}
+		$condition = DBA::mergeConditions($condition, ["(`gravity` != ? OR `origin`)", ItemModel::GRAVITY_ACTIVITY]);
 
 		if ($compactTimeline) {
 			$condition = DBA::mergeConditions($condition, ['author-id' => $filterAuthors]);
@@ -686,7 +684,7 @@ final readonly class ConversationDataProvider
 	 */
 	private function getQuoteShares(array $uriIds): array
 	{
-		$condition = DBA::mergeConditions(['quote-uri-id' => $uriIds], ["NOT `quote-uri-id` IS NULL"]);
+		$condition = DBA::mergeConditions(['quote-uri-id' => $uriIds], ["NOT `quote-uri-id` IS NULL AND NOT `post`.`deleted`"]);
 		$separator = chr(255) . chr(255) . chr(255);
 		$sql       = "SELECT `quote-uri-id`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-quote` INNER JOIN `post` ON `post`.`uri-id` = `post-quote`.`uri-id` INNER JOIN `contact` ON `post`.`author-id` = `contact`.`id` WHERE " . array_shift($condition) . " GROUP BY `quote-uri-id`";
 		$quotes    = [];
@@ -1490,17 +1488,6 @@ final readonly class ConversationDataProvider
 			}
 
 			if (!empty($activity['verb']) && $this->activity->match($activity['verb'], $verb) && ($activity['gravity'] !== ItemModel::GRAVITY_PARENT)) {
-				$author = [
-					'uid'     => 0,
-					'id'      => $activity['author-id'],
-					'network' => $activity['author-network'],
-					'url'     => $activity['author-link'],
-					'alias'   => $activity['author-alias'],
-				];
-				$url     = Contact::magicLinkByContact($author);
-				$sparkle = str_starts_with($url, 'contact/redir/') ? ' class="sparkle" ' : '';
-				$link    = '<a href="' . $url . '"' . $sparkle . '>' . htmlentities((string) $activity['author-name']) . '</a>';
-
 				if (empty($activity['thr-parent-id'])) {
 					$activity['thr-parent-id'] = $activity['parent-uri-id'];
 				}
@@ -1510,19 +1497,13 @@ final readonly class ConversationDataProvider
 				}
 
 				if (!isset($convResponses[$mode][$activity['thr-parent-id']])) {
-					$convResponses[$mode][$activity['thr-parent-id']] = [
-						'links' => [],
-						'self'  => 0,
-					];
-				} elseif (in_array($link, $convResponses[$mode][$activity['thr-parent-id']]['links'])) {
-					continue;
+					$convResponses[$mode][$activity['thr-parent-id']] = ['self' => 0];
 				}
 
 				if ($pcid === $activity['author-id']) {
 					$convResponses[$mode][$activity['thr-parent-id']]['self'] = 1;
 				}
 
-				$convResponses[$mode][$activity['thr-parent-id']]['links'][] = $link;
 				return;
 			}
 		}

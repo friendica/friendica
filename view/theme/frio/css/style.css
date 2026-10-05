@@ -2515,6 +2515,27 @@ button[disabled] {
 .wall-item-responses {
 	margin-top: .3em;
 }
+.wall-item-interactions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 1.2em;
+	padding: .5em 0;
+}
+.wall-item-interactions a,
+.wall-item-interactions a strong {
+	color: $font_color;
+}
+.wall-item-interactions a,
+.wall-item-interactions a:hover,
+.wall-item-interactions a:focus {
+	text-decoration: none;
+}
+.wall-item-interactions a:hover,
+.wall-item-interactions a:focus,
+.wall-item-interactions a:hover strong,
+.wall-item-interactions a:focus strong {
+	color: $link_hover_color;
+}
 .wall-item-responses > div > p {
 	margin: 0;
 }

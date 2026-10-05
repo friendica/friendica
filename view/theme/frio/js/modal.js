@@ -105,6 +105,12 @@
 			addToModal(this.href);
 		});
 
+		// Page links inside a modal load the next page into the modal
+		$body.on("click.frio", "#modal-body .pagination a", function (e) {
+			e.preventDefault();
+			addToModal(this.href);
+		});
+
 		// Bind the edit-jot reset handler exactly once using event delegation
 		bindJotResetOnce();
 	});

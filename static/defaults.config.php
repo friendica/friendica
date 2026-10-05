@@ -290,10 +290,6 @@ return [
 		// restricts develop log writes to requests originating from this IP address.
 		'dlogip' => '',
 
-		// legacy_activities (Boolean)
-		// Display received activities (like, dislike, reshare) as detailed list
-		'legacy_activities' => true,
-
 		// expire-notify-priority (integer)
 		// Priority for the expiry notification
 		'expire-notify-priority' => Friendica\Core\Worker::PRIORITY_LOW,
@@ -430,10 +426,6 @@ return [
 		// Pictures longer than this length will be resized to be this length (on the longest side, the other side will be scaled appropriately).
 		// If you don't want to set a maximum length, set to -1.
 		'max_image_length' => -1,
-
-		// max_likers (Integer)
-		// Maximum number of "people who like (or don't like) this" that we will list by name
-		'max_likers' => 75,
 
 		// max_processes_backend (Integer)
 		// Maximum number of concurrent database processes for background tasks.

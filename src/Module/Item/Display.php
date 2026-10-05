@@ -142,6 +142,8 @@ class Display extends BaseModule
 			System::externalRedirect($plink['href']);
 		}
 
+		$highlightUriId = (int) $item['uri-id'];
+
 		if ($item['gravity'] != Item::GRAVITY_PARENT) {
 			$parent = Post::selectFirst($fields, [
 				'uid'    => [0, $itemUid],
@@ -167,12 +169,12 @@ class Display extends BaseModule
 
 		// add the uri-id to the update_display parameter
 		if ($this->session->getLocalUserId()) {
-			$output .= "<script> var netargs = '?uri_id=" . $item['uri-id'] . "'; </script>";
+			$output .= "<script> var netargs = '?uri_id=" . $item['uri-id'] . "&highlight=" . $highlightUriId . "'; </script>";
 
 			$output .= $this->spaBackButton->render();
 		}
 
-		$output .= $this->getDisplayData($item, false, false);
+		$output .= $this->getDisplayData($item, false, false, $highlightUriId);
 
 		$author              = Contact::getByURLForUser($item['author-link'], $this->session->getLocalUserId());
 		$this->page['title'] = $this->l10n->t("Post by %s", $author['name']);
@@ -215,7 +217,7 @@ class Display extends BaseModule
 		$this->appHelper->setProfileOwner($item['uid']);
 	}
 
-	protected function getDisplayData(array $item, bool $update = false, bool $force = false): string
+	protected function getDisplayData(array $item, bool $update = false, bool $force = false, int $highlightUriId = 0): string
 	{
 		$itemUid = $this->session->getLocalUserId();
 
@@ -293,7 +295,7 @@ class Display extends BaseModule
 			$output .= $this->statusEditor->renderEditor([], 0, true);
 		}
 
-		$output .= $this->htmlRenderer->renderThreadByItem($item, $update, $itemUid, ConversationRenderer::MODE_DISPLAY);
+		$output .= $this->htmlRenderer->renderThreadByItem($item, $update, $itemUid, ConversationRenderer::MODE_DISPLAY, $highlightUriId);
 
 		return $output;
 	}
