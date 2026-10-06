@@ -472,6 +472,7 @@ return [
 	],
 
 	'/credits'                  => [Module\Credits::class,          [R::GET]],
+	'/deck'                     => [Module\Deck::class,             [R::GET]],
 	'/delegation'               => [Module\User\Delegation::class,  [R::GET, R::POST]],
 	'/dfrn_notify[/{nickname}]' => [Module\DFRN\Notify::class,      [        R::POST]],
 	'/dfrn_poll/{nickname}'     => [Module\Feed::class,            [R::GET]],
@@ -600,6 +601,7 @@ return [
 		'/system[/json]'               => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
 		'/personal[/json]'             => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
 		'/home[/json]'                 => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
+		'/stream'                      => [Module\Notifications\Stream::class,        [R::GET]],
 		'/intros[/json]'               => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
 		'/intros/all[/json]'           => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
 		'/intros/{contact:\d+}[/json]' => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
@@ -744,6 +746,10 @@ return [
 		'/circle/{circle_id:\d+}'                                          => [Module\Ping\Network::class, [R::GET]],
 	],
 
+	'/ping_contact/{id:\d+}/conversations' => [Module\Ping\Contact::class,       [R::GET]],
+	'/ping_notifications[/]'               => [Module\Ping\Notifications::class, [R::GET]],
+	'/ping_search[/]'                      => [Module\Ping\Search::class,        [R::GET]],
+
 	'/update_channel[/{content}]'   => [Module\Update\Channel::class,        [R::GET]],
 	'/update_community[/{content}]' => [Module\Update\Community::class,      [R::GET]],
 
@@ -758,8 +764,10 @@ return [
 		'/circle/{circle_id:\d+}'                                          => [Module\Update\Network::class, [R::GET]],
 	],
 
-	'/update_notes'   => [Module\Update\Notes::class,          [R::GET]],
-	'/update_profile' => [Module\Update\Profile::class,        [R::GET]],
+	'/update_notes'            => [Module\Update\Notes::class,         [R::GET]],
+	'/update_notifications[/]' => [Module\Update\Notifications::class, [R::GET]],
+	'/update_profile'          => [Module\Update\Profile::class,       [R::GET]],
+	'/update_search[/]'        => [Module\Update\Search::class,        [R::GET]],
 
 	'/user/import' => [Module\User\Import::class,           [R::GET, R::POST]],
 

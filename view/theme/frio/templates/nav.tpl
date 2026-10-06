@@ -89,6 +89,14 @@
 							</li>
 						{{/if}}
 
+						{{if $nav.deck}}
+							<li class="nav-segment hidden-xs">
+								<a id="nav-deck-link" href="{{$nav.deck.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
+									aria-label="{{$nav.deck.1}}" title="{{$nav.deck.3}}" class="nav-menu {{$sel.deck}}"><i
+									class="ri ri-xl ri-layout-column-{{if $sel.deck}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.deck.1}}</span></a>
+							</li>
+						{{/if}}
+
 						{{if $nav.calendar}}
 							<li class="nav-segment">
 								<a accesskey="e" id="nav-calendar-link" href="{{$nav.calendar.0}}" data-toggle="tooltip" data-viewport="#topbar-first"

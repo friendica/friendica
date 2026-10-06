@@ -334,11 +334,12 @@ final readonly class ConversationRenderer
 	 * @param string $mode One of self::MODE_*
 	 * @param bool $preview Post preview (no actual database record)
 	 * @param int $uid The user ID of the viewer
+	 * @param array $request The request parameters, used for the automatic update of the search
 	 * @return string The rendered HTML
 	 * @throws ImagickException
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function renderFlat(array $items, string $mode, bool $preview, int $uid = 0): string
+	public function renderFlat(array $items, string $mode, bool $preview, int $uid = 0, array $request = []): string
 	{
 		$this->profiler->startRecording('rendering');
 		$this->statusEditor->registerAssets();
@@ -347,8 +348,9 @@ final readonly class ConversationRenderer
 
 		$live_update_div = '';
 
-		if ($mode === self::MODE_SEARCH) {
-			$live_update_div = '<div id="live-search"></div>' . "\r\n";
+		// Only a search with a term can be updated
+		if ($mode === self::MODE_SEARCH && $viewerUid && (isset($request['q']) || isset($request['tag']))) {
+			$live_update_div = $this->getLiveUpdateHtml($mode, false, $viewerUid, $request);
 		}
 
 		$_SESSION['return_path'] = $this->args->getQueryString();
@@ -378,12 +380,13 @@ final readonly class ConversationRenderer
 	private function getNetargsForMode(string $mode, array $request): string
 	{
 		$paramsByMode = [
-			self::MODE_NETWORK   => ['contactid', 'search', 'star', 'order', 'bmark', 'liked', 'conv', 'nets', 'cmin', 'cmax', 'file', 'channel', 'no_sharer', 'accounttype'],
+			self::MODE_NETWORK   => ['contactid', 'search', 'star', 'mention', 'order', 'bmark', 'liked', 'conv', 'nets', 'cmin', 'cmax', 'file', 'channel', 'no_sharer', 'accounttype'],
 			self::MODE_CHANNEL   => ['no_sharer', 'accounttype'],
 			self::MODE_COMMUNITY => ['no_sharer', 'accounttype'],
 			self::MODE_CONTACTS  => [],
 			self::MODE_PROFILE   => [],
 			self::MODE_NOTES     => [],
+			self::MODE_SEARCH    => ['q', 'tag', 'search-option'],
 		];
 
 		// MODE_DISPLAY must receive an empty netargs string, all other modes must receive at least "?f="
@@ -426,6 +429,7 @@ final readonly class ConversationRenderer
 			self::MODE_CHANNEL,
 			self::MODE_COMMUNITY,
 			self::MODE_CONTACTS,
+			self::MODE_SEARCH,
 		];
 
 		if (!in_array($mode, $supportedModes, true)) {

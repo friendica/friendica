@@ -1702,6 +1702,65 @@ class Contact
 	}
 
 	/**
+	 * Selects the threads of a contact, newest first
+	 *
+	 * @param array $contact     Fields 'contact-type' and 'network' of the contact
+	 * @param bool  $update      Update mode, 'first_created' of the request limits the result to newer threads
+	 * @param int   $parentUriId Thread parent URI-ID for the update mode
+	 * @return array List of posts
+	 */
+	private static function selectThreadItems(array $contact, int $cid, int $uid, int $parentUriId, array $request, bool $update, int $start, int $limit): array
+	{
+		if (empty($contact["network"]) || in_array($contact["network"], Protocol::FEDERATED)) {
+			$condition = ["(`uid` = 0 OR (`uid` = ? AND NOT `global`))", $uid];
+		} else {
+			$condition = ["`uid` = ?", $uid];
+		}
+
+		if (!empty($parentUriId)) {
+			$condition = DBA::mergeConditions($condition, ['parent-uri-id' => $parentUriId]);
+		} elseif (isset($request['last_created'])) {
+			$condition = DBA::mergeConditions($condition, ["`created` < ?", $request['last_created']]);
+		} elseif ($update && !empty($request['first_created'])) {
+			$condition = DBA::mergeConditions($condition, ["`created` > ?", $request['first_created']]);
+		}
+
+		$contact_field = ((($contact["contact-type"] == self::TYPE_COMMUNITY) || ($contact['network'] == Protocol::MAIL)) ? 'owner-id' : 'author-id');
+
+		$condition1 = DBA::mergeConditions($condition, ["`$contact_field` = ? AND `gravity` = ?", $cid, Item::GRAVITY_PARENT]);
+
+		$condition2 = DBA::mergeConditions($condition, [
+			"`author-id` = ? AND `gravity` = ? AND `vid` = ? AND `protocol` != ? AND `thr-parent-id` = `parent-uri-id`",
+			$cid, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA,
+		]);
+
+		$sql1 = "SELECT `uri-id`, `created` FROM `post-thread-user-view` WHERE " . array_shift($condition1);
+		$sql2 = "SELECT `thr-parent-id` AS `uri-id`, `created` FROM `post-user-view` WHERE " . array_shift($condition2);
+
+		$union = array_merge($condition1, $condition2);
+		$sql   = $sql1 . " UNION " . $sql2;
+
+		$sql .= " ORDER BY `created` DESC LIMIT ?, ?";
+		$union = array_merge($union, [$start, $limit]);
+		return Post::toArray(DBA::p($sql, $union));
+	}
+
+	/**
+	 * Number of threads of a contact that are newer than the given creation date
+	 *
+	 * @return int Number of threads, limited to 100
+	 */
+	public static function countNewThreadsFromId(int $cid, int $uid, string $firstCreated): int
+	{
+		$contact = DBA::selectFirst('contact', ['contact-type', 'network'], ['id' => $cid]);
+		if (!DBA::isResult($contact) || Contact\User::isIsBlocked($cid, $uid)) {
+			return 0;
+		}
+
+		return count(self::selectThreadItems($contact, $cid, $uid, 0, ['first_created' => $firstCreated], true, 0, 100));
+	}
+
+	/**
 	 * Returns threads from a given contact id
 	 *
 	 * @param int   $cid          Contact ID
@@ -1722,20 +1781,6 @@ class Contact
 			return DI::l10n()->t('%s has blocked you', $contact['name'] ?: $contact['nick']);
 		}
 
-		if (empty($contact["network"]) || in_array($contact["network"], Protocol::FEDERATED)) {
-			$condition = ["(`uid` = 0 OR (`uid` = ? AND NOT `global`))", $uid];
-		} else {
-			$condition = ["`uid` = ?", $uid];
-		}
-
-		if (!empty($parentUriId)) {
-			$condition = DBA::mergeConditions($condition, ['parent-uri-id' => $parentUriId]);
-		} elseif (isset($request['last_created'])) {
-			$condition = DBA::mergeConditions($condition, ["`created` < ?", $request['last_created']]);
-		}
-
-		$contact_field = ((($contact["contact-type"] == self::TYPE_COMMUNITY) || ($contact['network'] == Protocol::MAIL)) ? 'owner-id' : 'author-id');
-
 		if (DI::mode()->isMobile()) {
 			$itemsPerPage = DI::pConfig()->get($uid, 'system', 'itemspage_mobile_network', DI::config()->get('system', 'itemspage_network_mobile'));
 		} else {
@@ -1744,22 +1789,7 @@ class Contact
 
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
-		$condition1 = DBA::mergeConditions($condition, ["`$contact_field` = ? AND `gravity` = ?", $cid, Item::GRAVITY_PARENT]);
-
-		$condition2 = DBA::mergeConditions($condition, [
-			"`author-id` = ? AND `gravity` = ? AND `vid` = ? AND `protocol` != ? AND `thr-parent-id` = `parent-uri-id`",
-			$cid, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA,
-		]);
-
-		$sql1 = "SELECT `uri-id`, `created` FROM `post-thread-user-view` WHERE " . array_shift($condition1);
-		$sql2 = "SELECT `thr-parent-id` AS `uri-id`, `created` FROM `post-user-view` WHERE " . array_shift($condition2);
-
-		$union = array_merge($condition1, $condition2);
-		$sql   = $sql1 . " UNION " . $sql2;
-
-		$sql .= " ORDER BY `created` DESC LIMIT ?, ?";
-		$union = array_merge($union, [$pager->getStart(), $pager->getItemsPerPage()]);
-		$items = Post::toArray(DBA::p($sql, $union));
+		$items = self::selectThreadItems($contact, $cid, $uid, $parentUriId, $request, (bool) $update, $pager->getStart(), $pager->getItemsPerPage());
 
 		$raw = isset($request['mode']) && ($request['mode'] == 'raw');
 

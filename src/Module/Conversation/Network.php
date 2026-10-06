@@ -287,7 +287,11 @@ class Network extends Timeline
 				$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
 					'$title' => $this->l10n->t('Circle: %s', $circle['name']),
 				]) . $o;
-			} elseif (Profile::shouldDisplayEventList($this->session->getLocalUserId(), $this->mode)) {
+			} elseif (
+				Profile::shouldDisplayEventList($this->session->getLocalUserId(), $this->mode)
+				// A channel in a column of the deck shows nothing but its posts
+				&& !(($request['mode'] ?? '') === 'column' && ($this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId()) || $this->community->isTimeline($this->selectedTab)))
+			) {
 				$o .= Profile::getBirthdays($this->session->getLocalUserId());
 				$o .= Profile::getEventsReminderHTML($this->session->getLocalUserId(), $this->session->getPublicContactId());
 			}
@@ -451,8 +455,13 @@ class Network extends Timeline
 			$this->star = false;
 		}
 
-		$this->session->set('network-tab', $this->selectedTab);
-		$this->pConfig->set($this->session->getLocalUserId(), 'network.view', 'selected_tab', $this->selectedTab);
+		// The columns of the deck must not overwrite what the single view remembers
+		$isColumn = ($request['mode'] ?? '') === 'column';
+
+		if (!$isColumn) {
+			$this->session->set('network-tab', $this->selectedTab);
+			$this->pConfig->set($this->session->getLocalUserId(), 'network.view', 'selected_tab', $this->selectedTab);
+		}
 
 		$this->network = $request['nets'] ?? '';
 
@@ -461,7 +470,7 @@ class Network extends Timeline
 
 		$this->setMaxMinByOrder($request);
 
-		if (is_null($this->maxId) && !is_null($this->minId)) {
+		if (!$isColumn && is_null($this->maxId) && !is_null($this->minId)) {
 			$this->session->set('network-request', $request);
 			$this->pConfig->set($this->session->getLocalUserId(), 'network.view', 'request', $request);
 		}

@@ -637,7 +637,7 @@ function triggerLiveUpdates(force, guid) {
 		showProcessing();
 	}
 	force_update = force;
-	['network', 'profile', 'channel', 'community', 'notes', 'display', 'contact'].forEach(function (src) {
+	['network', 'profile', 'channel', 'community', 'notes', 'display', 'contact', 'notifications', 'search'].forEach(function (src) {
 		// updateContent: 0 = never, 1 = only at the top of the page, 2 = always. The display page is never updated automatically.
 		var autoUpdate = src !== 'display' && (updateContent === 2 || (updateContent === 1 && $(window).scrollTop() === 0));
 		if ($('#live-' + src).length && (force || autoUpdate)) {
@@ -736,6 +736,12 @@ function NavUpdate() {
 					// start live update
 					triggerLiveUpdates(force_update);
 
+					['notifications', 'contact', 'search'].forEach(function (src) {
+						if ($('#live-' + src).length) {
+							columnUpdate(src);
+						}
+					});
+
 					if ($('#live-network').length && !$('#live-display').length) {
 						networkUpdate(force_update);
 					} else if (!$('#live-display').length) {
@@ -818,6 +824,23 @@ function updateConvItems(data, guid) {
 	}
 }
 
+/**
+ * Adds the new notifications of the notification stream above the existing ones
+ *
+ * @param {string} data The response of the update
+ */
+function updateNotificationItems(data) {
+	$('.notification-stream-item', data).each(function() {
+		var id = $(this).data('notification-id');
+
+		if ($('.notification-stream-item[data-notification-id="' + id + '"]').length === 0) {
+			$('#notification-stream-empty').remove();
+			$('#' + prev).after($(this));
+			prev = this.id;
+		}
+	});
+}
+
 function getUpdateUrl(src)
 {
 	var udargs = ((netargs.length) ? '/' + netargs : '');
@@ -834,25 +857,23 @@ function getUpdateUrl(src)
 		update_url += '&max_id=' + getUrlParameter('max_id');
 	}
 
-	match = $("span.received").first();
-	if (match.length > 0) {
-		update_url += '&first_received=' + match[0].innerHTML;
+	var firstNotification = $(".notification-stream-item").first();
+	if (firstNotification.length > 0) {
+		update_url += '&first_id=' + firstNotification.data('notification-id');
 	}
+
+	// Without any post (yet) everything is new
+	match = $("span.received").first();
+	update_url += '&first_received=' + (match.length > 0 ? match[0].innerHTML : '1970-01-01 00:00:00');
 
 	match = $("span.created").first();
-	if (match.length > 0) {
-		update_url += '&first_created=' + match[0].innerHTML;
-	}
+	update_url += '&first_created=' + (match.length > 0 ? match[0].innerHTML : '1970-01-01 00:00:00');
 
 	match = $("span.commented").first();
-	if (match.length > 0) {
-		update_url += '&first_commented=' + match[0].innerHTML;
-	}
+	update_url += '&first_commented=' + (match.length > 0 ? match[0].innerHTML : '1970-01-01 00:00:00');
 
 	match = $("span.uriid").first();
-	if (match.length > 0) {
-		update_url += '&first_uriid=' + match[0].innerHTML;
-	}
+	update_url += '&first_uriid=' + (match.length > 0 ? match[0].innerHTML : '1');
 	return update_url;
 }
 
@@ -889,11 +910,11 @@ function liveUpdate(src, force, guid) {
 			in_progress = false;
 			update_item = 0;
 
-			if ($('.wall-item-body', data).length == 0) {
+			if ($('.wall-item-body, .notification-stream-item', data).length == 0) {
 				return;
 			}
 
-			$('.wall-item-body', data).imagesLoaded(function() {
+			$('.wall-item-body, .notification-stream-item', data).imagesLoaded(function() {
 				var atTop = $(window).scrollTop() === 0;
 
 				// Remember the first visible thread, so it can be kept at the same screen position.
@@ -910,7 +931,11 @@ function liveUpdate(src, force, guid) {
 					});
 				}
 
-				updateConvItems(data, guid);
+				if (src === 'notifications') {
+					updateNotificationItems(data);
+				} else {
+					updateConvItems(data, guid);
+				}
 
 				document.dispatchEvent(new Event('postprocess_liveupdate'));
 
@@ -947,6 +972,23 @@ function networkUpdate(force) {
 			if (force) {
 				hideLoading();
 			}
+		});
+}
+
+/**
+ * Checks for new entries on pages without a ping of their own, like the notification stream, the posts of a contact
+ * or a search. The number is shown in the element "column-update" if the page has one (like the columns of the deck).
+ *
+ * @param {string} src The type of the page, as in the element "live-<src>"
+ */
+function columnUpdate(src) {
+	if (!$('#column-update').length) {
+		return;
+	}
+
+	$.get('ping_' + getUpdateUrl(src))
+		.done(function(count) {
+			updateCounter('column', count);
 		});
 }
 
@@ -1854,18 +1896,26 @@ function loadScrollContent() {
 		uriid = "0";
 	}
 
+	var scrollData = {
+		'mode'          : 'raw',
+		'last_received' : received,
+		'last_commented': commented,
+		'last_created'  : created,
+		'last_uriid'    : uriid
+	};
+
+	// The notification stream continues after its last notification
+	var lastNotification = $(".notification-stream-item").last();
+	if (lastNotification.length > 0) {
+		scrollData.max_id = lastNotification.data('notification-id');
+	}
+
 	// get the raw content from the next page and insert this content
 	// right before "#conversation-end"
 	showFetching();
 	$.get({
 		url: infinite_scroll.reload_uri,
-		data: {
-			'mode'          : 'raw',
-			'last_received' : received,
-			'last_commented': commented,
-			'last_created'  : created,
-			'last_uriid'    : uriid
-		}
+		data: scrollData
 	})
 	.done(function(data) {
 		showProcessing();

@@ -670,9 +670,10 @@ class Tag
 	 * @param integer $start Starting record
 	 * @param integer $limit Maximum count of records
 	 * @param integer $last_uriid
+	 * @param integer $first_uriid Only posts that are newer than this URI-ID
 	 * @return array with URI-ID
 	 */
-	public static function getURIIdListByTag(string $search, int $uid = 0, int $start = 0, int $limit = 100, int $last_uriid = 0): array
+	public static function getURIIdListByTag(string $search, int $uid = 0, int $start = 0, int $limit = 100, int $last_uriid = 0, int $first_uriid = 0): array
 	{
 		$condition = ["`name` = ? AND (`uid` = ? OR (`uid` = ? AND NOT `global`))
 			AND (`network` IN (?, ?, ?) OR (`uid` = ? AND `uid` != ?))",
@@ -682,6 +683,10 @@ class Tag
 
 		if (!empty($last_uriid)) {
 			$condition = DBA::mergeConditions($condition, ["`uri-id` < ?", $last_uriid]);
+		}
+
+		if (!empty($first_uriid)) {
+			$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", $first_uriid]);
 		}
 
 		$params = [

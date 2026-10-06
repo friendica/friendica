@@ -47,7 +47,7 @@ class Compose extends BaseModule
 	protected function post(array $request = [])
 	{
 		if (!empty($request['body'])) {
-			$_REQUEST['return'] = 'network';
+			$_REQUEST['return'] = ($_GET['mode'] ?? '') === 'column' ? 'compose?mode=column&posted=1' : 'network';
 			require_once 'mod/item.php';
 			item_post();
 		} else {
