@@ -1522,6 +1522,7 @@ $(document).on('click', '.click-to-display[data-display-url]', function(event) {
 		return;
 	}
 	if (typeof window.up !== 'undefined' && typeof up.visit === 'function') {
+		window.dispatchEvent(new CustomEvent('spa:before-visit', { detail: { url: new URL(url, document.baseURI).href } }));
 		up.error.muteUncriticalRejection(up.visit(url));
 		return;
 	}
