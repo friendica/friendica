@@ -43,7 +43,19 @@ const NAVIGATE_TARGET =
   'nav#topbar-first, div#topbar-second:maybe, main:maybe, ' +
   '#content-section:maybe, #aside-section:maybe, #right-aside-section:maybe';
 
+const SNAPSHOT_SELECTORS = [
+  'nav#topbar-first',
+  'div#topbar-second',
+  'main',
+  '#content-section',
+  '#aside-section',
+  '#right-aside-section',
+];
+const SNAPSHOT_LIMIT = 3;
+const SNAPSHOT_MAX_AGE = 30 * 60 * 1000;
+
 const pendingScriptSyncs = new Map();
+let backButtonUsed = false;
 let lastScriptSync = Promise.resolve();
 
 /**
@@ -388,6 +400,34 @@ function focusContentAfterNavigation() {
 }
 
 /**
+ * Everything that has to happen once the new page content is in place and its
+ * out-of-band scripts are ready. Also used when a page is restored from a
+ * snapshot, see bindListSnapshots().
+ */
+function completeNavigation(path, scriptSyncPromise) {
+  Promise.resolve(scriptSyncPromise).then(() => {
+    runBlockedFragmentScripts();
+
+    cleanupTooltips();
+
+    focusContentAfterNavigation();
+
+    window.dispatchEvent(new CustomEvent('spa:navigate', { detail: { path } }));
+    window.dispatchEvent(new CustomEvent('spa:initInfiniteScroll'));
+
+    if (typeof initInfiniteScroll === 'function') {
+      initInfiniteScroll();
+    }
+    if (typeof NavUpdate === 'function') {
+      NavUpdate();
+    }
+    if (typeof hideLoading === 'function') {
+      hideLoading();
+    }
+  });
+}
+
+/**
  * Fires once per completed navigation (including browser back/forward), by
  * dispatching spa:navigate and friends so main.js's onDocumentReady/
  * onWindowLoad helpers and theme.js's spa:navigate listener keep working.
@@ -400,29 +440,6 @@ function focusContentAfterNavigation() {
 function bindNavigationCompleted() {
   let microtaskScheduled = false;
   let isFirstBurst = true;
-
-  function runCompletion(path, scriptSyncPromise) {
-    Promise.resolve(scriptSyncPromise).then(() => {
-      runBlockedFragmentScripts();
-
-      cleanupTooltips();
-
-      focusContentAfterNavigation();
-
-      window.dispatchEvent(new CustomEvent('spa:navigate', { detail: { path } }));
-      window.dispatchEvent(new CustomEvent('spa:initInfiniteScroll'));
-
-      if (typeof initInfiniteScroll === 'function') {
-        initInfiniteScroll();
-      }
-      if (typeof NavUpdate === 'function') {
-        NavUpdate();
-      }
-      if (typeof hideLoading === 'function') {
-        hideLoading();
-      }
-    });
-  }
 
   up.on('up:fragment:inserted', function () {
     if (microtaskScheduled) {
@@ -443,7 +460,7 @@ function bindNavigationCompleted() {
       const scriptSyncPromise = pendingScriptSyncs.get(url) || lastScriptSync;
       pendingScriptSyncs.delete(url);
 
-      runCompletion(path, scriptSyncPromise);
+      completeNavigation(path, scriptSyncPromise);
     });
   });
 }
@@ -497,6 +514,9 @@ function bindBackButton() {
   const goBack = function (event) {
     if (depth > 0) {
       event.preventDefault();
+      backButtonUsed = true;
+      // The flag only belongs to this one history step
+      setTimeout(() => { backButtonUsed = false; }, 1000);
       history.back();
     }
   };
@@ -504,6 +524,106 @@ function bindBackButton() {
   // Links are followed by Unpoly before a click listener would run
   up.on('up:link:follow', 'a[data-spa-back]', goBack);
   up.on('click', 'button[data-spa-back]', goBack);
+}
+
+/**
+ * When the back button ([data-spa-back]) leads from a display page back to a
+ * list of posts (timeline, channel, search ...), bring that list back exactly
+ * as it was left: with all posts loaded by infinite scroll and at the same
+ * scroll position, without a new request.
+ *
+ * Unpoly's own cache can't do this, it only holds the HTML of the first
+ * response. So when a link from such a list to a display page is followed, the
+ * swapped containers are kept as live DOM nodes together with the scroll
+ * position. Unpoly detaches them when it swaps in the display page, which
+ * leaves them intact. The browser's own back button and every other
+ * navigation keep working as before and load the page fresh.
+ */
+function bindListSnapshots() {
+  const snapshots = new Map();
+  let pending = null;
+  let nextId = 1;
+
+  const isDisplayUrl = (url) => /\/display\//.test(new URL(url, document.baseURI).pathname);
+
+  const captureSnapshot = () => {
+    const elements = SNAPSHOT_SELECTORS
+      .map((selector) => ({ selector, element: document.querySelector(selector) }))
+      .filter((entry) => entry.element);
+
+    return {
+      id: 'snap' + nextId++,
+      time: Date.now(),
+      scrollY: window.scrollY,
+      title: document.title,
+      bodyClass: document.body.className,
+      updateContent: window.updateContent,
+      localUser: window.localUser,
+      infiniteScroll: window.infinite_scroll,
+      // A container inside another one comes back with its parent
+      elements: elements.filter((entry) => !elements.some((other) => other !== entry && other.element.contains(entry.element))),
+    };
+  };
+
+  up.on('up:link:follow', 'a[href]', function (event, link) {
+    if (event.defaultPrevented || link.hasAttribute('data-spa-back')) {
+      return;
+    }
+    if (isDisplayUrl(location.href) || !isDisplayUrl(link.href) || !document.getElementById('conversation-end')) {
+      pending = null;
+      return;
+    }
+
+    pending = captureSnapshot();
+    history.replaceState({ ...history.state, friendicaSnapshot: pending.id }, '');
+  });
+
+  // Only a navigation that really happened turns the capture into a snapshot
+  up.on('up:location:changed', function (event) {
+    if (event.reason !== 'push' || !pending) {
+      return;
+    }
+    snapshots.set(pending.id, pending);
+    pending = null;
+
+    while (snapshots.size > SNAPSHOT_LIMIT) {
+      snapshots.delete(snapshots.keys().next().value);
+    }
+  });
+
+  up.on('up:location:restore', function (event) {
+    const id = history.state?.friendicaSnapshot;
+    const snapshot = id && backButtonUsed ? snapshots.get(id) : null;
+    if (!snapshot) {
+      return;
+    }
+
+    snapshots.delete(id);
+    backButtonUsed = false;
+
+    if (Date.now() - snapshot.time > SNAPSHOT_MAX_AGE || !snapshot.elements.every(({ selector }) => document.querySelector(selector))) {
+      return;
+    }
+
+    event.preventDefault();
+
+    document.title = snapshot.title;
+    document.body.className = snapshot.bodyClass;
+    window.updateContent = snapshot.updateContent;
+    window.localUser = snapshot.localUser;
+    window.infinite_scroll = snapshot.infiniteScroll;
+
+    snapshot.elements.forEach(({ selector, element }) => {
+      // up.fragment.markAsDestroying() marked it when Unpoly swapped it out
+      element.classList.remove('up-destroying');
+      element.removeAttribute('inert');
+      document.querySelector(selector).replaceWith(element);
+      up.hello(element);
+    });
+
+    window.scrollTo(0, snapshot.scrollY);
+    completeNavigation(window.location.pathname, Promise.resolve());
+  });
 }
 
 function bindLoadingIndicatorHooks() {
@@ -565,6 +685,7 @@ function initSPANavigation() {
   bindNavigationCompleted();
   bindModalCleanup();
   bindBackButton();
+  bindListSnapshots();
   bindLoadingIndicatorHooks();
   bindInitialLifecycleEvents();
 }
