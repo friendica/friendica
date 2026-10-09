@@ -171,10 +171,12 @@ return [
 
 		// cache_driver (database|memcache|memcached|redis|apcu)
 		// Whether to use Memcache, Memcached, Redis or APCu to store temporary cache.
+		// Falls back to the database if the driver isn't available, e.g. because of a missing PHP extension.
 		'cache_driver' => 'database',
 
 		// distributed_cache_driver (database|memcache|memcached|redis)
 		// Whether to use database, Memcache, Memcached or Redis as a distributed cache.
+		// Falls back to the database if the driver isn't available, e.g. because of a missing PHP extension.
 		'distributed_cache_driver' => 'database',
 
 		// fetch_parents (Boolean)

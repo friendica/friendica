@@ -14,7 +14,6 @@
 	},
 	"require": {
 		"php": "8.2.* || 8.3.* || 8.4.* || 8.5.*",
-		"ext-apcu": "*",
 		"ext-ctype": "*",
 		"ext-curl": "*",
 		"ext-dom": "*",
@@ -89,6 +88,7 @@
 		"xemlock/htmlpurifier-html5": "^0.1.11"
 	},
 	"suggest": {
+		"ext-apcu": "To use APCu as a caching provider",
 		"ext-imagick": "For faster image processing",
 		"ext-redis": "To use Redis as a locking or caching provider",
 		"ext-pdo": "To use PDO as a database driver, has priority over mysqli unless database.disable_pdo is set",

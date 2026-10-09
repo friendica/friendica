@@ -9,6 +9,7 @@ namespace Friendica\Core;
 
 use DOMDocument;
 use Exception;
+use Friendica\Core\Cache\Type\APCuCache;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
@@ -96,6 +97,8 @@ class Installer
 		if (!$this->checkImagick()) {
 			$returnVal = false;
 		}
+
+		$this->checkAPCu();
 
 		if (!$this->checkLocalIni()) {
 			$returnVal = false;
@@ -669,6 +672,18 @@ class Installer
 
 		// Imagick is not required
 		return true;
+	}
+
+	/**
+	 * Checks, if the optional APCu module is available
+	 */
+	public function checkAPCu(): void
+	{
+		if (!APCuCache::isAvailable()) {
+			$this->addCheck(DI::l10n()->t('APCu PHP extension is not available (optional, only needed for the "apcu" cache driver)'), false, false, '');
+		} else {
+			$this->addCheck(DI::l10n()->t('APCu PHP extension is available'), true, false, '');
+		}
 	}
 
 	/**

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 11:22+0000\n"
+"POT-Creation-Date: 2026-10-06 08:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1954,7 +1954,7 @@ msgid "Add categories to your posts"
 msgstr ""
 
 #: src/Content/Feature.php:122 src/Model/Profile.php:826
-#: src/Module/Admin/Summary.php:216 src/Module/Item/Compose.php:161
+#: src/Module/Admin/Summary.php:223 src/Module/Item/Compose.php:161
 #: src/Module/Moderation/Report/Create.php:320
 #: src/Module/Moderation/Summary.php:60
 msgid "Summary"
@@ -2853,296 +2853,304 @@ msgstr ""
 msgid "Connectors"
 msgstr ""
 
-#: src/Core/Installer.php:156
+#: src/Core/Installer.php:159
 msgid "The database configuration file \"config/local.config.php\" could not be written. Please use the enclosed text to create a configuration file in your web server root."
 msgstr ""
 
-#: src/Core/Installer.php:173
+#: src/Core/Installer.php:176
 msgid "You may need to import the file \"database.sql\" manually using phpmyadmin or mysql."
 msgstr ""
 
-#: src/Core/Installer.php:174 src/Module/Install.php:189
+#: src/Core/Installer.php:177 src/Module/Install.php:189
 #: src/Module/Install.php:334
 msgid "Please see the file \"doc/INSTALL.md\"."
 msgstr ""
 
-#: src/Core/Installer.php:261
+#: src/Core/Installer.php:264
 msgid "Could not find a command line version of PHP in the web server PATH."
 msgstr ""
 
-#: src/Core/Installer.php:262
+#: src/Core/Installer.php:265
 msgid "If you don't have a command line version of PHP installed on your server, you will not be able to run the background processing. See <a href='https://github.com/friendica/friendica/blob/stable/doc/Install.md#set-up-the-worker'>'Setup the worker'</a>"
 msgstr ""
 
-#: src/Core/Installer.php:267
+#: src/Core/Installer.php:270
 msgid "PHP executable path"
 msgstr ""
 
-#: src/Core/Installer.php:267
+#: src/Core/Installer.php:270
 msgid "Enter full path to php executable. You can leave this blank to continue the installation."
 msgstr ""
 
-#: src/Core/Installer.php:272
+#: src/Core/Installer.php:275
 msgid "Command line PHP"
 msgstr ""
 
-#: src/Core/Installer.php:281
+#: src/Core/Installer.php:284
 msgid "PHP executable is not the php cli binary (could be cgi-fgci version)"
 msgstr ""
 
-#: src/Core/Installer.php:282
+#: src/Core/Installer.php:285
 msgid "Found PHP version: "
 msgstr ""
 
-#: src/Core/Installer.php:284
+#: src/Core/Installer.php:287
 msgid "PHP cli binary"
 msgstr ""
 
-#: src/Core/Installer.php:297
+#: src/Core/Installer.php:300
 msgid "The command line version of PHP on your system does not have \"register_argc_argv\" enabled."
 msgstr ""
 
-#: src/Core/Installer.php:298
+#: src/Core/Installer.php:301
 msgid "This is required for message delivery to work."
 msgstr ""
 
-#: src/Core/Installer.php:303
+#: src/Core/Installer.php:306
 msgid "PHP register_argc_argv"
 msgstr ""
 
-#: src/Core/Installer.php:335
+#: src/Core/Installer.php:338
 msgid "Error: the \"openssl_pkey_new\" function on this system is not able to generate encryption keys"
 msgstr ""
 
-#: src/Core/Installer.php:336
+#: src/Core/Installer.php:339
 msgid "If running under Windows, please see \"http://www.php.net/manual/en/openssl.installation.php\"."
 msgstr ""
 
-#: src/Core/Installer.php:339
+#: src/Core/Installer.php:342
 msgid "Generate encryption keys"
 msgstr ""
 
-#: src/Core/Installer.php:391
+#: src/Core/Installer.php:394
 msgid "Error: Apache webserver mod-rewrite module is required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:395
+#: src/Core/Installer.php:398
 msgid "Apache mod_rewrite module"
 msgstr ""
 
-#: src/Core/Installer.php:401
+#: src/Core/Installer.php:404
 msgid "Error: PDO or MySQLi PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:405
+#: src/Core/Installer.php:408
 msgid "Error: The MySQL driver for PDO is not installed."
 msgstr ""
 
-#: src/Core/Installer.php:408
+#: src/Core/Installer.php:411
 msgid "PDO or MySQLi PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:414
+#: src/Core/Installer.php:417
 msgid "Error: The IntlChar module is not installed."
 msgstr ""
 
-#: src/Core/Installer.php:417
+#: src/Core/Installer.php:420
 msgid "IntlChar PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:425
+#: src/Core/Installer.php:428
 msgid "Error, XML PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:429
+#: src/Core/Installer.php:432
 msgid "XML PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:433
+#: src/Core/Installer.php:436
 msgid "libCurl PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:434
+#: src/Core/Installer.php:437
 msgid "Error: libCURL PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:441
+#: src/Core/Installer.php:444
 msgid "GD graphics PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:442
+#: src/Core/Installer.php:445
 msgid "Error: GD graphics PHP module with JPEG support required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:449
+#: src/Core/Installer.php:452
 msgid "OpenSSL PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:450
+#: src/Core/Installer.php:453
 msgid "Error: openssl PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:457
+#: src/Core/Installer.php:460
 msgid "Sodium PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:458
+#: src/Core/Installer.php:461
 msgid "Error: Sodium PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:465
+#: src/Core/Installer.php:468
 msgid "mb_string PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:466
+#: src/Core/Installer.php:469
 msgid "Error: mb_string PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:473
+#: src/Core/Installer.php:476
 msgid "iconv PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:474
+#: src/Core/Installer.php:477
 msgid "Error: iconv PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:481
+#: src/Core/Installer.php:484
 msgid "POSIX PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:482
+#: src/Core/Installer.php:485
 msgid "Error: POSIX PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:489
+#: src/Core/Installer.php:492
 msgid "Program execution functions"
 msgstr ""
 
-#: src/Core/Installer.php:490
+#: src/Core/Installer.php:493
 msgid "Error: Program execution functions (proc_open) required but not enabled."
 msgstr ""
 
-#: src/Core/Installer.php:497
+#: src/Core/Installer.php:500
 msgid "JSON PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:498
+#: src/Core/Installer.php:501
 msgid "Error: JSON PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:505
+#: src/Core/Installer.php:508
 msgid "File Information PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:506
+#: src/Core/Installer.php:509
 msgid "Error: File Information PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:513
+#: src/Core/Installer.php:516
 msgid "GNU Multiple Precision PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:514
+#: src/Core/Installer.php:517
 msgid "Error: GNU Multiple Precision PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:521
+#: src/Core/Installer.php:524
 msgid "IDN Functions PHP module"
 msgstr ""
 
-#: src/Core/Installer.php:522
+#: src/Core/Installer.php:525
 msgid "Error: IDN Functions PHP module required but not installed."
 msgstr ""
 
-#: src/Core/Installer.php:545
+#: src/Core/Installer.php:548
 msgid "The web installer needs to be able to create a file called \"local.config.php\" in the \"config\" folder of your web server and it is unable to do so."
 msgstr ""
 
-#: src/Core/Installer.php:546
+#: src/Core/Installer.php:549
 msgid "This is most often a permission setting, as the web server may not be able to write files in your folder - even if you can."
 msgstr ""
 
-#: src/Core/Installer.php:547
+#: src/Core/Installer.php:550
 msgid "At the end of this procedure, we will give you a text to save in a file named local.config.php in your Friendica \"config\" folder."
 msgstr ""
 
-#: src/Core/Installer.php:548
+#: src/Core/Installer.php:551
 msgid "You can alternatively skip this procedure and perform a manual installation. Please see the file \"doc/INSTALL.md\" for instructions."
 msgstr ""
 
-#: src/Core/Installer.php:551
+#: src/Core/Installer.php:554
 msgid "config/local.config.php is writable"
 msgstr ""
 
-#: src/Core/Installer.php:571
+#: src/Core/Installer.php:574
 msgid "Friendica uses the Smarty3 template engine to render its web views. Smarty3 compiles templates to PHP to speed up rendering."
 msgstr ""
 
-#: src/Core/Installer.php:572
+#: src/Core/Installer.php:575
 msgid "In order to store these compiled templates, the web server needs to have write access to the directory view/smarty3/ under the Friendica top level folder."
 msgstr ""
 
-#: src/Core/Installer.php:573
+#: src/Core/Installer.php:576
 msgid "Please ensure that the user that your web server runs as (e.g. www-data) has write access to this folder."
 msgstr ""
 
-#: src/Core/Installer.php:574
+#: src/Core/Installer.php:577
 msgid "Note: as a security measure, you should give the web server write access to view/smarty3/ only--not the template files (.tpl) that it contains."
 msgstr ""
 
-#: src/Core/Installer.php:577
+#: src/Core/Installer.php:580
 msgid "view/smarty3 is writable"
 msgstr ""
 
-#: src/Core/Installer.php:605
+#: src/Core/Installer.php:608
 msgid "Url rewrite in .htaccess seems not working. Make sure you copied .htaccess-dist to .htaccess."
 msgstr ""
 
-#: src/Core/Installer.php:606
+#: src/Core/Installer.php:609
 msgid "In some circumstances (like running inside containers), you can skip this error."
 msgstr ""
 
-#: src/Core/Installer.php:608
+#: src/Core/Installer.php:611
 msgid "Error message from Curl when fetching"
 msgstr ""
 
-#: src/Core/Installer.php:614
+#: src/Core/Installer.php:617
 msgid "Url rewrite is working"
 msgstr ""
 
-#: src/Core/Installer.php:643
+#: src/Core/Installer.php:646
 msgid "The detection of TLS to secure the communication between the browser and the new Friendica server failed."
 msgstr ""
 
-#: src/Core/Installer.php:644
+#: src/Core/Installer.php:647
 msgid "It is highly encouraged to use Friendica only over a secure connection as sensitive information like passwords will be transmitted."
 msgstr ""
 
-#: src/Core/Installer.php:645
+#: src/Core/Installer.php:648
 msgid "Please ensure that the connection to the server is secure."
 msgstr ""
 
-#: src/Core/Installer.php:646
+#: src/Core/Installer.php:649
 msgid "No TLS detected"
 msgstr ""
 
-#: src/Core/Installer.php:648
+#: src/Core/Installer.php:651
 msgid "TLS detected"
 msgstr ""
 
-#: src/Core/Installer.php:665
+#: src/Core/Installer.php:668
 msgid "ImageMagick PHP extension is not installed"
 msgstr ""
 
-#: src/Core/Installer.php:667
+#: src/Core/Installer.php:670
 msgid "ImageMagick PHP extension is installed"
 msgstr ""
 
-#: src/Core/Installer.php:688
+#: src/Core/Installer.php:683
+msgid "APCu PHP extension is not available (optional, only needed for the \"apcu\" cache driver)"
+msgstr ""
+
+#: src/Core/Installer.php:685
+msgid "APCu PHP extension is available"
+msgstr ""
+
+#: src/Core/Installer.php:703
 msgid "Database already in use."
 msgstr ""
 
-#: src/Core/Installer.php:693
+#: src/Core/Installer.php:708
 msgid "Could not connect to database."
 msgstr ""
 
@@ -4137,7 +4145,7 @@ msgstr ""
 #: src/Module/Admin/Federation.php:225 src/Module/Admin/Logs/Settings.php:74
 #: src/Module/Admin/Logs/View.php:101 src/Module/Admin/Queue.php:64
 #: src/Module/Admin/Roles.php:130 src/Module/Admin/Site.php:459
-#: src/Module/Admin/Storage.php:118 src/Module/Admin/Summary.php:215
+#: src/Module/Admin/Storage.php:118 src/Module/Admin/Summary.php:222
 #: src/Module/Admin/Themes/Details.php:82 src/Module/Admin/Themes/Index.php:103
 #: src/Module/Admin/Tos.php:63 src/Module/Moderation/Users/Pending.php:81
 msgid "Administration"
@@ -4251,14 +4259,14 @@ msgstr ""
 msgid "Attempt to execute this update step automatically"
 msgstr ""
 
-#: src/Module/Admin/Features.php:53 src/Module/Admin/Summary.php:186
+#: src/Module/Admin/Features.php:53 src/Module/Admin/Summary.php:193
 #: src/Module/Notifications/Introductions.php:140
 #: src/Module/OAuth/Acknowledge.php:39 src/Module/Register.php:138
 #: src/Module/Settings/TwoFactor/Trusted.php:128
 msgid "No"
 msgstr ""
 
-#: src/Module/Admin/Features.php:53 src/Module/Admin/Summary.php:186
+#: src/Module/Admin/Features.php:53 src/Module/Admin/Summary.php:193
 #: src/Module/Contact/Revoke.php:91
 #: src/Module/Notifications/Introductions.php:140
 #: src/Module/OAuth/Acknowledge.php:38 src/Module/Register.php:137
@@ -5742,99 +5750,104 @@ msgstr ""
 msgid "Changing the current backend is prohibited because it is set by an environment variable"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:39
+#: src/Module/Admin/Summary.php:40
 #, php-format
 msgid "Template engine (%s) error: %s"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:43
+#: src/Module/Admin/Summary.php:44
 #, php-format
 msgid "Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href=\"%s\">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:48
+#: src/Module/Admin/Summary.php:49
 #, php-format
 msgid "Your DB still runs with InnoDB tables in the Antelope file format. You should change the file format to Barracuda. Friendica is using features that are not provided by the Antelope format. See <a href=\"%s\">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:58
+#: src/Module/Admin/Summary.php:59
 #, php-format
 msgid "Your table_definition_cache is too low (%d). This can lead to the database error \"Prepared statement needs to be re-prepared\". Please set it at least to %d. See <a href=\"%s\">here</a> for more information.<br />"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:66
+#: src/Module/Admin/Summary.php:67
 #, php-format
 msgid "There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:74
+#: src/Module/Admin/Summary.php:75
 msgid "The database update failed. Please run \"php bin/console.php dbstructure update\" from the command line and have a look at the errors that might appear."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:78
+#: src/Module/Admin/Summary.php:79
 msgid "The last update failed. Please run \"php bin/console.php dbstructure update\" from the command line and have a look at the errors that might appear. (Some of the errors are possibly inside the logfile.)"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:82
+#: src/Module/Admin/Summary.php:83
 msgid "The system.url entry is missing. This is a low level setting and can lead to unexpected behavior. Please add a valid entry as soon as possible in the config file or per console command!"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:87
+#: src/Module/Admin/Summary.php:88
+#, php-format
+msgid "The system.%s entry is set to \"apcu\", but APCu isn't available. Friendica uses a fallback driver instead. Please install and enable the APCu PHP extension or change the setting."
+msgstr ""
+
+#: src/Module/Admin/Summary.php:94
 msgid "The worker was never executed. Please check your database structure!"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:89
+#: src/Module/Admin/Summary.php:96
 #, php-format
 msgid "The last worker execution was on %s UTC. This is older than one hour. Please check your crontab settings."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:94
+#: src/Module/Admin/Summary.php:101
 #, php-format
 msgid "Friendica's configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>.htconfig.php</code>. See <a href=\"%s\">the Config help page</a> for help with the transition."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:98
+#: src/Module/Admin/Summary.php:105
 #, php-format
 msgid "Friendica's configuration now is stored in config/local.config.php, please copy config/local-sample.config.php and move your config from <code>config/local.ini.php</code>. See <a href=\"%s\">the Config help page</a> for help with the transition."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:105
+#: src/Module/Admin/Summary.php:112
 #, php-format
 msgid "<a href=\"%s\">%s</a> is not reachable on your system. This is a severe configuration issue that prevents server to server communication. See <a href=\"%s\">the installation page</a> for help."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:133
+#: src/Module/Admin/Summary.php:140
 #, php-format
 msgid "Friendica's system.basepath was updated from '%s' to '%s'. Please remove the system.basepath from your db to avoid differences."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:143
+#: src/Module/Admin/Summary.php:150
 #, php-format
 msgid "Friendica's current system.basepath '%s' is wrong and the config file '%s' isn't used."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:153
+#: src/Module/Admin/Summary.php:160
 #, php-format
 msgid "Friendica's current system.basepath '%s' is not equal to the config file '%s'. Please fix your configuration."
 msgstr ""
 
-#: src/Module/Admin/Summary.php:165
+#: src/Module/Admin/Summary.php:172
 msgid "Message queues"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:171
+#: src/Module/Admin/Summary.php:178
 msgid "Server Settings"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:218
+#: src/Module/Admin/Summary.php:225
 msgid "Version"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:222
+#: src/Module/Admin/Summary.php:229
 msgid "Active addons"
 msgstr ""
 
-#: src/Module/Admin/Summary.php:225
+#: src/Module/Admin/Summary.php:232
 msgid "Enable new addons"
 msgstr ""
 

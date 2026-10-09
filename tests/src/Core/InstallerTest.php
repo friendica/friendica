@@ -599,6 +599,50 @@ class InstallerTest extends MockedTestCase
 	}
 
 	/**
+	 * Separate process, because php-mock can't mock functions which were already called in the namespace (e.g. by the APCu cache tests).
+	 */
+	#[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+	public function testAPCuNotAvailable(): void
+	{
+		$this->getFunctionMock('Friendica\Core\Cache\Type', 'extension_loaded')->expects($this->any())->willReturn(false);
+		$this->mockL10nT('APCu PHP extension is not available (optional, only needed for the "apcu" cache driver)', 1);
+
+		$install = new Installer();
+		$install->checkAPCu();
+
+		// APCu is optional, so the check must not be required
+		self::assertCheckExist(
+			0,
+			'APCu PHP extension is not available (optional, only needed for the "apcu" cache driver)',
+			'',
+			false,
+			false,
+			$install->getChecks(),
+		);
+	}
+
+	#[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+	public function testAPCuAvailable(): void
+	{
+		$this->getFunctionMock('Friendica\Core\Cache\Type', 'extension_loaded')->expects($this->any())->willReturn(true);
+		$this->getFunctionMock('Friendica\Core\Cache\Type', 'ini_get')->expects($this->any())->willReturn('1');
+		$this->getFunctionMock('Friendica\Core\Cache\Type', 'phpversion')->expects($this->any())->willReturn('5.1.24');
+		$this->mockL10nT('APCu PHP extension is available', 1);
+
+		$install = new Installer();
+		$install->checkAPCu();
+
+		self::assertCheckExist(
+			0,
+			'APCu PHP extension is available',
+			'',
+			true,
+			false,
+			$install->getChecks(),
+		);
+	}
+
+	/**
 	 * Test the setup of the config cache for installation
 	 */
 	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
