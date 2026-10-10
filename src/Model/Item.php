@@ -3051,7 +3051,17 @@ class Item
 		$itemSplitAttachments = DI::postMediaRepository()->splitAttachments($item['uri-id'], $shared_links, $item['has-media'] ?? false, $uid != 0);
 		$item['body']         = self::replaceVisualAttachments($itemSplitAttachments['visual'], $item['body'] ?? '');
 
-		self::putInCache($item);
+		// Images that are hidden from the visitor must not be rendered from the body.
+		// The result differs per viewer, so it must not be stored in the shared cache.
+		$hidden_urls  = self::getHiddenImageUrls($itemSplitAttachments['hidden']);
+		$hidden_urls  = array_merge($hidden_urls, self::getHiddenImageUrls($sharedSplitAttachments['hidden'] ?? new PostMedias()));
+		$visible_body = Post\Media::removeImagesByUrl($hidden_urls, $item['body']);
+
+		if ($visible_body !== $item['body']) {
+			$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $visible_body);
+		} else {
+			self::putInCache($item);
+		}
 		$item['body'] = $body;
 		$s            = $item["rendered-html"];
 
@@ -3350,6 +3360,28 @@ class Item
 		}
 		DI::profiler()->stopRecording();
 		return $body;
+	}
+
+	/**
+	 * Get the URLs (including previews) of the hidden images
+	 *
+	 * @param PostMedias $PostMedias
+	 * @return string[]
+	 */
+	private static function getHiddenImageUrls(PostMedias $PostMedias): array
+	{
+		$urls = [];
+		/** @var PostMedia $PostMedia */
+		foreach ($PostMedias as $PostMedia) {
+			if ($PostMedia->type != PostMedia::TYPE_IMAGE) {
+				continue;
+			}
+			$urls[] = (string) $PostMedia->url;
+			if ($PostMedia->preview) {
+				$urls[] = (string) $PostMedia->preview;
+			}
+		}
+		return $urls;
 	}
 
 	/**
