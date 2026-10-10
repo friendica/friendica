@@ -957,6 +957,29 @@ class Media
 	}
 
 	/**
+	 * Remove the images with the given URLs, including a surrounding link, from the body
+	 *
+	 * @param string[] $urls Image URLs (full size and preview)
+	 * @param string   $body
+	 * @return string
+	 */
+	public static function removeImagesByUrl(array $urls, string $body): string
+	{
+		foreach ($urls as $url) {
+			$url = preg_quote($url, '#');
+			$img = '(?:\[img=' . $url . '\][^\[]*|\[img(?:=\d*x\d*)?\]' . $url . ')\[/img\]';
+
+			$body = preg_replace([
+				"#\[url=[^\]]*\]\s*$img\s*\[/url\]#ism",
+				"#\[url=$url\]\s*\[img[^\]]*\][^\[]*\[/img\]\s*\[/url\]#ism",
+				"#$img#ism",
+			], '', (string) $body);
+		}
+
+		return $body;
+	}
+
+	/**
 	 * Replace the image link in Friendica image posts with a link to the image
 	 *
 	 * @param string $body
