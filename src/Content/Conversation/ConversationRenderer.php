@@ -9,22 +9,13 @@ declare(strict_types=1);
 
 namespace Friendica\Content\Conversation;
 
-use Friendica\App\BaseURL;
-use Friendica\BaseModule;
-use Friendica\Content\ContactSelector;
-use Friendica\Content\Item;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
-use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Event\ArrayFilterEvent;
-use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
-use Friendica\Model\Tag;
-use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
-use Friendica\Util\Strings;
 use ImagickException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
@@ -56,8 +47,6 @@ final readonly class ConversationRenderer
 
 	public function __construct(
 		private L10n $l10n,
-		private Item $item,
-		private BaseURL $baseURL,
 		private IManagePersonalConfigValues $pConfig,
 		private EventDispatcherInterface $eventDispatcher,
 		private IHandleUserSessions $session,
@@ -329,16 +318,8 @@ final readonly class ConversationRenderer
 
 		$items = $cb['items'];
 
-		$html = $this->renderContextLessTimelineByItems(
-			$items,
-			$mode,
-			false,
-			$preview,
-			false,
-			$live_update_div,
-			$this->args->getQueryString(),
-			$viewerUid,
-		);
+		$roots = $this->dataProvider->getFlatTemplateData($items, $viewerUid, $preview);
+		$html  = $live_update_div . $this->renderThreadedTemplate($roots, $mode, false, false);
 
 		$this->profiler->stopRecording();
 		return $html;
@@ -477,190 +458,6 @@ final readonly class ConversationRenderer
 			'$threads'     => $threads,
 			'$dropping'    => ($pagedrop ? $this->l10n->t('Delete Selected Items') : false),
 		]);
-	}
-
-	/**
-	 * Render the context-less list view (search/filed/contact-posts style).
-	 *
-	 * @param array<int, array> $items The items to render
-	 * @param string $mode The rendering mode (e.g., self::MODE_DISPLAY)
-	 * @param bool $update Whether this is an AJAX update
-	 * @param bool $preview Whether to render in preview mode
-	 * @param bool $pagedrop Whether to enable page drop functionality
-	 * @param string $liveUpdate The live update URL
-	 * @param string $returnPath The return path for navigation
-	 * @param int $uid The user ID of the viewer, or null for public view
-	 * @return string The rendered HTML of the context-less timeline
-	 * @throws ImagickException
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	private function renderContextLessTimelineByItems(array $items, string $mode, bool $update, bool $preview, bool $pagedrop, string $liveUpdate, string $returnPath, int $uid): string
-	{
-		$formSecurityToken = BaseModule::getFormSecurityToken('contact_action');
-		$threads           = $this->buildContextLessThreadList($items, $mode, $preview, $pagedrop, $formSecurityToken, $uid);
-
-		return Renderer::replaceMacros(Renderer::getMarkupTemplate('conversation.tpl'), [
-			'$live_update' => $liveUpdate,
-			'$update'      => $update,
-			'$threads'     => $threads,
-			'$dropping'    => ($pagedrop ? $this->l10n->t('Delete Selected Items') : false),
-		]);
-	}
-
-	/**
-	 * Build context-less thread list from items.
-	 *
-	 * @param array<int, array> $items The items to build from
-	 * @param string $mode The rendering mode (e.g., self::MODE_DISPLAY)
-	 * @param bool $preview Whether to render in preview mode
-	 * @param bool $pagedrop Whether to enable page drop functionality
-	 * @param string $formSecurityToken The form security token
-	 * @param int $viewerUid The user ID of the viewer
-	 * @return array<int, array> The built thread list
-	 * @throws ImagickException
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
-	 */
-	private function buildContextLessThreadList(array $items, string $mode, bool $preview, bool $pagedrop, string $formSecurityToken, int $viewerUid): array
-	{
-		$threads = [];
-		$uriids  = [];
-
-		foreach ($items as $item) {
-			if (in_array($item['uri-id'], $uriids)) {
-				continue;
-			}
-
-			$uriids[] = $item['uri-id'];
-
-			if (!$this->item->isVisibleActivity($item)) {
-				continue;
-			}
-
-			if ($item['network'] === Protocol::MAIL && $viewerUid !== $item['uid']) {
-				continue;
-			}
-
-			$profileName = $item['author-name'];
-			if (!empty($item['author-link']) && empty($item['author-name'])) {
-				$profileName = $item['author-link'];
-			}
-
-			$tags = Tag::populateFromItem($item);
-
-			$author = [
-				'uid'     => 0,
-				'id'      => $item['author-id'],
-				'network' => $item['author-network'],
-				'url'     => $item['author-link'],
-				'alias'   => $item['author-alias'],
-			];
-			$profileLink = Contact::magicLinkByContact($author);
-
-			$sparkle = '';
-			if (str_starts_with($profileLink, 'contact/redir/')) {
-				$sparkle = ' sparkle';
-			}
-
-			$locate = ['location' => $item['location'], 'coord' => $item['coord'], 'html' => ''];
-			$locate = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::RENDER_LOCATION, $locate),
-			)->getArray();
-			$locationHtml = $locate['html'] ?: Strings::escapeHtml($locate['location'] ?: $locate['coord'] ?: '');
-
-			$this->item->localize($item);
-			$drop = [
-				'dropping' => ($mode === self::MODE_FILED),
-				'pagedrop' => $pagedrop,
-				'select'   => $this->l10n->t('Select'),
-				'delete'   => $this->l10n->t('Delete'),
-			];
-
-			$likebuttons = [
-				'like'     => null,
-				'dislike'  => null,
-				'share'    => null,
-				'announce' => null,
-			];
-
-			if ($this->pConfig->get($viewerUid, 'system', 'hide_dislike')) {
-				unset($likebuttons['dislike']);
-			}
-
-			$bodyHtml               = ItemModel::prepareBody($item, true, $preview);
-			[$categories, $folders] = $this->item->determineCategoriesTerms($item, $viewerUid);
-
-			$pinned = !empty($item['featured']) ? $this->l10n->t('Pinned item') : '';
-			if ($this->item->redundantSummary($item['body'], $item['content-warning'])) {
-				$item['content-warning'] = '';
-			}
-
-			$tmpItem = [
-				'template'             => 'search_item.tpl',
-				'id'                   => ($preview ? 'P0' : $item['id']),
-				'guid'                 => ($preview ? 'Q0' : $item['guid']),
-				'commented'            => $item['commented'],
-				'received'             => $item['received'],
-				'created_date'         => $item['created'],
-				'uriid'                => $item['uri-id'],
-				'network'              => $item['network'],
-				'network_name'         => ContactSelector::networkToName($item['author-network'], $item['network'], $item['author-gsid']),
-				'network_svg'          => ContactSelector::networkToSVG($item['network'], $item['author-gsid'], '', $viewerUid),
-				'linktitle'            => $this->l10n->t('View %s\'s profile @ %s', $profileName, $item['author-link']),
-				'profile_url'          => $profileLink,
-				'item_photo_menu_html' => $this->item->photoMenu($item, $formSecurityToken),
-				'name'                 => $profileName,
-				'sparkle'              => $sparkle,
-				'lock'                 => false,
-				'thumb'                => $this->baseURL->remove($this->item->getAuthorAvatar($item)),
-				'title'                => $item['title'],
-				'summary'              => $item['content-warning'],
-				'body_html'            => $bodyHtml,
-				'tags'                 => $tags['tags'],
-				'hashtags'             => $tags['hashtags'],
-				'mentions'             => $tags['mentions'],
-				'txt_cats'             => $this->l10n->t('Categories:'),
-				'txt_folders'          => $this->l10n->t('Filed under:'),
-				'has_cats'             => (count($categories) ? 'true' : ''),
-				'has_folders'          => (count($folders) ? 'true' : ''),
-				'categories'           => $categories,
-				'folders'              => $folders,
-				'localtime'            => $this->l10n->fullDateTime($item['created']),
-				'utc'                  => DateTimeFormat::utc($item['created'], 'c'),
-				'ago'                  => (($item['app']) ? $this->l10n->t('%s from %s', $this->l10n->relativeDateTime($item['created']), $item['app']) : $this->l10n->relativeDateTime($item['created'])),
-				'location_html'        => $locationHtml,
-				'indent'               => '',
-				'owner_name'           => '',
-				'owner_url'            => '',
-				'owner_photo'          => $this->baseURL->remove($this->item->getOwnerAvatar($item)),
-				'plink'                => ItemModel::getPlink($item),
-				'edpost'               => false,
-				'pinned'               => $pinned,
-				'star'                 => false,
-				'drop'                 => $drop,
-				'vote'                 => $likebuttons,
-				'like_html'            => '',
-				'dislike_html'         => '',
-				'comment_html'         => '',
-				'conv'                 => $preview ? '' : ['href' => 'display/' . $item['guid'], 'title' => $this->l10n->t('View in context')],
-				'previewing'           => $preview ? ' preview ' : '',
-				'wait'                 => $this->l10n->t('Please wait'),
-				'loading'              => $this->l10n->t('Loading ...'),
-				'thread_level'         => 1,
-			];
-
-			$arr = ['item' => $item, 'output' => $tmpItem];
-			$arr = $this->eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr),
-			)->getArray();
-
-			$threads[] = [
-				'id'      => $item['id'],
-				'network' => $item['network'],
-				'items'   => [$arr['output']],
-			];
-		}
-
-		return $threads;
 	}
 
 	/**

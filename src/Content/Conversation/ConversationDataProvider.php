@@ -166,6 +166,79 @@ final readonly class ConversationDataProvider
 	}
 
 	/**
+	 * Get the template data for a list of items that are rendered on their own, without their threads
+	 * (search results, posts of a contact). Comments are not loaded, they can be read on the display page.
+	 *
+	 * @param array<int, array> $items The items to render
+	 * @param int $viewerUid The user ID of the viewer
+	 * @param bool $preview Whether the items are a post preview without database records
+	 * @return array<int, array> The template data of the items
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public function getFlatTemplateData(array $items, int $viewerUid, bool $preview): array
+	{
+		$unique = [];
+		foreach ($items as $item) {
+			$unique[$item['uri-id']] ??= $item;
+		}
+		$items = array_values($unique);
+
+		if (empty($items)) {
+			return [];
+		}
+
+		$uriIds        = array_keys($unique);
+		$convResponses = $this->buildConversationResponses($viewerUid);
+		$emojis        = $quoteshares = $counts = $parents = [];
+
+		if (!$preview) {
+			$parentUriIds = array_values(array_unique(array_column($items, 'parent-uri-id')));
+			$emojis       = $this->getEmojis($parentUriIds, $viewerUid);
+			$quoteshares  = $this->getQuoteShares($uriIds);
+			$counts       = $this->getCounts($parentUriIds);
+
+			if ($viewerUid) {
+				$verbs = [Activity::LIKE => 'like', Activity::DISLIKE => 'dislike', Activity::ANNOUNCE => 'announce'];
+				$own   = Post::selectToArray(['thr-parent-id', 'verb'], ['thr-parent-id' => $uriIds, 'gravity' => ItemModel::GRAVITY_ACTIVITY, 'author-id' => Contact::getPublicIdByUserId($viewerUid), 'verb' => array_keys($verbs), 'deleted' => false]);
+				foreach ($own as $post) {
+					if (isset($convResponses[$verbs[$post['verb']]])) {
+						$convResponses[$verbs[$post['verb']]][$post['thr-parent-id']] = ['links' => [], 'self' => 1];
+					}
+				}
+			}
+
+			$thrIds = array_values(array_unique(array_filter(array_column($items, 'thr-parent-id'))));
+			if ($thrIds) {
+				foreach (Post::selectToArray(['uri-id', 'guid', 'author-name'], ['uri-id' => $thrIds]) as $post) {
+					$parents[$post['uri-id']] = ['guid' => $post['guid'], 'name' => $post['author-name']];
+				}
+			}
+		}
+
+		$formSecurityToken = BaseModule::getFormSecurityToken('contact_action');
+		$remoteComment     = $this->session->get('remote_comment', null);
+
+		$result = [];
+		foreach ($items as $item) {
+			if (!$preview) {
+				$item = $this->addRowInformation($item, [], [], '', $viewerUid, []);
+			}
+
+			$item['emojis']      = $emojis[$item['uri-id']]      ?? [];
+			$item['quoteshares'] = $quoteshares[$item['uri-id']] ?? [];
+			$item['counts']      = $item['gravity'] === ItemModel::GRAVITY_PARENT ? ($counts[$item['uri-id']] ?? 0) : 0;
+			$item['pagedrop']    = false;
+
+			$templateData = $this->postTemplateBuilder->renderFlatItem($item, $preview, $viewerUid !== 0 && !$preview, $viewerUid, $convResponses, $formSecurityToken, $item['gravity'] === ItemModel::GRAVITY_PARENT ? [] : ($parents[$item['thr-parent-id'] ?? 0] ?? []), $remoteComment);
+			if ($templateData !== null) {
+				$result[] = $templateData;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Build thread template data from items.
 	 *
 	 * @param array<int, array> $items The items to build from

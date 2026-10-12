@@ -30,7 +30,6 @@
         "view/theme/frio/templates/moderation/users/blocked.tpl": 1,
         "view/theme/frio/templates/moderation/users/deleted.tpl": 1,
         "view/theme/frio/templates/moderation/users/index.tpl": 1,
-        "view/theme/frio/templates/search_item.tpl": 1,
         "view/theme/frio/templates/settings/addons/connector.tpl": 1,
         "view/theme/frio/templates/wall_thread.tpl": 1,
         "view/theme/frio/templates/widget/vcard.tpl": 1

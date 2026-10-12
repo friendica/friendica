@@ -62,7 +62,7 @@ as the value of $top_child_total (this is done at the end of this file)
 	<article class="media {{$item.shiny}}" aria-posinset="{{$item.id}}" aria-setsize="-1">
 	{{if $item.parentguid}}
 		<span class="visible-sm-inline visible-xs wall-item-responses time">
-			<i class="ri ri-reply-line" aria-hidden="true"></i> <a id="btn-{{$item.id}}" class="" href="javascript:;" onclick="scrollToItem('item-' + '{{$item.parentguid}}');">{{$item.inreplyto}}</a>
+			<i class="ri ri-reply-line" aria-hidden="true"></i> <a id="btn-{{$item.id}}" class="" {{if $item.inreplyto_url}}href="{{$item.inreplyto_url}}"{{else}}href="javascript:;" onclick="scrollToItem('item-' + '{{$item.parentguid}}');"{{/if}}>{{$item.inreplyto}}</a>
 			{{if $item.reshared}}<i class="hidden-xs "aria-hidden="true">&#x2022;</i>{{/if}}
 		</span>
 	{{else}}
@@ -151,6 +151,10 @@ as the value of $top_child_total (this is done at the end of this file)
 
 				<div class="additional-info text-muted">
 					<div id="wall-item-ago-{{$item.id}}" class="wall-item-ago">
+						{{if $item.inreplyto_url}}
+							<a class="time" href="{{$item.inreplyto_url}}"><i class="ri ri-reply-line" aria-hidden="true"></i> {{$item.inreplyto}}</a>
+							<span aria-hidden="true">&bull;</span>
+						{{/if}}
 						<a href="{{$item.plink.orig}}">
 							<time class="time dt-published" title="{{$item.localtime}}" data-toggle="tooltip" datetime="{{$item.utc}}">{{$item.ago}}</time>
 						</a>
@@ -326,6 +330,12 @@ as the value of $top_child_total (this is done at the end of this file)
 				{{elseif $item.remote_comment}}
 					<a href="{{$item.remote_comment.2}}" class="btn button-comments" title="{{$item.remote_comment.0}}">
 						<i class="ri ri-chat-3-line" aria-hidden="true"></i>
+						<span class="action-label">{{$item.switchcomment}}</span>
+					</a>
+				{{elseif $item.flat && !$item.previewing}}
+					<a href="{{$item.plink.orig}}" class="btn button-comments" id="comment-{{$item.id}}" title="{{$item.switchcomment}}">
+						<i class="ri ri-chat-3-line" aria-hidden="true"></i>
+						<span class="total" title="{{$item.responses.comment.title}}">{{$item.responses.comment.total}}</span>
 						<span class="action-label">{{$item.switchcomment}}</span>
 					</a>
 				{{else}}

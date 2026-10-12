@@ -135,6 +135,8 @@
 
                                 {{if $item.comment_html}}
 									<a role="button" id="comment-{{$item.id}}" class="fakelink togglecomment" onclick="openClose('item-comments-{{$item.id}}'); commentExpand({{$item.id}});" title="{{$item.switchcomment}}"><i class="icon-commenting"><span class="sr-only">{{$item.switchcomment}}</span></i></a>
+                                {{elseif $item.flat && !$item.previewing}}
+									<a role="button" id="comment-{{$item.id}}" href="{{$item.plink.orig}}" title="{{$item.switchcomment}}"><i class="icon-commenting"><span class="sr-only">{{$item.switchcomment}}</span></i></a>
                                 {{/if}}
 
                                 {{if $item.isevent}}
