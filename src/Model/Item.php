@@ -2877,6 +2877,35 @@ class Item
 	}
 
 	/**
+	 * Convert the given body to HTML and let addons modify the result
+	 *
+	 * @param array  $item          Item array
+	 * @param string $render_body   Body to be converted
+	 * @param string $original_body Original body used for the cache hash
+	 * @return array Item array with updated "rendered-html" and "rendered-hash"
+	 */
+	private static function renderBody(array $item, string $render_body, string $original_body): array
+	{
+		$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $render_body);
+		$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $original_body);
+
+		$hook_data = [
+			'rendered-html' => $item['rendered-html'],
+			'rendered-hash' => $item['rendered-hash'],
+			'item'          => $item,
+		];
+
+		$hook_data = DI::eventDispatcher()->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::CACHE_ITEM, $hook_data),
+		)->getArray();
+
+		$item['rendered-html'] = $hook_data['rendered-html'];
+		$item['rendered-hash'] = $hook_data['rendered-hash'];
+
+		return $item;
+	}
+
+	/**
 	 * Sets the "rendered-html" field of the provided item
 	 *
 	 * Body is preserved to avoid side-effects as we modify it just-in-time for spoilers and private image links
@@ -2900,24 +2929,7 @@ class Item
 			|| $rendered_hash != hash('md5', BBCode::VERSION . '::' . $body)
 			|| DI::config()->get('system', 'ignore_cache')
 		) {
-			$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $item['body']);
-			$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $body);
-
-			$hook_data = [
-				'rendered-html' => $item['rendered-html'],
-				'rendered-hash' => $item['rendered-hash'],
-				'item'          => $item,
-			];
-
-			$eventDispatcher = DI::eventDispatcher();
-
-			$hook_data = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::CACHE_ITEM, $hook_data),
-			)->getArray();
-
-			$item['rendered-html'] = $hook_data['rendered-html'];
-			$item['rendered-hash'] = $hook_data['rendered-hash'];
-			unset($hook_data);
+			$item = self::renderBody($item, (string) $item['body'], (string) $body);
 
 			// Update if the generated values differ from the existing ones
 			if ((($rendered_hash != $item['rendered-hash']) || ($rendered_html != $item['rendered-html'])) && !empty($item['id'])) {
@@ -3060,7 +3072,7 @@ class Item
 		$visible_body = Post\Media::removeImagesByUrl($hidden_urls, $item['body']);
 
 		if ($visible_body !== $item['body']) {
-			$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $visible_body);
+			$item = self::renderBody($item, $visible_body, $body);
 		} else {
 			self::putInCache($item);
 		}
