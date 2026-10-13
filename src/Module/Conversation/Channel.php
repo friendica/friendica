@@ -99,13 +99,15 @@ class Channel extends Timeline
 
 			Nav::setSelected('channel');
 
+			$this->page['aside'] .= Widget\SidebarMenu::getHTML($this->session->getLocalUserId(), Widget\SidebarMenu::CHANNELS);
+
 			$this->page['aside'] .= Widget::accountTypes('channel/' . $this->selectedTab, $this->accountTypeString);
 
 			if (!in_array($this->selectedTab, [ChannelEntity::FOLLOWERS, ChannelEntity::FORYOU, ChannelEntity::DISCOVER])) {
 				$this->page['aside'] .= $this->getNoSharerWidget('channel');
 			}
 
-			if (Feature::isEnabled($this->session->getLocalUserId(), Feature::TRENDING_TAGS)) {
+			if (Feature::isEnabled($this->session->getLocalUserId(), Feature::TRENDING_TAGS) && !Widget\SidebarMenu::replaces($this->session->getLocalUserId(), Feature::TRENDING_TAGS)) {
 				$this->page['aside'] .= TrendingTags::getHTML($this->selectedTab);
 			}
 

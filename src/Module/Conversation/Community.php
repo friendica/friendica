@@ -23,6 +23,7 @@ use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Content\Widget\TrendingTags;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -98,7 +99,7 @@ class Community extends Timeline
 				$this->page['aside'] .= $this->getNoSharerWidget('community');
 			}
 
-			if (Feature::isEnabled($this->session->getLocalUserId(), Feature::TRENDING_TAGS)) {
+			if (Feature::isEnabled($this->session->getLocalUserId(), Feature::TRENDING_TAGS) && !SidebarMenu::replaces($this->session->getLocalUserId(), Feature::TRENDING_TAGS)) {
 				$this->page['aside'] .= TrendingTags::getHTML($this->selectedTab);
 			}
 

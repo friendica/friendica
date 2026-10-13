@@ -145,6 +145,18 @@ function openCloseWidget(name) {
 	}
 }
 
+/**
+ * Hides all entries of an overview page that don't contain the entered text
+ */
+function filterOverviewList(input) {
+	const term = input.value.trim().toLowerCase();
+	const page = input.closest(".generic-page-wrapper");
+
+	page.querySelectorAll("[data-filter-item]").forEach(function (entry) {
+		entry.hidden = term !== "" && !entry.textContent.toLowerCase().includes(term);
+	});
+}
+
 function openClose(theID) {
 	var el = document.getElementById(theID);
 	if (el) {

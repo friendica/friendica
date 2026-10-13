@@ -108,6 +108,7 @@ class Groups extends BaseModule
 			'$discover_short'  => $this->t('Discover'),
 			'$discover_server' => $this->t('Discover more groups on this server'),
 			'$no_groups'       => $this->t('You are not subscribed to any groups.'),
+			'$filter'          => $this->t('Filter groups'),
 			'$groups'          => $groups,
 		]);
 	}
