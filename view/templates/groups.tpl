@@ -13,6 +13,7 @@
 	{{if !$groups}}
 		<p>{{$no_groups}}</p>
 	{{else}}
+		<input type="search" class="form-control overview-filter" placeholder="{{$filter}}" aria-label="{{$filter}}" oninput="filterOverviewList(this)">
 		{{foreach $groups as $server}}
 		<div class="group-list-server">
 			<h2>
@@ -23,7 +24,7 @@
 		</div>
 		<ul class="group-list">
 			{{foreach $server.groups as $group}}
-			<li class="group-list-entry">
+			<li class="group-list-entry" data-filter-item>
 				<a href="{{$group.profile}}" class="group-list-avatar"><img src="{{$group.thumb}}" alt="{{$group.name}}"></a>
 				<div class="group-list-title">
 					<a href="{{$group.link}}" class="group-list-name">{{$group.name}}</a>

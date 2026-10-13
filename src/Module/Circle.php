@@ -9,6 +9,7 @@ namespace Friendica\Module;
 
 use Friendica\BaseModule;
 use Friendica\Content\Widget;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
@@ -134,6 +135,50 @@ class Circle extends BaseModule
 		$this->earlyJsonExit(['status' => 'OK', 'message' => $message]);
 	}
 
+	/**
+	 * Overview of all circles of the user, used when the circles are shown as menu
+	 *
+	 * @return string
+	 */
+	private function overview(): string
+	{
+		$items = [[
+			'name' => DI::l10n()->t('Contacts not in any circle'),
+			'href' => 'circle/none',
+		]];
+
+		$circles = DBA::select('group', ['id', 'name'], ['deleted' => false, 'uid' => DI::userSession()->getLocalUserId(), 'cid' => null], ['order' => ['name']]);
+		while ($circle = DBA::fetch($circles)) {
+			$items[] = [
+				'name'    => $circle['name'],
+				'href'    => 'network/circle/' . $circle['id'],
+				'actions' => [[
+					'href'  => 'circle/' . $circle['id'],
+					'label' => DI::l10n()->t('Edit circle'),
+					'icon'  => 'ri-pencil-line',
+				]],
+			];
+		}
+		DBA::close($circles);
+
+		return Renderer::replaceMacros(Renderer::getMarkupTemplate('overview_list.tpl'), [
+			'$title' => DI::l10n()->t('Circles'),
+			'$intro' => '',
+			'$links' => [],
+			'$add'   => [
+				'action'      => 'circle/new',
+				'method'      => 'post',
+				'hidden'      => [['name' => 'form_security_token', 'value' => BaseModule::getFormSecurityToken('circle_edit')]],
+				'name'        => 'circle_name',
+				'placeholder' => DI::l10n()->t('Circle Name: '),
+				'submit'      => DI::l10n()->t('Create a new circle'),
+			],
+			'$filter' => DI::l10n()->t('Filter circles'),
+			'$items'  => $items,
+			'$empty'  => '',
+		]);
+	}
+
 	protected function content(array $request = []): string
 	{
 		DI::page()['title'] = DI::l10n()->t("Circles");
@@ -144,12 +189,19 @@ class Circle extends BaseModule
 			throw new \Friendica\Network\HTTPException\ForbiddenException();
 		}
 
-		DI::page()['aside'] = Model\Circle::sidebarWidget('contact', 'circle', 'extended', ((DI::args()->getArgc() > 1) ? DI::args()->getArgv()[1] : 'everyone'));
+		DI::page()['aside'] = SidebarMenu::getHTML(DI::userSession()->getLocalUserId(), SidebarMenu::CIRCLES);
+		DI::page()['aside'] .= Model\Circle::sidebarWidget('contact', 'circle', 'extended', ((DI::args()->getArgc() > 1) ? DI::args()->getArgv()[1] : 'everyone'));
 		DI::page()['aside'] .= Widget::contactRels($this->server['REQUEST_URI'], $relation);
 
 		// With no circle number provided we jump to the unassigned contacts as a starting point
 		// @TODO: Replace with parameter from router
 		if (DI::args()->getArgc() === 1) {
+			if (SidebarMenu::isActive(DI::userSession()->getLocalUserId())) {
+				DI::page()['aside'] = SidebarMenu::getHTML(DI::userSession()->getLocalUserId(), SidebarMenu::CIRCLES);
+
+				return $this->overview();
+			}
+
 			DI::baseUrl()->redirect('circle/none');
 		}
 

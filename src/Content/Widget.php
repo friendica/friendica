@@ -585,40 +585,29 @@ class Widget
 	}
 
 	/**
-	 * Get a list of all channels
+	 * Get the list of all enabled channels in the order of the user
 	 *
-	 * @param string $base
-	 * @param string $channelname
 	 * @param integer $uid
-	 * @return string
+	 * @return array List of channels with the keys 'ref', 'name' and 'description'
 	 */
-	public static function channels(string $base, string $channelname, int $uid): string
+	public static function getChannelList(int $uid): array
 	{
 		$channels = [];
 
 		$enabled = DI::pConfig()->get($uid, 'system', 'enabled_timelines', []);
 
-		foreach (DI::NetworkFactory()->getTimelines('') as $channel) {
-			if (empty($enabled) || in_array($channel->code, $enabled)) {
-				$channels[] = ['ref' => $channel->code, 'name' => $channel->label];
-			}
-		}
+		$timelines = [
+			DI::NetworkFactory()->getTimelines(''),
+			DI::ChannelFactory()->getTimelines($uid),
+			DI::userDefinedChannel()->selectByUid($uid),
+			DI::CommunityFactory()->getTimelines(true),
+		];
 
-		foreach (DI::ChannelFactory()->getTimelines($uid) as $channel) {
-			if (empty($enabled) || in_array($channel->code, $enabled)) {
-				$channels[] = ['ref' => $channel->code, 'name' => $channel->label];
-			}
-		}
-
-		foreach (DI::userDefinedChannel()->selectByUid($uid) as $channel) {
-			if (empty($enabled) || in_array($channel->code, $enabled)) {
-				$channels[] = ['ref' => $channel->code, 'name' => $channel->label];
-			}
-		}
-
-		foreach (DI::CommunityFactory()->getTimelines(true) as $community) {
-			if (empty($enabled) || in_array($community->code, $enabled)) {
-				$channels[] = ['ref' => $community->code, 'name' => $community->label];
+		foreach ($timelines as $list) {
+			foreach ($list as $channel) {
+				if (empty($enabled) || in_array($channel->code, $enabled)) {
+					$channels[] = ['ref' => $channel->code, 'name' => $channel->label, 'description' => $channel->description];
+				}
 			}
 		}
 
@@ -634,6 +623,21 @@ class Widget
 			}
 			$channels = $tmp;
 		}
+
+		return $channels;
+	}
+
+	/**
+	 * Get a list of all channels
+	 *
+	 * @param string $base
+	 * @param string $channelname
+	 * @param integer $uid
+	 * @return string
+	 */
+	public static function channels(string $base, string $channelname, int $uid): string
+	{
+		$channels = self::getChannelList($uid);
 
 		return self::filter(
 			'channel',

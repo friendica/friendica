@@ -54,6 +54,51 @@ class Category
 
 		return DBA::delete('post-category', ['uri-id' => $uri_id, 'uid' => $uid, 'type' => $type, 'tid' => $tagid]);
 	}
+
+	/**
+	 * Renames a whole folder, moving every post filed under the old name to the new name
+	 *
+	 * @param int    $uid
+	 * @param string $oldname
+	 * @param string $newname
+	 * @return boolean success
+	 * @throws \Exception
+	 */
+	public static function renameFolder(int $uid, string $oldname, string $newname): bool
+	{
+		$old_tagid = Tag::getID($oldname);
+		$new_tagid = Tag::getID($newname);
+		if (empty($old_tagid) || empty($new_tagid) || $old_tagid == $new_tagid) {
+			return false;
+		}
+
+		$posts = DBA::select('post-category', ['uri-id'], ['uid' => $uid, 'type' => self::FILE, 'tid' => $old_tagid]);
+		while ($post = DBA::fetch($posts)) {
+			self::storeByURIId($post['uri-id'], $uid, self::FILE, $new_tagid);
+		}
+		DBA::close($posts);
+
+		return DBA::delete('post-category', ['uid' => $uid, 'type' => self::FILE, 'tid' => $old_tagid]);
+	}
+
+	/**
+	 * Deletes a whole folder, removing the folder tag from every post filed under it
+	 *
+	 * @param int    $uid
+	 * @param string $file
+	 * @return boolean success
+	 * @throws \Exception
+	 */
+	public static function deleteFolder(int $uid, string $file): bool
+	{
+		$tagid = Tag::getID($file);
+		if (empty($tagid)) {
+			return false;
+		}
+
+		return DBA::delete('post-category', ['uid' => $uid, 'type' => self::FILE, 'tid' => $tagid]);
+	}
+
 	/**
 	 * Generates the legacy item.file field string from an item ID.
 	 * Includes only file and category terms.

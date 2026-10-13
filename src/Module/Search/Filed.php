@@ -50,7 +50,11 @@ class Filed extends BaseSearch
 			return Login::form();
 		}
 
-		DI::page()['aside'] .= Widget::fileAs(DI::args()->getCommand(), $_GET['file'] ?? '');
+		if (Widget\SidebarMenu::isActive(DI::userSession()->getLocalUserId())) {
+			DI::page()['aside'] .= Widget\SidebarMenu::getHTML(DI::userSession()->getLocalUserId(), Widget\SidebarMenu::FOLDERS);
+		} else {
+			DI::page()['aside'] .= Widget::fileAs(DI::args()->getCommand(), $_GET['file'] ?? '');
+		}
 
 		$file = $_GET['file'] ?? '';
 
