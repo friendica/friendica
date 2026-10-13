@@ -194,8 +194,14 @@ class Network extends Timeline
 			];
 		}
 
+		$this->page['aside'] .= Widget\SidebarMenu::getHTML($this->session->getLocalUserId(), $this->circleId ? Widget\SidebarMenu::CIRCLES : Widget\SidebarMenu::HOME);
+
+		if ($this->circleId && Widget\SidebarMenu::isActive($this->session->getLocalUserId())) {
+			$widgetorder = [];
+		}
+
 		foreach ($widgetorder as $widget) {
-			if (Feature::isEnabled($this->session->getLocalUserId(), $widget)) {
+			if (Feature::isEnabled($this->session->getLocalUserId(), $widget) && !Widget\SidebarMenu::replaces($this->session->getLocalUserId(), $widget)) {
 				switch ($widget) {
 					case Feature::CIRCLES:
 						$this->page['aside'] .= Circle::sidebarWidget($module, $module . '/circle', 'standard', $this->circleId);

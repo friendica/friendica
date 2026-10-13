@@ -9,6 +9,7 @@ namespace Friendica\Module\Search;
 
 use Friendica\App;
 use Friendica\Content\Conversation\ConversationRenderer;
+use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
@@ -88,7 +89,15 @@ class Index extends BaseSearch
 		}
 
 		if (DI::userSession()->getLocalUserId()) {
-			DI::page()['aside'] .= Widget\SavedSearches::getHTML(Search::getSearchPath($search), $search);
+			if (Widget\SidebarMenu::isActive(DI::userSession()->getLocalUserId())) {
+				DI::page()['aside'] .= Widget\SidebarMenu::getHTML(DI::userSession()->getLocalUserId(), Widget\SidebarMenu::SEARCHES);
+			} else {
+				DI::page()['aside'] .= Widget\SavedSearches::getHTML(Search::getSearchPath($search), $search);
+			}
+
+			if (($tag || str_starts_with($search, '#')) && Feature::isEnabled(DI::userSession()->getLocalUserId(), Feature::TRENDING_TAGS)) {
+				DI::page()['aside'] .= Widget\TrendingTags::getHTML();
+			}
 		}
 
 		Nav::setSelected('search');
