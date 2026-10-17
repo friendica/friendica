@@ -634,7 +634,7 @@ header #banner {
 }
 header #banner #logo-img,
 .navbar-brand #logo-img {
-	font-size: 36px;
+	font-size: 40px;
 	color: $nav_icon_color;
 }
 
@@ -825,11 +825,20 @@ nav.navbar .nav > li > button:focus,
 #topbar-first .nav > li > a.selected:focus {
 	background-color: transparent;
 }
-#topbar-first .nav > .account img {
-	height: 32px;
-	width: 32px;
-	max-width: 35px;
-	border-radius: 3px;
+#topbar-first .nav > .account .user-avatar {
+	height: 42px;
+	width: 42px;
+
+	@media screen and (max-width: 990px) {
+		& {
+			margin-right: 10px;
+		}
+	}
+}
+#topbar-first .nav > .account .user-avatar img {
+	border-radius: 100%;
+	height: 100%;
+	width: 100%;
 }
 #topbar-first .nav > .account .dropdown-toggle span {
 	font-size: 12px;
@@ -943,8 +952,17 @@ nav.navbar .nav > li > button:focus,
 #topbar-first .dropdown-footer {
 	margin: 10px 10px 5px;
 }
-#topbar-first .caret {
-	border-top-color: #bebebe;
+#topbar-first .dropdown-indicator {
+	position: absolute;
+	bottom: 0;
+	right: 3%;
+	height: 15px;
+	width: 15px;
+}
+#topbar-first .dropdown-indicator svg {
+	border-radius: 100px;
+	background: rgb(0, 0, 0, 0.5);
+	color: white;
 }
 #topbar-first .btn-group > a {
 	background-color: #7f9baa;
@@ -1437,7 +1455,11 @@ aside .vcard #profile-photo-wrapper {
 aside .vcard img.u-photo,
 aside img.vcard-photo {
 	width: 100%;
-	border-radius: 3px;
+}
+aside .vcard img.u-photo,
+aside img.vcard-photo,
+#change-profile-picture {
+	border-radius: 100%;
 }
 aside .vcard .tool .action {
 	position: absolute;
@@ -2038,7 +2060,7 @@ aside .panel-body {
 .contact-photo {
 	height: 48px;
 	width: 48px;
-	border-radius: 3px;
+	border-radius: 100%;
 	/*maybe some adional stuff is needed for the different screen sizes */
 }
 .contact-photo-image-wrapper {
@@ -2075,7 +2097,7 @@ aside .panel-body {
 .contact-photo-xs {
 	height: 38px;
 	width: 38px;
-	border-radius: 3px;
+	border-radius: 100%;
 }
 .wwto .contact-photo {
 	width: auto;
@@ -4120,6 +4142,12 @@ body .tread-wrapper .hovercard:hover .hover-card-content a {
 	color: $link_color !important;
 }
 
+.hover-card-pic img.thumbnail {
+	border: none;
+	border-radius: 100%;
+	box-shadow: unset;
+}
+
 /* Pagination improvements */
 .pagination {
 	text-align: center;
@@ -4713,6 +4741,12 @@ div.login-form, .login-content-wrapper,
 	#topbar-first #mobile-left-menu {
 		padding-inline-end: 3px;
 		padding-inline-start: 3px;
+	}
+
+	#topbar-first .nav > .account .user-avatar {
+		height: 30px;
+		width: 30px;
+		margin-right: 0;
 	}
 
 	/* Compose adjustments, mostly to improve the bbcode button experience at lower resolutions */
