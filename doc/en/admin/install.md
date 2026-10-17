@@ -30,7 +30,7 @@ Due to the large variety of operating systems and PHP platforms in existence we 
 * Apache with `mod_rewrite` enabled and "[AllowOverride All](https://httpd.apache.org/docs/2.4/mod/core.html#allowoverride)" so you can use a local `.htaccess` file
 * PHP 8.2 to PHP 8.5
   * PHP *command line* access with register_argc_argv set to true in the php.ini file
-  * Curl, GD, GMP, PDO, mbstring, MySQLi, xml, zip, Intl, IDN and OpenSSL extensions
+  * Curl, GD, GMP, PDO, mbstring, MySQLi, xml, zip, Intl, IDN, OpenSSL and Sodium extensions
   * The POSIX module of PHP needs to be activated (e.g. [RHEL, CentOS](http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7) have disabled it)
   * Some form of email server or email gateway such that PHP mail() works.
     If you cannot set up your own email server, you can use the [phpmailer](https://github.com/friendica/friendica-addons/tree/develop/phpmailer) addon and use a remote SMTP server.
@@ -378,6 +378,32 @@ Also check your file permissions. Your website and all contents must generally b
 It is likely that your web server reported the source of the problem in its error log files.
 Please review these system error logs to determine what caused the problem.
 Often this will need to be resolved with your hosting provider or (if self-hosted) your web server configuration.
+
+### Empty navigation bar, "blocked due to a disallowed MIME type" in the browser console
+
+Friendica loads some of its JavaScript as ES modules, one of them from a `.mjs` file.
+Browsers reject a module that is not served with a JavaScript MIME type.
+nginx and older Apache versions have no `.mjs` entry in their MIME type table.
+
+For nginx, add this to your Friendica server block:
+
+```nginx
+  # The include has to stay, a bare types block would replace the whole table.
+  include mime.types;
+
+  types {
+    text/javascript mjs;
+  }
+```
+
+For Apache, add this to your `.htaccess`:
+
+```apache
+AddType text/javascript .mjs
+```
+
+Both ship with `.htaccess-dist` and `mods/sample-nginx.config` since Friendica 2026.08.
+An existing configuration is never updated automatically.
 
 ### 400 and 4xx "File not found" errors
 

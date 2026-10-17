@@ -13,9 +13,11 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\System;
 use Friendica\Network\HTTPClient\Client;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
+use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use GuzzleHttp;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
 use mattwright\URLResolver;
@@ -64,6 +66,12 @@ class HttpClient extends BaseFactory
 			UriInterface $uri,
 		) use ($logger): void {
 			$logger->info('Curl redirect.', ['url' => $request->getUri(), 'to' => $uri, 'method' => $request->getMethod()]);
+
+			// Apply the outbound restrictions to every redirect target.
+			if (Network::isUriBlocked($uri) || !Network::isValidHttpUrl((string) $uri) || Network::isPrivateTarget($uri)) {
+				$logger->notice('Redirect target is not allowed.', ['url' => $request->getUri(), 'to' => $uri]);
+				throw new TransferException('Redirect to a disallowed target: ' . $uri);
+			}
 		};
 
 		$guzzle = new GuzzleHttp\Client([
@@ -87,7 +95,7 @@ class HttpClient extends BaseFactory
 			// by default, we will allow self-signed certs,
 			// but it can be overridden
 			RequestOptions::VERIFY  => (bool) $this->config->get('system', 'verifyssl'),
-			RequestOptions::VERSION => 2.0,
+			RequestOptions::VERSION => (curl_version()['features'] & CURL_VERSION_HTTP2) ? 2.0 : 1.1,
 			RequestOptions::PROXY   => $proxy,
 			RequestOptions::HEADERS => [],
 			'handler'               => $handlerStack ?? HandlerStack::create(),
@@ -102,6 +110,6 @@ class HttpClient extends BaseFactory
 		// Some websites test the browser for cookie support, so this enhances results.
 		$resolver->setCookieJar(System::getTempPath() . '/resolver-cookie-' . Strings::getRandomName(10));
 
-		return new Client\HttpClient($logger, $this->profiler, $guzzle, $resolver, $this->baseUrl);
+		return new Client\HttpClient($logger, $this->profiler, $guzzle, $resolver, $this->baseUrl, (int) $this->config->get('performance', 'max_download_size', 0));
 	}
 }

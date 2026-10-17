@@ -4,16 +4,26 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
+{{if $item.thread_level==1}}
+	{{assign var="top_child_total" value=count($item.children)}}
+	{{assign var="top_child_nr" value=0}}
+{{/if}}
+{{if $item.thread_level==2}}
+	{{assign var="top_child_nr" value=$top_child_nr+1 scope=parent}}
+{{/if}}
+{{if $item.thread_level==2 && $top_child_nr==1}}
+<div class="comment-container {{if $item.smart_threading}} smart-threaded{{/if}}"> <!--top-child-begin-->
+{{/if}}
 {{if $mode == display}}
 {{else}}
 {{if $item.comment_firstcollapsed}}
 {{if $item.thread_level<3}}
 <button type="button" class="hide-comments-outer fakelink" onclick="showHideComments({{$item.id}});">
 			<span id="hide-comments-total-{{$item.id}}" class="hide-comments-total">
-				{{$item.num_comments}} - {{$item.show_text}}
+				{{$item.show_text}}
 			</span>
 	<span id="hide-comments-{{$item.id}}" class="hide-comments" style="display: none">
-				{{$item.num_comments}} - {{$item.hide_text}}
+				{{$item.hide_text}}
 			</span>
 </button>
 <div id="collapsed-comments-{{$item.id}}" class="collapsed-comments" style="display: none;">
@@ -30,9 +40,9 @@
 			</div>
 
             {{if $item.thread_level<7}}
-			<div class="wall-item-container {{$item.indent}} {{$item.shiny}} {{$item.network}} thread_level_{{$item.thread_level}}" id="item-{{$item.guid}}">
+			<div class="wall-item-container {{$item.indent}} {{$item.shiny}} {{$item.network}} thread_level_{{$item.thread_level}}" id="item-{{$item.guid}}" data-uri-id="{{$item.uriid}}">
                 {{else}}
-				<div class="wall-item-container {{$item.indent}} {{$item.shiny}} {{$item.network}} thread_level_7" id="item-{{$item.guid}}">
+				<div class="wall-item-container {{$item.indent}} {{$item.shiny}} {{$item.network}} thread_level_7" id="item-{{$item.guid}}" data-uri-id="{{$item.uriid}}">
                     {{/if}}
                     {{if $item.thread_level==1}}
 						<span class="commented" style="display: none;">{{$item.commented}}</span>
@@ -262,3 +272,7 @@
 				<div class="wall-item-comment-wrapper" id="item-comments-{{$item.id}}" style="display: none;">{{$item.comment_html nofilter}}</div>
             {{/if}}
         {{/if}}
+{{* close the comment-container div if no more thread_level = 2 children are left *}}
+{{if $item.thread_level==2 && $top_child_nr==$top_child_total}}
+</div><!--./comment-container-->
+{{/if}}

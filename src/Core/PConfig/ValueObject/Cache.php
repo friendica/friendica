@@ -59,13 +59,12 @@ class Cache
 	 */
 	public function get(int $uid, string $cat, ?string $key = null)
 	{
-		if (isset($this->config[$uid][$cat][$key])) {
-			return $this->config[$uid][$cat][$key];
-		} elseif (!isset($key) && isset($this->config[$uid][$cat])) {
-			return $this->config[$uid][$cat];
-		} else {
-			return null;
+		// A null key returns the whole category - it must not be used as an array offset
+		if ($key === null) {
+			return $this->config[$uid][$cat] ?? null;
 		}
+
+		return $this->config[$uid][$cat][$key] ?? null;
 	}
 
 	/**

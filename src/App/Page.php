@@ -13,6 +13,7 @@ use DOMXPath;
 use Friendica\App;
 use Friendica\AppHelper;
 use Friendica\Content\Nav;
+use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
@@ -258,6 +259,8 @@ class Page implements ArrayAccess
 			'$local_user'     => $localUID,
 			'$generator'      => 'Friendica' . ' ' . App::VERSION,
 			'$update_content' => (int) $pConfig->get($localUID, 'system', 'update_content'),
+			'$spa_mode'       => (int) $pConfig->get($localUID, 'system', 'enable_spa'),
+			'$spa_router_ts'  => $this->getSpaModuleTimestamp(),
 			'$shortcut_icon'  => $shortcut_icon,
 			'$touch_icon'     => $touch_icon,
 			'$block_public'   => intval($config->get('system', 'block_public')),
@@ -273,7 +276,6 @@ class Page implements ArrayAccess
 			'$spaErrors' => [
 				'timeout'         => $l10n->t('Timeout'),
 				'timeout_message' => $l10n->t('The request took too long. Please try again.'),
-				'close'           => $l10n->t('Close'),
 				'delay_title'     => $l10n->t('Please wait'),
 			],
 
@@ -409,6 +411,18 @@ class Page implements ArrayAccess
 	}
 
 	/**
+	 * Get the directory modification timestamp combined with the application version.
+	 * This ensures that changes to any SPA module file (which affects directory timestamp)
+	 * or version changes trigger a reload.
+	 *
+	 * @return string
+	 */
+	private function getSpaModuleTimestamp(): string
+	{
+		return (filemtime($this->basePath . '/view/js/spa') ?: 0) . '-' . App::VERSION;
+	}
+
+	/**
 	 * Executes the creation of the current page and prints it to the screen
 	 *
 	 * @param BaseURL                     $baseURL   The Friendica Base URL
@@ -499,10 +513,12 @@ class Page implements ArrayAccess
 			$target = new DOMDocument();
 			$target->loadXML("<root></root>");
 
-			$content = mb_convert_encoding($this->page["content"], 'HTML-ENTITIES', "UTF-8");
+			$content = HTML::toNumericEntities($this->page["content"]);
 
-			/// @TODO one day, kill those error-suppressing @ stuff, or PHP should ban it
-			@$doc->loadHTML($content);
+			if ($content !== '') {
+				/// @TODO one day, kill those error-suppressing @ stuff, or PHP should ban it
+				@$doc->loadHTML($content);
+			}
 
 			$xpath = new DOMXPath($doc);
 

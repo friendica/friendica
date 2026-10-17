@@ -49,6 +49,21 @@ Jeder Kanal wird durch diese Werte definiert:
 * Volltextsuche: Dies kann genutzt werden um Inhalte, basierend auf dem Inhalt und ein paar zusätzlichen Schlüsselwörtern, ein- oder auszuschließen. Es nutzt die "boolean mode"-Operatoren von MariaDB: https://mariadb.com/kb/en/full-text-index-overview/#in-boolean-mode
 * Bilder, Videos, Audio: Wenn ausgewählt, wirst du Inhalte mit dem gewählten Medientyp sehen. Diese Optionen können kombiniert werden. Wenn keines dieser Felder ausgewählt wurde, wirst du alle Inhalte, mit oder ohne angefügten Medien, sehen.
 
+## Timeline- und Filter-Kanäle
+
+Wenn dein Administrator den Kanal-Cache aktiviert hat, bieten die Anzeige-Einstellungen im Bereich "Kanäle" zwei weitere Auswahlfelder: "Timeline Kanäle" und "Filter Kanäle".
+Timeline Kanäle fügen Beiträge aus den ausgewählten Kanälen zusätzlich zu den Beiträgen der Leute, denen du folgst, in deine normale Network-Timeline ein.
+Filter Kanäle machen das Gegenteil.
+Beiträge, die zu einem der ausgewählten Kanäle passen, werden aus deiner normalen Network-Timeline entfernt.
+So kannst du bestimmte Inhalte, zum Beispiel importierte Hashtags oder Feeds, aus deiner Haupt-Timeline heraushalten und trotzdem in einem eigenen Kanal betrachten.
+
+Als Filter-Kanal kannst du nur deine eigenen Kanäle nutzen, die voreingestellten Kanäle wie "Für Dich" oder "Entdecken" stehen hier nicht zur Verfügung.
+Als Timeline-Kanal kannst du außerdem nur eigene Kanäle nutzen, die auf dem Circle "Globale Gemeinschaft" oder "Folgende" basieren.
+Jeder andere Circle enthält ohnehin nur Beiträge, die bereits Teil deiner normalen Timeline sind, ihn hinzuzufügen würde also nichts Neues zeigen.
+
+Der Kanal-Cache ist eine Einstellung in der Serverkonfiguration, die sich nicht über das Admin-Panel aktivieren lässt.
+Wenn dir diese Auswahlfelder fehlen, frag deinen Administrator, ob er sie aktivieren kann.
+
 ## Zusätzliche Schlüsselwörter für die Volltextsuche
 
 Zusätzlich zu der Suche nach Inhalten, gibt es Schlüsselwörter, die in der Volltextsuche genutzt werden können.

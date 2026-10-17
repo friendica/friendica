@@ -22,6 +22,7 @@
 <link rel="icon" href="{{$shortcut_icon}}" />
 <link rel="apple-touch-icon" href="{{$touch_icon}}"/>
 
+<meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <link rel="manifest" href="{{$baseurl}}/manifest" />
 <script>
@@ -74,9 +75,16 @@ window.onload = function(){
 <script type="text/javascript">
 	const updateContent = {{$update_content}};
 	const localUser = {{if $local_user}}{{$local_user}}{{else}}false{{/if}};
+	var spaEnabled = {{$spa_mode}};
 </script>
 <script type="text/javascript" src="view/js/loading-indicator.js?v={{$VERSION}}"></script>
 <script type="text/javascript" src="view/js/main.js?v={{$VERSION}}"></script>
+{{if $spa_mode}}
+	<link rel="stylesheet" href="view/asset/unpoly/unpoly.min.css?v={{$VERSION}}" type="text/css" media="all" />
+	<script type="text/javascript" src="view/asset/unpoly/unpoly.min.js?v={{$VERSION}}"></script>
+	<script type="module" src="view/js/spa/spa-unpoly-nav.js?v={{$VERSION}}"></script>
+	<script data-spa-version="{{$spa_router_ts}}" data-update-content="{{$update_content}}" data-local-user="{{if $local_user}}{{$local_user}}{{else}}false{{/if}}">window.__spa_router_version = "{{$spa_router_ts}}";</script>
+{{/if}}
 <script>
 // Loading indicator translations with delay messages
 window.spaLoadingTexts = {
@@ -91,7 +99,6 @@ window.spaLoadingTexts = {
 window.spaErrorTexts = {
 	timeout: "{{$spaErrors.timeout nofilter}}",
 	timeout_message: "{{$spaErrors.timeout_message nofilter}}",
-	close: "{{$spaErrors.close nofilter}}",
 	delay_title: "{{$spaErrors.delay_title nofilter}}"
 };
 </script>

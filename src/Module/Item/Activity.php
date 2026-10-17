@@ -74,6 +74,12 @@ class Activity extends BaseModule
 			'state'   => 1,
 		];
 
+		// URI ID for refreshing the item's counters in place instead of rebuilding the thread
+		$rendered = Post::selectFirst(['uri-id'], ['id' => $itemId, 'uid' => [DI::userSession()->getLocalUserId(), 0]]);
+		if (isset($rendered['uri-id'])) {
+			$return['uri-id'] = $rendered['uri-id'];
+		}
+
 		$this->earlyJsonExit($return);
 	}
 }

@@ -1227,7 +1227,7 @@ class Probe
 			$data['poll'] = $profile_page['atprotocol']['feed'];
 		}
 
-		$directory = DI::atProtocol()->get(DI::atProtocol()->getPLCDirectory() . '/' . $profile->did);
+		$directory = DI::atProtocol()->getDidDocument($profile->did);
 		if (!empty($directory)) {
 			foreach ($directory->service as $service) {
 				if (($service->id == '#atproto_pds') && ($service->type == 'AtprotoPersonalDataServer') && !empty($service->serviceEndpoint)) {

@@ -168,9 +168,15 @@ class ExpirePosts
 			DI::logger()->notice('No post-thread entries added');
 		}
 
+		// Entries that exist but lack the link to "post-user"
+		DBA::e("UPDATE `post-thread-user` INNER JOIN `post-user` ON `post-user`.`uri-id` = `post-thread-user`.`uri-id` AND `post-user`.`uid` = `post-thread-user`.`uid`
+			SET `post-thread-user`.`post-user-id` = `post-user`.`id` WHERE `post-thread-user`.`post-user-id` IS NULL");
+
 		$rows      = 0;
-		$userposts = DBA::select('post-user', [], ["`gravity` = ? AND `id` not in (select `post-user-id` from `post-thread-user`)", Item::GRAVITY_PARENT]);
+		$userposts = DBA::p("SELECT `post-user`.* FROM `post-user` WHERE `gravity` = ? AND NOT EXISTS
+			(SELECT 1 FROM `post-thread-user` WHERE `post-thread-user`.`uri-id` = `post-user`.`uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`)", Item::GRAVITY_PARENT);
 		while ($fields = DBA::fetch($userposts)) {
+			$fields['post-user-id']   = $fields['id'];
 			$post_fields              = DI::dbaDefinition()->truncateFieldsForTable('post-thread-user', $fields);
 			$post_fields['commented'] = $post_fields['changed'] = $post_fields['created'];
 			DBA::insert('post-thread-user', $post_fields, Database::INSERT_IGNORE);
@@ -304,7 +310,12 @@ class ExpirePosts
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user`
 					WHERE (`origin` OR `event-id` != 0 OR `post-type` = ?) AND `parent-uri-id` = `post-thread`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `uri-id` FROM `post-content`
-					WHERE `resource-id` != 0 AND `uri-id` = `post-thread`.`uri-id`)",
+					WHERE `resource-id` != 0 AND `uri-id` = `post-thread`.`uri-id`)
+				AND NOT `uri-id` IN (SELECT `post`.`parent-uri-id` FROM `post-quote`
+					INNER JOIN `post` ON `post`.`uri-id` = `post-quote`.`uri-id`
+					INNER JOIN `post-origin` ON `post-origin`.`uri-id` = `post-quote`.`quote-uri-id`
+					WHERE `post`.`parent-uri-id` = `post-thread`.`uri-id`)
+				AND NOT EXISTS (SELECT 1 FROM `contact` WHERE `contact`.`uri-id` = `post-thread`.`uri-id`)",
 				DateTimeFormat::utc('now - ' . (int) $expire_days . ' days'), Item::PT_PERSONAL_NOTE,
 			];
 			$pass = 0;
@@ -332,7 +343,12 @@ class ExpirePosts
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user` AS `i` WHERE `i`.`uid` != ?
 					AND `i`.`parent-uri-id` = `post-user`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user` AS `i` WHERE `i`.`uid` = ?
-					AND `i`.`parent-uri-id` = `post-user`.`uri-id` AND `i`.`received` > ?)",
+					AND `i`.`parent-uri-id` = `post-user`.`uri-id` AND `i`.`received` > ?)
+				AND NOT `uri-id` IN (SELECT `post`.`parent-uri-id` FROM `post-quote`
+					INNER JOIN `post` ON `post`.`uri-id` = `post-quote`.`uri-id`
+					INNER JOIN `post-origin` ON `post-origin`.`uri-id` = `post-quote`.`quote-uri-id`
+					WHERE `post`.`parent-uri-id` = `post-user`.`uri-id`)
+				AND NOT EXISTS (SELECT 1 FROM `contact` WHERE `contact`.`uri-id` = `post-user`.`uri-id`)",
 				Item::GRAVITY_PARENT, 0, DateTimeFormat::utc('now - ' . (int) $expire_days_unclaimed . ' days'), 0, 0, DateTimeFormat::utc('now - ' . (int) $expire_days_unclaimed . ' days'),
 			];
 			$pass = 0;

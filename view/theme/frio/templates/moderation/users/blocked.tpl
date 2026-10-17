@@ -65,7 +65,7 @@
 				{{/if}}
 
 				{{if $order_users == $th_users.3.1}}
-					<td>{{$u.login_date}}</td>
+					<td>{{$u.last_activity}}</td>
 				{{/if}}
 
 				{{if $order_users == $th_users.4.1}}
@@ -128,7 +128,7 @@
 					{{if $order_users != $th_users.3.1}}
 						<p>
 							<a href="{{$baseurl}}/moderation/users/blocked?o={{if $order_direction_users == "+"}}-{{/if}}{{$th_users.3.1}}" class="btn-link table-order">
-								&#8597; {{$th_users.3.0}}</a> : {{$u.login_date}}
+								&#8597; {{$th_users.3.0}}</a> : {{$u.last_activity}}
 						</p>
 					{{/if}}
 

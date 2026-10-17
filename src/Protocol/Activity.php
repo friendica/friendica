@@ -196,6 +196,15 @@ final class Activity
 	];
 
 	/**
+	 * Technical activities, which are usually not considered as content interactions
+	 */
+	public const TECHNICAL_ACTIVITIES = [
+		self::FOLLOW,
+		self::VIEW,
+		self::READ,
+	];
+
+	/**
 	 * Checks if the given activity is a hidden activity
 	 *
 	 * @param string $activity The current activity

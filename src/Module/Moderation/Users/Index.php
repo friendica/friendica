@@ -86,7 +86,7 @@ class Index extends BaseUsers
 
 		$users = array_map($this->setupUserCallback(), $users);
 
-		$th_users = array_map(null, [$this->t('Name'), $this->t('Email'), $this->t('Register date'), $this->t('Last login'), $this->t('Last public item'), $this->t('Type')], $valid_orders);
+		$th_users = array_map(null, [$this->t('Name'), $this->t('Email'), $this->t('Register date'), $this->t('Last activity'), $this->t('Last public item'), $this->t('Type')], $valid_orders);
 
 		$count = $this->database->count('user', ["`uid` != ?", 0]);
 
@@ -107,7 +107,7 @@ class Index extends BaseUsers
 
 			'$h_users'               => $this->t('Users'),
 			'$h_newuser'             => $this->t('Create a new user'),
-			'$th_deleted'            => [$this->t('Name'), $this->t('Email'), $this->t('Register date'), $this->t('Last login'), $this->t('Last public item'), $this->t('Permanent deletion')],
+			'$th_deleted'            => [$this->t('Name'), $this->t('Email'), $this->t('Register date'), $this->t('Last activity'), $this->t('Last public item'), $this->t('Permanent deletion')],
 			'$th_users'              => $th_users,
 			'$order_users'           => $order,
 			'$order_direction_users' => $order_direction,

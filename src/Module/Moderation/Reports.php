@@ -49,6 +49,9 @@ class Reports extends BaseModeration
 
 	protected function post(array $request = [])
 	{
+		$this->checkModerationAccess();
+		self::checkFormSecurityTokenRedirectOnError('/moderation/reports', 'moderation_reports');
+
 		// Handle bulk close reports
 		if (isset($request['close_reports']) && isset($request['report_ids'])) {
 			$reportIds = $request['report_ids'];
@@ -257,7 +260,8 @@ INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
 			'$total_reports' => $this->tt('%s total report', '%s total reports', $total),
 			'$paginate'      => $pager->renderFull($total),
 
-			'$contacturl' => ['contact_url', $this->t('Profile URL'), '', $this->t('URL of the reported contact.')],
+			'$contacturl'          => ['contact_url', $this->t('Profile URL'), '', $this->t('URL of the reported contact.')],
+			'$form_security_token' => self::getFormSecurityToken('moderation_reports'),
 		]);
 	}
 
@@ -326,6 +330,7 @@ INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
 			'$page'                => $this->t('Report details'),
 			'$back_to_reports'     => $this->t('Back to reports'),
 			'$back_to_reports_url' => $backToReportsUrl,
+			'$form_security_token' => self::getFormSecurityToken('moderation_reports'),
 			'$forwarded'           => $this->t('Forwarded'),
 			'$not_forwarded'       => $this->t('Not forwarded'),
 			'$assigned_user_id'    => $this->t('Assigned user id:'),

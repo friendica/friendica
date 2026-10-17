@@ -84,6 +84,9 @@ class Lists extends BaseApi
 
 	public function put(array $request = [])
 	{
+		$this->checkAllowedScope(self::SCOPE_WRITE);
+		$uid = self::getCurrentUserID();
+
 		$request = $this->getRequest([
 			'title'          => '', // The title of the list to be updated.
 			'replies_policy' => '', // One of: "followed", "list", or "none".
@@ -91,6 +94,10 @@ class Lists extends BaseApi
 
 		if (empty($request['title']) || empty($this->parameters['id'])) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+		}
+
+		if (!Circle::exists((int) $this->parameters['id'], $uid)) {
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
 		Circle::update($this->parameters['id'], $request['title']);

@@ -7,6 +7,7 @@
 
 <div id='adminpage'>
 	<h1>{{$title}} - {{$page}}</h1>
+	<div class="settings-section">
 {{if $warningtext|count}}
 	<div id="admin-warning-message-wrapper">
 		{{foreach $warningtext as $wt}}
@@ -47,9 +48,13 @@
 					{{foreach $serversettings.mysql as $k => $p}}
 						<tr><td>{{$k}}</td><td>{{$p}}</td></tr>
 					{{/foreach}}
+					<tr><td colspan="2"><b>cURL</b></td></tr>
+					{{foreach $serversettings.curl as $k => $p}}
+						<tr><td>{{$k}}</td><td>{{$p}}</td></tr>
+					{{/foreach}}
 				</tbody>
 			</table>
 		</dd>
 	</dl>
-
+	</div>
 </div>

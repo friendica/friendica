@@ -46,6 +46,12 @@ class ParseUrl
 	public const MIN_DESC_COUNT = 100;
 
 	/**
+	 * Maximum size in bytes of a fetched page. Some pages are quite large (YouTube is above 1 MB),
+	 * but the relevant meta data is contained in the head.
+	 */
+	private const MAX_PAGE_SIZE = 5000000;
+
+	/**
 	 * Fetch the content type of the given url
 	 *
 	 * Performs a HEAD (fallback to GET) and returns the detected
@@ -241,7 +247,7 @@ class ParseUrl
 		}
 
 		try {
-			$curlResult = DI::httpClient()->get($url, HttpClientAccept::HTML, [HttpClientOptions::CONTENT_LENGTH => 1000000, HttpClientOptions::REQUEST => HttpClientRequest::SITEINFO]);
+			$curlResult = DI::httpClient()->get($url, HttpClientAccept::HTML, [HttpClientOptions::CONTENT_LENGTH => self::MAX_PAGE_SIZE, HttpClientOptions::REQUEST => HttpClientRequest::SITEINFO]);
 		} catch (\Throwable $th) {
 			DI::logger()->info('Exception when fetching', ['url' => $url, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return $siteinfo;
@@ -298,7 +304,7 @@ class ParseUrl
 			$body = iconv($charset, 'UTF-8//TRANSLIT', $body);
 		}
 
-		$body = mb_convert_encoding($body, 'HTML-ENTITIES', 'UTF-8');
+		$body = HTML::toNumericEntities($body);
 
 		if (empty($body)) {
 			return $siteinfo;

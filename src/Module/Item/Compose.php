@@ -334,13 +334,13 @@ class Compose extends BaseModule
 			'helpParagraphA11yTitle' => $this->l10n->t('Paragraph Check (Accessibility)'),
 			'helpParagraphA11yBody'  => $this->l10n->t('For posts longer than 300 characters, checks whether at least one paragraph break exists. Screen readers and cognitive-accessibility tools benefit greatly from structured text. Short posts are always rated neutral.'),
 			'btnClose'               => $this->l10n->t('Close'),
-			'btnCloseSymbol'         => $this->l10n->t('\u00d7'),
+			'btnCloseSymbol'         => '×',
 			'placeholder'            => $this->l10n->t('Image description'),
 		];
 
-		$advancedComposerL10n = array_map(fn ($v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'), $advancedComposerL10n);
-
-		$advancedComposerL10nJson = json_encode($advancedComposerL10n, JSON_UNESCAPED_UNICODE);
+		// The strings end up in textContent/title, so they must not be HTML escaped.
+		// JSON_HEX_* keeps them safe inside the <script> block instead.
+		$advancedComposerL10nJson = json_encode($advancedComposerL10n, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 		$tpl = Renderer::getMarkupTemplate('item/advancedcomposer.tpl');
 		return Renderer::replaceMacros($tpl, [

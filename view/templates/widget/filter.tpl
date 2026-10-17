@@ -31,7 +31,7 @@
 			<div id="{{$type}}-desc">{{$desc nofilter}}</div>
 			<ul class="{{$type}}-ul">
 				{{if $all_label}}
-					<li {{if !is_null($selected) && !$selected}}class="selected" {{/if}}><a href="{{$base}}" class="{{$type}}-link{{if !$selected}} {{$type}}-selected{{/if}} {{$type}}-all">{{$all_label}}</a>
+					<li {{if $selected !== null && !$selected}}class="selected" {{/if}}><a href="{{$base}}" class="{{$type}}-link{{if !$selected}} {{$type}}-selected{{/if}} {{$type}}-all">{{$all_label}}</a>
 					</li>
 				{{/if}}
 				{{foreach $options as $option}}

@@ -253,8 +253,8 @@
 		const refreshBtn = document.createElement('button');
 		refreshBtn.type = 'button';
 		refreshBtn.className = 'ec-preview-refresh-btn';
-		refreshBtn.title = l10n.btnRefreshPreview;
-		api.buildButtonContent(refreshBtn, 'ri ri-refresh-line', l10n.btnRefreshPreview);
+		refreshBtn.title = l10n.btnRefresh;
+		api.buildButtonContent(refreshBtn, 'ri ri-refresh-line', l10n.btnRefresh);
 
 		const topbarLeft = document.createElement('div');
 		topbarLeft.className = 'ec-preview-topbar-left';

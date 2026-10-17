@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2010-2026 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Verifies bin/composer.phar against the official release, only if it (or the check itself) changed
+when:
+  branch:
+    exclude: [ stable ]
+  event: [ pull_request, push ]
+  path:
+    include:
+      - 'bin/composer.phar'
+      - 'bin/dev/verify-composer-phar.sh'
+      - 'bin/dev/composer-signing-key.asc'
+      - '.woodpecker/.composer-phar_check.yml'
+
+steps:
+  verify:
+    image: php:8.3
+    commands:
+      - apt-get update -q
+      - DEBIAN_FRONTEND=noninteractive apt-get install -q -y gnupg
+      - bin/dev/verify-composer-phar.sh

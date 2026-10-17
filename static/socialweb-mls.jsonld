@@ -1,0 +1,48 @@
+{
+  "@context": {
+    "mls": "https://purl.archive.org/socialweb/mls#",
+    "KeyPackage": {
+      "@id": "mls:KeyPackage",
+      "@type": "@id"
+    },
+    "Welcome": {
+      "@id": "mls:Welcome",
+      "@type": "@id"
+    },
+    "GroupInfo": {
+      "@id": "mls:GroupInfo",
+      "@type": "@id"
+    },
+    "PublicMessage": {
+      "@id": "mls:PublicMessage",
+      "@type": "@id"
+    },
+    "PrivateMessage": {
+      "@id": "mls:PrivateMessage",
+      "@type": "@id"
+    },
+    "Topology": {
+      "@id": "mls:Topology",
+      "@type": "@id"
+    },
+    "keyPackages": "mls:keyPackages",
+    "encoding": "mls:encoding",
+    "ciphersuite": "mls:ciphersuite",
+    "messages": {
+      "@id": "mls:messages",
+      "@type": "@id"
+    },
+    "conversation": {
+      "@id": "mls:conversation",
+      "@type": "@id"
+    },
+    "topology": {
+      "@id": "mls:topology",
+      "@type": "@id"
+    },
+    "FullMesh": {
+      "@id": "mls:FullMesh",
+      "@type": "@id"
+    }
+  }
+}

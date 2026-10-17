@@ -49,6 +49,21 @@ Each channel is defined by these values:
 * Full Text Search: This can be used to include or exclude content, based on the content and some additional keywords. It uses the "boolean mode" operators from MariaDB: https://mariadb.com/kb/en/full-text-index-overview/#in-boolean-mode
 * Images, Videos, Audio: When selected, you will see content with the selected media type. This can be combined. If none of these fields are checked, you will see any content, with or without attached media.
 
+## Timeline and Filter Channels
+
+If your server administrator activated the channel cache, the display settings offer two more selections in the "Channels" section: "Timeline channels" and "Filter channels".
+Timeline channels add posts from the selected channels to your default network timeline, on top of the posts from the people you follow.
+Filter channels do the opposite.
+Posts that match one of the selected channels are removed from your default network timeline instead.
+This is the way to keep specific content, for example imported hashtags or feeds, out of your main timeline while still being able to look at it in its own channel.
+
+Only your own channels can be used as a filter channel, the predefined channels like "For you" or "Discover" are not available here.
+Also, only your own channels based on the circle "Global Community" or "Followers" can be used as a timeline channel.
+Every other circle only ever contains posts that are already part of your default timeline, so adding them wouldn't show you anything new.
+
+The channel cache is a setting in the server configuration, it can't be activated from the admin panel.
+If these options are missing from your settings, ask your administrator to enable it.
+
 ## Additional keywords for the full text search
 
 Additionally to the search for content, there are keywords that can be used in the full text search.

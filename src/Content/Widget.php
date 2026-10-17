@@ -98,6 +98,10 @@ class Widget
 		$networks = [Protocol::PHANTOM, Protocol::FACEBOOK, Protocol::APPNET, Protocol::TWITTER, Protocol::ZOT, Protocol::OSTATUS, Protocol::STATUSNET];
 		$addonHelper->loadAddons();
 
+		if (!$addonHelper->isAddonEnabled('bluesky')) {
+			$networks[] = Protocol::ATPROTO;
+		}
+
 		if (!$addonHelper->isAddonEnabled('discourse')) {
 			$networks[] = Protocol::DISCOURSE;
 		}
@@ -131,6 +135,10 @@ class Widget
 
 		$networks = [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::FEED];
 		$addonHelper->loadAddons();
+
+		if ($addonHelper->isAddonEnabled('bluesky')) {
+			$networks[] = Protocol::ATPROTO;
+		}
 
 		if ($addonHelper->isAddonEnabled('discourse')) {
 			$networks[] = Protocol::DISCOURSE;

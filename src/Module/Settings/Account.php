@@ -576,7 +576,7 @@ class Account extends BaseSettings
 			'$notify_comment_participation'  => ['notify_comment_participation', DI::l10n()->t('Someone commented in a thread where you commented'), is_null($notify_type) || $notify_type & UserNotification::TYPE_COMMENT_PARTICIPATION, ''],
 			'$notify_activity_participation' => ['notify_activity_participation', DI::l10n()->t('Someone commented in a thread where you interacted'), is_null($notify_type) || $notify_type & UserNotification::TYPE_ACTIVITY_PARTICIPATION, ''],
 
-			'$desktop_notifications' => ['desktop_notifications', DI::l10n()->t('Activate desktop notifications'), false, DI::l10n()->t('Show desktop popup on new notifications')],
+			'$desktop_notifications' => ['desktop_notifications', DI::l10n()->t('Activate desktop notifications'), false, DI::l10n()->t('Show a popup on new notifications while this browser window is open. Your browser will ask you to allow this once, and the setting only applies to the browser and device you enable it on.')],
 
 			'$email_textonly' => [
 				'email_textonly',

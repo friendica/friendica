@@ -51,7 +51,7 @@ class Receiver
 	public const PUBLIC_COLLECTION = 'as:Public';
 
 	public const ACCOUNT_TYPES  = ['as:Person', 'as:Organization', 'as:Service', 'as:Group', 'as:Application'];
-	public const CONTENT_TYPES  = ['as:Note', 'as:Article', 'as:Video', 'as:Image', 'as:Event', 'as:Audio', 'as:Page', 'as:Question'];
+	public const CONTENT_TYPES  = ['as:Note', 'as:Article', 'as:Video', 'as:Image', 'as:Event', 'as:Audio', 'as:Page', 'as:Question', '_:Comment', '_:Quotation', '_:Review'];
 	public const ACTIVITY_TYPES = ['as:Like', 'as:Dislike', 'as:Accept', 'as:Reject', 'as:TentativeAccept', 'as:View', 'as:Read', 'litepub:EmojiReact'];
 
 	public const TARGET_UNKNOWN  = 0;
@@ -472,7 +472,7 @@ class Receiver
 			$object_data = [];
 
 			$object_data['id']          = JsonLD::fetchElement($activity, '@id');
-			$object_data['target_id']   = JsonLD::fetchElement($activity, 'as:instrument', '@id', '@type', 'as:Note');
+			$object_data['target_id']   = self::fetchQuoteRequestInstrument($activity);
 			$object_data['object_id']   = JsonLD::fetchElement($activity, 'as:object', '@id');
 			$object_data['object_type'] = JsonLD::fetchElement($activity['as:object'], '@type');
 		} else {
@@ -526,6 +526,27 @@ class Receiver
 		DI::logger()->info('Processing', ['type' => $object_data['type'], 'object_type' => $object_data['object_type'], 'id' => $object_data['id'], 'actor' => $actor, 'platform' => $platform]);
 
 		return $object_data;
+	}
+
+	/**
+	 * Fetch the id of the quoting post from the instrument of a quote request
+	 *
+	 * The instrument can either be the embedded post or just its id.
+	 *
+	 * @param array $activity
+	 * @return string|null
+	 */
+	private static function fetchQuoteRequestInstrument(array $activity): ?string
+	{
+		foreach (JsonLD::fetchElementArray($activity, 'as:instrument') ?? [] as $instrument) {
+			if (empty($instrument['@id'])) {
+				continue;
+			}
+			if (empty($instrument['@type']) || in_array($instrument['@type'], self::CONTENT_TYPES)) {
+				return $instrument['@id'];
+			}
+		}
+		return null;
 	}
 
 	/**

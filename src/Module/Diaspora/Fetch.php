@@ -34,7 +34,7 @@ class Fetch extends BaseModule
 		$guid = $this->parameters['guid'];
 
 		// Fetch the item
-		$condition = ['origin' => true, 'private' => [Item::PUBLIC, Item::UNLISTED], 'guid' => $guid,
+		$condition = ['origin' => true, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED], 'guid' => $guid,
 			'gravity'             => [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT], 'network' => [Protocol::DFRN, Protocol::DIASPORA]];
 		$item = Post::selectFirst([], $condition);
 		if (empty($item)) {

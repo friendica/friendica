@@ -84,7 +84,7 @@
 				{{/if}}
 				{{if $subscribe_feed_link}}
 					<div id="subscribe-feed-link-button">
-						<a id="subscribe-feed-link" class="btn btn-labeled btn-primary" href="{{$subscribe_feed_link}}">
+						<a id="subscribe-feed-link" class="btn btn-labeled btn-primary" href="{{$subscribe_feed_link}}" up-follow="false">
 							<span><i class="ri ri-rss-line"></i></span>
 							<span>{{$subscribe_feed}}</span>
 						</a>

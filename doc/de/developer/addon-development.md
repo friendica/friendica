@@ -93,7 +93,8 @@ Du kannst ebenso `addon_name_init()` nutzen, was oft frühzeitig aufgerufen wird
     $b ist das Item-Array einer Information, die gerade in der Datenbank gespeichert wurden.
         {Bitte beachte: der Seiteninhalt ist bbcode - nicht HTML)
 
-**'post_remote'** - wird aufgerufen, wenn ein Beitrag aus einer anderen Quelle empfangen wird. Dies kann auch genutzt werden, um lokale Aktivitäten oder systemgenerierte Nachrichten zu veröffentlichen/posten.
+**'post_remote'** - wird aufgerufen, wenn ein Beitrag aus einer anderen Quelle empfangen wird.
+Dies kann auch genutzt werden, um lokale Aktivitäten oder systemgenerierte Nachrichten zu veröffentlichen/posten.
     $b ist das Item-Array einer Information, die in der Datenbank und im Item gespeichert ist.
         {Bitte beachte: der Seiteninhalt ist bbcode - nicht HTML)
 

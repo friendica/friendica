@@ -18,23 +18,12 @@ class ListsTest extends ApiTestCase
 	 */
 	public function testApiStatusesFWithFollowers(): void
 	{
+		// @phpstan-ignore method.deprecated
 		$response = (new Lists(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock);
 
 		$json = $this->toJson($response);
 
 		self::assertIsArray($json->users);
-	}
-
-	/**
-	 * Test the api_statuses_followers() function an undefined cursor GET variable.
-	 *
-	 */
-	public function testApiStatusesFollowersWithUndefinedCursor(): void
-	{
-		self::markTestIncomplete('Needs refactoring of Lists - replace filter_input() with $request parameter checks');
-
-		// $_GET['cursor'] = 'undefined';
-		// self::assertFalse(api_statuses_followers('json'));
 	}
 }

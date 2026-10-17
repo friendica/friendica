@@ -15,7 +15,7 @@
 }
 
 a:hover, button:focus, .btn-link:focus, .btn-primary:focus,
-a:hover, button:hover, .btn-link:hover, .btn-primary:hover,
+button:hover, .btn-link:hover, .btn-primary:hover,
 #topbar-first li a:hover, #topbar-first li button:hover,
 #topbar-first li a:focus, #topbar-first li button:focus {
 	color: white;
@@ -48,7 +48,7 @@ a:hover, button:hover, .btn-link:hover, .btn-primary:hover,
 }
 header #banner #logo-img:focus,
 header #banner #logo-img:hover {
-		background-color: $font_color;
+		color: $font_color;
 }
 
 .dropdown-menu,
@@ -58,17 +58,25 @@ header #banner #logo-img:hover {
 .dropdown-menu > li > a:focus,
 .dropdown-menu > li > a:hover {
 	color: $link_color;
+	background-image: none;
+	background-color: rgba(232, 232, 232, $contentbg_transp);
 }
 .account .dropdown-menu li {
 	border-color: $background_color;
 }
-
-.dropdown-menu > li > a:focus,
-.dropdown-menu > li > a:hover {
-	background-image: none;
-	background-color: rgba(232, 232, 232, $contentbg_transp);
+#nav-delegation-link {
+	background-color: rgba(255, 255, 255, $contentbg_transp);
+	box-shadow: 0 0 3px $link_color;
+  	-webkit-box-shadow: 0 0 3px $link_color;
+  	-moz-box-shadow: 0 0 3px $link_color;
+  	color: $link_color;
 }
-
+#nav-delegation-link:hover,
+#nav-delegation-link:focus,
+#nav-delegation-link:active {
+	background-color: rgba(0, 0, 0, $contentbg_transp);
+	color: white;
+}
 .breadcrumb,
 .panel-footer,
 .list-group-item {

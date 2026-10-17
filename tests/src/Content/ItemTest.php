@@ -127,6 +127,16 @@ class ItemTest extends MockedTestCase
 				'body'     => 'Short',
 				'summary'  => 'Short but longer summary',
 			],
+			'truncated-bbcode-summary' => [
+				'expected' => true,
+				'body'     => "Hm... [url=https://w3id.org/fep/c0e0]FEP-c0e0: Emoji reactions[/url] details two ways to federate an Emoji reaction:\n[ol]\n[li][code]EmojiReact[/code] activity[/li]\n[li][code]Like[/code] with [code]content[/code] (as opposed to a regular [code]Like[/code], which has no content)[/li]\n[/ol]\nIn testing, I noticed that misskey (or at least, the site I was testing with, [code]birb.space[/code]) sends the latter. I don't know what sends the former, and if NodeBB were to start federating out [code]EmojiReact[/code], would it be broadly understood?\n\nPerhaps I should federate out both at once.",
+				'summary'  => "Hm... [url=https://w3id.org/fep/c0e0]FEP-c0e0: Emoji reactions[/url] details two ways to federate an Emoji reaction:\n [ol]\n[li][code]EmojiReact[/code] activity[/li] \n[li][code]Like[/code] with [code]content[/code] (as opposed to a regular [code]Like[/code], which has no content)[/li]\n[/ol] \nIn testing, I noticed that misskey (or at least, the site I was testing with, [code]birb.space[/code]) sends the latter. I don't know what sends the former, and if NodeBB were to start federating out [code]Em",
+			],
+			'truncated-plaintext-summary' => [
+				'expected' => true,
+				'body'     => "Hm... [url=https://w3id.org/fep/c0e0]FEP-c0e0: Emoji reactions[/url] details two ways to federate an Emoji reaction:\n[ol]\n[li][code]EmojiReact[/code] activity[/li]\n[li][code]Like[/code] with [code]content[/code] (as opposed to a regular [code]Like[/code], which has no content)[/li]\n[/ol]\nIn testing, I noticed that misskey (or at least, the site I was testing with, [code]birb.space[/code]) sends the latter. I don't know what sends the former, and if NodeBB were to start federating out [code]EmojiReact[/code], would it be broadly understood?\n\nPerhaps I should federate out both at once.",
+				'summary'  => "Hm... FEP-c0e0: Emoji reactions details two ways to federate an Emoji reaction:\n* EmojiReact activity\n* Like with content (as opposed to a regular Like, which has no content)\nIn testing, I noticed that misskey (or at least, the site I was testing with, birb.space) sends the latter. I don't know what sends the former, and if NodeBB were to start federating out Em",
+			],
 		];
 	}
 

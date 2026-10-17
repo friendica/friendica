@@ -14,6 +14,7 @@ use Friendica\Model\User;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Protocol\ActivityNamespace;
+use Friendica\Util\HTTPCache;
 use Friendica\Util\Network;
 use Friendica\Util\XML;
 
@@ -24,8 +25,6 @@ class Xrd extends BaseModule
 {
 	protected function rawContent(array $request = [])
 	{
-		header('Vary: Accept', false);
-
 		// @TODO: Replace with parameter from router
 		if (DI::args()->getArgv()[0] == 'xrd') {
 			if (empty($_GET['uri'])) {
@@ -63,6 +62,7 @@ class Xrd extends BaseModule
 		}
 
 		header('Vary: Accept', false);
+		header(sprintf('Cache-Control: max-age=%d, public', HTTPCache::DISCOVERY_MAX_AGE));
 
 		$alias = '';
 

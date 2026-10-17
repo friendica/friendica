@@ -185,7 +185,8 @@ function message_content()
 			'$readonly'    => '',
 			'$yourmessage' => DI::l10n()->t('Your message'),
 			'$select'      => $select,
-			'$parent'      => '',
+			'$recipient'   => null,
+			'$replyto'     => '',
 			'$upload'      => DI::l10n()->t('Upload photo'),
 			'$insert'      => DI::l10n()->t('Insert web link'),
 			'$wait'        => DI::l10n()->t('Please wait'),
@@ -321,9 +322,6 @@ function message_content()
 			$seen = $message['seen'];
 		}
 
-		$select = $message['name'] . '<input type="hidden" name="recipient" value="' . $contact_id . '" />';
-		$parent = '<input type="hidden" name="replyto" value="' . $message['parent-uri'] . '" />';
-
 		$tpl = Renderer::getMarkupTemplate('mail_display.tpl');
 		$o   = Renderer::replaceMacros($tpl, [
 			'$thread_id'      => DI::args()->getArgv()[1],
@@ -341,8 +339,9 @@ function message_content()
 			'$readonly'    => ' readonly="readonly" style="background: #BBBBBB;" ',
 			'$yourmessage' => DI::l10n()->t('Your message:'),
 			'$text'        => '',
-			'$select'      => $select,
-			'$parent'      => $parent,
+			'$select'      => '',
+			'$recipient'   => ['name' => $message['name'], 'id' => $contact_id],
+			'$replyto'     => $message['parent-uri'],
 			'$upload'      => DI::l10n()->t('Upload photo'),
 			'$insert'      => DI::l10n()->t('Insert web link'),
 			'$submit'      => DI::l10n()->t('Send Message'),

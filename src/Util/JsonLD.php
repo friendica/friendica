@@ -60,6 +60,9 @@ class JsonLD
 			case 'https://purl.archive.org/socialweb/webfinger':
 				$url = DI::basePath() . '/static/socialweb-webfinger.jsonld';
 				break;
+			case 'https://purl.archive.org/socialweb/mls':
+				$url = DI::basePath() . '/static/socialweb-mls.jsonld';
+				break;
 			case 'https://www.w3.org/ns/cid/v1':
 				$url = DI::basePath() . '/static/cid-v1.jsonld';
 				break;

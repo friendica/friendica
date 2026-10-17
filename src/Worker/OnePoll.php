@@ -150,8 +150,11 @@ class OnePoll
 		} catch (\Throwable $th) {
 			DI::logger()->notice('Got exception', ['code' => $th->getCode(), 'message' => $th->getMessage()]);
 			return false;
+		} finally {
+			if ($cookiejar !== false && file_exists($cookiejar)) {
+				unlink($cookiejar);
+			}
 		}
-		unlink($cookiejar);
 		DI::logger()->debug('Polled feed', ['url' => $contact['poll'], 'http-code' => $curlResult->getReturnCode(), 'redirect-url' => $curlResult->getRedirectUrl()]);
 
 		if ($curlResult->isTimeout()) {

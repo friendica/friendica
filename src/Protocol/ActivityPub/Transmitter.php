@@ -1438,7 +1438,12 @@ class Transmitter
 			$data['actor'] = $link;
 		}
 
-		$data['published'] = DateTimeFormat::utc($item['created'] . '+00:00', DateTimeFormat::ATOM);
+		// @see https://github.com/friendica/friendica/issues/16150
+		if (in_array($data['type'], ['Undo', 'Delete'])) {
+			$data['published'] = DateTimeFormat::utc($item['edited'] . '+00:00', DateTimeFormat::ATOM);
+		} else {
+			$data['published'] = DateTimeFormat::utc($item['created'] . '+00:00', DateTimeFormat::ATOM);
+		}
 
 		$data['instrument'] = self::getService();
 

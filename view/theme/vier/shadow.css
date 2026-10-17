@@ -7,8 +7,7 @@
 nav#topbar-first {
   background: rgb(36, 76, 94);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
-  padding: 0px;
-  padding-left: 0px;
+  padding: 6px 0px;
 }
 
 nav#topbar-first a:active,
@@ -91,9 +90,7 @@ div.jGrowl div.info {
   background: #fff url("../../../images/icons/48/info.png") no-repeat 5px center;
 }
 
-div.jGrowl div.notice {
-  color: #737373;
-}
+div.jGrowl div.notice,
 div.jGrowl div.info {
   color: #737373;
 }
@@ -107,10 +104,6 @@ div.pager, ul.tabs {
 }
 
 nav#topbar-first .nav-menu-icon.selected {
-  background-color: #fff;
-}
-
-#jot #jot-tools li:hover {
   background-color: #fff;
 }
 

@@ -7,6 +7,9 @@
 
 namespace Friendica\Test\src\Util;
 
+use Dice\Dice;
+use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\DI;
 use Friendica\Util\Network;
 use PHPUnit\Framework\TestCase;
 
@@ -57,5 +60,95 @@ class NetworkTest extends TestCase
 
 		// Whitespace only
 		self::assertFalse(Network::isValidAtUrl('   '));
+	}
+
+	/** @var Dice|null */
+	private $previousDice;
+
+	protected function tearDown(): void
+	{
+		// Don't leak the mocked Dice into tests which rely on the DI state left by earlier tests
+		if ($this->previousDice !== null) {
+			$property = new \ReflectionProperty(DI::class, 'dice');
+			$property->setValue(null, $this->previousDice);
+			$this->previousDice = null;
+		}
+
+		\Mockery::close();
+
+		parent::tearDown();
+	}
+
+	private function useEmailDomainConfig(string $allowed, string $disallowed): void
+	{
+		$config = \Mockery::mock(IManageConfigValues::class);
+		$config->shouldReceive('get')->with('system', 'allowed_email')->andReturn($allowed);
+		$config->shouldReceive('get')->with('system', 'disallowed_email')->andReturn($disallowed);
+		$dice = \Mockery::mock(Dice::class);
+		$dice->shouldReceive('create')->with(IManageConfigValues::class)->andReturn($config);
+
+		$property = new \ReflectionProperty(DI::class, 'dice');
+		$this->previousDice ??= $property->getValue();
+
+		DI::init($dice, true);
+	}
+
+	public function testEmailDomainAllowedWithoutLists(): void
+	{
+		$this->useEmailDomainConfig('', '');
+
+		self::assertTrue(Network::isEmailDomainAllowed('user@example.org'));
+	}
+
+	public function testEmailDomainAllowedList(): void
+	{
+		$this->useEmailDomainConfig('example.org, *.example.com', '');
+
+		self::assertTrue(Network::isEmailDomainAllowed('user@example.org'));
+		self::assertTrue(Network::isEmailDomainAllowed('user@mail.example.com'));
+		self::assertFalse(Network::isEmailDomainAllowed('user@evil.com'));
+		self::assertFalse(Network::isEmailDomainAllowed('user@example.org.evil.com'));
+	}
+
+	public function testEmailDomainDisallowedList(): void
+	{
+		$this->useEmailDomainConfig('', 'spam.example, *.junk.example');
+
+		self::assertFalse(Network::isEmailDomainAllowed('user@spam.example'));
+		self::assertFalse(Network::isEmailDomainAllowed('user@mail.junk.example'));
+		self::assertTrue(Network::isEmailDomainAllowed('user@example.org'));
+	}
+
+	public function testEmailDomainDisallowedOverridesAllowed(): void
+	{
+		$this->useEmailDomainConfig('*.edu', 'spam.edu');
+
+		self::assertTrue(Network::isEmailDomainAllowed('user@uni.edu'));
+		self::assertFalse(Network::isEmailDomainAllowed('user@spam.edu'));
+		self::assertFalse(Network::isEmailDomainAllowed('user@example.org'));
+	}
+
+	public function testEmailDomainIsCaseInsensitive(): void
+	{
+		$this->useEmailDomainConfig('*.Example.ORG', '');
+
+		self::assertTrue(Network::isEmailDomainAllowed('User@Mail.EXAMPLE.org'));
+	}
+
+	public function testEmailDomainInvalidAddresses(): void
+	{
+		$this->useEmailDomainConfig('', '');
+
+		self::assertFalse(Network::isEmailDomainAllowed('no-at-sign'));
+		self::assertFalse(Network::isEmailDomainAllowed('user@'));
+		self::assertFalse(Network::isEmailDomainAllowed(''));
+	}
+
+	public function testEmailDomainUsesLastAtSign(): void
+	{
+		$this->useEmailDomainConfig('example.org', '');
+
+		self::assertFalse(Network::isEmailDomainAllowed('example.org@evil.com'));
+		self::assertTrue(Network::isEmailDomainAllowed('"a@b"@example.org'));
 	}
 }

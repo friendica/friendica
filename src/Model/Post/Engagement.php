@@ -367,6 +367,17 @@ class Engagement
 	}
 
 	/**
+	 * Delete the engagement data of the given uri-id
+	 *
+	 * @param int $uri_id
+	 * @return void
+	 */
+	public static function delete(int $uri_id)
+	{
+		DBA::delete('post-engagement', ['uri-id' => $uri_id]);
+	}
+
+	/**
 	 * Expire old engagement data
 	 *
 	 * @return void

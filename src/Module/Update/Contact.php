@@ -71,11 +71,11 @@ final class Contact extends ContactModule
 			throw new NotFoundException();
 		}
 
-		$item = Post::selectFirst(['parent'], ['id' => $request['item']]);
+		$item = Post::selectFirst(['parent-uri-id'], ['id' => $request['item']]);
 		if (!DBA::isResult($item)) {
 			throw new NotFoundException();
 		}
 
-		System::htmlUpdateExit(ModelContact::getThreadsFromId($pcid, $this->userSession->getLocalUserId(), 1, $item['parent'] ?? 0, $request));
+		System::htmlUpdateExit(ModelContact::getThreadsFromId($pcid, $this->userSession->getLocalUserId(), 1, $item['parent-uri-id'] ?? 0, $request));
 	}
 }

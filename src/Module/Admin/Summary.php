@@ -9,6 +9,7 @@ namespace Friendica\Module\Admin;
 
 use Friendica\App;
 use Friendica\Core\Addon\Exception\InvalidAddonException;
+use Friendica\Core\Cache\Type\APCuCache;
 use Friendica\Core\Config\ValueObject\Cache;
 use Friendica\Core\Renderer;
 use Friendica\Core\Update;
@@ -80,6 +81,12 @@ class Summary extends BaseAdmin
 
 		if (empty(DI::config()->get('system', 'url'))) {
 			$warningtext[] = DI::l10n()->t('The system.url entry is missing. This is a low level setting and can lead to unexpected behavior. Please add a valid entry as soon as possible in the config file or per console command!');
+		}
+
+		foreach (['cache_driver', 'distributed_cache_driver', 'lock_driver'] as $driverKey) {
+			if (DI::config()->get('system', $driverKey) === APCuCache::NAME && !APCuCache::isAvailable()) {
+				$warningtext[] = DI::l10n()->t('The system.%s entry is set to "apcu", but APCu isn\'t available. Friendica uses a fallback driver instead. Please install and enable the APCu PHP extension or change the setting.', $driverKey);
+			}
 		}
 
 		$last_worker_call = DI::keyValue()->get('last_worker_execution');
@@ -164,6 +171,9 @@ class Summary extends BaseAdmin
 		// We can do better, but this is a quick queue status
 		$queues = ['label' => DI::l10n()->t('Message queues'), 'deferred' => $deferred, 'workerq' => $workerqueue];
 
+		$db_version = (string) DBA::getVariable('version');
+		$curl       = curl_version();
+
 		$server_settings = [
 			'label' => DI::l10n()->t('Server Settings'),
 			'php'   => [
@@ -174,7 +184,13 @@ class Summary extends BaseAdmin
 				'memory_limit'        => ini_get('memory_limit'),
 			],
 			'mysql' => [
+				'type'               => str_contains($db_version, 'MariaDB') ? 'MariaDB' : 'MySQL',
+				'version'            => $db_version,
 				'max_allowed_packet' => DBA::getVariable('max_allowed_packet'),
+			],
+			'curl' => [
+				'version' => $curl['version'],
+				'HTTP/2'  => ($curl['features'] & CURL_VERSION_HTTP2) ? DI::l10n()->t('Yes') : DI::l10n()->t('No'),
 			],
 		];
 

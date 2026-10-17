@@ -131,6 +131,88 @@ class ParsedLogIteratorTest extends TestCase
 		self::assertCount(0, $pls);
 	}
 
+	public function testLimitCountsMatchingLines(): void
+	{
+		$this->pli
+			->withLimit(1)
+			->withFilters(['level' => 'INFO']);
+		$pls = iterator_to_array($this->pli, false);
+		self::assertCount(1, $pls);
+		self::assertParsed($pls[0], ['message' => 'No HTTP_SIGNATURE header']);
+	}
+
+	public function testScanLimit(): void
+	{
+		$this->pli->withScanLimit(2);
+		self::assertCount(2, iterator_to_array($this->pli, false));
+		self::assertTrue($this->pli->isScanLimitReached());
+	}
+
+	public function testScanLimitNotReached(): void
+	{
+		$this->pli->withScanLimit(3);
+		self::assertCount(3, iterator_to_array($this->pli, false));
+		self::assertFalse($this->pli->isScanLimitReached());
+	}
+
+	public function testTimeoutNotReached(): void
+	{
+		$this->pli->withTimeout(20);
+		self::assertCount(3, iterator_to_array($this->pli, false));
+		self::assertFalse($this->pli->isTimeoutReached());
+	}
+
+	public function testExcludedRequestId(): void
+	{
+		$logfile = dirname(__DIR__) . '/../../Fixtures/log/request-id.friendica.log.txt';
+
+		$reader = new ReversedFileReader();
+		$pli    = new ParsedLogIterator($reader);
+		$pli->open($logfile);
+
+		$pli->withSearch('6ab8ad2540896');
+		self::assertCount(3, iterator_to_array($pli, false));
+
+		$pli->withExcludedRequestId('6ab8ad3827519');
+		$pls = iterator_to_array($pli, false);
+		self::assertCount(1, $pls);
+		self::assertParsed($pls[0], ['message' => 'Fetched replies']);
+	}
+
+	public function testExcludedRequestIdCombinedWithLimitAndScanLimit(): void
+	{
+		$logfile = dirname(__DIR__) . '/../../Fixtures/log/request-id.friendica.log.txt';
+
+		$reader = new ReversedFileReader();
+		$pli    = new ParsedLogIterator($reader);
+		$pli->open($logfile);
+
+		$pli
+			->withLimit(1)
+			->withScanLimit(2)
+			->withSearch('6ab8ad2540896')
+			->withExcludedRequestId('6ab8ad3827519');
+
+		$pls = iterator_to_array($pli, false);
+		self::assertCount(1, $pls);
+		self::assertParsed($pls[0], ['message' => 'Fetched replies']);
+		self::assertFalse($pli->isScanLimitReached());
+	}
+
+	public function testRewindResetsLimitFlags(): void
+	{
+		$this->pli->withScanLimit(2);
+		iterator_to_array($this->pli, false);
+		self::assertTrue($this->pli->isScanLimitReached());
+
+		// rewind() gives every pass its own fresh scan/timeout budget and flags,
+		// so raising the limit before a second pass must clear the stale flag.
+		$this->pli->withScanLimit(3);
+		$this->pli->rewind();
+		self::assertCount(3, iterator_to_array($this->pli, false));
+		self::assertFalse($this->pli->isScanLimitReached());
+	}
+
 	public function testEmptyLogFile(): void
 	{
 		$logfile = dirname(__DIR__) . '/../../Fixtures/log/empty.friendica.log.txt';

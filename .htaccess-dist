@@ -11,28 +11,22 @@ Options -Multiviews
 Options -Indexes
 AddType application/x-java-archive .jar
 AddType audio/ogg .oga
+# Older Apache versions don't know .mjs.
+AddType text/javascript .mjs
 
 # deny access to log files (friendica.log or php.out)
 <FilesMatch "\.(out|log)$">
-  <IfModule authz_host_module>
+  <IfModule authz_core_module>
     #Apache 2.4
     Require all denied
-  </IfModule>
-  <IfModule !authz_host_module>
-    #Apache 2.2
-    Deny from all
   </IfModule>
 </FilesMatch>
 
 # deny access to backup files
 <FilesMatch "(\~|\.bak|\.swp)$">
-  <IfModule authz_host_module>
+  <IfModule authz_core_module>
     #Apache 2.4
     Require all denied
-  </IfModule>
-  <IfModule !authz_host_module>
-    #Apache 2.2
-    Deny from all
   </IfModule>
 </FilesMatch>
 

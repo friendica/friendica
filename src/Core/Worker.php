@@ -1216,7 +1216,7 @@ class Worker
 	 */
 	public static function spawnWorker(bool $do_cron = false)
 	{
-		if (Worker\Daemon::isMode() && DI::config()->get('system', 'worker_fork')) {
+		if (Worker\Daemon::isMode() && DI::config()->get('system', 'worker_fork') && function_exists('pcntl_fork')) {
 			self::forkProcess($do_cron);
 		} else {
 			DI::system()->run('bin/console.php', ['worker'], ['no_cron' => !$do_cron]);
@@ -1405,8 +1405,21 @@ class Worker
 	 */
 	public static function defer(int $worker_defer_limit = 0): bool
 	{
-		$queue = DI::appHelper()->getQueue();
+		return self::deferQueueEntry(DI::appHelper()->getQueue(), $worker_defer_limit);
+	}
 
+	/**
+	 * Defers the given worker entry
+	 *
+	 * Unlike self::defer() this works on any entry, not only on the one of the current process.
+	 *
+	 * @param array $queue Worker queue entry, needs at least id, priority, created and retrial
+	 * @param int $worker_defer_limit Maximum defer limit
+	 * @return boolean had the entry been deferred?
+	 * @throws \Exception
+	 */
+	public static function deferQueueEntry(array $queue, int $worker_defer_limit = 0): bool
+	{
 		if (empty($queue)) {
 			return false;
 		}

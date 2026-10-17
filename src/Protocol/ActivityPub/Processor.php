@@ -465,7 +465,7 @@ class Processor
 			$item['direction'] = Conversation::RELAY;
 		}
 
-		if ($activity['object_type'] == 'as:Article') {
+		if (in_array($activity['object_type'], ['as:Article', '_:Review'])) {
 			$item['post-type'] = Item::PT_ARTICLE;
 		} elseif ($activity['object_type'] == 'as:Audio') {
 			$item['post-type'] = Item::PT_AUDIO;
@@ -960,7 +960,7 @@ class Processor
 		}
 
 		$item['title']           = trim(BBCode::toPlaintext($item['title']));
-		$item['content-warning'] = HTML::toBBCode($activity['summary'] ?? '');
+		$item['content-warning'] = trim(BBCode::toPlaintext(HTML::toBBCode($activity['summary'] ?? '')));
 
 		if (!empty($activity['languages'])) {
 			$item['language'] = self::processLanguages($activity['languages']);
@@ -1162,7 +1162,8 @@ class Processor
 		ksort($activity['receiver']);
 
 		if (!self::isSolicitedMessage($activity, $item)) {
-			DBA::delete('item-uri', ['id' => $item['uri-id']]);
+			// The item-uri can be in use by a parallel insert, ExpirePosts removes it once it is unused.
+			DI::logger()->notice('Unsolicited message dropped', ['uri-id' => $item['uri-id'], 'uri' => $item['uri']]);
 			if (!empty($activity['entry-id'])) {
 				Queue::deleteById($activity['entry-id']);
 			}
@@ -2272,7 +2273,7 @@ class Processor
 	 */
 	public static function processQuoteRequest(array $activity)
 	{
-		if (!($post = Post::selectFirst(['author-link', 'uid'], ['uri' => $activity['object_id'], 'origin' => true, 'private' => [Item::PUBLIC, Item::UNLISTED]]))) {
+		if (!($post = Post::selectFirst(['uri-id', 'author-link', 'uid'], ['uri' => $activity['object_id'], 'origin' => true, 'private' => [Item::PUBLIC, Item::UNLISTED]]))) {
 			DI::logger()->info('Quoted post not found locally or it is not public', ['uri' => $activity['object_id']]);
 			Queue::remove($activity);
 			return;
@@ -2287,14 +2288,32 @@ class Processor
 			return;
 		}
 
-		$quote = Post::selectFirst(['guid'], ['uri' => $activity['target_id']]);
+		if (empty($activity['target_id'])) {
+			DI::logger()->info('Quote request without quoting post', ['id' => $activity['id']]);
+			Queue::remove($activity);
+			return;
+		}
+
+		$quote = Post::selectFirst(['uri-id', 'guid', 'author-link'], ['uri' => $activity['target_id']]);
 		if (!isset($quote['guid'])) {
 			if (Processor::fetchMissingActivity($activity['target_id'], $activity, '', Receiver::COMPLETION_ANNOUNCE)) {
-				$quote = Post::selectFirst(['guid'], ['uri' => $activity['target_id']]);
+				$quote = Post::selectFirst(['uri-id', 'guid', 'author-link'], ['uri' => $activity['target_id']]);
 			}
 		}
 		if (!isset($quote['guid'])) {
 			DI::logger()->debug('Remote quote was not found', ['uri' => $activity['target_id']]);
+			return;
+		}
+
+		if ($quote['author-link'] !== $contact['url']) {
+			DI::logger()->info('Quote request actor is not the author of the quoting post', ['actor' => $contact['url'], 'author' => $quote['author-link'], 'uri' => $activity['target_id']]);
+			Queue::remove($activity);
+			return;
+		}
+
+		if (!Post\Quote::isQuoting($quote['uri-id'], $post['uri-id'])) {
+			DI::logger()->info('Remote post does not quote the requested post', ['uri' => $activity['target_id'], 'quote-id' => $activity['object_id']]);
+			Queue::remove($activity);
 			return;
 		}
 

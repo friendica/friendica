@@ -11,7 +11,6 @@
 	z-index: 1040;
 	background-color: #ffffff;
 	background-clip: padding-box;
-	border: 1px solid rgba(0, 0, 0, 0);
 	border-radius: 4px;
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	box-shadow: 0 10px 100px rgba(0, 0, 0, 0.25);
@@ -115,9 +114,8 @@
 	left: 50%;
 	margin-left: -11px;
 	border-top-width: 0;
-	border-bottom-color: #999999;
-	border-bottom-color: rgba(0, 0, 0, 0.25);
 	top: -11px;
+	border-color: rgba(0, 0, 0, 0.05);
 }
 
 .hovercard.bottom > .arrow:after {
@@ -241,10 +239,6 @@
 	text-decoration: none;
 }
 
-.hovercard.bottom > .arrow {
-	border-color: rgba(0, 0, 0, 0.05);
-}
-
 .hover-card-header, .hover-card-details, .hover-card-content {
 	width: 100%;
 }
@@ -282,17 +276,19 @@
 	text-overflow: ellipsis;
 }
 
-.hover-card-actions, .hover-card-actions-connection {
+.hover-card-actions {
 	display: flex;
 	gap: 5px;
 	flex-wrap: wrap;
-}
-
-.hover-card-actions {
+	justify-content: flex-end;
 	margin-bottom: 5px;
 }
 
 .hovercard .hovercard-content .hover-card-actions a.btn {
+	display: inline-block;
+}
+
+body.show-action-labels .hover-card-actions a .action-label {
 	display: inline-block;
 }
 

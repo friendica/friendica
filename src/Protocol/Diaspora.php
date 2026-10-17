@@ -2711,7 +2711,8 @@ class Diaspora
 		Tag::storeRawTagsFromBody($datarray['uri-id'], $datarray['body']);
 
 		if (!self::isSolicitedMessage($datarray, $author, $body, $direction)) {
-			DBA::delete('item-uri', ['uri' => $datarray['uri']]);
+			// The item-uri can be in use by a parallel insert, ExpirePosts removes it once it is unused.
+			DI::logger()->notice('Unsolicited message dropped', ['uri-id' => $datarray['uri-id'], 'uri' => $datarray['uri']]);
 			return false;
 		}
 

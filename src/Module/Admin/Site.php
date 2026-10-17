@@ -160,8 +160,6 @@ class Site extends BaseAdmin
 		$max_posts_per_author    = (!empty($_POST['max_posts_per_author'])    ? intval($_POST['max_posts_per_author']) : 0);
 		$sharer_interaction_days = (!empty($_POST['sharer_interaction_days']) ? intval($_POST['sharer_interaction_days']) : 0);
 
-		$active_panel = (!empty($_POST['active_panel'])      ? "#" . trim((string) $_POST['active_panel']) : '');
-
 		$transactionConfig = DI::config()->beginTransaction();
 
 		// Has the directory url changed? If yes, then resubmit the existing profiles there
@@ -251,7 +249,9 @@ class Site extends BaseAdmin
 		$transactionConfig->set('system', 'allowed_email', $allowed_email);
 		$transactionConfig->set('system', 'disallowed_email', $disallowed_email);
 		$transactionConfig->set('system', 'forbidden_nicknames', $forbidden_nicknames);
-		$transactionConfig->set('system', 'system_actor_name', $system_actor_name);
+		if (!empty($system_actor_name) && !DBA::exists('contact', ['uid' => 0, 'self' => true])) {
+			$transactionConfig->set('system', 'actor_name', $system_actor_name);
+		}
 		$transactionConfig->set('system', 'block_public', $block_public);
 		$transactionConfig->set('system', 'publish_all', $force_publish);
 		$transactionConfig->set('system', 'newuser_private', $newuser_private);
@@ -344,7 +344,7 @@ class Site extends BaseAdmin
 
 		$transactionConfig->commit();
 
-		DI::baseUrl()->redirect('admin/site' . $active_panel);
+		DI::baseUrl()->redirect('admin/site');
 	}
 
 	protected function content(array $request = []): string

@@ -11,6 +11,7 @@ use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\App\Mode;
 use Friendica\App\Page;
+use Friendica\App\Router;
 use Friendica\AppHelper;
 use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Conversation\StatusEditor;
@@ -62,6 +63,11 @@ class Conversations extends BaseProfile
 
 		if (!empty($profile['hidewall']) && !$this->session->isAuthenticated()) {
 			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
+		}
+
+		// HEAD gets the same status and headers as GET, the body is discarded anyway.
+		if (($this->server['REQUEST_METHOD'] ?? '') === Router::HEAD) {
+			return '';
 		}
 
 		if (!$profile['net-publish']) {

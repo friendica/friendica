@@ -53,4 +53,8 @@ return [
 	// Proxy Config
 	'FRIENDICA_FORWARDED_HEADERS' => ['proxy', 'forwarded_for_headers'],
 	'FRIENDICA_TRUSTED_PROXIES'   => ['proxy', 'trusted_proxies'],
+
+	// Outbound security
+	'FRIENDICA_BLOCK_PRIVATE_ADDRESSES' => ['system', 'block_private_addresses'],
+	'FRIENDICA_ALLOWED_INTERNAL_HOSTS'  => ['system', 'allowed_internal_hosts'],
 ];

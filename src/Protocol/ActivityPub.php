@@ -62,7 +62,17 @@ class ActivityPub
 				'@id'   => 'https://w3id.org/fep/044f#quoteAuthorization',
 				'@type' => '@id',
 			],
-			'gts'               => 'https://gotosocial.org/ns#',
+			'QuoteAuthorization' => 'https://w3id.org/fep/044f#QuoteAuthorization',
+			'QuoteRequest'       => 'https://w3id.org/fep/044f#QuoteRequest',
+			'gts'                => 'https://gotosocial.org/ns#',
+			'interactingObject'  => [
+				'@id'   => 'gts:interactingObject',
+				'@type' => '@id',
+			],
+			'interactionTarget' => [
+				'@id'   => 'gts:interactionTarget',
+				'@type' => '@id',
+			],
 			'interactionPolicy' => [
 				'@id'   => 'gts:interactionPolicy',
 				'@type' => '@id',
