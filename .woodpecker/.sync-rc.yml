@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2010-2026 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# Opens a "Merge <rc> into develop" PR after each push to a *-rc branch, unless one is already open
+# Runs at the releaser location because it needs a token with write access
+labels:
+  location: friendica
+  type: releaser
+
+when:
+  repo: friendica/friendica
+  branch: '*-rc'
+  event: push
+
+steps:
+  open_sync_pr:
+    image: alpine
+    environment:
+      TOKEN:
+        from_secret: sync_token
+    commands:
+      - apk add --no-cache curl jq
+      - if [ "${CI_FORGE_TYPE}" = "github" ]; then
+          API="https://api.github.com/repos/${CI_REPO}";
+          PR_HEAD="${CI_REPO_OWNER}:${CI_COMMIT_BRANCH}";
+        else
+          API="${CI_FORGE_URL}/api/v1/repos/${CI_REPO}";
+          PR_HEAD="${CI_COMMIT_BRANCH}";
+        fi
+      - >-
+        PULLS="$(curl -sf -H "Authorization: token $${TOKEN}"
+        "$${API}/pulls?state=open&base=develop&head=$${PR_HEAD}")" || exit 1
+      - OPEN="$(echo "$${PULLS}" | jq length)"
+      - if [ "$${OPEN}" -gt 0 ]; then echo "Sync PR already open"; exit 0; fi
+      - >-
+        curl -sf -X POST -H "Authorization: token $${TOKEN}" -H "Content-Type: application/json"
+        -d "{\"base\":\"develop\",\"head\":\"${CI_COMMIT_BRANCH}\",\"title\":\"Merge ${CI_COMMIT_BRANCH} into develop\"}"
+        "$${API}/pulls"
