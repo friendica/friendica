@@ -9,7 +9,7 @@ No, this function is no longer supported as of Friendica 3.3 onwards.
 You can find the main repository [here](https://github.com/friendica/friendica).
 There you will always find the current stable version of friendica.
 
-Addons are listed at [this page](https://github.com/friendica/friendica-addons).
+Addons are listed at [this page](https://git.friendi.ca/friendica/friendica-addons).
 
 If you are searching for new themes, you can find them at [github.com/bkil/friendica-themes](https://github.com/bkil/friendica-themes)
 

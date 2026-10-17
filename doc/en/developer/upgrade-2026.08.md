@@ -14,6 +14,14 @@ Mandatory (Breaking changes)
 
 This section contains backward compatibility breaks, make sure your code is compatible with these entries before upgrading.
 
+- The addon repository moved to [git.friendi.ca](https://git.friendi.ca/friendica/friendica-addons).
+
+   The copy on GitHub can lag behind.
+   An addon tree cloned from GitHub has to be switched once:
+   ```sh
+   git -C addon remote set-url origin https://git.friendi.ca/friendica/friendica-addons.git
+   ```
+
 - Outbound requests to non-public IP addresses are blocked by default.
 
    This can affect internal feed servers, mail servers, media proxies and other services using private network addresses.

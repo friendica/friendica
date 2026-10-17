@@ -35,7 +35,7 @@ jobs:
           tools: none
 
       - name: Clone addon repository
-        run: git clone -b develop --single-branch https://github.com/friendica/friendica-addons.git addon
+        run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
         uses: "ramsey/composer-install@v4"
@@ -68,7 +68,7 @@ jobs:
           tools: none
 
       - name: Clone addon repository
-        run: git clone -b develop --single-branch https://github.com/friendica/friendica-addons.git addon
+        run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
         uses: "ramsey/composer-install@v4"
@@ -100,7 +100,7 @@ jobs:
           tools: none
 
       - name: Clone addon repository
-        run: git clone -b develop --single-branch https://github.com/friendica/friendica-addons.git addon
+        run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
         uses: "ramsey/composer-install@v4"
@@ -147,7 +147,7 @@ jobs:
           tools: none
 
       - name: Clone addon repository
-        run: git clone -b develop --single-branch https://github.com/friendica/friendica-addons.git addon
+        run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
         uses: "ramsey/composer-install@v4"
@@ -179,7 +179,7 @@ jobs:
           tools: none
 
       - name: Clone addon repository
-        run: git clone -b develop --single-branch https://github.com/friendica/friendica-addons.git addon
+        run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
 
       - name: Install Composer dependencies
         uses: "ramsey/composer-install@v4"
