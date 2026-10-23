@@ -26,7 +26,7 @@ class SerializeUtil
 		// This checks for possible multiple serialized values
 		while (static::isSerialized($value)) {
 			$oldValue = $value;
-			$value    = @unserialize($value);
+			$value    = @unserialize($value, ['allowed_classes' => false]);
 
 			// If there's no change after the unserialize call, break the loop (avoid endless loops)
 			if ($oldValue === $value) {

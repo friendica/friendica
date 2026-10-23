@@ -206,7 +206,7 @@ class Cache
 		}
 
 		if (preg_match("|^a:[0-9]+:{.*}$|s", $value)) {
-			return unserialize($value);
+			return unserialize($value, ['allowed_classes' => false]);
 		} else {
 			return $value;
 		}

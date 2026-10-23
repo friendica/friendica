@@ -32,7 +32,8 @@ class ValueConversion
 		}
 
 		return match (true) {
-			preg_match("|^a:[0-9]+:{.*}$|s", $value) === 1 => unserialize($value),
+			// CWE-502: Classes are explicitly disallowed to prevent malicious exploitation
+			preg_match("|^a:[0-9]+:{.*}$|s", $value) === 1 => unserialize($value, ['allowed_classes' => false]),
 			default                                        => $value,
 		};
 	}
