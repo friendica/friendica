@@ -100,7 +100,7 @@ class Actor
 	/**
 	 * Update a contact for a given DID and user id
 	 *
-	 * @param string  $did         DID (did:plc:...)
+	 * @param string  $did         DID (did:plc:... or did:web:...)
 	 * @param integer $contact_uid User id of the contact to be updated
 	 * @return void
 	 */
@@ -130,7 +130,7 @@ class Actor
 			$fields['header'] = $profile->banner;
 		}
 
-		$directory = $this->atprotocol->get($this->atprotocol->getPLCDirectory() . '/' . $profile->did);
+		$directory = $this->atprotocol->getDidDocument($profile->did);
 		if (!empty($directory->service)) {
 			foreach ($directory->service as $service) {
 				if (($service->id == '#atproto_pds') && ($service->type == 'AtprotoPersonalDataServer') && !empty($service->serviceEndpoint)) {

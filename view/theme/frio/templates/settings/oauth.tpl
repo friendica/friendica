@@ -26,7 +26,7 @@
 					{{foreach $apps as $app}}
 					<tr>
 						<td>{{$app.name}}</td>
-						<td>{{$app.website}}</td>
+						<td style="word-break: break-all;">{{$app.website}}</td>
 						<td>{{$app.created_at}}</td>
 						<td>
 							<button type="submit" class="btn" title="{{$delete}}" name="delete" value="{{$app.id}}">

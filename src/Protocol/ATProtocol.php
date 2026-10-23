@@ -433,25 +433,101 @@ final class ATProtocol
 	}
 
 	/**
+	 * Fetch the DID document for a given DID.
+	 *
+	 * did:plc identities are resolved via the PLC directory. did:web identities
+	 * don't use a directory, their document is hosted on the domain that is
+	 * encoded in the DID itself.
+	 *
+	 * @param string $did DID (did:plc:... or did:web:...)
+	 * @return stdClass|null DID document
+	 */
+	public function getDidDocument(string $did): ?stdClass
+	{
+		if (str_starts_with($did, 'did:web:')) {
+			$url = $this->getDidWebUrl($did);
+			return $url ? $this->get($url) : null;
+		}
+
+		return $this->get($this->getPLCDirectory() . '/' . $did);
+	}
+
+	/**
+	 * Translate a did:web DID into the URL of its DID document
+	 *
+	 * @see https://w3c-ccg.github.io/did-method-web/
+	 *
+	 * @param string $did DID (did:web:...)
+	 * @return string|null URL of the DID document
+	 */
+	private function getDidWebUrl(string $did): ?string
+	{
+		$parts  = array_map(rawurldecode(...), explode(':', substr($did, strlen('did:web:'))));
+		$domain = array_shift($parts);
+		if (empty($domain)) {
+			return null;
+		}
+
+		if (empty($parts)) {
+			return 'https://' . $domain . '/.well-known/did.json';
+		}
+
+		return 'https://' . $domain . '/' . implode('/', $parts) . '/did.json';
+	}
+
+	/**
 	 * Fetch the PDS URL for a given DID
 	 *
-	 * @param string $did DID (did:plc:...)
+	 * @param string $did DID (did:plc:... or did:web:...)
 	 * @return string|null URL of the PDS, e.g. https://enoki.us-east.host.bsky.network
 	 */
 	public function getPdsOfDid(string $did): ?string
 	{
-		$data = $this->get($this->getPLCDirectory() . '/' . $did);
+		$data = $this->getDidDocument($did);
 		if (empty($data) || empty($data->service)) {
 			return null;
 		}
 
 		foreach ($data->service as $service) {
 			if (($service->id == '#atproto_pds') && ($service->type == 'AtprotoPersonalDataServer') && !empty($service->serviceEndpoint)) {
+				if (!$this->isValidPdsEndpoint($service->serviceEndpoint)) {
+					$this->logger->notice('Invalid PDS endpoint', ['did' => $did, 'endpoint' => $service->serviceEndpoint]);
+					return null;
+				}
 				return $service->serviceEndpoint;
 			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Checks whether a PDS endpoint taken from a DID document is safe to send requests to.
+	 *
+	 * The endpoint is stored per user and gets the bearer token attached on every API call.
+	 * It therefore has to be a plain https origin.
+	 * A query or fragment would swallow the '/xrpc/...' path that is appended to it.
+	 *
+	 * @param mixed $endpoint The serviceEndpoint value of the DID document
+	 * @return bool
+	 */
+	private function isValidPdsEndpoint($endpoint): bool
+	{
+		if (!is_string($endpoint)) {
+			return false;
+		}
+
+		$parts = parse_url($endpoint);
+		if (!is_array($parts)) {
+			return false;
+		}
+
+		return (($parts['scheme'] ?? '') === 'https')
+			&& !empty($parts['host'])
+			&& empty($parts['user'])
+			&& empty($parts['pass'])
+			&& empty($parts['query'])
+			&& empty($parts['fragment']);
 	}
 
 	/**
@@ -533,13 +609,13 @@ final class ATProtocol
 	/**
 	 * Checks if the provided DID matches the handle
 	 *
-	 * @param string $did DID (did:plc:...)
+	 * @param string $did DID (did:plc:... or did:web:...)
 	 * @param string $handle The user handle
 	 * @return boolean
 	 */
 	public function isValidDid(string $did, string $handle): bool
 	{
-		$data = $this->get($this->getPLCDirectory() . '/' . $did);
+		$data = $this->getDidDocument($did);
 		if (empty($data) || empty($data->alsoKnownAs)) {
 			return false;
 		}

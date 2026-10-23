@@ -13,7 +13,7 @@ Du kannst den Friendica-Quellcode [hier](https://github.com/friendica/friendica)
 Dort findest Du immer die aktuellste stabile Version von Friendica.
 Der Quellcode von Friendica Red ist [hier](https://github.com/friendica/red) zu finden.
 
-Addons findest Du auf [dieser Seite](https://github.com/friendica/friendica-addons).
+Addons findest Du auf [dieser Seite](https://git.friendi.ca/friendica/friendica-addons).
 
 Wenn Du neue Themen suchst, findest Du sie auf [github.com/bkil/friendica-themes](https://github.com/bkil/friendica-themes).
 

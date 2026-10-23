@@ -7,7 +7,7 @@
 
 <div id="adminpage">
 	<h1>{{$title}} - {{$page}}</h1>
-
+	<div class="settings-section">
 	<p><span class="toggleaddon icon {{$status}}"></span> {{$info.name}} - {{$info.version}} : <a href="{{$baseurl}}/admin/{{$function}}/{{$addon}}/?action=toggle&amp;t={{$form_security_token}}">{{$action}}</a></p>
 	<p>{{$info.description nofilter}}</p>
 
@@ -41,4 +41,5 @@
 		{{$readme nofilter}}
 	</div>
 	{{/if}}
+	</div>
 </div>

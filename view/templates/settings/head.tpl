@@ -6,6 +6,7 @@
   *}}
 
 <script type="text/javascript" src="view/asset/es-jquery-sortable/source/js/jquery-sortable.js"></script>
+<link rel="stylesheet" href="view/settings.css" type="text/css" media="all" />
 <script>
 	var ispublic = "{{$ispublic nofilter}}";
 
@@ -68,7 +69,7 @@
 		$(target).focus();
 	}
 
-	$(document).ready(function() {
+	window.onDocumentReady('body', function() {
 		$('#contact_allow, #contact_deny, #circle_allow, #circle_deny').change(function() {
 			var selstr;
 			$('#contact_allow option:selected, #contact_deny option:selected, #circle_allow option:selected, #circle_deny option:selected').each( function() {
@@ -83,11 +84,6 @@
 
 		}).trigger('change');
 
-		$('.settings-content-block').hide();
-		$('.settings-heading').click(function(){
-			$('.settings-content-block').hide();
-			$(this).next('.settings-content-block').toggle();
-		});
 		$( function() {
 			// check if primary input is touch
 			if(window.matchMedia("(hover: none) and (pointer: coarse)").matches){
@@ -159,119 +155,3 @@
 	});
 
 </script>
-
-<style>
-/* styling for sortable lists */
-.placeholder {
-	height: 75px;
-	width: 100%;
-	background-color: rgba(128,128,128,.1);
-	border: 1px dashed var(--link-color, blue);
-	list-style: none;
-}
-.sortable > .field {
-	position: relative;
-	border: 1px solid var(--border-color, #eee);
-	padding: 10px 30px 10px 30px;
-	margin: 0;
-	box-sizing: border-box;
-	min-height: 75px;
-	overflow: visible;
-}
-	.sortable > .field:first-of-type {
-		border-top-left-radius: 8px;
-		border-top-right-radius: 8px;
-	}
-	.sortable > .field:nth-last-of-type(2) {
-		border-bottom-left-radius: 8px;
-		border-bottom-right-radius: 8px;
-	}
-	.dragged {
-		position: absolute !important;
-	}
-	[class^="sorter-"] {
-		position: absolute;
-		right: 5px;
-		height: 24px;
-		width:  24px;
-		border-radius: 100%;
-		color: inherit;
-		text-align: center;
-		opacity: .5;
-		z-index: 1;
-	}
-		[class^="sorter-"]:hover,
-		[class^="sorter-"]:active {
-			background-color: var(--dimbright, rgba(128,128,128,.2));
-			color: var(--link-color, inherit);
-			opacity: 1;
-		}
-	.sorter-mvup {
-		top: 10px;
-	}
-		.sorter-mvup::before {
-			content: '\ea78';
-			font-family: "remixicon";
-			font-size: 14px;
-			line-height: 24px;
-		}
-	.sorter-mvdn {
-		bottom: 10px;
-	}
-		.sorter-mvdn::before {
-			content: '\ea4e';
-			font-family: "remixicon";
-			font-size: 14px;
-			line-height: 24px;
-		}
-	/* motion indicator animations */
-	@keyframes borderflash {
-	  0% {
-		border-color: var(--link-color, blue);
-	  }
-	  100% {
-		border-color:  var(--border-color, #eee);
-	  }
-	}
-	@keyframes aniUp {
-		0% {
-			top: 100%;
-		}
-		100% {
-			top: 0%;
-		}
-	}
-	@keyframes aniDn {
-		0% {
-			bottom: 100%;
-		}
-		100% {
-			bottom: 0%;
-		}
-	}
-	.borderani {
-		animation: borderflash .5s ease .5s infinite normal none;
-	}
-		.borderani.move-up:before {
-			content: '';
-			display: block;
-			position: absolute;
-			top: 0%;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			border: 1px solid var(--link-color, blue);
-			animation: aniUp .5s ease 0s 1 normal none;
-		}
-		.borderani.move-dn:after {
-			content: '';
-			display: block;
-			position: absolute;
-			bottom: 0%;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			border: 1px solid var(--link-color, blue);
-			animation: aniDn .5s ease 0s 1 normal none;
-		}
-</style>

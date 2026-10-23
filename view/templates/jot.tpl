@@ -99,4 +99,12 @@
 <div id="profile-jot-end"></div>
 </form>
 </div>
-{{if $content}}<script>initEditor();</script>{{/if}}
+{{if $content}}
+<script>
+	window.onDocumentReady('#profile-jot-form', function () {
+		if (typeof initEditor === 'function') {
+			initEditor();
+		}
+	});
+</script>
+{{/if}}

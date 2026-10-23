@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: 2010-2026 the Friendica project
+#
+# SPDX-License-Identifier: CC0-1.0
+
+# After each push to a *-rc branch, updates the branch "merge-<rc>-into-develop" (develop with <rc> merged in,
+# keeping the version of develop) and opens a PR for it, unless one is already open.
+# Runs at the releaser location because it needs a token with write access
+labels:
+  location: friendica
+  type: releaser
+
+when:
+  repo: friendica/friendica
+  branch: '*-rc'
+  event: push
+
+steps:
+  open_sync_pr:
+    image: alpine
+    environment:
+      TOKEN:
+        from_secret: sync_token
+    commands:
+      - apk add --no-cache curl git jq
+      - SCRIPT="$(pwd)/bin/dev/sync-rc-into-develop.sh"
+      - SYNC_BRANCH="merge-${CI_COMMIT_BRANCH}-into-develop"
+      - if [ "${CI_FORGE_TYPE}" = "github" ]; then
+          API_ROOT="https://api.github.com";
+          PR_HEAD="${CI_REPO_OWNER}:$${SYNC_BRANCH}";
+        else
+          API_ROOT="${CI_FORGE_URL}/api/v1";
+          PR_HEAD="$${SYNC_BRANCH}";
+        fi
+      - API="$${API_ROOT}/repos/${CI_REPO}"
+      - FORGE_URL="${CI_FORGE_URL}"
+      - >-
+        LOGIN="$(curl -sS --fail-with-body -H "Authorization: token $${TOKEN}" "$${API_ROOT}/user")"
+        || { echo "$${LOGIN}"; exit 1; }
+      - LOGIN="$(echo "$${LOGIN}" | jq -r .login)"
+      - git clone --quiet --filter=blob:none --single-branch --branch develop "${CI_FORGE_URL}/${CI_REPO}.git" /tmp/sync
+      - cd /tmp/sync
+      - git fetch --quiet origin "${CI_COMMIT_BRANCH}:refs/remotes/origin/${CI_COMMIT_BRANCH}"
+      - git config user.name "$${LOGIN}"
+      - git config user.email "no-reply@friendi.ca"
+      - RESULT=0
+      - sh "$${SCRIPT}" "${CI_COMMIT_BRANCH}" || RESULT=$$?
+      - if [ "$${RESULT}" -eq 3 ]; then exit 0; fi
+      - if [ "$${RESULT}" -ne 0 ]; then exit "$${RESULT}"; fi
+      - git push --quiet --force "https://$${LOGIN}:$${TOKEN}@$${FORGE_URL#https://}/${CI_REPO}.git" "$${SYNC_BRANCH}"
+      - >-
+        PULLS="$(curl -sS --fail-with-body -H "Authorization: token $${TOKEN}"
+        "$${API}/pulls?state=open&base=develop&head=$${PR_HEAD}")" || { echo "$${PULLS}"; exit 1; }
+      - OPEN="$(echo "$${PULLS}" | jq length)"
+      - if [ "$${OPEN}" -gt 0 ]; then echo "Sync PR already open, branch updated"; exit 0; fi
+      - >-
+        jq -n --arg head "$${SYNC_BRANCH}" --arg rc "${CI_COMMIT_BRANCH}"
+        '{base: "develop", head: $$head, title: "Merge \($$rc) into develop",
+        body: "Merges `\($$rc)` into `develop`. Keeps the version of `develop` in VERSION, database.sql, src/App.php and view/lang/C/messages.po.\n\nUpdated by the sync-rc pipeline after each push to `\($$rc)`."}'
+        > /tmp/pr.json
+      - >-
+        curl -sS --fail-with-body -X POST -H "Authorization: token $${TOKEN}" -H "Content-Type: application/json"
+        -d @/tmp/pr.json "$${API}/pulls"

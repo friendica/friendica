@@ -342,6 +342,8 @@ But due to the volume of information we recommend only enabling this when you ar
 **The amount of data can grow the filesize of the logfile quickly**.
 You should set up some kind of [log rotation](https://en.wikipedia.org/wiki/Log_rotation) to keep the log file from growing too big.
 
+See [Reading the log file](help/admin/log-files) for how to make sense of an entry once you have found one, and for the log file's permission requirements.
+
 **Known Issues**: The filename ``friendica.log`` can cause problems depending on your server configuration (see [issue 2209](https://github.com/friendica/friendica/issues/2209)).
 
 By default PHP warnings and error messages are suppressed.

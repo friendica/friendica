@@ -43,6 +43,11 @@ final class DelegatingLoggerFactory implements LoggerFactory
 		$factoryName = $this->config->get('system', 'logger_config') ?? '';
 
 		if (!array_key_exists($factoryName, $this->factories)) {
+			$this->reportFallback(sprintf(
+				'There is no logger registered for the config value "system.logger_config" = "%s".',
+				$factoryName,
+			));
+
 			return new NullLogger();
 		}
 
@@ -50,10 +55,27 @@ final class DelegatingLoggerFactory implements LoggerFactory
 
 		try {
 			$logger = $factory->createLogger($logLevel, $logChannel);
-		} catch (\Throwable) {
+		} catch (\Throwable $exception) {
+			$this->reportFallback(sprintf(
+				'The logger "%s" could not be created: %s',
+				$factoryName,
+				$exception->getMessage(),
+			));
+
 			return new NullLogger();
 		}
 
 		return $logger;
+	}
+
+	/**
+	 * Reports that logging has been silently disabled.
+	 *
+	 * An instance falling back to a NullLogger looks exactly like an idle one.
+	 * The logger cannot report its own failure, so this goes to PHP's error log.
+	 */
+	private function reportFallback(string $message): void
+	{
+		error_log('Friendica: logging is disabled, no log entries will be written. ' . $message);
 	}
 }

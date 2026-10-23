@@ -26,7 +26,7 @@ Wir planen, diese Einschränkung in einer zukünftigen Version zu beheben.
   * Curl, GD, GMP, PDO, mbstrings, MySQLi, hash, xml, zip, Intl, IDN und OpenSSL-Erweiterung
   * Das POSIX Modul muss aktiviert sein ([CentOS, RHEL](http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7http://www.bigsoft.co.uk/blog/index.php/2014/12/08/posix-php-commands-not-working-under-centos-7) haben dies z.B. deaktiviert)
   * Einen E-Mail Server, so dass PHP `mail()` funktioniert.
-    Wenn kein eigener E-Mail Server zur Verfügung steht, kann alternativ das [phpmailer](https://github.com/friendica/friendica-addons/tree/develop/phpmailer) Addon mit einem externen SMTP Account verwendet werden.
+    Wenn kein eigener E-Mail Server zur Verfügung steht, kann alternativ das [phpmailer](https://git.friendi.ca/friendica/friendica-addons/src/branch/stable/phpmailer) Addon mit einem externen SMTP Account verwendet werden.
 * Mysql Server mit Unterstützung vom InnoDB und Barracuda (wir empfehlen MariaDB da die Entwicklung mit solchen Server erfolgt, aber Alternativen wie MySQL, Percona Server etc. sollten auch funktionieren)
 * die Möglichkeit, wiederkehrende Aufgaben mit cron (Linux/Mac) oder "Scheduled Tasks" einzustellen (Windows) [Beachte: andere Optionen sind in Abschnitt 7 dieser Dokumentation zu finden]
 * Installation in einer Top-Level-Domain oder Subdomain (ohne eine Verzeichnis/Pfad-Komponente in der URL) wird bevorzugt. Verzeichnispfade sind für diesen Zweck nicht so günstig und wurden auch nicht ausführlich getestet.
@@ -70,7 +70,7 @@ cd mywebsite
 
 Und die Addon Repository klonst:
 ```sh
-git clone https://github.com/friendica/friendica-addons.git -b stable addon
+git clone https://git.friendi.ca/friendica/friendica-addons.git -b stable addon
 ```
 
 Um das Addon-Verzeichnis aktuell zu halten, solltest du in diesem Pfad ein "git pull"-Befehl eintragen

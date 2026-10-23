@@ -7,7 +7,6 @@
 
 namespace Friendica\Protocol\ActivityPub;
 
-use Friendica\Content\Text\BBCode;
 use Friendica\Database\DBA;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Text\Markdown;
@@ -51,7 +50,7 @@ class Receiver
 	public const PUBLIC_COLLECTION = 'as:Public';
 
 	public const ACCOUNT_TYPES  = ['as:Person', 'as:Organization', 'as:Service', 'as:Group', 'as:Application'];
-	public const CONTENT_TYPES  = ['as:Note', 'as:Article', 'as:Video', 'as:Image', 'as:Event', 'as:Audio', 'as:Page', 'as:Question'];
+	public const CONTENT_TYPES  = ['as:Note', 'as:Article', 'as:Video', 'as:Image', 'as:Event', 'as:Audio', 'as:Page', 'as:Question', '_:Comment', '_:Quotation', '_:Review'];
 	public const ACTIVITY_TYPES = ['as:Like', 'as:Dislike', 'as:Accept', 'as:Reject', 'as:TentativeAccept', 'as:View', 'as:Read', 'litepub:EmojiReact'];
 
 	public const TARGET_UNKNOWN  = 0;
@@ -472,7 +471,7 @@ class Receiver
 			$object_data = [];
 
 			$object_data['id']          = JsonLD::fetchElement($activity, '@id');
-			$object_data['target_id']   = JsonLD::fetchElement($activity, 'as:instrument', '@id', '@type', 'as:Note');
+			$object_data['target_id']   = self::fetchQuoteRequestInstrument($activity);
 			$object_data['object_id']   = JsonLD::fetchElement($activity, 'as:object', '@id');
 			$object_data['object_type'] = JsonLD::fetchElement($activity['as:object'], '@type');
 		} else {
@@ -526,6 +525,27 @@ class Receiver
 		DI::logger()->info('Processing', ['type' => $object_data['type'], 'object_type' => $object_data['object_type'], 'id' => $object_data['id'], 'actor' => $actor, 'platform' => $platform]);
 
 		return $object_data;
+	}
+
+	/**
+	 * Fetch the id of the quoting post from the instrument of a quote request
+	 *
+	 * The instrument can either be the embedded post or just its id.
+	 *
+	 * @param array $activity
+	 * @return string|null
+	 */
+	private static function fetchQuoteRequestInstrument(array $activity): ?string
+	{
+		foreach (JsonLD::fetchElementArray($activity, 'as:instrument') ?? [] as $instrument) {
+			if (empty($instrument['@id'])) {
+				continue;
+			}
+			if (empty($instrument['@type']) || in_array($instrument['@type'], self::CONTENT_TYPES)) {
+				return $instrument['@id'];
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -1529,6 +1549,60 @@ class Receiver
 	}
 
 	/**
+	 * Fetches the raw text parts of a place object: its name followed by its address (Used by Mobilizon)
+	 *
+	 * @param array|null $place Compacted "as:Place" element
+	 * @return string[] Text parts
+	 */
+	private static function fetchLocationParts(?array $place): array
+	{
+		if (empty($place)) {
+			return [];
+		}
+
+		$parts   = [JsonLD::fetchElement($place, 'as:name', '@value')];
+		$country = JsonLD::fetchElement($place, 'sc:addressCountry', '@value');
+		$address = JsonLD::fetchElementArray($place, 'sc:address')[0] ?? null;
+
+		if (!is_array($address)) {
+			$parts[] = $address;
+		} elseif (isset($address['@value'])) {
+			$parts[] = $address['@value'];
+		} else {
+			$parts[] = JsonLD::fetchElement($address, 'sc:streetAddress', '@value');
+			$parts[] = trim(JsonLD::fetchElement($address, 'sc:postalCode', '@value') . ' ' . JsonLD::fetchElement($address, 'sc:addressLocality', '@value'));
+			$parts[] = JsonLD::fetchElement($address, 'sc:addressRegion', '@value');
+			$country = JsonLD::fetchElement($address, 'sc:addressCountry', '@value') ?? $country;
+		}
+
+		$parts[] = $country;
+
+		// Mobilizon already puts the formatted address into the name, but with a different word order
+		$words  = fn (string $text): array => preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($text), -1, PREG_SPLIT_NO_EMPTY);
+		$result = [];
+		foreach ($parts as $part) {
+			// Some AP software allow formatted text in post location, so we boil it down to plaintext.
+			$part = is_string($part) ? trim(HTML::toPlaintext($part, 0)) : '';
+			if ($part !== '' && !empty(array_diff($words($part), $words(implode(' ', $result))))) {
+				$result[] = $part;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Builds the plaintext location of a place object
+	 *
+	 * @param array|null $place Compacted "as:Place" element
+	 * @return string|null Plain text location or null if there is none
+	 */
+	private static function fetchLocationName(?array $place): ?string
+	{
+		return mb_substr(implode(', ', self::fetchLocationParts($place)), 0, 255) ?: null;
+	}
+
+	/**
 	 * Converts the language element (Used by Peertube)
 	 *
 	 * @param array $languages
@@ -2139,14 +2213,9 @@ class Receiver
 			$actor = $author;
 		}
 
-		$location = JsonLD::fetchElement($object, 'as:location', 'as:name', '@type', 'as:Place');
-		$location = JsonLD::fetchElement($location, 'location', '@value');
-		if ($location) {
-			// Some AP software allow formatted text in post location, so we run all the text converters we have to boil
-			// down to HTML and then finally format to plaintext.
-			$location = Markdown::convert($location);
-			$location = BBCode::toPlaintext($location);
-		}
+		$place = JsonLD::fetchElementArray($object, 'as:location', null, '@type', 'as:Place')[0] ?? null;
+
+		$location = self::fetchLocationName($place);
 
 		$object_data['sc:identifier']         = JsonLD::fetchElement($object, 'sc:identifier', '@value');
 		$object_data['diaspora:guid']         = JsonLD::fetchElement($object, 'diaspora:guid', '@value');
@@ -2167,10 +2236,8 @@ class Receiver
 		$object_data['start-time']            = JsonLD::fetchElement($object, 'as:startTime', '@value');
 		$object_data['end-time']              = JsonLD::fetchElement($object, 'as:endTime', '@value');
 		$object_data['location']              = $location;
-		$object_data['latitude']              = JsonLD::fetchElement($object, 'as:location', 'as:latitude', '@type', 'as:Place');
-		$object_data['latitude']              = JsonLD::fetchElement($object_data, 'latitude', '@value');
-		$object_data['longitude']             = JsonLD::fetchElement($object, 'as:location', 'as:longitude', '@type', 'as:Place');
-		$object_data['longitude']             = JsonLD::fetchElement($object_data, 'longitude', '@value');
+		$object_data['latitude']              = JsonLD::fetchElement($place, 'as:latitude', '@value');
+		$object_data['longitude']             = JsonLD::fetchElement($place, 'as:longitude', '@value');
 		$object_data['attachments']           = self::processAttachments(JsonLD::fetchElementArray($object, 'as:attachment') ?? []);
 		$object_data['tags']                  = self::processTags(JsonLD::fetchElementArray($object, 'as:tag') ?? []);
 		$object_data['emojis']                = self::processEmojis(JsonLD::fetchElementArray($object, 'as:tag', null, '@type', 'toot:Emoji') ?? []);

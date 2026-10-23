@@ -26,7 +26,7 @@ contact table
 | uri-id                    | Id of the item-uri table entry that contains the contact url                                                   | int unsigned       | YES  |     | NULL                |                |
 | addr                      |                                                                                                                | varchar(255)       | NO   |     |                     |                |
 | alias                     |                                                                                                                | varbinary(383)     | NO   |     |                     |                |
-| pubkey                    | RSA public key 4096 bit                                                                                        | text               | YES  |     | NULL                |                |
+| pubkey                    | RSA public key 4096 bit, or, for Ed25519 only ActivityPub actors, the Multikey in multibase form               | text               | YES  |     | NULL                |                |
 | prvkey                    | RSA private key 4096 bit                                                                                       | text               | YES  |     | NULL                |                |
 | batch                     |                                                                                                                | varbinary(383)     | NO   |     |                     |                |
 | notify                    |                                                                                                                | varbinary(383)     | YES  |     | NULL                |                |

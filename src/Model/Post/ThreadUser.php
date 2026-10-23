@@ -79,6 +79,39 @@ class ThreadUser
 	}
 
 	/**
+	 * Ensure that the thread starter has a valid entry with a link to the "post-user" table and repair it if not
+	 *
+	 * @param int $uri_id       URI ID of the thread starter
+	 * @param int $uid          User ID
+	 * @param int $post_user_id ID of the thread starter in the "post-user" table
+	 * @return void
+	 * @throws Exception
+	 */
+	public static function ensure(int $uri_id, int $uid, int $post_user_id): void
+	{
+		$threaduser = DBA::selectFirst('post-thread-user', ['post-user-id'], ['uri-id' => $uri_id, 'uid' => $uid]);
+		if (!empty($threaduser['post-user-id'])) {
+			return;
+		}
+
+		DI::logger()->notice('Post-Thread-User entry is missing or incomplete - repairing', ['uri-id' => $uri_id, 'uid' => $uid, 'exists' => DBA::isResult($threaduser)]);
+
+		if (DBA::isResult($threaduser)) {
+			self::update($uri_id, $uid, ['post-user-id' => $post_user_id]);
+			return;
+		}
+
+		$post = DBA::selectFirst('post-user', [], ['id' => $post_user_id]);
+		if (!DBA::isResult($post)) {
+			return;
+		}
+
+		$post['post-user-id'] = $post['id'];
+		$post['commented']    = $post['changed'] = $post['created'];
+		self::insert($post['uri-id'], $post['uid'], $post);
+	}
+
+	/**
 	 * @param int $uri_id
 	 * @param int $uid
 	 * @return bool

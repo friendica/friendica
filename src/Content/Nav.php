@@ -77,6 +77,13 @@ class Nav
 
 		$nav_info = $this->getInfo();
 
+		// NOTE: Frio does not use this link.
+		if ($this->session->getLocalUserNickname()) {
+			$profile_link = 'profile/' . $this->session->getLocalUserNickname() . '/conversations';
+		} else {
+			$profile_link = false;
+		}
+
 		$tpl = Renderer::getMarkupTemplate('nav.tpl');
 
 		$nav .= Renderer::replaceMacros($tpl, [
@@ -86,6 +93,8 @@ class Nav
 			'$emptynotifications'   => $this->l10n->t('Nothing new here'),
 			'$loadingnotifications' => $this->l10n->t('Loading...'),
 			'$userinfo'             => $nav_info['userinfo'],
+			'$profile_link'         => $profile_link,
+			'$profile_link_title'   => $this->l10n->t('My Profile'),
 			'$nickname'             => $this->session->getLocalUserNickname(),
 			'$sel'                  => self::$selected,
 			'$apps'                 => $this->getAppMenu(),
@@ -197,6 +206,7 @@ class Nav
 		if ($this->session->isAuthenticated()) {
 			// user menu
 			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/photos', $this->l10n->t('Photos'), '', $this->l10n->t('My photos'), 'ri-image-line'];
+			$nav['usermenu'][] = ['settings/attachments', $this->l10n->t('Files'), '', $this->l10n->t('My uploaded files'), 'ri-file-line'];
 			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Only you can see these'), 'ri-sticky-note-line'];
 
 			// user info
@@ -204,7 +214,7 @@ class Nav
 			$userinfo = [
 				'icon' => Contact::getMicro($contact),
 				'name' => $contact['name'],
-				'link' => 'profile/' . $this->session->getLocalUserNickname(),
+				'link' => ['profile/' . $this->session->getLocalUserNickname() . '/conversations', $this->l10n->t('Profile'), '', $this->l10n->t('My profile')],
 			];
 		}
 
@@ -262,9 +272,6 @@ class Nav
 		if ($this->session->getLocalUserNickname()) {
 			$nav['network'] = ['network', $this->l10n->t('Home'), '', $this->l10n->t('Home')];
 
-			// Only used by Vier
-			$nav['my_profile'] = ['profile/' . $this->session->getLocalUserNickname(), $this->l10n->t('Profile'), '', ''];
-
 			// Don't show notifications for public communities
 			if ($this->session->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {
 				$nav['introductions']         = ['notifications/intros', $this->l10n->t('Introductions'), '', $this->l10n->t('Friend Requests')];
@@ -278,15 +285,18 @@ class Nav
 			$nav['messages']['outbox'] = ['message/sent', $this->l10n->t('Outbox'), '', $this->l10n->t('Outbox')];
 			$nav['messages']['new']    = ['message/new', $this->l10n->t('New Message'), '', $this->l10n->t('New Message')];
 
-			$nav_accounts_name        = $this->l10n->t('Accounts');
 			$nav_accounts_description = $this->l10n->t('Manage other accounts, including groups and pages');
 			if (User::hasIdentities($this->session->getSubManagedUserId() ?: $this->session->getLocalUserId())) {
-				$nav['delegation'] = ['delegation', $nav_accounts_name, '', $nav_accounts_description];
+				$nav_accounts_name = $this->l10n->t('Switch Accounts');
+				$nav['delegation'] = ['delegation', $nav_accounts_name, '', $nav_accounts_description, 'switch'];
 			} else {
-				$nav['delegation'] = ['settings/delegation', $nav_accounts_name, '', $nav_accounts_description];
+				$nav_accounts_name = $this->l10n->t('Add Account');
+				$nav['delegation'] = ['settings/delegation', $nav_accounts_name, '', $nav_accounts_description, 'add'];
 			}
 
-			$nav['settings'] = ['settings', $this->l10n->t('Settings'), '', $this->l10n->t('Account settings')];
+			if (!$this->session->getSubManagedUserId()) {
+				$nav['settings'] = ['settings', $this->l10n->t('Settings'), '', $this->l10n->t('Account settings')];
+			}
 
 			$nav['contacts'] = ['contact', $this->l10n->t('Contacts'), '', $this->l10n->t('Manage/edit friends and contacts')];
 		}

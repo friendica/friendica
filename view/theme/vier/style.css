@@ -118,7 +118,7 @@ img {
 #adminpage table#users tr { box-shadow: 0 0 1px rgb(128,128,128); }
 #adminpage table#users td.acct-type-col {
 	white-space: normal !important;
-	word-break: break-word !important;
+	overflow-wrap: break-word !important;
 }
 #adminpage table#users span.acct-type {
 	display: block;
@@ -170,11 +170,6 @@ img {
 .icon:active {
 	text-decoration: none;
 	color: #000;
-}
-
-.icon a:hover,
-.icon a:focus,
-.icon a:active {
 }
 
 .icon.text {
@@ -274,9 +269,6 @@ div.pager {
 	border-bottom: 1px solid #D2D2D2;
 	width: 100%;
 	height: 10px;
-}
-
-.pager a {
 }
 
 .pager a.pager_older {
@@ -382,7 +374,6 @@ button.fakelink {
 }
 pre code {
 	font-family: Courier, monospace;
-	white-space: pre;
 	display: block;
 	overflow: auto;
 	border: 1px solid #444;
@@ -484,7 +475,7 @@ pre code {
 #pages-widget-collapse:hover,
 .admin.link a:hover,
 aside h4 a:hover,
-right_aside h4 a:hover,
+#right-aside-section h4 a:hover,
 
 .tool a:focus,
 .widget a:focus,
@@ -492,7 +483,7 @@ right_aside h4 a:hover,
 #pages-widget-collapse:focus,
 .admin.link a:focus,
 aside h4 a:focus,
-right_aside h4 a:focus,
+#right-aside-section h4 a:focus,
 
 .tool a:active,
 .widget a:active,
@@ -500,7 +491,7 @@ right_aside h4 a:focus,
 #pages-widget-collapse:active,
 .admin.link a:active,
 aside h4 a:active,
-right_aside h4 a:active,
+#right-aside-section h4 a:active,
 
 .tool a:focus-within,
 .widget a:focus-within,
@@ -536,7 +527,7 @@ right_aside h4 a:active,
 li.tool:hover,
 .admin.link:hover,
 aside h4 a:hover,
-right_aside h4 a:hover,
+#right-aside-section h4 a:hover,
 #message-new:hover,
 #sidebar-photos-albums li:hover,
 .photos-upload-link:hover,
@@ -559,7 +550,7 @@ right_aside h4 a:hover,
 li.tool:focus,
 .admin.link:focus,
 aside h4 a:focus,
-right_aside h4 a:focus,
+#right-aside-section h4 a:focus,
 #message-new:focus,
 #sidebar-photos-albums li:focus,
 .photos-upload-link:focus,
@@ -582,7 +573,7 @@ right_aside h4 a:focus,
 li.tool:active,
 .admin.link:active,
 aside h4 a:active,
-right_aside h4 a:active,
+#right-aside-section h4 a:active,
 #message-new:active,
 #sidebar-photos-albums li:active,
 .photos-upload-link:active,
@@ -606,7 +597,7 @@ right_aside h4 a:active,
 li.tool:focus-within,
 .admin.link:focus-within,
 aside h4 a:focus-within,
-right_aside h4 a:focus-within,
+#right-aside-section h4 a:focus-within,
 #message-new:focus-within,
 #sidebar-photos-albums li:focus-within,
 .photos-upload-link:focus-within {
@@ -659,7 +650,7 @@ right_aside h4 a:focus-within,
 	display: inline-block;
 }
 
-a.nets-link, .side-link a, #sidebar-new-circle a, #sidebar-edit-circles a, #sidebar-new-group a, a.savedsearchterm,a.fileas-link, aside h4 a, right_aside h4 a {
+a.nets-link, .side-link a, #sidebar-new-circle a, #sidebar-edit-circles a, #sidebar-new-group a, a.savedsearchterm,a.fileas-link, aside h4 a, #right-aside-section h4 a {
 	display: block;
 	color: #737373;
 }
@@ -808,10 +799,6 @@ nav#topbar-first a:active {
 	padding-top: 8px;
 }
 
-nav#topbar-first ul {
-	margin: 0px;
-	padding: 0px 10px;
-}
 nav#topbar-first ul li {
 	list-style: none;
 	margin: 0px;
@@ -940,7 +927,6 @@ nav#topbar-first #nav-help-link,
 nav#topbar-first #nav-search-link,
 nav#topbar-first #nav-directory-link,
 nav#topbar-first #nav-apps-link,
-nav#topbar-first #nav-apps-link,
 nav#topbar-first #nav-login-link,
 nav#topbar-first #nav-logout-link,
 nav#topbar-first #nav-messages-linkmenu,
@@ -1028,6 +1014,8 @@ nav#topbar-first #nav-notifications-linkmenu.on .icon-bell:before {
 
 /* nav#topbar-first #nav-community-link {*/
 nav#topbar-first ul {
+	margin: 0px;
+	padding: 0px 10px;
 	margin-left: 210px;
 }
 
@@ -1062,7 +1050,6 @@ nav#topbar-first ul.menu-popup,
 ul.menu-popup {
 	visibility:hidden;
 	opacity:0;
-	z-index:1;
 	transition:all 0.2s ease-in-out;
 	/* display: none; */
 	position: absolute;
@@ -1247,7 +1234,7 @@ img.acpopup-img {
 	overflow: hidden;
 }
 
-right_aside {
+#right-aside-section {
 	display: none;
 	vertical-align: top;
 	width: 185px;
@@ -1308,7 +1295,7 @@ aside .vcard .title {
 aside .vcard dl {
 	height: auto;
 	overflow: auto;
-	word-break: break-word;
+	overflow-wrap: break-word;
 }
 aside .vcard .account-type {
 	margin-bottom: 13px;
@@ -1383,7 +1370,7 @@ aside #profiles-menu {
 aside #search-text,
 aside #side-follow-url,
 aside #side-peoplefind-url,
-right_aside #side-peoplefind-url {
+#right-aside-section #side-peoplefind-url {
 	width: 65%;
 	float: left;
 	padding-left: 10px;
@@ -1398,7 +1385,7 @@ right_aside #side-peoplefind-url {
 }
 
 aside #side-peoplefind-submit,
-right_aside #side-peoplefind-submit {
+#right-aside-section #side-peoplefind-submit {
 	float: left;
 }
 
@@ -1406,7 +1393,7 @@ right_aside #side-peoplefind-submit {
 	clear: both;
 }
 
-aside h4, right_aside h4 {
+aside h4, #right-aside-section h4 {
 	margin-bottom: 0px;
 	margin-top: 0px;
 	font-size: 1.17em;
@@ -1621,6 +1608,8 @@ section.minimal {
 	display: table;
 	width: 745px;
 	width: calc(100% - 10px);
+	/* padding-right: 30px; */
+	padding-right: 0px;
 }
 
 .wall-item-content hr {
@@ -1678,12 +1667,8 @@ section.minimal {
 	text-align: left;
 	width: 80px;
 }
-.wall-item-container {
-	/* padding-right: 30px; */
-	padding-right: 0px;
-}
 .wall-item-container .wall-item-ago {
-	word-wrap: break-word;
+	overflow-wrap: break-word;
 	width: 50px;
 	margin-left: 10px;
 	color: #999;
@@ -1715,8 +1700,7 @@ section.minimal {
 .wall-item-container .wall-item-content {
 	/* font-size: 14px; */
 	max-width: 660px;
-	word-wrap: break-word;
-	word-break: break-word;
+	overflow-wrap: break-word;
 	/* line-height: 1.36; */
 	padding-bottom: 6px;
 }
@@ -1843,7 +1827,7 @@ section.minimal {
 	transition: all 0.2s ease-in-out;
 	/* color: darkblue; */
 	/* color: #3E3E8C; */
-	word-break: break-word;
+	overflow-wrap: break-word;
 }
 
 .toplevel_item:hover .fakelink,
@@ -1924,6 +1908,8 @@ section.minimal {
 	width: 665px;
 	width: calc(100% - 90px);
 	border-bottom: 1px solid hsl(198, 21%, 79%);
+	top: 15px !important;
+	left: 15px !important;
 }
 .wall-item-container.thread_level_2 {
 	margin-left: 80px;
@@ -1984,10 +1970,6 @@ section.minimal {
 	margin-left: 16px;
 	/* background: url(../../../images/icons/22/user.png) no-repeat center center; */
 
-}
-.wall-item-container.comment {
-	top: 15px !important;
-	left: 15px !important;
 }
 .wall-item-container.comment .wall-item-links {
 	padding-left: 12px;
@@ -2105,7 +2087,7 @@ section.minimal {
 	margin-top: 3px;
 	color: #9c9c9c;
 }
-profile-jot-form #jot-title, #profile-jot-form #jot-category {
+#profile-jot-form #jot-title, #profile-jot-form #jot-category {
 	border-radius: 5px 5px 5px 5px;
 	font-weight: bold;
 	height: 20px;
@@ -2121,6 +2103,12 @@ profile-jot-form #jot-title, #profile-jot-form #jot-category {
 }
 #profile-jot-form #jot-title:-moz-placeholder {
 	font-weight: normal;
+}
+#profile-jot-form #jot-title:hover,
+#profile-jot-form #jot-title:focus,
+#profile-jot-form #jot-title:active,
+#profile-jot-form #jot-title:focus-within {
+	border: 1px solid #999999;
 }
 #profile-jot-form #profile-jot-text_parent #profile-jot-text_tbl {
 /*  width: 785px; */
@@ -2175,11 +2163,8 @@ profile-jot-form #jot-title, #profile-jot-form #jot-category {
 	height: 25px;
 	background: #FFFFFF;
 	border: 2px solid #364e59;
-	height: 25px;
-	width: 25px;
 	overflow: hidden;
 	padding: 1px;
-	position: absolute !important;
 	top: 40px;
 	left: 30px;
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
@@ -2233,153 +2218,17 @@ profile-jot-form #jot-title, #profile-jot-form #jot-category {
 	width: 80px;
 	height: 80px;
 }
-.contact-wrapper {
-	left: 0px;
-	top: 63px;
-}
-.contact-photo {
-	width: 48px;
-	height: 48px;
-}
-.contact-photo img {
-	width: 48px;
-	height: 48px;
-}
-.contact-name {
-	/* text-align: center; */
-	/*font-weight: bold;*/
-	font-size: 12px;
-}
-.contact-details {
-	color: #999999;
-}
 /* editor */
 .jothidden {
 	display: none;
 }
-#jot {
-	width: 785px;
-	margin: 0px 2em 20px 0px;
-}
-#jot .profile-jot-text {
-	height: 1.2em;
-	width: 99%;
-	font-size: 10px;
-	color: #999999;
-	border: 1px solid #DDD;
-	padding: 0.3em;
-}
-#jot #jot-tools {
-	margin: 0px;
-	padding: 0px;
-	height: 40px;
-	width: 783px;
-	background-color: #0e232e;
-	border-bottom: 2px solid #9eabb0;
-}
-#jot #jot-tools li {
-	list-style: none;
-	float: left;
-	width: 80px;
-	height: 40px;
-	border-bottom: 2px solid #9eabb0;
-}
-#jot #jot-tools li a {
-	display: block;
-	color: #cccccc;
-	width: 100%;
-	height: 40px;
-	text-align: center;
-	line-height: 40px;
-	overflow: hidden;
-}
-#jot #jot-tools li:hover,
-#jot #jot-tools li:focus,
-#jot #jot-tools li:active,
-#jot #jot-tools li:focus-within {
-	background-color: #364e59;
-	border-bottom: 2px solid #bdcdd4;
-}
-#jot #jot-tools li.perms {
-	float: right;
-	width: 40px;
-}
-#jot #jot-tools li.perms a.unlock {
-	width: 30px;
-	border-left: 10px solid #cccccc;
-	background-color: #cccccc;
-	background-position: left center;
-}
-#jot #jot-tools li.perms a.lock {
-	width: 30px;
-	border-left: 10px solid #666666;
-	background-color: #666666;
-}
-#jot #jot-tools li.submit {
-	float: right;
-	background-color: #cccccc;
-	border-bottom: 2px solid #cccccc;
-	border-right: 1px solid #666666;
-	border-left: 1px solid #666666;
-}
-#jot #jot-tools li.submit input {
-	border: 0px;
-	margin: 0px;
-	padding: 0px;
-	background-color: #cccccc;
-	color: #666666;
-	width: 80px;
-	height: 40px;
-	line-height: 40px;
-}
-#jot #jot-tools li.submit input:hover,
-#jot #jot-tools li.submit input:focus,
-#jot #jot-tools li.submit input:active,
-#jot #jot-tools li.submit input:focus-within {
-	background-color: #bdcdd4;
-	color: #666666;
-}
-#jot #jot-tools li.loading {
-	float: right;
-	background-color: #ffffff;
-	width: 20px;
-	vertical-align: center;
-	text-align: center;
-	border-top: 2px solid #9eabb0;
-	height: 38px;
-}
-#jot #jot-tools li.loading img {
-	margin-top: 10px;
-}
-/* #jot */
 #jot-title {
-	border: 0px;
 	margin: 0px;
 	height: 20px;
 	width: 700px;
 	max-width: 100%;
 	font-weight: bold;
 	border: 1px solid #ffffff;
-}
-#jot #jot-title:-webkit-input-placeholder {
-	font-weight: normal;
-}
-#jot #jot-title:-moz-placeholder {
-	font-weight: normal;
-}
-#jot #jot-title:hover,
-#jot #jot-title:focus,
-#jot #jot-title:active,
-#jot #jot-title:focus-within {
-	border: 1px solid #999999;
-}
-#jot #character-counter {
-	width: 80px;
-	float: right;
-	text-align: right;
-	height: 20px;
-	line-height: 20px;
-	padding-right: 20px;
 }
 
 #profile-jot-submit {
@@ -2530,9 +2379,6 @@ ul.tabs a {
 .comment-edit-submit-wrapper .fakelink {
 	padding: 2px 7px 2px 7px;
 	color: black;
-}
-
-.comment-edit-submit-wrapper .fakelink {
 	/* border: 1px solid lightgray; */
 	background: #F2F2F2;
 	margin-top: 2px;
@@ -2633,19 +2479,20 @@ ul.tabs li .active, span.pager_current a {
 	overflow: auto;
 	width: 100%;
 }
-.field label {
-	float: left;
-	width: 200px;
-}
-.field input, .field textarea {
-	max-width: 400px;
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="number"],
+.field textarea {
+	max-width: 100%;
+	width: 100%;
+	box-sizing: border-box;
 }
 .field textarea {
 	height: 100px;
 }
 .field .field_help {
 	display: block;
-	margin-left: 200px;
 	color: #666666;
 }
 .field .hidden {
@@ -2653,6 +2500,39 @@ ul.tabs li .active, span.pager_current a {
 }
 .field.radio .field_help {
 	margin-left: 0px;
+}
+.settings-section .field.custom label,
+.settings-subsection .field.custom label,
+.settings-section .field.select label,
+.settings-subsection .field.select label {
+	display: block;
+	font-weight: bold;
+}
+.settings-section .field.custom select,
+.settings-subsection .field.custom select,
+.settings-section .field.select select,
+.settings-subsection .field.select select {
+	width: 100%;
+	box-sizing: border-box;
+}
+#profpic-left {
+	width: 50%;
+	float: left;
+}
+#profpic-right{
+	width: 50%;
+	float: right;
+}
+.settings-row::after {
+	content: '';
+	display: block;
+	clear: both;
+}
+@media (max-width: 720px){
+	#profpic-left, #profpic-right {
+		width: auto;
+		float: none;
+	}
 }
 aside form {
 	overflow-x: hidden;
@@ -2855,12 +2735,6 @@ aside #id_password {
 	height: 80px;
 }
 /* profile match wrapper */
-.profile-match-wrapper {
-	float: left;
-	width: 90px;
-	height: 90px;
-	margin-bottom: 20px;
-}
 .profile-match-wrapper .contact-photo {
 	width: 80px;
 	height: 80px;
@@ -2869,11 +2743,6 @@ aside #id_password {
 	width: 80px;
 	height: 80px;
 }
-.profile-match-wrapper {
-	left: 0px;
-	top: 63px;
-}
-
 .contact-photo-menu-button {
 	position: relative;
 	background-image: url("../../../images/icons/16/menu.png");
@@ -2883,7 +2752,8 @@ aside #id_password {
 	padding: 0px;
 	width: 16px;
 	height: 16px;
-	top: -20px; left:0px;
+	top: -20px;
+	left: -2px;
 	overflow: hidden;
 	text-indent: 40px;
 	display: none;
@@ -3012,59 +2882,6 @@ a.mail-list-link {
 *}
 */
 
-.mail-list-outside-wrapper-end {
-	clear: both;
-}
-
-.mail-list-outside-wrapper {
-	margin-top: 30px;
-}
-
-.mail-list-delete-wrapper {
-	float: right;
-	margin-right: 30px;
-	margin-top: 15px;
-}
-
-.mail-list-delete-icon {
-	border: none;
-}
-
-.mail-conv-sender,
-.mail-conv-detail {
-	float: left;
-}
-.mail-conv-detail {
-	margin-left: 20px;
-	width: 500px;
-}
-
-.mail-conv-subject {
-	font-size: 1.4em;
-	margin: 10px 0;
-}
-
-.mail-conv-outside-wrapper-end {
-	clear: both;
-}
-
-.mail-conv-outside-wrapper {
-	margin-top: 30px;
-}
-
-.mail-conv-delete-wrapper {
-	float: right;
-	margin-right: 30px;
-	margin-top: 15px;
-}
-.mail-conv-break {
-	clear: both;
-}
-
-.mail-conv-delete-icon {
-	border: none;
-}
-
 
 /* ========== */
 /* = Events = */
@@ -3149,7 +2966,54 @@ a.mail-list-link {
 	margin-bottom: 10px;
 	margin-top: 20px;
 }
-
+.settings-section,
+.settings-subsection {
+	background-color: #fff;
+	margin-bottom: 10px;
+	border-radius: 4px;
+	padding: 10px;
+}
+	details[open].settings-section,
+	.settings-section:open {
+		padding-bottom: 20px;
+	}
+.settings-heading {
+	font-size: 24.5px;
+	list-style: none;
+}
+.settings-subheading {
+	font-size: 20.5px;
+	list-style: none;
+}
+	details[open].settings-section > summary,
+	details[open].settings-subsection > summary {
+		margin-bottom: 10px;
+	}
+	details.settings-section > summary::before,
+	details.settings-subsection > summary::before {
+		font-family: remixicon;
+		content: "\ea6e";
+		padding-right: 5px;
+	}
+	details[open].settings-section > summary::before,
+	details[open].settings-subsection > summary::before {
+		font-family: remixicon;
+		content: "\ea4e";
+		padding-right: 5px;
+	}
+	details[open].settings-section::details-content,
+	details[open].settings-subsection::details-content {
+		animation: sweep .5s ease-in-out;
+		padding-bottom: 10px;
+	}
+.settings-submit-wrapper {
+	padding-top: 10px;
+	clear: both;
+}
+@keyframes sweep {
+	0% {opacity: 0; margin-left: -10px}
+	100% {opacity: 1; margin-left: 0px}
+}
 .settings-block {
 	border-bottom: 1px solid #898989;
 	/* border: 1px solid #AAA; */
@@ -3215,6 +3079,7 @@ a.mail-list-link {
 	padding: 10px;
 	width: 120px;
 	height: 120px;
+	margin-bottom: 20px;
 }
 #profile-match-wrapper-end {
 	clear: both;
@@ -3224,40 +3089,6 @@ a.mail-list-link {
 /* = Directory = */
 /* ============= */
 /* contacts menu */
-.contact-photo-wrapper {
-	position: relative;
-}
-.contact-photo {
-	width: 48px;
-	height: 48px;
-	overflow: hidden;
-	display: block;
-}
-.contact-photo img {
-	width: 48px;
-	height: 48px;
-}
-.contact-photo-menu-button {
-	display: none;
-	/* position: absolute; */
-	/* position: absolute; */
-	left: -2px;
-	top: -20px;
-}
-.contact-wrapper {
-	float: left;
-	width: 90px;
-	height: 90px;
-	margin-bottom: 15px;
-}
-.contact-wrapper .contact-photo {
-	width: 80px;
-	height: 80px;
-}
-.contact-wrapper .contact-photo img {
-	width: 80px;
-	height: 80px;
-}
 .contact-wrapper .contact-photo-menu-button {
 	left: 0px;
 	top: 63px;
@@ -3710,6 +3541,7 @@ img.photo-album-photo {
 
 #profile-edit-wrapper {
 	line-height: 30px;
+	margin-bottom: 15px;
 }
 #profile-edit-wrapper .field {
 	margin-bottom:0;
@@ -3722,10 +3554,6 @@ img.photo-album-photo {
 #profile-edit-wrapper #profile-edit-dob select {
 	width:auto;
 }
-#profile-edit-wrapper,
-#profile-edit-wrapper .toggle-section-content {
-	margin-bottom:15px;
-}
 .profile-edit-submit-wrapper {
 	margin-top:15px;
 }
@@ -3734,10 +3562,6 @@ img.photo-album-photo {
 	padding:15px;
 	width:auto;
 	border:1px solid #511919;
-}
-#profile-edit-wrapper .toggle-section-content {
-	background:#ededed;
-	padding:5px;
 }
 
 .btn {
@@ -3811,7 +3635,7 @@ img.photo-album-photo {
 }
 
 /* upload/select popup */
-fbrowser.photo .photo-album-image-wrapper { margin-left: 10px; }
+.fbrowser.photo .photo-album-image-wrapper { margin-left: 10px; }
 #message-preview { margin-top: 15px; }
 #message-preview span { width: 100%; }
 #message-preview .mail-count, #message-preview .mail-delete { display:none; }

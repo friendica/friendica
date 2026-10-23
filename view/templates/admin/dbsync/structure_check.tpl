@@ -7,8 +7,9 @@
 
 <div id="adminpage">
 	<h2>{{$banner}}</h2>
-
+	<div class="settings-section">
 	<p><a href="{{$baseurl}}/admin/dbsync/check">{{$check}}</a></p>
 
 	<hr />
+	</div>
 </div>

@@ -736,7 +736,8 @@ return [
 			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-origin`.`uri-id`
-			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`",
+			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`
+			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`",
 	],
 	"post-user-view" => [
 		"fields" => [

@@ -55,10 +55,10 @@ class Image implements \Stringable
 
 		if (Images::isSupportedMimeType($type)) {
 			$this->originType = $this->outputType = Images::getImageTypeByMimeType($type);
-		} elseif (($type == '') || str_starts_with($type, 'image/') || substr($type, 0, 12) == ' application/') {
+		} elseif (($type == '') || str_starts_with($type, 'image/') || str_starts_with($type, 'application/')) {
 			$this->originType = IMAGETYPE_UNKNOWN;
-			$this->outputType = IMAGETYPE_WEBP;
-			DI::logger()->debug('Unhandled image mime type, use WebP instead', ['type' => $type, 'filename' => $this->filename, 'size' => strlen($data)]);
+			$this->outputType = Images::getPreferredImageType();
+			DI::logger()->debug('Unhandled image mime type, use fallback instead', ['type' => $type, 'outputType' => $this->outputType, 'filename' => $this->filename, 'size' => strlen($data)]);
 		} else {
 			DI::logger()->debug('Unhandled mime type', ['type' => $type, 'filename' => $this->filename, 'size' => strlen($data)]);
 			$this->valid = false;
@@ -741,6 +741,10 @@ class Image implements \Stringable
 
 			case IMAGETYPE_WEBP:
 				@imagewebp($this->image, $stream, DI::config()->get('system', 'jpeg_quality'));
+				break;
+
+			case IMAGETYPE_AVIF:
+				@imageavif($this->image, $stream, DI::config()->get('system', 'jpeg_quality'));
 				break;
 
 			case IMAGETYPE_BMP:

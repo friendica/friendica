@@ -30,7 +30,7 @@ steps:
     commands:
       - git config --global user.email "no-reply@friendi.ca"
       - git config --global user.name "Friendica"
-      - git clone https://github.com/friendica/friendica-addons.git addon
+      - git clone https://git.friendi.ca/friendica/friendica-addons.git addon
       - cd addon/
       - git checkout $CI_COMMIT_BRANCH
   restore_cache:

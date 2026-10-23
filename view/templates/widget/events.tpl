@@ -12,7 +12,7 @@
   </h3>
 
   <ul class="sidebar-calendar-export-ul">
-    <li class="sidebar-calendar-export-li"><a href="calendar/export/{{$user}}/ical">{{$export_ical}}</a></li>
-    <li class="sidebar-calendar-export-li"><a href="calendar/export/{{$user}}/csv">{{$export_csv}}</a></li>
+    <li class="sidebar-calendar-export-li"><a href="calendar/export/{{$user}}/ical" download>{{$export_ical}}</a></li>
+    <li class="sidebar-calendar-export-li"><a href="calendar/export/{{$user}}/csv" download>{{$export_csv}}</a></li>
   </ul>
 </nav>

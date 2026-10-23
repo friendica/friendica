@@ -95,4 +95,16 @@ class Quote
 	{
 		return DBA::exists('post-quote', ['quote-uri-id' => $uri_id]);
 	}
+
+	/**
+	 * Check if the given post quotes the given quoted post
+	 *
+	 * @param integer $uri_id       URI ID of the quoting post
+	 * @param integer $quote_uri_id URI ID of the quoted post
+	 * @return boolean is quoting?
+	 */
+	public static function isQuoting(int $uri_id, int $quote_uri_id): bool
+	{
+		return DBA::exists('post-quote', ['uri-id' => $uri_id, 'quote-uri-id' => $quote_uri_id]);
+	}
 }

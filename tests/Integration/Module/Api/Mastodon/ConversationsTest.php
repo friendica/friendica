@@ -36,26 +36,8 @@ final class ConversationsTest extends ApiTestCase
 
 	public function testApiConversationShowWithId(): void
 	{
-		DI::dba()->insert('conv', [
-			'id'      => 1,
-			'guid'    => 'conversation-1',
-			'recips'  => 'sender@example.org;recipient@example.org',
-			'uid'     => 42,
-			'creator' => 'sender@example.org',
-			'created' => '2020-01-01 12:00:00',
-			'updated' => '2020-01-01 12:00:00',
-			'subject' => 'First conversation',
-		]);
-		DI::dba()->insert('conv', [
-			'id'      => 2,
-			'guid'    => 'conversation-2',
-			'recips'  => 'sender@example.org;recipient@example.org',
-			'uid'     => 42,
-			'creator' => 'sender@example.org',
-			'created' => '2020-01-01 12:00:00',
-			'updated' => '2020-01-01 12:00:00',
-			'subject' => 'Second conversation',
-		]);
+		$this->insertMail(1);
+		$this->insertMail(2);
 
 		$module = $this->createModule();
 
@@ -69,34 +51,14 @@ final class ConversationsTest extends ApiTestCase
 
 			self::assertCount(2, $conversations);
 			self::assertEquals(['2', '1'], array_column($conversations, 'id'));
-			self::assertSame([], $conversations[0]->accounts);
 			self::assertFalse($conversations[0]->unread);
-			self::assertNull($conversations[0]->last_status);
 		}
 	}
 
 	public function testApiConversationShowWithMaxId(): void
 	{
-		DI::dba()->insert('conv', [
-			'id'      => 1,
-			'guid'    => 'conversation-1',
-			'recips'  => 'sender@example.org;recipient@example.org',
-			'uid'     => 42,
-			'creator' => 'sender@example.org',
-			'created' => '2020-01-01 12:00:00',
-			'updated' => '2020-01-01 12:00:00',
-			'subject' => 'First conversation',
-		]);
-		DI::dba()->insert('conv', [
-			'id'      => 2,
-			'guid'    => 'conversation-2',
-			'recips'  => 'sender@example.org;recipient@example.org',
-			'uid'     => 42,
-			'creator' => 'sender@example.org',
-			'created' => '2020-01-01 12:00:00',
-			'updated' => '2020-01-01 12:00:00',
-			'subject' => 'Second conversation',
-		]);
+		$this->insertMail(1);
+		$this->insertMail(2);
 
 		$module = $this->createModule();
 
@@ -116,26 +78,8 @@ final class ConversationsTest extends ApiTestCase
 
 	public function testApiConversationShowWithMinId(): void
 	{
-		DI::dba()->insert('conv', [
-			'id'      => 1,
-			'guid'    => 'conversation-1',
-			'recips'  => 'sender@example.org;recipient@example.org',
-			'uid'     => 42,
-			'creator' => 'sender@example.org',
-			'created' => '2020-01-01 12:00:00',
-			'updated' => '2020-01-01 12:00:00',
-			'subject' => 'First conversation',
-		]);
-		DI::dba()->insert('conv', [
-			'id'      => 2,
-			'guid'    => 'conversation-2',
-			'recips'  => 'sender@example.org;recipient@example.org',
-			'uid'     => 42,
-			'creator' => 'sender@example.org',
-			'created' => '2020-01-01 12:00:00',
-			'updated' => '2020-01-01 12:00:00',
-			'subject' => 'Second conversation',
-		]);
+		$this->insertMail(1);
+		$this->insertMail(2);
 
 		$module = $this->createModule();
 
@@ -167,6 +111,30 @@ final class ConversationsTest extends ApiTestCase
 		} catch (EarlyExitException $e) { // @phpstan-ignore catch.neverThrown
 			self::assertEquals(401, $e->getResponse()->getStatusCode());
 		}
+	}
+
+	/**
+	 * Inserts a single message that forms a conversation on its own, since conversations are grouped by the parent URI.
+	 */
+	private function insertMail(int $id): void
+	{
+		DI::dba()->insert('mail', [
+			'id'            => $id,
+			'uid'           => 42,
+			'author-id'     => 48,
+			'contact-id'    => 44,
+			'uri-id'        => 44,
+			'parent-uri'    => 'conversation-' . $id,
+			'parent-uri-id' => 44,
+			'thr-parent-id' => 44,
+			'guid'          => 'mail-' . $id,
+			'from-name'     => 'Tester',
+			'from-url'      => 'https://friendica.local/profile/friendcontact',
+			'title'         => 'Conversation ' . $id,
+			'body'          => 'Message ' . $id,
+			'seen'          => true,
+			'created'       => '2020-01-01 12:00:00',
+		]);
 	}
 
 	private function createModule(): Conversations

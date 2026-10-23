@@ -79,7 +79,7 @@ class ListTimeline extends BaseApi
 		foreach ($items as $item) {
 			try {
 				$status = DI::mstdnStatus()->createFromUriId($item['uri-id'], $uid);
-				$this->updateBoundaries($status, $item, $request['friendica_order']);
+				$this->updateBoundaries($status, ['uri-id' => $item['paging-id'] ?? $item['uri-id']] + $item, $request['friendica_order']);
 				$statuses[] = $status;
 			} catch (\Throwable $th) {
 				$this->logger->info('Post not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'error' => $th]);
@@ -110,11 +110,16 @@ class ListTimeline extends BaseApi
 		$condition1 = $this->addPagingConditions($request, $condition1);
 		$condition2 = $this->addPagingConditions($request, $condition2);
 
-		$sql1 = "SELECT `uri-id` FROM `post-thread-user-view` WHERE " . array_shift($condition1);
-		$sql2 = "SELECT `thr-parent-id` AS `uri-id` FROM `post-user-view` WHERE " . array_shift($condition2);
+		$sql1 = "SELECT `uri-id`, `uri-id` AS `paging-id` FROM `post-thread-user-view` WHERE " . array_shift($condition1);
+		$sql2 = "SELECT `thr-parent-id` AS `uri-id`, `uri-id` AS `paging-id` FROM `post-user-view` WHERE " . array_shift($condition2);
+
+		$params = $this->buildOrderAndLimitParams($request);
+		if ($request['friendica_order'] == TimelineOrderByTypes::ID) {
+			$params['order'] = empty($request['min_id']) ? ['paging-id' => true] : ['paging-id'];
+		}
 
 		$condition = array_merge($condition1, $condition2);
-		$sql       = $sql1 . " UNION " . $sql2 . " GROUP BY `uri-id` " . DBA::buildParameter($this->buildOrderAndLimitParams($request));
+		$sql       = "SELECT `uri-id`, MAX(`paging-id`) AS `paging-id` FROM (" . $sql1 . " UNION " . $sql2 . ") AS `timeline` GROUP BY `uri-id`" . DBA::buildParameter($params);
 
 		return Post::toArray(DBA::p($sql, $condition));
 	}

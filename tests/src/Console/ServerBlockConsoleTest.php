@@ -232,6 +232,40 @@ CONS;
 	}
 
 	/**
+	 * Test blockedservers clear command
+	 */
+	public function testClearBlockedServers(): void
+	{
+		$this->blocklistMock
+			->shouldReceive('clear')
+			->andReturn(true)
+			->once();
+
+		$console = new ServerBlock($this->blocklistMock, $this->consoleArgv);
+		$console->setArgument(0, 'clear');
+		$txt = $this->dumpExecute($console);
+
+		self::assertEquals('The block list was cleared' . "\n", $txt);
+	}
+
+	/**
+	 * Test blockedservers clear command without save
+	 */
+	public function testClearBlockedServersNoSave(): void
+	{
+		$this->blocklistMock
+			->shouldReceive('clear')
+			->andReturn(false)
+			->once();
+
+		$console = new ServerBlock($this->blocklistMock, $this->consoleArgv);
+		$console->setArgument(0, 'clear');
+		$txt = $this->dumpExecute($console);
+
+		self::assertEquals("Couldn't clear the block list" . "\n", $txt);
+	}
+
+	/**
 	 * Test the blockedservers help
 	 */
 	public function testBlockedServersHelp(): void
@@ -246,12 +280,14 @@ Usage
     bin/console serverblock [-h|--help|-?] [-v]
     bin/console serverblock add <pattern> <reason> [-h|--help|-?] [-v]
     bin/console serverblock remove <pattern> [-h|--help|-?] [-v]
+    bin/console serverblock clear [-h|--help|-?] [-v]
     bin/console serverblock export <filename>
     bin/console serverblock import <filename>
 
 Description
     With this tool, you can list the current blocked server domain patterns
     or you can add / remove a blocked server domain pattern from the list.
+    The clear command removes the whole block list at once.
     Using the export and import options you can share your server blocklist
     with other node admins by CSV files.
 

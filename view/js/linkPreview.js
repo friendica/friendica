@@ -15,6 +15,13 @@
  */
 (function ($) {
 	$.fn.linkPreview = function (options) {
+		// A second instance on the same textarea would reset "has_attachment"
+		// of the already displayed preview, so the attachment gets lost on submit.
+		var instance = $(this).data('linkPreview');
+		if (instance) {
+			return instance;
+		}
+
 		var opts = jQuery.extend({}, $.fn.linkPreview.defaults, options);
 
 		var id = $(this).attr('id');
@@ -776,7 +783,7 @@
 		 * @returns {void}
 		 */
 		var destroy = function() {
-			$('#' + id).unbind();
+			$('#' + id).unbind().removeData('linkPreview');
 			$('#preview_' + id).remove();
 			binurl;
 			block = false;
@@ -809,7 +816,7 @@
 		// Initialize LinkPreview
 		init();
 
-		return {
+		instance = {
 			// make crawlText() accessable from the outside.
 			crawlText: function(text) {
 				crawlText(text);
@@ -821,6 +828,9 @@
 				destroy();
 			}
 		};
+		$('#' + id).data('linkPreview', instance);
+
+		return instance;
 	};
 
 	$.fn.linkPreview.defaults = {

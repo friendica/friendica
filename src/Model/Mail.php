@@ -22,6 +22,36 @@ use Friendica\Util\DateTimeFormat;
 class Mail
 {
 	/**
+	 * Get the messages of a thread in their sequence.
+	 *
+	 * In the mail table every reply points to the first message of the thread.
+	 * For APIs that need a proper chain the predecessor of a message is the message before it.
+	 *
+	 * @param int $uid         User id
+	 * @param int $parentUriId URI id of the thread
+	 * @return array[] List of ['uri-id' => int, 'author-id' => int, 'predecessor' => int|null, 'predecessor-author-id' => int|null]
+	 */
+	public static function getThread(int $uid, int $parentUriId): array
+	{
+		$thread   = [];
+		$previous = null;
+
+		$mails = DBA::select('mail', ['uri-id', 'author-id'], ['parent-uri-id' => $parentUriId, 'uid' => $uid], ['order' => ['id']]);
+		while ($mail = DBA::fetch($mails)) {
+			$thread[] = [
+				'uri-id'                => $mail['uri-id'],
+				'author-id'             => $mail['author-id'],
+				'predecessor'           => $previous['uri-id']    ?? null,
+				'predecessor-author-id' => $previous['author-id'] ?? null,
+			];
+			$previous = $mail;
+		}
+		DBA::close($mails);
+
+		return $thread;
+	}
+
+	/**
 	 * Insert private message
 	 *
 	 * @param array $msg

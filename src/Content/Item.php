@@ -428,7 +428,7 @@ class Item
 				$this->l10n->t('View Profile')                                => $profile_link,
 				$this->l10n->t('View Photos')                                 => $photos_link,
 				$this->l10n->t('Posts')                                       => $posts_link,
-				$this->l10n->t('View Contact')                                => $contact_url,
+				$this->l10n->t('Settings')                                    => $contact_url,
 				$this->l10n->t('Message')                                     => $pm_url,
 				$this->l10n->t('Collapse')                                    => $collapse_link,
 				$this->l10n->t('Ignore user')                                 => $ignore_link,
@@ -1025,9 +1025,9 @@ class Item
 		} else {
 			Attach::setPermissionFromBody($post);
 		}
-		if (preg_match("/\[attachment\](.*?)\[\/attachment\]/ism", (string) $post['body'], $matches)) {
-			$post['body'] = preg_replace("/\[attachment].*?\[\/attachment\]/ism", PageInfo::getFooterFromUrl($matches[1]), (string) $post['body']);
-		}
+		$post['body'] = preg_replace_callback("/\[attachment\](.*?)\[\/attachment\]/ism", function ($matches) {
+			return PageInfo::getFooterFromUrl($matches[1]);
+		}, (string) $post['body']);
 
 		// Convert links with empty descriptions to links without an explicit description
 		$post['body'] = trim((string) preg_replace('#\[url=([^\]]*?)\]\[/url\]#ism', '[url]$1[/url]', (string) $post['body']));
@@ -1483,7 +1483,7 @@ class Item
 			return trim($text);
 		};
 
-		$summary_norm = $normalize($summary ?? '');
+		$summary_norm = $normalize(BBCode::toPlaintext($summary ?? '', false));
 		if ($summary_norm === '') {
 			return false;
 		}

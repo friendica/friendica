@@ -1926,7 +1926,8 @@ class DFRN
 
 		// Check if the message is wanted
 		if (!self::isSolicitedMessage($item, $importer)) {
-			DBA::delete('item-uri', ['uri' => $item['uri']]);
+			// The item-uri can be in use by a parallel insert, ExpirePosts removes it once it is unused.
+			DI::logger()->notice('Unsolicited message dropped', ['uri-id' => $item['uri-id'], 'uri' => $item['uri']]);
 			return;
 		}
 

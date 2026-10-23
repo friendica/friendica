@@ -11,9 +11,11 @@
 	var ispublic = "{{$ispublic nofilter}}";
 
 
-	$(document).ready(function() {
+	window.onDocumentReady('body', function() {
 
-		$('#contact_allow, #contact_deny, #circle_allow, #circle_deny').change(function() {
+		$('#contact_allow, #contact_deny, #circle_allow, #circle_deny')
+			.off('change.photos-head')
+			.on('change.photos-head', function() {
 			var selstr;
 			$('#contact_allow option:selected, #contact_deny option:selected, #circle_allow option:selected, #circle_deny option:selected').each( function() {
 				selstr = $(this).html();

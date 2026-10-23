@@ -274,7 +274,12 @@ class Display extends BaseSettings
 		$itemspage_mobile_network = intval($this->pConfig->get($uid, 'system', 'itemspage_mobile_network'));
 		$itemspage_mobile_network = (($itemspage_mobile_network > 0 && $itemspage_mobile_network < 101) ? $itemspage_mobile_network : $this->config->get('system', 'itemspage_network_mobile'));
 
-		$update_content         = $this->pConfig->get($uid, 'system', 'update_content') ?? false;
+		$update_content  = (int) $this->pConfig->get($uid, 'system', 'update_content');
+		$update_contents = [
+			0 => $this->t('Don\'t update'),
+			1 => $this->t('Update at the top of the page'),
+			2 => $this->t('Always update'),
+		];
 		$enable_smile           = !$this->pConfig->get($uid, 'system', 'no_smilies', false);
 		$enable_spa             = $this->pConfig->get($uid, 'system', 'enable_spa', false);
 		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', true);
@@ -465,9 +470,9 @@ class Display extends BaseSettings
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],
 			'$itemspage_mobile_network' => ['itemspage_mobile_network', $this->t('Number of items to display per page when viewed from mobile device:'), $itemspage_mobile_network, $this->t('Maximum of 100 items')],
-			'$update_content'           => ['update_content', $this->t('Regularly update the page content'), $update_content, $this->t('When enabled, new content on network, community and channels are added on top.')],
+			'$update_content'           => ['update_content', $this->t('Regularly update the timeline'), $update_content, $this->t('Controls whether new content on network, community and channels is added on top of the timeline. The display page is never updated automatically.'), $update_contents, false],
 			'$enable_smile'             => ['enable_smile', $this->t('Display emojis'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching emojis.')],
-			'$enable_spa'               => ['enable_spa', $this->t('Enable SPA mode'), $enable_spa, $this->t('Warning - Experimental feature: This may lead to errors or unexpected behaviour. When enabled, supported page requests can use the single page application response.')],
+			'$enable_spa'               => ['enable_spa', $this->t('Enable SPA mode'), $enable_spa, $this->t('Warning - Experimental feature: This may lead to errors or unexpected behaviour. When enabled, supported pages are loaded by replacing only the main content instead of reloading the whole browser page, which makes navigation faster.')],
 			'$infinite_scroll'          => ['infinite_scroll', $this->t('Infinite scroll'), $infinite_scroll, $this->t('Automatic fetch new items when reaching the page end.')],
 			'$enable_smart_threading'   => ['enable_smart_threading', $this->t('Enable Smart Threading'), $enable_smart_threading, $this->t('Enable the automatic suppression of extraneous thread indentation.')],
 			'$enable_dislike'           => ['enable_dislike', $this->t('Display the Dislike feature'), $enable_dislike, $this->t('Display the Dislike button and dislike reactions on posts and comments.')],

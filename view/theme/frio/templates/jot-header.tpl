@@ -6,6 +6,7 @@
   *}}
 
 <script type="text/javascript" src="{{$baseurl}}/view/js/linkPreview.js?v={{$VERSION}}"></script>
+<script type="text/javascript" src="{{$baseurl}}/view/theme/frio/js/jot.js?v={{$VERSION}}"></script>
 
 <script type="text/javascript">
 	var editor = false;
@@ -77,15 +78,16 @@
 		}
 	}
 
-	$(document).ready(function() {
-
+	function initJotHeader() {
 		/* enable editor on focus and click */
-		$("#profile-jot-text").focus(enableOnUser);
-		$("#profile-jot-text").click(enableOnUser);
+		$("#profile-jot-text").off('focus.jot-header').on('focus.jot-header', enableOnUser);
+		$("#profile-jot-text").off('click.jot-header').on('click.jot-header', enableOnUser);
 
 		// When clicking on a group in acl we should remove the profile jot textarea
 		// default value before inserting the group mention
-		$("body").on('click', '#jot-modal .acl-list-item.group', function(){
+		$("body")
+		.off('click.frio-jot', '#jot-modal .acl-list-item.group')
+		.on('click.frio-jot', '#jot-modal .acl-list-item.group', function(){
 			jotTextOpenUI(document.getElementById("profile-jot-text"));
 		});
 
@@ -94,19 +96,23 @@
 		 **/
 
 		/* callback */
-		$('body').on('fbrowser.photo.main', function(e, filename, embedcode, id) {
+		$('body')
+		.off('fbrowser.photo.main')
+		.on('fbrowser.photo.main', function(e, filename, embedcode, id) {
 			///@todo this part isn't ideal and need to be done in a better way
 			jotTextOpenUI(document.getElementById("profile-jot-text"));
 			jotActive();
 			addeditortext(embedcode);
 		})
+		.off('fbrowser.attachment.main')
 		.on('fbrowser.attachment.main', function(e, filename, embedcode, id) {
 			jotTextOpenUI(document.getElementById("profile-jot-text"));
 			jotActive();
 			addeditortext(embedcode);
 		})
 		// Asynchronous jot submission
-		.on('submit', '#profile-jot-form', function (e) {
+		.off('submit.frio-jot', '#profile-jot-form')
+		.on('submit.frio-jot', '#profile-jot-form', function (e) {
 			e.preventDefault();
 
 			// Disable jot submit buttons during processing
@@ -140,9 +146,6 @@
 				// Reset the form for jot reuse in the same page
 				e.target.reset();
 				$('#jot-modal').modal('hide');
-				// Ensure modal backdrop is removed (fixes lingering backdrop issue)
-				$(".modal-backdrop").remove();
-				$("body").removeClass("modal-open");
 				resetFormModifiedFlag(); // Reset formModified after successful submission
 			})
 			.always(function() {
@@ -162,7 +165,7 @@
 				}
 
 				if (isNewPost) {
-					let alertHandler = function() {
+					let newPostHandler = function() {
 						// find our new post (has edit button)
 						let newPostElement = null;
 						$('.toplevel_item').each(function() {
@@ -172,45 +175,52 @@
 							}
 						});
 
+						const yMaxScroll = 1300;
+
 						if (newPostElement) {
-							let postId = newPostElement.attr('id');
-							let alertHtml = '<div id="post-published-alert" class="alert alert-info alert-dismissible" role="alert">' +
-								'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-								aStr.postPublished + ' ' +
-								'<a href="#' + postId + '" class="alert-link" onclick="goToElement(\'' + postId + '\'); return false;">' + aStr.goToPost + '</a>' +
-								'</div>';
+							if (window.scrollY < yMaxScroll) {
+								$('html, body').animate({ scrollTop: 0 }, 400);
+							}
+							else {
+								let postId = newPostElement.attr('id');
+								let alertHtml = '<div id="post-published-alert" class="alert alert-info alert-dismissible" role="alert">' +
+									'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+									aStr.postPublished + ' ' +
+									'<a href="#' + postId + '" class="alert-link" onclick="goToElement(\'' + postId + '\'); return false;">' + aStr.goToPost + '</a>' +
+									'</div>';
 
-							$('#post-published-alert').remove();
-							$('body').append(alertHtml);
+								$('#post-published-alert').remove();
+								$('body').append(alertHtml);
 
-							// auto-dismiss after 5 seconds
-							setTimeout(function() {
-								$('#post-published-alert').fadeOut(400, function() {
-									$(this).remove();
-								});
-							}, 5000);
+								// auto-dismiss after 5 seconds
+								setTimeout(function() {
+									$('#post-published-alert').fadeOut(400, function() {
+										$(this).remove();
+									});
+								}, 5000);
+							}
 						}
 
-						document.removeEventListener('postprocess_liveupdate', alertHandler);
+						document.removeEventListener('postprocess_liveupdate', newPostHandler);
 					};
-					document.addEventListener('postprocess_liveupdate', alertHandler);
+					document.addEventListener('postprocess_liveupdate', newPostHandler);
 				}
 
 				NavUpdate();
 			});
 		});
 
-		$('#wall-image-upload').on('click', function(){
+		$('#wall-image-upload').off('click.frio-jot').on('click.frio-jot', function(){
 			Dialog.doImageBrowser("main");
 			jotActive();
 		});
 
-		$('#wall-file-upload').on('click', function(){
+		$('#wall-file-upload').off('click.frio-jot').on('click.frio-jot', function(){
 			Dialog.doFileBrowser("main");
 			jotActive();
 		});
 
-		$('body').on('click', '.tag .filerm', function(e){
+		$('body').off('click.frio-jot', '.tag .filerm').on('click.frio-jot', '.tag .filerm', function(e){
 			e.preventDefault();
 
 			let t = e.currentTarget
@@ -228,7 +238,9 @@
 				});
 			}
 		});
-	});
+	}
+
+	window.onDocumentReady('body', initJotHeader);
 
 	function deleteCheckedItems() {
 		if (confirm('{{$delitems}}')) {
@@ -422,5 +434,34 @@
 	}
 
 	{{$geotag nofilter}}
+
+	function jotShow() {
+		var modal = $('#jot-modal').modal();
+		jotcache = $("#jot-sections");
+
+		// Auto focus on the first enabled field in the modal
+		modal.on('shown.bs.modal', function (e) {
+			$('#jot-modal-content').find('select:not([disabled]), input:not([type=hidden]):not([disabled]), textarea:not([disabled])').first().focus();
+		})
+
+		modal
+			.find('#jot-modal-content')
+			.append(jotcache)
+			.modal.show;
+
+		// Jot attachment live preview.
+		linkPreview = $('#profile-jot-text').linkPreview();
+	}
+
+	// Activate the jot text section in the jot modal
+	function jotActive() {
+		// Make sure jot text does have really the active class (we do this because there are some
+		// other events which trigger jot text (we need to do this for the desktop and mobile
+		// jot nav
+		var elem = $("#jot-modal .jot-nav #jot-text-lnk");
+		var elemMobile = $("#jot-modal .jot-nav #jot-text-lnk-mobile")
+		toggleJotNav(elem[0]);
+		toggleJotNav(elemMobile[0]);
+	}
 </script>
 

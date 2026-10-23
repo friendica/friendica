@@ -41,6 +41,7 @@
 * [Migrating to a new server](help/admin/migrate)
 * [Administration tools](help/admin/tools)
 * [Monitoring](help/admin/monitoring)
+* [Reading the log file](help/admin/log-files)
 
 ## Developer Manual
 

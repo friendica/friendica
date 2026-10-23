@@ -1,0 +1,8 @@
+SPDX-FileCopyrightText: 2010-2026 the Friendica project
+
+SPDX-License-Identifier: CC0-1.0
+
+Public GPG key of Packagist Conductors <contact@packagist.com>, used to sign Composer releases.
+Fingerprint: 161DFBE342889F01DDAC4E61CBB3D576F2A0946F
+Source: https://keys.openpgp.org/vks/v1/by-email/contact@packagist.com
+Used by bin/dev/verify-composer-phar.sh.

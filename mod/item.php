@@ -29,6 +29,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
 use Friendica\Model\Post;
+use Friendica\Model\Tag;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Content\Post\Entity\PostMedia;
@@ -97,6 +98,7 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	}
 
 	$post['edit'] = $post;
+	$old_body     = $post['body'];
 	$post['file'] = Post\Category::getTextByURIId($post['uri-id'], $post['uid']);
 
 	Post\Media::deleteByURIId($post['uri-id'], [PostMedia::TYPE_AUDIO, PostMedia::TYPE_VIDEO, PostMedia::TYPE_IMAGE, PostMedia::TYPE_HTML, PostMedia::TYPE_HLS]);
@@ -122,6 +124,8 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 		$fields['quote-uri-id'] = $quote_uri_id;
 		$fields['body']         = BBCode::removeSharedData($post['body']);
 	}
+
+	Tag::updateFromBody($post['uri-id'], $old_body, $fields['body']);
 
 	Item::update($fields, ['id' => $post['id']]);
 	Item::updateDisplayCache($post['uri-id']);
@@ -358,6 +362,11 @@ function item_post_return(string $baseurl, string $return_path, array $item = []
 
 	if (isset($item['guid'])) {
 		$json['guid'] = $item['guid'];
+	}
+
+	if ($item && ($item['gravity'] === Item::GRAVITY_COMMENT)) {
+		$json['comment-uri-id'] = $item['uri-id'];
+		$json['parent-uri-id']  = $item['thr-parent-id'];
 	}
 
 	DI::logger()->debug('post_json', ['json' => $json]);

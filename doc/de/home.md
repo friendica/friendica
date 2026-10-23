@@ -38,6 +38,7 @@
 * [Konfigurationswerte, die nur in der config/local.config.php gesetzt werden können](help/admin/config) (EN)
 * [Performance verbessern](help/admin/improve-performance)
 * [Administration Werkzeuge](help/admin/tools) (EN)
+* [Die Logdatei lesen](help/admin/log-files)
 
 ## Dokumentation für Entwickler
 

@@ -28,13 +28,20 @@ class QuoteAuthorization extends BaseModule
 			throw new HTTPException\BadRequestException();
 		}
 
-		$local = Post::selectFirst(['uri', 'author-link'], ['guid' => $this->parameters['guid'], 'origin' => true, 'private' => [Item::PUBLIC, Item::UNLISTED]]);
+		$local = Post::selectFirst(['uri-id', 'uri', 'author-link'], ['guid' => $this->parameters['guid'], 'origin' => true, 'private' => [Item::PUBLIC, Item::UNLISTED]]);
 		if (!isset($local['uri'])) {
+			$this->logger->info('Quoted post not found or not public', ['guid' => $this->parameters['guid'], 'remote' => $this->parameters['remote']]);
 			throw new HTTPException\NotFoundException();
 		}
 
-		$remote = Post::selectFirstPost(['uri'], ['guid' => $this->parameters['remote']]);
+		$remote = Post::selectFirstPost(['uri-id', 'uri'], ['guid' => $this->parameters['remote']]);
 		if (!isset($remote['uri'])) {
+			$this->logger->info('Quoting post not found', ['guid' => $this->parameters['guid'], 'remote' => $this->parameters['remote']]);
+			throw new HTTPException\NotFoundException();
+		}
+
+		if (!Post\Quote::isQuoting($remote['uri-id'], $local['uri-id'])) {
+			$this->logger->info('Post does not quote the quoted post', ['quote' => $local['uri'], 'remote' => $remote['uri']]);
 			throw new HTTPException\NotFoundException();
 		}
 

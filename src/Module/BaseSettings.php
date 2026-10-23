@@ -145,6 +145,13 @@ class BaseSettings extends BaseModule
 		];
 
 		$tabs[] = [
+			'label'     => $this->t('Files'),
+			'url'       => 'settings/attachments',
+			'selected'  => ($this instanceof Settings\Attachments) ? 'active' : '',
+			'accesskey' => '',
+		];
+
+		$tabs[] = [
 			'label'     => $this->t('Remote servers'),
 			'url'       => 'settings/server',
 			'selected'  => ($this instanceof Settings\Server\Index) ? 'active' : '',

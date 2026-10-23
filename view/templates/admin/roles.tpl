@@ -6,6 +6,7 @@
   *}}
 <div id="adminpage">
 	<h1>{{$title}} - {{$page}}</h1>
+	<div class="settings-section">
 	<p>{{$intro}}</p>
 
 	<h2>{{$admin_title}}</h2>
@@ -84,9 +85,10 @@
 				{{/foreach}}
 			</select>
 
-			<div class="submit"><input type="submit" name="page_roles" value="{{$assign_button}}"></div>
+			<div class="settings-submit-wrapper"><input type="submit" class="settings-submit btn btn-default" name="page_roles" value="{{$assign_button}}"></div>
 		</form>
 	{{else}}
 		<p>{{$no_assignable_users}}</p>
 	{{/if}}
+	</div>
 </div>

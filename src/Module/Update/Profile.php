@@ -36,9 +36,9 @@ class Profile extends BaseModule
 		LoggerInterface $logger,
 		Profiler $profiler,
 		Response $response,
+		EventDispatcherInterface $eventDispatcher,
 		array $server,
 		array $parameters = [],
-		?EventDispatcherInterface $eventDispatcher = null,
 	) {
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters, $eventDispatcher);
 	}

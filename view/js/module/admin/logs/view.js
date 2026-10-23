@@ -2,7 +2,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-(function(){
+// Runs again after every SPA navigation, since the log table is replaced then
+window.onDocumentReady(".log-event", function () {
 	function log_show_details(elm) {
 		const id = elm.id;
 		var hidden = true;
@@ -25,13 +26,13 @@
 	document
 		.querySelectorAll('.log-event')
 		.forEach(elm => {
-			elm.addEventListener("click", evt => {
+			elm.onclick = evt => {
 				log_show_details(evt.currentTarget);
-			});
-			elm.addEventListener("keydown", evt => {
+			};
+			elm.onkeydown = evt => {
 				if (evt.keyCode == 13 || evt.keyCode == 32) {
 					log_show_details(evt.currentTarget);
 				}
-			});
+			};
 		});
-})();
+});

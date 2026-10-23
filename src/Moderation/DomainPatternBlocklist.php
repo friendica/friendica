@@ -80,6 +80,16 @@ class DomainPatternBlocklist
 	}
 
 	/**
+	 * Removes all entries from the block list
+	 *
+	 * @return bool
+	 */
+	public function clear(): bool
+	{
+		return $this->set([]);
+	}
+
+	/**
 	 * @param string $filename
 	 *
 	 * @return void

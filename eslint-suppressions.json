@@ -31,7 +31,7 @@
       "count": 53
     },
     "no-unused-vars": {
-      "count": 3
+      "count": 2
     },
     "no-use-before-define": {
       "count": 1
@@ -45,11 +45,6 @@
   },
   "view/js/module/admin/logs/view.js": {
     "eqeqeq": {
-      "count": 2
-    }
-  },
-  "view/js/spa-router.js": {
-    "no-undef": {
       "count": 2
     }
   },

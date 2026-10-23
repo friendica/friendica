@@ -18,6 +18,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Item;
+use Friendica\Model\Mail;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Network\HTTPException\InternalServerErrorException;
@@ -288,9 +289,6 @@ class Status extends BaseFactory
 	 */
 	private function createQuote(array $item, int $uid, int $level): array
 	{
-		if ($level > 2) {
-			return [];
-		}
 		if (empty($item['quote-uri-id'])) {
 			$media = Post\Media::getByURIId($item['uri-id'], [PostMedia::TYPE_ACTIVITY]);
 			if (!empty($media)) {
@@ -306,14 +304,22 @@ class Status extends BaseFactory
 		}
 
 		if (!empty($quote_id) && ($quote_id != $item['uri-id'])) {
-			try {
-				$quoted_status = $this->createFromUriId($quote_id, $uid, false, false, ++$level)->toArray();
-				$quote         = [
-					'state'         => 'accepted',
-					'quoted_status' => $quoted_status,
-					'account'       => $quoted_status['account'],
+			// Like Mastodon, only the first quote level is delivered completely.
+			// A quote inside a quoted status is reduced to a reference, since
+			// clients can't handle arbitrarily nested statuses.
+			// @see https://github.com/pachli/pachli-android/issues/2406
+			if ($level > 0) {
+				return [
+					'state'            => 'accepted',
+					'quoted_status_id' => (string) $quote_id,
 				];
-				$quote = array_merge($quote, $quoted_status);
+			}
+
+			try {
+				$quote = [
+					'state'         => 'accepted',
+					'quoted_status' => $this->createFromUriId($quote_id, $uid, false, false, ++$level)->toArray(),
+				];
 			} catch (\Exception $exception) {
 				DI::logger()->info('Quote not fetchable', ['uri-id' => $item['uri-id'], 'uid' => $uid, 'exception' => $exception]);
 				$quote = [];
@@ -336,6 +342,14 @@ class Status extends BaseFactory
 		$item = ActivityPub\Transmitter::getItemArrayFromMail($id, true);
 		if (empty($item)) {
 			throw new NotFoundException('Mail record not found with id: ' . $id);
+		}
+
+		// Show the thread as a chain instead of replies to the first message
+		foreach (Mail::getThread($item['uid'], $item['parent-uri-id']) as $message) {
+			if ($message['uri-id'] == $item['uri-id'] && !empty($message['predecessor'])) {
+				$item['thr-parent-id']    = $message['predecessor'];
+				$item['parent-author-id'] = $message['predecessor-author-id'];
+			}
 		}
 
 		$account = $this->mstdnAccountFactory->createFromContactId($item['author-id']);

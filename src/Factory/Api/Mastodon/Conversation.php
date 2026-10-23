@@ -22,39 +22,52 @@ class Conversation extends BaseFactory
 	}
 
 	/**
-	 * @param int $id Conversation id
+	 * Creates a conversation from all messages that share the thread of a given message.
+	 * Like in the message module the messages are grouped by their parent URI.
+	 * The conversation id is the id of the newest message of the thread.
+	 *
+	 * @param int $uid  User id
+	 * @param int $id   Id of a message of the thread
 	 *
 	 * @return \Friendica\Object\Api\Mastodon\Conversation
 	 * @throws ImagickException|HTTPException\InternalServerErrorException|HTTPException\NotFoundException
 	 */
-	public function createFromConvId(int $id): \Friendica\Object\Api\Mastodon\Conversation
+	public function createFromMailId(int $uid, int $id): \Friendica\Object\Api\Mastodon\Conversation
 	{
+		$thread = $this->dba->selectFirst('mail', ['parent-uri'], ['id' => $id, 'uid' => $uid]);
+		if (!$thread) {
+			throw new HTTPException\NotFoundException('Conversation not found.');
+		}
+
 		$accounts    = [];
 		$unread      = false;
 		$last_status = null;
+		$last_id     = $id;
 
 		$ids = [];
 
-		$mails = $this->dba->select('mail', ['id', 'from-url', 'uid', 'seen'], ['convid' => $id], ['order' => ['id' => true]]);
+		$mails = $this->dba->select('mail', ['id', 'from-url', 'seen'], ['parent-uri' => $thread['parent-uri'], 'uid' => $uid], ['order' => ['id' => true]]);
 		while ($mail = $this->dba->fetch($mails)) {
 			if (!$mail['seen']) {
 				$unread = true;
 			}
 
-			$id = Contact::getIdForURL($mail['from-url'], 0, false);
-			if (in_array($id, $ids)) {
-				continue;
-			}
-
-			$ids[] = $id;
-
 			if (empty($last_status)) {
+				$last_id     = $mail['id'];
 				$last_status = $this->mstdnStatusFactory->createFromMailId($mail['id']);
 			}
 
-			$accounts[] = $this->mstdnAccountFactory->createFromContactId($id, 0);
-		}
+			$contactId = Contact::getIdForURL($mail['from-url'], 0, false);
+			if (in_array($contactId, $ids)) {
+				continue;
+			}
 
-		return new \Friendica\Object\Api\Mastodon\Conversation((string) $id, $accounts, $unread, $last_status);
+			$ids[] = $contactId;
+
+			$accounts[] = $this->mstdnAccountFactory->createFromContactId($contactId, 0);
+		}
+		$this->dba->close($mails);
+
+		return new \Friendica\Object\Api\Mastodon\Conversation((string) $last_id, $accounts, $unread, $last_status);
 	}
 }

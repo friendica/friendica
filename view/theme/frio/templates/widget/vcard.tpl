@@ -71,7 +71,7 @@
 				{{/if}}
 				{{if $unfollow_link}}
 					<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$unfollow_link}}">
-						<span><i class="ri ri-user-unfollow-line"></i></span>
+						<span><i class="ri ri-user-minus-fill"></i></span>
 						<span>{{$unfollow}}</span>
 					</a>
 				{{/if}}

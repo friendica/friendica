@@ -399,6 +399,10 @@ class Item
 			self::markForDeletion(['uri-id' => $item['uri-id'], 'uid' => 0, 'deleted' => false], $priority);
 		}
 
+		if ($item['gravity'] == self::GRAVITY_PARENT && !Post::exists(["`uri-id` = ? AND NOT `deleted`", $item['uri-id']])) {
+			Post\Engagement::delete($item['uri-id']);
+		}
+
 		Post\DeliveryData::delete($item['uri-id']);
 
 		// If it's the parent of a comment thread, kill all the kids
@@ -724,6 +728,8 @@ class Item
 			$parent_id     = (int) $toplevel_parent['id'];
 			$item          = $itemHelper->handleToplevelParent($item, $toplevel_parent, $defined_permissions);
 			$parent_origin = $toplevel_parent['origin'];
+
+			Post\ThreadUser::ensure($toplevel_parent['uri-id'], $toplevel_parent['uid'], $parent_id);
 		} else {
 			$parent_id     = 0;
 			$parent_origin = $item['origin'];
@@ -991,7 +997,7 @@ class Item
 		if ($item['gravity'] == self::GRAVITY_PARENT) {
 			$item['post-user-id'] = $post_user_id;
 			if (!Post\ThreadUser::insert($item['uri-id'], $item['uid'], $item)) {
-				DI::logger()->error('Post-Thread-User entry was not inserted', ['uri-id' => $item['uri-id']]);
+				DI::logger()->error('Post-Thread-User entry was not inserted', ['uri-id' => $item['uri-id'], 'uid' => $item['uid'], 'network' => $item['network'], 'post-user-id' => $post_user_id, 'error' => DBA::errorNo() . ': ' . DBA::errorMessage()]);
 			}
 		}
 
@@ -1975,9 +1981,13 @@ class Item
 
 		if ($update) {
 			// The "self" contact id is used (for example in the connectors) when the contact is unknown
-			// So we have to ensure to only update the last item when it had been our own post,
+			// So we have to ensure to only update the last item when it had been our own content,
 			// or it had been done by a "regular" contact.
-			if (!empty($arr['wall'])) {
+			// Our own content is a post or activity we created for a federated network, but not a technical activity like "view".
+			$own_content = !empty($arr['origin'])
+				&& in_array($arr['network'], Protocol::FEDERATED)
+				&& !in_array($arr['verb'], Activity::TECHNICAL_ACTIVITIES);
+			if ($own_content) {
 				$condition = ['id' => $arr['contact-id']];
 			} else {
 				$condition = ['id' => $arr['contact-id'], 'self' => false];
@@ -2867,6 +2877,35 @@ class Item
 	}
 
 	/**
+	 * Convert the given body to HTML and let addons modify the result
+	 *
+	 * @param array  $item          Item array
+	 * @param string $render_body   Body to be converted
+	 * @param string $original_body Original body used for the cache hash
+	 * @return array Item array with updated "rendered-html" and "rendered-hash"
+	 */
+	private static function renderBody(array $item, string $render_body, string $original_body): array
+	{
+		$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $render_body);
+		$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $original_body);
+
+		$hook_data = [
+			'rendered-html' => $item['rendered-html'],
+			'rendered-hash' => $item['rendered-hash'],
+			'item'          => $item,
+		];
+
+		$hook_data = DI::eventDispatcher()->dispatch(
+			new ArrayFilterEvent(ArrayFilterEvent::CACHE_ITEM, $hook_data),
+		)->getArray();
+
+		$item['rendered-html'] = $hook_data['rendered-html'];
+		$item['rendered-hash'] = $hook_data['rendered-hash'];
+
+		return $item;
+	}
+
+	/**
 	 * Sets the "rendered-html" field of the provided item
 	 *
 	 * Body is preserved to avoid side-effects as we modify it just-in-time for spoilers and private image links
@@ -2890,24 +2929,7 @@ class Item
 			|| $rendered_hash != hash('md5', BBCode::VERSION . '::' . $body)
 			|| DI::config()->get('system', 'ignore_cache')
 		) {
-			$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $item['body']);
-			$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $body);
-
-			$hook_data = [
-				'rendered-html' => $item['rendered-html'],
-				'rendered-hash' => $item['rendered-hash'],
-				'item'          => $item,
-			];
-
-			$eventDispatcher = DI::eventDispatcher();
-
-			$hook_data = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::CACHE_ITEM, $hook_data),
-			)->getArray();
-
-			$item['rendered-html'] = $hook_data['rendered-html'];
-			$item['rendered-hash'] = $hook_data['rendered-hash'];
-			unset($hook_data);
+			$item = self::renderBody($item, (string) $item['body'], (string) $body);
 
 			// Update if the generated values differ from the existing ones
 			if ((($rendered_hash != $item['rendered-hash']) || ($rendered_html != $item['rendered-html'])) && !empty($item['id'])) {
@@ -3043,7 +3065,17 @@ class Item
 		$itemSplitAttachments = DI::postMediaRepository()->splitAttachments($item['uri-id'], $shared_links, $item['has-media'] ?? false, $uid != 0);
 		$item['body']         = self::replaceVisualAttachments($itemSplitAttachments['visual'], $item['body'] ?? '');
 
-		self::putInCache($item);
+		// Images that are hidden from the visitor must not be rendered from the body.
+		// The result differs per viewer, so it must not be stored in the shared cache.
+		$hidden_urls  = self::getHiddenImageUrls($itemSplitAttachments['hidden']);
+		$hidden_urls  = array_merge($hidden_urls, self::getHiddenImageUrls($sharedSplitAttachments['hidden'] ?? new PostMedias()));
+		$visible_body = Post\Media::removeImagesByUrl($hidden_urls, $item['body']);
+
+		if (!$only_cache && ($visible_body !== $item['body'])) {
+			$item = self::renderBody($item, $visible_body, $body);
+		} else {
+			self::putInCache($item);
+		}
 		$item['body'] = $body;
 		$s            = $item["rendered-html"];
 
@@ -3220,7 +3252,7 @@ class Item
 			}
 
 			if ($PostMedia->hasDimensions()) {
-				$pattern = '#<a href="' . preg_quote($PostMedia->url) . '">(.*?)"></a>#';
+				$pattern = '#<a href="' . preg_quote($PostMedia->url) . '"[^>]*>(.*?)"></a>#';
 
 				$s = preg_replace_callback($pattern, function () use ($PostMedia) {
 					return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/image/single_with_height_allocation.tpl'), [
@@ -3342,6 +3374,28 @@ class Item
 		}
 		DI::profiler()->stopRecording();
 		return $body;
+	}
+
+	/**
+	 * Get the URLs (including previews) of the hidden images
+	 *
+	 * @param PostMedias $PostMedias
+	 * @return string[]
+	 */
+	private static function getHiddenImageUrls(PostMedias $PostMedias): array
+	{
+		$urls = [];
+		/** @var PostMedia $PostMedia */
+		foreach ($PostMedias as $PostMedia) {
+			if ($PostMedia->type !== PostMedia::TYPE_IMAGE) {
+				continue;
+			}
+			$urls[] = (string) $PostMedia->url;
+			if ($PostMedia->preview) {
+				$urls[] = (string) $PostMedia->preview;
+			}
+		}
+		return $urls;
 	}
 
 	/**
@@ -3833,19 +3887,22 @@ class Item
 			return is_numeric($hook_data['item_id']) ? $hook_data['item_id'] : 0;
 		}
 
+		$head_not_found = false;
 		if (!$mimetype) {
 			try {
-				$curlResult = DI::httpClient()->head($uri, [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::JSON_AS, HttpClientOptions::REQUEST => HttpClientRequest::ACTIVITYPUB]);
-				$mimetype   = $curlResult->getContentType();
+				$curlResult     = DI::httpClient()->head($uri, [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::JSON_AS, HttpClientOptions::REQUEST => HttpClientRequest::ACTIVITYPUB]);
+				$mimetype       = $curlResult->getContentType();
+				$head_not_found = ($curlResult->getReturnCode() == 404);
 			} catch (\Throwable $th) {
 				DI::logger()->info('Error while fetching HTTP link via HEAD', ['uid' => $uid, 'uri' => $uri, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
 				return 0;
 			}
 		}
 
-		if (!HTTPSignature::isValidContentType($mimetype, $uri) && (current(explode(';', $mimetype)) == 'application/json')) {
+		if (!HTTPSignature::isValidContentType($mimetype, $uri) && ($head_not_found || (current(explode(';', $mimetype)) == 'application/json'))) {
 			try {
 				// Issue 14126: Workaround for Mastodon servers that return "application/json" on a "head" request.
+				// Issue 14536: Lemmy answers a "head" request with an error (404), so we retry with a signed "get" request.
 				$curlResult = HTTPSignature::fetchRaw($uri, $uid);
 				$mimetype   = $curlResult->getContentType();
 			} catch (\Throwable $th) {

@@ -6,7 +6,7 @@
   *}}
 
 {{if $field.5=="preview"}}
-	<script type="text/javascript">$(document).ready(function(){ previewTheme($("#id_{{$field.0}}")[0]); });</script>
+	<script type="text/javascript">window.onDocumentReady('body', function(){ previewTheme($("#id_{{$field.0}}") [0]); });</script>
 {{/if}}
 	<div id="field-theme-select-container" class="form-group field select">
 		<label for="id_{{$field.0}}">{{$field.1}}</label>

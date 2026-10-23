@@ -100,13 +100,12 @@ class Cache
 	 */
 	public function get(string $cat, ?string $key = null)
 	{
-		if (isset($this->config[$cat][$key])) {
-			return $this->config[$cat][$key];
-		} elseif (!isset($key) && isset($this->config[$cat])) {
-			return $this->config[$cat];
-		} else {
-			return null;
+		// A null key returns the whole category - it must not be used as an array offset
+		if ($key === null) {
+			return $this->config[$cat] ?? null;
 		}
+
+		return $this->config[$cat][$key] ?? null;
 	}
 
 	/**

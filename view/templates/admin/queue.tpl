@@ -6,7 +6,7 @@
   *}}
 <div id='adminpage' class='adminpage'>
 	<h1>{{$title}} - {{$page}} ({{$count}})</h1>
-	
+	<div class="settings-section">
 	<p>{{$info}}</p>
 	<table>
 		<colgroup>
@@ -36,4 +36,5 @@
 		</tr>
 		{{/foreach}}
 	</table>
+	</div>
 </div>

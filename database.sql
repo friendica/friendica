@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.08-dev (Blutwurz)
--- DB_UPDATE_VERSION 1598
+-- DB_UPDATE_VERSION 1600
 -- ------------------------------------------
 
 
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`uri-id` int unsigned COMMENT 'Id of the item-uri table entry that contains the contact url',
 	`addr` varchar(255) NOT NULL DEFAULT '' COMMENT '',
 	`alias` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`pubkey` text COMMENT 'RSA public key 4096 bit',
+	`pubkey` text COMMENT 'RSA public key 4096 bit, or, for Ed25519 only ActivityPub actors, the Multikey in multibase form',
 	`prvkey` text COMMENT 'RSA private key 4096 bit',
 	`batch` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
 	`notify` varbinary(383) COMMENT '',
@@ -405,7 +405,7 @@ CREATE TABLE IF NOT EXISTS `apcontact` (
 	`header` varbinary(383) COMMENT 'Header picture',
 	`addr` varchar(255) COMMENT '',
 	`alias` varbinary(383) COMMENT '',
-	`pubkey` text COMMENT '',
+	`pubkey` text COMMENT 'RSA public key in PEM format or, for Ed25519 only actors, the Multikey in multibase form',
 	`subscribe` varbinary(383) COMMENT '',
 	`baseurl` varbinary(383) COMMENT 'baseurl of the ap contact',
 	`gsid` int unsigned COMMENT 'Global Server ID',
@@ -2890,7 +2890,8 @@ CREATE VIEW `post-thread-origin-view` AS SELECT
 			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-origin`.`uri-id`
-			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`;
+			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`
+			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`;
 
 --
 -- VIEW post-user-view

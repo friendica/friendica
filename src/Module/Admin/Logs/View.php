@@ -7,15 +7,33 @@
 
 namespace Friendica\Module\Admin\Logs;
 
+use Friendica\App;
+use Friendica\Core\L10n;
+use Friendica\Core\Logger\Capability\LogChannel;
 use Friendica\Core\Renderer;
 use Friendica\Core\Theme;
 use Friendica\DI;
 use Friendica\Module\BaseAdmin;
+use Friendica\Module\Response;
+use Friendica\Util\Profiler;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 class View extends BaseAdmin
 {
-	public const LIMIT = 500;
+	public const LIMIT      = 500;
+	public const SCAN_LIMIT = 1000000;
+	public const TIMEOUT    = 20;
+
+	/** @var string */
+	private $requestId;
+
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Request $request, array $server, array $parameters = [])
+	{
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+
+		$this->requestId = $request->getRequestId();
+	}
 
 	protected function content(array $request = []): string
 	{
@@ -42,7 +60,16 @@ class View extends BaseAdmin
 				LogLevel::INFO,
 				LogLevel::DEBUG,
 			],
-			'context' => ['', 'index', 'worker', 'daemon'],
+			'context' => [
+				'',
+				LogChannel::APP,
+				LogChannel::WORKER,
+				LogChannel::DAEMON,
+				LogChannel::JETSTREAM,
+				LogChannel::CONSOLE,
+				LogChannel::AUTH_JABBERED,
+				LogChannel::DEV,
+			],
 		];
 		$filters = [
 			'level'   => $_GET['level']   ?? '',
@@ -61,8 +88,11 @@ class View extends BaseAdmin
 				$data = DI::parsedLogIterator()
 					->open($f)
 					->withLimit(self::LIMIT)
+					->withScanLimit(self::SCAN_LIMIT)
+					->withTimeout(self::TIMEOUT)
 					->withFilters($filters)
-					->withSearch($search);
+					->withSearch($search)
+					->withExcludedRequestId($this->requestId);
 			} catch (\Exception) {
 				$error = DI::l10n()->t('Couldn\'t open <strong>%1$s</strong> log file.<br/>Check to see if file %1$s is readable.', $f);
 			}
@@ -88,7 +118,12 @@ class View extends BaseAdmin
 				'Function'              => DI::l10n()->t('Function'),
 				'UID'                   => DI::l10n()->t('UID'),
 				'Process_ID'            => DI::l10n()->t('Process ID'),
+				'Request_ID'            => DI::l10n()->t('Request ID'),
+				'Worker_ID'             => DI::l10n()->t('Worker ID'),
+				'Call_stack'            => DI::l10n()->t('Call stack'),
 				'Close'                 => DI::l10n()->t('Close'),
+				'Scan_limit_reached'    => DI::l10n()->t('Only the last %d lines of the log file have been searched.', self::SCAN_LIMIT),
+				'Timeout_reached'       => DI::l10n()->t('The search has been stopped after %d seconds.', self::TIMEOUT),
 			],
 			'$data'          => $data,
 			'$q'             => $search,

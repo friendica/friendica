@@ -15,9 +15,8 @@
 		"lint:js:fix": "eslint --fix --pass-on-unpruned-suppressions",
 		"lint:js:prune": "eslint --prune-suppressions",
 
-		"lint:css": "stylelint \"view/**/*.css\" --max-warnings 107",
-		"lint:css:fix": "stylelint \"view/**/*.css\" --fix --max-warnings 107",
-		"lint:css:errors": "stylelint \"view/**/*.css\" --quiet"
+		"lint:css": "stylelint \"view/**/*.css\" --max-warnings 0",
+		"lint:css:fix": "stylelint \"view/**/*.css\" --fix --max-warnings 0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

@@ -68,7 +68,7 @@
 				{{/if}}
 				{{if $contact.photo_menu.unfollow}}
 				<a class="contact-action-link btn btn-default" href="{{$contact.photo_menu.unfollow.1}}" data-toggle="tooltip" title="{{$contact.photo_menu.unfollow.0}}">
-					<i class="ri ri-user-unfollow-line" aria-hidden="true"></i>
+					<i class="ri ri-user-minus-fill" aria-hidden="true"></i>
 				</a>
 				{{/if}}
 				{{if $contact.photo_menu.hide}}

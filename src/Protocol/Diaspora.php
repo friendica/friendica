@@ -1025,6 +1025,23 @@ class Diaspora
 	 */
 	private static function storeByGuid(string $guid, string $server, bool $force)
 	{
+		$msg = self::fetchByGuid($guid, $server);
+
+		if (!$msg) {
+			return false;
+		}
+
+		// Now call the dispatcher
+		return self::dispatchPublic($msg, $force ? self::FORCED_FETCH : self::FETCHED);
+	}
+
+	/**
+	 * Fetches a message with a given guid from the server of the given address
+	 *
+	 * @return array{message: string, author: string, key: string}|false
+	 */
+	private static function fetchByGuid(string $guid, string $server): array|false
+	{
 		$serverparts = parse_url($server);
 
 		if (empty($serverparts['host']) || empty($serverparts['scheme'])) {
@@ -1043,8 +1060,7 @@ class Diaspora
 
 		DI::logger()->info('Successfully fetched item ' . $guid . ' from ' . $server);
 
-		// Now call the dispatcher
-		return self::dispatchPublic($msg, $force ? self::FORCED_FETCH : self::FETCHED);
+		return $msg;
 	}
 
 	/**
@@ -1193,12 +1209,15 @@ class Diaspora
 
 		if (!DBA::isResult($item)) {
 			try {
-				$result = self::storeByGuid($guid, DI::dsprContact()->getByAddr($author)->url, false);
+				$msg = self::fetchByGuid($guid, DI::dsprContact()->getByAddr($author)->url);
 
 				// We don't have an url for items that arrived at the public dispatcher
-				if (!$result && !empty($contact['url'])) {
-					$result = self::storeByGuid($guid, $contact['url'], false);
+				if (!$msg && !empty($contact['url'])) {
+					$msg = self::fetchByGuid($guid, $contact['url']);
 				}
+
+				// A fetched but rejected message is not fetched again from the second server
+				$result = $msg ? self::dispatchPublic($msg, self::FETCHED) : false;
 
 				if ($result) {
 					DI::logger()->info('Fetched missing item ' . $guid . ' - result: ' . $result);
@@ -2549,7 +2568,7 @@ class Diaspora
 	private static function isSolicitedMessage(array $item, string $author, string $body, int $direction): bool
 	{
 		$contact = Contact::getByURL($author);
-		if (DBA::exists('contact', ['`nurl` = ? AND `uid` != ? AND `rel` IN (?, ?)', $contact['nurl'], 0, Contact::FRIEND, Contact::SHARING])) {
+		if (self::hasLocalFollowers($contact['nurl'])) {
 			DI::logger()->debug('Author has got followers - accepted', ['uri-id' => $item['uri-id'], 'guid' => $item['guid'], 'url' => $item['uri'], 'author' => $author]);
 			return true;
 		}
@@ -2566,6 +2585,38 @@ class Diaspora
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Checks if an incoming message is unwanted, decided only by the author and the direction
+	 *
+	 * This is a cheap subset of isSolicitedMessage() that runs before mentions are resolved.
+	 * It only rejects when the relay settings don't need the body or the tags.
+	 */
+	private static function isUnsolicitedByAuthor(string $author, int $direction): bool
+	{
+		if ($direction == self::FORCED_FETCH) {
+			return false;
+		}
+
+		if (DI::config()->get('system', 'relay_scope') != Relay::SCOPE_NONE) {
+			return false;
+		}
+
+		$contact = Contact::getByURL($author, false, ['id', 'nurl']);
+		if (empty($contact)) {
+			return false;
+		}
+
+		return !self::hasLocalFollowers($contact['nurl']) && !Contact::hasFollowers($contact['id']);
+	}
+
+	/**
+	 * Checks if a local user follows the contact with the given normalised url
+	 */
+	private static function hasLocalFollowers(string $nurl): bool
+	{
+		return DBA::exists('contact', ['`nurl` = ? AND `uid` != ? AND `rel` IN (?, ?)', $nurl, 0, Contact::FRIEND, Contact::SHARING]);
 	}
 
 	/**
@@ -2650,6 +2701,12 @@ class Diaspora
 			return true;
 		}
 
+		// Reject before the mentions in the body are resolved, since every unknown mention is probed
+		if (self::isUnsolicitedByAuthor($author, $direction)) {
+			DI::logger()->notice('Unsolicited message dropped', ['guid' => $guid, 'author' => $author]);
+			return false;
+		}
+
 		$address = [];
 		if ($data->location) {
 			foreach ($data->location->children() as $fieldname => $data) {
@@ -2711,7 +2768,8 @@ class Diaspora
 		Tag::storeRawTagsFromBody($datarray['uri-id'], $datarray['body']);
 
 		if (!self::isSolicitedMessage($datarray, $author, $body, $direction)) {
-			DBA::delete('item-uri', ['uri' => $datarray['uri']]);
+			// The item-uri can be in use by a parallel insert, ExpirePosts removes it once it is unused.
+			DI::logger()->notice('Unsolicited message dropped', ['uri-id' => $datarray['uri-id'], 'uri' => $datarray['uri']]);
 			return false;
 		}
 
