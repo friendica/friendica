@@ -2983,9 +2983,10 @@ class Item
 
 		$tags = Tag::populateFromItem($item);
 
-		$item['tags']     = $tags['tags'];
-		$item['hashtags'] = $tags['hashtags'];
-		$item['mentions'] = $tags['mentions'];
+		$item['tags']              = $tags['tags'];
+		$item['hashtags']          = $tags['hashtags'];
+		$item['mentions']          = $tags['mentions'];
+		$item['implicit_mentions'] = $tags['implicit_mentions'];
 
 		if (!$is_preview) {
 			$item['body'] = preg_replace("#\s*\[attachment .*?].*?\[/attachment]\s*#ism", "\n", (string) $item['body']);
