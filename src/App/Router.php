@@ -49,6 +49,8 @@ class Router
 	public const POST    = 'POST';
 	public const PUT     = 'PUT';
 	public const OPTIONS = 'OPTIONS';
+	// Not routable on its own: Arguments maps it to GET, modules read it from the server array.
+	public const HEAD = 'HEAD';
 
 	public const ALLOWED_METHODS = [
 		self::DELETE,

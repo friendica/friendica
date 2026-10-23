@@ -100,6 +100,15 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 	}
 
 	/**
+	 * Arguments maps HEAD to GET for routing, only the server array keeps the real method.
+	 * The body of a HEAD response is discarded, modules can skip expensive rendering.
+	 */
+	protected function isHeadRequest(): bool
+	{
+		return ($this->server['REQUEST_METHOD'] ?? '') === App\Router::HEAD;
+	}
+
+	/**
 	 * Module GET method to display raw content from technical endpoints
 	 *
 	 * Extend this method if the module is supposed to return communication data,

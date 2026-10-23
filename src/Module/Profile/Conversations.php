@@ -64,6 +64,11 @@ class Conversations extends BaseProfile
 			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
 		}
 
+		// HEAD gets the same status and headers as GET, the body is discarded anyway.
+		if ($this->isHeadRequest()) {
+			return '';
+		}
+
 		if (!$profile['net-publish']) {
 			$this->page['htmlhead'] .= '<meta content="noindex, noarchive" name="robots" />' . "\n";
 		}
