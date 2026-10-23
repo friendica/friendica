@@ -50,6 +50,7 @@
 		}
 
 		body.wide-editor-active.wide-preview-active form.comment-edit-form {
+			column-gap: 10px !important;
 			display: grid;
 			grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
 			grid-template-areas: "title title" "summary summary" "category category" "toolbar toolbar" "body preview" "submit submit";
@@ -65,7 +66,7 @@
 			grid-area: preview;
 			align-self: start;
 			border: 1px solid #ccc;
-			border-radius: 4px;
+			border-radius: 15px;
 			padding: 15px;
 			overflow-y: auto;
 		}
