@@ -70,6 +70,7 @@
 | [post-origin](help/spec/database/db-post-origin) | Posts from local users |
 | [post-question](help/spec/database/db-post-question) | Question |
 | [post-question-option](help/spec/database/db-post-question-option) | Question option |
+| [post-question-voter](help/spec/database/db-post-question-voter) | Records which user voted for which question option, to prevent double voting |
 | [post-quote](help/spec/database/db-post-quote) | Quotes |
 | [post-searchindex](help/spec/database/db-post-searchindex) | Content for all posts |
 | [post-tag](help/spec/database/db-post-tag) | post relation to tags |

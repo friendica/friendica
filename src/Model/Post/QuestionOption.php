@@ -55,4 +55,17 @@ class QuestionOption
 
 		return DBA::selectToArray('post-question-option', [], $condition, ['order' => ['id']]);
 	}
+
+	/**
+	 * Retrieves a single question option by its primary key.
+	 *
+	 * @param int $uri_id
+	 * @param int $id
+	 * @return array|bool
+	 * @throws \Exception
+	 */
+	public static function getOption(int $uri_id, int $id)
+	{
+		return DBA::selectFirst('post-question-option', [], ['uri-id' => $uri_id, 'id' => $id]);
+	}
 }

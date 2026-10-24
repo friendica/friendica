@@ -1045,3 +1045,35 @@ summary.wall-item-summary {
 .edit-profile-link-wrapper {
 	text-align: center;
 }
+
+/* Poll voting */
+.poll-options {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.poll-option {
+	position: relative;
+	overflow: hidden;
+	margin-bottom: 0.3em;
+	padding: 0.3em 0.5em;
+}
+
+.poll-option-bar {
+	position: absolute;
+	z-index: 0;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba(49, 112, 143, 0.15);
+}
+
+.poll-option label {
+	position: relative;
+	z-index: 1;
+}
+
+.poll-vote-button {
+	margin-top: 0.5em;
+}
