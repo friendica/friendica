@@ -195,7 +195,11 @@
             const savedContent = localStorage.getItem(`comment-edit-text-${textarea.id}`);
             const lastSaved = localStorage.getItem(`last-saved-${textarea.id}`);
 
-            if (savedContent && lastSaved) {
+            // A body prefilled by the server (e.g. "compose?body=...") takes precedence over the stored draft
+            if (textarea.defaultValue.trim() !== "") {
+                localStorage.removeItem(`comment-edit-text-${textarea.id}`);
+                localStorage.removeItem(`last-saved-${textarea.id}`);
+            } else if (savedContent && lastSaved) {
                 const currentTime = new Date().getTime();
                 const timeElapsed = currentTime - parseInt(lastSaved, 10);
 
