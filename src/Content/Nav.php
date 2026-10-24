@@ -209,7 +209,6 @@ class Nav
 			// user menu
 			$nav['usermenu'][] = ['profile/' . $this->session->getLocalUserNickname() . '/photos', $this->l10n->t('Photos'), '', $this->l10n->t('My photos'), 'ri-image-line'];
 			$nav['usermenu'][] = ['settings/attachments', $this->l10n->t('Files'), '', $this->l10n->t('My uploaded files'), 'ri-file-line'];
-			$nav['usermenu'][] = ['deck', $this->l10n->t('Deck'), '', $this->l10n->t('Show several timelines side by side'), 'ri-layout-column-line'];
 			$nav['usermenu'][] = ['notes/', $this->l10n->t('Personal notes'), '', $this->l10n->t('Only you can see these'), 'ri-sticky-note-line'];
 
 			// user info

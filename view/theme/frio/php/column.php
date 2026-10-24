@@ -11,6 +11,7 @@
  * without navigation bar, aside and footer widgets.
  */
 
+use Friendica\App;
 use Friendica\DI;
 
 require_once 'view/theme/frio/theme.php';
@@ -29,7 +30,7 @@ if (!empty($page['htmlhead'])) {
 	echo $page['htmlhead'];
 }
 ?>
-		<link rel="stylesheet" href="view/theme/frio/css/deck.css" type="text/css" media="screen" />
+		<link rel="stylesheet" href="view/theme/frio/css/deck.css?v=<?php echo App::VERSION; ?>" type="text/css" media="screen" />
 	</head>
 
 	<body id="top" class="column-view mobile-view mod-<?php echo $page['module'] . ' ' . $show_action_labels; ?>">

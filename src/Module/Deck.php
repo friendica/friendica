@@ -28,7 +28,6 @@ use Friendica\Database\Database;
 use Friendica\Model\Circle;
 use Friendica\Model\Contact;
 use Friendica\Module\Security\Login;
-use Friendica\Network\HTTPException\NotImplementedException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -62,8 +61,8 @@ class Deck extends BaseModule
 			return Login::form('deck');
 		}
 
-		if ($this->appHelper->getCurrentTheme() !== 'frio') {
-			throw new NotImplementedException($this->t('This feature is only available with the frio theme.'));
+		if ($this->appHelper->getCurrentTheme() !== 'frio' && $this->appHelper->getThemeInfoValue('extends') !== 'frio') {
+			return '<p>' . $this->t('This feature is only available with the frio theme.') . '</p>';
 		}
 
 		Nav::setSelected('deck');
@@ -99,7 +98,7 @@ class Deck extends BaseModule
 		];
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('deck.tpl'), [
-			'$config'      => json_encode($config),
+			'$config'      => json_encode($config, JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE),
 			'$add'         => $this->t('Add column'),
 			'$new_post'    => $this->t('New post'),
 			'$close'       => $this->t('Close'),

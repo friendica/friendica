@@ -714,13 +714,21 @@ function scrollToItem(elementId, fallbackId) {
 		});
 }
 
+/**
+ * Whether the page is embedded as a column of the deck (see view/theme/frio/php/column.php)
+ */
+function isColumnMode() {
+	return document.body.classList.contains('column-view');
+}
+
 function NavUpdate() {
 	if (!stopped) {
 		if (force_update) {
 			showFetching();
 		}
-		var pingCmd = 'ping';
-		$.get(pingCmd)
+		// In a column of the deck only the page itself is updated, the notification counters are fetched by the deck.
+		var pingRequest = isColumnMode() ? $.Deferred().resolve({ result: {} }) : $.get('ping');
+		pingRequest
 			.done(function(data) {
 				if (data.result) {
 					if (force_update) {
@@ -744,7 +752,7 @@ function NavUpdate() {
 
 					if ($('#live-network').length && !$('#live-display').length) {
 						networkUpdate(force_update);
-					} else if (!$('#live-display').length) {
+					} else if (!$('#live-display').length && !isColumnMode()) {
 						var update_url = 'ping_network?ping=1';
 						if (force_update) {
 							showFetching();
@@ -843,6 +851,7 @@ function updateNotificationItems(data) {
 
 function getUpdateUrl(src)
 {
+	var match;
 	var udargs = ((netargs.length) ? '/' + netargs : '');
 
 	var update_url = src + udargs + '&p=' + profile_uid + '&force=1&item=' + update_item;
@@ -862,18 +871,32 @@ function getUpdateUrl(src)
 		update_url += '&first_id=' + firstNotification.data('notification-id');
 	}
 
-	// Without any post (yet) everything is new
-	match = $("span.received").first();
-	update_url += '&first_received=' + (match.length > 0 ? match[0].innerHTML : '1970-01-01 00:00:00');
+	// In a column without any post (yet) everything is new
+	var emptyTime = isColumnMode() ? '1970-01-01 00:00:00' : '';
+	var emptyUriId = isColumnMode() ? '1' : '';
 
-	match = $("span.created").first();
-	update_url += '&first_created=' + (match.length > 0 ? match[0].innerHTML : '1970-01-01 00:00:00');
+	match = $("span.received").first();
+	if (match.length > 0 || emptyTime) {
+		update_url += '&first_received=' + (match.length > 0 ? match[0].innerHTML : emptyTime);
+	}
+
+	// Pinned posts are shown first and are older than the newest post
+	match = $("span.created").filter(function() {
+		return $(this).closest('.wall-item-container').find('.ri-pushpin-line').length === 0;
+	}).first();
+	if (match.length > 0 || emptyTime) {
+		update_url += '&first_created=' + (match.length > 0 ? match[0].innerHTML : emptyTime);
+	}
 
 	match = $("span.commented").first();
-	update_url += '&first_commented=' + (match.length > 0 ? match[0].innerHTML : '1970-01-01 00:00:00');
+	if (match.length > 0 || emptyTime) {
+		update_url += '&first_commented=' + (match.length > 0 ? match[0].innerHTML : emptyTime);
+	}
 
 	match = $("span.uriid").first();
-	update_url += '&first_uriid=' + (match.length > 0 ? match[0].innerHTML : '1');
+	if (match.length > 0 || emptyUriId) {
+		update_url += '&first_uriid=' + (match.length > 0 ? match[0].innerHTML : emptyUriId);
+	}
 	return update_url;
 }
 
@@ -993,7 +1016,8 @@ function columnUpdate(src) {
 }
 
 function updateCounter(type, counter) {
-	if (counter < 0) {
+	// An empty answer means that the server skipped the check (e.g. a busy lock), not that there is nothing new
+	if (counter === '' || counter < 0) {
 		return;
 	}
 

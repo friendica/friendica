@@ -22,17 +22,6 @@
 	const composeFrame = document.getElementById("deck-compose-frame");
 	let columns = [];
 
-	/** Diagnostic output, enabled with localStorage.setItem("friendica.deck.debug", "1"). */
-	function log() {
-		try {
-			if (window.localStorage.getItem("friendica.deck.debug")) {
-				console.debug.apply(console, ["[deck]"].concat(Array.prototype.slice.call(arguments)));
-			}
-		} catch (e) {
-			// Storage is not available, no logging.
-		}
-	}
-
 	host.style.backgroundColor = window.getComputedStyle(document.body).backgroundColor;
 
 	/** Places the host directly below the fixed navigation bars. */
@@ -100,7 +89,9 @@
 
 	function save() {
 		try {
-			window.localStorage.setItem(STORAGE_KEY, JSON.stringify(columns.map(function (column) {
+			window.localStorage.setItem(STORAGE_KEY, JSON.stringify(columns.filter(function (column) {
+				return !column.pending;
+			}).map(function (column) {
 				return { url: column.url, title: column.title };
 			})));
 		} catch (e) {
@@ -236,8 +227,9 @@
 		column.url = url;
 		column.title = titleText;
 		column.titleElement.textContent = titleText;
+		column.frame.title = titleText;
+		column.pending = true;
 		column.frame.src = frameUrl(url);
-		save();
 	}
 
 	function createColumn(data) {
@@ -268,8 +260,10 @@
 
 		const frame = document.createElement("iframe");
 		frame.src = frameUrl(data.url);
+		frame.title = data.title || "";
 
-		const column = { url: data.url, title: data.title || "", element: element, frame: frame, titleElement: title };
+		// A column is stored after its first load only, so the target of a link without a page of its own isn't replayed.
+		const column = { url: data.url, title: data.title || "", element: element, frame: frame, titleElement: title, pending: !!data.pending };
 
 		fillMenu(menu, function (path, titleText) { change(column, path, titleText); });
 
@@ -286,6 +280,7 @@
 		element.append(header, frame);
 
 		frame.addEventListener("load", function () {
+			column.pending = false;
 			setUnseen(column, false);
 			try {
 				// Follow the navigation inside the column so it is restored on the next visit.
@@ -295,6 +290,7 @@
 				}
 				if (!column.title && frame.contentDocument.title) {
 					title.textContent = frame.contentDocument.title;
+					frame.title = frame.contentDocument.title;
 				}
 				save();
 			} catch (e) {
@@ -312,12 +308,11 @@
 			return;
 		}
 
-		const column = createColumn({ url: url, title: titleText });
+		const column = createColumn({ url: url, title: titleText, pending: true });
 		const index = after ? columns.indexOf(after) + 1 : columns.length;
 		columns.splice(index, 0, column);
 		scroller.insertBefore(column.element, scroller.children[index] || null);
 		column.element.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
-		save();
 	}
 
 	function closeCompose() {
@@ -341,22 +336,13 @@
 			return column.frame.contentWindow === e.source;
 		});
 
-		if (e.data.action === "log") {
-			if (source) {
-				log.apply(null, ["column " + columns.indexOf(source)].concat(e.data.args));
-			}
-			return;
-		}
-
-		log("message", e.data.action, source ? "column " + columns.indexOf(source) : "unknown source", e.data);
-
 		if (e.data.action === "open" && source) {
 			add(e.data.url, "", source);
 		} else if (e.data.action === "unseen" && source) {
 			setUnseen(source, true);
 		} else if (e.data.action === "seen" && source) {
 			setUnseen(source, false);
-		} else if (e.data.action === "posted") {
+		} else if (e.data.action === "posted" && e.source === composeFrame.contentWindow) {
 			// A new post changes the timelines.
 			closeCompose();
 			columns.forEach(reload);

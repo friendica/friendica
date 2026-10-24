@@ -26,77 +26,6 @@
 		window.parent.postMessage(Object.assign({ friendicaColumns: true }, message), window.location.origin);
 	}
 
-	/** Diagnostic output, shown by the deck when localStorage "friendica.deck.debug" is set. */
-	function log() {
-		post({ action: "log", args: Array.prototype.map.call(arguments, function (arg) {
-			return typeof arg === "string" || typeof arg === "number" || typeof arg === "boolean" || arg == null ? arg : String(arg);
-		}) });
-	}
-
-	/** The state variables of main.js that decide whether the automatic update runs. */
-	function updateState() {
-		return "stopped=" + (typeof stopped !== "undefined" ? stopped : "n/a")
-			+ " updateContent=" + (typeof updateContent !== "undefined" ? updateContent : "n/a")
-			+ " profile_uid=" + (typeof profile_uid !== "undefined" ? profile_uid : "n/a")
-			+ " in_progress=" + (typeof in_progress !== "undefined" ? in_progress : "n/a");
-	}
-
-	// Trace the automatic update of main.js: ping, live update and the counter.
-	["NavUpdate", "triggerLiveUpdates", "liveUpdate", "networkUpdate", "updateCounter"].forEach(function (name) {
-		const original = window[name];
-		if (typeof original !== "function") {
-			log("update function missing", name);
-			return;
-		}
-		window[name] = function () {
-			log("call", name, Array.prototype.slice.call(arguments).join(","), updateState());
-			return original.apply(this, arguments);
-		};
-	});
-
-	if (window.jQuery) {
-		window.jQuery(document).ajaxComplete(function (event, xhr, settings) {
-			if (/(^|\/)(ping|update_|ping_)/.test(settings.url)) {
-				log("ajax", settings.url, xhr.status, String(xhr.responseText || "").length + " bytes",
-					(xhr.responseText || "").substring(0, 100));
-			}
-		}).ajaxError(function (event, xhr, settings, error) {
-			log("ajax error", settings.url, xhr.status, error);
-		});
-	} else {
-		log("jQuery is not available");
-	}
-
-	// At the top of the page getUpdateUrl() of main.js sets force=1 and ping_network answers with an empty
-	// result for forced requests. A column at the top would never report new posts, so the check is not forced.
-	// Only relevant without the live update, with it main.js inserts the new posts itself.
-	if (typeof networkUpdate === "function" && typeof updateContent !== "undefined" && Number(updateContent) === 0) {
-		window.networkUpdate = function () {
-			window.jQuery.get("ping_" + getUpdateUrl("network").replace(/([?&])force=1(&|$)/, "$1force=0$2"))
-				.done(function (net) {
-					updateCounter("net", net);
-				});
-		};
-	}
-
-	// Without #live-network main.js asks ping_network for the default network timeline of the user,
-	// which says nothing about the page of this column. Only a network timeline may report new posts.
-	if (typeof updateCounter === "function") {
-		const updateCounterOriginal = window.updateCounter;
-		window.updateCounter = function (type) {
-			if (type === "net" && !document.getElementById("live-network")) {
-				return;
-			}
-			return updateCounterOriginal.apply(this, arguments);
-		};
-	}
-
-	window.addEventListener("load", function () {
-		log("loaded", window.location.pathname + window.location.search,
-			"live elements: " + Array.prototype.map.call(document.querySelectorAll("[id^=live-]"), function (el) { return el.id; }).join(","),
-			updateState());
-	});
-
 	// Links stay in the column when they lead to the same module, otherwise they open in a new column.
 	window.addEventListener("click", function (e) {
 		if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
@@ -137,7 +66,6 @@
 			counter.hidden = true;
 			document.body.appendChild(counter);
 			new MutationObserver(function () {
-				log(id + " counter", counter.className, counter.textContent, "autoInsert=" + autoInsert);
 				if (!autoInsert) {
 					post({ action: counter.classList.contains("show") ? "unseen" : "seen" });
 				}

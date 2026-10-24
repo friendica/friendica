@@ -287,11 +287,7 @@ class Network extends Timeline
 				$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
 					'$title' => $this->l10n->t('Circle: %s', $circle['name']),
 				]) . $o;
-			} elseif (
-				Profile::shouldDisplayEventList($this->session->getLocalUserId(), $this->mode)
-				// A channel in a column of the deck shows nothing but its posts
-				&& !(($request['mode'] ?? '') === 'column' && ($this->channel->isTimeline($this->selectedTab) || $this->userDefinedChannel->isTimeline($this->selectedTab, $this->session->getLocalUserId()) || $this->community->isTimeline($this->selectedTab)))
-			) {
+			} elseif (Profile::shouldDisplayEventList($this->session->getLocalUserId(), $this->mode)) {
 				$o .= Profile::getBirthdays($this->session->getLocalUserId());
 				$o .= Profile::getEventsReminderHTML($this->session->getLocalUserId(), $this->session->getPublicContactId());
 			}

@@ -23,6 +23,7 @@ use Friendica\Factory\Api\Mastodon\Notification as MastodonNotificationFactory;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
+use Friendica\Model\Verb;
 use Friendica\Module\BaseNotifications;
 use Friendica\Module\Response;
 use Friendica\Module\Security\Login;
@@ -133,8 +134,12 @@ class Stream extends BaseModule
 	 */
 	protected function getCondition(int $uid, ?int $afterId = null): array
 	{
-		$condition = ["`uid` = ? AND NOT `dismissed` AND (NOT `type` IN (?, ?)) AND NOT EXISTS(SELECT `cid` FROM `user-contact` WHERE `user-contact`.`cid` = `notification`.`actor-id` AND `user-contact`.`uid` = `notification`.`uid` AND (`is-blocked` OR `blocked`))",
-			$uid, Post\UserNotification::TYPE_ACTIVITY_PARTICIPATION, Post\UserNotification::TYPE_COMMENT_PARTICIPATION];
+		$condition = ["`uid` = ? AND NOT `dismissed` AND (`type` IN (?, ?, ?, ?, ?, ?) OR (`type` = ? AND `vid` = ?)) AND NOT EXISTS(SELECT `cid` FROM `user-contact` WHERE `user-contact`.`cid` = `notification`.`actor-id` AND `user-contact`.`uid` = `notification`.`uid` AND (`is-blocked` OR `blocked`))",
+			$uid,
+			Post\UserNotification::TYPE_EXPLICIT_TAGGED, Post\UserNotification::TYPE_IMPLICIT_TAGGED,
+			Post\UserNotification::TYPE_DIRECT_COMMENT, Post\UserNotification::TYPE_DIRECT_THREAD_COMMENT,
+			Post\UserNotification::TYPE_THREAD_COMMENT, Post\UserNotification::TYPE_SHARED,
+			Post\UserNotification::TYPE_NONE, Verb::getID(Activity::FOLLOW)];
 
 		if ($afterId) {
 			$condition[0] .= ' AND `id` > ?';
@@ -149,27 +154,42 @@ class Stream extends BaseModule
 	 */
 	protected function renderList(int $uid, ?int $minId, ?int $maxId): array
 	{
-		$notifications = $this->notification->selectByBoundaries(
-			$this->getCondition($uid),
-			['order' => ['id' => true]],
-			$minId,
-			$maxId,
-			self::ITEMS_PER_PAGE,
-		);
-
 		$list = ['html' => '', 'first' => null, 'last' => null, 'count' => 0];
 
-		foreach ($notifications as $notification) {
-			$list['first'] ??= $notification->id;
-			$list['last'] = $notification->id;
-			$list['count']++;
+		do {
+			$notifications = $this->notification->selectByBoundaries(
+				$this->getCondition($uid),
+				['order' => ['id' => true]],
+				$minId,
+				$maxId,
+				self::ITEMS_PER_PAGE,
+			);
 
-			try {
-				$list['html'] .= $this->renderNotification($notification, $uid);
-			} catch (\Exception $e) {
-				$this->logger->notice('Notification could not be rendered', ['id' => $notification->id, 'code' => $e->getCode(), 'message' => $e->getMessage()]);
+			$fetched = 0;
+			foreach ($notifications as $notification) {
+				$fetched++;
+				$maxId = $notification->id;
+
+				try {
+					$html = $this->renderNotification($notification, $uid);
+				} catch (\Exception $e) {
+					$this->logger->notice('Notification could not be rendered', ['id' => $notification->id, 'code' => $e->getCode(), 'message' => $e->getMessage()]);
+					continue;
+				}
+
+				// Notifications without anything to show (e.g. a deleted post) are skipped
+				if ($html === '') {
+					continue;
+				}
+
+				$list['first'] ??= $notification->id;
+				$list['last'] = $notification->id;
+				$list['count']++;
+				$list['html'] .= $html;
 			}
-		}
+
+			// Continue behind the skipped notifications, so a page doesn't end early. Only possible when paging backwards.
+		} while ($minId === null && $fetched === self::ITEMS_PER_PAGE && $list['count'] < self::ITEMS_PER_PAGE);
 
 		return $list;
 	}
@@ -215,7 +235,7 @@ class Stream extends BaseModule
 		$post = $postUriId ? $this->renderPost($postUriId, $uid) : '';
 
 		$actor = Contact::getById($notification->actorId, ['name', 'nick']);
-		$name  = $actor['name'] ?: ($actor['nick'] ?? '');
+		$name  = ($actor['name'] ?? '') ?: ($actor['nick'] ?? '');
 		$link  = '<a href="contact/' . $notification->actorId . '">' . htmlspecialchars($name) . '</a>';
 
 		switch ($type) {

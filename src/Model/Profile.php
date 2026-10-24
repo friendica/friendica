@@ -528,7 +528,7 @@ class Profile
 	 */
 	public static function shouldDisplayEventList(int $uid, Mode $mode): bool
 	{
-		if (empty($uid) || $mode->isMobile()) {
+		if (empty($uid) || $mode->isMobile() || ($_GET['mode'] ?? '') === 'column') {
 			return false;
 		}
 
