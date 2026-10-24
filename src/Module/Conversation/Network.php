@@ -451,8 +451,13 @@ class Network extends Timeline
 			$this->star = false;
 		}
 
-		$this->session->set('network-tab', $this->selectedTab);
-		$this->pConfig->set($this->session->getLocalUserId(), 'network.view', 'selected_tab', $this->selectedTab);
+		// The columns of the deck must not overwrite what the single view remembers
+		$isColumn = ($request['mode'] ?? '') === 'column';
+
+		if (!$isColumn) {
+			$this->session->set('network-tab', $this->selectedTab);
+			$this->pConfig->set($this->session->getLocalUserId(), 'network.view', 'selected_tab', $this->selectedTab);
+		}
 
 		$this->network = $request['nets'] ?? '';
 
@@ -461,7 +466,7 @@ class Network extends Timeline
 
 		$this->setMaxMinByOrder($request);
 
-		if (is_null($this->maxId) && !is_null($this->minId)) {
+		if (!$isColumn && is_null($this->maxId) && !is_null($this->minId)) {
 			$this->session->set('network-request', $request);
 			$this->pConfig->set($this->session->getLocalUserId(), 'network.view', 'request', $request);
 		}

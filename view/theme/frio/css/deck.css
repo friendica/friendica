@@ -1,0 +1,175 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2026 the Friendica project
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ * Styles for the deck (/deck) and for the pages embedded in it (mode=column)
+ */
+
+/* Page embedded as a column */
+body.column-view {
+	padding-top: 0 !important;
+}
+
+body.column-view main,
+body.column-view .page-wrapper {
+	padding-top: 0;
+	margin-top: 0;
+}
+
+body.column-view .container {
+	width: 100%;
+	padding-left: 0;
+	padding-right: 0;
+}
+
+body.column-view .row {
+	margin-left: 0;
+	margin-right: 0;
+}
+
+body.column-view #content {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+body.column-view #back-to-top {
+	display: none;
+}
+
+/* The deck host page: a toolbar on the left and the columns next to it */
+#deck-host {
+	position: fixed;
+	top: 110px; /* corrected by deck.js to the real height of the navigation bars */
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 10;
+	display: flex;
+}
+
+#deck-toolbar {
+	flex: none;
+	width: 48px;
+	padding: 6px 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+}
+
+#deck-toolbar .btn {
+	font-size: 18px;
+	line-height: 1;
+	padding: 8px;
+}
+
+#deck-toolbar .dropdown {
+	position: relative;
+}
+
+#deck-toolbar .dropdown-menu {
+	top: 0;
+	left: 100%;
+	max-height: 80vh;
+	overflow-y: auto;
+}
+
+#deck-scroller {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	gap: 10px;
+	padding: 6px 10px 10px 0;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+/*
+ * The width of a column is flexible between the narrowest and the widest layout
+ * that the theme renders for mobile devices (see the 767px breakpoint of Bootstrap).
+ */
+.friendica-column {
+	flex: 1 1 360px;
+	min-width: min(360px, 100%);
+	max-width: 767px;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid rgba(128, 128, 128, 0.35);
+	border-radius: 4px;
+	background: #fff;
+}
+.friendica-column-header {
+	flex: none;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	padding: 4px 8px;
+	border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+}
+
+.friendica-column-switcher {
+	flex: 1 1 auto;
+	min-width: 0;
+	position: relative;
+}
+
+.friendica-column-title {
+	display: block;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-align: left;
+	font-weight: bold;
+	padding: 2px 6px;
+}
+
+.friendica-column-switcher .dropdown-menu {
+	max-height: 70vh;
+	overflow-y: auto;
+}
+
+.friendica-column-header .btn {
+	padding: 2px 6px;
+}
+
+.friendica-column iframe {
+	flex: 1 1 auto;
+	width: 100%;
+	border: 0;
+	border-radius: 0 0 4px 4px;
+}
+
+#deck-compose-frame {
+	width: 100%;
+	height: 70vh;
+	border: 0;
+}
+
+#deck-compose-modal .modal-body {
+	padding: 0;
+}
+
+.friendica-column-header .btn.has-new {
+	/* Inverted: the (link) color of the button becomes the background, the icon turns white */
+	background-color: currentColor;
+}
+
+.friendica-column-header .btn.has-new > i {
+	color: #fff;
+}
+
+.notification-stream-header {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 10px 4px;
+}
+
+.notification-stream-header img {
+	border-radius: 3px;
+}
+
+.notification-stream-empty {
+	padding: 10px;
+}
