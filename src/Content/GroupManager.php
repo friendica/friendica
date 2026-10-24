@@ -13,6 +13,8 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Addon\AddonHelper;
+use Friendica\Core\Cache\Capability\ICanCache;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
@@ -20,10 +22,8 @@ use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
-use Friendica\Model\GServer;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
-use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Proxy;
 use Friendica\Worker\UpdateServerDirectory;
 
@@ -36,7 +36,11 @@ class GroupManager
 
 	// Like on the contact page: public threads come from the global copy, private ones from the copy of the user
 	private const THREADS = "FROM `post-thread-user` INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
-		WHERE (`post-thread-user`.`uid` = 0 OR (`post-thread-user`.`uid` = ? AND NOT `post-user`.`global`))";
+		WHERE (`post-thread-user`.`uid` = 0 OR (`post-thread-user`.`uid` = ? AND NOT `post-user`.`global`)) AND " . self::THREAD_VISIBLE;
+
+	// Like in Post::selectForUser(): hidden, deleted and blocked or ignored threads are skipped
+	private const THREAD_VISIBLE = "`post-user`.`visible` AND NOT `post-user`.`deleted`
+		AND NOT `post-user`.`author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored`))";
 
 	public function __construct(
 		private readonly ContactByType $contacts,
@@ -45,6 +49,7 @@ class GroupManager
 		private readonly L10n $l10n,
 		private readonly IHandleUserSessions $session,
 		private readonly Database $database,
+		private readonly ICanCache $cache,
 	) {}
 
 	/**
@@ -368,11 +373,24 @@ class GroupManager
 	 */
 	public function getThreadIds(int $uid, int $pcid, int $start, int $limit): array
 	{
+		// Both parts are served by the index on uid, owner-id and commented, so they are combined afterwards
+		$join    = "FROM `post-thread-user` INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id` WHERE ";
 		$threads = $this->database->p(
-			"SELECT `post-thread-user`.`uri-id` " . self::THREADS . " AND `post-thread-user`.`owner-id` = ?
-				ORDER BY `post-thread-user`.`commented` DESC LIMIT ?, ?",
+			"(SELECT `post-thread-user`.`uri-id`, `post-thread-user`.`commented` " . $join . "`post-thread-user`.`uid` = 0
+				AND `post-thread-user`.`owner-id` = ? AND " . self::THREAD_VISIBLE . "
+				ORDER BY `post-thread-user`.`commented` DESC LIMIT ?)
+			UNION ALL
+			(SELECT `post-thread-user`.`uri-id`, `post-thread-user`.`commented` " . $join . "`post-thread-user`.`uid` = ?
+				AND `post-thread-user`.`owner-id` = ? AND NOT `post-user`.`global` AND " . self::THREAD_VISIBLE . "
+				ORDER BY `post-thread-user`.`commented` DESC LIMIT ?)
+			ORDER BY `commented` DESC LIMIT ?, ?",
+			$pcid,
+			$uid,
+			$start + $limit,
 			$uid,
 			$pcid,
+			$uid,
+			$start + $limit,
 			$start,
 			$limit,
 		);
@@ -395,24 +413,32 @@ class GroupManager
 			return [];
 		}
 
-		$stats        = [];
-		$placeholders = implode(', ', array_fill(0, count($pcids), '?'));
+		$stats = [];
 
-		$threads = $this->database->p(
-			"SELECT `post-thread-user`.`owner-id`, COUNT(*) AS `threads`, MAX(`post-thread-user`.`commented`) AS `commented` " . self::THREADS . "
-				AND `post-thread-user`.`owner-id` IN (" . $placeholders . ")
-				GROUP BY `post-thread-user`.`owner-id`",
-			$uid,
-			...$pcids,
-		);
-		while ($row = $this->database->fetch($threads)) {
-			$stats[$row['owner-id']] = [
-				'threads'   => (int) $row['threads'],
+		$counts  = [];
+		$missing = [];
+		foreach ($pcids as $pcid) {
+			$cached = $this->cache->get('group-threads:' . $uid . ':' . $pcid);
+			if (is_array($cached)) {
+				$counts[$pcid] = $cached;
+			} else {
+				$missing[] = $pcid;
+			}
+		}
+
+		if (!empty($missing)) {
+			$counts += $this->countThreads($uid, $missing);
+		}
+
+		foreach ($counts as $pcid => $count) {
+			$stats[$pcid] = [
+				'threads'   => $count['threads'],
 				'unread'    => 0,
-				'commented' => $row['commented'],
+				'commented' => $count['commented'],
 			];
 		}
-		$this->database->close($threads);
+
+		$placeholders = implode(', ', array_fill(0, count($pcids), '?'));
 
 		$unread = $this->database->p(
 			"SELECT `post-thread-user`.`owner-id`, COUNT(DISTINCT `post-user`.`parent-uri-id`) AS `unread` FROM `post-user`
@@ -433,6 +459,36 @@ class GroupManager
 		$this->database->close($unread);
 
 		return $stats;
+	}
+
+	/**
+	 * Counts the threads and fetches the latest activity of the given groups
+	 *
+	 * @param int   $uid   User id
+	 * @param int[] $pcids Public contact ids of the groups
+	 *
+	 * @return array Number of threads and latest activity keyed by the public contact id
+	 * @throws \Exception
+	 */
+	private function countThreads(int $uid, array $pcids): array
+	{
+		$counts = [];
+
+		$threads = $this->database->p(
+			"SELECT `post-thread-user`.`owner-id`, COUNT(*) AS `threads`, MAX(`post-thread-user`.`commented`) AS `commented` " . self::THREADS . "
+				AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
+				GROUP BY `post-thread-user`.`owner-id`",
+			$uid,
+			$uid,
+			...$pcids,
+		);
+		while ($row = $this->database->fetch($threads)) {
+			$counts[$row['owner-id']] = ['threads' => (int) $row['threads'], 'commented' => $row['commented']];
+			$this->cache->set('group-threads:' . $uid . ':' . $row['owner-id'], $counts[$row['owner-id']], Duration::FIVE_MINUTES);
+		}
+		$this->database->close($threads);
+
+		return $counts;
 	}
 
 	/**
@@ -458,6 +514,7 @@ class GroupManager
 			"SELECT `post-thread-user`.`owner-id`, `post-thread-user`.`uri-id`, `post-thread-user`.`commented` " . self::THREADS . "
 				AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
 				AND `post-thread-user`.`commented` IN (" . implode(', ', array_fill(0, count($commented), '?')) . ")",
+			$uid,
 			$uid,
 			...$pcids,
 			...$commented,
@@ -487,7 +544,7 @@ class GroupManager
 			return [];
 		}
 
-		return array_column($this->database->selectToArray('gserver', ['id', 'url', 'site_name', 'info', 'platform', 'last_poco_query'], ['id' => array_values($gsids)]), null, 'id');
+		return array_column($this->database->selectToArray('gserver', ['id', 'url', 'site_name', 'info', 'platform'], ['id' => array_values($gsids)]), null, 'id');
 	}
 
 	/**
@@ -499,11 +556,12 @@ class GroupManager
 	 */
 	public function discoverServerGroups(array $server): void
 	{
-		if (!in_array($server['platform'], UpdateServerDirectory::GROUP_PLATFORMS) || ($server['last_poco_query'] > DateTimeFormat::utc('now - 1 day'))) {
+		$key = 'group-discovery:' . $server['id'];
+		if (!in_array($server['platform'], UpdateServerDirectory::GROUP_PLATFORMS) || $this->cache->get($key)) {
 			return;
 		}
 
-		GServer::update(['last_poco_query' => DateTimeFormat::utcNow()], ['id' => $server['id']]);
+		$this->cache->set($key, true, Duration::DAY);
 		Worker::add(Worker::PRIORITY_LOW, 'UpdateServerDirectory', ['id' => $server['id'], 'url' => $server['url'], 'platform' => $server['platform']]);
 	}
 

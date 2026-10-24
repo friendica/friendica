@@ -93,7 +93,12 @@ class Group extends BaseModule
 
 	protected function content(array $request = []): string
 	{
-		$uid     = $this->session->getLocalUserId();
+		$uid = $this->session->getLocalUserId();
+
+		if (!$uid && $this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
+			return Login::form();
+		}
+
 		$contact = $this->getGroup($uid);
 		$pcid    = $contact['id'];
 
@@ -103,10 +108,6 @@ class Group extends BaseModule
 
 		// Visitors can only see local groups, remote groups are shown on their own server
 		if (!$uid) {
-			if ($this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
-				return Login::form();
-			}
-
 			$owner = $this->getLocalOwner($pcid);
 			if (empty($owner)) {
 				System::externalRedirect(Contact::getProfileLink($contact));

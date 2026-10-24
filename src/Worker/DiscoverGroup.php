@@ -9,10 +9,8 @@ namespace Friendica\Worker;
 
 use Friendica\DI;
 use Friendica\Model\Contact;
-use Friendica\Protocol\ActivityPub\Receiver;
+use Friendica\Protocol\ActivityPub;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\HTTPSignature;
-use Friendica\Util\JsonLD;
 
 class DiscoverGroup
 {
@@ -44,26 +42,9 @@ class DiscoverGroup
 			return;
 		}
 
-		$activities = self::getLatestActivities($account['ap-outbox'], (string) $account['platform']);
-		foreach ($activities as $activity) {
-			Receiver::processActivity(JsonLD::compact($activity), '', 0, true);
-		}
-
-		DI::logger()->info('Fetched group posts', ['url' => $url, 'cid' => $cid, 'count' => count($activities)]);
-	}
-
-	private static function getLatestActivities(string $outbox, string $platform): array
-	{
-		$data = HTTPSignature::fetch($outbox);
-
 		// NodeBB sorts its outbox ascending, so the latest activities are on the last page
-		if (($platform === 'nodebb') && !empty($data['last']) && is_string($data['last'])) {
-			$data                 = HTTPSignature::fetch($data['last']);
-			$data['orderedItems'] = array_reverse($data['orderedItems'] ?? []);
-		}
+		ActivityPub::fetchOutbox($account['ap-outbox'], 0, self::POSTS, $account['platform'] === 'nodebb');
 
-		$items = $data['orderedItems'] ?? $data['first']['orderedItems'] ?? [];
-
-		return array_slice(array_filter($items, is_array(...)), 0, self::POSTS);
+		DI::logger()->info('Fetched group posts', ['url' => $url, 'cid' => $cid]);
 	}
 }

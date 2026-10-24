@@ -1963,8 +1963,8 @@ msgstr ""
 msgid "Display posts that have been created by accounts of the selected circle."
 msgstr ""
 
-#: src/Content/Feature.php:129 src/Content/GroupManager.php:111
-#: src/Content/Nav.php:247 src/Content/Nav.php:276
+#: src/Content/Feature.php:129 src/Content/GroupManager.php:116
+#: src/Content/Nav.php:247 src/Content/Nav.php:279
 #: src/Content/Text/HTML.php:902 src/Content/Widget.php:572
 #: src/Model/User.php:1468 src/Module/Groups.php:103
 msgid "Groups"
@@ -2081,25 +2081,25 @@ msgstr ""
 msgid "Allows anonymous visitors to consult your calendar and your public events. Contact birthday events are private to you."
 msgstr ""
 
-#: src/Content/GroupManager.php:113
+#: src/Content/GroupManager.php:118
 msgid "External link to group"
 msgstr ""
 
-#: src/Content/GroupManager.php:117 src/Content/PagesManager.php:101
+#: src/Content/GroupManager.php:122 src/Content/PagesManager.php:101
 #: src/Content/Widget.php:547
 msgid "show less"
 msgstr ""
 
-#: src/Content/GroupManager.php:118 src/Content/PagesManager.php:102
+#: src/Content/GroupManager.php:123 src/Content/PagesManager.php:102
 #: src/Content/Widget.php:442 src/Content/Widget.php:548
 msgid "show more"
 msgstr ""
 
-#: src/Content/GroupManager.php:119
+#: src/Content/GroupManager.php:124
 msgid "Create new group"
 msgstr ""
 
-#: src/Content/GroupManager.php:121
+#: src/Content/GroupManager.php:126
 msgid "Find groups to join"
 msgstr ""
 
@@ -2281,7 +2281,7 @@ msgstr ""
 msgid "My profile"
 msgstr ""
 
-#: src/Content/Nav.php:224 src/Module/Group.php:196
+#: src/Content/Nav.php:224 src/Module/Group.php:197
 #: src/Module/Security/Login.php:124
 msgid "Register"
 msgstr ""
@@ -2378,7 +2378,7 @@ msgstr ""
 msgid "Terms of Service of this Friendica instance"
 msgstr ""
 
-#: src/Content/Nav.php:276
+#: src/Content/Nav.php:279
 msgid "Overview of your groups"
 msgstr ""
 
@@ -2506,7 +2506,7 @@ msgstr ""
 msgid "Find pages to follow"
 msgstr ""
 
-#: src/Content/SpaBackButton.php:34 src/Module/Group.php:191
+#: src/Content/SpaBackButton.php:34 src/Module/Group.php:192
 #: src/Module/Groups/Discover.php:114
 msgid "Back"
 msgstr ""
@@ -6421,16 +6421,16 @@ msgstr ""
 
 #: src/Module/Circle.php:92 src/Module/Circle.php:101
 #: src/Module/Contact/Advanced.php:56 src/Module/Contact/Advanced.php:95
-#: src/Module/Contact/Contacts.php:49 src/Module/Contact/Conversations.php:51
-#: src/Module/Contact/Conversations.php:56
-#: src/Module/Contact/Conversations.php:61 src/Module/Contact/Media.php:40
+#: src/Module/Contact/Contacts.php:49 src/Module/Contact/Conversations.php:52
+#: src/Module/Contact/Conversations.php:57
+#: src/Module/Contact/Conversations.php:62 src/Module/Contact/Media.php:40
 #: src/Module/Contact/Posts.php:47 src/Module/Contact/Posts.php:52
 #: src/Module/Contact/Posts.php:57 src/Module/Contact/Profile.php:148
 #: src/Module/Contact/Profile.php:153 src/Module/Contact/Profile.php:172
 #: src/Module/Contact/Redir.php:68 src/Module/Contact/Redir.php:122
 #: src/Module/FriendSuggest.php:58 src/Module/FriendSuggest.php:96
-#: src/Module/FriendSuggest.php:102 src/Module/Group.php:252
-#: src/Module/Group.php:257
+#: src/Module/FriendSuggest.php:102 src/Module/Group.php:253
+#: src/Module/Group.php:258
 msgid "Contact not found."
 msgstr ""
 
@@ -6495,7 +6495,7 @@ msgstr ""
 msgid "Edit Circle Name"
 msgstr ""
 
-#: src/Module/Circle.php:291 src/Module/Group.php:198
+#: src/Module/Circle.php:291 src/Module/Group.php:199
 msgid "Mark all as read"
 msgstr ""
 
@@ -7129,7 +7129,7 @@ msgstr ""
 msgid "Refetch contact data"
 msgstr ""
 
-#: src/Module/Contact/Profile.php:538 src/Module/Group.php:197
+#: src/Module/Contact/Profile.php:538 src/Module/Group.php:198
 msgid "Fetch latest posts"
 msgstr ""
 
@@ -7454,27 +7454,27 @@ msgstr ""
 msgid "The latest posts of the group will be fetched shortly."
 msgstr ""
 
-#: src/Module/Group.php:194 src/Module/Groups/Discover.php:123
+#: src/Module/Group.php:195 src/Module/Groups/Discover.php:123
 msgid "Join"
 msgstr ""
 
-#: src/Module/Group.php:206 src/Module/Groups.php:104
+#: src/Module/Group.php:207 src/Module/Groups.php:104
 msgid "Threads"
 msgstr ""
 
-#: src/Module/Group.php:209
+#: src/Module/Group.php:210
 msgid "Comments"
 msgstr ""
 
-#: src/Module/Group.php:210 src/Module/Groups.php:105
+#: src/Module/Group.php:211 src/Module/Groups.php:105
 msgid "Unread"
 msgstr ""
 
-#: src/Module/Group.php:211
+#: src/Module/Group.php:212
 msgid "No comments yet"
 msgstr ""
 
-#: src/Module/Group.php:212
+#: src/Module/Group.php:213
 msgid "There are no threads in this group."
 msgstr ""
 

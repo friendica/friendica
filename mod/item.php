@@ -250,7 +250,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 		$post['body'] .= DI::contentItem()->storeAttachmentFromRequest($request);
 	}
 
-	$post = DI::contentItem()->finalizePost($post, $preview);
+	$post = DI::contentItem()->finalizePost($post, $preview, !empty($request['group_post']));
 
 	if (!strlen((string) $post['body'])) {
 		if ($preview) {

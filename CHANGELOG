@@ -1,3 +1,14 @@
+Version 2026-10 (unrelease)
+  Friendica Core
+    Added dedicated pages to handle groups (#15988, PR 16370) [annando]
+    Posts of groups are no longer marked as seen when a timeline is displayed, they stay unseen until the group or the post is opened (#15988, PR 16370) [annando]
+    Posts from the group page are sent as exclusive group posts with the group as audience, like posts that are addressed with "!group". Posts with an "@group" mention and the group as only receiver are still sent in parallel without an audience (#15988, PR 16370) [annando]
+    The database update adds an index to the table "post-thread-user". On large nodes this can take a long time and causes a high I/O load (#15988, PR 16370) [annando]
+
+  Friendica Addons
+
+  Closed Issues
+
 Version 2026-08 (unrelease)
   Friendica Core
     This release of Friendica will require PHP 8.2 or higher

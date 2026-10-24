@@ -40,7 +40,8 @@ class Conversations extends BaseModule
 
 	protected function content(array $request = []): string
 	{
-		if (!$this->userSession->getLocalUserId()) {
+		$uid = $this->userSession->getLocalUserId();
+		if (!$uid) {
 			return Login::form($_SERVER['REQUEST_URI']);
 		}
 
@@ -81,7 +82,9 @@ class Conversations extends BaseModule
 		if (!$contact['ap-posting-restricted'] && !$raw) {
 			$ucid = 0;
 			if ($contact['contact-type'] == ModelContact::TYPE_COMMUNITY) {
-				$ucid = ModelContact::getUserContactId($contact['id'], $this->userSession->getLocalUserId());
+				if (ModelContact::isSharing($contact['id'], $uid, true)) {
+					$ucid = ModelContact::getUserContactId($contact['id'], $uid);
+				}
 			}
 
 			if ($ucid) {

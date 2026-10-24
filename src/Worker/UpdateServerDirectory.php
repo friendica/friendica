@@ -109,9 +109,12 @@ class UpdateServerDirectory
 		DI::logger()->info('Group discovery started', ['url' => $gserver['url'], 'platform' => $gserver['platform']]);
 
 		if ($gserver['platform'] === 'lemmy') {
-			$urls = self::getLemmyGroups($gserver['url'] . '/api/v3/community/list');
+			$urls = self::getLemmyGroups($gserver['url'], '/api/v3/community/list');
+			if (empty($urls)) {
+				$urls = self::getLemmyGroups($gserver['url'], '/api/v4/community/list');
+			}
 		} elseif ($gserver['platform'] === 'piefed') {
-			$urls = self::getLemmyGroups($gserver['url'] . '/api/alpha/community/list');
+			$urls = self::getLemmyGroups($gserver['url'], '/api/alpha/community/list');
 		} else {
 			$urls = self::getNodeBBGroups($gserver['url']);
 		}
@@ -126,18 +129,23 @@ class UpdateServerDirectory
 	/**
 	 * Fetches the most active local groups from the Lemmy compatible API
 	 *
-	 * @param string $url API endpoint
+	 * @param string $server   Server URL
+	 * @param string $endpoint API endpoint
 	 *
 	 * @return array Profile URLs of the groups
 	 */
-	private static function getLemmyGroups(string $url): array
+	private static function getLemmyGroups(string $server, string $endpoint): array
 	{
-		$result = DI::httpClient()->fetch($url . '?type_=Local&sort=Active&limit=50', HttpClientAccept::JSON, 0, '', HttpClientRequest::SERVERDISCOVER);
+		$result = DI::httpClient()->fetch($server . $endpoint . '?type_=Local&sort=Active&limit=50', HttpClientAccept::JSON, 0, '', HttpClientRequest::SERVERDISCOVER);
+
+		$host = parse_url($server, PHP_URL_HOST);
 
 		$urls = [];
 		foreach (json_decode($result, true)['communities'] ?? [] as $entry) {
 			$community = $entry['community'] ?? [];
-			if (empty($community['actor_id']) || !empty($community['deleted']) || !empty($community['removed'])) {
+
+			$actor = $community['actor_id'] ?? $community['ap_id'] ?? '';
+			if (empty($actor) || !empty($community['deleted']) || !empty($community['removed'])) {
 				continue;
 			}
 
@@ -146,7 +154,11 @@ class UpdateServerDirectory
 				continue;
 			}
 
-			$urls[] = $community['actor_id'];
+			if (parse_url((string) $actor, PHP_URL_HOST) !== $host) {
+				continue;
+			}
+
+			$urls[] = $actor;
 		}
 
 		return $urls;

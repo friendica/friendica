@@ -25,6 +25,7 @@
 		{{/if}}
 		{{if $group_cid}}
 		<input type="hidden" name="contact_allow[]" value="<{{$group_cid}}>" />
+		<input type="hidden" name="group_post" value="1" />
 		{{/if}}
 		<div id="jot-title-wrap"><input name="title" id="jot-title" type="text" placeholder="{{$placeholdertitle}}" value="{{$title}}" class="jothidden" style="display:none" dir="auto"></div>
 		{{if $placeholdersummary}}

@@ -154,10 +154,11 @@ class Discover extends BaseModule
 			$condition['gsid'] = $gsid;
 		}
 
-		$condition = DBA::mergeConditions($condition, ["`platform` NOT IN (?, ?)", 'peertube', 'wordpress']);
+		$condition = DBA::mergeConditions($condition, ["(`platform` IS NULL OR `platform` NOT IN (?, ?))", 'peertube', 'wordpress']);
 
 		if ($search !== '') {
-			$condition = DBA::mergeConditions($condition, ["(`name` LIKE ? OR `about` LIKE ?)", '%' . $search . '%', '%' . $search . '%']);
+			$like      = '%' . addcslashes($search, '\\%_') . '%';
+			$condition = DBA::mergeConditions($condition, ["(`name` LIKE ? OR `about` LIKE ?)", $like, $like]);
 		}
 
 		$subscribed = array_column($this->groupManager->getList($uid, false, true, true), 'pid');

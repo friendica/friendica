@@ -933,7 +933,7 @@ class Item
 		}
 
 		if (!empty($item['audience'])) {
-			DI::logger()->info('Store group audience', ['uri-id' => $item['uri-id'], 'audience' => $item['audience']]);
+			DI::logger()->debug('Store group audience', ['uri-id' => $item['uri-id'], 'audience' => $item['audience']]);
 			Tag::store($item['uri-id'], Tag::AUDIENCE, $item['audience'], $item['audience']);
 		}
 
