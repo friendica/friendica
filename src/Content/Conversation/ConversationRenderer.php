@@ -54,6 +54,7 @@ final readonly class ConversationRenderer
 		private Profiler $profiler,
 		private \Friendica\App\Arguments $args,
 		private StatusEditor $statusEditor,
+		private PostInteractions $postInteractions,
 	) {}
 
 	/**
@@ -223,6 +224,7 @@ final readonly class ConversationRenderer
 		$node = $root ? $this->findNodeByUriId($root, $uriId) : null;
 		if ($node !== null) {
 			$node['children'] = [];
+			$this->addInteractions($node, $uriId, $viewerUid);
 		}
 
 		$html = $node !== null ? $this->renderItemHtml($node, self::MODE_DISPLAY) : '';
@@ -272,6 +274,33 @@ final readonly class ConversationRenderer
 	}
 
 	/**
+	 * Add the interaction summary (reshares, quotes, likes, ...) to the nodes that should show it.
+	 *
+	 * @param array $node The node to start from (thread root or any child)
+	 * @param int $targetUriId The URI ID of the highlighted post
+	 * @param int $viewerUid The user ID of the viewer
+	 */
+	private function addInteractions(array &$node, int $targetUriId, int $viewerUid): void
+	{
+		if ($this->showInteractions($node, $targetUriId, $viewerUid)) {
+			$node['interactions'] = $this->postInteractions->getSummary((int) $node['uriid'], (string) $node['guid'], $viewerUid);
+		}
+
+		foreach ($node['children'] ?? [] as $index => $child) {
+			$this->addInteractions($node['children'][$index], $targetUriId, $viewerUid);
+		}
+	}
+
+	/**
+	 * Decide for a single node whether it shows the interaction summary.
+	 * This is the only place to extend for showing it on more posts, e.g. with a user setting.
+	 */
+	private function showInteractions(array $node, int $targetUriId, int $viewerUid): bool
+	{
+		return (int) ($node['uriid'] ?? 0) === $targetUriId;
+	}
+
+	/**
 	 * Recursively look for a thread node by its URI ID.
 	 *
 	 * @param array $node The node to start from (thread root or any child)
@@ -302,11 +331,12 @@ final readonly class ConversationRenderer
 	 * @param bool $update Whether this is an update
 	 * @param int $uid The user ID of the viewer, or null for public view
 	 * @param string $mode The rendering mode (e.g., self::MODE_DISPLAY)
+	 * @param int $highlightUriId The URI ID of the post that was requested in the thread (display mode only), 0 for the thread root
 	 * @return string The rendered HTML of the complete thread
 	 * @throws ImagickException
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function renderThreadByItem(array $item, bool $update, int $uid, string $mode): string
+	public function renderThreadByItem(array $item, bool $update, int $uid, string $mode, int $highlightUriId = 0): string
 	{
 		$this->profiler->startRecording('rendering');
 		$this->statusEditor->registerAssets();
@@ -320,6 +350,11 @@ final readonly class ConversationRenderer
 		if (empty($root)) {
 			$this->profiler->stopRecording();
 			return '';
+		}
+
+		if ($mode === self::MODE_DISPLAY) {
+			$targetUriId = $highlightUriId && $this->findNodeByUriId($root, $highlightUriId) !== null ? $highlightUriId : (int) $root['uriid'];
+			$this->addInteractions($root, $targetUriId, $viewerUid);
 		}
 
 		$html = $this->renderThreadedTemplate([$root], $mode, $update, $page_dropping);

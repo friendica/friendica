@@ -1465,7 +1465,7 @@ function refreshItemActivity(itemId, data) {
 			}
 
 			// Swap the per-button counters (the caller only toggled the pressed
-			// state) plus the two response blocks - but not the buttons, body or
+			// state) plus the interaction summary - but not the buttons, body or
 			// comment box, which carry state and init the fresh markup would lose.
 			// A like can promote the viewer's own copy of a public post, changing
 			// its item id, so match the buttons by their stable verb prefix.
@@ -1482,10 +1482,10 @@ function refreshItemActivity(itemId, data) {
 				$shownEmoji.replaceWith($freshEmoji);
 			}
 
-			var $shownResponses = $liveArticle.find('div.wall-item-responses').first();
-			var $freshResponses = $newArticle.find('div.wall-item-responses').first();
-			if ($shownResponses.length && $freshResponses.length) {
-				$shownResponses.replaceWith($freshResponses);
+			var $shownInteractions = $liveArticle.find('div.wall-item-interactions').first();
+			var $freshInteractions = $newArticle.find('div.wall-item-interactions').first();
+			if ($shownInteractions.length && $freshInteractions.length) {
+				$shownInteractions.replaceWith($freshInteractions);
 			}
 
 			clearTimeout(timer);

@@ -148,11 +148,6 @@ abstract class DI
 		return self::$dice->create(Content\Item::class);
 	}
 
-	public static function activityFormatter(): Content\Conversation\ActivityFormatter
-	{
-		return self::$dice->create(Content\Conversation\ActivityFormatter::class);
-	}
-
 	public static function postTemplateBuilder(): Content\Conversation\PostTemplateBuilder
 	{
 		return self::$dice->create(Content\Conversation\PostTemplateBuilder::class);

@@ -26,6 +26,7 @@ class Display extends DisplayModule
 		$profileUid = $request['p']      ?? 0;
 		$force      = $request['force']  ?? false;
 		$uriId      = $request['uri_id'] ?? 0;
+		$highlight  = (int) ($request['highlight'] ?? 0);
 
 		if (empty($uriId)) {
 			throw new HTTPException\BadRequestException($this->t('Parameter uri_id is missing.'));
@@ -66,6 +67,6 @@ class Display extends DisplayModule
 			$this->notify->setAllSeenForUser($this->session->getLocalUserId(), ['parent-uri-id' => $item['parent-uri-id']]);
 		}
 
-		return $this->getDisplayData($item, true, $force);
+		return $this->getDisplayData($item, true, $force, $highlight);
 	}
 }
