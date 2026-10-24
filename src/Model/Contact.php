@@ -3308,6 +3308,11 @@ class Contact
 
 		$result['success'] = Protocol::follow($uid, $contact, $protocol);
 
+		// Groups are displayed by their threads, so we fetch the latest ones directly
+		if ($result['success'] && ($contact['contact-type'] == self::TYPE_COMMUNITY) && in_array($contact['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN])) {
+			Worker::add(Worker::PRIORITY_MEDIUM, 'FetchOutbox', $contact_id, 0);
+		}
+
 		return $result;
 	}
 

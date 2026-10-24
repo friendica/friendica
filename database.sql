@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.08-dev (Blutwurz)
--- DB_UPDATE_VERSION 1600
+-- DB_UPDATE_VERSION 1601
 -- ------------------------------------------
 
 
@@ -1822,6 +1822,7 @@ CREATE TABLE IF NOT EXISTS `post-thread-user` (
 	 INDEX `uid_received` (`uid`,`received`),
 	 INDEX `uid_wall_received` (`uid`,`wall`,`received`),
 	 INDEX `uid_commented` (`uid`,`commented`),
+	 INDEX `uid_owner-id_commented` (`uid`,`owner-id`,`commented`),
 	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `uid_starred` (`uid`,`starred`),
 	 INDEX `uid_mention` (`uid`,`mention`),

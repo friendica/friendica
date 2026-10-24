@@ -81,6 +81,14 @@
 							</li>
 						{{/if}}
 
+						{{if $nav.groups}}
+							<li class="nav-segment">
+								<a class="nav-menu {{$sel.groups}}" href="{{$nav.groups.0}}"
+									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.groups.3}}" title="{{$nav.groups.3}}"><i
+									  class="ri ri-xl ri-discuss-{{if $sel.groups}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.groups.1}}</span></a>
+							</li>
+						{{/if}}
+
 						{{if $nav.community}}
 							<li class="nav-segment hidden-xs">
 								<a accesskey="c" class="nav-menu {{$sel.community}}" href="{{$nav.community.0}}"

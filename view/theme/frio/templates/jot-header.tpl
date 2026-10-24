@@ -147,6 +147,15 @@
 				e.target.reset();
 				$('#jot-modal').modal('hide');
 				resetFormModifiedFlag(); // Reset formModified after successful submission
+
+				// Pages without a live update wouldn't show the new post otherwise
+				if (isNewPost && $('[data-reload-after-post]').length) {
+					if (window.up) {
+						up.reload('[data-reload-after-post]');
+					} else {
+						window.location.reload();
+					}
+				}
 			})
 			.always(function() {
 				hideLoading();
