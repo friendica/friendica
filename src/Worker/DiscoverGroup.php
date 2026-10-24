@@ -22,7 +22,7 @@ class DiscoverGroup
 	 *
 	 * @param string $url Profile URL of the group
 	 */
-	public static function execute(string $url)
+	public static function execute(string $url): void
 	{
 		$cid = Contact::getIdForURL($url);
 		if (!$cid) {

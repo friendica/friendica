@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 16:59+0000\n"
+"POT-Creation-Date: 2026-10-24 17:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6429,8 +6429,8 @@ msgstr ""
 #: src/Module/Contact/Profile.php:153 src/Module/Contact/Profile.php:172
 #: src/Module/Contact/Redir.php:68 src/Module/Contact/Redir.php:122
 #: src/Module/FriendSuggest.php:58 src/Module/FriendSuggest.php:96
-#: src/Module/FriendSuggest.php:102 src/Module/Group.php:253
-#: src/Module/Group.php:258
+#: src/Module/FriendSuggest.php:102 src/Module/Group.php:254
+#: src/Module/Group.php:259
 msgid "Contact not found."
 msgstr ""
 
@@ -7471,10 +7471,14 @@ msgid "Unread"
 msgstr ""
 
 #: src/Module/Group.php:212
-msgid "No comments yet"
+msgid "Unseen"
 msgstr ""
 
 #: src/Module/Group.php:213
+msgid "No comments yet"
+msgstr ""
+
+#: src/Module/Group.php:214
 msgid "There are no threads in this group."
 msgstr ""
 

@@ -28,7 +28,7 @@
 				<tr>
 					<th colspan="2">{{$group}}</th>
 					<th>{{$latest}}</th>
-					<th></th>
+					<th><span class="sr-only">{{$join}}</span></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -39,7 +39,7 @@
 					</td>
 					<td class="group-overview-title">
 						<a href="{{$group.link}}"><strong>{{$group.name}}</strong></a>
-						{{if $group.private}}<i class="ri ri-lock-line" title="{{$private}}" aria-label="{{$private}}"></i>{{/if}}
+						{{if $group.private}}<i class="ri ri-lock-line" role="img" title="{{$private}}" aria-label="{{$private}}"></i>{{/if}}
 						{{if $group.server}}<div class="group-discover-server" title="{{$group.host}}">{{$group.server}}</div>{{/if}}
 						<div>{{$group.about}}</div>
 					</td>

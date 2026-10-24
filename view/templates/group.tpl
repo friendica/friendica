@@ -37,7 +37,7 @@
 				<li class="group-list-entry">
 					<a href="{{$thread.link}}" class="group-list-avatar"><img src="{{$thread.thumb}}" alt="{{$thread.author}}"></a>
 					<div class="group-list-title">
-						<a href="display/{{$thread.guid}}" class="group-list-name{{if $thread.unseen}} unseen{{/if}}">{{$thread.title}}</a>
+						<a href="display/{{$thread.guid}}" class="group-list-name{{if $thread.unseen}} unseen{{/if}}">{{$thread.title}}{{if $thread.unseen}} <span class="sr-only">{{$unseen}}</span>{{/if}}</a>
 						<div class="group-list-about"><a href="{{$thread.link}}">{{$thread.author}}</a>, {{$thread.created}}</div>
 					</div>
 					<div class="group-list-stats">

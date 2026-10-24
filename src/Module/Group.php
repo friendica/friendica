@@ -209,6 +209,7 @@ class Group extends BaseModule
 			'$unread_count'  => $groupStats['unread'],
 			'$comments'      => $this->t('Comments'),
 			'$unread'        => $this->t('Unread'),
+			'$unseen'        => $this->t('Unseen'),
 			'$no_comments'   => $this->t('No comments yet'),
 			'$no_threads'    => $this->t('There are no threads in this group.'),
 			'$threads'       => $threads,
