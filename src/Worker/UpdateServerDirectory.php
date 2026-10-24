@@ -109,12 +109,12 @@ class UpdateServerDirectory
 		DI::logger()->info('Group discovery started', ['url' => $gserver['url'], 'platform' => $gserver['platform']]);
 
 		if ($gserver['platform'] === 'lemmy') {
-			$urls = self::getLemmyGroups($gserver['url'], '/api/v3/community/list');
+			$urls = self::getLemmyGroups($gserver['url'], '/api/v4/community/list?type_=local&sort=active_monthly');
 			if (empty($urls)) {
-				$urls = self::getLemmyGroups($gserver['url'], '/api/v4/community/list');
+				$urls = self::getLemmyGroups($gserver['url'], '/api/v3/community/list?type_=Local&sort=Active');
 			}
 		} elseif ($gserver['platform'] === 'piefed') {
-			$urls = self::getLemmyGroups($gserver['url'], '/api/alpha/community/list');
+			$urls = self::getLemmyGroups($gserver['url'], '/api/alpha/community/list?type_=Local&sort=Active');
 		} else {
 			$urls = self::getNodeBBGroups($gserver['url']);
 		}
@@ -130,18 +130,19 @@ class UpdateServerDirectory
 	 * Fetches the most active local groups from the Lemmy compatible API
 	 *
 	 * @param string $server   Server URL
-	 * @param string $endpoint API endpoint
+	 * @param string $endpoint API endpoint with the query for type and sort order
 	 *
 	 * @return array Profile URLs of the groups
 	 */
 	private static function getLemmyGroups(string $server, string $endpoint): array
 	{
-		$result = DI::httpClient()->fetch($server . $endpoint . '?type_=Local&sort=Active&limit=50', HttpClientAccept::JSON, 0, '', HttpClientRequest::SERVERDISCOVER);
+		$result = DI::httpClient()->fetch($server . $endpoint . '&limit=50', HttpClientAccept::JSON, 0, '', HttpClientRequest::SERVERDISCOVER);
 
 		$host = parse_url($server, PHP_URL_HOST);
+		$data = json_decode($result, true);
 
 		$urls = [];
-		foreach (json_decode($result, true)['communities'] ?? [] as $entry) {
+		foreach ($data['communities'] ?? $data['items'] ?? [] as $entry) {
 			$community = $entry['community'] ?? [];
 
 			$actor = $community['actor_id'] ?? $community['ap_id'] ?? '';
@@ -149,8 +150,8 @@ class UpdateServerDirectory
 				continue;
 			}
 
-			// Local only communities aren't federated
-			if (str_starts_with($community['visibility'] ?? '', 'LocalOnly')) {
+			// Local only communities aren't federated ("LocalOnly" in Lemmy 0.19, "local_only_public" and "local_only_private" in Lemmy 1.0)
+			if (str_starts_with(strtolower($community['visibility'] ?? ''), 'local')) {
 				continue;
 			}
 

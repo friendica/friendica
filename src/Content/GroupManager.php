@@ -598,15 +598,18 @@ class GroupManager
 			return $name;
 		}
 
-		$offset = 0;
+		$siteName = $name;
+		$best     = 80;
+		$offset   = 0;
 		while (($pos = strpos($name, ' - ', $offset)) !== false) {
 			similar_text(trim(substr($name, $pos + 3)), $info, $percent);
-			if ($percent >= 80) {
-				return trim(substr($name, 0, $pos));
+			if ($percent >= $best) {
+				$best     = $percent;
+				$siteName = trim(substr($name, 0, $pos));
 			}
 			$offset = $pos + 1;
 		}
 
-		return $name;
+		return $siteName;
 	}
 }
