@@ -9,6 +9,7 @@ namespace Friendica\Module\Settings;
 
 use Exception;
 use Friendica\Core\ACL;
+use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Core\Worker;
@@ -116,7 +117,7 @@ class Account extends BaseSettings
 				'timezone'         => $timezone,
 				'default-location' => trim($request['default_location'] ?? ''),
 				'allow_location'   => !empty($request['allow_location']),
-				'language'         => trim($request['language'] ?? ''),
+				'language'         => L10n::toDirectoryName($request['language'] ?? ''),
 			];
 
 			if (!empty($request['delete_openid'])) {
@@ -350,7 +351,7 @@ class Account extends BaseSettings
 		$email            = $user['email'];
 		$nickname         = DI::userSession()->getLocalUserNickname();
 		$timezone         = $user['timezone'];
-		$language         = $user['language'];
+		$language         = L10n::toDirectoryName($user['language']);
 		$notify           = $user['notify-flags'];
 		$default_location = $user['default-location'];
 		$openid           = $user['openid'];

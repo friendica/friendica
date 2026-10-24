@@ -1260,7 +1260,7 @@ class User
 		$confirm    = !empty($data['confirm'])    ? trim((string) $data['confirm'])    : '';
 		$blocked    = !empty($data['blocked']);
 		$verified   = !empty($data['verified']);
-		$language   = !empty($data['language'])   ? trim((string) $data['language'])   : 'en';
+		$language   = !empty($data['language'])   ? L10n::toDirectoryName((string) $data['language']) : 'en';
 
 		$netpublish = $publish = !empty($data['profile_publish_reg']);
 
