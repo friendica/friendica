@@ -616,10 +616,10 @@ as the value of $top_child_total (this is done at the end of this file)
 		</div><!--./wall-item-actions-->
 
 		<div class="wall-item-links"></div>
-		{{if $item.interactions}}
+		{{if isset($item.interactions)}}
 		<div class="wall-item-interactions">
 			{{foreach $item.interactions as $interaction}}
-			<a class="wall-item-interaction wall-item-interaction-{{$interaction.type}}" href="{{$interaction.url}}" onclick="addToModal(this.href); return false;">{{$interaction.label nofilter}}</a>
+			<a class="wall-item-interaction wall-item-interaction-{{$interaction.type}}" href="{{$interaction.url}}" aria-haspopup="dialog" onclick="addToModal(this.href); return false;"><strong>{{$interaction.total}}</strong> {{$interaction.label}}</a>
 			{{/foreach}}
 		</div>
 		{{/if}}

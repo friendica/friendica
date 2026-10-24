@@ -104,14 +104,6 @@ span.connector {
   margin-right: 5px;
 }
 
-.wall-item-like-expanded,
-.wall-item-dislike-expanded,
-.wall-item-attendyes-expanded,
-.wall-item-attendno-expanded,
-.wall-item-attendmaybe-expanded {
-  margin: 0;
-}
-
 .wall-item-response {
   white-space: nowrap;
   overflow: hidden;

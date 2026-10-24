@@ -224,6 +224,7 @@ final readonly class ConversationRenderer
 		$node = $root ? $this->findNodeByUriId($root, $uriId) : null;
 		if ($node !== null) {
 			$node['children'] = [];
+			$this->addInteractions($node, $uriId, $viewerUid);
 		}
 
 		$html = $node !== null ? $this->renderItemHtml($node, self::MODE_DISPLAY) : '';

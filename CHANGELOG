@@ -1,3 +1,12 @@
+Version 2026-10 (unrelease)
+  Friendica Core
+    Changed the display of likes, reshares and quotes: the names are replaced by a summary below the requested post, linking to the lists of the contacts (PR 16372) [annando]
+    Removed the config settings system.legacy_activities and system.max_likers (PR 16372) [annando]
+
+  Friendica Addons
+
+  Closed Issues
+
 Version 2026-08 (unrelease)
   Friendica Core
     This release of Friendica will require PHP 8.2 or higher

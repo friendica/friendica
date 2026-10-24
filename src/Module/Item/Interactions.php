@@ -5,6 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+declare(strict_types=1);
+
 namespace Friendica\Module\Item;
 
 use Friendica\App;
@@ -16,6 +18,8 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Core\System;
+use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -33,6 +37,7 @@ class Interactions extends BaseModule
 	public function __construct(
 		private readonly IManageConfigValues $config,
 		private readonly IHandleUserSessions $session,
+		private readonly App\Page $page,
 		private readonly PostInteractions $postInteractions,
 		private readonly ConversationRenderer $conversationRenderer,
 		L10n $l10n,
@@ -65,24 +70,27 @@ class Interactions extends BaseModule
 			throw new HTTPException\NotFoundException($this->t('Item not found.'));
 		}
 
-		$total = $this->postInteractions->count($type, $item['uri-id'], $uid);
+		$plink = Item::getPlink($item);
+		if (!$uid && isset($plink['href']) && !$this->baseUrl->isLocalUrl($plink['href'])) {
+			System::externalRedirect($plink['href']);
+		}
+
+		// The interactions of a private post of a local user are stored with the uid of that user
+		$itemUid = $item['view-uid'];
+
+		$this->page['title'] = $this->postInteractions->getTitle($type);
+
+		$total = $this->postInteractions->count($type, $item['uri-id'], $itemUid);
 		$pager = new Pager($this->l10n, $this->args->getQueryString(), 50);
 
 		if ($type === PostInteractions::QUOTES) {
-			return $this->renderQuotes($item['uri-id'], $uid, $pager, $total);
+			return $this->renderQuotes($item['uri-id'], $itemUid, $uid, $pager, $total);
 		}
 
+		$actors   = $this->postInteractions->getActorIds($type, $item['uri-id'], $itemUid, $pager->getStart(), $pager->getItemsPerPage());
 		$contacts = [];
-		foreach ($this->postInteractions->getActorIds($type, $item['uri-id'], $uid, $pager->getStart(), $pager->getItemsPerPage()) as $actorId => $emoji) {
-			$public = Contact::getById($actorId, ['uri-id']);
-			if (empty($public)) {
-				continue;
-			}
-
-			$contact = Contact::selectFirst([], ['uri-id' => $public['uri-id'], 'uid' => [0, $uid]], ['order' => ['uid' => 'DESC']]);
-			if (!empty($contact)) {
-				$contacts[] = Module\Contact::getContactTemplateVars($contact) + ['emoji' => $emoji];
-			}
+		foreach ($this->getContacts(array_keys($actors), $uid) as $actorId => $contact) {
+			$contacts[] = Module\Contact::getContactTemplateVars($contact) + ['emoji' => $actors[$actorId]];
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('profile/contacts.tpl'), [
@@ -96,12 +104,49 @@ class Interactions extends BaseModule
 	}
 
 	/**
+	 * Fetch the contact entries that are shown to the viewer (the personal contact, if there is one)
+	 *
+	 * @param int[] $publicIds Public contact ids
+	 * @return array<int, array> Contact by public contact id, in the order of the given ids
+	 */
+	private function getContacts(array $publicIds, int $uid): array
+	{
+		if (empty($publicIds)) {
+			return [];
+		}
+
+		$uriIds = [];
+		foreach (Contact::selectToArray(['id', 'uri-id'], ['id' => $publicIds]) as $public) {
+			$uriIds[$public['id']] = $public['uri-id'];
+		}
+
+		$byUriId = [];
+		foreach (Contact::selectToArray([], ['uri-id' => array_values($uriIds), 'uid' => [0, $uid]], ['order' => ['uid' => true]]) as $contact) {
+			$byUriId[$contact['uri-id']] ??= $contact;
+		}
+
+		$contacts = [];
+		foreach ($publicIds as $publicId) {
+			if (isset($uriIds[$publicId], $byUriId[$uriIds[$publicId]])) {
+				$contacts[$publicId] = $byUriId[$uriIds[$publicId]];
+			}
+		}
+
+		return $contacts;
+	}
+
+	/**
 	 * Show the quoting posts themselves, not only their authors
 	 */
-	private function renderQuotes(int $uriId, int $uid, Pager $pager, int $total): string
+	private function renderQuotes(int $uriId, int $itemUid, int $uid, Pager $pager, int $total): string
 	{
-		$uriIds = $this->postInteractions->getQuoteUriIds($uriId, $pager->getStart(), $pager->getItemsPerPage());
-		$items  = $uriIds ? Post::toArray(Post::selectForUser($uid, Item::DISPLAY_FIELDLIST, ['uri-id' => $uriIds], ['order' => ['uri-id' => true]])) : [];
+		$uriIds = $this->postInteractions->getQuoteUriIds($uriId, $itemUid, $pager->getStart(), $pager->getItemsPerPage());
+		$items  = [];
+		if ($uriIds) {
+			// Only the posts of the public timeline and the ones of the viewer, not the copies of other users
+			$condition = DBA::mergeConditions(["(`uid` = ? OR (`uid` = ? AND NOT `global`))", 0, $uid], ['uri-id' => $uriIds]);
+			$items     = Post::toArray(Post::selectForUser($uid, Item::DISPLAY_FIELDLIST, $condition, ['order' => ['received' => true]]));
+		}
 
 		$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('section_title.tpl'), [
 			'$title' => $this->postInteractions->getTitle(PostInteractions::QUOTES),
@@ -119,26 +164,30 @@ class Interactions extends BaseModule
 	/**
 	 * Fetch the item with the same visibility rules as the display page
 	 *
+	 * The result contains the user id under which the interactions of the item are stored as "view-uid".
+	 *
 	 * @see Display::content()
 	 */
 	private function fetchItem(string $guid, int $uid): ?array
 	{
-		$fields = ['uri-id', 'uid', 'private'];
+		$fields = ['uri-id', 'uid', 'private', 'guid', 'plink', 'uri', 'network', 'author-id', 'author-link', 'author-network', 'author-alias', 'owner-id', 'owner-contact-type', 'owner-network'];
 
 		if ($uid) {
 			$item = Post::selectFirstForUser($uid, $fields, ['guid' => $guid, 'uid' => $uid]);
 			if (!empty($item)) {
-				return $item;
+				return $item + ['view-uid' => $uid];
 			}
 		}
 
 		if ($this->session->getRemoteUserId()) {
 			$item = Post::selectFirst($fields, ['guid' => $guid, 'private' => Item::PRIVATE, 'origin' => true]);
 			if (!empty($item) && Contact::isFollower($this->session->getRemoteUserId(), $item['uid'])) {
-				return $item;
+				return $item + ['view-uid' => $item['uid']];
 			}
 		}
 
-		return Post::selectFirstForUser($uid, $fields, ['guid' => $guid, 'private' => [Item::PUBLIC, Item::UNLISTED], 'uid' => 0]) ?: null;
+		$item = Post::selectFirstForUser($uid, $fields, ['guid' => $guid, 'private' => [Item::PUBLIC, Item::UNLISTED], 'uid' => 0]);
+
+		return $item ? $item + ['view-uid' => $uid] : null;
 	}
 }

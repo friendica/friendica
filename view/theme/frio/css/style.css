@@ -2519,6 +2519,8 @@ button[disabled] {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0 1.2em;
+}
+.wall-item-interactions a {
 	padding: .5em 0;
 }
 .wall-item-interactions a,
@@ -2535,9 +2537,6 @@ button[disabled] {
 .wall-item-interactions a:hover strong,
 .wall-item-interactions a:focus strong {
 	color: $link_hover_color;
-}
-.wall-item-responses > div > p {
-	margin: 0;
 }
 .btn-group-event {
 	display: flex;

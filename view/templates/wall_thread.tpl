@@ -214,10 +214,10 @@
 								{{/if}}
 							{{/foreach}}
                         {{/if}}
-						{{if $item.interactions}}
+						{{if isset($item.interactions)}}
 							<div class="wall-item-interactions">
 							{{foreach $item.interactions as $interaction}}
-								<a class="wall-item-interaction wall-item-interaction-{{$interaction.type}}" href="{{$interaction.url}}">{{$interaction.label nofilter}}</a>
+								<a class="wall-item-interaction wall-item-interaction-{{$interaction.type}}" href="{{$interaction.url}}"><strong>{{$interaction.total}}</strong> {{$interaction.label}}</a>
 							{{/foreach}}
 							</div>
 						{{/if}}
