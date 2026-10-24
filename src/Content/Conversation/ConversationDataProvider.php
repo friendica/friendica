@@ -419,7 +419,7 @@ final readonly class ConversationDataProvider
 		$counts      = $this->getCounts($uriIds);
 
 		$commentsMode = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS])
-			? (int) $this->pConfig->get($uid, 'system', 'compact_timeline', ConversationRenderer::COMMENTS_MODE_ALL)
+			? ConversationRenderer::normalizeCommentsMode($this->pConfig->get($uid, 'system', 'compact_timeline', ConversationRenderer::COMMENTS_MODE_ALL))
 			: ConversationRenderer::COMMENTS_MODE_ALL;
 		$compactTimeline = $commentsMode === ConversationRenderer::COMMENTS_MODE_COMPACT;
 		$hideComments    = $commentsMode === ConversationRenderer::COMMENTS_MODE_HIDDEN;
@@ -460,8 +460,13 @@ final readonly class ConversationDataProvider
 			$condition = DBA::mergeConditions($condition, ['(`uri-id` >= ? OR `uri-id` = ? OR `created` >= ?)', $sinceId, $uriId, $sinceDate]);
 		}
 
+		if ($hideComments) {
+			// Only the thread roots are shown, but they go through the normal row handling
+			$condition = DBA::mergeConditions($condition, ['gravity' => ItemModel::GRAVITY_PARENT]);
+		}
+
 		$params      = ['order' => ['uri-id' => !$partialLoad && !$compactTimeline]];
-		$threadItems = $hideComments ? null : Post::select(array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), $condition, $params);
+		$threadItems = Post::select(array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), $condition, $params);
 
 		$channels = [];
 		foreach ($this->userDefinedChannel->selectByUid($uid) as $userChannel) {
@@ -471,9 +476,7 @@ final readonly class ConversationDataProvider
 			$channels[$systemChannel->code] = $systemChannel;
 		}
 
-		if ($hideComments) {
-			$rows = [];
-		} elseif ($partialLoad) {
+		if ($partialLoad) {
 			$rows = $this->getRows($threadItems, $mode, $ignoredGsids, $maxComments);
 			$rows = $this->filterCommentSubtree($rows, $sinceId);
 		} elseif ($compactTimeline) {

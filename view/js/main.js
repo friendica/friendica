@@ -1256,14 +1256,30 @@ function showHideComments(id) {
 }
 
 // Opens a post's display page from a click on its text, unless the click hit
-// a link, button or embedded media inside it - used when comments are hidden
-// from the feed and can only be read/written on the display page. A plain
-// element.click() on a synthesized link isn't picked up by Unpoly - it only
-// forwards clicks that either came from a real mouse hit or lack coordinates
-// entirely (keyboard activation), so up.visit() is used directly when SPA
-// mode is active.
-function clickToDisplay(event, url) {
-	if ($(event.target).closest('a, button, img, video, audio, iframe').length) {
+// an interactive element or embedded media inside it, or the user is selecting
+// text - used when comments are hidden or compacted in the feed, so that the
+// whole conversation can be read and written on the display page. The target
+// url is taken from the data-display-url attribute of the clicked content.
+// Ctrl/Cmd/Shift/middle clicks open a new tab or window like a real link. A
+// plain element.click() on a synthesized link isn't picked up by Unpoly - it
+// only forwards clicks that either came from a real mouse hit or lack
+// coordinates entirely (keyboard activation), so up.visit() is used directly
+// when SPA mode is active.
+$(document).on('click', '.click-to-display[data-display-url]', function(event) {
+	// The display page itself already shows the whole conversation
+	if (/(^|\/)display\//.test(window.location.pathname)) {
+		return;
+	}
+	if (event.target.closest('a, button, summary, details, label, input, select, textarea, img, video, audio, iframe')) {
+		return;
+	}
+	if (String(window.getSelection()).length) {
+		return;
+	}
+
+	var url = $(this).data('display-url');
+	if (event.ctrlKey || event.metaKey || event.shiftKey || event.which === 2) {
+		window.open(url, '_blank');
 		return;
 	}
 	if (typeof window.up !== 'undefined' && typeof up.visit === 'function') {
@@ -1271,7 +1287,7 @@ function clickToDisplay(event, url) {
 		return;
 	}
 	window.location.href = url;
-}
+});
 
 // Load more comments for a specific post
 function loadMoreComments(uriId, itemId, existing) {
