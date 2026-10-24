@@ -10,8 +10,8 @@
       parent.postMessage({type:'resize-{{$id}}',height:document.body.scrollHeight},'*');
       setTimeout(function() {parent.postMessage({type:'resize-{{$id}}',height:document.body.scrollHeight},'*');}, 2000);
   };
-  &lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" width="{{$width}}" data-host="{{$host}}" data-preview="{{$preview}}" scrolling="no" frameborder="0" loading="lazy" allow="fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-popups"></iframe>
-  <script>
+  &lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" width="{{$width}}" data-host="{{$host}}" data-link="{{$link}}" data-preview="{{$preview}}" scrolling="no" frameborder="0" loading="lazy" allow="fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-popups"></iframe>
+  <script data-iframe-resize>
     window.addEventListener('message', function(event) {
       if (event.data && event.data.type === 'resize-{{$id}}') {
         if (document.getElementById('{{$id}}')) {

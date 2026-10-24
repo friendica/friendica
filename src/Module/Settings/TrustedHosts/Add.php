@@ -20,6 +20,9 @@ use Psr\Log\LoggerInterface;
 
 class Add extends BaseModule
 {
+	private const MAX_HOST_LENGTH = 253;
+	private const MAX_HOSTS       = 1000;
+
 	public function __construct(
 		private readonly IHandleUserSessions $session,
 		private readonly IManagePersonalConfigValues $pConfig,
@@ -42,13 +45,22 @@ class Add extends BaseModule
 			throw new HTTPException\ForbiddenException();
 		}
 
+		self::checkFormSecurityTokenForbiddenOnError('trustedhosts-add');
+
 		$host = mb_strtolower(trim((string) ($request['hostname'] ?? '')));
-		if ($host === '') {
+		if ($host !== '' && function_exists('idn_to_ascii')) {
+			$host = (string) idn_to_ascii($host, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
+		}
+
+		if ($host === '' || strlen($host) > self::MAX_HOST_LENGTH || !filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
 			throw new HTTPException\BadRequestException();
 		}
 
-		$trusted = $this->pConfig->get($uid, 'system', 'trusted_iframe_hosts', []);
+		$trusted = (array) $this->pConfig->get($uid, 'system', 'trusted_iframe_hosts', []);
 		if (!in_array($host, $trusted, true)) {
+			if (count($trusted) >= self::MAX_HOSTS) {
+				throw new HTTPException\BadRequestException();
+			}
 			$trusted[] = $host;
 			$this->pConfig->set($uid, 'system', 'trusted_iframe_hosts', $trusted);
 		}

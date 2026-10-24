@@ -15,6 +15,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Response;
+use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -38,9 +39,13 @@ class Index extends BaseSettings
 
 	protected function post(array $request = [])
 	{
+		$uid = $this->session->getLocalUserId();
+		if (!$uid) {
+			throw new HTTPException\ForbiddenException();
+		}
+
 		self::checkFormSecurityTokenRedirectOnError('/settings/trustedhosts', 'settings-trustedhosts');
 
-		$uid     = $this->session->getLocalUserId();
 		$trusted = $this->pConfig->get($uid, 'system', 'trusted_iframe_hosts', []);
 
 		if (array_key_exists('delete', $request) && is_array($request['delete'])) {
@@ -58,9 +63,13 @@ class Index extends BaseSettings
 
 	protected function content(array $request = []): string
 	{
+		$uid = $this->session->getLocalUserId();
+		if (!$uid) {
+			throw new HTTPException\ForbiddenException();
+		}
+
 		parent::content();
 
-		$uid     = $this->session->getLocalUserId();
 		$trusted = $this->pConfig->get($uid, 'system', 'trusted_iframe_hosts', []);
 		sort($trusted);
 

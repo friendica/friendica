@@ -981,7 +981,7 @@ function iframePlaceholderOnce(button) {
 	var placeholder = button.closest('.iframe-placeholder');
 	var fragment = placeholder.querySelector('template').content.cloneNode(true);
 	// Scripts cloned out of a <template> never run, the resize script of embed-iframe-resize.tpl needs re-creating to execute.
-	fragment.querySelectorAll('script').forEach(function(oldScript) {
+	fragment.querySelectorAll('script[data-iframe-resize]').forEach(function(oldScript) {
 		var newScript = document.createElement('script');
 		newScript.textContent = oldScript.textContent;
 		oldScript.replaceWith(newScript);
@@ -990,8 +990,19 @@ function iframePlaceholderOnce(button) {
 }
 
 function iframePlaceholderAlways(button) {
-	$.post('settings/trustedhosts/add', {hostname: button.closest('.iframe-placeholder').dataset.host});
-	iframePlaceholderOnce(button);
+	var placeholder = button.closest('.iframe-placeholder');
+	var host = placeholder.dataset.host;
+	$.post('settings/trustedhosts/add', {hostname: host, form_security_token: placeholder.dataset.token}).done(function() {
+		// The host is trusted now, so open all other placeholders of this host as well
+		document.querySelectorAll('.iframe-placeholder').forEach(function(other) {
+			if (other.dataset.host === host) {
+				iframePlaceholderOnce(other.querySelector('button'));
+			}
+		});
+	}).fail(function() {
+		console.warn('Could not store the trusted host', host);
+		iframePlaceholderOnce(button);
+	});
 }
 
 // Since our ajax calls are asynchronous, we will give a few

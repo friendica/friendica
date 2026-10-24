@@ -10,6 +10,7 @@ namespace Friendica\Content\Post\Repository;
 use DOMDocument;
 use DOMXPath;
 use Friendica\App\BaseURL;
+use Friendica\BaseModule;
 use Friendica\BaseRepository;
 use Friendica\Content\Item;
 use Friendica\Content\Post\Collection\PostMedias as PostMediasCollection;
@@ -485,9 +486,9 @@ class PostMedia extends BaseRepository
 				$player = $this->getAudioAttachment($media, $uid);
 			} elseif (in_array($media->type, [PostMediaEntity::TYPE_VIDEO, PostMediaEntity::TYPE_HLS])) {
 				$player = $this->getVideoAttachment($media, $uid);
-			} elseif ($media->hasPlayerUrl() && $media->hasPlayerHeight()) {
+			} elseif ($local_visitor && $media->hasPlayerUrl() && $media->hasPlayerHeight()) {
 				$player = $this->getPlayerIframe($media);
-			} elseif ($media->hasEmbedHtml() && !$media->isPhoto()) {
+			} elseif ($local_visitor && $media->hasEmbedHtml() && !$media->isPhoto()) {
 				$player = $this->getEmbedIframe($media);
 			} else {
 				$player = $this->getLinkAttachment($media);
@@ -522,7 +523,7 @@ class PostMedia extends BaseRepository
 	 */
 	public function getVideoAttachment(PostMediaEntity $postMedia, int $uid): string
 	{
-		if ($postMedia->preview || ($postMedia->blurhash && $this->config->get('system', 'ffmpeg_installed'))) {
+		if ($postMedia->id && ($postMedia->preview || ($postMedia->blurhash && $this->config->get('system', 'ffmpeg_installed')))) {
 			$preview_url = $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_MEDIUM);
 		} else {
 			$preview_url = '';
@@ -542,12 +543,13 @@ class PostMedia extends BaseRepository
 				$template = $postMedia->type == PostMediaEntity::TYPE_HLS ? 'content/hls.tpl' : 'content/video.tpl';
 			}
 			$style = 'aspect-ratio:' . $postMedia->width . '/' . $postMedia->height . ';';
+			$src   = $postMedia->type == PostMediaEntity::TYPE_HLS
+				? Post\Media::resolvePlaylistUrl((string) $postMedia->url)
+				: (string) $postMedia->url;
 			$media = Renderer::replaceMacros(Renderer::getMarkupTemplate($template), [
 				'$video' => [
-					'id'  => $postMedia->id,
-					'src' => $postMedia->type == PostMediaEntity::TYPE_HLS
-						? Post\Media::resolvePlaylistUrl((string) $postMedia->url)
-						: (string) $postMedia->url,
+					'id'          => $postMedia->id,
+					'src'         => $src,
 					'name'        => $postMedia->name ?: $postMedia->url,
 					'preview'     => $preview_url,
 					'mime'        => (string) $postMedia->mimetype,
@@ -557,7 +559,7 @@ class PostMedia extends BaseRepository
 					'description' => $postMedia->description,
 				],
 			]);
-			$media = $this->gateExternalMedia($media, $postMedia, $uid, $style, 'auto', '100%', $preview_url);
+			$media = $this->gateExternalMedia($media, $src, (string) $postMedia->url, $uid, $style, 'auto', '100%', $preview_url);
 		}
 		return $media;
 	}
@@ -602,8 +604,9 @@ class PostMedia extends BaseRepository
 			'height'       => $height,
 			'width'        => $width,
 			'iframe_style' => $iframe_style,
-			'host'         => $postMedia->url->getHost(),
-			'preview'      => $postMedia->preview ? $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_MEDIUM) : '',
+			'host'         => $this->getUrlHost((string) $postMedia->playerUrl),
+			'preview'      => $postMedia->preview && $postMedia->id ? $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_MEDIUM) : '',
+			'link'         => (string) $postMedia->url,
 		]);
 	}
 
@@ -648,8 +651,10 @@ class PostMedia extends BaseRepository
 			'height'       => $height,
 			'width'        => $width,
 			'iframe_style' => $iframe_style,
-			'host'         => $postMedia->url->getHost(),
-			'preview'      => $postMedia->preview ? $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_MEDIUM) : '',
+			// The embed HTML can load content from arbitrary hosts, so there is no host that could be trusted for it
+			'host'    => '',
+			'preview' => $postMedia->preview && $postMedia->id ? $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_MEDIUM) : '',
+			'link'    => (string) $postMedia->url,
 		]);
 	}
 
@@ -666,7 +671,8 @@ class PostMedia extends BaseRepository
 	 */
 	public function gateEmbeddedIframes(string $html, int $uid): string
 	{
-		if ($html == '' || !str_contains($html, '<iframe')) {
+		// Guests have no way to decide, so they are never asked
+		if ($uid == 0 || $html == '' || !str_contains($html, '<iframe')) {
 			return $html;
 		}
 
@@ -679,7 +685,7 @@ class PostMedia extends BaseRepository
 		$list  = $xpath->query('//iframe[@class="embed"]');
 		foreach ($list as $iframe) {
 			$host = $this->getNodeAttribute($iframe, 'data-host');
-			if ($host === '' || $this->isTrustedHost($uid, $host)) {
+			if ($host !== '' && $this->isTrustedHost($uid, $host)) {
 				continue;
 			}
 
@@ -688,17 +694,15 @@ class PostMedia extends BaseRepository
 				$target = $iframe;
 			}
 
-			$placeholder = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/iframe-placeholder.tpl'), [
-				'host'         => $host,
-				'preview'      => $this->getNodeAttribute($iframe, 'data-preview'),
-				'iframe'       => $doc->saveHTML($target),
-				'iframe_style' => $this->getNodeAttribute($iframe, 'style'),
-				'height'       => $this->getNodeAttribute($iframe, 'height'),
-				'width'        => $this->getNodeAttribute($iframe, 'width'),
-				'question'     => $this->l10n->t('Show external content from %s?', $host),
-				'once'         => $this->l10n->t('Once'),
-				'always'       => $this->l10n->t('Always'),
-			]);
+			$placeholder = $this->renderPlaceholder(
+				$host,
+				$this->getNodeAttribute($iframe, 'data-preview'),
+				$doc->saveHTML($target),
+				$this->getNodeAttribute($iframe, 'style'),
+				$this->getNodeAttribute($iframe, 'height'),
+				$this->getNodeAttribute($iframe, 'width'),
+				$this->getNodeAttribute($iframe, 'data-link'),
+			);
 
 			@$tmp->loadHTML(HTML::toNumericEntities($placeholder), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 			$imported = $doc->importNode($tmp->documentElement, true);
@@ -751,7 +755,8 @@ class PostMedia extends BaseRepository
 	 * directly is safe and doesn't need the generic post-cache pass that gateEmbeddedIframes() uses.
 	 *
 	 * @param string $media Rendered <video>/<audio> markup to gate
-	 * @param PostMediaEntity $postMedia Media entity the markup was built from
+	 * @param string $src URL the markup finally loads the media from, which decides about the host
+	 * @param string $link URL of the media, offered as link to the source
 	 * @param int $uid Viewer user id
 	 * @param string $iframe_style Inline style applied to the video wrapper, mirrored on the placeholder
 	 * @param string $height Height applied to the video wrapper, mirrored on the placeholder
@@ -759,26 +764,65 @@ class PostMedia extends BaseRepository
 	 * @param string $preview Preview image URL
 	 * @return string Either the unchanged markup or a consent placeholder
 	 */
-	private function gateExternalMedia(string $media, PostMediaEntity $postMedia, int $uid, string $iframe_style = '', string $height = '', string $width = '', string $preview = ''): string
+	private function gateExternalMedia(string $media, string $src, string $link, int $uid, string $iframe_style = '', string $height = '', string $width = '', string $preview = ''): string
 	{
-		$host = $postMedia->url->getHost();
+		$host = $this->getUrlHost($src);
 
-		if ($host === '' || $this->baseURL->isLocalUri($postMedia->url) || $this->isTrustedHost($uid, $host)) {
+		// Guests have no way to decide, so they are never asked
+		if ($uid == 0 || $this->baseURL->isLocalUrl($src) || ($host !== '' && $this->isTrustedHost($uid, $host))) {
 			return $media;
 		}
 
+		return $this->renderPlaceholder($host, $preview, $media, $iframe_style, $height, $width, $link, true);
+	}
+
+	/**
+	 * Renders the consent placeholder for external content.
+	 *
+	 * Without a host there is nothing that could be trusted permanently, so only "Once" is offered then.
+	 *
+	 * @param string $host Host the content is loaded from, empty if it isn't known
+	 * @param string $preview Preview image URL
+	 * @param string $iframe Markup that replaces the placeholder after consent
+	 * @param string $iframe_style Inline style mirrored on the placeholder
+	 * @param string $height Height mirrored on the placeholder
+	 * @param string $width Width mirrored on the placeholder
+	 * @param string $link URL of the source, offered as plain link
+	 * @param bool $contain Whether the preview should be contained instead of covering the placeholder
+	 * @return string Rendered placeholder
+	 */
+	private function renderPlaceholder(string $host, string $preview, string $iframe, string $iframe_style, string $height, string $width, string $link, bool $contain = false): string
+	{
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/iframe-placeholder.tpl'), [
-			'host'         => $host,
-			'preview'      => $preview,
-			'contain'      => true,
-			'iframe'       => $media,
-			'iframe_style' => $iframe_style,
-			'height'       => $height,
-			'width'        => $width,
-			'question'     => $this->l10n->t('Show external content from %s?', $host),
-			'once'         => $this->l10n->t('Once'),
-			'always'       => $this->l10n->t('Always'),
+			'host'                => $host,
+			'preview'             => $preview,
+			'contain'             => $contain,
+			'link'                => $link,
+			'iframe'              => $iframe,
+			'iframe_style'        => $iframe_style,
+			'height'              => $height,
+			'width'               => $width,
+			'form_security_token' => BaseModule::getFormSecurityToken('trustedhosts-add'),
+			'question'            => $host === '' ? $this->l10n->t('Show external content?') : $this->l10n->t('Show external content from %s?', $host),
+			'once'                => $this->l10n->t('Once'),
+			'always'              => $this->l10n->t('Always'),
 		]);
+	}
+
+	/**
+	 * Extracts the host of an URL, including protocol-relative ones.
+	 *
+	 * @param string $url URL to get the host from
+	 * @return string Lowercased host, empty if there is none
+	 */
+	private function getUrlHost(string $url): string
+	{
+		$url = trim($url);
+		if (str_starts_with($url, '//')) {
+			$url = 'https:' . $url;
+		}
+
+		return strtolower((string) parse_url($url, PHP_URL_HOST));
 	}
 
 	/**
@@ -799,7 +843,7 @@ class PostMedia extends BaseRepository
 			],
 		]);
 
-		return $this->gateExternalMedia($media, $postMedia, $uid);
+		return $this->gateExternalMedia($media, (string) $postMedia->url, (string) $postMedia->url, $uid);
 	}
 
 	/**
