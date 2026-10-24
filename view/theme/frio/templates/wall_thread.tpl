@@ -273,7 +273,7 @@ as the value of $top_child_total (this is done at the end of this file)
 		{{if $item.thread_level==1}}<span aria-hidden="true"><hr /></span>{{/if}}
 
 		{{* item content *}}
-		<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}" lang="{{$item.lang}}">
+		<div class="wall-item-content {{$item.type}}{{if $click_to_display}} click-to-display{{/if}}" id="wall-item-content-{{$item.id}}" lang="{{$item.lang}}"{{if $click_to_display}} data-display-url="{{$item.plink.orig}}"{{/if}}>
 			{{if $item.title}}
 			<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h3 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name" target="_blank">{{$item.title}}</a></h3><br /></span>
 			{{/if}}

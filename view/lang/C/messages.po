@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 04:38+0000\n"
+"POT-Creation-Date: 2026-10-24 21:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,8 +68,8 @@ msgstr ""
 #: src/Module/Settings/Channels.php:135
 #: src/Module/Settings/ContactImport.php:45
 #: src/Module/Settings/ContactImport.php:110
-#: src/Module/Settings/Delegation.php:68 src/Module/Settings/Display.php:92
-#: src/Module/Settings/Display.php:240
+#: src/Module/Settings/Delegation.php:68 src/Module/Settings/Display.php:93
+#: src/Module/Settings/Display.php:250
 #: src/Module/Settings/Profile/Photo/Crop.php:148
 #: src/Module/Settings/Profile/Photo/Index.php:95
 #: src/Module/Settings/RemoveMe.php:93 src/Module/Settings/UserExport.php:73
@@ -1053,109 +1053,109 @@ msgid_plural "<button type=\"button\" %2$s>%1$d people</button> reshared this"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:986
-#: src/Content/Conversation/ConversationDataProvider.php:989
-#: src/Content/Conversation/ConversationDataProvider.php:992
 #: src/Content/Conversation/ConversationDataProvider.php:995
 #: src/Content/Conversation/ConversationDataProvider.php:998
+#: src/Content/Conversation/ConversationDataProvider.php:1001
+#: src/Content/Conversation/ConversationDataProvider.php:1004
+#: src/Content/Conversation/ConversationDataProvider.php:1007
 #, php-format
 msgid "You had been addressed (%s)."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1001
+#: src/Content/Conversation/ConversationDataProvider.php:1010
 #, php-format
 msgid "You are following %s."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1005
+#: src/Content/Conversation/ConversationDataProvider.php:1014
 msgid "You subscribed to one or more tags in this post."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1005
+#: src/Content/Conversation/ConversationDataProvider.php:1014
 #, php-format
 msgid "You subscribed to %s."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1023
+#: src/Content/Conversation/ConversationDataProvider.php:1032
 #, php-format
 msgid "%s reshared this."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1025
+#: src/Content/Conversation/ConversationDataProvider.php:1034
 msgid "Reshared"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1025
+#: src/Content/Conversation/ConversationDataProvider.php:1034
 #, php-format
 msgid "Reshared by %s <%s>"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1028
+#: src/Content/Conversation/ConversationDataProvider.php:1037
 #, php-format
 msgid "%s is participating in this thread."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1031
+#: src/Content/Conversation/ConversationDataProvider.php:1040
 msgid "Stored for general reasons"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1034
+#: src/Content/Conversation/ConversationDataProvider.php:1043
 msgid "Global post"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1037
+#: src/Content/Conversation/ConversationDataProvider.php:1046
 msgid "Sent via an relay server"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1037
+#: src/Content/Conversation/ConversationDataProvider.php:1046
 #, php-format
 msgid "Sent via the relay server %s <%s>"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1040
+#: src/Content/Conversation/ConversationDataProvider.php:1049
 msgid "Fetched"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1040
+#: src/Content/Conversation/ConversationDataProvider.php:1049
 #, php-format
 msgid "Fetched because of %s <%s>"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1043
+#: src/Content/Conversation/ConversationDataProvider.php:1052
 msgid "Stored because of a child post to complete this thread."
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1046
+#: src/Content/Conversation/ConversationDataProvider.php:1055
 msgid "Local delivery"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1049
+#: src/Content/Conversation/ConversationDataProvider.php:1058
 msgid "Stored because of your activity (like, comment, bookmark, ...)"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1052
+#: src/Content/Conversation/ConversationDataProvider.php:1061
 msgid "Distributed"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1055
+#: src/Content/Conversation/ConversationDataProvider.php:1064
 msgid "Pushed to us"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1060
+#: src/Content/Conversation/ConversationDataProvider.php:1069
 #, php-format
 msgid "Channel \"%s\": %s"
 msgstr ""
 
-#: src/Content/Conversation/ConversationDataProvider.php:1060
+#: src/Content/Conversation/ConversationDataProvider.php:1069
 #, php-format
 msgid "Channel \"%s\""
 msgstr ""
 
-#: src/Content/Conversation/ConversationRenderer.php:502
+#: src/Content/Conversation/ConversationRenderer.php:522
 msgid "Delete Selected Items"
 msgstr ""
 
-#: src/Content/Conversation/ConversationRenderer.php:518
+#: src/Content/Conversation/ConversationRenderer.php:564
 msgid "remove"
 msgstr ""
 
@@ -2007,7 +2007,7 @@ msgstr ""
 
 #: src/Content/Feature.php:134 src/Content/Widget.php:640
 #: src/Module/Admin/Site.php:476 src/Module/BaseSettings.php:113
-#: src/Module/Settings/Channels.php:231 src/Module/Settings/Display.php:479
+#: src/Module/Settings/Channels.php:231 src/Module/Settings/Display.php:499
 msgid "Channels"
 msgstr ""
 
@@ -2343,7 +2343,7 @@ msgstr ""
 #: src/Content/Nav.php:260 src/Module/BaseProfile.php:70
 #: src/Module/BaseProfile.php:73 src/Module/BaseProfile.php:81
 #: src/Module/BaseProfile.php:84 src/Module/Calendar/Show.php:113
-#: src/Module/Settings/Display.php:480 view/theme/frio/theme.php:223
+#: src/Module/Settings/Display.php:500 view/theme/frio/theme.php:223
 #: view/theme/frio/theme.php:229
 msgid "Calendar"
 msgstr ""
@@ -3461,31 +3461,31 @@ msgstr ""
 msgid "Sat"
 msgstr ""
 
-#: src/Model/Event.php:421 src/Module/Settings/Display.php:446
+#: src/Model/Event.php:421 src/Module/Settings/Display.php:466
 msgid "Sunday"
 msgstr ""
 
-#: src/Model/Event.php:422 src/Module/Settings/Display.php:447
+#: src/Model/Event.php:422 src/Module/Settings/Display.php:467
 msgid "Monday"
 msgstr ""
 
-#: src/Model/Event.php:423 src/Module/Settings/Display.php:448
+#: src/Model/Event.php:423 src/Module/Settings/Display.php:468
 msgid "Tuesday"
 msgstr ""
 
-#: src/Model/Event.php:424 src/Module/Settings/Display.php:449
+#: src/Model/Event.php:424 src/Module/Settings/Display.php:469
 msgid "Wednesday"
 msgstr ""
 
-#: src/Model/Event.php:425 src/Module/Settings/Display.php:450
+#: src/Model/Event.php:425 src/Module/Settings/Display.php:470
 msgid "Thursday"
 msgstr ""
 
-#: src/Model/Event.php:426 src/Module/Settings/Display.php:451
+#: src/Model/Event.php:426 src/Module/Settings/Display.php:471
 msgid "Friday"
 msgstr ""
 
-#: src/Model/Event.php:427 src/Module/Settings/Display.php:452
+#: src/Model/Event.php:427 src/Module/Settings/Display.php:472
 msgid "Saturday"
 msgstr ""
 
@@ -3587,17 +3587,17 @@ msgid "today"
 msgstr ""
 
 #: src/Model/Event.php:455 src/Module/Calendar/Show.php:118
-#: src/Module/Settings/Display.php:457 src/Util/Temporal.php:354
+#: src/Module/Settings/Display.php:477 src/Util/Temporal.php:354
 msgid "month"
 msgstr ""
 
 #: src/Model/Event.php:456 src/Module/Calendar/Show.php:119
-#: src/Module/Settings/Display.php:458 src/Util/Temporal.php:355
+#: src/Module/Settings/Display.php:478 src/Util/Temporal.php:355
 msgid "week"
 msgstr ""
 
 #: src/Model/Event.php:457 src/Module/Calendar/Show.php:120
-#: src/Module/Settings/Display.php:459 src/Util/Temporal.php:356
+#: src/Module/Settings/Display.php:479 src/Util/Temporal.php:356
 msgid "day"
 msgstr ""
 
@@ -4170,7 +4170,7 @@ msgstr ""
 #: src/Module/Settings/Addons.php:73 src/Module/Settings/Connectors.php:148
 #: src/Module/Settings/Connectors.php:234
 #: src/Module/Settings/ContactImport.php:118
-#: src/Module/Settings/Delegation.php:171 src/Module/Settings/Display.php:472
+#: src/Module/Settings/Delegation.php:171 src/Module/Settings/Display.php:492
 #: src/Module/Settings/Features.php:85
 #: src/Module/Settings/Profile/Index.php:264
 msgid "Save Settings"
@@ -4628,11 +4628,11 @@ msgstr ""
 msgid "%s is no valid input for maximum image size"
 msgstr ""
 
-#: src/Module/Admin/Site.php:366 src/Module/Settings/Display.php:258
+#: src/Module/Admin/Site.php:366 src/Module/Settings/Display.php:268
 msgid "No special theme for mobile devices"
 msgstr ""
 
-#: src/Module/Admin/Site.php:383 src/Module/Settings/Display.php:268
+#: src/Module/Admin/Site.php:383 src/Module/Settings/Display.php:278
 #, php-format
 msgid "%s - (Experimental)"
 msgstr ""
@@ -5561,7 +5561,7 @@ msgid "Can be \"all\" or \"tags\". \"all\" means that every public post should b
 msgstr ""
 
 #: src/Module/Admin/Site.php:598 src/Module/Contact/Profile.php:322
-#: src/Module/Settings/Display.php:310
+#: src/Module/Settings/Display.php:326
 #: src/Module/Settings/TwoFactor/Index.php:132
 msgid "Disabled"
 msgstr ""
@@ -5855,7 +5855,7 @@ msgid "Screenshot"
 msgstr ""
 
 #: src/Module/Admin/Themes/Details.php:83 src/Module/Admin/Themes/Index.php:104
-#: src/Module/BaseAdmin.php:79 src/Module/Settings/Display.php:475
+#: src/Module/BaseAdmin.php:79 src/Module/Settings/Display.php:495
 msgid "Themes"
 msgstr ""
 
@@ -6352,7 +6352,7 @@ msgid "Where does it happen?"
 msgstr ""
 
 #: src/Module/Calendar/Event/Form.php:253 src/Module/Settings/Channels.php:185
-#: src/Module/Settings/Channels.php:218 src/Module/Settings/Display.php:521
+#: src/Module/Settings/Channels.php:218 src/Module/Settings/Display.php:542
 #: src/Module/Settings/TwoFactor/AppSpecific.php:135
 msgid "Description"
 msgstr ""
@@ -6390,7 +6390,7 @@ msgstr ""
 msgid "New Event"
 msgstr ""
 
-#: src/Module/Calendar/Show.php:121 src/Module/Settings/Display.php:460
+#: src/Module/Calendar/Show.php:121 src/Module/Settings/Display.php:480
 msgid "list"
 msgstr ""
 
@@ -10736,7 +10736,7 @@ msgid "When selected, the channel results are reshared. This only works for publ
 msgstr ""
 
 #: src/Module/Settings/Channels.php:184 src/Module/Settings/Channels.php:217
-#: src/Module/Settings/Display.php:520
+#: src/Module/Settings/Display.php:541
 msgid "Label"
 msgstr ""
 
@@ -11131,324 +11131,344 @@ msgstr ""
 msgid "No entries."
 msgstr ""
 
-#: src/Module/Settings/Display.php:226
+#: src/Module/Settings/Display.php:236
 msgid "The theme you chose isn't available."
 msgstr ""
 
-#: src/Module/Settings/Display.php:266
+#: src/Module/Settings/Display.php:276
 #, php-format
 msgid "%s - (Unsupported)"
 msgstr ""
 
-#: src/Module/Settings/Display.php:289
+#: src/Module/Settings/Display.php:299
 msgid "Don't update"
 msgstr ""
 
-#: src/Module/Settings/Display.php:290
+#: src/Module/Settings/Display.php:300
 msgid "Update at the top of the page"
 msgstr ""
 
-#: src/Module/Settings/Display.php:291
+#: src/Module/Settings/Display.php:301
 msgid "Always update"
 msgstr ""
 
-#: src/Module/Settings/Display.php:311
-msgid "Color/Black"
-msgstr ""
-
-#: src/Module/Settings/Display.php:312 view/theme/frio/php/scheme.php:96
-msgid "Black"
+#: src/Module/Settings/Display.php:312
+msgid "Show all comments"
 msgstr ""
 
 #: src/Module/Settings/Display.php:313
-msgid "Color/White"
+msgid "Compact conversation view: only comments from the thread author and yourself that form coherent conversation threads"
 msgstr ""
 
 #: src/Module/Settings/Display.php:314
-msgid "White"
+msgid "Hide comments in feeds"
 msgstr ""
 
-#: src/Module/Settings/Display.php:319 src/Module/Settings/Display.php:329
-msgid "Theme default"
+#: src/Module/Settings/Display.php:327
+msgid "Color/Black"
+msgstr ""
+
+#: src/Module/Settings/Display.php:328 view/theme/frio/php/scheme.php:96
+msgid "Black"
+msgstr ""
+
+#: src/Module/Settings/Display.php:329
+msgid "Color/White"
 msgstr ""
 
 #: src/Module/Settings/Display.php:330
+msgid "White"
+msgstr ""
+
+#: src/Module/Settings/Display.php:342 src/Module/Settings/Display.php:349
+msgid "Theme default"
+msgstr ""
+
+#: src/Module/Settings/Display.php:350
 msgid "Increased"
 msgstr ""
 
-#: src/Module/Settings/Display.php:331
+#: src/Module/Settings/Display.php:351
 msgid "Large"
 msgstr ""
 
-#: src/Module/Settings/Display.php:336
+#: src/Module/Settings/Display.php:356
 msgid "No preview"
 msgstr ""
 
-#: src/Module/Settings/Display.php:337
+#: src/Module/Settings/Display.php:357
 msgid "No image"
 msgstr ""
 
-#: src/Module/Settings/Display.php:338
+#: src/Module/Settings/Display.php:358
 msgid "Small Image"
 msgstr ""
 
-#: src/Module/Settings/Display.php:339
+#: src/Module/Settings/Display.php:359
 msgid "Large Image"
 msgstr ""
 
-#: src/Module/Settings/Display.php:340
+#: src/Module/Settings/Display.php:360
 msgid "Automatic image size"
 msgstr ""
 
-#: src/Module/Settings/Display.php:471
+#: src/Module/Settings/Display.php:491
 msgid "Display Settings"
 msgstr ""
 
-#: src/Module/Settings/Display.php:473
+#: src/Module/Settings/Display.php:493
 msgid "Content Settings"
 msgstr ""
 
-#: src/Module/Settings/Display.php:474 view/theme/frio/config.php:171
+#: src/Module/Settings/Display.php:494 view/theme/frio/config.php:171
 #: view/theme/vier/config.php:146
 msgid "Theme settings"
 msgstr ""
 
-#: src/Module/Settings/Display.php:476
+#: src/Module/Settings/Display.php:496
 #, php-format
 msgid "Settings for %s"
 msgstr ""
 
-#: src/Module/Settings/Display.php:477
+#: src/Module/Settings/Display.php:497
 msgid "Note: If you switch the theme, you need to save changes before you can see the settings for the new theme below."
 msgstr ""
 
-#: src/Module/Settings/Display.php:478
+#: src/Module/Settings/Display.php:498
 msgid "Timelines"
 msgstr ""
 
-#: src/Module/Settings/Display.php:481 src/Module/Settings/Features.php:78
+#: src/Module/Settings/Display.php:501 src/Module/Settings/Features.php:78
 msgid "Drag to reorder, use arrow buttons on each item, or tab to item with keyboard and move up/down with arrow keys"
 msgstr ""
 
-#: src/Module/Settings/Display.php:484 src/Module/Settings/Display.php:488
+#: src/Module/Settings/Display.php:504 src/Module/Settings/Display.php:508
 #: src/Module/Settings/Features.php:82
 msgid "Reset order"
 msgstr ""
 
-#: src/Module/Settings/Display.php:494
+#: src/Module/Settings/Display.php:514
 msgid "Theme"
 msgstr ""
 
-#: src/Module/Settings/Display.php:495
+#: src/Module/Settings/Display.php:515
 msgid "Mobile theme"
 msgstr ""
 
-#: src/Module/Settings/Display.php:498
+#: src/Module/Settings/Display.php:518
 msgid "Number of items to display per page:"
 msgstr ""
 
-#: src/Module/Settings/Display.php:498 src/Module/Settings/Display.php:499
+#: src/Module/Settings/Display.php:518 src/Module/Settings/Display.php:519
 msgid "Maximum of 100 items"
 msgstr ""
 
-#: src/Module/Settings/Display.php:499
+#: src/Module/Settings/Display.php:519
 msgid "Number of items to display per page when viewed from mobile device:"
 msgstr ""
 
-#: src/Module/Settings/Display.php:500
+#: src/Module/Settings/Display.php:520
 msgid "Regularly update the timeline"
 msgstr ""
 
-#: src/Module/Settings/Display.php:500
+#: src/Module/Settings/Display.php:520
 msgid "Controls whether new content on network, community and channels is added on top of the timeline. The display page is never updated automatically."
 msgstr ""
 
-#: src/Module/Settings/Display.php:501
+#: src/Module/Settings/Display.php:521
 msgid "Display emojis"
 msgstr ""
 
-#: src/Module/Settings/Display.php:501
+#: src/Module/Settings/Display.php:521
 msgid "When enabled, emoticons are replaced with matching emojis."
 msgstr ""
 
-#: src/Module/Settings/Display.php:502
+#: src/Module/Settings/Display.php:522
 msgid "Enable SPA mode"
 msgstr ""
 
-#: src/Module/Settings/Display.php:502
+#: src/Module/Settings/Display.php:522
 msgid "Warning - Experimental feature: This may lead to errors or unexpected behaviour. When enabled, supported pages are loaded by replacing only the main content instead of reloading the whole browser page, which makes navigation faster."
 msgstr ""
 
-#: src/Module/Settings/Display.php:503
+#: src/Module/Settings/Display.php:523
 msgid "Infinite scroll"
 msgstr ""
 
-#: src/Module/Settings/Display.php:503
+#: src/Module/Settings/Display.php:523
 msgid "Automatic fetch new items when reaching the page end."
 msgstr ""
 
-#: src/Module/Settings/Display.php:504
+#: src/Module/Settings/Display.php:524
 msgid "Enable Smart Threading"
 msgstr ""
 
-#: src/Module/Settings/Display.php:504
+#: src/Module/Settings/Display.php:524
 msgid "Enable the automatic suppression of extraneous thread indentation."
 msgstr ""
 
-#: src/Module/Settings/Display.php:505
+#: src/Module/Settings/Display.php:525
 msgid "Display the Dislike feature"
 msgstr ""
 
-#: src/Module/Settings/Display.php:505
+#: src/Module/Settings/Display.php:525
 msgid "Display the Dislike button and dislike reactions on posts and comments."
 msgstr ""
 
-#: src/Module/Settings/Display.php:506
+#: src/Module/Settings/Display.php:526
 msgid "Display the resharer"
 msgstr ""
 
-#: src/Module/Settings/Display.php:506
+#: src/Module/Settings/Display.php:526
 msgid "Display the first resharer as icon and text on a reshared item."
 msgstr ""
 
-#: src/Module/Settings/Display.php:507
+#: src/Module/Settings/Display.php:527
 msgid "Stay local"
 msgstr ""
 
-#: src/Module/Settings/Display.php:507
+#: src/Module/Settings/Display.php:527
 msgid "Don't go to a remote system when following a contact link."
 msgstr ""
 
-#: src/Module/Settings/Display.php:508
-msgid "Compact conversation view"
+#: src/Module/Settings/Display.php:528
+msgid "Comments in timelines"
 msgstr ""
 
-#: src/Module/Settings/Display.php:508
-msgid "Show only comments from the thread author and yourself that form coherent conversation threads. Hides replies to filtered-out comments."
+#: src/Module/Settings/Display.php:528
+msgid "Controls which comments are shown below posts on all pages that list posts, like timelines, profiles and contact pages. \"Compact conversation view\" hides replies to filtered-out comments, \"Hide comments in feeds\" shows no comments at all. Single post pages always show the full conversation."
 msgstr ""
 
-#: src/Module/Settings/Display.php:509
+#: src/Module/Settings/Display.php:529
+msgid "Open the post when clicking it"
+msgstr ""
+
+#: src/Module/Settings/Display.php:529
+msgid "Clicking the text of a post opens its own page. This applies to feeds with compact or hidden comments and to lists that never show comments, like search results and contact posts."
+msgstr ""
+
+#: src/Module/Settings/Display.php:530
 msgid "Show the post deletion checkbox"
 msgstr ""
 
-#: src/Module/Settings/Display.php:509
+#: src/Module/Settings/Display.php:530
 msgid "Display the checkbox for the post deletion on the network page."
 msgstr ""
 
-#: src/Module/Settings/Display.php:510
+#: src/Module/Settings/Display.php:531
 msgid "Display the event list"
 msgstr ""
 
-#: src/Module/Settings/Display.php:510
+#: src/Module/Settings/Display.php:531
 msgid "Display the birthday reminder and event list on the network page."
 msgstr ""
 
-#: src/Module/Settings/Display.php:511
+#: src/Module/Settings/Display.php:532
 msgid "Link preview mode"
 msgstr ""
 
-#: src/Module/Settings/Display.php:511
+#: src/Module/Settings/Display.php:532
 msgid "Appearance of the link preview that is added to each post with a link."
 msgstr ""
 
-#: src/Module/Settings/Display.php:512
+#: src/Module/Settings/Display.php:533
 msgid "Hide pictures with empty alternative text"
 msgstr ""
 
-#: src/Module/Settings/Display.php:512
+#: src/Module/Settings/Display.php:533
 msgid "Don't display pictures that are missing the alternative text."
 msgstr ""
 
-#: src/Module/Settings/Display.php:513
+#: src/Module/Settings/Display.php:534
 msgid "Hide custom emojis"
 msgstr ""
 
-#: src/Module/Settings/Display.php:513
+#: src/Module/Settings/Display.php:534
 msgid "Don't display custom emojis."
 msgstr ""
 
-#: src/Module/Settings/Display.php:514
+#: src/Module/Settings/Display.php:535
 msgid "Platform icons style"
 msgstr ""
 
-#: src/Module/Settings/Display.php:514
+#: src/Module/Settings/Display.php:535
 msgid "Style of the platform icons"
 msgstr ""
 
-#: src/Module/Settings/Display.php:515
+#: src/Module/Settings/Display.php:536
 msgid "Font"
 msgstr ""
 
-#: src/Module/Settings/Display.php:515
+#: src/Module/Settings/Display.php:536
 msgid "Replace the font of the theme with a font that is easier to read. OpenDyslexic is designed for people with dyslexia, Atkinson Hyperlegible and Luciole for people with low vision, Lexend for a smoother reading flow, Andika for beginning readers."
 msgstr ""
 
-#: src/Module/Settings/Display.php:516
+#: src/Module/Settings/Display.php:537
 msgid "Text spacing"
 msgstr ""
 
-#: src/Module/Settings/Display.php:516
+#: src/Module/Settings/Display.php:537
 msgid "Increase the spacing between letters, words and lines to make texts easier to read. \"Large\" corresponds to the text spacing values of WCAG 2.1 success criterion 1.4.12."
 msgstr ""
 
-#: src/Module/Settings/Display.php:517
+#: src/Module/Settings/Display.php:538
 msgid "Embed remote media"
 msgstr ""
 
-#: src/Module/Settings/Display.php:517
+#: src/Module/Settings/Display.php:538
 msgid "When enabled, remote media will be embedded in the post, like for example YouTube videos."
 msgstr ""
 
-#: src/Module/Settings/Display.php:518
+#: src/Module/Settings/Display.php:539
 msgid "Embed supported media"
 msgstr ""
 
-#: src/Module/Settings/Display.php:518
+#: src/Module/Settings/Display.php:539
 msgid "When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos."
 msgstr ""
 
-#: src/Module/Settings/Display.php:522
+#: src/Module/Settings/Display.php:543
 msgid "Channels Widget"
 msgstr ""
 
-#: src/Module/Settings/Display.php:523
+#: src/Module/Settings/Display.php:544
 msgid "Top Menu"
 msgstr ""
 
-#: src/Module/Settings/Display.php:525
+#: src/Module/Settings/Display.php:546
 msgid "Enable timelines that you want to see in the channels widget. Bookmark timelines that you want to see in the top menu."
 msgstr ""
 
-#: src/Module/Settings/Display.php:527
+#: src/Module/Settings/Display.php:548
 msgid "Channel languages:"
 msgstr ""
 
-#: src/Module/Settings/Display.php:527
+#: src/Module/Settings/Display.php:548
 msgid "Select all the languages you want to see in your channels. \"Unspecified\" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language). If you want to see all languages, you will need to select all items in the list."
 msgstr ""
 
-#: src/Module/Settings/Display.php:528
+#: src/Module/Settings/Display.php:549
 msgid "Timeline channels:"
 msgstr ""
 
-#: src/Module/Settings/Display.php:528
+#: src/Module/Settings/Display.php:549
 msgid "Select all the channels that you want to see in your network timeline."
 msgstr ""
 
-#: src/Module/Settings/Display.php:530
+#: src/Module/Settings/Display.php:551
 msgid "Filter channels:"
 msgstr ""
 
-#: src/Module/Settings/Display.php:530
+#: src/Module/Settings/Display.php:551
 #, php-format
 msgid "Select all the channels that you want to use as a filter for your network timeline. All posts from these channels will be hidden. For technical reasons postings that are older than %s will not be filtered."
 msgstr ""
 
-#: src/Module/Settings/Display.php:533
+#: src/Module/Settings/Display.php:554
 msgid "Beginning of week:"
 msgstr ""
 
-#: src/Module/Settings/Display.php:534
+#: src/Module/Settings/Display.php:555
 msgid "Default calendar view:"
 msgstr ""
 

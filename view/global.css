@@ -84,6 +84,9 @@ span.connector {
 .wall-item-content {
 	position: relative;
 }
+.wall-item-content.click-to-display {
+	cursor: pointer;
+}
 .wall-item-container .wall-item-content .type-link img,
 .type-link img, .type-video img, img.attachment-preview {
   max-width: 160px;
