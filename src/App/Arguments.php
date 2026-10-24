@@ -40,9 +40,9 @@ class Arguments
 		 */
 		private int $argc = 0,
 		/**
-		 * @var string The used HTTP method
+		 * @var string The used HTTP method; the router turns HEAD into GET for routes without a HEAD opt-in
 		 */
-		private readonly string $method = Router::GET,
+		private string $method = Router::GET,
 	) {}
 
 	/**
@@ -104,6 +104,11 @@ class Arguments
 	public function setArgc(int $argc)
 	{
 		$this->argc = $argc;
+	}
+
+	public function setMethod(string $method)
+	{
+		$this->method = $method;
 	}
 
 	/**

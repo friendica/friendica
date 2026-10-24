@@ -77,14 +77,14 @@ class IndexTest extends FixtureTestCase
 		$this->handle('HEAD', self::NICKNAME);
 	}
 
-	public function testHeadOnBlockedPublicAccessShowsLogin(): void
+	public function testHeadOnBlockedPublicAccessKeepsStatus(): void
 	{
 		DI::config()->set('system', 'block_public', true);
 
 		$response = $this->handle('HEAD', self::NICKNAME);
 
 		self::assertSame(200, $response->getStatusCode());
-		self::assertStringContainsString('id="login-form"', (string) $response->getBody());
+		self::assertSame('', (string) $response->getBody());
 	}
 
 	/** @return array<string, array{string}> */
@@ -115,7 +115,8 @@ class IndexTest extends FixtureTestCase
 
 	private function handle(string $method, string $nickname): ResponseInterface
 	{
-		// Arguments maps HEAD to GET, only the server array keeps the real method.
+		// The router sets the method on the shared Arguments; the profile route registers HEAD.
+		DI::args()->setMethod($method);
 		$module = $this->dice->create(Index::class, [['REQUEST_METHOD' => $method], ['nickname' => $nickname]]);
 
 		return $module->handleRequest(new ServerRequest($method, DI::baseUrl() . '/profile/' . $nickname));

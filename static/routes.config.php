@@ -19,7 +19,7 @@ use Friendica\App\Router as R;
 use Friendica\Module;
 
 $profileRoutes = [
-	''                                                => [Module\Profile\Index::class,         [R::GET]],
+	''                                                => [Module\Profile\Index::class,         [R::GET, R::HEAD]],
 	'/contacts/common'                                => [Module\Profile\Common::class,        [R::GET]],
 	'/contacts[/{type}]'                              => [Module\Profile\Contacts::class,      [R::GET]],
 	'/circles/{circle_id:\d+}/download'               => [Module\Profile\CircleExport::class,  [R::GET]],
@@ -29,7 +29,7 @@ $profileRoutes = [
 	'/remote_follow'                                  => [Module\Profile\RemoteFollow::class,  [R::GET, R::POST]],
 	'/restricted'                                     => [Module\Profile\Restricted::class,    [R::GET         ]],
 	'/schedule'                                       => [Module\Profile\Schedule::class,      [R::GET, R::POST]],
-	'/conversations[/{category}[/{date1}[/{date2}]]]' => [Module\Profile\Conversations::class, [R::GET]],
+	'/conversations[/{category}[/{date1}[/{date2}]]]' => [Module\Profile\Conversations::class, [R::GET, R::HEAD]],
 ];
 
 $apiRoutes = [

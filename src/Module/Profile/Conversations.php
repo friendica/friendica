@@ -49,24 +49,16 @@ class Conversations extends BaseProfile
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 	}
 
+	protected function head(array $request = [])
+	{
+		$this->loadVisibleProfile();
+	}
+
 	protected function content(array $request = []): string
 	{
-		$profile = ProfileModel::load($this->appHelper, $this->parameters['nickname'] ?? '');
-		if (empty($profile)) {
-			throw new HTTPException\NotFoundException($this->t('User not found.'));
-		}
-
-		if ($this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
+		$profile = $this->loadVisibleProfile();
+		if ($profile === null) {
 			return Login::form();
-		}
-
-		if (!empty($profile['hidewall']) && !$this->session->isAuthenticated()) {
-			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
-		}
-
-		// HEAD gets the same status and headers as GET, the body is discarded anyway.
-		if ($this->isHeadRequest()) {
-			return '';
 		}
 
 		if (!$profile['net-publish']) {
@@ -222,5 +214,30 @@ class Conversations extends BaseProfile
 		$o .= $pager->renderMinimal(count($items));
 
 		return $o;
+	}
+
+	/**
+	 * Status-relevant checks shared by GET and HEAD
+	 *
+	 * @return array|null The profile, null when public access is blocked and the login form is shown
+	 * @throws HTTPException\NotFoundException
+	 * @throws HTTPException\FoundException
+	 */
+	private function loadVisibleProfile(): ?array
+	{
+		$profile = ProfileModel::load($this->appHelper, $this->parameters['nickname'] ?? '');
+		if (empty($profile)) {
+			throw new HTTPException\NotFoundException($this->t('User not found.'));
+		}
+
+		if ($this->config->get('system', 'block_public') && !$this->session->isAuthenticated()) {
+			return null;
+		}
+
+		if (!empty($profile['hidewall']) && !$this->session->isAuthenticated()) {
+			$this->baseUrl->redirect('profile/' . $profile['nickname'] . '/restricted');
+		}
+
+		return $profile;
 	}
 }

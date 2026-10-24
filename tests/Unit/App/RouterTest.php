@@ -18,6 +18,7 @@ use Friendica\Core\Lock\Capability\ICanLock;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 class RouterTest extends TestCase
@@ -332,12 +333,53 @@ class RouterTest extends TestCase
 	 */
 	public function testHttpMethodConstantsAndAllowedMethods(): void
 	{
-		$expectedMethods = ['DELETE', 'GET', 'PATCH', 'POST', 'PUT', 'OPTIONS'];
+		$expectedMethods = ['DELETE', 'GET', 'PATCH', 'POST', 'PUT', 'OPTIONS', 'HEAD'];
 
 		foreach ($expectedMethods as $method) {
 			self::assertContains($method, Router::ALLOWED_METHODS);
 		}
 
 		self::assertCount(count($expectedMethods), Router::ALLOWED_METHODS);
+	}
+
+	/** @return array<string, array{string, string[], string, string}> */
+	public static function headRoutes(): array
+	{
+		return [
+			'HEAD route registered' => ['HEAD', [Router::GET, Router::HEAD], 'HEAD', 'Friendica\Module\WithHead'],
+			'GET-only route'        => ['HEAD', [Router::GET], 'GET', 'Friendica\Module\WithHead'],
+			'GET on HEAD route'     => ['GET', [Router::GET, Router::HEAD], 'GET', 'Friendica\Module\WithHead'],
+		];
+	}
+
+	/**
+	 * Test that HEAD only reaches a module as HEAD when the route registers it, otherwise it is handled as GET
+	 *
+	 * @param string[] $routeMethods
+	 */
+	#[DataProvider('headRoutes')]
+	public function testHeadIsHandledAsGetWithoutHeadRoute(string $method, array $routeMethods, string $expectedMethod, string $expectedModule): void
+	{
+		$userSession     = self::createStub(IHandleUserSessions::class);
+		$eventDispatcher = self::createStub(EventDispatcherInterface::class);
+		$eventDispatcher->method('dispatch')->willReturnArgument(0);
+		$args = new Arguments('', 'test', 'test', ['test'], 1, $method);
+
+		$router = new Router(
+			['REQUEST_METHOD' => $method],
+			'',
+			self::createStub(L10n::class),
+			self::createStub(ICanCache::class),
+			self::createStub(ICanLock::class),
+			self::createStub(IManageConfigValues::class),
+			$args,
+			$eventDispatcher,
+			self::createStub(AddonHelper::class),
+			$userSession,
+		);
+		$router->loadRoutes(['/test' => [$expectedModule, $routeMethods]]);
+
+		self::assertSame($expectedModule, $router->getModuleClass());
+		self::assertSame($expectedMethod, $args->getMethod());
 	}
 }

@@ -100,6 +100,85 @@ final class BaseModuleTest extends TestCase
 		}
 	}
 
+	public function testHeadCallsHeadAndSkipsContent(): void
+	{
+		$calls  = new \ArrayObject();
+		$module = self::createRecordingModule('HEAD', $calls);
+
+		$response = $module->handleRequest(self::createStub(ServerRequestInterface::class));
+
+		self::assertSame(['head'], $calls->getArrayCopy());
+		self::assertSame('', (string) $response->getBody());
+	}
+
+	public function testGetCallsGetAndContent(): void
+	{
+		$calls  = new \ArrayObject();
+		$module = self::createRecordingModule('GET', $calls);
+
+		$response = $module->handleRequest(self::createStub(ServerRequestInterface::class));
+
+		self::assertSame(['get', 'content'], $calls->getArrayCopy());
+		self::assertStringContainsString('page', (string) $response->getBody());
+	}
+
+	/** @param \ArrayObject<int, string> $calls */
+	private static function createRecordingModule(string $method, \ArrayObject $calls): BaseModule
+	{
+		$args = self::createStub(App\Arguments::class);
+		$args->method('getMethod')->willReturn($method);
+		$args->method('getModuleName')->willReturn('test');
+		$args->method('getQueryString')->willReturn('');
+
+		$eventDispatcher = self::createStub(EventDispatcherInterface::class);
+		$eventDispatcher->method('dispatch')->willReturnCallback(fn ($event) => $event);
+
+		return new class (
+			self::createStub(L10n::class),
+			self::createStub(App\BaseURL::class),
+			$args,
+			self::createStub(LoggerInterface::class),
+			self::createStub(Profiler::class),
+			new Response(),
+			[],
+			[],
+			$eventDispatcher,
+			$calls,
+		) extends BaseModule {
+			/** @param \ArrayObject<int, string> $calls */
+			public function __construct(
+				L10n $l10n,
+				App\BaseURL $baseUrl,
+				App\Arguments $args,
+				LoggerInterface $logger,
+				Profiler $profiler,
+				Response $response,
+				array $server,
+				array $parameters,
+				EventDispatcherInterface $eventDispatcher,
+				private readonly \ArrayObject $calls,
+			) {
+				parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters, $eventDispatcher);
+			}
+
+			protected function get(array $request = []): void
+			{
+				$this->calls[] = 'get';
+			}
+
+			protected function head(array $request = []): void
+			{
+				$this->calls[] = 'head';
+			}
+
+			protected function content(array $request = []): string
+			{
+				$this->calls[] = 'content';
+				return 'page';
+			}
+		};
+	}
+
 	private static function createModule(?string $exitContent = null, mixed $exitJson = null, ?array $exitError = null, ?array $exitHttpError = null): BaseModule
 	{
 		$args = self::createStub(App\Arguments::class);

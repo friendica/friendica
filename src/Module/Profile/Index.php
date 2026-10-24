@@ -70,10 +70,20 @@ class Index extends BaseModule
 		(new Profile($this->profileField, $this->page, $this->config, $this->pConfig, $this->session, $this->appHelper, $this->database, $this->eventDispatcher, $this->groupManager, $this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $this->response, $this->server, $this->parameters))->rawContent();
 	}
 
+	protected function head(array $request = [])
+	{
+		$this->conversations()->head();
+	}
+
 	protected function content(array $request = []): string
+	{
+		return $this->conversations()->content();
+	}
+
+	private function conversations(): Conversations
 	{
 		/** @var Response $response */
 		$response = $this->response;
-		return (new Conversations($this->mode, $this->pConfig, $this->conversationRenderer, $this->statusEditor, $this->session, $this->config, $this->dateTimeFormat, $this->page, $this->appHelper, $this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $response, $this->server, $this->parameters))->content();
+		return (new Conversations($this->mode, $this->pConfig, $this->conversationRenderer, $this->statusEditor, $this->session, $this->config, $this->dateTimeFormat, $this->page, $this->appHelper, $this->l10n, $this->baseUrl, $this->args, $this->logger, $this->profiler, $response, $this->server, $this->parameters));
 	}
 }
