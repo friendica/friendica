@@ -59,7 +59,6 @@
 						{{include file="field_select.tpl" field=$platform_icon_style}}
 						{{include file="field_select.tpl" field=$font}}
 						{{include file="field_select.tpl" field=$text_spacing}}
-						{{include file="field_checkbox.tpl" field=$embed_remote_media}}
 						{{include file="field_checkbox.tpl" field=$embed_media}}
 					</div>
 					<div class="panel-footer">
