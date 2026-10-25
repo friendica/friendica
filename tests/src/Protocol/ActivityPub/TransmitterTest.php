@@ -48,4 +48,27 @@ class TransmitterTest extends FixtureTestCase
 			$this->assertEquals('Emoji', $emoji['type']);
 		}
 	}
+
+	public function testCreateQuestionVote(): void
+	{
+		$activity = Transmitter::createQuestionVote(
+			'https://mastodon.example/users/bob/statuses/9001',
+			'https://mastodon.example/users/bob',
+			'Tabs',
+			'https://friendica.local/profile/alice',
+		);
+
+		$this->assertEquals('Create', $activity['type']);
+		$this->assertEquals('https://friendica.local/profile/alice', $activity['actor']);
+		$this->assertEquals(['https://mastodon.example/users/bob'], $activity['to']);
+
+		$object = $activity['object'];
+		$this->assertEquals('Note', $object['type']);
+		$this->assertEquals('Tabs', $object['name']);
+		$this->assertEquals('https://mastodon.example/users/bob/statuses/9001', $object['inReplyTo']);
+		$this->assertEquals('https://friendica.local/profile/alice', $object['attributedTo']);
+		$this->assertEquals(['https://mastodon.example/users/bob'], $object['to']);
+		// The vote/reply distinction hinges on this key being entirely absent, not just empty.
+		$this->assertArrayNotHasKey('content', $object);
+	}
 }
