@@ -74,6 +74,11 @@
 		body.wide-editor-active #comment-edit-text-{{$id}} {
 			max-height: calc(100vh - 180px);
 		}
+
+		body.wide-editor-active .preview,
+		body.wide-editor-active .previewseparator {
+			display: none !important;
+		}
 	}
 </style>
 <div class="generic-page-wrapper">
