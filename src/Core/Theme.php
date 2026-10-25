@@ -66,6 +66,7 @@ class Theme
 			'credits'      => "",
 			'experimental' => file_exists("view/theme/$theme/experimental"),
 			'unsupported'  => file_exists("view/theme/$theme/unsupported"),
+			'features'     => [],
 		];
 
 		if (!is_file("view/theme/$theme/theme.php")) {
@@ -98,6 +99,13 @@ class Theme
 							$info['maintainer'][] = ['name' => $matches[1], 'link' => $matches[2]];
 						} else {
 							$info['maintainer'][] = ['name' => $value];
+						}
+					} elseif ($key == 'features') {
+						$result = explode(',', $value);
+						if ($result) {
+							foreach($result as $key => $value) {
+								$info['features'][$key] = trim($value);
+							}
 						}
 					} elseif (array_key_exists($key, $info)) {
 						$info[$key] = $value;
