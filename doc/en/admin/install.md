@@ -59,6 +59,7 @@ If this is nothing for you, you might be interested in the following:
   * [Setting Up Friendica Daemon as a Systemd Service Tutorial](https://nequalsonelifestyle.com/2022/08/04/setting-up-friendica-daemon-systemd-service/)
 * [Setting up Friendica on Unraid](https://www.jenovarain.com/2023/03/setting-up-friendica-on-unraid/) (NAS)
 * [Installing Friendica with Elastio](https://elest.io/open-source/friendica)
+* [Friendica 1-click Docker deployment on Hostinger VPS](https://www.hostinger.com/applications/friendica)
 
 ### Get Friendica
 

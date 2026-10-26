@@ -98,6 +98,17 @@ class APContact
 	}
 
 	/**
+	 * Cache key that marks a recent fetch attempt for the given profile url
+	 *
+	 * @param string $url profile url
+	 * @return string
+	 */
+	private static function getRequestCacheKey(string $url): string
+	{
+		return 'apcontact:' . ItemURI::getIdByURI($url);
+	}
+
+	/**
 	 * Fetches a profile from a given url
 	 *
 	 * @param string   $url    profile url
@@ -148,6 +159,12 @@ class APContact
 			}
 		}
 
+		// A repeated request must not pay for WebFinger before the check below returns the stored contact.
+		if (!empty($fetched_contact) && !is_null(DI::cache()->get(self::getRequestCacheKey($fetched_contact['url'])))) {
+			DI::logger()->info('Multiple requests for the address', ['url' => $url, 'update' => $update]);
+			return $fetched_contact;
+		}
+
 		$apcontact = self::fetchWebfingerData($url);
 		if (!Network::isValidHttpUrl($url) && !isset($apcontact['url'])) {
 			return $fetched_contact;
@@ -165,7 +182,7 @@ class APContact
 
 		// Detect multiple fast repeating request to the same address
 		// See https://github.com/friendica/friendica/issues/9303
-		$cachekey = 'apcontact:' . ItemURI::getIdByURI($url);
+		$cachekey = self::getRequestCacheKey($url);
 		$result   = DI::cache()->get($cachekey);
 		if (!is_null($result)) {
 			DI::logger()->info('Multiple requests for the address', ['url' => $url, 'update' => $update, 'result' => $result]);

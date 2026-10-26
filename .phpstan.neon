@@ -40,29 +40,60 @@ parameters:
     strictRules:
         allRules: false
 
+    # Ignores are listed per file and never with "count".
+    # A count breaks as soon as two branches each add an occurrence, even if both pass on their own.
     ignoreErrors:
 
         # Deprecated since 2022.05: Notify -> Notification, FormattedNotify -> FormattedNotification
         -
             message: '#deprecated class Friendica\\Navigation\\Notifications\\(?:Repository\\Notify|Entity\\Notify|Factory\\Notify|Factory\\FormattedNotify|ValueObject\\FormattedNotify)#'
-            path: src/
-            count: 90
+            paths:
+                - src/DI.php
+                - src/Model/Contact.php
+                - src/Model/Item.php
+                - src/Model/Mail.php
+                - src/Model/Subscription.php
+                - src/Module/Api/Friendica/Notification.php
+                - src/Module/Api/Friendica/Notification/Seen.php
+                - src/Module/Api/Mastodon/Statuses.php
+                - src/Module/BaseNotifications.php
+                - src/Module/Item/Display.php
+                - src/Module/Notifications/Notification.php
+                - src/Module/Notifications/Notifications.php
+                - src/Module/Notifications/Ping.php
+                - src/Module/Register.php
+                - src/Module/Update/Display.php
+                - src/Module/User/Delegation.php
+                - src/Navigation/Notifications/Collection/Notifies.php
+                - src/Navigation/Notifications/Factory/FormattedNavNotification.php
+                - src/Object/Api/Friendica/Notification.php
+                - src/Protocol/DFRN.php
 
         # Deprecated run() calls in tests are preserved for BC promise and
         # will be replaced by handleRequest() tests in the future
         -
             message: '#^Call to deprecated method run\(\) of class#'
             identifier: method.deprecated
-            path: tests/
-            count: 40
-
-        # vfsStream v1.6.12: getChild() returns vfsStreamContent, but at() expects
-        # vfsStreamContainer. vfsStreamContainer does NOT extend vfsStreamContent,
-        # so PHPStan can't narrow the type. Library is frozen, no upstream fix.
-        -
-            message: '#^Parameter \#1 \$container of method org\\bovigo\\vfs\\vfsStreamAbstractContent\:\:at\(\) expects org\\bovigo\\vfs\\vfsStreamContainer, org\\bovigo\\vfs\\vfsStreamContent given\.$#'
-            path: tests/
-            count: 36
+            paths:
+                - tests/src/Module/Api/Friendica/DirectMessages/SearchTest.php
+                - tests/src/Module/Api/Friendica/Photoalbum/DeleteTest.php
+                - tests/src/Module/Api/GnuSocial/GnuSocial/ConfigTest.php
+                - tests/src/Module/Api/GnuSocial/GnuSocial/VersionTest.php
+                - tests/src/Module/Api/GnuSocial/Help/TestTest.php
+                - tests/src/Module/Api/Twitter/Account/RateLimitStatusTest.php
+                - tests/src/Module/Api/Twitter/Account/UpdateProfileTest.php
+                - tests/src/Module/Api/Twitter/DirectMessages/AllTest.php
+                - tests/src/Module/Api/Twitter/DirectMessages/ConversationTest.php
+                - tests/src/Module/Api/Twitter/DirectMessages/InboxTest.php
+                - tests/src/Module/Api/Twitter/Media/UploadTest.php
+                - tests/src/Module/Api/Twitter/SavedSearchesTest.php
+                - tests/src/Module/Api/Twitter/Users/LookupTest.php
+                - tests/src/Module/Api/Twitter/Users/SearchTest.php
+                - tests/src/Module/Api/Twitter/Users/ShowTest.php
+                - tests/src/Module/HTTPException/PageNotFoundTest.php
+                - tests/src/Module/NodeInfoTest.php
+                - tests/src/Module/Special/OptionsTest.php
+                - tests/src/Module/StatsCachingTest.php
 
         # Arguments::getModuleName() deprecated since 2022.12.
         # Migration: replace with getModuleClass() (returns FQCN like
@@ -75,5 +106,9 @@ parameters:
                 2022\.12 \- With the new \(sub\-\)routes, it's not trustworthy anymore, use the ModuleClass instead$#
             '''
             identifier: method.deprecated
-            path: src/
-            count: 10
+            paths:
+                - src/App/Mode.php
+                - src/App/Page.php
+                - src/App/Router.php
+                - src/BaseModule.php
+                - src/Core/ACL.php

@@ -701,6 +701,11 @@ For the test suites and the `MYSQL_*` database variables the harness needs, see 
 **PHPStan level:** Level 4 with partial strict rules.
 PHPStan does not enforce architectural boundaries such as `DI::` or `DBA::` in the wrong layer — those are reviewed manually.
 
+**PHPStan ignores:** Fix the type instead of ignoring the error.
+If that is not possible, use `// @phpstan-ignore <identifier> (<reason>)` on the line, or list the affected files with `paths` in `.phpstan.neon`.
+Never use `count` in `.phpstan.neon`: two branches that each add one occurrence pass on their own and fail once merged.
+`composer run phpstan` rejects it.
+
 ---
 
 ## 10. Database Performance

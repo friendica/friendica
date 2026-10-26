@@ -55,7 +55,7 @@
 		"npm-asset/chart.js": "^2.8",
 		"npm-asset/cropperjs": "1.2.2",
 		"npm-asset/unpoly": "^3.14.0",
-		"npm-asset/dompurify": "^1.0",
+		"npm-asset/dompurify": "^3.4.17",
 		"npm-asset/es-jquery-sortable": "^0.9.13",
 		"npm-asset/fullcalendar": "^3.10",
 		"npm-asset/imagesloaded": "4.1.4",
@@ -197,7 +197,11 @@
 		"test:functional": "phpunit -c tests/phpunit.xml --testsuite functional",
 		"test:legacy": "phpunit -c tests/phpunit.xml --testsuite legacy",
 		"phpmd": "phpmd src/ text .phpmd-ruleset.xml --color --cache",
-		"phpstan": "phpstan analyze --memory-limit 1024M --configuration .phpstan.neon",
+		"phpstan": [
+			"@phpstan:check-ignores",
+			"phpstan analyze --memory-limit 1024M --configuration .phpstan.neon"
+		],
+		"phpstan:check-ignores": "sh -c '! grep -n \"^ *count:\" .phpstan.neon || { echo \"Ignores in .phpstan.neon must not use count, list the files with paths instead\" >&2; exit 1; }' --",
 		"phpstan:generate-baseline": "phpstan --generate-baseline=.phpstan-baseline.neon --memory-limit=1024M --configuration=.phpstan.neon",
 		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './view/asset/*' -print0 | xargs -0 -n1 php -l",
 		"docker:translate": "docker run --rm -v $PWD:/data -w /data friendicaci/transifex bin/run_xgettext.sh",

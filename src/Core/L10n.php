@@ -130,13 +130,13 @@ class L10n
 			if ($session->get('uid')) {
 				$user = $this->dba->selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
 				if ($this->dba->isResult($user)) {
-					$session->set('language', $this->normaliseLocale($user['language']));
+					$session->set('language', self::toDirectoryName($this->normaliseLocale($user['language'])));
 				}
 			}
 		}
 
 		if (isset($_GET['lang'])) {
-			$session->set('language', $this->normaliseLocale($_GET['lang']));
+			$session->set('language', self::toDirectoryName($this->normaliseLocale($_GET['lang'])));
 		}
 	}
 
@@ -170,10 +170,7 @@ class L10n
 		$a          = new \stdClass();
 		$a->strings = [];
 
-		$child = array_search($lang, $this::LANG_PARENTS);
-		if ($child) {
-			$lang = $child;
-		}
+		$lang = self::toDirectoryName($lang);
 
 		// load enabled addons strings
 		$addons = array_keys($this->config->get('addons') ?? []);
@@ -192,6 +189,37 @@ class L10n
 		$this->strings = $a->strings;
 
 		unset($a);
+	}
+
+	/**
+	 * Converts a language code to the name of the matching directory below view/lang.
+	 *
+	 * Handles different spellings (case, "_" instead of "-") and codes without or with a different region,
+	 * e.g. "da", "da-DK" and "da_dk" all result in "da-dk". If a language has got several variants, the first one is used.
+	 * "en" results in "en-gb", the same as it did before.
+	 *
+	 * @param string $lang Language code
+	 * @return string Directory name, or the normalised code if there is no matching directory
+	 */
+	public static function toDirectoryName(string $lang): string
+	{
+		$lang = strtolower(str_replace('_', '-', trim($lang)));
+
+		if (isset(self::LANG_PARENTS[$lang]) || is_dir(__DIR__ . '/../../view/lang/' . $lang)) {
+			return $lang;
+		}
+
+		$child = array_search($lang, self::LANG_PARENTS);
+		if ($child) {
+			return $child;
+		}
+
+		// Unknown region, e.g. "de-at" or "pt-pt": Try it with the plain language
+		if (str_contains($lang, '-')) {
+			return self::toDirectoryName(explode('-', $lang)[0]);
+		}
+
+		return $lang;
 	}
 
 	/**

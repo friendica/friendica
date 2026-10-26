@@ -488,6 +488,28 @@ class Images
 	}
 
 	/**
+	 * Checks whether GD can decode and then process the image within the given memory budget.
+	 * Only the header is read: GD allocates 4 bytes per pixel for a truecolor bitmap,
+	 * so an image with huge declared dimensions is caught before it is decoded.
+	 * Rotating or scaling the decoded image allocates a second bitmap of up to the same size,
+	 * so the budget has to hold two of them.
+	 * Data without a readable header is left to the decoder.
+	 *
+	 * @param string $image_data      Image data
+	 * @param int    $available_bytes Free memory, i.e. the memory limit minus the current usage
+	 * @return bool
+	 */
+	public static function fitsIntoMemory(string $image_data, int $available_bytes): bool
+	{
+		$size = @getimagesizefromstring($image_data);
+		if (empty($size[0]) || empty($size[1])) {
+			return true;
+		}
+
+		return $size[0] * $size[1] * 4 * 2 <= $available_bytes;
+	}
+
+	/**
 	 * Get a BBCode tag for an local photo page URL with a preview thumbnail and an image description
 	 *
 	 * @param string $resource_id

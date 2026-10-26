@@ -14,6 +14,7 @@ use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Util\Images;
+use Friendica\Util\Strings;
 use Imagick;
 use ImagickDraw;
 use ImagickPixel;
@@ -217,6 +218,12 @@ class Image implements \Stringable
 
 		if (($this->originType == IMAGETYPE_WEBP) && $this->isAnimatedWebP(substr($data, 0, 90))) {
 			DI::logger()->notice('Animated WebP images are unsupported by GDlib. Please install Imagick.', ['file' => $this->filename]);
+			return false;
+		}
+
+		$memory_limit = Strings::getBytesFromShorthand((string) ini_get('memory_limit'));
+		if ($memory_limit > 0 && !Images::fitsIntoMemory($data, $memory_limit - memory_get_usage())) {
+			DI::logger()->notice('Image is too large to be decoded within the memory limit', ['memory_limit' => $memory_limit, 'file' => $this->filename]);
 			return false;
 		}
 

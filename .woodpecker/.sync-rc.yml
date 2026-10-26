@@ -16,12 +16,14 @@ when:
 
 steps:
   open_sync_pr:
-    image: alpine
+    image: friendicaci/php8.5:php8.5.5
+    # A sync needing manual work must not mark the rc push as failed
+    failure: ignore
     environment:
       TOKEN:
         from_secret: sync_token
     commands:
-      - apk add --no-cache curl git jq
+      - apt-get update -qq && apt-get install -qq -y jq > /dev/null
       - SCRIPT="$(pwd)/bin/dev/sync-rc-into-develop.sh"
       - SYNC_BRANCH="merge-${CI_COMMIT_BRANCH}-into-develop"
       - if [ "${CI_FORGE_TYPE}" = "github" ]; then

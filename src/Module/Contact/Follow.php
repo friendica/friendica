@@ -15,6 +15,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -104,6 +105,10 @@ class Follow extends BaseModule
 		if (!empty($userContact['pending'])) {
 			$this->sysMessages->addNotice($this->t('You already added this contact.'));
 			$submit = '';
+		}
+
+		if (empty(Contact::getByURL($url, false)) && empty(APContact::getByURL($url))) {
+			$this->followRemoteItem($url);
 		}
 
 		$contact = Contact::getByURL($url, true);

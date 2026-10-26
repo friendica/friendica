@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "933a089cf2ec957a1fa06498f70e7da6",
+    "content-hash": "85746a6c5205f338117c2cc51d5767dd",
     "packages": [
         {
             "name": "asika/simple-console",
@@ -1964,14 +1964,17 @@
         },
         {
             "name": "npm-asset/dompurify",
-            "version": "1.0.11",
+            "version": "3.4.17",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/dompurify/-/dompurify-1.0.11.tgz"
+                "url": "https://registry.npmjs.org/dompurify/-/dompurify-3.4.17.tgz"
+            },
+            "require": {
+                "npm-asset/types--trusted-types": ">=2.0.7,<3.0.0"
             },
             "type": "npm-asset",
             "license": [
-                "MPL-2.0 OR Apache-2.0"
+                "(MPL-2.0 OR Apache-2.0)"
             ]
         },
         {
@@ -2170,6 +2173,18 @@
                 "npm-asset/jquery": ">=1.7"
             },
             "type": "npm-asset"
+        },
+        {
+            "name": "npm-asset/types--trusted-types",
+            "version": "2.0.7",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/@types/trusted-types/-/trusted-types-2.0.7.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
         },
         {
             "name": "npm-asset/unpoly",

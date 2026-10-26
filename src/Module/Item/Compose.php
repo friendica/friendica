@@ -315,7 +315,7 @@ class Compose extends BaseModule
 			'previewTimestamp'       => $this->l10n->t('Just now · Preview'),
 			'lblYou'                 => $this->l10n->t('You'),
 			'brandText'              => $this->l10n->t('Advanced Composer (deactivatable in settings)'),
-			'avatarFallback'         => $this->l10n->t('👤'),
+			'avatarFallback'         => '👤',
 			'helpToggleLabel'        => $this->l10n->t('How does the analysis work?'),
 			'helpPrivacyBadge'       => $this->l10n->t('No external services · All processing on your own instance'),
 			'helpPrivacyDetail'      => $this->l10n->t('Text analysis runs entirely in your browser - no data is sent anywhere for analysis. No third-party APIs, no cookies, no tracking. The optional post preview works exactly like Friendica\'s built-in preview button: your draft is sent to your own Friendica instance for rendering. The only server-side storage is your personal enable/disable preference in the standard Friendica settings.'),
