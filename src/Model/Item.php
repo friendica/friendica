@@ -2985,6 +2985,15 @@ class Item
 		// are treated differently.
 		if ($item['object-type'] === Activity\ObjectType::EVENT && isset($item['event-id'])) {
 			$ev = Event::getItemHTML($item);
+
+			if ($attach) {
+				$splitAttachments = DI::postMediaRepository()->splitAttachments($item['uri-id'], [], $item['has-media'] ?? false, $uid != 0);
+
+				$ev = self::addVisualAttachments($splitAttachments['visual'], $item, $ev, false, $uid);
+				$ev = self::addNonVisualAttachments($splitAttachments['additional'], $item, $ev);
+				$ev = self::addHiddenAttachments($splitAttachments['hidden'], $item, $ev);
+			}
+
 			return $ev;
 		}
 
