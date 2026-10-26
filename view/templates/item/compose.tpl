@@ -74,7 +74,6 @@
 		body.wide-editor-active #comment-edit-text-{{$id}} {
 			max-height: calc(100vh - 180px);
 		}
-
 		body.wide-editor-active .preview,
 		body.wide-editor-active .previewseparator {
 			display: none !important;
@@ -155,7 +154,7 @@
 
 			<div id="dropzone-{{$id}}" class="dropzone">
 				<p>
-					<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text form-control text-autosize expandable-textarea" name="body" placeholder="{{$l10n.default}}" rows="18" tabindex="3" dir="auto" onkeydown="sendOnCtrlEnter(event, 'comment-edit-submit-{{$id}}')">{{$body}}</textarea>
+					<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text form-control expandable-textarea" name="body" placeholder="{{$l10n.default}}" rows="18" tabindex="3" dir="auto" onkeydown="sendOnCtrlEnter(event, 'comment-edit-submit-{{$id}}')">{{$body}}</textarea>
 				</p>
 			</div>
 			<div class="comment-edit-submit-wrapper clearfix">
@@ -402,6 +401,11 @@
 					// Debounce interval as in the Advanced Composer preview
 					clearTimeout(window.wideEditorPreviewTimer);
 					window.wideEditorPreviewTimer = setTimeout(updateWidePreview, 2000);
+				}
+			});
+			textarea.addEventListener("change", function() {
+				if (!(this.id === 'comment-edit-text-{{$id}}' && document.body.classList.contains('wide-editor-active'))) {
+					autosizeTextarea(this);
 				}
 			});
 		});
