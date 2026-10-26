@@ -8,6 +8,7 @@
 namespace Friendica\Factory\Api\Mastodon;
 
 use Friendica\BaseFactory;
+use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
@@ -55,8 +56,9 @@ class Poll extends BaseFactory
 			$ownvotes = null;
 			$voted    = null;
 		} else {
-			$ownvotes = [];
-			$voted    = false;
+			$author_id = Contact::getPublicIdByUserId($uid);
+			$ownvotes  = $author_id ? Post\QuestionVote::getChoices($question['uri-id'], $author_id) : [];
+			$voted     = !empty($ownvotes);
 		}
 
 		return new \Friendica\Object\Api\Mastodon\Poll($question, $options, $expired, $votes, $ownvotes, $voted);

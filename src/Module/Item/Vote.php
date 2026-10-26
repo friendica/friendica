@@ -8,78 +8,29 @@
 namespace Friendica\Module\Item;
 
 use Friendica\BaseModule;
-use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Model\Contact;
-use Friendica\Model\Item;
 use Friendica\Model\Post;
-use Friendica\Model\Post\QuestionOption;
-use Friendica\Model\Post\QuestionVote;
 use Friendica\Network\HTTPException;
-use Friendica\Protocol\ActivityPub\Transmitter;
-use Friendica\Util\DateTimeFormat;
 
 /**
- * Records and transmits a vote for one option of a poll
+ * Vote on a poll
  */
 class Vote extends BaseModule
 {
 	protected function post(array $request = [])
 	{
 		if (!DI::userSession()->isAuthenticated()) {
-			throw new HTTPException\ForbiddenException();
+			throw new HTTPException\ForbiddenException(DI::l10n()->t('Access denied.'));
 		}
 
-		if (empty($this->parameters['id']) || !isset($this->parameters['option'])) {
-			throw new HTTPException\BadRequestException();
+		$uid  = DI::userSession()->getLocalUserId();
+		$item = Post::selectFirstForUser($uid, ['uri-id'], ['uid' => [0, $uid], 'id' => $this->parameters['id'] ?? 0]);
+		if (empty($item)) {
+			throw new HTTPException\NotFoundException();
 		}
 
-		$itemId   = (int) $this->parameters['id'];
-		$optionId = (int) $this->parameters['option'];
-		$uid      = DI::userSession()->getLocalUserId();
-		$authorId = Contact::getPublicIdByUserId($uid);
+		Post\QuestionVote::vote($item['uri-id'], $uid, (array) ($request['choices'] ?? []));
 
-		// selectFirstForUser (not the plain post-view) so a blocked/hidden poll can't be voted on.
-		$item = Post::selectFirstForUser($uid, ['uri', 'uri-id', 'author-link', 'post-type', 'question-multiple', 'question-end-time'], ['uid' => [0, $uid], 'id' => $itemId]);
-		if (empty($item) || $item['post-type'] != Item::PT_POLL) {
-			throw new HTTPException\BadRequestException();
-		}
-
-		if (!empty($item['question-end-time']) && $item['question-end-time'] != DBA::NULL_DATETIME && $item['question-end-time'] < DateTimeFormat::utcNow()) {
-			throw new HTTPException\BadRequestException(DI::l10n()->t('This poll has already closed.'));
-		}
-
-		// Single-choice: one vote total, for any option. Multiple-choice: one vote per
-		// option, each independent — this check must NOT be poll-wide for multiple-choice,
-		// since the client fires one concurrent request per checked option.
-		if (!$item['question-multiple'] && QuestionVote::hasVoted($item['uri-id'], $authorId)) {
-			throw new HTTPException\BadRequestException(DI::l10n()->t('You have already voted on this poll.'));
-		}
-
-		$option = QuestionOption::getOption($item['uri-id'], $optionId);
-		if (empty($option)) {
-			throw new HTTPException\BadRequestException();
-		}
-
-		// Record first and use the atomic INSERT_IGNORE result to settle races (two
-		// concurrent requests for the same option, e.g. two open tabs): only the request
-		// that actually inserts the row proceeds to transmit. A hasVoted()-then-transmit
-		// ordering would leave a gap where both requests pass the check before either commits.
-		if (!QuestionVote::add($item['uri-id'], $optionId, $authorId)) {
-			throw new HTTPException\BadRequestException(DI::l10n()->t('You have already voted on this poll.'));
-		}
-
-		if (!Transmitter::sendQuestionVote($item['uri'], $item['author-link'], $option['name'], $uid)) {
-			// Delivery failed after recording — undo it so the user isn't stuck in a false
-			// "voted" state and can retry.
-			QuestionVote::delete($item['uri-id'], $optionId, $authorId);
-			throw new HTTPException\InternalServerErrorException(DI::l10n()->t('Your vote could not be delivered.'));
-		}
-
-		$this->earlyJsonExit([
-			'status'  => 'ok',
-			'item_id' => $itemId,
-			'option'  => $optionId,
-		]);
+		$this->earlyJsonExit(['status' => 'ok']);
 	}
 }
