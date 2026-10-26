@@ -756,6 +756,22 @@ class Contact
 	}
 
 	/**
+	 * Checks if a given contact id (public or user's own) represents the given user's own identity
+	 *
+	 * @param integer $cid Either public contact id or user's contact id
+	 * @param integer $uid User ID
+	 * @return boolean
+	 */
+	public static function isSelf(int $cid, int $uid): bool
+	{
+		if (empty($cid) || empty($uid)) {
+			return false;
+		}
+
+		return self::getPublicContactId($cid, $uid) === self::getPublicIdByUserId($uid);
+	}
+
+	/**
 	 * Helper function for "getPublicAndUserContactID"
 	 *
 	 * @param int $cid Either public contact id or user's contact id
@@ -1643,10 +1659,11 @@ class Contact
 	 * @param int  $uid        User ID
 	 * @param bool $only_media Only display media content
 	 * @param array $request   Request variables
+	 * @param bool $only_quotes Only display posts that quote another post and add their own content
 	 * @return string posts in HTML
 	 * @throws Exception
 	 */
-	public static function getPostsFromId(int $cid, int $uid, bool $only_media = false, array $request = []): string
+	public static function getPostsFromId(int $cid, int $uid, bool $only_media = false, array $request = [], bool $only_quotes = false): string
 	{
 		$contact = DBA::selectFirst('contact', ['contact-type', 'network', 'name', 'nick'], ['id' => $cid]);
 		if (!DBA::isResult($contact)) {
@@ -1678,6 +1695,10 @@ class Contact
 			]);
 		}
 
+		if ($only_quotes) {
+			$condition = DBA::mergeConditions($condition, ["`quote-uri-id` IS NOT NULL AND IFNULL(`body`, '') != ''"]);
+		}
+
 		if (DI::mode()->isMobile()) {
 			$itemsPerPage = DI::pConfig()->get($uid, 'system', 'itemspage_mobile_network', DI::config()->get('system', 'itemspage_network_mobile'));
 		} else {
@@ -1702,18 +1723,67 @@ class Contact
 	}
 
 	/**
-	 * Returns threads from a given contact id
+	 * Returns the posts and comments of a given contact that quote another post
 	 *
-	 * @param int   $cid          Contact ID
-	 * @param int   $update       Update mode
-	 * @param int   $parentUriId  Thread parent URI-ID for the update mode
-	 * @param array $request      Request variables
+	 * @param int   $cid     Contact ID
+	 * @param int   $uid     User ID
+	 * @param array $request Request variables
 	 * @return string posts in HTML
 	 * @throws Exception
 	 */
-	public static function getThreadsFromId(int $cid, int $uid, int $update = 0, int $parentUriId = 0, array $request = []): string
+	public static function getQuotesFromId(int $cid, int $uid, array $request = []): string
 	{
-		$contact = DBA::selectFirst('contact', ['contact-type', 'network', 'name', 'nick'], ['id' => $cid]);
+		return self::getPostsFromId($cid, $uid, false, $request, true);
+	}
+
+	/**
+	 * Returns the posts a given contact has liked, disliked or reacted to with an emoji
+	 *
+	 * @param int   $cid     Contact ID
+	 * @param int   $uid     User ID
+	 * @param array $request Request variables
+	 * @return string posts in HTML
+	 * @throws Exception
+	 */
+	public static function getActivitiesFromId(int $cid, int $uid, array $request = []): string
+	{
+		$verbs = [Verb::getID(Activity::LIKE), Verb::getID(Activity::DISLIKE), Verb::getID(Activity::EMOJIREACT)];
+
+		return self::getActivityTargetsFromId($cid, $uid, $verbs, $request);
+	}
+
+	/**
+	 * Returns the posts a given contact has reshared
+	 *
+	 * @param int   $cid     Contact ID
+	 * @param int   $uid     User ID
+	 * @param array $request Request variables
+	 * @return string posts in HTML
+	 * @throws Exception
+	 */
+	public static function getResharesFromId(int $cid, int $uid, array $request = []): string
+	{
+		// Diaspora doesn't use announce activities, a reshare is a post without own content that quotes the original post
+		if (DBA::exists('contact', ['id' => $cid, 'network' => Protocol::DIASPORA])) {
+			return self::getActivityTargetsFromId($cid, $uid, null, $request);
+		}
+
+		return self::getActivityTargetsFromId($cid, $uid, [Verb::getID(Activity::ANNOUNCE)], $request);
+	}
+
+	/**
+	 * Returns the posts a given contact has interacted with via the given activity verbs
+	 *
+	 * @param int   $cid     Contact ID
+	 * @param int   $uid     User ID
+	 * @param ?array $vids   Verb IDs of the activities, null for Diaspora style reshares (posts that only quote another post)
+	 * @param array $request Request variables
+	 * @return string posts in HTML
+	 * @throws Exception
+	 */
+	private static function getActivityTargetsFromId(int $cid, int $uid, ?array $vids, array $request): string
+	{
+		$contact = DBA::selectFirst('contact', ['network', 'name', 'nick'], ['id' => $cid]);
 		if (!DBA::isResult($contact)) {
 			return '';
 		}
@@ -1722,6 +1792,80 @@ class Contact
 			return DI::l10n()->t('%s has blocked you', $contact['name'] ?: $contact['nick']);
 		}
 
+		if (empty($contact['network']) || in_array($contact['network'], Protocol::FEDERATED)) {
+			$condition = ["(`uid` = 0 OR (`uid` = ? AND NOT `global`))", $uid];
+		} else {
+			$condition = ["`uid` = ?", $uid];
+		}
+
+		if (is_null($vids)) {
+			$condition = DBA::mergeConditions($condition, [
+				"`author-id` = ? AND `gravity` = ? AND `protocol` = ? AND IFNULL(`body`, '') = '' AND `quote-uri-id` IS NOT NULL",
+				$cid, Item::GRAVITY_PARENT, Conversation::PARCEL_DIASPORA,
+			]);
+		} else {
+			$condition = DBA::mergeConditions($condition, ['author-id' => $cid, 'gravity' => Item::GRAVITY_ACTIVITY, 'vid' => $vids]);
+		}
+
+		if (!empty($request['last_uriid']) && !is_null($vids)) {
+			$last = Post::selectFirst(['created'], DBA::mergeConditions($condition, ['thr-parent-id' => $request['last_uriid']]), ['order' => ['created']]);
+			if (!empty($last['created'])) {
+				$condition = DBA::mergeConditions($condition, ["`created` < ?", $last['created']]);
+			}
+		} elseif (!empty($request['last_created'])) {
+			$condition = DBA::mergeConditions($condition, ["`created` < ?", $request['last_created']]);
+		}
+
+		if (DI::mode()->isMobile()) {
+			$itemsPerPage = DI::pConfig()->get($uid, 'system', 'itemspage_mobile_network', DI::config()->get('system', 'itemspage_network_mobile'));
+		} else {
+			$itemsPerPage = DI::pConfig()->get($uid, 'system', 'itemspage_network', DI::config()->get('system', 'itemspage_network'));
+		}
+
+		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
+
+		$activities = Post::selectToArray(['uri-id', 'thr-parent-id'], $condition, ['order' => ['created' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]]);
+
+		$items = [];
+		if (!empty($activities)) {
+			// The Diaspora style reshares are displayed themselves, for the other activities the target is displayed
+			$uriIds = array_unique(array_column($activities, is_null($vids) ? 'uri-id' : 'thr-parent-id'));
+			$fields = array_merge(Item::DISPLAY_FIELDLIST, ['featured']);
+			$posts  = [];
+			foreach (Post::toArray(Post::selectForUser($uid, $fields, ['uri-id' => $uriIds])) as $post) {
+				$posts[$post['uri-id']] = $post;
+			}
+
+			// Keep the order of the activities
+			foreach ($uriIds as $uriId) {
+				if (isset($posts[$uriId])) {
+					$items[] = $posts[$uriId];
+				}
+			}
+		}
+
+		$o = DI::conversationRenderer()->renderFlat($items, ConversationRenderer::MODE_CONTACT_POSTS, false, $uid);
+
+		if (DI::pConfig()->get($uid, 'system', 'infinite_scroll', true)) {
+			$o .= HTML::scrollLoader($request);
+		} else {
+			$o .= $pager->renderMinimal(count($activities));
+		}
+
+		return $o;
+	}
+
+	/**
+	 * Selects the threads of a contact, newest first
+	 *
+	 * @param array $contact     Fields 'contact-type' and 'network' of the contact
+	 * @param bool  $update      Update mode, 'first_created' of the request limits the result to newer threads
+	 * @param int   $parentUriId Thread parent URI-ID for the update mode
+	 * @param bool  $only_original Only select posts that aren't reshares or quotes
+	 * @return array List of posts
+	 */
+	private static function selectThreadItems(array $contact, int $cid, int $uid, int $parentUriId, array $request, bool $update, int $start, int $limit, bool $only_original = false): array
+	{
 		if (empty($contact["network"]) || in_array($contact["network"], Protocol::FEDERATED)) {
 			$condition = ["(`uid` = 0 OR (`uid` = ? AND NOT `global`))", $uid];
 		} else {
@@ -1732,9 +1876,73 @@ class Contact
 			$condition = DBA::mergeConditions($condition, ['parent-uri-id' => $parentUriId]);
 		} elseif (isset($request['last_created'])) {
 			$condition = DBA::mergeConditions($condition, ["`created` < ?", $request['last_created']]);
+		} elseif ($update && !empty($request['first_created'])) {
+			$condition = DBA::mergeConditions($condition, ["`created` > ?", $request['first_created']]);
 		}
 
 		$contact_field = ((($contact["contact-type"] == self::TYPE_COMMUNITY) || ($contact['network'] == Protocol::MAIL)) ? 'owner-id' : 'author-id');
+
+		$condition1 = DBA::mergeConditions($condition, ["`$contact_field` = ? AND `gravity` = ?", $cid, Item::GRAVITY_PARENT]);
+
+		if ($only_original) {
+			$condition1 = DBA::mergeConditions($condition1, ["`quote-uri-id` IS NULL"]);
+
+			$sql   = "SELECT `uri-id`, `created` FROM `post-thread-user-view` WHERE " . array_shift($condition1);
+			$union = $condition1;
+		} else {
+			$condition2 = DBA::mergeConditions($condition, [
+				"`author-id` = ? AND `gravity` = ? AND `vid` = ? AND `protocol` != ? AND `thr-parent-id` = `parent-uri-id`",
+				$cid, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA,
+			]);
+
+			$sql1 = "SELECT `uri-id`, `created` FROM `post-thread-user-view` WHERE " . array_shift($condition1);
+			$sql2 = "SELECT `thr-parent-id` AS `uri-id`, `created` FROM `post-user-view` WHERE " . array_shift($condition2);
+
+			$union = array_merge($condition1, $condition2);
+			$sql   = $sql1 . " UNION " . $sql2;
+		}
+
+		$sql .= " ORDER BY `created` DESC LIMIT ?, ?";
+		$union = array_merge($union, [$start, $limit]);
+		return Post::toArray(DBA::p($sql, $union));
+	}
+
+	/**
+	 * Number of threads of a contact that are newer than the given creation date
+	 *
+	 * @return int Number of threads, limited to 100
+	 */
+	public static function countNewThreadsFromId(int $cid, int $uid, string $firstCreated): int
+	{
+		$contact = DBA::selectFirst('contact', ['contact-type', 'network'], ['id' => $cid]);
+		if (!DBA::isResult($contact) || Contact\User::isIsBlocked($cid, $uid)) {
+			return 0;
+		}
+
+		return count(self::selectThreadItems($contact, $cid, $uid, 0, ['first_created' => $firstCreated], true, 0, 100));
+	}
+
+	/**
+	 * Returns threads from a given contact id
+	 *
+	 * @param int   $cid          Contact ID
+	 * @param int   $update       Update mode
+	 * @param int   $parentUriId  Thread parent URI-ID for the update mode
+	 * @param array $request      Request variables
+	 * @param bool  $only_original Only display posts that aren't reshares or quotes
+	 * @return string posts in HTML
+	 * @throws Exception
+	 */
+	public static function getThreadsFromId(int $cid, int $uid, int $update = 0, int $parentUriId = 0, array $request = [], bool $only_original = false): string
+	{
+		$contact = DBA::selectFirst('contact', ['contact-type', 'network', 'name', 'nick'], ['id' => $cid]);
+		if (!DBA::isResult($contact)) {
+			return '';
+		}
+
+		if (Contact\User::isIsBlocked($cid, $uid)) {
+			return DI::l10n()->t('%s has blocked you', $contact['name'] ?: $contact['nick']);
+		}
 
 		if (DI::mode()->isMobile()) {
 			$itemsPerPage = DI::pConfig()->get($uid, 'system', 'itemspage_mobile_network', DI::config()->get('system', 'itemspage_network_mobile'));
@@ -1744,22 +1952,7 @@ class Contact
 
 		$pager = new Pager(DI::l10n(), DI::args()->getQueryString(), $itemsPerPage);
 
-		$condition1 = DBA::mergeConditions($condition, ["`$contact_field` = ? AND `gravity` = ?", $cid, Item::GRAVITY_PARENT]);
-
-		$condition2 = DBA::mergeConditions($condition, [
-			"`author-id` = ? AND `gravity` = ? AND `vid` = ? AND `protocol` != ? AND `thr-parent-id` = `parent-uri-id`",
-			$cid, Item::GRAVITY_ACTIVITY, Verb::getID(Activity::ANNOUNCE), Conversation::PARCEL_DIASPORA,
-		]);
-
-		$sql1 = "SELECT `uri-id`, `created` FROM `post-thread-user-view` WHERE " . array_shift($condition1);
-		$sql2 = "SELECT `thr-parent-id` AS `uri-id`, `created` FROM `post-user-view` WHERE " . array_shift($condition2);
-
-		$union = array_merge($condition1, $condition2);
-		$sql   = $sql1 . " UNION " . $sql2;
-
-		$sql .= " ORDER BY `created` DESC LIMIT ?, ?";
-		$union = array_merge($union, [$pager->getStart(), $pager->getItemsPerPage()]);
-		$items = Post::toArray(DBA::p($sql, $union));
+		$items = self::selectThreadItems($contact, $cid, $uid, $parentUriId, $request, (bool) $update, $pager->getStart(), $pager->getItemsPerPage(), $only_original);
 
 		$raw = isset($request['mode']) && ($request['mode'] == 'raw');
 
@@ -3307,6 +3500,11 @@ class Contact
 		}
 
 		$result['success'] = Protocol::follow($uid, $contact, $protocol);
+
+		// Groups are displayed by their threads, so we fetch the latest ones directly
+		if ($result['success'] && ($contact['contact-type'] == self::TYPE_COMMUNITY) && in_array($contact['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN])) {
+			Worker::add(Worker::PRIORITY_MEDIUM, 'FetchOutbox', $contact_id, 0);
+		}
 
 		return $result;
 	}

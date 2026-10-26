@@ -1,0 +1,216 @@
+{
+    "communities": [
+        {
+            "activity_alert": false,
+            "blocked": false,
+            "community": {
+                "actor_id": "https://piefed.social/c/microblogs",
+                "ai_generated": false,
+                "ap_domain": "piefed.social",
+                "banned": false,
+                "deleted": false,
+                "description": "Microblog posts from around the fediverse.",
+                "hidden": false,
+                "id": 15339,
+                "instance_id": 1,
+                "local": true,
+                "name": "microblogs",
+                "nsfw": false,
+                "posting_warning": null,
+                "published": "2026-07-02T06:08:37.314340Z",
+                "question_answer": false,
+                "removed": false,
+                "restricted_to_mods": false,
+                "title": "Microblogs",
+                "updated": "2026-07-02T06:08:37.314340Z"
+            },
+            "counts": {
+                "active_6monthly": 8979,
+                "active_daily": 495,
+                "active_monthly": 4005,
+                "active_weekly": 1652,
+                "id": 15339,
+                "post_count": 31429,
+                "post_reply_count": 38558,
+                "published": "2026-07-02T06:08:37.314340Z",
+                "subscriptions_count": 19,
+                "total_subscriptions_count": 24
+            },
+            "flair_list": [],
+            "subscribed": "NotSubscribed"
+        },
+        {
+            "activity_alert": false,
+            "blocked": false,
+            "community": {
+                "actor_id": "https://piefed.social/c/ask",
+                "ai_generated": false,
+                "ap_domain": "piefed.social",
+                "banned": false,
+                "deleted": false,
+                "description": "Rules  \r\n\r\n1. Be nice \r\n2. Posts must be legitimate questions (no rage bait or sea lioning)  \r\n3. No spam  \r\n4. NSFW allowed if tagged  \r\n5. No politics  \r\n6. For support questions, please go to !newcomers@piefed.zip \r\n\r\n[Icon by Hilmy Abiyyu A.](https://www.flaticon.com/free-icons/faq)",
+                "hidden": false,
+                "icon": "https://media.piefed.social/communities/qQ/rQ/qQrQO57qTV2huV0.png",
+                "id": 2668,
+                "instance_id": 1,
+                "local": true,
+                "name": "ask",
+                "nsfw": false,
+                "posting_warning": "",
+                "published": "2025-03-12T14:56:19.347664Z",
+                "question_answer": false,
+                "removed": false,
+                "restricted_to_mods": false,
+                "title": "Ask",
+                "updated": "2025-03-12T14:56:19.347664Z"
+            },
+            "counts": {
+                "active_6monthly": 860,
+                "active_daily": 1,
+                "active_monthly": 441,
+                "active_weekly": 61,
+                "id": 2668,
+                "post_count": 813,
+                "post_reply_count": 1886,
+                "published": "2025-03-12T14:56:19.347664Z",
+                "subscriptions_count": 1032,
+                "total_subscriptions_count": 1706
+            },
+            "flair_list": [],
+            "subscribed": "NotSubscribed"
+        },
+        {
+            "activity_alert": false,
+            "blocked": false,
+            "community": {
+                "actor_id": "https://piefed.social/c/movies",
+                "ai_generated": false,
+                "ap_domain": "piefed.social",
+                "banned": false,
+                "banner": "https://media.piefed.social/communities/p4/Bu/p4BuWUYVbk17hMb.jpg",
+                "deleted": false,
+                "description": "A community about movies and cinema.  \r\n\r\nRelated communities:  \r\n- !television@piefed.social  \r\n- !homevideo@feddit.uk  \r\n- !mediareviews@lemmy.world  \r\n- !casualconversation@piefed.social  \r\n\r\n## Rules  \r\n\r\n1. Be civil  \r\n2. No discrimination or prejudice of any kind  \r\n3. Do not spam  \r\n4. Stay on topic  \r\n5. These rules will evolve as this community grows  \r\n\r\nNo posts or comments will be removed without an explanation from mods. ",
+                "hidden": false,
+                "icon": "https://media.piefed.social/communities/aK/jV/aKjVCu5ImS3JIry.webp",
+                "id": 2615,
+                "instance_id": 1,
+                "local": true,
+                "name": "movies",
+                "nsfw": false,
+                "posting_warning": "",
+                "published": "2025-03-09T00:48:10.260151Z",
+                "question_answer": false,
+                "removed": false,
+                "restricted_to_mods": false,
+                "title": "movies",
+                "updated": "2025-03-09T00:48:10.260151Z"
+            },
+            "counts": {
+                "active_6monthly": 5646,
+                "active_daily": 309,
+                "active_monthly": 2831,
+                "active_weekly": 1194,
+                "id": 2615,
+                "post_count": 3508,
+                "post_reply_count": 16799,
+                "published": "2025-03-09T00:48:10.260151Z",
+                "subscriptions_count": 1562,
+                "total_subscriptions_count": 4006
+            },
+            "flair_list": [
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/663",
+                    "background_color": "#5fad47",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "Box Office",
+                    "id": 663,
+                    "text_color": "#ffffff"
+                },
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/306",
+                    "background_color": "#8ff0a4",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "Discussion",
+                    "id": 306,
+                    "text_color": "#000000"
+                },
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/665",
+                    "background_color": "#5b2067",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "Humor",
+                    "id": 665,
+                    "text_color": "#ffffff"
+                },
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/1143",
+                    "background_color": "#63452c",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "Media",
+                    "id": 1143,
+                    "text_color": "#ffffff"
+                },
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/1144",
+                    "background_color": "#dc8add",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "Meta",
+                    "id": 1144,
+                    "text_color": "#ffffff"
+                },
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/664",
+                    "background_color": "#21a1de",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "Movie Review",
+                    "id": 664,
+                    "text_color": "#ffffff"
+                },
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/308",
+                    "background_color": "#ffbe6f",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "Movie thread",
+                    "id": 308,
+                    "text_color": "#000000"
+                },
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/407",
+                    "background_color": "#d73920",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "News/Updates",
+                    "id": 407,
+                    "text_color": "#ffffff"
+                },
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/307",
+                    "background_color": "#99c1f1",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "Recommendation",
+                    "id": 307,
+                    "text_color": "#000000"
+                },
+                {
+                    "ap_id": "https://piefed.social/c/movies/tag/309",
+                    "background_color": "#f9f06b",
+                    "blur_images": false,
+                    "community_id": 2615,
+                    "flair_title": "Trailer/Poster",
+                    "id": 309,
+                    "text_color": "#000000"
+                }
+            ],
+            "subscribed": "NotSubscribed"
+        }
+    ],
+    "next_page": "2"
+}

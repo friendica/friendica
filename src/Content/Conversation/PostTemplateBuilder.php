@@ -50,7 +50,6 @@ final class PostTemplateBuilder
 		private readonly \Friendica\Core\Addon\AddonHelper $addonHelper,
 		private readonly LoggerInterface $logger,
 		private readonly Item $item,
-		private readonly ActivityFormatter $activityFormatter,
 		private int $uid = 0,
 		private ?string $remote_comment = null,
 	) {}
@@ -368,8 +367,6 @@ final class PostTemplateBuilder
 			'report'                 => $report,
 			'ignore_server'          => $ignoreServer,
 			'vote'                   => $buttons,
-			'like_html'              => $responses['like']['output'],
-			'dislike_html'           => $responses['dislike']['output'],
 			'hide_dislike'           => $hide_dislike,
 			'emojis'                 => $emojis,
 			'missing'                => $item['missing']  ?? 0,
@@ -381,7 +378,6 @@ final class PostTemplateBuilder
 			'reactions'              => $reactions,
 			'reactions_more'         => $reactionsMore,
 			'responses'              => $responses,
-			'legacy_activities'      => $this->config->get('system', 'legacy_activities'),
 			'switchcomment'          => $this->l10n->t('Comment'),
 			'like_label'             => $this->l10n->t('Like'),
 			'dislike_label'          => $this->l10n->t('Dislike'),
@@ -783,10 +779,9 @@ final class PostTemplateBuilder
 		$responses = [];
 		foreach ($response_verbs as $verb) {
 			$responses[$verb] = [
-				'self'   => $convResponses[$verb][$item['uri-id']]['self'] ?? 0,
-				'output' => !empty($convResponses[$verb][$item['uri-id']]['links']) ? $this->activityFormatter->formatActivity($convResponses[$verb][$item['uri-id']]['links'], $verb, $item['uri-id'], $verbs[$verb], $emojis) : '',
-				'total'  => $emojis[$verbs[$verb]]['total'] ?? '',
-				'title'  => $emojis[$verbs[$verb]]['title'] ?? '',
+				'self'  => $convResponses[$verb][$item['uri-id']]['self'] ?? 0,
+				'total' => $emojis[$verbs[$verb]]['total']                ?? '',
+				'title' => $emojis[$verbs[$verb]]['title']                ?? '',
 			];
 			unset($reactions[$verbs[$verb]]);
 		}
@@ -966,6 +961,23 @@ final class PostTemplateBuilder
 	}
 
 	/**
+	 * Get the abstract that is added to a comment. It is only taken over from sensitive posts,
+	 * otherwise the summary is just a summary.
+	 *
+	 * @param string $contentWarning Content warning of the post that is commented on
+	 * @param bool   $sensitive      Is the post that is commented on marked as sensitive?
+	 * @return string
+	 */
+	public static function getAbstractText(string $contentWarning, bool $sensitive): string
+	{
+		if ($contentWarning === '' || !$sensitive) {
+			return '';
+		}
+
+		return '[abstract=' . Protocol::ACTIVITYPUB . ']' . $contentWarning . "[/abstract]\n";
+	}
+
+	/**
 	 * Get default text for comment box
 	 *
 	 * @param array<string, mixed> $item
@@ -980,8 +992,8 @@ final class PostTemplateBuilder
 		$owner = User::getOwnerDataById($this->uid);
 		$text  = '';
 
-		if (!empty($item['content-warning']) && Feature::isEnabled($this->uid, Feature::ADD_ABSTRACT)) {
-			$text = '[abstract=' . Protocol::ACTIVITYPUB . ']' . $item['content-warning'] . "[/abstract]\n";
+		if (Feature::isEnabled($this->uid, Feature::ADD_ABSTRACT)) {
+			$text = self::getAbstractText($item['content-warning'] ?? '', !empty($item['sensitive']));
 		}
 
 		if (!Feature::isEnabled($this->uid, Feature::EXPLICIT_MENTIONS)) {

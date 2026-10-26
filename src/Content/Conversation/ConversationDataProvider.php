@@ -194,7 +194,7 @@ final readonly class ConversationDataProvider
 		if (!$preview) {
 			$parentUriIds = array_values(array_unique(array_column($items, 'parent-uri-id')));
 			$emojis       = $this->getEmojis($parentUriIds, $viewerUid, $uriIds);
-			$quoteshares  = $this->getQuoteShares($uriIds);
+			$quoteshares  = $this->getQuoteShares($uriIds, $viewerUid);
 			$counts       = $this->getCounts($parentUriIds);
 
 			if ($viewerUid) {
@@ -202,7 +202,7 @@ final readonly class ConversationDataProvider
 				$own   = Post::selectToArray(['thr-parent-id', 'verb'], ['thr-parent-id' => $uriIds, 'gravity' => ItemModel::GRAVITY_ACTIVITY, 'author-id' => Contact::getPublicIdByUserId($viewerUid), 'verb' => array_keys($verbs), 'deleted' => false]);
 				foreach ($own as $post) {
 					if (isset($convResponses[$verbs[$post['verb']]])) {
-						$convResponses[$verbs[$post['verb']]][$post['thr-parent-id']] = ['links' => [], 'self' => 1];
+						$convResponses[$verbs[$post['verb']]][$post['thr-parent-id']] = ['self' => 1];
 					}
 				}
 			}
@@ -415,15 +415,17 @@ final readonly class ConversationDataProvider
 		}
 
 		$emojis      = $this->getEmojis($uriIds, $uid);
-		$quoteshares = $this->getQuoteShares($uriIds);
+		$quoteshares = $this->getQuoteShares($uriIds, $uid);
 		$counts      = $this->getCounts($uriIds);
 
-		$compactTimeline = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS]) && $this->pConfig->get($uid, 'system', 'compact_timeline');
+		$commentsMode = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS])
+			? ConversationRenderer::normalizeCommentsMode($this->pConfig->get($uid, 'system', 'compact_timeline', ConversationRenderer::COMMENTS_MODE_ALL))
+			: ConversationRenderer::COMMENTS_MODE_ALL;
+		$compactTimeline = $commentsMode === ConversationRenderer::COMMENTS_MODE_COMPACT;
+		$hideComments    = $commentsMode === ConversationRenderer::COMMENTS_MODE_HIDDEN;
 		$partialLoad     = $mode === ConversationRenderer::MODE_COMMENTS && $sinceId > 0;
 
-		if (!$this->config->get('system', 'legacy_activities')) {
-			$condition = DBA::mergeConditions($condition, ["(`gravity` != ? OR `origin`)", ItemModel::GRAVITY_ACTIVITY]);
-		}
+		$condition = DBA::mergeConditions($condition, ["(`gravity` != ? OR `origin`)", ItemModel::GRAVITY_ACTIVITY]);
 
 		if ($compactTimeline) {
 			$condition = DBA::mergeConditions($condition, ['author-id' => $filterAuthors]);
@@ -456,6 +458,11 @@ final readonly class ConversationDataProvider
 			$condition = DBA::mergeConditions($condition, ['(`uri-id` >= ? OR `uri-id` = ? OR `created` >= ?)', $sinceId, $uriId, $sinceDate]);
 		}
 
+		if ($hideComments) {
+			// Only the thread roots are shown, but they go through the normal row handling
+			$condition = DBA::mergeConditions($condition, ['gravity' => ItemModel::GRAVITY_PARENT]);
+		}
+
 		$params      = ['order' => ['uri-id' => !$partialLoad && !$compactTimeline]];
 		$threadItems = Post::select(array_merge(ItemModel::DISPLAY_FIELDLIST, ['featured', 'contact-uid', 'gravity', 'post-type', 'post-reason']), $condition, $params);
 
@@ -482,7 +489,7 @@ final readonly class ConversationDataProvider
 		}
 
 		// @todo is currently only needed in this mode, but could be helpful for the future to do it for all modes
-		if ($compactTimeline || $partialLoad) {
+		if ($compactTimeline || $partialLoad || $hideComments) {
 			$answers    = $this->getAnswersPerThread($rows);
 			$replyCount = $this->calculateMissingReplyCounts($rows, $emojis);
 		} else {
@@ -681,12 +688,18 @@ final readonly class ConversationDataProvider
 	/**
 	 * Get quote shares for the given URI IDs.
 	 *
+	 * Contacts the viewer blocked or ignored are left out, like in the interaction lists (see PostInteractions)
+	 *
 	 * @param array<int, int> $uriIds The URI IDs to get quote shares for
+	 * @param int $uid The user ID of the viewer
 	 * @return array<int, array> The quote shares data
 	 */
-	private function getQuoteShares(array $uriIds): array
+	private function getQuoteShares(array $uriIds, int $uid): array
 	{
-		$condition = DBA::mergeConditions(['quote-uri-id' => $uriIds], ["NOT `quote-uri-id` IS NULL"]);
+		$condition = DBA::mergeConditions(['quote-uri-id' => $uriIds], ["NOT `quote-uri-id` IS NULL AND NOT `post`.`deleted` AND `post`.`private` IN (?, ?) AND NOT `contact`.`blocked`", ItemModel::PUBLIC, ItemModel::UNLISTED]);
+		if ($uid) {
+			$condition = DBA::mergeConditions($condition, ["NOT `post`.`author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored`))", $uid]);
+		}
 		$separator = chr(255) . chr(255) . chr(255);
 		$sql       = "SELECT `quote-uri-id`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-quote` INNER JOIN `post` ON `post`.`uri-id` = `post-quote`.`uri-id` INNER JOIN `contact` ON `post`.`author-id` = `contact`.`id` WHERE " . array_shift($condition) . " GROUP BY `quote-uri-id`";
 		$quotes    = [];
@@ -1490,17 +1503,6 @@ final readonly class ConversationDataProvider
 			}
 
 			if (!empty($activity['verb']) && $this->activity->match($activity['verb'], $verb) && ($activity['gravity'] !== ItemModel::GRAVITY_PARENT)) {
-				$author = [
-					'uid'     => 0,
-					'id'      => $activity['author-id'],
-					'network' => $activity['author-network'],
-					'url'     => $activity['author-link'],
-					'alias'   => $activity['author-alias'],
-				];
-				$url     = Contact::magicLinkByContact($author);
-				$sparkle = str_starts_with($url, 'contact/redir/') ? ' class="sparkle" ' : '';
-				$link    = '<a href="' . $url . '"' . $sparkle . '>' . htmlentities((string) $activity['author-name']) . '</a>';
-
 				if (empty($activity['thr-parent-id'])) {
 					$activity['thr-parent-id'] = $activity['parent-uri-id'];
 				}
@@ -1510,19 +1512,13 @@ final readonly class ConversationDataProvider
 				}
 
 				if (!isset($convResponses[$mode][$activity['thr-parent-id']])) {
-					$convResponses[$mode][$activity['thr-parent-id']] = [
-						'links' => [],
-						'self'  => 0,
-					];
-				} elseif (in_array($link, $convResponses[$mode][$activity['thr-parent-id']]['links'])) {
-					continue;
+					$convResponses[$mode][$activity['thr-parent-id']] = ['self' => 0];
 				}
 
 				if ($pcid === $activity['author-id']) {
 					$convResponses[$mode][$activity['thr-parent-id']]['self'] = 1;
 				}
 
-				$convResponses[$mode][$activity['thr-parent-id']]['links'][] = $link;
 				return;
 			}
 		}

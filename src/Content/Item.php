@@ -493,7 +493,7 @@ class Item
 		);
 	}
 
-	public function expandTags(array $item, bool $setPermissions = false): array
+	public function expandTags(array $item, bool $setPermissions = false, bool $groupPost = false): array
 	{
 		// Look for any tags and linkify them
 		$item['inform'] = '';
@@ -544,6 +544,26 @@ class Item
 				$this->logger->info('Public group', ['url' => $tag[2], 'mention' => $tag[1]]);
 			} else {
 				$this->logger->info('Post with group mention will not be converted to a group post', ['url' => $tag[2], 'mention' => $tag[1]]);
+			}
+		}
+
+		// A top-level post from the group editor is a group post, even without a mention in the body
+		if ($groupPost && ($item['gravity'] == ItemModel::GRAVITY_PARENT) && empty($group_contact) && preg_match('/^<(\d+)>$/', $item['allow_cid'] ?? '', $matches)) {
+			$contact = Contact::selectFirst(['id', 'url', 'prv'], ['id' => $matches[1], 'uid' => $item['uid'], 'contact-type' => Contact::TYPE_COMMUNITY]);
+			if (!empty($contact) && Contact::isSharing($contact['id'], $item['uid'], true)) {
+				$private_group = $contact['prv'];
+				$only_to_group = true;
+				$private_id    = $contact['id'];
+				$group_contact = $contact;
+
+				// Stored as audience after the post has been created
+				$item['audience'] = $contact['url'];
+
+				if (!empty($item['inform'])) {
+					$item['inform'] .= ',';
+				}
+				$item['inform'] .= 'cid:' . $contact['id'];
+				$this->logger->info('Post is only addressed to a group', ['url' => $contact['url'], 'private' => $private_group]);
 			}
 		}
 		$this->logger->info('Got inform', ['inform' => $item['inform']]);
@@ -1018,7 +1038,7 @@ class Item
 		return $post;
 	}
 
-	public function finalizePost(array $post, bool $preview): array
+	public function finalizePost(array $post, bool $preview, bool $groupPost = false): array
 	{
 		if ($preview) {
 			$post['body'] = Attach::addAttachmentToBody($post['body'], $post['uid']);
@@ -1037,7 +1057,7 @@ class Item
 		// Personal notes must never be altered to a group post.
 		if ($post['post-type'] != ItemModel::PT_PERSONAL_NOTE) {
 			// Look for any tags and linkify them
-			$post = $this->expandTags($post);
+			$post = $this->expandTags($post, false, $groupPost);
 		}
 
 		return $post;

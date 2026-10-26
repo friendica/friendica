@@ -44,7 +44,6 @@ For example, for moving to profile page in Firefox, press these three keys simul
 * m - Status Messages and Posts
 * r - Profile Details
 * h - Photo Albums
-* d - Media
 * e - Events and Calendar
 * t - Personal Notes
 * o - Scheduled Posts
@@ -64,8 +63,6 @@ For example, for moving to profile page in Firefox, press these three keys simul
 ## ../contact (single contact view)
 
 * m - Status messages
-* p - Posts and Comments
-* d - Media
 * o - Profile
 * t - Contacts
 * r - Advanced

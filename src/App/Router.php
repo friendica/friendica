@@ -49,7 +49,7 @@ class Router
 	public const POST    = 'POST';
 	public const PUT     = 'PUT';
 	public const OPTIONS = 'OPTIONS';
-	// Not routable on its own: Arguments maps it to GET, modules read it from the server array.
+	// Opt-in per route: without a HEAD route, HEAD is handled as GET.
 	public const HEAD = 'HEAD';
 
 	public const ALLOWED_METHODS = [
@@ -59,6 +59,7 @@ class Router
 		self::POST,
 		self::PUT,
 		self::OPTIONS,
+		self::HEAD,
 	];
 
 	/**
@@ -253,6 +254,11 @@ class Router
 				$this->moduleClass  = Options::class;
 				$this->parameters[] = ['AllowedMethods' => $dispatcher->getOptions($cmd)];
 			} else {
+				// FastRoute falls back to the GET route for HEAD; the module then has to handle it as GET.
+				if ($this->args->getMethod() === static::HEAD && !in_array(static::HEAD, $dispatcher->getOptions($cmd))) {
+					$this->args->setMethod(static::GET);
+				}
+
 				$routeInfo = $dispatcher->dispatch($this->args->getMethod(), $cmd);
 				if ($routeInfo[0] === Dispatcher::FOUND) {
 					$this->moduleClass  = $routeInfo[1];

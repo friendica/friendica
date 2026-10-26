@@ -96,6 +96,7 @@
 			<div class="contact-entry-desc">
 				<div class="contact-entry-name" id="contact-entry-name-{{$contact.id}}">
 					<h4 class="media-heading"><a href="{{if !empty($contact.photo_menu.edit)}}{{$contact.photo_menu.edit.1}}{{else}}{{$contact.url}}{{/if}}">{{$contact.name}}</a>
+					{{if !empty($contact.emoji)}}<span class="contact-entry-emoji">{{$contact.emoji}}</span>{{/if}}
 					{{if $contact.account_type == 4}}
 						{{$acct_icon = "ri-broadcast-line"}}
 					{{else if $contact.account_type == 3}}

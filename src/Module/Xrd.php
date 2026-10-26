@@ -64,7 +64,7 @@ class Xrd extends BaseModule
 		header('Vary: Accept', false);
 		header(sprintf('Cache-Control: max-age=%d, public', HTTPCache::DISCOVERY_MAX_AGE));
 
-		$alias = '';
+		$aliases = [];
 
 		if ($name == User::getActorName()) {
 			$owner = User::getSystemAccount();
@@ -79,7 +79,10 @@ class Xrd extends BaseModule
 				throw new NotFoundException('Owner was not found for user->uid=' . $name);
 			}
 
-			$alias = str_replace('/profile/', '/~', $owner['url']);
+			$aliases[] = str_replace('/profile/', '/~', $owner['url']);
+			if ($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY) {
+				$aliases[] = $this->baseUrl . '/group/' . $owner['nickname'];
+			}
 
 			$avatar = Photo::selectFirst(['type'], ['uid' => $owner['uid'], 'profile' => true]);
 		}
@@ -89,9 +92,9 @@ class Xrd extends BaseModule
 		}
 
 		if ($mode == Response::TYPE_XML) {
-			$this->printXML($alias, $owner, $avatar);
+			$this->printXML($aliases, $owner, $avatar);
 		} else {
-			$this->printJSON($alias, $owner, $avatar);
+			$this->printJSON($aliases, $owner, $avatar);
 		}
 	}
 
@@ -177,14 +180,14 @@ class Xrd extends BaseModule
 		$this->earlyJsonExit($json, 'application/jrd+json; charset=utf-8');
 	}
 
-	private function printJSON(string $alias, array $owner, array $avatar): never
+	private function printJSON(array $aliases, array $owner, array $avatar): never
 	{
 		$baseURL = (string) $this->baseUrl;
 
 		$json = [
 			'subject' => 'acct:' . $owner['addr'],
 			'aliases' => [
-				$alias,
+				...$aliases,
 				$owner['url'],
 			],
 			'links' => [
@@ -250,19 +253,23 @@ class Xrd extends BaseModule
 		$this->earlyJsonExit($json, 'application/jrd+json; charset=utf-8');
 	}
 
-	private function printXML(string $alias, array $owner, array $avatar): never
+	private function printXML(array $aliases, array $owner, array $avatar): never
 	{
 		$baseURL = (string) $this->baseUrl;
 
+		$xmlAliases = ['1:Alias' => $owner['url']];
+		foreach ($aliases as $index => $alias) {
+			$xmlAliases[($index + 2) . ':Alias'] = $alias;
+		}
+
 		$xmlString = XML::fromArray([
-			'XRD' => [
+			'XRD' => array_merge([
 				'@attributes' => [
 					'xmlns' => 'http://docs.oasis-open.org/ns/xri/xrd-1.0',
 				],
 				'Subject' => 'acct:' . $owner['addr'],
-				'1:Alias' => $owner['url'],
-				'2:Alias' => $alias,
-				'1:link'  => [
+			], $xmlAliases, [
+				'1:link' => [
 					'@attributes' => [
 						'rel'  => ActivityNamespace::DFRN,
 						'href' => $owner['url'],
@@ -341,7 +348,7 @@ class Xrd extends BaseModule
 						'href' => $baseURL . '/owa',
 					],
 				],
-			],
+			]),
 		]);
 
 		header('Access-Control-Allow-Origin: *');

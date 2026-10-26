@@ -469,12 +469,13 @@ class BBCode
 			}
 		}
 
-		if (!isset($embed_media) && isset($media->name)) {
+		// The embedded player is shown together with the link card, so the source stays visible and reachable before the content is loaded
+		if (isset($media->name)) {
 			$preview_class = in_array($preview_mode, [self::PREVIEW_AUTO, self::PREVIEW_LARGE]) ? 'attachment-image' : 'attachment-preview';
 
 			$link_attributes = 'target="_blank" rel="noopener noreferrer"';
 
-			if ($preview_mode !== self::PREVIEW_NO_IMAGE && isset($media->preview)) {
+			if (!isset($embed_media) && $preview_mode !== self::PREVIEW_NO_IMAGE && isset($media->preview)) {
 				if ($media->previewWidth >= 500) {
 					$return .= sprintf('<a href="%s" %s><img src="%s" alt="" title="%s" class="%s" /></a><br>', $media->url, $link_attributes, self::proxyUrl($media->preview, $simplehtml, $uriid), $media->name, $preview_class);
 				} else {
@@ -485,12 +486,12 @@ class BBCode
 			$return .= sprintf('<h4><a href="%s" target="_blank" rel="noopener noreferrer">%s</a></h4>', $media->url, $media->name);
 		}
 
-		if (!isset($embed_media) && !$hide_description && !empty($media->description) && $media->description != $media->name) {
+		if (!$hide_description && !empty($media->description) && $media->description != $media->name) {
 			// Sanitize the HTML
 			$return .= sprintf('<blockquote>%s</blockquote>', trim(HTML::purify($media->description)));
 		}
 
-		if (!isset($embed_media) && !empty($media->publisherUrl) && !empty($media->publisherName)) {
+		if (!empty($media->publisherUrl) && !empty($media->publisherName)) {
 			$provider_url = Network::sanitizeUrl((string) ($media->publisherUrl));
 			if (!empty($media->authorName)) {
 				$return .= sprintf('<sup><a href="%s" target="_blank" rel="noopener noreferrer">%s (%s)</a></sup>', $provider_url, $media->authorName, $media->publisherName);

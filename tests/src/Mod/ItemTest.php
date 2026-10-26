@@ -208,6 +208,24 @@ class ItemTest extends ApiTestCase
 		self::assertSame('Edited title', $post['title']);
 	}
 
+	public function testItemEditKeepsSensitiveStateWhenRequestHasNoSensitiveField(): void
+	{
+		Post::update(['sensitive' => true], ['id' => 1]);
+
+		$header = $this->mockRedirectHeader();
+		$header->expects(self::once());
+
+		try {
+			item_edit(42, ['post_id' => 1, 'body' => 'Edited sensitive post'], false, 'network');
+			self::fail('Expected a redirect (FoundException)');
+		} catch (HTTPException\FoundException) {
+			// expected
+		}
+
+		$post = Post::selectFirst(['sensitive'], ['id' => 1]);
+		self::assertTrue((bool) $post['sensitive']);
+	}
+
 	public function testItemEditWithoutReturnPathThrowsOkException(): void
 	{
 		$this->expectException(HTTPException\OKException::class);
@@ -283,6 +301,44 @@ class ItemTest extends ApiTestCase
 		self::assertTrue(DBA::isResult($stored));
 		self::assertEquals(Item::GRAVITY_COMMENT, $stored['gravity']);
 		self::assertSame($parent['id'], $stored['parent']);
+	}
+
+	public function testItemInsertCommentOnSensitivePostIsSensitive(): void
+	{
+		Post::update(['sensitive' => true], ['id' => 3]);
+
+		$header = $this->mockRedirectHeader();
+		$header->expects(self::once());
+
+		try {
+			item_insert(42, ['parent' => 3, 'body' => 'A reply to a sensitive post'], false, 'network');
+			self::fail('Expected a redirect (FoundException)');
+		} catch (HTTPException\FoundException) {
+			// expected
+		}
+
+		$stored = Post::selectFirst(['sensitive'], ['uid' => 42, 'body' => 'A reply to a sensitive post']);
+		self::assertTrue(DBA::isResult($stored));
+		self::assertTrue((bool) $stored['sensitive']);
+	}
+
+	public function testItemInsertCommentOnNonSensitivePostIsNotSensitive(): void
+	{
+		Post::update(['sensitive' => false], ['id' => 3]);
+
+		$header = $this->mockRedirectHeader();
+		$header->expects(self::once());
+
+		try {
+			item_insert(42, ['parent' => 3, 'body' => 'A reply to a normal post'], false, 'network');
+			self::fail('Expected a redirect (FoundException)');
+		} catch (HTTPException\FoundException) {
+			// expected
+		}
+
+		$stored = Post::selectFirst(['sensitive'], ['uid' => 42, 'body' => 'A reply to a normal post']);
+		self::assertTrue(DBA::isResult($stored));
+		self::assertFalse((bool) $stored['sensitive']);
 	}
 
 	public function testItemInsertWithFutureScheduledAtQueuesDelayedPostInsteadOfInserting(): void

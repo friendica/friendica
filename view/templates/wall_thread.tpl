@@ -92,7 +92,7 @@
 							<div class="wall-item-network-end"></div>
 						</div>
 
-						<div itemprop="description" class="wall-item-content">
+						<div itemprop="description" class="wall-item-content{{if $click_to_display}} click-to-display{{/if}}"{{if $click_to_display}} data-display-url="{{$item.plink.orig}}"{{/if}}>
                             {{if $item.title}}<h2 dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name" dir="auto">{{$item.title}}</a></h2>{{/if}}
 							{{if $item.summary}}<summary class="wall-item-summary" id="wall-item-summary-{{$item.id}}">{{$item.summary}}</summary>{{/if}}
 							<div class="wall-item-body e-content {{if !$item.title}}p-name{{/if}}" dir="auto">{{$item.body_html nofilter}}</div>
@@ -213,11 +213,14 @@
 									<span class="wall-item-emoji" title="{{$emoji.title}}">{{$emoji.emoji}} {{$emoji.total}}</span>
 								{{/if}}
 							{{/foreach}}
-                        {{elseif $item.responses}}
-                            {{foreach $item.responses as $verb=>$response}}
-								<div class="wall-item-{{$verb}}" id="wall-item-{{$verb}}-{{$item.id}}">{{$response.output nofilter}}</div>
-                            {{/foreach}}
                         {{/if}}
+						{{if isset($item.interactions)}}
+							<div class="wall-item-interactions">
+							{{foreach $item.interactions as $interaction}}
+								<a class="wall-item-interaction wall-item-interaction-{{$interaction.type}}" href="{{$interaction.url}}"><strong>{{$interaction.total}}</strong> {{$interaction.label}}</a>
+							{{/foreach}}
+							</div>
+						{{/if}}
 
 					</div>
 

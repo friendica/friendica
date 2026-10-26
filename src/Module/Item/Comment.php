@@ -51,7 +51,7 @@ class Comment extends BaseModule
 
 		$viewerUid = $this->session->getLocalUserId();
 
-		$html = $this->htmlRenderer->renderCommentByUriId($uriId, $viewerUid);
+		$html = $this->htmlRenderer->renderCommentByUriId($uriId, $viewerUid, !empty($request['display']));
 		$this->logger->debug('Rendered comment for targeted insert', ['uri-id' => $uriId, 'viewer' => $viewerUid, 'length' => strlen($html)]);
 
 		$this->earlyHttpExit($html);

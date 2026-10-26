@@ -17,6 +17,10 @@ use Friendica\Util\Strings;
 /**
  * Creates a bookmarklet
  * Shows either a editor browser or adds the given bookmarklet to the current user
+ *
+ * Also serves the "/share" route, which is the share intent URL that Mastodon
+ * specifies (?title=&text=&url=), so links that other sites build for Mastodon
+ * work here as well.
  */
 class Bookmarklet extends BaseModule
 {
@@ -33,14 +37,17 @@ class Bookmarklet extends BaseModule
 		}
 
 		$referer = Strings::normaliseLink($_SERVER['HTTP_REFERER'] ?? '');
-		$page    = Strings::normaliseLink(DI::baseUrl() . "/bookmarklet");
+		$page    = Strings::normaliseLink(DI::baseUrl() . '/' . DI::args()->getCommand());
 
-		if (!strstr($referer, $page)) {
-			if (empty($_REQUEST["url"])) {
-				throw new HTTPException\BadRequestException(DI::l10n()->t('This page is missing a url parameter.'));
+		if (!str_starts_with($referer, $page)) {
+			if (empty($_REQUEST['url']) && empty($_REQUEST['text'])) {
+				throw new HTTPException\BadRequestException(DI::l10n()->t('This page is missing a url or text parameter.'));
 			}
 
-			$content = "\n" . PageInfo::getFooterFromUrl($_REQUEST['url']);
+			$content = htmlspecialchars(trim($_REQUEST['text'] ?? ''));
+			if (!empty($_REQUEST['url'])) {
+				$content .= "\n" . PageInfo::getFooterFromUrl($_REQUEST['url']);
+			}
 
 			$x = [
 				'title'   => trim($_REQUEST['title'] ?? '', '*'),

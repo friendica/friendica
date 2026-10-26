@@ -19,17 +19,17 @@ use Friendica\App\Router as R;
 use Friendica\Module;
 
 $profileRoutes = [
-	''                                                => [Module\Profile\Index::class,         [R::GET]],
-	'/contacts/common'                                => [Module\Profile\Common::class,        [R::GET]],
-	'/contacts[/{type}]'                              => [Module\Profile\Contacts::class,      [R::GET]],
-	'/circles/{circle_id:\d+}/download'               => [Module\Profile\CircleExport::class,  [R::GET]],
-	'/media'                                          => [Module\Profile\Media::class,         [R::GET]],
-	'/photos'                                         => [Module\Profile\Photos::class,        [R::GET, R::POST]],
-	'/profile'                                        => [Module\Profile\Profile::class,       [R::GET]],
-	'/remote_follow'                                  => [Module\Profile\RemoteFollow::class,  [R::GET, R::POST]],
-	'/restricted'                                     => [Module\Profile\Restricted::class,    [R::GET         ]],
-	'/schedule'                                       => [Module\Profile\Schedule::class,      [R::GET, R::POST]],
-	'/conversations[/{category}[/{date1}[/{date2}]]]' => [Module\Profile\Conversations::class, [R::GET]],
+	''                                                          => [Module\Profile\Index::class,         [R::GET, R::HEAD]],
+	'/contacts/common'                                          => [Module\Profile\Common::class,        [R::GET]],
+	'/contacts[/{type}]'                                        => [Module\Profile\Contacts::class,      [R::GET]],
+	'/circles/{circle_id:\d+}/download'                         => [Module\Profile\CircleExport::class,  [R::GET]],
+	'/{filter:activities|media|original|posts|quotes|reshares}' => [Module\Profile\Posts::class, [R::GET]],
+	'/photos'                                                   => [Module\Profile\Photos::class,        [R::GET, R::POST]],
+	'/profile'                                                  => [Module\Profile\Profile::class,       [R::GET]],
+	'/remote_follow'                                            => [Module\Profile\RemoteFollow::class,  [R::GET, R::POST]],
+	'/restricted'                                               => [Module\Profile\Restricted::class,    [R::GET         ]],
+	'/schedule'                                                 => [Module\Profile\Schedule::class,      [R::GET, R::POST]],
+	'/conversations[/{category}[/{date1}[/{date2}]]]'           => [Module\Profile\Conversations::class, [R::GET, R::HEAD]],
 ];
 
 $apiRoutes = [
@@ -424,6 +424,7 @@ return [
 	'/blocklist/domain/download' => [Module\Blocklist\Domain\Download::class, [R::GET]],
 
 	'/bookmarklet' => [Module\Bookmarklet::class,  [R::GET]],
+	'/share'       => [Module\Bookmarklet::class,  [R::GET]],
 
 	'/calendar' => [
 		'[/]'                                           => [Module\Calendar\Show::class,       [R::GET         ]],
@@ -449,11 +450,15 @@ return [
 
 		'/{id:\d+}/{action:block|ignore|collapse|update|updateprofile|fetchoutbox}' => [Module\Contact\Profile::class,        [R::GET]],
 
+		'/{id:\d+}/activities'        => [Module\Contact\Activities::class,     [R::GET]],
 		'/{id:\d+}/advanced'          => [Module\Contact\Advanced::class,       [R::GET, R::POST]],
 		'/{id:\d+}/conversations'     => [Module\Contact\Conversations::class,  [R::GET]],
 		'/{id:\d+}/contacts[/{type}]' => [Module\Contact\Contacts::class,       [R::GET]],
 		'/{id:\d+}/media'             => [Module\Contact\Media::class,          [R::GET]],
+		'/{id:\d+}/original'          => [Module\Contact\Original::class,       [R::GET]],
 		'/{id:\d+}/posts'             => [Module\Contact\Posts::class,          [R::GET]],
+		'/{id:\d+}/quotes'            => [Module\Contact\Quotes::class,         [R::GET]],
+		'/{id:\d+}/reshares'          => [Module\Contact\Reshares::class,       [R::GET]],
 		'/{id:\d+}/revoke'            => [Module\Contact\Revoke::class,         [R::GET, R::POST]],
 		'/archived'                   => [Module\Contact::class,                [R::GET]],
 		'/batch'                      => [Module\Contact::class,                [R::GET, R::POST]],
@@ -471,15 +476,17 @@ return [
 	],
 
 	'/credits'                  => [Module\Credits::class,          [R::GET]],
+	'/deck'                     => [Module\Deck::class,             [R::GET]],
 	'/delegation'               => [Module\User\Delegation::class,  [R::GET, R::POST]],
 	'/dfrn_notify[/{nickname}]' => [Module\DFRN\Notify::class,      [        R::POST]],
 	'/dfrn_poll/{nickname}'     => [Module\Feed::class,            [R::GET]],
 	'/dirfind'                  => [Module\Search\Directory::class, [R::GET]],
 	'/directory'                => [Module\Directory::class,        [R::GET]],
 
-	'/display/{guid}'                                        => [Module\Item\Display::class, [R::GET]],
-	'/display/feed-item/{uri-id}[.atom]'                     => [Module\Item\Feed::class,    [R::GET]],
-	'/display/feed-item/{uri-id}/{mode:conversation}[.atom]' => [Module\Item\Feed::class,    [R::GET]],
+	'/display/{guid}'                                                 => [Module\Item\Display::class, [R::GET]],
+	'/display/{guid}/{type:reshares|quotes|likes|dislikes|reactions}' => [Module\Item\Interactions::class, [R::GET]],
+	'/display/feed-item/{uri-id}[.atom]'                              => [Module\Item\Feed::class,    [R::GET]],
+	'/display/feed-item/{uri-id}/{mode:conversation}[.atom]'          => [Module\Item\Feed::class,    [R::GET]],
 
 	'/featured/{nickname}' => [Module\ActivityPub\Featured::class, [R::GET]],
 
@@ -514,6 +521,10 @@ return [
 		'/{circle:\d+}/{contact:\d+}'                      => [Module\Circle::class, [R::GET, R::POST]],
 		'/{circle:\d+}/{command:add|remove}/{contact:\d+}' => [Module\Circle::class, [R::GET, R::POST]],
 	],
+	'/group/{id}'                   => [Module\Group::class,            [R::GET, R::POST]],
+	'/groups'                       => [Module\Groups::class,           [R::GET]],
+	'/groups/discover[/{gsid:\d+}]' => [Module\Groups\Discover::class, [R::GET]],
+
 	'/hashtag'                    => [Module\Hashtag::class,           [R::GET]],
 	'/help[/{doc:.+}]'            => [Module\Help::class,              [R::GET]],
 	'/home'                       => [Module\Home::class,              [R::GET]],
@@ -599,6 +610,7 @@ return [
 		'/system[/json]'               => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
 		'/personal[/json]'             => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
 		'/home[/json]'                 => [Module\Notifications\Notifications::class, [R::GET, R::POST]],
+		'/stream'                      => [Module\Notifications\Stream::class,        [R::GET]],
 		'/intros[/json]'               => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
 		'/intros/all[/json]'           => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
 		'/intros/{contact:\d+}[/json]' => [Module\Notifications\Introductions::class, [R::GET, R::POST]],
@@ -707,7 +719,11 @@ return [
 			'/photo[/new]'       => [Module\Settings\Profile\Photo\Index::class, [R::GET, R::POST]],
 			'/photo/crop/{guid}' => [Module\Settings\Profile\Photo\Crop::class,  [R::GET, R::POST]],
 		],
-		'/removeme'              => [Module\Settings\RemoveMe::class,              [R::GET, R::POST]],
+		'/removeme'     => [Module\Settings\RemoveMe::class,              [R::GET, R::POST]],
+		'/trustedhosts' => [
+			'[/]'  => [Module\Settings\TrustedHosts\Index::class, [R::GET, R::POST]],
+			'/add' => [Module\Settings\TrustedHosts\Add::class,   [        R::POST]],
+		],
 		'/userexport[/{action}]' => [Module\Settings\UserExport::class,            [R::GET         ]],
 		'/2fa'                   => [
 			'[/]'           => [Module\Settings\TwoFactor\Index::class,       [R::GET, R::POST]],
@@ -743,6 +759,10 @@ return [
 		'/circle/{circle_id:\d+}'                                          => [Module\Ping\Network::class, [R::GET]],
 	],
 
+	'/ping_contact/{id:\d+}/conversations' => [Module\Ping\Contact::class,       [R::GET]],
+	'/ping_notifications[/]'               => [Module\Ping\Notifications::class, [R::GET]],
+	'/ping_search[/]'                      => [Module\Ping\Search::class,        [R::GET]],
+
 	'/update_channel[/{content}]'   => [Module\Update\Channel::class,        [R::GET]],
 	'/update_community[/{content}]' => [Module\Update\Community::class,      [R::GET]],
 
@@ -757,8 +777,10 @@ return [
 		'/circle/{circle_id:\d+}'                                          => [Module\Update\Network::class, [R::GET]],
 	],
 
-	'/update_notes'   => [Module\Update\Notes::class,          [R::GET]],
-	'/update_profile' => [Module\Update\Profile::class,        [R::GET]],
+	'/update_notes'            => [Module\Update\Notes::class,         [R::GET]],
+	'/update_notifications[/]' => [Module\Update\Notifications::class, [R::GET]],
+	'/update_profile'          => [Module\Update\Profile::class,       [R::GET]],
+	'/update_search[/]'        => [Module\Update\Search::class,        [R::GET]],
 
 	'/user/import' => [Module\User\Import::class,           [R::GET, R::POST]],
 

@@ -68,7 +68,8 @@ window.onload = function(){
 				insertInto: ['.comment-edit-text-full']
 			}
 		],
-		closeButton: true
+		closeButton: true,
+		l10n: {{$emoji_l10n nofilter}}
 	});
 };
 </script>

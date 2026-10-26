@@ -87,7 +87,13 @@ final class StatusEditor
 		$formData['allow_location'] ??= $user['allow_location'];
 		$formData['default_location'] ??= $user['default-location'];
 		$formData['nickname'] ??= $user['nickname'];
-		$formData['lockstate'] = $formData['lockstate'] ?? ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
+		$formData['group_cid'] ??= 0;
+		if ($formData['group_cid']) {
+			// The permissions are set by the group, so there is nothing to choose
+			$formData['lockstate'] = 'unlock';
+			$formData['acl']       = '';
+		}
+		$formData['lockstate'] ??= ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
 		$formData['acl'] ??= ACL::getFullSelectorHTML($this->page, $user['uid'], true);
 		$formData['bang'] ??= '';
 		$formData['visitor'] ??= 'block';
@@ -194,6 +200,7 @@ final class StatusEditor
 			'$preview'      => $this->l10n->t('Preview'),
 			'$jotplugins'   => $jotplugins,
 			'$notes_cid'    => $notesContactId,
+			'$group_cid'    => $formData['group_cid'],
 			'$rand_num'     => Crypto::randomDigits(12),
 
 			// ACL permissions box

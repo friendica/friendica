@@ -1,0 +1,20 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2026 the Friendica project
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+html body,
+html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt, .glyphicon, :is(code, pre, kbd, samp, tt) *)) {
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+}
+
+html body :where([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt, .glyphicon, :is(code, pre, kbd, samp, tt) *) {
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+}
+
+html body :where(p, li, dd, dt, td, th, blockquote, textarea, .wall-item-body) {
+  line-height: 1.5 !important;
+}

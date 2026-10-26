@@ -755,6 +755,11 @@ class Item
 		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
 		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
 
+		// Local comments on a sensitive post are sensitive as well
+		if ($item['origin'] && ($item['gravity'] == self::GRAVITY_COMMENT) && empty($item['sensitive']) && Post::exists(['uri-id' => $item['thr-parent-id'], 'sensitive' => true])) {
+			$item['sensitive'] = true;
+		}
+
 		if (!empty($item['conversation']) && empty($item['conversation-id'])) {
 			$item['conversation-id'] = ItemURI::getIdByURI($item['conversation']);
 		}
@@ -925,6 +930,11 @@ class Item
 		// Store tags from the body if this hadn't been handled previously in the protocol classes
 		if (!Tag::existsForPost($item['uri-id'])) {
 			Tag::storeFromBody($item['uri-id'], $item['body']);
+		}
+
+		if (!empty($item['audience'])) {
+			DI::logger()->debug('Store group audience', ['uri-id' => $item['uri-id'], 'audience' => $item['audience']]);
+			Tag::store($item['uri-id'], Tag::AUDIENCE, $item['audience'], $item['audience']);
 		}
 
 		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) && (!isset($item['sensitive']) || is_null($item['sensitive']))) {
@@ -3184,6 +3194,7 @@ class Item
 		}
 
 		$s = DI::postMediaRepository()->addEmbed($s, $uid, $item['uri-id'], $uid != 0);
+		$s = DI::postMediaRepository()->gateEmbeddedIframes($s, $uid);
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
@@ -3443,7 +3454,7 @@ class Item
 					$trailing .= $media;
 				}
 			} elseif ($PostMedia->type == PostMedia::TYPE_AUDIO) {
-				$media = DI::postMediaRepository()->getAudioAttachment($PostMedia);
+				$media = DI::postMediaRepository()->getAudioAttachment($PostMedia, $uid);
 				if (($item['post-type'] ?? null) == Item::PT_AUDIO) {
 					$leading .= $media;
 				} else {
@@ -3547,7 +3558,7 @@ class Item
 					$preview_mode = $attachment->isArticle() ? BBCode::PREVIEW_SMALL : BBCode::PREVIEW_LARGE;
 				}
 				if (!$has_media && $preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $attachment->url)) {
-					$rendered = BBCode::convertAttachmentFromPostMedia($attachment, BBCode::INTERNAL, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false), self::hideDescription($attachment, $content));
+					$rendered = BBCode::convertAttachmentFromPostMedia($attachment, BBCode::INTERNAL, $uriid, $preview_mode, $uid != 0, self::hideDescription($attachment, $content));
 				} elseif (!self::containsLink($content, $attachment->url, PostMedia::TYPE_HTML)) {
 					$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
 						'$url'   => $attachment->url,

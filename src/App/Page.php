@@ -43,6 +43,16 @@ use Psr\Http\Message\ResponseInterface;
 class Page implements ArrayAccess
 {
 	/**
+	 * @var string[] Fonts a user can select in the accessibility settings, each backed by view/fonts/accessibility/<name>.css
+	 */
+	public const ACCESSIBILITY_FONTS = ['opendyslexic', 'atkinson-hyperlegible', 'lexend', 'luciole', 'andika'];
+
+	/**
+	 * @var string[] Text spacings a user can select in the accessibility settings, each backed by view/accessibility/text-spacing-<name>.css
+	 */
+	public const ACCESSIBILITY_TEXT_SPACINGS = ['increased', 'large'];
+
+	/**
 	 * @var array Contains all stylesheets, which should get loaded during page
 	 */
 	private $stylesheets = [];
@@ -259,13 +269,27 @@ class Page implements ArrayAccess
 			'$local_user'     => $localUID,
 			'$generator'      => 'Friendica' . ' ' . App::VERSION,
 			'$update_content' => (int) $pConfig->get($localUID, 'system', 'update_content'),
-			'$spa_mode'       => (int) $pConfig->get($localUID, 'system', 'enable_spa'),
+			'$spa_mode'       => ($_GET['mode'] ?? '') === 'column' ? 0 : (int) $pConfig->get($localUID, 'system', 'enable_spa'),
 			'$spa_router_ts'  => $this->getSpaModuleTimestamp(),
-			'$shortcut_icon'  => $shortcut_icon,
-			'$touch_icon'     => $touch_icon,
-			'$block_public'   => intval($config->get('system', 'block_public')),
-			'$stylesheets'    => $this->stylesheets,
-			'$loading'        => [
+			'$emoji_l10n'     => json_encode([
+				'search'        => $l10n->t('Search'),
+				'skintone'      => $l10n->t('Skin tone'),
+				'Frequent'      => $l10n->t('Frequently used'),
+				'Smileys'       => $l10n->t('Smileys & Emotion'),
+				'People'        => $l10n->t('People & Body'),
+				'Nature'        => $l10n->t('Animals & Nature'),
+				'Food-dring'    => $l10n->t('Food & Drink'),
+				'Activity'      => $l10n->t('Activities'),
+				'Travel-places' => $l10n->t('Travel & Places'),
+				'Objects'       => $l10n->t('Objects'),
+				'Symbols'       => $l10n->t('Symbols'),
+				'Flags'         => $l10n->t('Flags'),
+			], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT),
+			'$shortcut_icon' => $shortcut_icon,
+			'$touch_icon'    => $touch_icon,
+			'$block_public'  => intval($config->get('system', 'block_public')),
+			'$stylesheets'   => $this->stylesheets,
+			'$loading'       => [
 				'fetching'            => $l10n->t('Fetching...'),
 				'receiving'           => $l10n->t('Receiving data...'),
 				'processing'          => $l10n->t('Processing...'),
@@ -284,6 +308,14 @@ class Page implements ArrayAccess
 
 		]) . $this->page['htmlhead'];
 
+		$font = $pConfig->get($localUID, 'accessibility', 'font');
+		if (in_array($font, self::ACCESSIBILITY_FONTS, true)) {
+			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/fonts/accessibility/' . $font . '.css?v=' . App::VERSION . '" type="text/css" media="all" />' . "\n";
+		}
+		$text_spacing = $pConfig->get($localUID, 'accessibility', 'text_spacing');
+		if (in_array($text_spacing, self::ACCESSIBILITY_TEXT_SPACINGS, true)) {
+			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/accessibility/text-spacing-' . $text_spacing . '.css?v=' . App::VERSION . '" type="text/css" media="all" />' . "\n";
+		}
 		if ($pConfig->get($localUID, 'accessibility', 'hide_empty_descriptions')) {
 			$this->page['htmlhead'] .= "<style>a[data-alt='']{display:none;} a:has(.empty-description){display:none;} .empty-description {display: none;}</style>\n";
 		}

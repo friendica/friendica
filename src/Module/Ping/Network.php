@@ -125,7 +125,7 @@ class Network extends NetworkModule
 			$this->earlyHttpExit('');
 		}
 
-		$lockkey = 'network-ping-' . $this->session->getLocalUserId();
+		$lockkey = 'network-ping-' . $this->session->getLocalUserId() . '-' . md5(json_encode([$this->selectedTab, $this->parameters]));
 		if (!$this->lock->acquire($lockkey, 0)) {
 			$this->logger->debug('Ping-1-lock', ['uid' => $this->session->getLocalUserId()]);
 			$this->earlyHttpExit('');

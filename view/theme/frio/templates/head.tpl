@@ -193,7 +193,8 @@
 					insertInto: ['#comment-edit-text-0', '#profile-jot-text', '.profile-jot-text-full', '.comment-edit-text-full', '.prvmail-text', '.emojis-target']
 				}
 			],
-			closeButton: true
+			closeButton: true,
+			l10n: {{$emoji_l10n nofilter}}
 		});
 	};
 	</script>

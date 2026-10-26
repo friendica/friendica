@@ -1,0 +1,27 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2026 the Friendica project
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/* Atkinson Hyperlegible Next, see atkinson-hyperlegible/OFL.txt for the font license */
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("atkinson-hyperlegible/AtkinsonHyperlegibleNext-Variable.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  src: url("atkinson-hyperlegible/AtkinsonHyperlegibleNext-Italic-Variable.woff2") format("woff2");
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+html body,
+html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt, .glyphicon, :is(code, pre, kbd, samp, tt) *)) {
+  font-family: "Atkinson Hyperlegible Next", sans-serif !important;
+}

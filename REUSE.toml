@@ -154,6 +154,31 @@ SPDX-FileCopyrightText = "Dave Gandy"
 SPDX-License-Identifier = "OFL-1.1"
 
 [[annotations]]
+path = "view/fonts/accessibility/opendyslexic/**"
+SPDX-FileCopyrightText = "2012-2019 Abbie Gonzalez (Abelardo Gonzalez) (https://abbiecod.es), with Reserved Font Name OpenDyslexic"
+SPDX-License-Identifier = "OFL-1.1"
+
+[[annotations]]
+path = "view/fonts/accessibility/atkinson-hyperlegible/**"
+SPDX-FileCopyrightText = "2020-2024 The Atkinson Hyperlegible Next Project Authors (https://github.com/googlefonts/atkinson-hyperlegible-next)"
+SPDX-License-Identifier = "OFL-1.1"
+
+[[annotations]]
+path = "view/fonts/accessibility/andika/**"
+SPDX-FileCopyrightText = "2004-2025 SIL Global (https://www.sil.org/), with Reserved Font Names Andika and SIL"
+SPDX-License-Identifier = "OFL-1.1"
+
+[[annotations]]
+path = "view/fonts/accessibility/lexend/**"
+SPDX-FileCopyrightText = "2018 The Lexend Project Authors (https://github.com/googlefonts/lexend), with Reserved Font Name RevReading Lexend"
+SPDX-License-Identifier = "OFL-1.1"
+
+[[annotations]]
+path = "view/fonts/accessibility/luciole/**"
+SPDX-FileCopyrightText = "Luciole & Laurent Bourcellier & Jonathan Perez"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
 path = "view/theme/frio/font/open_sans/**"
 SPDX-FileCopyrightText = "2010 Steve Matteson, Google LLC"
 SPDX-License-Identifier = "OFL-1.1"

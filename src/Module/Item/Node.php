@@ -51,7 +51,7 @@ class Node extends BaseModule
 
 		$viewerUid = $this->session->getLocalUserId();
 
-		$html = $this->htmlRenderer->renderItemByUriId($uriId, $viewerUid);
+		$html = $this->htmlRenderer->renderItemByUriId($uriId, $viewerUid, !empty($request['display']));
 		$this->logger->debug('Rendered item node for in-place refresh', ['uri-id' => $uriId, 'viewer' => $viewerUid, 'length' => strlen($html)]);
 
 		$this->earlyHttpExit($html);

@@ -112,7 +112,7 @@ class Feature
 			'composition' => [
 				$l10n->t('Post Composition Features'),
 				[self::EXPLICIT_MENTIONS, $l10n->t('Explicit Mentions'), $l10n->t('Add explicit mentions to comment box for manual control over who gets mentioned in replies.'), false, $config->get('feature_lock', Feature::EXPLICIT_MENTIONS, false)],
-				[self::ADD_ABSTRACT,      $l10n->t('Add an abstract from ActivityPub content warnings'), $l10n->t('Add an abstract when commenting on ActivityPub posts with a content warning. Abstracts are displayed as content warning on systems like Mastodon or Pleroma.'), false, $config->get('feature_lock', self::ADD_ABSTRACT, false)],
+				[self::ADD_ABSTRACT,      $l10n->t('Add an abstract from ActivityPub content warnings'), $l10n->t('Add an abstract when commenting on a sensitive ActivityPub post that has a content warning. Abstracts are displayed as content warning on systems like Mastodon or Pleroma.'), false, $config->get('feature_lock', self::ADD_ABSTRACT, false)],
 			],
 
 			// Item tools

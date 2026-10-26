@@ -195,7 +195,8 @@
             const savedContent = localStorage.getItem(`comment-edit-text-${textarea.id}`);
             const lastSaved = localStorage.getItem(`last-saved-${textarea.id}`);
 
-            if (savedContent && lastSaved) {
+            // A body passed in the URL (e.g. a group mention) takes precedence over an old draft
+            if (savedContent && lastSaved && textarea.defaultValue === "") {
                 const currentTime = new Date().getTime();
                 const timeElapsed = currentTime - parseInt(lastSaved, 10);
 
@@ -217,7 +218,7 @@
     }
     window.composeDraftSaver = setInterval(function () {
         document.querySelectorAll(".expandable-textarea").forEach(function(textarea) {
-            if (textarea.value.trim() !== "") {
+            if (textarea.value.trim() !== "" && textarea.value !== textarea.defaultValue) {
                 localStorage.setItem(`comment-edit-text-${textarea.id}`, textarea.value);
                 localStorage.setItem(`last-saved-${textarea.id}`, new Date().getTime().toString());
             }
@@ -240,7 +241,7 @@
             return;
         }
         var unsaved = Array.from(document.querySelectorAll(".expandable-textarea")).some(function(textarea) {
-            return textarea.value.trim().length > 0;
+            return textarea.value.trim().length > 0 && textarea.value !== textarea.defaultValue;
         });
         if (unsaved) {
             event.preventDefault();

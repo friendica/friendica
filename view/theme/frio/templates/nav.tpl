@@ -81,11 +81,27 @@
 							</li>
 						{{/if}}
 
+						{{if $nav.groups}}
+							<li class="nav-segment">
+								<a class="nav-menu {{$sel.groups}}" href="{{$nav.groups.0}}"
+									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.groups.3}}" title="{{$nav.groups.3}}"><i
+									  class="ri ri-xl ri-discuss-{{if $sel.groups}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.groups.1}}</span></a>
+							</li>
+						{{/if}}
+
 						{{if $nav.community}}
 							<li class="nav-segment hidden-xs">
 								<a accesskey="c" class="nav-menu {{$sel.community}}" href="{{$nav.community.0}}"
 									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.community.3}}" title="{{$nav.community.3}}"><i
 									  class="ri ri-xl ri-earth-{{if $sel.community}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.community.1}}</span></a>
+							</li>
+						{{/if}}
+
+						{{if $nav.deck}}
+							<li class="nav-segment hidden-xs">
+								<a id="nav-deck-link" href="{{$nav.deck.0}}" data-toggle="tooltip" data-viewport="#topbar-first"
+									aria-label="{{$nav.deck.1}}" title="{{$nav.deck.3}}" class="nav-menu {{$sel.deck}}"><i
+									class="ri ri-xl ri-layout-column-{{if $sel.deck}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.deck.1}}</span></a>
 							</li>
 						{{/if}}
 

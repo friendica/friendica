@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Friendica\Test\Unit\Content\Conversation;
 
 use Friendica\Content\Conversation\ConversationRenderer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -125,5 +126,25 @@ class ConversationRendererTest extends TestCase
 		$this->call('isolateReply', [$thread, 3]);
 
 		self::assertSame($this->thread(), $thread);
+	}
+
+	public static function commentsModeProvider(): array
+	{
+		return [
+			'string compact' => ['1', ConversationRenderer::COMMENTS_MODE_COMPACT],
+			'string hidden'  => ['2', ConversationRenderer::COMMENTS_MODE_HIDDEN],
+			'true'           => [true, ConversationRenderer::COMMENTS_MODE_COMPACT],
+			'int hidden'     => [2, ConversationRenderer::COMMENTS_MODE_HIDDEN],
+			'zero'           => [0, ConversationRenderer::COMMENTS_MODE_ALL],
+			'unknown value'  => [3, ConversationRenderer::COMMENTS_MODE_ALL],
+			'null'           => [null, ConversationRenderer::COMMENTS_MODE_ALL],
+			'false'          => [false, ConversationRenderer::COMMENTS_MODE_ALL],
+		];
+	}
+
+	#[DataProvider('commentsModeProvider')]
+	public function testNormalizeCommentsMode(mixed $stored, int $expected): void
+	{
+		self::assertSame($expected, ConversationRenderer::normalizeCommentsMode($stored));
 	}
 }

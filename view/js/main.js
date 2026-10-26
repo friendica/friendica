@@ -637,7 +637,7 @@ function triggerLiveUpdates(force, guid) {
 		showProcessing();
 	}
 	force_update = force;
-	['network', 'profile', 'channel', 'community', 'notes', 'display', 'contact'].forEach(function (src) {
+	['network', 'profile', 'channel', 'community', 'notes', 'display', 'contact', 'notifications', 'search'].forEach(function (src) {
 		// updateContent: 0 = never, 1 = only at the top of the page, 2 = always. The display page is never updated automatically.
 		var autoUpdate = src !== 'display' && (updateContent === 2 || (updateContent === 1 && $(window).scrollTop() === 0));
 		if ($('#live-' + src).length && (force || autoUpdate)) {
@@ -714,13 +714,21 @@ function scrollToItem(elementId, fallbackId) {
 		});
 }
 
+/**
+ * Whether the page is embedded as a column of the deck (see view/theme/frio/php/column.php)
+ */
+function isColumnMode() {
+	return document.body.classList.contains('column-view');
+}
+
 function NavUpdate() {
 	if (!stopped) {
 		if (force_update) {
 			showFetching();
 		}
-		var pingCmd = 'ping';
-		$.get(pingCmd)
+		// In a column of the deck only the page itself is updated, the notification counters are fetched by the deck.
+		var pingRequest = isColumnMode() ? $.Deferred().resolve({ result: {} }) : $.get('ping');
+		pingRequest
 			.done(function(data) {
 				if (data.result) {
 					if (force_update) {
@@ -736,9 +744,15 @@ function NavUpdate() {
 					// start live update
 					triggerLiveUpdates(force_update);
 
+					['notifications', 'contact', 'search'].forEach(function (src) {
+						if ($('#live-' + src).length) {
+							columnUpdate(src);
+						}
+					});
+
 					if ($('#live-network').length && !$('#live-display').length) {
 						networkUpdate(force_update);
-					} else if (!$('#live-display').length) {
+					} else if (!$('#live-display').length && !isColumnMode()) {
 						var update_url = 'ping_network?ping=1';
 						if (force_update) {
 							showFetching();
@@ -818,8 +832,26 @@ function updateConvItems(data, guid) {
 	}
 }
 
+/**
+ * Adds the new notifications of the notification stream above the existing ones
+ *
+ * @param {string} data The response of the update
+ */
+function updateNotificationItems(data) {
+	$('.notification-stream-item', data).each(function() {
+		var id = $(this).data('notification-id');
+
+		if ($('.notification-stream-item[data-notification-id="' + id + '"]').length === 0) {
+			$('#notification-stream-empty').remove();
+			$('#' + prev).after($(this));
+			prev = this.id;
+		}
+	});
+}
+
 function getUpdateUrl(src)
 {
+	var match;
 	var udargs = ((netargs.length) ? '/' + netargs : '');
 
 	var update_url = src + udargs + '&p=' + profile_uid + '&force=1&item=' + update_item;
@@ -834,24 +866,36 @@ function getUpdateUrl(src)
 		update_url += '&max_id=' + getUrlParameter('max_id');
 	}
 
-	match = $("span.received").first();
-	if (match.length > 0) {
-		update_url += '&first_received=' + match[0].innerHTML;
+	var firstNotification = $(".notification-stream-item").first();
+	if (firstNotification.length > 0) {
+		update_url += '&first_id=' + firstNotification.data('notification-id');
 	}
 
-	match = $("span.created").first();
-	if (match.length > 0) {
-		update_url += '&first_created=' + match[0].innerHTML;
+	// In a column without any post (yet) everything is new
+	var emptyTime = isColumnMode() ? '1970-01-01 00:00:00' : '';
+	var emptyUriId = isColumnMode() ? '1' : '';
+
+	match = $("span.received").first();
+	if (match.length > 0 || emptyTime) {
+		update_url += '&first_received=' + (match.length > 0 ? match[0].innerHTML : emptyTime);
+	}
+
+	// Pinned posts are shown first and are older than the newest post
+	match = $("span.created").filter(function() {
+		return $(this).closest('.wall-item-container').find('.ri-pushpin-line').length === 0;
+	}).first();
+	if (match.length > 0 || emptyTime) {
+		update_url += '&first_created=' + (match.length > 0 ? match[0].innerHTML : emptyTime);
 	}
 
 	match = $("span.commented").first();
-	if (match.length > 0) {
-		update_url += '&first_commented=' + match[0].innerHTML;
+	if (match.length > 0 || emptyTime) {
+		update_url += '&first_commented=' + (match.length > 0 ? match[0].innerHTML : emptyTime);
 	}
 
 	match = $("span.uriid").first();
-	if (match.length > 0) {
-		update_url += '&first_uriid=' + match[0].innerHTML;
+	if (match.length > 0 || emptyUriId) {
+		update_url += '&first_uriid=' + (match.length > 0 ? match[0].innerHTML : emptyUriId);
 	}
 	return update_url;
 }
@@ -889,11 +933,11 @@ function liveUpdate(src, force, guid) {
 			in_progress = false;
 			update_item = 0;
 
-			if ($('.wall-item-body', data).length == 0) {
+			if ($('.wall-item-body, .notification-stream-item', data).length == 0) {
 				return;
 			}
 
-			$('.wall-item-body', data).imagesLoaded(function() {
+			$('.wall-item-body, .notification-stream-item', data).imagesLoaded(function() {
 				var atTop = $(window).scrollTop() === 0;
 
 				// Remember the first visible thread, so it can be kept at the same screen position.
@@ -910,7 +954,11 @@ function liveUpdate(src, force, guid) {
 					});
 				}
 
-				updateConvItems(data, guid);
+				if (src === 'notifications') {
+					updateNotificationItems(data);
+				} else {
+					updateConvItems(data, guid);
+				}
 
 				document.dispatchEvent(new Event('postprocess_liveupdate'));
 
@@ -950,8 +998,26 @@ function networkUpdate(force) {
 		});
 }
 
+/**
+ * Checks for new entries on pages without a ping of their own, like the notification stream, the posts of a contact
+ * or a search. The number is shown in the element "column-update" if the page has one (like the columns of the deck).
+ *
+ * @param {string} src The type of the page, as in the element "live-<src>"
+ */
+function columnUpdate(src) {
+	if (!$('#column-update').length) {
+		return;
+	}
+
+	$.get('ping_' + getUpdateUrl(src))
+		.done(function(count) {
+			updateCounter('column', count);
+		});
+}
+
 function updateCounter(type, counter) {
-	if (counter < 0) {
+	// An empty answer means that the server skipped the check (e.g. a busy lock), not that there is nothing new
+	if (counter === '' || counter < 0) {
 		return;
 	}
 
@@ -975,6 +1041,34 @@ function imgbright(node) {
 
 function imgdull(node) {
 	$(node).removeClass("drop").addClass("drophide");
+}
+
+function iframePlaceholderOnce(button) {
+	var placeholder = button.closest('.iframe-placeholder');
+	var fragment = placeholder.querySelector('template').content.cloneNode(true);
+	// Scripts cloned out of a <template> never run, the resize script of embed-iframe-resize.tpl needs re-creating to execute.
+	fragment.querySelectorAll('script[data-iframe-resize]').forEach(function(oldScript) {
+		var newScript = document.createElement('script');
+		newScript.textContent = oldScript.textContent;
+		oldScript.replaceWith(newScript);
+	});
+	placeholder.replaceWith(fragment);
+}
+
+function iframePlaceholderAlways(button) {
+	var placeholder = button.closest('.iframe-placeholder');
+	var host = placeholder.dataset.host;
+	$.post('settings/trustedhosts/add', {hostname: host, form_security_token: placeholder.dataset.token}).done(function() {
+		// The host is trusted now, so open all other placeholders of this host as well
+		document.querySelectorAll('.iframe-placeholder').forEach(function(other) {
+			if (other.dataset.host === host) {
+				iframePlaceholderOnce(other.querySelector('button'));
+			}
+		});
+	}).fail(function() {
+		console.warn('Could not store the trusted host', host);
+		iframePlaceholderOnce(button);
+	});
 }
 
 // Since our ajax calls are asynchronous, we will give a few
@@ -1255,6 +1349,42 @@ function showHideComments(id) {
 	}
 }
 
+// Opens a post's display page from a click on its text, unless the click hit
+// an interactive element or embedded media inside it, or the user is selecting
+// text - used when comments are hidden or compacted in the feed, so that the
+// whole conversation can be read and written on the display page. The target
+// url is taken from the data-display-url attribute of the clicked content.
+// Ctrl/Cmd/Shift/middle clicks open a new tab or window like a real link. A
+// plain element.click() on a synthesized link isn't picked up by Unpoly - it
+// only forwards clicks that either came from a real mouse hit or lack
+// coordinates entirely (keyboard activation), so up.visit() is used directly
+// when SPA mode is active.
+$(document).on('click', '.click-to-display[data-display-url]', function(event) {
+	if (event.target.closest('a, button, summary, details, label, input, select, textarea, img, video, audio, iframe')) {
+		return;
+	}
+	if (String(window.getSelection()).length) {
+		return;
+	}
+
+	var url = $(this).data('display-url');
+	if (event.ctrlKey || event.metaKey || event.shiftKey) {
+		window.open(url, '_blank');
+		return;
+	}
+	if (typeof window.up !== 'undefined' && typeof up.visit === 'function') {
+		up.error.muteUncriticalRejection(up.visit(url));
+		return;
+	}
+	window.location.href = url;
+});
+
+// The display page itself already shows the whole conversation, so rendered
+// items fetched there must not offer to open themselves
+function onDisplayPage() {
+	return /(^|\/)display\//.test(window.location.pathname);
+}
+
 // Load more comments for a specific post
 function loadMoreComments(uriId, itemId, existing) {
 	var button = $('#load-more-comments-' + itemId);
@@ -1277,7 +1407,8 @@ function loadMoreComments(uriId, itemId, existing) {
 		url: 'item/' + uriId + '/comments',
 		data: {
 			'mode': 'raw',
-			'existing': existingArray.join(',')
+			'existing': existingArray.join(','),
+			'display': onDisplayPage() ? 1 : 0
 		}
 	})
 	.done(function(data) {
@@ -1347,7 +1478,7 @@ function insertPostedComment(parentItemId, data) {
 		return false;
 	}
 
-	$.get('item/' + data['comment-uri-id'] + '/comment')
+	$.get('item/' + data['comment-uri-id'] + '/comment', {'display': onDisplayPage() ? 1 : 0})
 		.done(function(html) {
 			// keepScripts: the comment form carries an inline <script> that wires up its dropzone
 			var $new = $('<div>').append($.parseHTML(html, document, true)).find(parent).first();
@@ -1456,7 +1587,7 @@ function refreshItemActivity(itemId, data) {
 		return false;
 	}
 
-	$.get('item/' + data['uri-id'] + '/node')
+	$.get('item/' + data['uri-id'] + '/node', {'display': onDisplayPage() ? 1 : 0})
 		.done(function(html) {
 			var $newArticle = $('<div>').append($.parseHTML(html)).find(item + ' > article.media').first();
 			if (!$newArticle.length) {
@@ -1465,7 +1596,7 @@ function refreshItemActivity(itemId, data) {
 			}
 
 			// Swap the per-button counters (the caller only toggled the pressed
-			// state) plus the two response blocks - but not the buttons, body or
+			// state) plus the interaction summary - but not the buttons, body or
 			// comment box, which carry state and init the fresh markup would lose.
 			// A like can promote the viewer's own copy of a public post, changing
 			// its item id, so match the buttons by their stable verb prefix.
@@ -1482,10 +1613,10 @@ function refreshItemActivity(itemId, data) {
 				$shownEmoji.replaceWith($freshEmoji);
 			}
 
-			var $shownResponses = $liveArticle.find('div.wall-item-responses').first();
-			var $freshResponses = $newArticle.find('div.wall-item-responses').first();
-			if ($shownResponses.length && $freshResponses.length) {
-				$shownResponses.replaceWith($freshResponses);
+			var $shownInteractions = $liveArticle.find('div.wall-item-interactions').first();
+			var $freshInteractions = $newArticle.find('div.wall-item-interactions').first();
+			if ($shownInteractions.length && $freshInteractions.length) {
+				$shownInteractions.replaceWith($freshInteractions);
 			}
 
 			clearTimeout(timer);
@@ -1854,18 +1985,26 @@ function loadScrollContent() {
 		uriid = "0";
 	}
 
+	var scrollData = {
+		'mode'          : 'raw',
+		'last_received' : received,
+		'last_commented': commented,
+		'last_created'  : created,
+		'last_uriid'    : uriid
+	};
+
+	// The notification stream continues after its last notification
+	var lastNotification = $(".notification-stream-item").last();
+	if (lastNotification.length > 0) {
+		scrollData.max_id = lastNotification.data('notification-id');
+	}
+
 	// get the raw content from the next page and insert this content
 	// right before "#conversation-end"
 	showFetching();
 	$.get({
 		url: infinite_scroll.reload_uri,
-		data: {
-			'mode'          : 'raw',
-			'last_received' : received,
-			'last_commented': commented,
-			'last_created'  : created,
-			'last_uriid'    : uriid
-		}
+		data: scrollData
 	})
 	.done(function(data) {
 		showProcessing();

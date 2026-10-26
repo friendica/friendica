@@ -273,7 +273,7 @@ as the value of $top_child_total (this is done at the end of this file)
 		{{if $item.thread_level==1}}<span aria-hidden="true"><hr /></span>{{/if}}
 
 		{{* item content *}}
-		<div class="wall-item-content {{$item.type}}" id="wall-item-content-{{$item.id}}" lang="{{$item.lang}}">
+		<div class="wall-item-content {{$item.type}}{{if $click_to_display}} click-to-display{{/if}}" id="wall-item-content-{{$item.id}}" lang="{{$item.lang}}"{{if $click_to_display}} data-display-url="{{$item.plink.orig}}"{{/if}}>
 			{{if $item.title}}
 			<span class="wall-item-title" id="wall-item-title-{{$item.id}}"><h3 class="media-heading" dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name" target="_blank">{{$item.title}}</a></h3><br /></span>
 			{{/if}}
@@ -616,13 +616,12 @@ as the value of $top_child_total (this is done at the end of this file)
 		</div><!--./wall-item-actions-->
 
 		<div class="wall-item-links"></div>
-		{{* Display likes, dislike and attendance stats *}}
-		{{if $item.legacy_activities}}
-			<div class="wall-item-responses">
-			{{foreach $item.responses as $verb=>$response}}
-				<div class="wall-item-{{$verb}}" id="wall-item-{{$verb}}-{{$item.id}}">{{$response.output nofilter}}</div>
+		{{if isset($item.interactions)}}
+		<div class="wall-item-interactions">
+			{{foreach $item.interactions as $interaction}}
+			<a class="wall-item-interaction wall-item-interaction-{{$interaction.type}}" href="{{$interaction.url}}" aria-haspopup="dialog" onclick="addToModal(this.href); return false;"><strong>{{$interaction.total}}</strong> {{$interaction.label}}</a>
 			{{/foreach}}
-			</div>
+		</div>
 		{{/if}}
 
 		{{* Insert comment box of threaded children *}}

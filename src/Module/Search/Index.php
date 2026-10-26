@@ -207,7 +207,7 @@ class Index extends BaseSearch
 
 		$this->logger->info('Start Conversation.', ['q' => $search]);
 
-		$o .= $this->conversationRenderer->renderFlat($items, ConversationRenderer::MODE_SEARCH, false, DI::userSession()->getLocalUserId());
+		$o .= $this->conversationRenderer->renderFlat($items, ConversationRenderer::MODE_SEARCH, false, DI::userSession()->getLocalUserId(), $request);
 
 		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader($request);
@@ -217,6 +217,49 @@ class Index extends BaseSearch
 
 
 		return $o;
+	}
+
+	/**
+	 * URI-IDs of the posts that are newer than the ones shown on the search page, used by the automatic update
+	 *
+	 * @param array $request Request with the search ('q' or 'tag') and 'first_uriid' of the newest shown post
+	 * @return array List of URI-IDs, newest first
+	 */
+	protected function getNewUriIds(array $request, int $uid, int $limit): array
+	{
+		if (isset($request['tag'])) {
+			$tag    = true;
+			$search = trim(rawurldecode($request['tag']));
+		} else {
+			$tag    = false;
+			$search = isset($request['q']) ? trim(rawurldecode($request['q'])) : '';
+
+			if (str_starts_with($search, '#')) {
+				$tag    = true;
+				$search = substr($search, 1);
+			} elseif (str_starts_with($search, '@') || str_starts_with($search, '!')) {
+				return [];
+			} elseif (isset($request['search-option']) && in_array($request['search-option'], ['contacts', 'groups'])) {
+				return [];
+			} elseif (isset($request['search-option']) && $request['search-option'] == 'tags') {
+				$tag = true;
+			}
+		}
+
+		// The same as in content(): Neither tag nor fulltext search is done for URLs
+		if ($search === '' || (parse_url($search, PHP_URL_SCHEME) && parse_url($search, PHP_URL_HOST))) {
+			return [];
+		}
+
+		$tag = $tag || DI::config()->get('system', 'only_tag_search');
+
+		$first_uriid = isset($request['first_uriid']) ? intval($request['first_uriid']) : 0;
+
+		if ($tag) {
+			return Tag::getURIIdListByTag($search, $uid, 0, $limit, 0, $first_uriid);
+		}
+
+		return Post\Content::getURIIdListBySearch($search, $uid, 0, $limit, 0, $first_uriid);
 	}
 
 	/**

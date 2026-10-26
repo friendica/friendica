@@ -9,6 +9,7 @@ namespace Friendica\Worker;
 
 use Friendica\DI;
 use Friendica\Model\Item;
+use Friendica\Model\Post;
 
 /**
  * Set posts seen for the given user.
@@ -17,7 +18,7 @@ class SetSeen
 {
 	public static function execute(int $uid)
 	{
-		$ret = Item::update(['unseen' => false], ['unseen' => true, 'uid' => $uid]);
+		$ret = Item::update(['unseen' => false], Post::getUnseenCondition($uid));
 		DI::logger()->debug('Set seen', ['uid' => $uid, 'ret' => $ret]);
 	}
 }

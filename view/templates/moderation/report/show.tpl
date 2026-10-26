@@ -16,7 +16,7 @@
 			<p>{{if $report.forward}}{{$forwarded}}{{else}}{{$not_forwarded}}{{/if}}</p>
 			<p>{{if $report.assigned_uid}}{{$assigned_user_id}} {{$report.assigned_uid}}{{else}}{{$unassigned}}{{/if}}</p>
 			{{if $report.reporter}}
-			<p><strong>{{$reporter_label}}</strong> {{$report.reporter.name}} ({{$report.reporter.nick}})</p>
+			<p><strong>{{$reporter_label}}</strong> {{$report.reporter.name}} ({{$report.reporter.addr}}){{if $report.reporter_contact_url}} · <a href="{{$report.reporter_contact_url}}">{{$contact_reporter}}</a>{{/if}}</p>
 			{{/if}}
 			{{if $report.target}}
 			<p><strong>{{$target_label}}</strong> {{$report.target.name}} ({{$report.target.nick}})</p>

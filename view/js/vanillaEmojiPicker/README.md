@@ -37,3 +37,18 @@ new EmojiPicker({
     specialButtons: 'green' // #008000, rgba(0, 128, 0);
 });
 ```
+
+## Minified file
+
+Only `vanillaEmojiPicker.min.js` is loaded by Friendica.
+After every change to `vanillaEmojiPicker.js` it has to be regenerated, for example with [Terser](https://terser.org/):
+
+```
+npx terser@5 vanillaEmojiPicker.js -c -m -o vanillaEmojiPicker.min.js
+```
+
+## Emoji data
+
+Emojis of recent Unicode versions carry a `"v"` property with the Unicode emoji version (for example `"v": 17`).
+These emojis are only shown when the browser is able to draw them.
+New emojis can be marked this way using the version column of [emoji-test.txt](https://unicode.org/Public/emoji/latest/emoji-test.txt).

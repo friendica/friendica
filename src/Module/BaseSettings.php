@@ -110,6 +110,13 @@ class BaseSettings extends BaseModule
 		];
 
 		$tabs[] = [
+			'label'     => $this->t('External content'),
+			'url'       => 'settings/trustedhosts',
+			'selected'  => ($this instanceof Settings\TrustedHosts\Index) ? 'active' : '',
+			'accesskey' => '',
+		];
+
+		$tabs[] = [
 			'label'     => $this->t('Channels'),
 			'url'       => 'settings/channels',
 			'selected'  => ($this instanceof Settings\Channels) ? 'active' : '',

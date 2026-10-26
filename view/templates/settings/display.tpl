@@ -41,14 +41,16 @@
 		{{include file="field_checkbox.tpl" field=$enable_dislike}}
 		{{include file="field_checkbox.tpl" field=$display_resharer}}
 		{{include file="field_checkbox.tpl" field=$stay_local}}
-		{{include file="field_checkbox.tpl" field=$compact_timeline}}
+		{{include file="field_select.tpl" field=$compact_timeline}}
+		{{include file="field_checkbox.tpl" field=$click_to_display}}
 		{{include file="field_checkbox.tpl" field=$show_page_drop}}
 		{{include file="field_checkbox.tpl" field=$display_eventlist}}
 		{{include file="field_select.tpl" field=$preview_mode}}
 		{{include file="field_checkbox.tpl" field=$hide_empty_descriptions}}
 		{{include file="field_checkbox.tpl" field=$hide_custom_emojis}}
 		{{include file="field_select.tpl" field=$platform_icon_style}}
-		{{include file="field_checkbox.tpl" field=$embed_remote_media}}
+		{{include file="field_select.tpl" field=$font}}
+		{{include file="field_select.tpl" field=$text_spacing}}
 		{{include file="field_checkbox.tpl" field=$embed_media}}
 		<div class="settings-submit-wrapper">
 			<input type="submit" name="submit" class="settings-submit btn btn-default" value="{{$submit}}"/>

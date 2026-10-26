@@ -149,6 +149,11 @@
 			return;
 		}
 
+		// A body prefilled by the server (e.g. "compose?body=...") takes precedence over the stored draft
+		if ($textarea && $textarea.length && $textarea[0].defaultValue.trim() !== "") {
+			return;
+		}
+
 		try {
 			const draftJson = sessionStorage.getItem("compose_draft");
 			if (!draftJson) {

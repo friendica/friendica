@@ -29,6 +29,7 @@ class Nav
 	private static $selected = [
 		'global'        => null,
 		'community'     => null,
+		'groups'        => null,
 		'channel'       => null,
 		'network'       => null,
 		'profiles'      => null,
@@ -39,6 +40,7 @@ class Nav
 		'settings'      => null,
 		'contacts'      => null,
 		'delegation'    => null,
+		'deck'          => null,
 		'calendar'      => null,
 		'register'      => null,
 	];
@@ -181,7 +183,9 @@ class Nav
 			'moderation'    => null,
 			'apps'          => null,
 			'community'     => null,
+			'groups'        => null,
 			'channel'       => null,
+			'deck'          => null,
 			'calendar'      => null,
 			'login'         => null,
 			'logout'        => null,
@@ -257,6 +261,7 @@ class Nav
 		}
 
 		if ($this->session->getLocalUserId()) {
+			$nav['deck']     = ['deck', $this->l10n->t('Deck'), '', $this->l10n->t('Show several timelines side by side')];
 			$nav['calendar'] = ['calendar', $this->l10n->t('Calendar'), '', $this->l10n->t('Calendar')];
 		}
 
@@ -272,11 +277,12 @@ class Nav
 		if ($this->session->getLocalUserNickname()) {
 			$nav['network'] = ['network', $this->l10n->t('Home'), '', $this->l10n->t('Home')];
 
-			// Don't show notifications for public communities
+			// Don't show groups and notifications for public communities
 			if ($this->session->get('page_flags', '') != User::PAGE_FLAGS_COMMUNITY) {
+				$nav['groups']                = ['groups', $this->l10n->t('Groups'), '', $this->l10n->t('Overview of your groups')];
 				$nav['introductions']         = ['notifications/intros', $this->l10n->t('Introductions'), '', $this->l10n->t('Friend Requests')];
 				$nav['notifications']         = ['notifications', $this->l10n->t('Notifications'), '', $this->l10n->t('Notifications')];
-				$nav['notifications']['all']  = ['notifications/system?show=all', $this->l10n->t('View all'), '', ''];
+				$nav['notifications']['all']  = ['notifications/stream', $this->l10n->t('View all'), '', ''];
 				$nav['notifications']['mark'] = ['', $this->l10n->t('Mark as read'), '', $this->l10n->t('Mark all system notifications as seen')];
 			}
 

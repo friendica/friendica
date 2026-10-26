@@ -179,9 +179,11 @@ class Reports extends BaseModeration
 		WHERE `report-rule`.`rid` = `report`.`id`
 		GROUP BY `report-rule`.`rid`
 	) AS `rules`,
-	`contact`.`micro`, `contact`.`name`, `contact`.`nick`, `contact`.`url`, `contact`.`addr`
+	`contact`.`micro`, `contact`.`name`, `contact`.`nick`, `contact`.`url`, `contact`.`addr`,
+	`reporter`.`id` AS `reporter_cid`, `reporter`.`name` AS `reporter_name`, `reporter`.`nick` AS `reporter_nick`, `reporter`.`addr` AS `reporter_addr`
 FROM report
 INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
+LEFT JOIN `contact` `reporter` ON `reporter`.`id` = `report`.`reporter-id`
 		";
 		$reportParams = [];
 		$whereParts   = [];
@@ -242,7 +244,7 @@ INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
 			'$no_data'     => $this->t('No report exists at this node.'),
 
 			'$h_reports'             => $this->t('Reports'),
-			'$th_reports'            => [$this->t('Created'), $this->t('Photo'), $this->t('Name'), $this->t('Comment'), $this->t('Category'), $this->t('Status')],
+			'$th_reports'            => [$this->t('Created'), $this->t('Photo'), $this->t('Name'), $this->t('Reporter'), $this->t('Comment'), $this->t('Category'), $this->t('Status')],
 			'$select_all'            => $this->t('Select all'),
 			'$close_reports'         => $this->t('Close selected reports'),
 			'$open_reports'          => $this->t('Open reports'),
@@ -275,29 +277,32 @@ INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
 			$selectedRuleIds[] = $rule->lineId;
 		}
 
+		$reporter = Contact::getById($report->reporterCid, ['id', 'micro', 'name', 'nick', 'url', 'addr', 'contact-type']);
+
 		$reportArray = [
-			'id'               => $report->id,
-			'created'          => DateTimeFormat::local($report->created->format(DateTimeFormat::MYSQL), DateTimeFormat::MYSQL),
-			'edited'           => $report->edited ? DateTimeFormat::local($report->edited->format(DateTimeFormat::MYSQL), DateTimeFormat::MYSQL) : null,
-			'category'         => $this->reportUtil->getReportCategoryName($report->category),
-			'category_id'      => $report->category,
-			'comment'          => $report->comment,
-			'public_remarks'   => $report->publicRemarks,
-			'private_remarks'  => $report->privateRemarks,
-			'forward'          => $report->forward,
-			'status'           => $report->status,
-			'status_label'     => $report->status === ReportEntity::STATUS_CLOSED ? $this->t('Closed') : $this->t('Open'),
-			'resolution'       => $report->resolution,
-			'assigned_uid'     => $report->assignedUid,
-			'reporter'         => Contact::getById($report->reporterCid, ['id', 'micro', 'name', 'nick', 'url', 'addr']),
-			'target'           => $target,
-			'target_is_local'  => $targetUserId > 0,
-			'target_user_id'   => $targetUserId,
-			'posts'            => [],
-			'rules'            => [],
-			'rules_available'  => $this->buildRuleOptions($selectedRuleIds),
-			'category_options' => $this->buildCategoryOptions($report->category),
-			'is_final'         => $report->status === ReportEntity::STATUS_CLOSED,
+			'id'                   => $report->id,
+			'created'              => DateTimeFormat::local($report->created->format(DateTimeFormat::MYSQL), DateTimeFormat::MYSQL),
+			'edited'               => $report->edited ? DateTimeFormat::local($report->edited->format(DateTimeFormat::MYSQL), DateTimeFormat::MYSQL) : null,
+			'category'             => $this->reportUtil->getReportCategoryName($report->category),
+			'category_id'          => $report->category,
+			'comment'              => $report->comment,
+			'public_remarks'       => $report->publicRemarks,
+			'private_remarks'      => $report->privateRemarks,
+			'forward'              => $report->forward,
+			'status'               => $report->status,
+			'status_label'         => $report->status === ReportEntity::STATUS_CLOSED ? $this->t('Closed') : $this->t('Open'),
+			'resolution'           => $report->resolution,
+			'assigned_uid'         => $report->assignedUid,
+			'reporter'             => $reporter,
+			'reporter_contact_url' => $this->appHelper->getCurrentTheme() === 'frio' && $reporter && !empty($reporter['addr']) && $reporter['contact-type'] !== Contact::TYPE_RELAY ? 'compose/post?body=' . rawurlencode('@!' . $reporter['addr'] . ' ') : '',
+			'target'               => $target,
+			'target_is_local'      => $targetUserId > 0,
+			'target_user_id'       => $targetUserId,
+			'posts'                => [],
+			'rules'                => [],
+			'rules_available'      => $this->buildRuleOptions($selectedRuleIds),
+			'category_options'     => $this->buildCategoryOptions($report->category),
+			'is_final'             => $report->status === ReportEntity::STATUS_CLOSED,
 		];
 
 		foreach ($report->posts as $post) {
@@ -336,6 +341,7 @@ INNER JOIN `contact` ON `contact`.`id` = `report`.`cid`
 			'$assigned_user_id'    => $this->t('Assigned user id:'),
 			'$unassigned'          => $this->t('Unassigned'),
 			'$reporter_label'      => $this->t('Reporter:'),
+			'$contact_reporter'    => $this->t('Contact the reporter privately'),
 			'$target_label'        => $this->t('Target:'),
 			'$category_and_rules'  => $this->t('Category and rules'),
 			'$category_label'      => $this->t('Category'),

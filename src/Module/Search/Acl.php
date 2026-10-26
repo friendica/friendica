@@ -164,7 +164,7 @@ class Acl extends BaseModule
 			case self::TYPE_PRIVATE_MESSAGE:
 				$condition = DBA::mergeConditions(
 					$condition,
-					["NOT `self` AND NOT `blocked` AND `network` IN (?, ?, ?)", Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA,
+					["NOT `self` AND NOT `blocked` AND `network` IN (?, ?, ?) AND `contact-type` != ?", Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::DIASPORA, Contact::TYPE_COMMUNITY,
 					],
 				);
 				break;
