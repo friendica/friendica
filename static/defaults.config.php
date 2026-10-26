@@ -716,6 +716,23 @@ return [
 		// Once the search terms of all channels exceed this length, the query gets split into several smaller ones.
 		'max_search_length' => 1000,
 	],
+	'poll' => [
+		// max_options (Integer)
+		// Maximum number of options of a poll.
+		'max_options' => 4,
+
+		// max_characters_per_option (Integer)
+		// Maximum number of characters of a poll option.
+		'max_characters_per_option' => 50,
+
+		// min_expiration (Integer)
+		// Minimum duration of a poll in seconds.
+		'min_expiration' => 300,
+
+		// max_expiration (Integer)
+		// Maximum duration of a poll in seconds.
+		'max_expiration' => 2629746,
+	],
 	'proxy' => [
 		// forwarded_for_headers (String)
 		// A comma separated list of all allowed header values to retrieve the real client IP
