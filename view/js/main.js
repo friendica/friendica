@@ -1208,62 +1208,38 @@ function doIgnoreThread(ident) {
 }
 
 /**
- * Submits one vote request per checked option (multiple-choice polls need
- * one Create activity per option, same as Mastodon's own client behavior),
- * then reports success or failure with a toast, matching how sysmsgs
- * notices/info are already shown above.
+ * Submits the checked options of a poll in a single request
  */
 function doPollVote(ident, votedMessage, failedMessage) {
 	ident = ident.toString();
 	var $button = $('#poll-form-' + ident + ' .poll-vote-button');
 	if ($button.prop('disabled')) {
-		// Already submitting — ignore a rapid re-click/re-submit instead of
-		// sending duplicate vote activities before the first request returns.
 		return;
 	}
 
-	var options = [];
+	var choices = [];
 	$('input[name="poll-option-' + ident + '"]:checked').each(function() {
-		options.push($(this).val());
+		choices.push($(this).val());
 	});
-	if (options.length === 0) {
+	if (choices.length === 0) {
 		return;
 	}
 
 	$button.prop('disabled', true);
 	showPosting();
 
-	// Tracked individually rather than via $.when.apply(), which rejects the whole
-	// batch as soon as one option fails — that would misreport a partial success
-	// (e.g. 2 of 3 options recorded) as a total failure.
-	var total = options.length;
-	var succeeded = 0;
-	var settled = 0;
-
-	function onSettled() {
-		settled++;
-		if (settled < total) {
-			return;
-		}
-		hideLoading();
-		if (succeeded > 0) {
-			// At least one vote landed — the form is done, same as a single-choice vote.
+	$.post('item/' + ident + '/vote', {choices: choices})
+		.done(function() {
 			$('#poll-form-' + ident).addClass('hidden');
 			$.jGrowl(votedMessage, {sticky: false, theme: 'info', life: 5000});
-		}
-		if (succeeded < total) {
-			$button.prop('disabled', succeeded > 0);
+		})
+		.fail(function() {
+			$button.prop('disabled', false);
 			$.jGrowl(failedMessage, {sticky: false, theme: 'info', life: 5000});
-		}
-	}
-
-	options.forEach(function(option) {
-		$.post('item/' + ident + '/vote/' + option)
-			.done(function() {
-				succeeded++;
-			})
-			.always(onSettled);
-	});
+		})
+		.always(function() {
+			hideLoading();
+		});
 }
 
 function getPosition(e) {

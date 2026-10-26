@@ -296,7 +296,7 @@ return [
 			'/notifications/requests/{id:\d+}/dismiss'               => [Module\Api\Mastodon\Unimplemented::class,                [        R::POST]], // not supported
 			'/notifications/unread_count'                            => [Module\Api\Mastodon\Unimplemented::class,                [R::GET         ]], // not supported
 			'/polls/{id:\d+}'                                        => [Module\Api\Mastodon\Polls::class,                        [R::GET         ]],
-			'/polls/{id:\d+}/votes'                                  => [Module\Api\Mastodon\Unimplemented::class,                [        R::POST]], // not supported
+			'/polls/{id:\d+}/votes'                                  => [Module\Api\Mastodon\Polls\Votes::class,                  [        R::POST]],
 			'/preferences'                                           => [Module\Api\Mastodon\Preferences::class,                  [R::GET         ]],
 			'/profile'                                               => [Module\Api\Mastodon\Unimplemented::class,                [R::GET, R::PATCH]], // not supported
 			'/profile/avatar'                                        => [Module\Api\Mastodon\Unimplemented::class,                [R::DELETE      ]], // not supported
@@ -538,18 +538,18 @@ return [
 	],
 
 	'/item/{id:\d+}' => [
-		'/activity/{verb}'   => [Module\Item\Activity::class,    [        R::POST]],
-		'/comment'           => [Module\Item\Comment::class,     [R::GET         ]],
-		'/comments'          => [Module\Item\Comments::class,    [R::GET         ]],
-		'/follow'            => [Module\Item\Follow::class,      [        R::POST]],
-		'/complete'          => [Module\Item\Complete::class,    [        R::POST]],
-		'/ignore'            => [Module\Item\Ignore::class,      [        R::POST]],
-		'/language'          => [Module\Item\Language::class,    [R::GET]],
-		'/node'              => [Module\Item\Node::class,        [R::GET         ]],
-		'/pin'               => [Module\Item\Pin::class,         [        R::POST]],
-		'/searchtext'        => [Module\Item\Searchtext::class,  [R::GET]],
-		'/star'              => [Module\Item\Star::class,        [        R::POST]],
-		'/vote/{option:\d+}' => [Module\Item\Vote::class,        [        R::POST]],
+		'/activity/{verb}' => [Module\Item\Activity::class,    [        R::POST]],
+		'/comment'         => [Module\Item\Comment::class,     [R::GET         ]],
+		'/comments'        => [Module\Item\Comments::class,    [R::GET         ]],
+		'/follow'          => [Module\Item\Follow::class,      [        R::POST]],
+		'/complete'        => [Module\Item\Complete::class,    [        R::POST]],
+		'/ignore'          => [Module\Item\Ignore::class,      [        R::POST]],
+		'/language'        => [Module\Item\Language::class,    [R::GET]],
+		'/node'            => [Module\Item\Node::class,        [R::GET         ]],
+		'/pin'             => [Module\Item\Pin::class,         [        R::POST]],
+		'/searchtext'      => [Module\Item\Searchtext::class,  [R::GET]],
+		'/star'            => [Module\Item\Star::class,        [        R::POST]],
+		'/vote'            => [Module\Item\Vote::class,        [        R::POST]],
 	],
 
 	'/localtime'             => [Module\Debug\Localtime::class, [R::GET, R::POST]],

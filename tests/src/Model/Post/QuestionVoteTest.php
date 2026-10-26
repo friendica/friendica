@@ -8,11 +8,33 @@
 namespace Friendica\Test\src\Model\Post;
 
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
+use Friendica\Model\Post\Question;
+use Friendica\Model\Post\QuestionOption;
 use Friendica\Model\Post\QuestionVote;
+use Friendica\Network\HTTPException;
 use Friendica\Test\FixtureTestCase;
+use Friendica\Util\DateTimeFormat;
 
 class QuestionVoteTest extends FixtureTestCase
 {
+	// Post 1 of the fixture, visible to user 42
+	private const URI_ID = 1;
+	private const UID    = 42;
+
+	private function createQuestion(bool $multiple = false, string $endTime = ''): void
+	{
+		Question::update(self::URI_ID, ['multiple' => $multiple, 'end-time' => $endTime ?: DateTimeFormat::utc('now + 1 day')]);
+		foreach (['Tacos', 'Pizza', 'Sushi'] as $id => $name) {
+			QuestionOption::update(self::URI_ID, $id, ['name' => $name, 'replies' => 0]);
+		}
+	}
+
+	private function queuedDeliveries(): int
+	{
+		return DBA::count('workerqueue', ['command' => 'SendPollVote', 'done' => false]);
+	}
+
 	private function createUriId(): int
 	{
 		DBA::insert('item-uri', ['uri' => 'https://friendica.local/objects/' . uniqid()]);
@@ -109,5 +131,76 @@ class QuestionVoteTest extends FixtureTestCase
 
 		self::assertSame(0, DBA::count('post-question-vote', ['uri-id' => $uriIdA]));
 		self::assertTrue(QuestionVote::hasVoted($uriIdB, $authorId));
+	}
+
+	public function testVoteStoresTheChoiceAndQueuesTheDelivery(): void
+	{
+		$this->createQuestion();
+		$queued = $this->queuedDeliveries();
+
+		QuestionVote::vote(self::URI_ID, self::UID, ['1']);
+
+		self::assertSame([1], QuestionVote::getChoices(self::URI_ID, Contact::getPublicIdByUserId(self::UID)));
+		self::assertSame($queued + 1, $this->queuedDeliveries());
+	}
+
+	public function testVoteStoresSeveralChoicesOnMultipleChoiceQuestions(): void
+	{
+		$this->createQuestion(true);
+
+		QuestionVote::vote(self::URI_ID, self::UID, [2, 0]);
+
+		self::assertSame([0, 2], QuestionVote::getChoices(self::URI_ID, Contact::getPublicIdByUserId(self::UID)));
+	}
+
+	public function testVoteRejectsSeveralChoicesOnSingleChoiceQuestions(): void
+	{
+		$this->createQuestion();
+
+		$this->expectException(HTTPException\UnprocessableEntityException::class);
+		QuestionVote::vote(self::URI_ID, self::UID, [0, 1]);
+	}
+
+	public function testVoteRejectsEmptyChoices(): void
+	{
+		$this->createQuestion();
+
+		$this->expectException(HTTPException\UnprocessableEntityException::class);
+		QuestionVote::vote(self::URI_ID, self::UID, []);
+	}
+
+	public function testVoteRejectsUnknownOptions(): void
+	{
+		$this->createQuestion();
+
+		$this->expectException(HTTPException\UnprocessableEntityException::class);
+		QuestionVote::vote(self::URI_ID, self::UID, [7]);
+	}
+
+	public function testVoteRejectsEndedQuestions(): void
+	{
+		$this->createQuestion(false, DateTimeFormat::utc('now - 1 hour'));
+
+		$this->expectException(HTTPException\UnprocessableEntityException::class);
+		QuestionVote::vote(self::URI_ID, self::UID, [0]);
+	}
+
+	public function testVoteRejectsASecondVote(): void
+	{
+		$this->createQuestion(true);
+		QuestionVote::vote(self::URI_ID, self::UID, [0]);
+
+		try {
+			QuestionVote::vote(self::URI_ID, self::UID, [1]);
+			self::fail('The second vote has been accepted');
+		} catch (HTTPException\UnprocessableEntityException $e) {
+			self::assertSame([0], QuestionVote::getChoices(self::URI_ID, Contact::getPublicIdByUserId(self::UID)));
+		}
+	}
+
+	public function testVoteRejectsPostsWithoutQuestion(): void
+	{
+		$this->expectException(HTTPException\NotFoundException::class);
+		QuestionVote::vote(self::URI_ID, self::UID, [0]);
 	}
 }
