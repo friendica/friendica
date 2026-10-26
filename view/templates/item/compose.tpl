@@ -210,7 +210,7 @@
 				<div class="modal-dialog" role="document">
 					<div class="modal-content">
 						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+							<button type="button" class="close" data-dismiss="modal" aria-label="{{$l10n.close}}">&times;</button>
 							<h4 class="modal-title" id="permissions-modal-title-{{$id}}">{{$l10n.visibility_title}}</h4>
 						</div>
 						<div class="modal-body">
@@ -227,7 +227,7 @@
 							{{/if}}
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-primary" data-dismiss="modal">{{$l10n.submit}}</button>
+							<button type="button" class="btn btn-primary" data-dismiss="modal">{{$l10n.done}}</button>
 						</div>
 					</div>
 				</div>
@@ -365,7 +365,7 @@
 
 	window.onDocumentReady("body", function() {
 		var permissionsBtn = document.getElementById('toggle-permissions');
-		if (permissionsBtn !== window.permissionsToggleBtn) {
+		if (permissionsBtn && permissionsBtn !== window.permissionsToggleBtn) {
 			permissionsBtn.addEventListener('click', togglePermissions);
 			window.permissionsToggleBtn = permissionsBtn;
 		}
@@ -403,6 +403,8 @@
 					window.wideEditorPreviewTimer = setTimeout(updateWidePreview, 2000);
 				}
 			});
+			// Sync height for programmatic insertions (BBCode toolbar, dropzone, link dialog),
+			// the core autosize library no longer manages this textarea
 			textarea.addEventListener("change", function() {
 				if (!(this.id === 'comment-edit-text-{{$id}}' && document.body.classList.contains('wide-editor-active'))) {
 					autosizeTextarea(this);
@@ -421,7 +423,7 @@
 			const savedContent = localStorage.getItem(`comment-edit-text-${textarea.id}`);
 			const lastSaved = localStorage.getItem(`last-saved-${textarea.id}`);
 
-			if (savedContent && lastSaved) {
+			if (savedContent && lastSaved && textarea.defaultValue === "") {
 				const currentTime = new Date().getTime();
 				const timeElapsed = currentTime - parseInt(lastSaved, 10);
 
@@ -444,7 +446,7 @@
 	}
 	window.composeDraftSaver = setInterval(function () {
 		document.querySelectorAll(".expandable-textarea").forEach(function(textarea) {
-			if (textarea.value.trim() !== "") {
+			if (textarea.value.trim() !== "" && textarea.value !== textarea.defaultValue) {
 				localStorage.setItem(`comment-edit-text-${textarea.id}`, textarea.value);
 				localStorage.setItem(`last-saved-${textarea.id}`, new Date().getTime().toString());
 			}
@@ -464,7 +466,7 @@
 			return;
 		}
 		var unsaved = Array.from(document.querySelectorAll(".expandable-textarea")).some(function(textarea) {
-			return textarea.value.trim().length > 0;
+			return textarea.value.trim().length > 0 && textarea.value !== textarea.defaultValue;
 		});
 		if (unsaved) {
 			event.preventDefault();
