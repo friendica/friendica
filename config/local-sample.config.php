@@ -25,6 +25,20 @@ return [
 		'charset' => 'utf8mb4',
 	],
 
+	/*
+	'imagemagick' => [
+		// https://www.php.net/manual/en/imagick.constants.php
+		'resourcelmits' => [
+			\Imagick::RESOURCETYPE_DISK => 100000000, // 100 MB
+			\Imagick::RESOURCETYPE_FILE => 2,
+		],
+		'registry' => [
+			'temporary-path' => '/efs'',
+		]
+	]
+	*/
+
+
 	// ****************************************************************
 	// The configuration below will be overruled by the admin panel.
 	// Changes made below will only have an effect if the database does
