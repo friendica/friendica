@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.11-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-26 17:21+0000\n"
+"POT-Creation-Date: 2026-10-27 04:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2553,8 +2553,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:939 src/Model/Item.php:3770
-#: src/Model/Item.php:3776 src/Model/Item.php:3777
+#: src/Content/Text/BBCode.php:939 src/Model/Item.php:3782
+#: src/Model/Item.php:3788 src/Model/Item.php:3789
 msgid "Link to source"
 msgstr ""
 
@@ -3731,40 +3731,52 @@ msgstr ""
 msgid "The media in this post is not displayed to visitors. To view it, please log in."
 msgstr ""
 
-#: src/Model/Item.php:3699
+#: src/Model/Item.php:3703
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3701
+#: src/Model/Item.php:3706
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3706
+#: src/Model/Item.php:3712
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3708
+#: src/Model/Item.php:3714
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3710
+#: src/Model/Item.php:3716
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3753 src/Model/Item.php:3754
+#: src/Model/Item.php:3728
+msgid "Vote"
+msgstr ""
+
+#: src/Model/Item.php:3729
+msgid "Your vote has been recorded."
+msgstr ""
+
+#: src/Model/Item.php:3730
+msgid "Your vote could not be recorded. Please try again."
+msgstr ""
+
+#: src/Model/Item.php:3765 src/Model/Item.php:3766
 #: src/Module/Calendar/Event/Show.php:80
 msgid "View related post"
 msgstr ""
@@ -3775,6 +3787,22 @@ msgstr ""
 
 #: src/Model/Photo.php:1209 src/Module/Media/Photo/Upload.php:148
 msgid "Wall Photos"
+msgstr ""
+
+#: src/Model/Post/QuestionVote.php:41
+msgid "The poll has already ended."
+msgstr ""
+
+#: src/Model/Post/QuestionVote.php:46
+msgid "Invalid number of choices."
+msgstr ""
+
+#: src/Model/Post/QuestionVote.php:50
+msgid "Invalid choice."
+msgstr ""
+
+#: src/Model/Post/QuestionVote.php:54 src/Model/Post/QuestionVote.php:63
+msgid "You have already voted on this poll."
 msgstr ""
 
 #: src/Model/Profile.php:345 src/Module/Settings/Profile/Index.php:265
@@ -6858,7 +6886,8 @@ msgstr[1] ""
 #: src/Module/Item/Language.php:35 src/Module/Item/Node.php:44
 #: src/Module/Item/Pin.php:26 src/Module/Item/Pin.php:41
 #: src/Module/Item/Searchtext.php:34 src/Module/Item/Star.php:27
-#: src/Module/Profile/Posts.php:43 src/Module/Update/Display.php:23
+#: src/Module/Item/Vote.php:23 src/Module/Profile/Posts.php:43
+#: src/Module/Update/Display.php:23
 msgid "Access denied."
 msgstr ""
 
