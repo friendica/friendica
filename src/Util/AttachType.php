@@ -5,9 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Content;
+namespace Friendica\Util;
 
-use Friendica\DI;
 use Friendica\Network\Entity\MimeType;
 
 /**
@@ -100,17 +99,6 @@ class AttachType
 			],
 		],
 	];
-
-	/**
-	 * Fetches the configured icon style for the given user, falling back to the default
-	 *
-	 * @param int $uid
-	 * @return int One of the ICON_* constants
-	 */
-	public static function iconStyle(int $uid = 0): int
-	{
-		return $uid ? (int) (DI::pConfig()->get($uid, 'accessibility', 'attachment_icon_style') ?? self::ICON_COLOR) : self::ICON_COLOR;
-	}
 
 	/**
 	 * Returns the icon category for the given mimetype: the default for its type,

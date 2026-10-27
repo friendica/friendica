@@ -9,10 +9,10 @@
  */
 
 use Friendica\AppHelper;
-use Friendica\Content\AttachType;
 use Friendica\Content\ContactSelector;
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Util\AttachType;
 
 require_once 'view/theme/frio/php/Image.php';
 require_once 'view/theme/frio/php/scheme.php';

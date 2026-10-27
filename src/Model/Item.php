@@ -8,7 +8,6 @@
 namespace Friendica\Model;
 
 use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
-use Friendica\Content\AttachType;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Image;
 use Friendica\Content\Post\Collection\PostMedias;
@@ -30,6 +29,7 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\ActivityPub\Processor;
 use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Diaspora;
+use Friendica\Util\AttachType;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\EmojiReaction;
 use Friendica\Util\Map;
@@ -3616,7 +3616,7 @@ class Item
 	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content, int $uid): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$style       = AttachType::iconStyle($uid);
+		$style       = $uid ? (int) (DI::pConfig()->get($uid, 'accessibility', 'attachment_icon_style') ?? AttachType::ICON_COLOR) : AttachType::ICON_COLOR;
 		$attachments = [];
 
 		/** @var PostMedia $PostMedia */
