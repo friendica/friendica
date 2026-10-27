@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 19:25+0100\n"
+"POT-Creation-Date: 2026-11-17 21:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2077,7 +2077,7 @@ msgstr ""
 #: src/Content/Feature.php:135 src/Content/Nav.php:244
 #: src/Content/Text/HTML.php:897 src/Content/Widget/SavedSearches.php:46
 #: src/Content/Widget/SidebarMenu.php:86 src/Content/Widget/TagCloud.php:54
-#: src/Module/Search/SavedList.php:83
+#: src/Module/Search/SavedList.php:84
 msgid "Tags"
 msgstr ""
 
@@ -2665,8 +2665,8 @@ msgstr ""
 msgid "<a href=\"%1$s\" target=\"_blank\" rel=\"noopener noreferrer\">%2$s</a> %3$s"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:939 src/Model/Item.php:3816
-#: src/Model/Item.php:3822 src/Model/Item.php:3823
+#: src/Content/Text/BBCode.php:939 src/Model/Item.php:3828
+#: src/Model/Item.php:3834 src/Model/Item.php:3835
 msgid "Link to source"
 msgstr ""
 
@@ -2698,7 +2698,7 @@ msgstr ""
 msgid "The end"
 msgstr ""
 
-#: src/Content/Text/HTML.php:881 src/Module/Search/SavedList.php:92
+#: src/Content/Text/HTML.php:881 src/Module/Search/SavedList.php:96
 msgid "Save search"
 msgstr ""
 
@@ -3867,40 +3867,52 @@ msgstr ""
 msgid "The media in this post is not displayed to visitors. To view it, please log in."
 msgstr ""
 
-#: src/Model/Item.php:3745
+#: src/Model/Item.php:3749
 #, php-format
 msgid "%2$s (%3$d%%, %1$d vote)"
 msgid_plural "%2$s (%3$d%%, %1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3747
+#: src/Model/Item.php:3752
 #, php-format
 msgid "%2$s (%1$d vote)"
 msgid_plural "%2$s (%1$d votes)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3752
+#: src/Model/Item.php:3758
 #, php-format
 msgid "%d voter. Poll end: %s"
 msgid_plural "%d voters. Poll end: %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3754
+#: src/Model/Item.php:3760
 #, php-format
 msgid "%d voter."
 msgid_plural "%d voters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/Item.php:3756
+#: src/Model/Item.php:3762
 #, php-format
 msgid "Poll end: %s"
 msgstr ""
 
-#: src/Model/Item.php:3799 src/Model/Item.php:3800
+#: src/Model/Item.php:3774
+msgid "Vote"
+msgstr ""
+
+#: src/Model/Item.php:3775
+msgid "Your vote has been recorded."
+msgstr ""
+
+#: src/Model/Item.php:3776
+msgid "Your vote could not be recorded. Please try again."
+msgstr ""
+
+#: src/Model/Item.php:3811 src/Model/Item.php:3812
 #: src/Module/Calendar/Event/Show.php:80
 msgid "View related post"
 msgstr ""
@@ -3911,6 +3923,22 @@ msgstr ""
 
 #: src/Model/Photo.php:1209 src/Module/Media/Photo/Upload.php:148
 msgid "Wall Photos"
+msgstr ""
+
+#: src/Model/Post/QuestionVote.php:41
+msgid "The poll has already ended."
+msgstr ""
+
+#: src/Model/Post/QuestionVote.php:46
+msgid "Invalid number of choices."
+msgstr ""
+
+#: src/Model/Post/QuestionVote.php:50
+msgid "Invalid choice."
+msgstr ""
+
+#: src/Model/Post/QuestionVote.php:54 src/Model/Post/QuestionVote.php:63
+msgid "You have already voted on this poll."
 msgstr ""
 
 #: src/Model/Profile.php:345 src/Module/Settings/Profile/Index.php:265
@@ -7025,7 +7053,8 @@ msgstr[1] ""
 #: src/Module/Item/Language.php:37 src/Module/Item/Node.php:44
 #: src/Module/Item/Pin.php:26 src/Module/Item/Pin.php:41
 #: src/Module/Item/Searchtext.php:34 src/Module/Item/Star.php:27
-#: src/Module/Profile/Posts.php:43 src/Module/Update/Display.php:23
+#: src/Module/Item/Vote.php:23 src/Module/Profile/Posts.php:43
+#: src/Module/Update/Display.php:23
 msgid "Access denied."
 msgstr ""
 
@@ -7612,7 +7641,7 @@ msgstr ""
 msgid "Personal notifications"
 msgstr ""
 
-#: src/Module/Deck.php:89 src/Module/Search/SavedList.php:91
+#: src/Module/Deck.php:89 src/Module/Search/SavedList.php:95
 msgid "Search term"
 msgstr ""
 
@@ -10469,11 +10498,11 @@ msgstr ""
 msgid "Search term was not removed."
 msgstr ""
 
-#: src/Module/Search/SavedList.php:94
+#: src/Module/Search/SavedList.php:98
 msgid "Filter searches"
 msgstr ""
 
-#: src/Module/Search/SavedList.php:96
+#: src/Module/Search/SavedList.php:100
 msgid "You have no saved searches."
 msgstr ""
 
