@@ -133,7 +133,7 @@ class ParseUrl
 
 		$parsed_url = DBA::selectFirst('parsed_url', ['content'], ['url_hash' => $urlHash, 'oembed' => false]);
 		if (!empty($parsed_url['content'])) {
-			$data = unserialize($parsed_url['content']);
+			$data = unserialize($parsed_url['content'], ['allowed_classes' => false]);
 			return $data;
 		}
 

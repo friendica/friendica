@@ -20,7 +20,7 @@ final class UserDefinedChannel extends Timeline implements ICanCreateFromTableRo
 	public function createFromTableRow(array $row): Entity\UserDefinedChannel
 	{
 		if (is_string($row['languages'])) {
-			$row['languages'] = unserialize($row['languages']);
+			$row['languages'] = unserialize($row['languages'], ['allowed_classes' => false]);
 		}
 
 		return new Entity\UserDefinedChannel(

@@ -99,7 +99,7 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 			return null;
 		}
 
-		$value = unserialize($cached);
+		$value = unserialize($cached, ['allowed_classes' => [\stdClass::class]]);
 
 		// Only return a value if the serialized value is valid.
 		// We also check if the db entry is a serialized

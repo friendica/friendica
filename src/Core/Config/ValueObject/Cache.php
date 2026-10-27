@@ -8,6 +8,7 @@
 namespace Friendica\Core\Config\ValueObject;
 
 use Friendica\Core\Config\Util\ConfigFileManager;
+use Friendica\Core\PConfig\Util\ValueConversion;
 use ParagonIE\HiddenString\HiddenString;
 
 /**
@@ -176,7 +177,7 @@ class Cache
 			&& is_string($value)) {
 			$this->config[$cat][$key] = new HiddenString((string) $value, false);
 		} elseif (is_string($value)) {
-			$this->config[$cat][$key] = self::toConfigValue($value);
+			$this->config[$cat][$key] = ValueConversion::toConfigValue($value);
 		} else {
 			$this->config[$cat][$key] = $value;
 		}
@@ -184,32 +185,6 @@ class Cache
 		$this->source[$cat][$key] = $source;
 
 		return true;
-	}
-
-	/**
-	 * Formats a DB value to a config value
-	 * - null   = The db-value isn't set
-	 * - bool   = The db-value is either '0' or '1'
-	 * - array  = The db-value is a serialized array
-	 * - string = The db-value is a string
-	 *
-	 * Keep in mind that there aren't any numeric/integer config values in the database
-	 *
-	 * @param string|null $value
-	 *
-	 * @return mixed
-	 */
-	public static function toConfigValue(?string $value)
-	{
-		if (!isset($value)) {
-			return null;
-		}
-
-		if (preg_match("|^a:[0-9]+:{.*}$|s", $value)) {
-			return unserialize($value);
-		} else {
-			return $value;
-		}
 	}
 
 	/**

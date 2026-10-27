@@ -722,7 +722,7 @@ class User
 			if (!in_array($channel['uid'], $uids)) {
 				continue;
 			}
-			$values = unserialize($channel['v']);
+			$values = unserialize($channel['v'], ['allowed_classes' => false]);
 			if (!empty($values) && is_array($values)) {
 				foreach ($values as $language) {
 					$language             = DI::l10n()->toISO6391($language);
