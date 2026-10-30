@@ -36,7 +36,7 @@ class Votes extends BaseApi
 
 		try {
 			Post\QuestionVote::vote($question['uri-id'], $uid, (array) $request['choices']);
-		} catch (HTTPException\NotFoundException $e) {
+		} catch (HTTPException\NotFoundException) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		} catch (HTTPException\UnprocessableEntityException $e) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity($e->getMessage()));

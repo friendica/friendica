@@ -31,7 +31,7 @@ class QuestionTest extends FixtureTestCase
 
 	private function storeQuestion(int $uriId, array $names, bool $multiple = false, int $replies = 0): void
 	{
-		$options = array_map(fn ($name) => ['name' => $name, 'replies' => $replies], $names);
+		$options = array_map(fn ($name): array => ['name' => $name, 'replies' => $replies], $names);
 
 		$method = new \ReflectionMethod(Processor::class, 'storeQuestion');
 		$method->invoke(null, ['type' => 'as:Update', 'question' => ['multiple' => $multiple, 'options' => $options]], ['uri-id' => $uriId]);
