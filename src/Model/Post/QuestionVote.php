@@ -41,7 +41,7 @@ class QuestionVote
 			throw new HTTPException\UnprocessableEntityException(DI::l10n()->t('The poll has already ended.'));
 		}
 
-		$choices = array_values(array_unique(array_map('intval', $choices)));
+		$choices = array_values(array_unique(array_map(intval(...), $choices)));
 		if (empty($choices) || (!$question['question-multiple'] && count($choices) > 1)) {
 			throw new HTTPException\UnprocessableEntityException(DI::l10n()->t('Invalid number of choices.'));
 		}
@@ -144,7 +144,7 @@ class QuestionVote
 	public static function getChoices(int $uri_id, int $author_id): array
 	{
 		$votes = DBA::selectToArray('post-question-vote', ['id'], ['uri-id' => $uri_id, 'author-id' => $author_id], ['order' => ['id']]);
-		return array_map('intval', array_column($votes, 'id'));
+		return array_map(intval(...), array_column($votes, 'id'));
 	}
 
 	/**

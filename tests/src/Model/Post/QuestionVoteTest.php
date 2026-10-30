@@ -193,7 +193,7 @@ class QuestionVoteTest extends FixtureTestCase
 		try {
 			QuestionVote::vote(self::URI_ID, self::UID, [1]);
 			self::fail('The second vote has been accepted');
-		} catch (HTTPException\UnprocessableEntityException $e) {
+		} catch (HTTPException\UnprocessableEntityException) {
 			self::assertSame([0], QuestionVote::getChoices(self::URI_ID, Contact::getPublicIdByUserId(self::UID)));
 		}
 	}
