@@ -5,22 +5,37 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-namespace Friendica\Util;
+declare(strict_types=1);
 
+namespace Friendica\Content\Post\Entity;
+
+use Friendica\Core\L10n;
 use Friendica\Network\Entity\MimeType;
 
 /**
- * Resolves the icon and color style used to display non-visual (file) attachments
+ * Kind of file behind a post media attachment, derived from its mimetype.
  */
-class AttachType
+enum FileKind: string
 {
-	public const ICON_DISABLED = -1;
-	public const ICON_COLOR    = 0;
-	public const ICON_BLACK    = 1;
-	public const ICON_WHITE    = 2;
+	case Audio    = 'audio';
+	case Video    = 'video';
+	case Image    = 'image';
+	case Text     = 'text';
+	case Link     = 'link';
+	case Calendar = 'calendar';
+	case Excel    = 'excel';
+	case Code     = 'code';
+	case Markdown = 'markdown';
+	case Generic  = 'generic';
+	case Pdf      = 'pdf';
+	case Word     = 'word';
+	case Ppt      = 'ppt';
+	case Zip      = 'zip';
+	case Torrent  = 'torrent';
+	case Feed     = 'feed';
 
-	// mimetype type => default icon category, and per-subtype icon categories that are more specific than the default
-	private static $types = [
+	// mimetype type => default kind, and per-subtype kinds that are more specific than the default
+	private const TYPES = [
 		'audio' => [
 			'default' => 'audio',
 		],
@@ -100,47 +115,41 @@ class AttachType
 		],
 	];
 
-	/**
-	 * Returns the icon category for the given mimetype: the default for its type,
-	 * refined by a more specific subtype if one is known.
-	 *
-	 * @param MimeType $mimetype
-	 * @return string
-	 */
-	private static function toCategory(MimeType $mimetype): string
+	public static function fromMimeType(MimeType $mimetype): self
 	{
-		$type = self::$types[$mimetype->type] ?? null;
+		$type = self::TYPES[$mimetype->type] ?? null;
 		if (!$type) {
-			return 'generic';
+			return self::Generic;
 		}
 
-		return $type['subtypes'][$mimetype->subtype] ?? $type['default'];
+		return self::from($type['subtypes'][$mimetype->subtype] ?? $type['default']);
 	}
 
 	/**
-	 * Returns the CSS classes that select the icon shape and color for the given mimetype and style.
-	 * The icon itself is drawn via a CSS mask, see view/theme/frio/css/style.css
+	 * Returns a human readable description of the file kind
 	 *
-	 * @param MimeType $mimetype
-	 * @param int      $style One of the ICON_* constants
+	 * @param L10n $l10n
 	 * @return string
 	 */
-	public static function toClass(MimeType $mimetype, int $style): string
+	public function label(L10n $l10n): string
 	{
-		if ($style == self::ICON_DISABLED) {
-			return '';
-		}
-
-		$category = self::toCategory($mimetype);
-
-		if ($style == self::ICON_BLACK) {
-			return 'attach-' . $category . ' attach-black';
-		}
-
-		if ($style == self::ICON_WHITE) {
-			return 'attach-' . $category . ' attach-white';
-		}
-
-		return 'attach-' . $category . ' attach-color';
+		return match ($this) {
+			self::Audio    => $l10n->t('Audio'),
+			self::Video    => $l10n->t('Video'),
+			self::Image    => $l10n->t('Image'),
+			self::Text     => $l10n->t('Text'),
+			self::Link     => $l10n->t('Web page'),
+			self::Calendar => $l10n->t('Calendar'),
+			self::Markdown => $l10n->t('Markdown'),
+			self::Code     => $l10n->t('Code'),
+			self::Pdf      => $l10n->t('PDF document'),
+			self::Word     => $l10n->t('Text document'),
+			self::Excel    => $l10n->t('Spreadsheet'),
+			self::Ppt      => $l10n->t('Presentation'),
+			self::Zip      => $l10n->t('Archive'),
+			self::Torrent  => $l10n->t('Torrent'),
+			self::Feed     => $l10n->t('Feed'),
+			self::Generic  => $l10n->t('File'),
+		};
 	}
 }

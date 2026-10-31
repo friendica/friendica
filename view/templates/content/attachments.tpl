@@ -12,9 +12,9 @@
 {{/if}}
 	{{foreach from=$attachments item=attachment}}
 		<a href="{{$attachment.url}}" class="attachlink" target="_blank" rel="noopener noreferrer">
-			{{if $attachment.class}}<span class="attachtype {{$attachment.class}}"></span>{{/if}}
+			<span class="attachtype attach-{{$attachment.kind}}" role="img" title="{{$attachment.type}}" aria-label="{{$attachment.type}}"></span>
 			<span class="attachname">{{$attachment.name}}</span>
-			{{if $attachment.size}}<span class="attachsize">{{$attachment.size}}</span>{{/if}}
+			<span class="attachsize"><span class="attachkind">{{$attachment.type}}{{if $attachment.size}} · {{/if}}</span>{{$attachment.size}}</span>
 		</a>
 	{{/foreach}}
 {{if $collapsible}}

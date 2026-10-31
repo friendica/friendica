@@ -37,7 +37,6 @@ use Friendica\Module\BaseSettings;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException;
-use Friendica\Util\AttachType;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
 use Psr\Log\LoggerInterface;
@@ -120,7 +119,6 @@ class Display extends BaseSettings
 		$hide_empty_descriptions = (bool) $request['hide_empty_descriptions'];
 		$hide_custom_emojis      = (bool) $request['hide_custom_emojis'];
 		$platform_icon_style     = (int) $request['platform_icon_style'];
-		$attachment_icon_style   = (int) $request['attachment_icon_style'];
 		$show_page_drop          = (bool) $request['show_page_drop'];
 		$display_eventlist       = (bool) $request['display_eventlist'];
 		$preview_mode            = (int) $request['preview_mode'];
@@ -134,6 +132,11 @@ class Display extends BaseSettings
 		$font = is_string($request['font'] ?? null) ? trim($request['font']) : '';
 		if (!in_array($font, Page::ACCESSIBILITY_FONTS, true)) {
 			$font = '';
+		}
+
+		$attachment_icons = is_string($request['attachment_icons'] ?? null) ? trim($request['attachment_icons']) : '';
+		if (!in_array($attachment_icons, Page::ACCESSIBILITY_ATTACHMENT_ICONS, true)) {
+			$attachment_icons = '';
 		}
 
 		$text_spacing = is_string($request['text_spacing'] ?? null) ? trim($request['text_spacing']) : '';
@@ -212,14 +215,13 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'accessibility', 'hide_empty_descriptions', $hide_empty_descriptions);
 		$this->pConfig->set($uid, 'accessibility', 'hide_custom_emojis', $hide_custom_emojis);
 		$this->pConfig->set($uid, 'accessibility', 'platform_icon_style', $platform_icon_style);
-		foreach (['font' => $font, 'text_spacing' => $text_spacing] as $key => $value) {
+		foreach (['font' => $font, 'text_spacing' => $text_spacing, 'attachment_icons' => $attachment_icons] as $key => $value) {
 			if ($value === '') {
 				$this->pConfig->delete($uid, 'accessibility', $key);
 			} else {
 				$this->pConfig->set($uid, 'accessibility', $key, $value);
 			}
 		}
-		$this->pConfig->set($uid, 'accessibility', 'attachment_icon_style', $attachment_icon_style);
 
 		$this->pConfig->set($uid, 'calendar', 'first_day_of_week', $first_day_of_week);
 		$this->pConfig->set($uid, 'calendar', 'default_view', $calendar_default_view);
@@ -352,12 +354,11 @@ class Display extends BaseSettings
 			'increased' => $this->t('Increased'),
 			'large'     => $this->t('Large'),
 		];
-		$attachment_icon_style  = $this->pConfig->get($uid, 'accessibility', 'attachment_icon_style', AttachType::ICON_COLOR);
-		$attachment_icon_styles = [
-			AttachType::ICON_DISABLED => $this->t('Disabled'),
-			AttachType::ICON_COLOR    => $this->t('Color'),
-			AttachType::ICON_BLACK    => $this->t('Black'),
-			AttachType::ICON_WHITE    => $this->t('White'),
+		$attachment_icons      = $this->pConfig->get($uid, 'accessibility', 'attachment_icons', '');
+		$attachment_icon_modes = [
+			''           => $this->t('Color'),
+			'monochrome' => $this->t('Monochrome'),
+			'none'       => $this->t('Disabled'),
 		];
 
 		$preview_mode  = $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_AUTO);
@@ -539,7 +540,7 @@ class Display extends BaseSettings
 			'$platform_icon_style'      => ['platform_icon_style', $this->t('Platform icons style'), $platform_icon_style, $this->t('Style of the platform icons'), $platform_icon_styles, false],
 			'$font'                     => ['font', $this->t('Font'), $font, $this->t('Replace the font of the theme with a font that is easier to read. OpenDyslexic is designed for people with dyslexia, Atkinson Hyperlegible and Luciole for people with low vision, Lexend for a smoother reading flow, Andika for beginning readers.'), $fonts, false],
 			'$text_spacing'             => ['text_spacing', $this->t('Text spacing'), $text_spacing, $this->t('Increase the spacing between letters, words and lines to make texts easier to read. "Large" corresponds to the text spacing values of WCAG 2.1 success criterion 1.4.12.'), $text_spacings, false],
-			'$attachment_icon_style'    => ['attachment_icon_style', $this->t('Attachment icons style'), $attachment_icon_style, $this->t('Style of the file attachment icons'), $attachment_icon_styles, false],
+			'$attachment_icons'         => ['attachment_icons', $this->t('Attachment icons style'), $attachment_icons, $this->t('Style of the file attachment icons'), $attachment_icon_modes, false],
 			'$embed_media'              => ['embed_media', $this->t('Embed supported media'), $embed_media, $this->t('When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos.')],
 
 			'$timeline_label'       => $this->t('Label'),

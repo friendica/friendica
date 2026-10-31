@@ -11,6 +11,7 @@ use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Image;
 use Friendica\Content\Post\Collection\PostMedias;
+use Friendica\Content\Post\Entity\FileKind;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
@@ -29,7 +30,6 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\ActivityPub\Processor;
 use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Diaspora;
-use Friendica\Util\AttachType;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\EmojiReaction;
 use Friendica\Util\Map;
@@ -3159,7 +3159,7 @@ class Item
 			$s    = self::addGallery($s, $sharedSplitAttachments['visual']);
 			$s    = self::addVisualAttachments($sharedSplitAttachments['visual'], $shared_item, $s, true, $uid);
 			$s    = self::addLinkAttachment($shared_uri_id ?: $item['uri-id'], $sharedSplitAttachments, $body, $s, true, $quote_shared_links, $uid, $shared_item);
-			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s, $uid);
+			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s);
 			$s    = self::addHiddenAttachments($sharedSplitAttachments['hidden'], $item, $s);
 			$body = BBCode::removeSharedData($body);
 		}
@@ -3173,7 +3173,7 @@ class Item
 		$s = self::addGallery($s, $itemSplitAttachments['visual']);
 		$s = self::addVisualAttachments($itemSplitAttachments['visual'], $item, $s, false, $uid);
 		$s = self::addLinkAttachment($item['uri-id'], $itemSplitAttachments, $body, $s, false, $shared_links, $uid, $item);
-		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s, $uid);
+		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s);
 		$s = self::addHiddenAttachments($itemSplitAttachments['hidden'], $item, $s);
 		$s = self::addQuestions($item, $s);
 
@@ -3611,15 +3611,13 @@ class Item
 	 * @param PostMedias $PostMedias
 	 * @param array      $item
 	 * @param string     $content
-	 * @param int        $uid
 	 * @return string modified content
 	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content, int $uid): string
+	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$style       = $uid ? (int) (DI::pConfig()->get($uid, 'accessibility', 'attachment_icon_style') ?? AttachType::ICON_COLOR) : AttachType::ICON_COLOR;
 		$attachments = [];
 
 		/** @var PostMedia $PostMedia */
@@ -3639,11 +3637,14 @@ class Item
 
 			$name = trim($PostMedia->description ?? '' ?: $PostMedia->name ?? '' ?: basename(parse_url($PostMedia->url, PHP_URL_PATH) ?: $PostMedia->url));
 
+			$kind = FileKind::fromMimeType($PostMedia->mimetype);
+
 			$attachments[] = [
-				'url'   => strip_tags($the_url),
-				'name'  => $name,
-				'size'  => $PostMedia->size ? Strings::formatBytes($PostMedia->size) : '',
-				'class' => AttachType::toClass($PostMedia->mimetype, $style),
+				'url'  => strip_tags($the_url),
+				'name' => $name,
+				'size' => $PostMedia->size ? Strings::formatBytes($PostMedia->size) : '',
+				'kind' => $kind->value,
+				'type' => $kind->label(DI::l10n()),
 			];
 		}
 
