@@ -486,6 +486,11 @@ window.onDocumentReady('body', function() {
 		$('#nav-notifications-menu').perfectScrollbar('update');
 	});
 
+	// Restore a "do not disturb" state set before the last page reload
+	if (localStorage.getItem('donotdisturb') === '1') {
+		pause();
+	}
+
 	// Asynchronous calls are deferred until the very end of the page load to ease on slower connections
 	// Only register once, not on every SPA navigation
 	if (typeof window.__friendica_main_load_handler === 'undefined') {
@@ -504,11 +509,12 @@ window.onDocumentReady('body', function() {
 		if (event.which === 19 || (!event.metaKey && !event.shiftKey && !event.altKey && event.ctrlKey && event.which === 32)) {
 			event.preventDefault();
 			if (stopped === false) {
-				stopped = true;
 				if (event.ctrlKey) {
-					totStopped = true;
+					pause();
+				} else {
+					stopped = true;
+					$('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
 				}
-				$('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
 			} else {
 				unpause();
 			}
@@ -2002,11 +2008,32 @@ function preview_masonry_rows(index) {
 		$(parentElement+" .wall-item-body").css({visibility: 'visible'});	// make container visible
 	}
 }
+function pause() {
+	// stop auto reloads until unpause() is called explicitly
+	stopped = true;
+	totStopped = true;
+	$('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
+	var $btn = $('#notifications-pause');
+	$btn.addClass('active').attr('aria-pressed', 'true').attr('title', $btn.data('label-resume'));
+	$btn.find('i').removeClass('ri-notification-off-line').addClass('ri-notification-off-fill');
+	localStorage.setItem('donotdisturb', '1');
+}
 function unpause() {
 	// unpause auto reloads if they are currently stopped
 	totStopped = false;
 	stopped = false;
 	$('#pause').html('');
+	var $btn = $('#notifications-pause');
+	$btn.removeClass('active').attr('aria-pressed', 'false').attr('title', $btn.data('label-pause'));
+	$btn.find('i').removeClass('ri-notification-off-fill').addClass('ri-notification-off-line');
+	localStorage.removeItem('donotdisturb');
+}
+function toggleDoNotDisturb() {
+	if (stopped) {
+		unpause();
+	} else {
+		pause();
+	}
 }
 
 // load more network content (used for infinite scroll)
