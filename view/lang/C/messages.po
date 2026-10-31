@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.11-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-26 22:16+0000\n"
+"POT-Creation-Date: 2026-10-31 08:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,7 +84,7 @@ msgid "Permission denied."
 msgstr ""
 
 #: mod/message.php:28 mod/message.php:124 src/Content/Nav.php:289
-#: src/Module/Deck.php:78 view/theme/frio/theme.php:230
+#: src/Module/Deck.php:78 view/theme/frio/theme.php:231
 msgid "Messages"
 msgstr ""
 
@@ -163,7 +163,7 @@ msgstr ""
 #: mod/message.php:192 mod/message.php:348 src/App/Page.php:303
 #: src/Content/Conversation/PostTemplateBuilder.php:392
 #: src/Content/Conversation/StatusEditor.php:191
-#: src/Module/Item/Compose.php:183 src/Module/Media/BaseBrowser.php:91
+#: src/Module/Item/Compose.php:190 src/Module/Media/BaseBrowser.php:91
 #: src/Module/Post/Edit.php:162
 msgid "Please wait"
 msgstr ""
@@ -627,7 +627,7 @@ msgid "toggle mobile"
 msgstr ""
 
 #: src/App/Page.php:398 src/Module/Admin/Logs/View.php:124
-#: src/Module/Deck.php:104 src/Module/Item/Compose.php:340
+#: src/Module/Deck.php:104 src/Module/Item/Compose.php:347
 #: src/Module/Media/BaseBrowser.php:94 view/theme/frio/php/minimal.php:39
 msgid "Close"
 msgstr ""
@@ -1710,7 +1710,7 @@ msgid "Quote shared by: %s"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1069
-#: src/Module/Contact.php:612 src/Module/Item/Compose.php:164
+#: src/Module/Contact.php:612 src/Module/Item/Compose.php:171
 msgid "This is you"
 msgstr ""
 
@@ -1726,54 +1726,54 @@ msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1074
 #: src/Content/Conversation/StatusEditor.php:158
-#: src/Module/Item/Compose.php:166 src/Module/Post/Edit.php:190
+#: src/Module/Item/Compose.php:173 src/Module/Post/Edit.php:190
 #: src/Module/Settings/Profile/Index.php:247
 msgid "Bold"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1075
 #: src/Content/Conversation/StatusEditor.php:159
-#: src/Module/Item/Compose.php:167 src/Module/Post/Edit.php:191
+#: src/Module/Item/Compose.php:174 src/Module/Post/Edit.php:191
 #: src/Module/Settings/Profile/Index.php:248
 msgid "Italic"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1076
 #: src/Content/Conversation/StatusEditor.php:160
-#: src/Module/Item/Compose.php:168 src/Module/Post/Edit.php:192
+#: src/Module/Item/Compose.php:175 src/Module/Post/Edit.php:192
 #: src/Module/Settings/Profile/Index.php:249
 msgid "Underline"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1077
 #: src/Content/Conversation/StatusEditor.php:163
-#: src/Module/Item/Compose.php:171
+#: src/Module/Item/Compose.php:178
 msgid "Content Warning"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1078
 #: src/Content/Conversation/StatusEditor.php:161
-#: src/Module/Item/Compose.php:169 src/Module/Post/Edit.php:193
+#: src/Module/Item/Compose.php:176 src/Module/Post/Edit.php:193
 #: src/Module/Settings/Profile/Index.php:250
 msgid "Quote"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1079
 #: src/Content/Conversation/StatusEditor.php:162
-#: src/Module/Item/Compose.php:170 src/Module/Post/Edit.php:194
+#: src/Module/Item/Compose.php:177 src/Module/Post/Edit.php:194
 #: src/Module/Settings/Profile/Index.php:251
 msgid "Add emojis"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1080
 #: src/Content/Conversation/StatusEditor.php:164
-#: src/Module/Item/Compose.php:172 src/Module/Post/Edit.php:195
+#: src/Module/Item/Compose.php:179 src/Module/Post/Edit.php:195
 #: src/Module/Settings/Profile/Index.php:252
 msgid "Code"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1081
-#: src/Module/Item/Compose.php:173 src/Module/Settings/Profile/Index.php:253
+#: src/Module/Item/Compose.php:180 src/Module/Settings/Profile/Index.php:253
 #: src/Module/Settings/Profile/Index.php:254
 msgid "Image"
 msgstr ""
@@ -1781,34 +1781,34 @@ msgstr ""
 #: src/Content/Conversation/PostTemplateBuilder.php:1082
 #: src/Content/Conversation/StatusEditor.php:165
 #: src/Content/Conversation/StatusEditor.php:172
-#: src/Module/Item/Compose.php:174 src/Module/Post/Edit.php:196
+#: src/Module/Item/Compose.php:181 src/Module/Post/Edit.php:196
 #: src/Module/Settings/Profile/Index.php:255
 msgid "Link"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1083
 #: src/Content/Conversation/StatusEditor.php:166
-#: src/Module/Item/Compose.php:175 src/Module/Post/Edit.php:197
+#: src/Module/Item/Compose.php:182 src/Module/Post/Edit.php:197
 #: src/Module/Settings/Profile/Index.php:256
 msgid "Link or Media"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1084
 #: src/Content/Conversation/StatusEditor.php:109
-#: src/Module/Item/Compose.php:176
+#: src/Module/Item/Compose.php:183
 msgid "Please enter a image/video/audio/webpage URL:"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1085
 #: src/Content/Conversation/StatusEditor.php:203
-#: src/Module/Calendar/Event/Form.php:261 src/Module/Item/Compose.php:177
-#: src/Module/Item/Compose.php:311 src/Module/Post/Edit.php:184
+#: src/Module/Calendar/Event/Form.php:261 src/Module/Item/Compose.php:184
+#: src/Module/Item/Compose.php:318 src/Module/Post/Edit.php:184
 msgid "Preview"
 msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1087
 #: src/Content/Conversation/StatusEditor.php:169
-#: src/Module/Item/Compose.php:182 src/Module/Post/Edit.php:204
+#: src/Module/Item/Compose.php:189 src/Module/Post/Edit.php:204
 msgid "Language"
 msgstr ""
 
@@ -1849,7 +1849,7 @@ msgid "Go to post"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:135
-#: src/Module/Item/Compose.php:141
+#: src/Module/Item/Compose.php:144
 msgid "Created at"
 msgstr ""
 
@@ -1864,7 +1864,7 @@ msgid "New Post"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:154
-#: src/Module/Item/Compose.php:165
+#: src/Module/Item/Compose.php:172
 msgid "Post"
 msgstr ""
 
@@ -1873,7 +1873,7 @@ msgid "Attach file"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:167
-#: src/Module/Item/Compose.php:178 src/Module/Post/Edit.php:158
+#: src/Module/Item/Compose.php:185 src/Module/Post/Edit.php:158
 msgid "Set your location"
 msgstr ""
 
@@ -1886,27 +1886,27 @@ msgid "Video"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:177
-#: src/Module/Item/Compose.php:188 src/Module/Post/Edit.php:174
+#: src/Module/Item/Compose.php:195 src/Module/Post/Edit.php:174
 msgid "Set title"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:179
-#: src/Module/Item/Compose.php:189 src/Module/Post/Edit.php:176
+#: src/Module/Item/Compose.php:196 src/Module/Post/Edit.php:176
 msgid "Set summary, abstract or spoiler text"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:181
-#: src/Module/Item/Compose.php:190 src/Module/Post/Edit.php:178
+#: src/Module/Item/Compose.php:197 src/Module/Post/Edit.php:178
 msgid "Categories (comma-separated list)"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:182
-#: src/Module/Item/Compose.php:206
+#: src/Module/Item/Compose.php:213
 msgid "Sensitive post"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:187
-#: src/Module/Item/Compose.php:211
+#: src/Module/Item/Compose.php:218
 msgid "Scheduled at"
 msgstr ""
 
@@ -1974,7 +1974,7 @@ msgid "Add categories to your posts"
 msgstr ""
 
 #: src/Content/Feature.php:122 src/Model/Profile.php:826
-#: src/Module/Admin/Summary.php:223 src/Module/Item/Compose.php:162
+#: src/Module/Admin/Summary.php:223 src/Module/Item/Compose.php:169
 #: src/Module/Moderation/Report/Create.php:320
 #: src/Module/Moderation/Summary.php:60
 msgid "Summary"
@@ -2157,11 +2157,11 @@ msgstr ""
 msgid "%1$s tagged %2$s's %3$s with %4$s"
 msgstr ""
 
-#: src/Content/Item.php:425 view/theme/frio/theme.php:251
+#: src/Content/Item.php:425 view/theme/frio/theme.php:252
 msgid "Turn on notifications for this post"
 msgstr ""
 
-#: src/Content/Item.php:426 view/theme/frio/theme.php:268
+#: src/Content/Item.php:426 view/theme/frio/theme.php:269
 msgid "Fetch more replies"
 msgstr ""
 
@@ -2189,7 +2189,7 @@ msgstr ""
 #: src/Model/Contact.php:1325 src/Module/Admin/Addons/Details.php:140
 #: src/Module/Admin/Themes/Details.php:85 src/Module/BaseAdmin.php:89
 #: src/Module/BaseSettings.php:191 src/Module/Welcome.php:39
-#: view/theme/frio/theme.php:231
+#: view/theme/frio/theme.php:232
 msgid "Settings"
 msgstr ""
 
@@ -2246,7 +2246,7 @@ msgid "My Profile"
 msgstr ""
 
 #: src/Content/Nav.php:103 src/Content/Nav.php:278 src/Module/Help.php:70
-#: view/theme/frio/theme.php:228
+#: view/theme/frio/theme.php:229
 msgid "Home"
 msgstr ""
 
@@ -2278,11 +2278,11 @@ msgstr ""
 
 #: src/Content/Nav.php:212 src/Module/BaseProfile.php:70
 #: src/Module/Media/BaseBrowser.php:92 src/Module/Media/Photo/Browser.php:34
-#: view/theme/frio/theme.php:222
+#: view/theme/frio/theme.php:223
 msgid "Photos"
 msgstr ""
 
-#: src/Content/Nav.php:212 view/theme/frio/theme.php:222
+#: src/Content/Nav.php:212 view/theme/frio/theme.php:223
 msgid "My photos"
 msgstr ""
 
@@ -2308,11 +2308,11 @@ msgstr ""
 #: src/Content/Nav.php:221 src/Module/BaseProfile.php:41
 #: src/Module/BaseSettings.php:86 src/Module/Contact.php:494
 #: src/Module/Contact/Profile.php:439 src/Module/Profile/Profile.php:293
-#: src/Module/Welcome.php:44 view/theme/frio/theme.php:216
+#: src/Module/Welcome.php:44 view/theme/frio/theme.php:217
 msgid "Profile"
 msgstr ""
 
-#: src/Content/Nav.php:221 view/theme/frio/theme.php:216
+#: src/Content/Nav.php:221 view/theme/frio/theme.php:217
 msgid "My profile"
 msgstr ""
 
@@ -2362,7 +2362,7 @@ msgstr ""
 #: src/Content/Nav.php:245 src/Content/Nav.php:307
 #: src/Content/Text/HTML.php:898 src/Module/BaseProfile.php:60
 #: src/Module/Contact.php:198 src/Module/Contact.php:416
-#: src/Module/Contact.php:510 view/theme/frio/theme.php:232
+#: src/Module/Contact.php:510 view/theme/frio/theme.php:233
 msgid "Contacts"
 msgstr ""
 
@@ -2381,8 +2381,8 @@ msgstr ""
 #: src/Content/Nav.php:265 src/Module/BaseProfile.php:81
 #: src/Module/BaseProfile.php:84 src/Module/BaseProfile.php:90
 #: src/Module/BaseProfile.php:93 src/Module/Calendar/Show.php:113
-#: src/Module/Settings/Display.php:494 view/theme/frio/theme.php:223
-#: view/theme/frio/theme.php:229
+#: src/Module/Settings/Display.php:494 view/theme/frio/theme.php:224
+#: view/theme/frio/theme.php:230
 msgid "Calendar"
 msgstr ""
 
@@ -2471,7 +2471,7 @@ msgstr ""
 msgid "Account settings"
 msgstr ""
 
-#: src/Content/Nav.php:307 view/theme/frio/theme.php:232
+#: src/Content/Nav.php:307 view/theme/frio/theme.php:233
 msgid "Manage/edit friends and contacts"
 msgstr ""
 
@@ -7439,7 +7439,7 @@ msgstr ""
 msgid "Lookup address:"
 msgstr ""
 
-#: src/Module/Deck.php:65 src/Module/Item/Compose.php:65
+#: src/Module/Deck.php:65
 msgid "This feature is only available with the frio theme."
 msgstr ""
 
@@ -7912,299 +7912,303 @@ msgstr ""
 msgid "Please enter a post body."
 msgstr ""
 
-#: src/Module/Item/Compose.php:85
+#: src/Module/Item/Compose.php:68
+msgid "This feature is not available with the current theme."
+msgstr ""
+
+#: src/Module/Item/Compose.php:88
 msgid "Compose new personal note"
 msgstr ""
 
-#: src/Module/Item/Compose.php:94
+#: src/Module/Item/Compose.php:97
 msgid "Compose new post"
 msgstr ""
 
-#: src/Module/Item/Compose.php:163
+#: src/Module/Item/Compose.php:170
 msgid "Visibility"
 msgstr ""
 
-#: src/Module/Item/Compose.php:179
+#: src/Module/Item/Compose.php:186
 msgid "Clear the location"
 msgstr ""
 
-#: src/Module/Item/Compose.php:180
+#: src/Module/Item/Compose.php:187
 msgid "Location services are unavailable on your device"
 msgstr ""
 
-#: src/Module/Item/Compose.php:181
+#: src/Module/Item/Compose.php:188
 msgid "Location services are disabled. Please check the website's permissions on your device"
 msgstr ""
 
-#: src/Module/Item/Compose.php:184 src/Module/Item/Compose.php:308
+#: src/Module/Item/Compose.php:191 src/Module/Item/Compose.php:315
 msgid "Writing Assistant"
 msgstr ""
 
-#: src/Module/Item/Compose.php:185 src/Module/Item/Compose.php:309
+#: src/Module/Item/Compose.php:192 src/Module/Item/Compose.php:316
 msgid "Distraction-Free"
 msgstr ""
 
-#: src/Module/Item/Compose.php:186 src/Module/Item/Compose.php:310
+#: src/Module/Item/Compose.php:193 src/Module/Item/Compose.php:317
 msgid "Image Descriptions"
 msgstr ""
 
-#: src/Module/Item/Compose.php:187 src/Module/Item/Compose.php:314
+#: src/Module/Item/Compose.php:194 src/Module/Item/Compose.php:321
 msgid "Focus Preview"
 msgstr ""
 
-#: src/Module/Item/Compose.php:197
+#: src/Module/Item/Compose.php:204
 msgid "If you want to always use this editor for posting, you can configure the New Post button to always open it in your <a href=\"/settings/display\">Theme settings</a>."
 msgstr ""
 
-#: src/Module/Item/Compose.php:266
+#: src/Module/Item/Compose.php:273
 msgid "Advanced Composer"
 msgstr ""
 
-#: src/Module/Item/Compose.php:267
+#: src/Module/Item/Compose.php:274
 msgid "Writing & Accessibility Assistant"
 msgstr ""
 
-#: src/Module/Item/Compose.php:268
+#: src/Module/Item/Compose.php:275
 msgid "Structure & Balance"
 msgstr ""
 
-#: src/Module/Item/Compose.php:269
+#: src/Module/Item/Compose.php:276
 msgid "Accessibility Checklist"
 msgstr ""
 
-#: src/Module/Item/Compose.php:270
+#: src/Module/Item/Compose.php:277
 msgid "Readability & Style"
 msgstr ""
 
-#: src/Module/Item/Compose.php:271 src/Module/Item/Compose.php:326
+#: src/Module/Item/Compose.php:278 src/Module/Item/Compose.php:333
 msgid "Paragraph Structure"
 msgstr ""
 
-#: src/Module/Item/Compose.php:272 src/Module/Item/Compose.php:328
+#: src/Module/Item/Compose.php:279 src/Module/Item/Compose.php:335
 msgid "Text Balance"
 msgstr ""
 
-#: src/Module/Item/Compose.php:273 src/Module/Item/Compose.php:330
+#: src/Module/Item/Compose.php:280 src/Module/Item/Compose.php:337
 msgid "Link Density"
 msgstr ""
 
-#: src/Module/Item/Compose.php:274 src/Module/Item/Compose.php:332
+#: src/Module/Item/Compose.php:281 src/Module/Item/Compose.php:339
 msgid "Hashtag Density"
 msgstr ""
 
-#: src/Module/Item/Compose.php:275
+#: src/Module/Item/Compose.php:282
 msgid "Balanced"
 msgstr ""
 
-#: src/Module/Item/Compose.php:276
+#: src/Module/Item/Compose.php:283
 msgid "One block"
 msgstr ""
 
-#: src/Module/Item/Compose.php:277
+#: src/Module/Item/Compose.php:284
 msgid "Very compact"
 msgstr ""
 
-#: src/Module/Item/Compose.php:278
+#: src/Module/Item/Compose.php:285
 msgid "Well structured"
 msgstr ""
 
-#: src/Module/Item/Compose.php:279
+#: src/Module/Item/Compose.php:286
 msgid "Short post"
 msgstr ""
 
-#: src/Module/Item/Compose.php:280
+#: src/Module/Item/Compose.php:287
 msgid "Easy to read"
 msgstr ""
 
-#: src/Module/Item/Compose.php:281
+#: src/Module/Item/Compose.php:288
 msgid "Complex"
 msgstr ""
 
-#: src/Module/Item/Compose.php:282
+#: src/Module/Item/Compose.php:289
 msgid "Medium"
 msgstr ""
 
-#: src/Module/Item/Compose.php:283 src/Module/Item/Compose.php:286
+#: src/Module/Item/Compose.php:290 src/Module/Item/Compose.php:293
 msgid "Subtle"
 msgstr ""
 
-#: src/Module/Item/Compose.php:284 src/Module/Item/Compose.php:287
+#: src/Module/Item/Compose.php:291 src/Module/Item/Compose.php:294
 msgid "Very dense"
 msgstr ""
 
-#: src/Module/Item/Compose.php:285
+#: src/Module/Item/Compose.php:292
 msgid "Many links"
 msgstr ""
 
-#: src/Module/Item/Compose.php:288
+#: src/Module/Item/Compose.php:295
 msgid "Many tags"
 msgstr ""
 
-#: src/Module/Item/Compose.php:289
+#: src/Module/Item/Compose.php:296
 msgid "All images have descriptions (Alt-Text)"
 msgstr ""
 
-#: src/Module/Item/Compose.php:290
+#: src/Module/Item/Compose.php:297
 msgid "Images missing descriptions (Alt-Text) detected!"
 msgstr ""
 
-#: src/Module/Item/Compose.php:291
+#: src/Module/Item/Compose.php:298
 msgid "No emoji overload (max 4 consecutive)"
 msgstr ""
 
-#: src/Module/Item/Compose.php:292
+#: src/Module/Item/Compose.php:299
 msgid "Emoji overload detected (hurts screen readers)"
 msgstr ""
 
-#: src/Module/Item/Compose.php:293
+#: src/Module/Item/Compose.php:300
 msgid "Good text structuring (paragraphs used)"
 msgstr ""
 
-#: src/Module/Item/Compose.php:294
+#: src/Module/Item/Compose.php:301
 msgid "No paragraphs found (hard to read)"
 msgstr ""
 
-#: src/Module/Item/Compose.php:295
+#: src/Module/Item/Compose.php:302
 msgid "No paragraphs required for short texts"
 msgstr ""
 
-#: src/Module/Item/Compose.php:296
+#: src/Module/Item/Compose.php:303
 msgid "Your post is beautifully readable and accessible!"
 msgstr ""
 
-#: src/Module/Item/Compose.php:297
+#: src/Module/Item/Compose.php:304
 msgid "Tip: Adding double line breaks to create paragraphs makes long texts much easier to scan."
 msgstr ""
 
-#: src/Module/Item/Compose.php:298
+#: src/Module/Item/Compose.php:305
 msgid "Tip: Some sentences are very long (> 25 words). Shortening them increases reading flow!"
 msgstr ""
 
-#: src/Module/Item/Compose.php:299
+#: src/Module/Item/Compose.php:306
 msgid "Tip: Typing in ALL CAPS feels like shouting. Consider using standard capitalization."
 msgstr ""
 
-#: src/Module/Item/Compose.php:300
+#: src/Module/Item/Compose.php:307
 msgid "Tip: Too many hashtags make the text feel restless. Try to focus on the key ones."
 msgstr ""
 
-#: src/Module/Item/Compose.php:301
+#: src/Module/Item/Compose.php:308
 msgid "Tip: Emoji clusters can be disruptive for visitors using assistive technology."
 msgstr ""
 
-#: src/Module/Item/Compose.php:302
+#: src/Module/Item/Compose.php:309
 msgid "Tip: An image is missing a description (Alt-Text). Adding a brief text ensures everyone can participate!"
 msgstr ""
 
-#: src/Module/Item/Compose.php:303
+#: src/Module/Item/Compose.php:310
 msgid "Tip: Text is extremely long. Real-time analysis paused for performance."
 msgstr ""
 
-#: src/Module/Item/Compose.php:304
+#: src/Module/Item/Compose.php:311
 msgid "Preview Paused"
 msgstr ""
 
-#: src/Module/Item/Compose.php:305
+#: src/Module/Item/Compose.php:312
 msgid "The post is extremely long. The live preview has been paused to keep your browser tab responsive."
 msgstr ""
 
-#: src/Module/Item/Compose.php:306
+#: src/Module/Item/Compose.php:313
 msgid "characters"
 msgstr ""
 
-#: src/Module/Item/Compose.php:307
+#: src/Module/Item/Compose.php:314
 msgid "Distraction-free mode"
 msgstr ""
 
-#: src/Module/Item/Compose.php:312
+#: src/Module/Item/Compose.php:319
 msgid "Refresh Preview"
 msgstr ""
 
-#: src/Module/Item/Compose.php:313 src/Module/Settings/Channels.php:176
+#: src/Module/Item/Compose.php:320 src/Module/Settings/Channels.php:176
 msgid "Publish"
 msgstr ""
 
-#: src/Module/Item/Compose.php:315
+#: src/Module/Item/Compose.php:322
 msgid "Desktop"
 msgstr ""
 
-#: src/Module/Item/Compose.php:316
+#: src/Module/Item/Compose.php:323
 msgid "Mobile"
 msgstr ""
 
-#: src/Module/Item/Compose.php:317
+#: src/Module/Item/Compose.php:324
 msgid "Back to Editor"
 msgstr ""
 
-#: src/Module/Item/Compose.php:318
+#: src/Module/Item/Compose.php:325
 msgid "Loading Preview..."
 msgstr ""
 
-#: src/Module/Item/Compose.php:319
+#: src/Module/Item/Compose.php:326
 msgid "Just now · Preview"
 msgstr ""
 
-#: src/Module/Item/Compose.php:320
+#: src/Module/Item/Compose.php:327
 msgid "You"
 msgstr ""
 
-#: src/Module/Item/Compose.php:321
+#: src/Module/Item/Compose.php:328
 msgid "Advanced Composer (deactivatable in settings)"
 msgstr ""
 
-#: src/Module/Item/Compose.php:323
+#: src/Module/Item/Compose.php:330
 msgid "How does the analysis work?"
 msgstr ""
 
-#: src/Module/Item/Compose.php:324
+#: src/Module/Item/Compose.php:331
 msgid "No external services · All processing on your own instance"
 msgstr ""
 
-#: src/Module/Item/Compose.php:325
+#: src/Module/Item/Compose.php:332
 msgid "Text analysis runs entirely in your browser - no data is sent anywhere for analysis. No third-party APIs, no cookies, no tracking. The optional post preview works exactly like Friendica's built-in preview button: your draft is sent to your own Friendica instance for rendering. The only server-side storage is your personal enable/disable preference in the standard Friendica settings."
 msgstr ""
 
-#: src/Module/Item/Compose.php:327
+#: src/Module/Item/Compose.php:334
 msgid "Counts how many paragraphs your post contains (separated by blank lines). A single unbroken block of text scores low (30 %) because readers find it hard to scan. Two or more paragraphs score 100 %. Posts under 600 characters are always rated \"Short post\" regardless of structure."
 msgstr ""
 
-#: src/Module/Item/Compose.php:329
+#: src/Module/Item/Compose.php:336
 msgid "Measures average sentence length and flags sentences longer than 25 words. An average above 24 words scores 40 % (\"Complex\"), above 16 words scores 75 % (\"Medium\"), everything else scores 100 % (\"Easy to read\"). Shorter sentences improve readability for all audiences."
 msgstr ""
 
-#: src/Module/Item/Compose.php:331
+#: src/Module/Item/Compose.php:338
 msgid "Counts all http/https URLs in your post. More than 5 links scores 30 % (\"Very dense\") - posts that are mostly links feel like spam to readers and federation filters. Up to 3 links scores 100 % (\"Subtle\")."
 msgstr ""
 
-#: src/Module/Item/Compose.php:333
+#: src/Module/Item/Compose.php:340
 msgid "Counts #hashtags. More than 6 scores 30 % (\"Very dense\"). Posts with fewer, focused hashtags reach more people than hashtag-stuffed ones. Up to 3 hashtags scores 100 % (\"Subtle\")."
 msgstr ""
 
-#: src/Module/Item/Compose.php:334
+#: src/Module/Item/Compose.php:341
 msgid "Alt-Text Check"
 msgstr ""
 
-#: src/Module/Item/Compose.php:335
+#: src/Module/Item/Compose.php:342
 msgid "Checks every [img] BBCode tag in your post for an alt text description. Alt text is essential for screen readers and users with visual impairments - it ensures everyone can participate in the conversation."
 msgstr ""
 
-#: src/Module/Item/Compose.php:336
+#: src/Module/Item/Compose.php:343
 msgid "Emoji Check"
 msgstr ""
 
-#: src/Module/Item/Compose.php:337
+#: src/Module/Item/Compose.php:344
 msgid "Detects sequences of 5 or more consecutive emoji. Screen readers read every emoji aloud by name (\"grinning face\", \"thumbs up\" ...), so a long cluster becomes an exhausting wall of words for blind users. Up to 4 consecutive emoji is fine."
 msgstr ""
 
-#: src/Module/Item/Compose.php:338
+#: src/Module/Item/Compose.php:345
 msgid "Paragraph Check (Accessibility)"
 msgstr ""
 
-#: src/Module/Item/Compose.php:339
+#: src/Module/Item/Compose.php:346
 msgid "For posts longer than 300 characters, checks whether at least one paragraph break exists. Screen readers and cognitive-accessibility tools benefit greatly from structured text. Short posts are always rated neutral."
 msgstr ""
 
-#: src/Module/Item/Compose.php:342
+#: src/Module/Item/Compose.php:349
 msgid "Image description"
 msgstr ""
 
@@ -13383,23 +13387,23 @@ msgstr ""
 msgid "Custom"
 msgstr ""
 
-#: view/theme/frio/theme.php:203
+#: view/theme/frio/theme.php:204
 msgid "Guest"
 msgstr ""
 
-#: view/theme/frio/theme.php:206
+#: view/theme/frio/theme.php:207
 msgid "Visitor"
 msgstr ""
 
-#: view/theme/frio/theme.php:223
+#: view/theme/frio/theme.php:224
 msgid "Your calendar"
 msgstr ""
 
-#: view/theme/frio/theme.php:227
+#: view/theme/frio/theme.php:228
 msgid "Back home"
 msgstr ""
 
-#: view/theme/frio/theme.php:227
+#: view/theme/frio/theme.php:228
 msgid "Back to my instance"
 msgstr ""
 
