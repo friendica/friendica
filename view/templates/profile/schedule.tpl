@@ -51,17 +51,19 @@
 				<div class="wall-item-body e-content {{if !$row.item.title}}p-name{{/if}}" dir="auto">{{$row.item['rendered-html'] nofilter}}</div>
 				<div class="wall-item-bottom">
 					<div class="wall-item-links"></div>
+				{{if $row.item.hashtags || $row.item.mentions || $row.item.implicit_mentions}}
 					<div class="tags wall-item-tags">
-						{{foreach $row.item.hashtags as $tag}}
-							<span class="tag hashtag">{{$tag nofilter}}</span>
-						{{/foreach}}
-						{{foreach $row.item.mentions as $tag}}
-							<span class="tag mention">{{$tag nofilter}}</span>
-						{{/foreach}}
-						{{foreach $row.item.implicit_mentions as $tag}}
-							<span class="tag mention">{{$tag nofilter}}</span>
-						{{/foreach}}
+					{{foreach $row.item.hashtags as $tag}}
+						<span class="tag hashtag">{{$tag nofilter}}</span>
+					{{/foreach}}
+					{{foreach $row.item.mentions as $tag}}
+						<span class="tag mention">{{$tag nofilter}}</span>
+					{{/foreach}}
+					{{foreach $row.item.implicit_mentions as $tag}}
+						<span class="tag mention">{{$tag nofilter}}</span>
+					{{/foreach}}
 					</div>
+				{{/if}}
 				</div>
 				<div class="wall-item-bottom" style="display:block;width:100%;margin-top:6px;">
 					<div class="wall-item-actions" style="display:block;width:100%;">
