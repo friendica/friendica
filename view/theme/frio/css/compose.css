@@ -1,0 +1,84 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2026 the Friendica project
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/* Compose editor styles, moved out of the compose.tpl <style> block.
+   Only loaded on /compose (registered in src/Module/Item/Compose.php). */
+
+.expandable-textarea {
+	resize: none;
+	overflow-y: auto;
+}
+
+@media (max-width: 991px) {
+	.expandable-textarea {
+		max-height: 300px;
+	}
+}
+
+#jot-summary {
+	max-height: 120px;
+}
+
+[id^="permissions-modal-"] .modal-body {
+	max-height: 65vh;
+	overflow-y: auto;
+}
+
+@media (min-width: 992px) {
+	.expandable-textarea {
+		line-height: 1.6;
+		max-height: 50vh;
+	}
+
+	/* Wide editor mode - layout rules borrowed from the Advanced Composer (desktop only) */
+	body.wide-editor-active #region-sidebar-first,
+	body.wide-editor-active #region-sidebar-second,
+	body.wide-editor-active .region-sidebar-first,
+	body.wide-editor-active .region-sidebar-second,
+	body.wide-editor-active #aside,
+	body.wide-editor-active .sidebar-col {
+		display: none !important;
+	}
+
+	body.wide-editor-active #content {
+		width: 100% !important;
+		max-width: 1350px !important;
+		float: none !important;
+		margin: 0 auto !important;
+	}
+
+	body.wide-editor-active.wide-preview-active form.comment-edit-form {
+		column-gap: 10px !important;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+		grid-template-areas: "title title" "summary summary" "category category" "toolbar toolbar" "body preview" "lang lang" "submit submit";
+	}
+
+	body.wide-editor-active.wide-preview-active #jot-title-wrap { grid-area: title; }
+	body.wide-editor-active.wide-preview-active #jot-summary-wrap { grid-area: summary; }
+	body.wide-editor-active.wide-preview-active #jot-category-wrap { grid-area: category; }
+	body.wide-editor-active.wide-preview-active .comment-edit-form .btn-toolbar { grid-area: toolbar; }
+	body.wide-editor-active.wide-preview-active .comment-edit-form .dropzone { grid-area: body; }
+	body.wide-editor-active.wide-preview-active .compose-actions { grid-area: lang; }
+	body.wide-editor-active.wide-preview-active .comment-edit-form .comment-edit-submit-wrapper { grid-area: submit; }
+	body.wide-editor-active.wide-preview-active .comment-edit-form .comment-edit-preview {
+		grid-area: preview;
+		align-self: start;
+		border: 1px solid var(--border-color, rgba(128, 128, 128, 0.2));
+		border-radius: 15px;
+		padding: 15px;
+		overflow-y: auto;
+	}
+
+	body.wide-editor-active .comment-edit-form .comment-edit-text {
+		max-height: calc(100vh - 180px);
+	}
+
+	body.wide-editor-active .preview,
+	body.wide-editor-active .previewseparator {
+		display: none !important;
+	}
+}

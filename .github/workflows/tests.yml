@@ -95,25 +95,11 @@ jobs:
       - name: "Install Composer dependencies"
         uses: "ramsey/composer-install@v4"
 
-      - name: Start mysql service
-        run: sudo /etc/init.d/mysql start
-
       - name: Copy default Friendica config
         run: cp config/local-sample.config.php config/local.config.php
 
-      - name: Verify MariaDB connection
-        env:
-          PORT: ${{ job.services.mariadb.ports[3306] }}
-        run: |
-          while ! mysqladmin ping -h"127.0.0.1" -P"$PORT" --silent; do
-            sleep 1
-          done
-
       - name: Setup MYSQL database
-        env:
-          PORT: ${{ job.services.mariadb.ports[3306] }}
-        run: |
-          mysql -h"127.0.0.1" -P"$PORT" -utest -ptest test < database.sql
+        run: docker exec -i ${{ job.services.mariadb.id }} mariadb -utest -ptest test < database.sql
 
       - name: Test with phpunit
         run: vendor/bin/phpunit --configuration tests/phpunit.xml --coverage-clover clover.xml

@@ -130,6 +130,7 @@ class Compose extends BaseModule
 		)->getHtml();
 
 		// Output
+		$this->page->registerStylesheet(Theme::getPathForFile('css/compose.css'));
 		$this->page->registerFooterScript(Theme::getPathForFile('js/ajaxupload.js'));
 		$this->page->registerFooterScript(Theme::getPathForFile('js/linkPreview.js'));
 		$this->page->registerFooterScript(Theme::getPathForFile('js/compose.js'));
