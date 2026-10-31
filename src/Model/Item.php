@@ -11,6 +11,7 @@ use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Image;
 use Friendica\Content\Post\Collection\PostMedias;
+use Friendica\Content\Post\Entity\FileKind;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
@@ -156,6 +157,9 @@ class Item
 	public const CANT_LIKE     = 2;
 	public const CANT_ANNOUNCE = 4;
 	public const CANT_QUOTE    = 8;
+
+	// Number of non-visual attachments from which the list is collapsed by default
+	public const ATTACHMENTS_COLLAPSED = 4;
 
 	/**
 	 * Update existing item entries
@@ -3614,7 +3618,8 @@ class Item
 	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$trailing = '';
+		$attachments = [];
+
 		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if (strpos((string) $item['body'], (string) $PostMedia->url)) {
@@ -3630,19 +3635,26 @@ class Item
 			];
 			$the_url = Contact::magicLinkByContact($author, $PostMedia->url);
 
-			$title = Strings::escapeHtml(trim($PostMedia->description ?? '' ?: $PostMedia->url));
+			$name = trim($PostMedia->description ?? '' ?: $PostMedia->name ?? '' ?: basename(parse_url($PostMedia->url, PHP_URL_PATH) ?: $PostMedia->url));
 
-			if ($PostMedia->size) {
-				$title .= ' ' . $PostMedia->size . ' ' . DI::l10n()->t('bytes');
-			}
+			$kind = FileKind::fromMimeType($PostMedia->mimetype);
 
-			/// @todo Use a template
-			$icon = '<div class="attachtype icon s22 type-' . $PostMedia->mimetype->type . ' subtype-' . $PostMedia->mimetype->subtype . '"></div>';
-			$trailing .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" rel="noopener noreferrer" >' . $icon . '</a>';
+			$attachments[] = [
+				'url'  => strip_tags($the_url),
+				'name' => $name,
+				'size' => $PostMedia->size ? Strings::formatBytes($PostMedia->size) : '',
+				'kind' => $kind->value,
+				'type' => $kind->label(DI::l10n()),
+			];
 		}
 
-		if ($trailing != '') {
-			$content .= '<div class="body-attach">' . $trailing . '</div>';
+		if (!empty($attachments)) {
+			$content .= Renderer::replaceMacros(Renderer::getMarkupTemplate('content/attachments.tpl'), [
+				'$collapsible' => count($attachments) > 1,
+				'$open'        => count($attachments) < self::ATTACHMENTS_COLLAPSED,
+				'$summary'     => DI::l10n()->tt('%d attachment', '%d attachments', count($attachments)),
+				'$attachments' => $attachments,
+			]);
 		}
 
 		DI::profiler()->stopRecording();

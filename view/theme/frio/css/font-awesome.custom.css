@@ -18,22 +18,3 @@ This file applies Remix Icon glyphs to some friendica standard classes
 	vertical-align: top;
 	font-size: 1.4em;
 }
-/* media icons */
-.icon.type-image:before {
-	content: "\ee4b";
-}
-.icon.type-video:before {
-	content: "\f282";
-}
-.icon.type-audio:before {
-	content: "\ef83";
-}
-.icon.type-text:before {
-	content: "\ed0f";
-}
-.icon.type-application:before {
-	content: "\eceb";
-}
-.icon.type-unkn:before {
-	content: "\eceb";
-}

@@ -2266,15 +2266,25 @@ blockquote.shared_content {
 .wall-item-body > a > img {
 	border-radius: 3px;
 }
+.wall-item-body .body-attach {
+	clear: both;
+	margin-top: 10px;
+}
+.wall-item-body .body-attach > summary {
+	cursor: pointer;
+	color: $font_color_darker;
+}
 .wall-item-body .body-attach > a {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 8px;
 	color: $font_color_darker;
-	display: inline-block;
 }
-.wall-item-body .body-attach > a div {
-	color: $font_color_darker;
-	width: 20px;
+.wall-item-body .body-attach > a .attachsize {
+	font-size: 12px;
+	opacity: 0.7;
 }
-
 /* wall-item content elements */
 .shared-wrapper {
 	position: relative;
