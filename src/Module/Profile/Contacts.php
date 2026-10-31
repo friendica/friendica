@@ -56,7 +56,7 @@ class Contacts extends Module\BaseProfile
 
 		$o = self::getTabsHTML('contacts', $is_owner, $profile['nickname'], $profile['hide-friends']);
 
-		$tabs = self::getContactFilterTabs('profile/' . $nickname, $type, $this->userSession->isAuthenticated() && $profile['uid'] != $this->userSession->getLocalUserId());
+		$tabs = $this->getContactFilterTabs('profile/' . $nickname, $type, $this->userSession->isAuthenticated() && $profile['uid'] != $this->userSession->getLocalUserId());
 
 		$condition = [
 			'uid'     => $profile['uid'],
