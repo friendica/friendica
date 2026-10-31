@@ -65,7 +65,7 @@ contact table
 | pending                   | Contact request is pending                                                                                     | boolean            | NO   |     | 1                   |                |
 | deleted                   | Contact has been deleted                                                                                       | boolean            | NO   |     | 0                   |                |
 | info                      |                                                                                                                | mediumtext         | YES  |     | NULL                |                |
-| notify_new_posts          |                                                                                                                | boolean            | NO   |     | 0                   |                |
+| notify_new_posts          |                                                                                                                | tinyint unsigned   | NO   |     | 0                   |                |
 | fetch_further_information |                                                                                                                | tinyint unsigned   | NO   |     | 0                   |                |
 | ffi_keyword_denylist      |                                                                                                                | text               | YES  |     | NULL                |                |
 | photo                     | Link to the profile photo of the contact                                                                       | varbinary(383)     | YES  |     |                     |                |
