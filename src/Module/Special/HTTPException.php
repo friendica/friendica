@@ -120,10 +120,6 @@ class HTTPException
 	public function content(NetworkHTTPException $e): string
 	{
 		if ($e->getCode() >= 400) {
-			if ($this->mode->isBackend()) {
-				$this->rawContent($e);
-			}
-
 			$this->logger->debug(
 				'Exit with error',
 				[
@@ -135,6 +131,10 @@ class HTTPException
 					'agent'       => $this->server['HTTP_USER_AGENT'] ?? '',
 				],
 			);
+
+			if ($this->mode->isBackend()) {
+				$this->rawContent($e);
+			}
 		}
 
 		$tpl = Renderer::getMarkupTemplate('exception.tpl');
