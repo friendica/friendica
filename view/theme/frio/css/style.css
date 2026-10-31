@@ -2217,7 +2217,7 @@ blockquote.shared_content {
 .wall-item-content img {
 	object-fit: contain;
 }
-.wall-item-body > p:last-child {
+.wall-item-body > :last-child {
 	margin-bottom: 0;
 }
 
