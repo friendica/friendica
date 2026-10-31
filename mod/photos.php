@@ -10,6 +10,8 @@
 
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
+use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\Plaintext;
 use Friendica\Core\ACL;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
@@ -19,6 +21,7 @@ use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Photo;
+use Friendica\Model\Post;
 use Friendica\Model\Profile;
 use Friendica\Model\User;
 use Friendica\Module\BaseProfile;
@@ -322,6 +325,7 @@ function photos_content()
 	// photos/name/image/xxxxx
 	// photos/name/image/xxxxx/edit
 	// photos/name/image/xxxxx/drop
+	// photos/name/image/xxxxx/usage
 
 	$user = User::getByNickname(DI::args()->getArgv()[1] ?? '');
 	if (!DBA::isResult($user)) {
@@ -748,12 +752,15 @@ function photos_content()
 
 		if ($can_post && ($ph[0]['uid'] == $owner_uid)) {
 			$tools = [];
-			if ($cmd === 'edit') {
+			if (in_array($cmd, ['edit', 'usage'])) {
 				$tools['view'] = ['photos/' . $user['nickname'] . '/image/' . $datum, DI::l10n()->t('View photo')];
 			} else {
 				$tools['edit']    = ['photos/' . $user['nickname'] . '/image/' . $datum . '/edit', DI::l10n()->t('Edit photo')];
 				$tools['delete']  = ['photos/' . $user['nickname'] . '/image/' . $datum . '/drop', DI::l10n()->t('Delete photo')];
 				$tools['profile'] = ['settings/profile/photo/crop/' . $ph[0]['resource-id'], DI::l10n()->t('Use as profile picture')];
+				if ($is_owner) {
+					$tools['usage'] = ['photos/' . $user['nickname'] . '/image/' . $datum . '/usage', DI::l10n()->t('Used in posts')];
+				}
 			}
 
 			if (
@@ -816,6 +823,24 @@ function photos_content()
 			]);
 		}
 
+		$usage = null;
+		if ($cmd === 'usage' && $is_owner) {
+			$posts = [];
+			foreach (Post\Media::getPostsByPhoto($ph[0]['resource-id'], $owner_uid) as $post) {
+				$posts[] = [
+					'url'     => 'display/' . $post['guid'],
+					'created' => DI::l10n()->fullDateTime($post['created']),
+					'text'    => $post['title'] ?: Plaintext::shorten(BBCode::toPlaintext($post['body'], false), 100),
+				];
+			}
+
+			$usage = Renderer::replaceMacros(Renderer::getMarkupTemplate('media_usage.tpl'), [
+				'$title'    => DI::l10n()->t('Used in posts'),
+				'$no_posts' => DI::l10n()->t('This photo isn\'t used in any of your posts.'),
+				'$posts'    => $posts,
+			]);
+		}
+
 		$photo_tpl = Renderer::getMarkupTemplate('photo_view.tpl');
 		$o .= Renderer::replaceMacros($photo_tpl, [
 			'$id'                          => $ph[0]['id'],
@@ -826,9 +851,11 @@ function photos_content()
 			'$nextlink'                    => $nextlink,
 			'$desc'                        => $ph[0]['desc'],
 			'$edit'                        => $edit,
+			'$usage'                       => $usage,
 			'$edit_text'                   => DI::l10n()->t('Edit'),
 			'$delete_text'                 => DI::l10n()->t('Delete'),
 			'$use_as_profile_picture_text' => DI::l10n()->t('Use as profile picture'),
+			'$usage_text'                  => DI::l10n()->t('Used in posts'),
 			'$back_text'                   => DI::l10n()->t('Back to viewing'),
 		]);
 
