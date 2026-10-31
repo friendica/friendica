@@ -158,6 +158,9 @@ class Item
 	public const CANT_ANNOUNCE = 4;
 	public const CANT_QUOTE    = 8;
 
+	// Number of non-visual attachments from which the list is collapsed by default
+	public const ATTACHMENTS_COLLAPSED = 4;
+
 	/**
 	 * Update existing item entries
 	 *
@@ -3646,6 +3649,8 @@ class Item
 
 		if (!empty($attachments)) {
 			$content .= Renderer::replaceMacros(Renderer::getMarkupTemplate('content/attachments.tpl'), [
+				'$collapsible' => count($attachments) > 1,
+				'$open'        => count($attachments) < self::ATTACHMENTS_COLLAPSED,
 				'$summary'     => DI::l10n()->tt('%d attachment', '%d attachments', count($attachments)),
 				'$attachments' => $attachments,
 			]);
