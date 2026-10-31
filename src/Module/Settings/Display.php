@@ -116,6 +116,7 @@ class Display extends BaseSettings
 		$stay_local              = (bool) $request['stay_local'];
 		$compact_timeline        = ConversationRenderer::normalizeCommentsMode($request['compact_timeline']);
 		$click_to_display        = (bool) $request['click_to_display'];
+		$widgets_as_menu         = (bool) $request['widgets_as_menu'];
 		$hide_empty_descriptions = (bool) $request['hide_empty_descriptions'];
 		$hide_custom_emojis      = (bool) $request['hide_custom_emojis'];
 		$platform_icon_style     = (int) $request['platform_icon_style'];
@@ -187,6 +188,7 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'stay_local', $stay_local);
 		$this->pConfig->set($uid, 'system', 'compact_timeline', $compact_timeline);
 		$this->pConfig->set($uid, 'system', 'click_to_display', $click_to_display);
+		$this->pConfig->set($uid, 'system', 'widgets_as_menu', $widgets_as_menu);
 		$this->pConfig->set($uid, 'system', 'show_page_drop', $show_page_drop);
 		$this->pConfig->set($uid, 'system', 'display_eventlist', $display_eventlist);
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
@@ -318,7 +320,7 @@ class Display extends BaseSettings
 			ConversationRenderer::COMMENTS_MODE_HIDDEN  => $this->t('Hide comments in feeds'),
 		];
 		$click_to_display  = $this->pConfig->get($uid, 'system', 'click_to_display', false);
-		$compact_timeline  = $this->pConfig->get($uid, 'system', 'compact_timeline', false);
+		$widgets_as_menu   = $this->pConfig->get($uid, 'system', 'widgets_as_menu', false);
 		$show_page_drop    = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
 		$display_eventlist = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
 		$embed_media       = $this->pConfig->get($uid, 'system', 'embed_media', false);
@@ -532,6 +534,7 @@ class Display extends BaseSettings
 			'$stay_local'               => ['stay_local', $this->t('Stay local'), $stay_local, $this->t("Don't go to a remote system when following a contact link.")],
 			'$compact_timeline'         => ['compact_timeline', $this->t('Comments in timelines'), $compact_timeline, $this->t('Controls which comments are shown below posts on all pages that list posts, like timelines, profiles and contact pages. "Compact conversation view" hides replies to filtered-out comments, "Hide comments in feeds" shows no comments at all. Single post pages always show the full conversation.'), $comments_modes, false],
 			'$click_to_display'         => ['click_to_display', $this->t('Open the post when clicking it'), $click_to_display, $this->t('Clicking the text of a post opens its own page. This applies to feeds with compact or hidden comments and to lists that never show comments, like search results and contact posts.')],
+			'$widgets_as_menu'          => ['widgets_as_menu', $this->t('Show circles, channels, saved searches and folders as a menu'), $widgets_as_menu, $this->t('Instead of expandable widgets in the sidebar, these entries are shown as a menu at the top of the sidebar. Each entry opens an overview page.')],
 			'$show_page_drop'           => ['show_page_drop', $this->t('Show the post deletion checkbox'), $show_page_drop, $this->t("Display the checkbox for the post deletion on the network page.")],
 			'$display_eventlist'        => ['display_eventlist', $this->t('Display the event list'), $display_eventlist, $this->t("Display the birthday reminder and event list on the network page.")],
 			'$preview_mode'             => ['preview_mode', $this->t('Link preview mode'), $preview_mode, $this->t('Appearance of the link preview that is added to each post with a link.'), $preview_modes, false],
