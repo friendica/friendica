@@ -101,22 +101,24 @@
 					<div class="wall-item-bottom">
 						<div class="wall-item-links">
 						</div>
+					{{if (!$item.suppress_tags && ($item.hashtags || $item.mentions)) || $item.folders || $item.categories}}
 						<div class="tags wall-item-tags">
-							{{if !$item.suppress_tags}}
-								{{foreach $item.hashtags as $tag}}
-									<span class="tag">{{$tag nofilter}}</span>
-								{{/foreach}}
-								{{foreach $item.mentions as $tag}}
-									<span class="mention">{{$tag nofilter}}</span>
-								{{/foreach}}
-							{{/if}}
-							{{foreach $item.folders as $cat}}
-								<span class="folder"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+						{{if !$item.suppress_tags}}
+							{{foreach $item.hashtags as $tag}}
+								<span class="tag">{{$tag nofilter}}</span>
 							{{/foreach}}
-							{{foreach $item.categories as $cat}}
-								<span class="category"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+							{{foreach $item.mentions as $tag}}
+								<span class="mention">{{$tag nofilter}}</span>
 							{{/foreach}}
+						{{/if}}
+						{{foreach $item.folders as $cat}}
+							<span class="folder"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+						{{/foreach}}
+						{{foreach $item.categories as $cat}}
+							<span class="category"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+						{{/foreach}}
 						</div>
+					{{/if}}
                         {{if $item.edited}}
 							<div class="itemedited text-muted">{{$item.edited['label']}} (<span title="{{$item.edited['date']}}">{{$item.edited['relative']}}</span>)</div>
                         {{/if}}
