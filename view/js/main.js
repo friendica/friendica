@@ -489,7 +489,7 @@ window.onDocumentReady('body', function() {
 
 	// Restore a "do not disturb" state set before the last page reload
 	try {
-		if (localStorage.getItem('donotdisturb') === '1') {
+		if ($('#notifications-pause').length && localStorage.getItem('donotdisturb') === '1') {
 			pause();
 		}
 	} catch (e) {
