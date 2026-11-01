@@ -281,6 +281,10 @@ final class PostTemplateBuilder
 		$attend       = $eventData['attend'];
 		$attend_label = $eventData['attend_label'];
 
+		if ($isevent) {
+			$item['content-warning'] = '';
+		}
+
 		$reactionData  = $this->buildReactionData($item, $convResponses);
 		$emojis        = $reactionData['emojis'];
 		$reactions     = $reactionData['reactions'];

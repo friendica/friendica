@@ -286,6 +286,7 @@ as the value of $top_child_total (this is done at the end of this file)
 		<!-- TODO -->
 		<div class="wall-item-bottom">
 			<div class="wall-item-links"></div>
+		{{if (!$item.suppress_tags && ($item.hashtags || $item.mentions)) || $item.folders || $item.categories}}
 			<div class="tags wall-item-tags" lang="{{$item.lang}}">
 			{{if !$item.suppress_tags}}
 				{{foreach $item.hashtags as $tag}}
@@ -312,6 +313,7 @@ as the value of $top_child_total (this is done at the end of this file)
 				</span>
 			{{/foreach}}
 			</div>
+		{{/if}}
 			{{if $item.edited}}<div class="itemedited text-muted">{{$item.edited['label']}} (<span title="{{$item.edited['date']}}">{{$item.edited['relative']}}</span>)</div>{{/if}}
 		</div>
 		<!-- ./TODO -->
