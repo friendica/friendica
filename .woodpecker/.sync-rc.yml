@@ -39,7 +39,7 @@ steps:
       - >-
         LOGIN="$(curl -sS --fail-with-body -H "Authorization: token $${TOKEN}" "$${API_ROOT}/user")"
         || { echo "$${LOGIN}"; exit 1; }
-      - LOGIN="$(echo "$${LOGIN}" | jq -r .login)"
+      - LOGIN="$(printf '%s\n' "$${LOGIN}" | jq -r .login)"
       - git clone --quiet --filter=blob:none --single-branch --branch develop "${CI_FORGE_URL}/${CI_REPO}.git" /tmp/sync
       - cd /tmp/sync
       - git fetch --quiet origin "${CI_COMMIT_BRANCH}:refs/remotes/origin/${CI_COMMIT_BRANCH}"
@@ -48,10 +48,10 @@ steps:
       - >-
         PULLS="$(curl -sS --fail-with-body -H "Authorization: token $${TOKEN}"
         "$${API}/pulls?state=open&base=develop&head=$${PR_HEAD}")" || { echo "$${PULLS}"; exit 1; }
-      - PR_NUMBER="$(echo "$${PULLS}" | jq -r '.[0].number // empty')"
+      - PR_NUMBER="$(printf '%s\n' "$${PULLS}" | jq -r '.[0].number // empty')"
       - RESULT=0
       - OUTPUT="$(sh "$${SCRIPT}" "${CI_COMMIT_BRANCH}" 2>&1)" || RESULT=$$?
-      - echo "$${OUTPUT}"
+      - printf '%s\n' "$${OUTPUT}"
       - if [ "$${RESULT}" -eq 3 ]; then exit 0; fi
       # On a conflict, ask for a manual merge in the sync PR (or in an issue, if no PR is open)
       - |
@@ -63,7 +63,7 @@ steps:
           fi
           START="origin/develop"
           if [ -n "$${PR_NUMBER}" ]; then START="origin/$${SYNC_BRANCH}"; fi
-          REASON="$(echo "$${OUTPUT}" | grep -m1 'resolve the sync manually' || echo "see ${CI_PIPELINE_URL}")"
+          REASON="$(printf '%s\n' "$${OUTPUT}" | grep -m1 'resolve the sync manually' || echo "see ${CI_PIPELINE_URL}")"
           jq -n --arg rc "${CI_COMMIT_BRANCH}" --arg sha "${CI_COMMIT_SHA}" --arg branch "$${SYNC_BRANCH}" \
             --arg start "$${START}" --arg reason "$${REASON}" \
             '{title: "Merge \($$rc) into develop needs manual resolution",
@@ -74,7 +74,7 @@ steps:
             QUERY="state=open&creator=$${LOGIN}&per_page=100&created_by=$${LOGIN}&limit=50"
             ISSUES="$(curl -sS --fail-with-body -H "Authorization: token $${TOKEN}" "$${API}/issues?$${QUERY}")" \
               || { echo "$${ISSUES}"; exit 1; }
-            PR_NUMBER="$(echo "$${ISSUES}" | jq -r --slurpfile n /tmp/notice.json \
+            PR_NUMBER="$(printf '%s\n' "$${ISSUES}" | jq -r --slurpfile n /tmp/notice.json \
               'map(select(.pull_request == null and .title == $$n[0].title)) | .[0].number // empty')"
           fi
           TARGET="$${API}/issues"
