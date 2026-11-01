@@ -27,6 +27,12 @@
 				{{$title}}
 			</h3>
 		</button>
+		{{if $edit_url}}
+			<a class="pull-right widget-action widget-action-top faded-icon" id="{{$type}}-sidebar-edit"
+				href="{{$edit_url}}" data-toggle="tooltip" title="{{$edit_text}}">
+				<i class="ri ri-pencil-line" aria-hidden="true"></i>
+			</a>
+		{{/if}}
 		<div id="{{$type}}-sidebar" class="sidebar-widget-list">
 			<div id="{{$type}}-desc">{{$desc nofilter}}</div>
 			<ul class="{{$type}}-ul">

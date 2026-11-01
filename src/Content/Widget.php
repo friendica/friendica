@@ -185,10 +185,11 @@ class Widget
 	 * @param string $baseUrl The full page request URI
 	 * @param array  $options
 	 * @param string $selected The currently selected filter option value
+	 * @param string $editUrl Link to a page to edit the options, shown right of the title only when provided
 	 * @return string
 	 * @throws \Exception
 	 */
-	private static function filter(string $type, string $title, string $desc, string $all, string $baseUrl, array $options, ?string $selected = null): string
+	private static function filter(string $type, string $title, string $desc, string $all, string $baseUrl, array $options, ?string $selected = null, ?string $editUrl = null): string
 	{
 		$queryString = parse_url($baseUrl, PHP_URL_QUERY);
 		$queryArray  = [];
@@ -218,6 +219,8 @@ class Widget
 			'$all_label' => $all,
 			'$options'   => $options,
 			'$base'      => $baseUrl,
+			'$edit_url'  => $editUrl,
+			'$edit_text' => DI::l10n()->t('Edit'),
 		]);
 	}
 
@@ -347,12 +350,13 @@ class Widget
 
 		return self::filter(
 			'file',
-			DI::l10n()->t('Saved Folders'),
+			DI::l10n()->t('Folders'),
 			'',
 			DI::l10n()->t('Everything'),
 			$baseurl,
 			$terms,
 			$selected,
+			'folders',
 		);
 	}
 

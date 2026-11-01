@@ -76,7 +76,7 @@ class SavedList extends BaseModule
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('overview_list.tpl'), [
-			'$title' => $this->t('Saved Searches'),
+			'$title' => $this->t('Tags'),
 			'$intro' => '',
 			'$links' => [],
 			'$add'   => [
