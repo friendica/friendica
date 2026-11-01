@@ -2075,7 +2075,7 @@ aside .panel-body {
 
 .wall-item-container .media {
 	margin-top: 0;
-	padding: 16px;
+	padding: 16px 16px 0 16px;
 	background-color: rgba(0, 0, 0, 0.03);
 }
 
@@ -2262,6 +2262,10 @@ blockquote.shared_content {
 .wall-item-content img {
 	object-fit: contain;
 }
+.wall-item-body > :last-child {
+	margin-bottom: 0;
+}
+
 .wall-item-body > img,
 .wall-item-body > a > img {
 	border-radius: 3px;
@@ -4662,12 +4666,12 @@ div.login-form, .login-content-wrapper,
 		height: 0px;
 	}
 
-	.wall-item-actions {
-		margin-top: 10px;
-	}
-
 	.media {
 		margin-top: 0;
+	}
+
+	.wall-item-container .media {
+		padding: 10px 10px 0 10px;
 	}
 
 	.mod-home.is-not-singleuser,
