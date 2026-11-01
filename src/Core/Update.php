@@ -52,7 +52,7 @@ class Update
 	public static function isAvailable(): ?bool
 	{
 		if (DI::config()->get('system', 'check_new_version_url', 'none') != 'none') {
-			if (version_compare(App::VERSION, static::getAvailableVersion()) < 0) {
+			if (version_compare(App::version(), static::getAvailableVersion()) < 0) {
 				return true;
 			} else {
 				return false;

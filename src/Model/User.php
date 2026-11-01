@@ -161,7 +161,7 @@ class User
 
 		self::repairSystemContact($system);
 
-		$system['name']         = App::PLATFORM . " '" . App::CODENAME . "' " . App::VERSION . '-' . DB_UPDATE_VERSION;
+		$system['name']         = App::PLATFORM . " '" . App::CODENAME . "' " . App::version() . '-' . DB_UPDATE_VERSION;
 		$system['uprvkey']      = $system['prvkey'];
 		$system['upubkey']      = $system['pubkey'];
 		$system['nickname']     = $system['nick'];

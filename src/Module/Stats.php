@@ -165,7 +165,7 @@ class Stats extends BaseModule
 				'db_status'         => DBStructure::getUpdateStatus(),
 			],
 			'server' => [
-				'version' => App::VERSION,
+				'version' => App::version(),
 				'php'     => [
 					'version'             => phpversion(),
 					'upload_max_filesize' => ini_get('upload_max_filesize'),

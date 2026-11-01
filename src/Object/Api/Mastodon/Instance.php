@@ -51,7 +51,7 @@ class Instance extends BaseDataTransferObject
 		$this->title             = $config->get('config', 'sitename')                  ?? '';
 		$this->short_description = $this->description = $config->get('config', 'info') ?? '';
 		$this->email             = $config->get('config', 'sender_email')              ?? '';
-		$this->version           = '2.8.0 (compatible; Friendica ' . App::VERSION . ')';
+		$this->version           = '2.8.0 (compatible; Friendica ' . App::version() . ')';
 		$this->urls              = ['streaming_api' => '']; // Not supported
 		$this->stats             = new Stats($config, $database);
 		$this->thumbnail         = $baseUrl . (new Header($config))->getMastodonBannerPath();

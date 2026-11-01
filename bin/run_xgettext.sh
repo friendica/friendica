@@ -71,9 +71,6 @@ case "$MODE" in
 		FINDSTARTDIR="."
 		# skip addon folder
 		FINDOPTS="( -path ./addon -or -path ./addons -or -path ./addons-extra -or -path ./tests -or -path ./view/lang -or -path ./view/smarty3 -or -path ./vendor  -or -path ./local  -or -path ./avatar -or -path ./proxy ) -prune -or"
-		
-		F9KVERSION=$(cat ./VERSION);
-		echo "Friendica version $F9KVERSION"
 	;;
 esac
 
@@ -119,7 +116,7 @@ case "$MODE" in
 		sed -i.bkp "s/SOME DESCRIPTIVE TITLE./FRIENDICA Distributed Social Network/g" "$OUTFILE"
 		sed -i.bkp "s/YEAR THE PACKAGE'S COPYRIGHT HOLDER/2010-$(date +%Y), the Friendica project/g" "$OUTFILE"
 		sed -i.bkp "s/FIRST AUTHOR <EMAIL@ADDRESS>, YEAR./Mike Macgirvin, 2010/g" "$OUTFILE"
-		sed -i.bkp "s/PACKAGE VERSION/$F9KVERSION/g" "$OUTFILE"
+		sed -i.bkp "s/PACKAGE VERSION/Friendica/g" "$OUTFILE"
 		sed -i.bkp "s/PACKAGE/Friendica/g" "$OUTFILE"
 	;;
 esac

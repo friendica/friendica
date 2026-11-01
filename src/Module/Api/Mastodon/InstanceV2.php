@@ -65,7 +65,7 @@ class InstanceV2 extends BaseApi
 	{
 		$domain               = $this->baseUrl->getHost();
 		$title                = $this->config->get('config', 'sitename');
-		$version              = '2.8.0 (compatible; Friendica ' . App::VERSION . ')';
+		$version              = '2.8.0 (compatible; Friendica ' . App::version() . ')';
 		$source_url           = 'https://git.friendi.ca/friendica/friendica';
 		$description          = $this->config->get('config', 'info');
 		$usage                = $this->buildUsageInfo();
@@ -150,7 +150,7 @@ class InstanceV2 extends BaseApi
 	private function buildFriendicaExtensionInfo(): InstanceEntity\FriendicaExtensions
 	{
 		return new InstanceEntity\FriendicaExtensions(
-			App::VERSION,
+			App::version(),
 			App::CODENAME,
 			$this->config->get('system', 'build'),
 		);

@@ -324,7 +324,7 @@ class Transmitter
 		return [
 			'id'   => (string) DI::baseUrl() . '/friendica',
 			'type' => 'Application',
-			'name' => App::PLATFORM . " '" . App::CODENAME . "' " . App::VERSION . '-' . DB_UPDATE_VERSION,
+			'name' => App::PLATFORM . " '" . App::CODENAME . "' " . App::version() . '-' . DB_UPDATE_VERSION,
 			'url'  => (string) DI::baseUrl(),
 		];
 	}

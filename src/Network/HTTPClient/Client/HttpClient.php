@@ -390,7 +390,7 @@ class HttpClient implements ICanSendHttpRequests
 	private function getUserAgent(string $type = ''): string
 	{
 		// @see https://developers.whatismybrowser.com/learn/browser-detection/user-agents/user-agent-best-practices
-		$userAgent = App::PLATFORM . '/' . App::VERSION . ' DatabaseVersion/' . DB_UPDATE_VERSION;
+		$userAgent = App::PLATFORM . '/' . App::version() . ' DatabaseVersion/' . DB_UPDATE_VERSION;
 		if ($type != '') {
 			$userAgent .= ' Request/' . $type;
 		}
