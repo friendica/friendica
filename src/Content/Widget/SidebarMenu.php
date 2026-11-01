@@ -9,8 +9,9 @@ namespace Friendica\Content\Widget;
 
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
+use Friendica\Core\L10n;
+use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
-use Friendica\DI;
 
 /**
  * Menu that replaces the widgets for circles, channels, saved searches and saved folders.
@@ -35,15 +36,20 @@ class SidebarMenu
 		self::FOLDERS  => Feature::FOLDERS,
 	];
 
+	public function __construct(
+		private readonly L10n $l10n,
+		private readonly IManagePersonalConfigValues $pConfig,
+	) {}
+
 	/**
 	 * Is the menu used instead of the widgets?
 	 *
 	 * @param int $uid
 	 * @return bool
 	 */
-	public static function isActive(int $uid): bool
+	public function isActive(int $uid): bool
 	{
-		return $uid && DI::pConfig()->get($uid, 'system', 'widgets_as_menu', false);
+		return $uid && $this->pConfig->get($uid, 'system', 'widgets_as_menu', false);
 	}
 
 	/**
@@ -53,9 +59,9 @@ class SidebarMenu
 	 * @param string $feature Feature name of the widget
 	 * @return bool
 	 */
-	public static function replaces(int $uid, string $feature): bool
+	public function replaces(int $uid, string $feature): bool
 	{
-		return self::isActive($uid) && (in_array($feature, self::WIDGETS) || $feature == Feature::TRENDING_TAGS);
+		return $this->isActive($uid) && (in_array($feature, self::WIDGETS) || $feature == Feature::TRENDING_TAGS);
 	}
 
 	/**
@@ -63,21 +69,19 @@ class SidebarMenu
 	 * @param string $selected Key of the entry of the currently displayed overview page
 	 * @return string
 	 */
-	public static function getHTML(int $uid, string $selected = ''): string
+	public function getHTML(int $uid, string $selected = ''): string
 	{
-		if (!self::isActive($uid)) {
+		if (!$this->isActive($uid)) {
 			return '';
 		}
 
 		Nav::setSelected('network');
 
-		$l10n = DI::l10n();
-
 		$entries = [
-			self::CIRCLES  => ['circle',      'ri-bubble-chart-line', $l10n->t('Circles')],
-			self::CHANNELS => ['channels',    'ri-broadcast-line',    $l10n->t('Channels')],
-			self::SEARCHES => ['search/saved', 'ri-search-line',      $l10n->t('Tags')],
-			self::FOLDERS  => ['folders',     'ri-folder-line',       $l10n->t('Saved Folders')],
+			self::CIRCLES  => ['circle',      'ri-bubble-chart-line', $this->l10n->t('Circles')],
+			self::CHANNELS => ['channels',    'ri-broadcast-line',    $this->l10n->t('Channels')],
+			self::SEARCHES => ['search/saved', 'ri-search-line',      $this->l10n->t('Tags')],
+			self::FOLDERS  => ['folders',     'ri-folder-line',       $this->l10n->t('Saved Folders')],
 		];
 
 		$menu = [];
@@ -101,7 +105,7 @@ class SidebarMenu
 		array_unshift($menu, [
 			'url'      => 'network',
 			'icon'     => 'ri-home-5-line',
-			'label'    => $l10n->t('Home'),
+			'label'    => $this->l10n->t('Home'),
 			'selected' => $selected == self::HOME,
 		]);
 

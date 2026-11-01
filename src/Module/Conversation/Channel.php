@@ -24,6 +24,7 @@ use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Content\Widget\TrendingTags;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -49,6 +50,8 @@ class Channel extends Timeline
 	protected $statusEditor;
 	/** @var App\Page */
 	protected $page;
+	/** @var SidebarMenu */
+	protected $sidebarMenu;
 	/** @var SystemMessages */
 	protected $systemMessages;
 	/** @var ChannelFactory */
@@ -60,7 +63,7 @@ class Channel extends Timeline
 	/** @var NetworkFactory */
 	protected $networkFactory;
 
-	public function __construct(UserDefinedChannelFactory $userDefinedChannel, NetworkFactory $network, CommunityFactory $community, ChannelFactory $channelFactory, ChannelRepository $channel, TimelineFactory $timeline, ConversationRenderer $conversationRenderer, StatusEditor $statusEditor, App\Page $page, SystemMessages $systemMessages, Mode $mode, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, ActivityFactory $ActivityFactory, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
+	public function __construct(UserDefinedChannelFactory $userDefinedChannel, NetworkFactory $network, CommunityFactory $community, ChannelFactory $channelFactory, ChannelRepository $channel, TimelineFactory $timeline, ConversationRenderer $conversationRenderer, StatusEditor $statusEditor, App\Page $page, SidebarMenu $sidebarMenu, SystemMessages $systemMessages, Mode $mode, IHandleUserSessions $session, Database $database, IManagePersonalConfigValues $pConfig, IManageConfigValues $config, ICanCache $cache, ActivityFactory $ActivityFactory, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters = [])
 	{
 		parent::__construct($channel, $mode, $session, $database, $pConfig, $config, $cache, $ActivityFactory, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -68,6 +71,7 @@ class Channel extends Timeline
 		$this->conversationRenderer = $conversationRenderer;
 		$this->statusEditor         = $statusEditor;
 		$this->page                 = $page;
+		$this->sidebarMenu          = $sidebarMenu;
 		$this->systemMessages       = $systemMessages;
 		$this->channel              = $channelFactory;
 		$this->community            = $community;
@@ -99,7 +103,7 @@ class Channel extends Timeline
 
 			Nav::setSelected('channel');
 
-			$this->page['aside'] .= Widget\SidebarMenu::getHTML($this->session->getLocalUserId(), Widget\SidebarMenu::CHANNELS);
+			$this->page['aside'] .= $this->sidebarMenu->getHTML($this->session->getLocalUserId(), Widget\SidebarMenu::CHANNELS);
 
 			$this->page['aside'] .= Widget::accountTypes('channel/' . $this->selectedTab, $this->accountTypeString);
 
@@ -107,7 +111,7 @@ class Channel extends Timeline
 				$this->page['aside'] .= $this->getNoSharerWidget('channel');
 			}
 
-			if (Feature::isEnabled($this->session->getLocalUserId(), Feature::TRENDING_TAGS) && !Widget\SidebarMenu::replaces($this->session->getLocalUserId(), Feature::TRENDING_TAGS)) {
+			if (Feature::isEnabled($this->session->getLocalUserId(), Feature::TRENDING_TAGS) && !$this->sidebarMenu->replaces($this->session->getLocalUserId(), Feature::TRENDING_TAGS)) {
 				$this->page['aside'] .= TrendingTags::getHTML($this->selectedTab);
 			}
 

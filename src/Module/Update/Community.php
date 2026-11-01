@@ -19,6 +19,7 @@ use Friendica\Content\Conversation\Factory\Activity as ActivityFactory;
 use Friendica\Content\Conversation\Factory\Community as CommunityFactory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Content\Conversation\StatusEditor;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -46,6 +47,7 @@ class Community extends CommunityModule
 		ConversationRenderer $conversationRenderer,
 		StatusEditor $statusEditor,
 		Page $page,
+		SidebarMenu $sidebarMenu,
 		SystemMessages $systemMessages,
 		Mode $mode,
 		IHandleUserSessions $session,
@@ -63,7 +65,7 @@ class Community extends CommunityModule
 		array $server,
 		array $parameters = [],
 	) {
-		parent::__construct($channel, $community, $conversationRenderer, $statusEditor, $page, $systemMessages, $mode, $session, $database, $pConfig, $config, $cache, $ActivityFactory, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($channel, $community, $conversationRenderer, $statusEditor, $page, $sidebarMenu, $systemMessages, $mode, $session, $database, $pConfig, $config, $cache, $ActivityFactory, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 	}
 
 	protected function rawContent(array $request = [])
