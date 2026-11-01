@@ -178,7 +178,7 @@ class Compose extends BaseModule
 				'contentwarn'          => $this->l10n->t('Content Warning'),
 				'edcode'               => $this->l10n->t('Code'),
 				'edimg'                => $this->l10n->t('Image'),
-				'edurl'                => $this->l10n->t('Link'),
+				'edurl'                => $this->l10n->t('Web link'),
 				'edattach'             => $this->l10n->t('Link or Media'),
 				'prompttext'           => $this->l10n->t('Please enter a image/video/audio/webpage URL:'),
 				'preview'              => $this->l10n->t('Preview'),

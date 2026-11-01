@@ -383,9 +383,11 @@ function initTheme() {
 		.off("shown.bs.offcanvas.frio-theme hidden.bs.offcanvas.frio-theme")
 		.on("shown.bs.offcanvas.frio-theme", function () {
 			$body.addClass("aside-out");
+			$('[data-toggle="offcanvas"][data-target="aside"]').attr("aria-expanded", "true");
 		})
 		.on("hidden.bs.offcanvas.frio-theme", function () {
 			$body.removeClass("aside-out");
+			$('[data-toggle="offcanvas"][data-target="aside"]').attr("aria-expanded", "false");
 		});
 
 	// Right offcanvas elements

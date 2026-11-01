@@ -15,15 +15,15 @@
 					{{* Buttons for the mobile view *}}
 					{{* Mobile left menu dropdown button *}}
 					<button type="button" id="mobile-left-menu" class="navbar-toggle collapsed visible-sm visible-xs"
-						data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
+						data-toggle="offcanvas" data-target="aside" aria-haspopup="true" aria-expanded="false">
 						<span class="sr-only">Toggle navigation</span>
 						<i class="ri ri-arrow-right-double-line ri-fw ri-lg" aria-hidden="true"></i>
 					</button>
 
 					<div id="site-location" aria-hidden="true">{{$sitelocation}}</div>
 					<div id="banner" class="hidden-sm hidden-xs">
-						<a href="{{$baseurl}}/" aria-hidden="true">
-							<i id="logo-img" aria-label="{{$home}}" class="ri ri-friendica-fill ri-fw ri-lg" aria-hidden="true"></i>
+						<a href="{{$baseurl}}/" aria-label="{{$home}}">
+							<i id="logo-img" class="ri ri-friendica-fill ri-fw ri-lg" aria-hidden="true"></i>
 						</a>
 					</div>
 					{{* The search box *}}
@@ -31,7 +31,7 @@
 						<form id="search-box" class="navbar-form hidden-sm hidden-xs form-group form-group-search" role="search" method="get" action="{{$nav.search.0}}">
 							<div class="form-group form-group-search">
 								<input accesskey="s" id="nav-search-input-field" class="form-control form-search"
-									type="search" name="q" placeholder="{{$search_placeholder}}">
+									type="search" name="q" placeholder="{{$search_placeholder}}" aria-label="{{$search_placeholder}}">
 								<button class="btn btn-primary form-button-search" type="submit">
 									<i class="ri ri-search-line ri-lg" aria-hidden="true"></i>
 									<span class="sr-only">{{$nav.search.1}}</span>
@@ -171,8 +171,8 @@
 									<li id="nav-notifications-mark-all" class="dropdown-header">
 										<div class="arrow"></div>
 										<header id="notifications-header">
-											<p id="notifications-title">{{$nav.notifications.1}}</p>
-											<header id="notifications-subheader">
+											<h3 id="notifications-title">{{$nav.notifications.1}}</h3>
+											<div id="notifications-subheader">
 												<a href="{{$nav.notifications.all.0}}">{{$nav.notifications.all.1}}</a>
 												<button role="menuitemcheckbox" type="button" id="notifications-pause" class="btn-link"
 													aria-checked="false" data-toggle="tooltip"
@@ -182,7 +182,7 @@
 												<button role="menuitem" type="button" id="notifications-mark-as-read" class="btn-link"
 													onclick="notificationMarkAll();" data-toggle="tooltip">{{$nav.notifications.mark.1}}
 												</button>
-											</header>
+											</div>
 										</header>
 									</li>
 
@@ -383,13 +383,13 @@
 		<div class="container-fluid">
 		<div class="navbar-header pull-left">
 			<button type="button" class="navbar-toggle collapsed pull-left visible-sm visible-xs"
-					data-toggle="offcanvas" data-target="aside" aria-haspopup="true">
+					data-toggle="offcanvas" data-target="aside" aria-haspopup="true" aria-expanded="false">
 				<span class="sr-only">Toggle navigation</span>
 				<i class="ri ri-more-2-line ri-fw ri-lg" aria-hidden="true"></i>
 			</button>
-			<a class="navbar-brand" href="#">
+			<a class="navbar-brand" href="{{$baseurl}}/">
 				<div id="navbrand-container">
-					<i id="logo-img" aria-label="{{$home}}" class="ri ri-friendica-fill ri-fw ri-lg" aria-hidden="true"></i>
+					<i id="logo-img" class="ri ri-friendica-fill ri-fw ri-lg" aria-hidden="true"></i>
 					<div id="navbar-brand-text"> Friendica</div>
 				</div>
 			</a>
@@ -420,7 +420,7 @@
 		<form class="navbar-form" role="search" method="get" action="{{$nav.search.0}}">
 			<div class="form-group form-group-search">
 				<input id="nav-search-input-field-mobile" class="form-control form-search" type="search" name="q"
-					placeholder="{{$search_placeholder}}">
+					placeholder="{{$search_placeholder}}" aria-label="{{$search_placeholder}}">
 				<button class="btn btn-primary btn-sm form-button-search" type="submit">
 					<i class="ri ri-search-line ri-fw ri-lg" aria-hidden="true"></i>
 					<span class="sr-only">{{$nav.search.1}}</span>

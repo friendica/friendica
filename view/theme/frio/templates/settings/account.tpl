@@ -14,7 +14,7 @@
 
 	<div id="settings-form">
 		{{* We organize the settings in collapsable panel-groups *}}
-		<div class="panel-group panel-group-settings" id="settings" role="tablist" aria-multiselectable="true">
+		<div class="panel-group panel-group-settings" id="settings">
 			{{* The password setting section *}}
 			<form action="settings/account/password" method="post" autocomplete="off" class="panel" >
 				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">

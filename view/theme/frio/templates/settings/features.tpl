@@ -9,7 +9,7 @@
 	<form action="settings/features" method="post" autocomplete="off">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 		{{* We organize the settings in collapsable panel-groups *}}
-		<div class="panel-group panel-group-settings" id="settings" role="tablist" aria-multiselectable="true">
+		<div class="panel-group panel-group-settings" id="settings">
 			{{foreach $features as $g => $f}}
 			<details class="panel">
 				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="{{$g}}-settings-title"><h2>{{$f.0}}</h2></summary>

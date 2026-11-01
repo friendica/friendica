@@ -7,7 +7,7 @@
 <div class="generic-page-wrapper">
 	<h1>{{$l10n.title}}</h1>
 	<p>{{$l10n.intro}}</p>
-	<div class="panel-group panel-group-settings" id="settings-channels" role="tablist" aria-multiselectable="true">
+	<div class="panel-group panel-group-settings" id="settings-channels">
 		<form class="panel" action="{{$baseurl}}/settings/channels" method="post">
 		<details class="panel"{{if $open}} open{{/if}}>
 			<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="add-settings-title"><h2>{{$l10n.addtitle}}</h2></summary>

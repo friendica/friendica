@@ -20,6 +20,27 @@ if (!Element.prototype.matches) {
 		};
 }
 
+// Announce jGrowl toasts to screen readers instead of only showing them visually.
+// Screen readers only announce changes inside a live region that already exists,
+// so the shared container is created up front with aria-live, jGrowl reuses it.
+// Error notices additionally keep role="alert" so they are announced assertively.
+if (typeof $ !== 'undefined' && $.fn.jGrowl) {
+	$.jGrowl.defaults.beforeOpen = function (element, message, options) {
+		if (options && options.theme === 'notice') {
+			$(element).attr('role', 'alert');
+		}
+		$(element).parent().attr('aria-live', 'polite');
+	};
+
+	$(function () {
+		if ($('#jGrowl').length === 0) {
+			$('<div id="jGrowl" aria-live="polite"></div>')
+				.addClass($.jGrowl.defaults.position)
+				.appendTo($.jGrowl.defaults.appendTo);
+		}
+	});
+}
+
 const ModuleLifecycleReadyEvent = Object.freeze({
 	DOCUMENT: 'document',
 	WINDOW: 'window'

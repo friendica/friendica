@@ -5,11 +5,11 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 			<!-- Modal  -->
-			<div id="modal" class="modal fade" tabindex="-1" role="dialog">
+			<div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="modal-title">
 				<div class="modal-dialog modal-full-screen">
 					<div class="modal-content">
 						<div id="modal-header" class="modal-header">
-							<button id="modal-close" type="button" class="close" data-dismiss="modal" title="{{$close}}">
+							<button id="modal-close" type="button" class="close" data-dismiss="modal" aria-label="{{$close}}" title="{{$close}}">
 								&times;
 							</button>
 							<h4 id="modal-title" class="modal-title"></h4>

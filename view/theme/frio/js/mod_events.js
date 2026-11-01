@@ -30,6 +30,7 @@
 			.off('change' + calendarEventNS, '#id_nofinish')
 			.off('click' + calendarEventNS, '#event-nav > li > a')
 			.off('click' + calendarEventNS, '#event-nav a')
+			.off('keydown' + calendarEventNS, '#event-nav a[role="tab"]')
 			.off('dblclick' + calendarEventNS, 'td.fc-day');
 		$('#contact_allow, #contact_deny, #circle_allow, #circle_deny')
 			.off('change' + calendarEventNS);
@@ -213,6 +214,16 @@
 			.on('click' + calendarEventNS, '#event-nav a', function (e) {
 				$('#event-preview').empty();
 				e.preventDefault();
+			});
+
+		// The tabs are links without href, so activate them with Enter and Space like buttons.
+		$body
+			.off('keydown' + calendarEventNS, '#event-nav a[role="tab"]')
+			.on('keydown' + calendarEventNS, '#event-nav a[role="tab"]', function (e) {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					this.click();
+				}
 			});
 
 		const reflowCalendar = function () {
@@ -442,10 +453,13 @@ function eventDescActive() {
 
 // Give the active "event-nav" list element the class "active".
 function toggleEventNav(elm) {
+	const $nav = $(elm).closest("#event-nav");
 	// Select all li of #event-nav and remove the active class.
-	$(elm).closest("#event-nav").children("li").removeClass("active");
+	$nav.children("li").removeClass("active");
+	$nav.find("> li > a").attr("aria-selected", "false");
 	// Add the active class to the parent of the link which was selected.
 	$(elm).parent("li").addClass("active");
+	$(elm).attr("aria-selected", "true");
 }
 
 // Disable the input for the finish date if it is not available.
