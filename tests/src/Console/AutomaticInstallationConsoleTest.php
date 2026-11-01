@@ -129,6 +129,7 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 		$this->installerMock->method('resetChecks')->willReturn(null);
 		$this->installerMock->method('checkFunctions')->willReturn(true);
 		$this->installerMock->method('checkImagick')->willReturn(true);
+		$this->installerMock->method('checkZip')->willReturn(true);
 		$this->installerMock->method('checkLocalIni')->willReturn(true);
 		$this->installerMock->method('checkSmarty3')->willReturn(true);
 		$this->installerMock->method('checkKeys')->willReturn(true);

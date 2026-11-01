@@ -12,6 +12,9 @@
 {{if $drop}}
 <div id="album-drop-link"><a href="{{$drop.1}}" title="{{$drop.0}}">{{$drop.0}}</a></div>
 {{/if}}
+{{if $download}}
+<div id="album-download-link"><a href="{{$download.1}}" title="{{$download.0}}">{{$download.0}}</a></div>
+{{/if}}
 <div class="photos-upload-link"><a href="{{$order.1}}" title="{{$order.0}}">{{$order.0}}</a></div>
 {{if $can_post}}
 <div class="photos-upload-link"><a href="{{$upload.1}}">{{$upload.0}}</a></div>

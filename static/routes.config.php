@@ -664,6 +664,10 @@ return [
 		'/{type}/{customsize:\d+}/{nickname_ext}'                  => [Module\Photo::class, [R::GET]],
 	],
 
+	'/photos/{nickname}' => [
+		'/album/{album}/download' => [Module\Photo\AlbumDownload::class, [R::GET]],
+	],
+
 	'/ping' => [Module\Notifications\Ping::class, [R::GET]],
 
 	'/post' => [
