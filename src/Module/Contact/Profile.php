@@ -93,7 +93,14 @@ class Profile extends BaseModule
 		}
 
 		if (isset($request['notify_new_posts'])) {
-			$fields['notify_new_posts'] = intval($request['notify_new_posts']);
+			$notifyNewPosts = intval($request['notify_new_posts']);
+
+			$fields['notify_new_posts'] = in_array($notifyNewPosts, [
+				ContactModel::NOTIFY_NEW_POSTS_NONE,
+				ContactModel::NOTIFY_NEW_POSTS_ALL,
+				ContactModel::NOTIFY_NEW_POSTS_POSTS,
+				ContactModel::NOTIFY_NEW_POSTS_SHARES,
+			], true) ? $notifyNewPosts : ContactModel::NOTIFY_NEW_POSTS_NONE;
 		}
 
 		if (isset($request['fetch_further_information'])) {

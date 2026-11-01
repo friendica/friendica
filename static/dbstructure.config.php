@@ -237,7 +237,7 @@ return [
 			"pending"                   => ["type" => "boolean", "not null" => "1", "default" => "1", "comment" => "Contact request is pending"],
 			"deleted"                   => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Contact has been deleted"],
 			"info"                      => ["type" => "mediumtext", "comment" => ""],
-			"notify_new_posts"          => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
+			"notify_new_posts"          => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => "0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only"],
 			"fetch_further_information" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 			"ffi_keyword_denylist"      => ["type" => "text", "comment" => ""],
 			// Deprecated, but still in use

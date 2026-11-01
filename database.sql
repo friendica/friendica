@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`pending` boolean NOT NULL DEFAULT '1' COMMENT 'Contact request is pending',
 	`deleted` boolean NOT NULL DEFAULT '0' COMMENT 'Contact has been deleted',
 	`info` mediumtext COMMENT '',
-	`notify_new_posts` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
+	`notify_new_posts` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only',
 	`fetch_further_information` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`ffi_keyword_denylist` text COMMENT '',
 	`photo` varbinary(383) DEFAULT '' COMMENT 'Link to the profile photo of the contact',
