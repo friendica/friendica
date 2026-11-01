@@ -58,8 +58,7 @@ function cleanupTooltips() {
     'body > .popover',
     'body > [role="tooltip"]',
     'body > .fancybox-wrap',
-    'body > .colorbox',
-    'body > .jGrowl'
+    'body > .colorbox'
   ];
 
   tooltipSelectors.forEach(selector => {
