@@ -4,256 +4,386 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<div class="generic-page-wrapper">
-    <h2>{{$l10n.compose_title}}</h2>
-    {{if $l10n.always_open_compose}}
-    <p>{{$l10n.always_open_compose nofilter}}</p>
-    {{/if}}
-    <div id="profile-jot-wrapper">
-        <form class="comment-edit-form" data-item-id="{{$id}}" id="comment-edit-form-{{$id}}" action="compose/{{$type}}" method="post">
-            <input type="hidden" name="post_id_random" value="{{$rand_num}}" />
-            <input type="hidden" name="post_type" value="{{$posttype}}" />
-            <input type="hidden" name="wall" value="{{$wall}}" />
 
-            <div id="jot-title-wrap">
-                <input type="text" name="title" id="jot-title" class="jothidden jotforms form-control" placeholder="{{$l10n.placeholdertitle}}" title="{{$l10n.placeholdertitle}}" value="{{$title}}" tabindex="1" dir="auto" />
-            </div>
+<div class="generic-page-wrapper">
+	<h2>{{$l10n.compose_title}}</h2>
+	{{if $l10n.always_open_compose}}
+	<p>{{$l10n.always_open_compose nofilter}}</p>
+	{{/if}}
+	<div id="profile-jot-wrapper">
+		<form class="comment-edit-form" data-item-id="{{$id}}" id="comment-edit-form-{{$id}}" action="compose/{{$type}}" method="post">
+			<input type="hidden" name="post_id_random" value="{{$rand_num}}" />
+			<input type="hidden" name="post_type" value="{{$posttype}}" />
+			<input type="hidden" name="wall" value="{{$wall}}" />
+
+			<div id="jot-title-wrap">
+				<input type="text" name="title" id="jot-title" class="jothidden jotforms form-control" placeholder="{{$l10n.placeholdertitle}}" title="{{$l10n.placeholdertitle}}" value="{{$title}}" tabindex="1" dir="auto" />
+			</div>
 			{{if $l10n.placeholdersummary}}
 			<div id="jot-summary-wrap">
-				<input type="text" name="summary" id="jot-summary" class="jothidden jotforms form-control" placeholder="{{$l10n.placeholdersummary}}" title="{{$l10n.placeholdersummary}}" value="{{$summary}}" tabindex="2" dir="auto" />
+				<textarea name="summary" id="jot-summary" class="jothidden jotforms form-control expandable-textarea" placeholder="{{$l10n.placeholdersummary}}" title="{{$l10n.placeholdersummary}}" rows="1" tabindex="2" dir="auto" style="min-height: 34px; height: 34px;">{{$summary}}</textarea>
 			</div>
 			{{/if}}
-            {{if $l10n.placeholdercategory}}
-                <div id="jot-category-wrap">
-                    <input name="category" id="jot-category" class="jothidden jotforms form-control" type="text" placeholder="{{$l10n.placeholdercategory}}" title="{{$l10n.placeholdercategory}}" value="{{$category}}" tabindex="3" dir="auto" />
-                </div>
-            {{/if}}
+			{{if $l10n.placeholdercategory}}
+			<div id="jot-category-wrap">
+				<input name="category" id="jot-category" class="jothidden jotforms form-control" type="text" placeholder="{{$l10n.placeholdercategory}}" title="{{$l10n.placeholdercategory}}" value="{{$category}}" tabindex="3" dir="auto" />
+			</div>
+			{{/if}}
 
-            <div class="comment-edit-bb-{{$id}} btn-toolbar clearfix" role="toolbar">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default bb-img" aria-label="{{$l10n.edimg}}" title="{{$l10n.edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}" tabindex="4">
-                        <i class="ri ri-image-line"></i>
-                    </button>
-                    <button type="button" class="btn btn-default bb-attach" aria-label="{{$l10n.edattach}}" title="{{$l10n.edattach}}" ondragenter="return commentLinkDrop(event, {{$id}});" ondragover="return commentLinkDrop(event, {{$id}});" ondrop="commentLinkDropper(event);" onclick="commentGetLink({{$id}}, '{{$l10n.prompttext}}');" tabindex="5">
-                        <i class="ri ri-attachment-2"></i>
-                    </button>
-                    <button type="button" id="button_emojipicker" class="btn btn-default emojis" aria-label="{{$l10n.edemojis}}" title="{{$l10n.edemojis}}" tabindex="6">
-                      <i class="ri ri-emotion-line"></i>
-                    </button>
-                </div>
+			<div class="comment-edit-bb-{{$id}} btn-toolbar clearfix" role="toolbar">
+				<div class="btn-group">
+					<button type="button" class="btn btn-default bb-img" aria-label="{{$l10n.edimg}}" title="{{$l10n.edimg}}" data-role="insert-formatting" data-bbcode="img" data-id="{{$id}}" tabindex="4">
+						<i class="ri ri-image-line"></i>
+					</button>
+					<button type="button" class="btn btn-default bb-attach" aria-label="{{$l10n.edattach}}" title="{{$l10n.edattach}}" ondragenter="return commentLinkDrop(event, {{$id}});" ondragover="return commentLinkDrop(event, {{$id}});" ondrop="commentLinkDropper(event);" onclick="commentGetLink({{$id}}, '{{$l10n.prompttext}}');" tabindex="5">
+						<i class="ri ri-attachment-2"></i>
+					</button>
+					<button type="button" id="button_emojipicker" class="btn btn-default emojis" aria-label="{{$l10n.edemojis}}" title="{{$l10n.edemojis}}" tabindex="6">
+						<i class="ri ri-emotion-line"></i>
+					</button>
+					{{if !$enableAdvancedComposer}}
+					<button type="button" class="btn btn-default" id="wide-editor-toggle" aria-label="{{$l10n.btnZen}}" title="{{$l10n.btnZen}}" onclick="toggleWideEditor()">
+						<i class="ri ri-fullscreen-line"></i>
+					</button>
+					{{/if}}
+				</div>
 
-                <div class="pull-right">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.edurl}}" title="{{$l10n.edurl}}" onclick="insertFormatting('url',{{$id}});" tabindex="7">
-                            <i class="ri ri-link"></i>
-                        </button>
-                        <button type="button" class="btn btn-default underline" aria-label="{{$l10n.eduline}}" title="{{$l10n.eduline}}" onclick="insertFormatting('u',{{$id}});" tabindex="9">
-                            <i class="ri ri-underline"></i>
-                        </button>
-                        <button type="button" class="btn btn-default italic" aria-label="{{$l10n.editalic}}" title="{{$l10n.editalic}}" onclick="insertFormatting('i',{{$id}});" tabindex="10">
-                            <i class="ri ri-italic"></i>
-                        </button>
-                        <button type="button" class="btn btn-default bold" aria-label="{{$l10n.edbold}}" title="{{$l10n.edbold}}" onclick="insertFormatting('b',{{$id}});" tabindex="11">
-                            <i class="ri ri-bold"></i>
-                        </button>
-                    </div>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default quote" aria-label="{{$l10n.edquote}}" title="{{$l10n.edquote}}" onclick="insertFormatting('quote',{{$id}});" tabindex="12">
-                            <i class="ri ri-double-quotes-l"></i>
-                        </button>
-                        <button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.contentwarn}}" title="{{$l10n.contentwarn}}" onclick="insertFormatting('abstract',{{$id}});" tabindex="13">
-                            <i class="ri ri-eye-line"></i>
-                        </button>
-                        <button type="button" class="btn btn-default code" aria-label="{{$l10n.edcode}}" title="{{$l10n.edcode}}" onclick="insertFormatting('code',{{$id}});" tabindex="14">
-                            <i class="ri ri-code-line"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
+				<div class="pull-right">
+					<div class="btn-group">
+						<button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.edurl}}" title="{{$l10n.edurl}}" onclick="insertFormatting('url',{{$id}});" tabindex="7">
+							<i class="ri ri-link"></i>
+						</button>
+						<button type="button" class="btn btn-default underline" aria-label="{{$l10n.eduline}}" title="{{$l10n.eduline}}" onclick="insertFormatting('u',{{$id}});" tabindex="9">
+							<i class="ri ri-underline"></i>
+						</button>
+						<button type="button" class="btn btn-default italic" aria-label="{{$l10n.editalic}}" title="{{$l10n.editalic}}" onclick="insertFormatting('i',{{$id}});" tabindex="10">
+							<i class="ri ri-italic"></i>
+						</button>
+						<button type="button" class="btn btn-default bold" aria-label="{{$l10n.edbold}}" title="{{$l10n.edbold}}" onclick="insertFormatting('b',{{$id}});" tabindex="11">
+							<i class="ri ri-bold"></i>
+						</button>
+					</div>
+					<div class="btn-group">
+						<button type="button" class="btn btn-default quote" aria-label="{{$l10n.edquote}}" title="{{$l10n.edquote}}" onclick="insertFormatting('quote',{{$id}});" tabindex="12">
+							<i class="ri ri-double-quotes-l"></i>
+						</button>
+						<button type="button" class="btn btn-default bb-url" aria-label="{{$l10n.contentwarn}}" title="{{$l10n.contentwarn}}" onclick="insertFormatting('abstract',{{$id}});" tabindex="13">
+							<i class="ri ri-eye-line"></i>
+						</button>
+						<button type="button" class="btn btn-default code" aria-label="{{$l10n.edcode}}" title="{{$l10n.edcode}}" onclick="insertFormatting('code',{{$id}});" tabindex="14">
+							<i class="ri ri-code-line"></i>
+						</button>
+					</div>
+				</div>
+			</div>
 
-            <div id="dropzone-{{$id}}" class="dropzone">
-                <p>
-                    <textarea id="comment-edit-text-{{$id}}" class="comment-edit-text form-control text-autosize expandable-textarea" name="body" placeholder="{{$l10n.default}}" rows="18" tabindex="3" dir="auto" onkeydown="sendOnCtrlEnter(event, 'comment-edit-submit-{{$id}}')">{{$body}}</textarea>
-                </p>
-            </div>
-            <div class="comment-edit-submit-wrapper clearfix">
-                {{if $type == 'post'}}
-                    <div id="compose-additional-settings-location">
-                        <button type="button" name="permissions" class="btn btn-default" id="toggle-permissions" title="{{$l10n.toggle_permissions_tooltip}}" onclick="togglePermissions()" tabindex="5">
-                            <i class="ri ri-more-line"></i> {{$l10n.toggle_permissions}}
-                        </button>
-                        <input type="text" name="location" class="form-control" id="jot-location" value="{{$location}}" placeholder="{{$l10n.location_set}}" tabindex="6" />
-                        <button type="button" class="btn btn-default" id="profile-location"
-                            data-title-set="{{$l10n.location_set}}"
-                            data-title-disabled="{{$l10n.location_disabled}}"
-                            data-title-unavailable="{{$l10n.location_unavailable}}"
-                            data-title-clear="{{$l10n.location_clear}}"
-                            title="{{$l10n.location_set}}"
-                            tabindex="7">
-                            <i class="ri ri-map-pin-line" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                {{/if}}
-                <div class="compose-actions">
-                    <select{{if $language != 'un'}} name="language"{{/if}} id="jot-language" class="form-control jot-language" title="{{$l10n.language_label}}" aria-label="{{$l10n.language_label}}">
-                        {{foreach $languages as $code => $name}}
-                            <option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$name}}</option>
-                        {{/foreach}}
-                    </select>
-                    <span role="presentation" id="profile-rotator-wrapper">
-                        <img role="presentation" id="profile-rotator" src="images/rotator.gif" alt="{{$l10n.wait}}" title="{{$l10n.wait}}" style="display: none;" />
-                    </span>
-                    <span role="presentation" id="character-counter" class="grey text-info"></span>
-                    <button type="button" class="btn btn-default" onclick="preview_comment_toggle({{$id}}, '{{$l10n.preview}}');" id="comment-edit-preview-link-{{$id}}" tabindex="8">
-                        <i class="ri ri-eye-line"></i> <span id="preview-btn-text-{{$id}}">{{$l10n.preview}}</span>
-                    </button>
-                    {{if $enableAdvancedComposer}}
-                    <button type="button" class="btn btn-default" id="easy-compose-toggle" title="{{$l10n.btnAssistant}}" onclick="AdvancedComposerTogglePanel()">
-                        <i class="ri ri-quill-pen-line"></i> <span class="ec-btn-text">{{$l10n.btnAssistant}}</span>
-                    </button>
-                    <button type="button" class="btn btn-default" id="easy-compose-distraction-toggle" title="{{$l10n.btnZen}}" onclick="AdvancedComposerToggleDistractionFree()">
-                        <i class="ri ri-fullscreen-line"></i> <span class="ec-btn-text">{{$l10n.btnZen}}</span>
-                    </button>
-                    <button type="button" class="btn btn-default" id="easy-compose-focus-preview-toggle" title="{{$l10n.btnFocusPreview}}" onclick="AdvancedComposerOpenFocusPreview()">
-                        <i class="ri ri-eye-line"></i> <span class="ec-btn-text">{{$l10n.btnFocusPreview}}</span>
-                    </button>
-                    <button type="button" class="btn btn-default ec-hidden" id="easy-compose-ep-zen-toggle" title="{{$l10n.btnEpZen}}" onclick="AdvancedComposerToggleEpZen()">
-                        <i class="ri ri-image-line"></i> <span class="ec-btn-text">{{$l10n.btnEpZen}}</span>
-                    </button>
-                    {{/if}}
-                    <button type="submit" class="btn btn-primary pull-right" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="ri ri-send-plane-line"></i> {{$l10n.submit}}</button>
-                </div>
-                <div class="jotplugins">
-                    {{$jotplugins nofilter}}
-                </div>
-            </div>
+			<div id="dropzone-{{$id}}" class="dropzone">
+				<p>
+					<textarea id="comment-edit-text-{{$id}}" class="comment-edit-text form-control expandable-textarea" name="body" placeholder="{{$l10n.default}}" rows="18" tabindex="3" dir="auto" onkeydown="sendOnCtrlEnter(event, 'comment-edit-submit-{{$id}}')">{{$body}}</textarea>
+				</p>
+			</div>
+			<div class="comment-edit-submit-wrapper clearfix">
+				{{if $type == 'post'}}
+				<div id="compose-additional-settings-location">
+					<button type="button" name="permissions" class="btn btn-default" id="toggle-permissions" title="{{$l10n.toggle_permissions_tooltip}}" onclick="togglePermissionsModal()" tabindex="5">
+						<i class="ri ri-more-line"></i> {{$l10n.toggle_permissions}}
+					</button>
+					<input type="text" name="location" class="form-control" id="jot-location" value="{{$location}}" placeholder="{{$l10n.location_set}}" tabindex="6" />
+					<button type="button" class="btn btn-default" id="profile-location"
+						data-title-set="{{$l10n.location_set}}"
+						data-title-disabled="{{$l10n.location_disabled}}"
+						data-title-unavailable="{{$l10n.location_unavailable}}"
+						data-title-clear="{{$l10n.location_clear}}"
+						title="{{$l10n.location_set}}"
+						tabindex="7">
+						<i class="ri ri-map-pin-line" aria-hidden="true"></i>
+					</button>
+				</div>
+				{{/if}}
+				<div class="compose-actions">
+					<select{{if $language != 'un'}} name="language"{{/if}} id="jot-language" class="form-control jot-language" title="{{$l10n.language_label}}" aria-label="{{$l10n.language_label}}">
+						{{foreach $languages as $code => $name}}
+							<option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$name}}</option>
+						{{/foreach}}
+					</select>
+					<span role="presentation" id="profile-rotator-wrapper">
+						<img role="presentation" id="profile-rotator" src="images/rotator.gif" alt="{{$l10n.wait}}" title="{{$l10n.wait}}" style="display: none;" />
+					</span>
+					<span role="presentation" id="character-counter" class="grey text-info"></span>
+					<button type="button" class="btn btn-default" onclick="preview_comment_toggle({{$id}}, '{{$l10n.preview}}');" id="comment-edit-preview-link-{{$id}}" tabindex="8">
+						<i class="ri ri-eye-line"></i> <span id="preview-btn-text-{{$id}}">{{$l10n.preview}}</span>
+					</button>
+					{{if $enableAdvancedComposer}}
+					<button type="button" class="btn btn-default" id="easy-compose-toggle" title="{{$l10n.btnAssistant}}" onclick="AdvancedComposerTogglePanel()">
+						<i class="ri ri-quill-pen-line"></i> <span class="ec-btn-text">{{$l10n.btnAssistant}}</span>
+					</button>
+					<button type="button" class="btn btn-default" id="easy-compose-distraction-toggle" title="{{$l10n.btnZen}}" onclick="AdvancedComposerToggleDistractionFree()">
+						<i class="ri ri-fullscreen-line"></i> <span class="ec-btn-text">{{$l10n.btnZen}}</span>
+					</button>
+					<button type="button" class="btn btn-default" id="easy-compose-focus-preview-toggle" title="{{$l10n.btnFocusPreview}}" onclick="AdvancedComposerOpenFocusPreview()">
+						<i class="ri ri-eye-line"></i> <span class="ec-btn-text">{{$l10n.btnFocusPreview}}</span>
+					</button>
+					<button type="button" class="btn btn-default ec-hidden" id="easy-compose-ep-zen-toggle" title="{{$l10n.btnEpZen}}" onclick="AdvancedComposerToggleEpZen()">
+						<i class="ri ri-image-line"></i> <span class="ec-btn-text">{{$l10n.btnEpZen}}</span>
+					</button>
+					{{/if}}
+					<button type="submit" class="btn btn-primary pull-right" id="comment-edit-submit-{{$id}}" name="submit" tabindex="9"><i class="ri ri-send-plane-line"></i> {{$l10n.submit}}</button>
+				</div>
+				<div class="jotplugins">
+					{{$jotplugins nofilter}}
+				</div>
+			</div>
 
-            <div id="comment-edit-preview-{{$id}}" class="comment-edit-preview" style="display:none;"></div>
+			<div id="comment-edit-preview-{{$id}}" class="comment-edit-preview" style="display:none;"></div>
 
-            <div id="permissions-section" style="display: none;">
-                {{if $type == 'post'}}
-                    <h3>{{$l10n.visibility_title}}</h3>
-                    {{$acl_selector nofilter}}
-
-        			{{include file="field_checkbox.tpl" field=$sensitive}}
-                    {{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
-                    {{if $created_at}}{{$created_at nofilter}}{{/if}}
-                {{else}}
-                    <input type="hidden" name="circle_allow" value="{{$circle_allow}}"/>
-                    <input type="hidden" name="contact_allow" value="{{$contact_allow}}"/>
-                    <input type="hidden" name="circle_deny" value="{{$circle_deny}}"/>
-                    <input type="hidden" name="contact_deny" value="{{$contact_deny}}"/>
-                {{/if}}
-            </div>
-        </form>
-    </div>
+			<div class="modal fade" id="permissions-modal-{{$id}}" tabindex="-1" role="dialog" aria-labelledby="permissions-modal-title-{{$id}}">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="{{$l10n.close}}">&times;</button>
+							<h4 class="modal-title" id="permissions-modal-title-{{$id}}">{{$l10n.visibility_title}}</h4>
+						</div>
+						<div class="modal-body">
+							{{if $type == 'post'}}
+							{{$acl_selector nofilter}}
+							{{include file="field_checkbox.tpl" field=$sensitive}}
+							{{if $scheduled_at}}{{$scheduled_at nofilter}}{{/if}}
+							{{if $created_at}}{{$created_at nofilter}}{{/if}}
+							{{else}}
+							<input type="hidden" name="circle_allow" value="{{$circle_allow}}" />
+							<input type="hidden" name="contact_allow" value="{{$contact_allow}}" />
+							<input type="hidden" name="circle_deny" value="{{$circle_deny}}" />
+							<input type="hidden" name="contact_deny" value="{{$contact_deny}}" />
+							{{/if}}
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" data-dismiss="modal">{{$l10n.done}}</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
 <script>
-    dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
+	dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
 
-    function preview_comment_toggle(id, originalText) {
-        var previewPane = document.getElementById('comment-edit-preview-' + id);
-        var btnTextSpan = document.getElementById('preview-btn-text-' + id);
-        if (previewPane.style.display === 'block') {
-            previewPane.style.display = 'none';
-            btnTextSpan.textContent = originalText;
-        } else {
-            preview_comment(id);
-            btnTextSpan.textContent = "Close preview";
-            previewPane.style.display = 'block';
-        }
-    }
+	function preview_comment_toggle(id, originalText) {
+		var previewPane = document.getElementById('comment-edit-preview-' + id);
+		var btnTextSpan = document.getElementById('preview-btn-text-' + id);
 
-    window.onDocumentReady("body", function() {
-        var textareas = document.querySelectorAll(".expandable-textarea");
+		if (document.body.classList.contains('wide-editor-active')) {
+			if (document.body.classList.contains('wide-preview-active')) {
+				document.body.classList.remove('wide-preview-active');
+				previewPane.style.display = 'none';
+				btnTextSpan.textContent = originalText;
+			} else {
+				document.body.classList.add('wide-preview-active');
+				previewPane.style.display = 'block';
+				btnTextSpan.textContent = "Close preview";
+				updateWidePreview();
+			}
+			sizeWideEditor();
+			return;
+		}
 
-        textareas.forEach(function(textarea) {
-            textarea.addEventListener("input", function() {
-                this.style.height = "auto";
-                this.style.height = (this.scrollHeight) + "px";
-            });
+		if (previewPane.style.display === 'block') {
+			previewPane.style.display = 'none';
+			btnTextSpan.textContent = originalText;
+		} else {
+			preview_comment(id);
+			btnTextSpan.textContent = "Close preview";
+			previewPane.style.display = 'block';
+		}
+	}
 
-            // Set initial height
-            textarea.style.height = "auto";
-            textarea.style.height = (textarea.scrollHeight) + "px";
-        });
-    });
+	window.wideEditorPreviewTimer = null;
 
-    function togglePermissions() {
-        var permissionsSection = document.getElementById('permissions-section');
-        if (permissionsSection.style.display === 'none' || permissionsSection.style.display === '') {
-            permissionsSection.style.display = 'block';
-        } else {
-            permissionsSection.style.display = 'none';
-        }
-    }
+	function updateWidePreview() {
+		var previewPane = document.getElementById('comment-edit-preview-{{$id}}');
+		if (!document.body.classList.contains('wide-editor-active') || !previewPane || previewPane.style.display === 'none') {
+			return;
+		}
+		$("#profile-rotator").show();
+		$.post(
+			"item",
+			$("#comment-edit-form-{{$id}}").serialize() + '&preview=1',
+			function (data) {
+				if (data.preview) {
+					$("#comment-edit-preview-{{$id}}").html(data.preview);
+					$("#comment-edit-preview-{{$id}} a").click(function () { return false; });
+				}
+				$("#profile-rotator").hide();
+			},
+			"json"
+		);
+	}
 
-    window.composeFormSubmitting = false;
+	function sizeWideEditor() {
+		var textarea = document.getElementById('comment-edit-text-{{$id}}');
+		var height = Math.max(300, window.innerHeight - textarea.getBoundingClientRect().top - 140);
+		// Pin height and maxHeight to keep the autosize library from expanding the textarea
+		textarea.style.height = height + 'px';
+		textarea.style.maxHeight = height + 'px';
+		var previewPane = document.getElementById('comment-edit-preview-{{$id}}');
+		if (previewPane) {
+			previewPane.style.maxHeight = height + 'px';
+		}
+	}
 
-    window.onDocumentReady("body", function() {
-        var textareas = document.querySelectorAll(".expandable-textarea");
+	function toggleWideEditor() {
+		var active = document.body.classList.toggle('wide-editor-active');
+		var previewPane = document.getElementById('comment-edit-preview-{{$id}}');
 
-        textareas.forEach(function(textarea) {
-            textarea.style.height = "auto";
-            textarea.style.height = (textarea.scrollHeight) + "px";
+		if (active) {
+			if (previewPane && previewPane.style.display === 'block') {
+				document.body.classList.add('wide-preview-active');
+			}
+			sizeWideEditor();
+			return;
+		}
 
-            const savedContent = localStorage.getItem(`comment-edit-text-${textarea.id}`);
-            const lastSaved = localStorage.getItem(`last-saved-${textarea.id}`);
+		document.body.classList.remove('wide-preview-active');
+		if (previewPane) {
+			previewPane.style.maxHeight = '';
+		}
+		var wideTextarea = document.getElementById('comment-edit-text-{{$id}}');
+		wideTextarea.style.height = '';
+		wideTextarea.style.maxHeight = '';
+		sizeExpandableTextareas();
+	}
 
-            // A body passed in the URL (e.g. a group mention) takes precedence over an old draft
-            if (savedContent && lastSaved && textarea.defaultValue === "") {
-                const currentTime = new Date().getTime();
-                const timeElapsed = currentTime - parseInt(lastSaved, 10);
+	if (window.wideEditorResize) {
+		window.removeEventListener("resize", window.wideEditorResize);
+	}
+	window.wideEditorResize = function () {
+		if (document.body.classList.contains('wide-editor-active')) {
+			sizeWideEditor();
+		}
+	};
+	window.addEventListener("resize", window.wideEditorResize);
 
-                if (timeElapsed <= 600000) {
-                    textarea.value = savedContent;
-                    textarea.style.height = "auto";
-                    textarea.style.height = (textarea.scrollHeight) + "px";
-                } else {
-                    localStorage.removeItem(`comment-edit-text-${textarea.id}`);
-                    localStorage.removeItem(`last-saved-${textarea.id}`);
-                }
-            }
-        });
-    });
+	if (!window.wideEditorEscapeBound) {
+		window.wideEditorEscapeBound = true;
+		document.addEventListener("keydown", function (e) {
+			if (e.key !== "Escape" || !document.body.classList.contains('wide-editor-active')) {
+				return;
+			}
+			if (document.querySelector('.modal.in')) {
+				return;
+			}
+			toggleWideEditor();
+		});
+	}
 
-    // The inline script re-runs on every SPA navigation, so replace the previous timer and handler
-    if (window.composeDraftSaver) {
-        clearInterval(window.composeDraftSaver);
-    }
-    window.composeDraftSaver = setInterval(function () {
-        document.querySelectorAll(".expandable-textarea").forEach(function(textarea) {
-            if (textarea.value.trim() !== "" && textarea.value !== textarea.defaultValue) {
-                localStorage.setItem(`comment-edit-text-${textarea.id}`, textarea.value);
-                localStorage.setItem(`last-saved-${textarea.id}`, new Date().getTime().toString());
-            }
-        });
-    }, 5000);
+	function togglePermissionsModal() {
+		$('#permissions-modal-{{$id}}').modal('show');
+	}
 
-    function setFormSubmitting() {
-        window.composeFormSubmitting = true;
-        document.querySelectorAll(".expandable-textarea").forEach(function(textarea) {
-            localStorage.removeItem(`comment-edit-text-${textarea.id}`);
-            localStorage.removeItem(`last-saved-${textarea.id}`);
-        });
-    }
+	function autosizeTextarea(textarea) {
+		textarea.style.height = "auto";
+		textarea.style.height = (textarea.scrollHeight) + "px";
+	}
 
-    if (window.composeConfirmUnload) {
-        window.removeEventListener("beforeunload", window.composeConfirmUnload);
-    }
-    window.composeConfirmUnload = function (event) {
-        if (window.composeFormSubmitting) {
-            return;
-        }
-        var unsaved = Array.from(document.querySelectorAll(".expandable-textarea")).some(function(textarea) {
-            return textarea.value.trim().length > 0 && textarea.value !== textarea.defaultValue;
-        });
-        if (unsaved) {
-            event.preventDefault();
-            event.returnValue = "";
-        }
-    };
-    window.addEventListener("beforeunload", window.composeConfirmUnload);
+	function sizeExpandableTextareas() {
+		document.querySelectorAll(".expandable-textarea").forEach(function(textarea) {
+			autosizeTextarea(textarea);
+		});
+	}
 
-    document.getElementById('comment-edit-form-{{$id}}').addEventListener('submit', setFormSubmitting);
+	window.onDocumentReady("body", function() {
+		var textareas = document.querySelectorAll(".expandable-textarea");
+
+		textareas.forEach(function(textarea) {
+			textarea.addEventListener("input", function() {
+				if (this.id === 'comment-edit-text-{{$id}}' && document.body.classList.contains('wide-editor-active')) {
+					sizeWideEditor();
+				} else {
+					autosizeTextarea(this);
+				}
+				if (this.id === 'comment-edit-text-{{$id}}') {
+					// Debounce interval as in the Advanced Composer preview
+					clearTimeout(window.wideEditorPreviewTimer);
+					window.wideEditorPreviewTimer = setTimeout(updateWidePreview, 2000);
+				}
+			});
+			// Sync height for programmatic insertions (BBCode toolbar, dropzone, link dialog),
+			// the core autosize library no longer manages this textarea
+			textarea.addEventListener("change", function() {
+				if (!(this.id === 'comment-edit-text-{{$id}}' && document.body.classList.contains('wide-editor-active'))) {
+					autosizeTextarea(this);
+				}
+			});
+			// Set initial height
+			autosizeTextarea(textarea);
+		});
+
+		if (document.fonts && document.fonts.ready) {
+			document.fonts.ready.then(function() {
+				sizeExpandableTextareas();
+			});
+		}
+		window.addEventListener("load", sizeExpandableTextareas);
+
+		textareas.forEach(function(textarea) {
+			const savedContent = localStorage.getItem(`comment-edit-text-${textarea.id}`);
+			const lastSaved = localStorage.getItem(`last-saved-${textarea.id}`);
+
+			// A body passed in the URL (e.g. a group mention) takes precedence over an old draft
+			if (savedContent && lastSaved && textarea.defaultValue === "") {
+				const currentTime = new Date().getTime();
+				const timeElapsed = currentTime - parseInt(lastSaved, 10);
+
+				if (timeElapsed <= 600000) {
+					textarea.value = savedContent;
+					autosizeTextarea(textarea);
+				} else {
+					localStorage.removeItem(`comment-edit-text-${textarea.id}`);
+					localStorage.removeItem(`last-saved-${textarea.id}`);
+				}
+			}
+		});
+	});
+
+	window.composeFormSubmitting = false;
+
+	// The inline script re-runs on every SPA navigation, so replace the previous timer and handler
+	if (window.composeDraftSaver) {
+		clearInterval(window.composeDraftSaver);
+	}
+	window.composeDraftSaver = setInterval(function () {
+		document.querySelectorAll(".expandable-textarea").forEach(function(textarea) {
+			if (textarea.value.trim() !== "" && textarea.value !== textarea.defaultValue) {
+				localStorage.setItem(`comment-edit-text-${textarea.id}`, textarea.value);
+				localStorage.setItem(`last-saved-${textarea.id}`, new Date().getTime().toString());
+			}
+		});
+	}, 5000);
+
+	function setFormSubmitting() {
+		window.composeFormSubmitting = true;
+		document.querySelectorAll(".expandable-textarea").forEach(function(textarea) {
+			localStorage.removeItem(`comment-edit-text-${textarea.id}`);
+			localStorage.removeItem(`last-saved-${textarea.id}`);
+		});
+	}
+
+	if (window.composeConfirmUnload) {
+		window.removeEventListener("beforeunload", window.composeConfirmUnload);
+	}
+	window.composeConfirmUnload = function (event) {
+		if (window.composeFormSubmitting) {
+			return;
+		}
+		var unsaved = Array.from(document.querySelectorAll(".expandable-textarea")).some(function(textarea) {
+			return textarea.value.trim().length > 0 && textarea.value !== textarea.defaultValue;
+		});
+		if (unsaved) {
+			event.preventDefault();
+			event.returnValue = "";
+		}
+	};
+	window.addEventListener("beforeunload", window.composeConfirmUnload);
+
+	document.getElementById('comment-edit-form-{{$id}}').addEventListener('submit', setFormSubmitting);
 </script>
