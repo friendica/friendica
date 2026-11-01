@@ -58,10 +58,23 @@ Beiträge, die zu einem der ausgewählten Kanäle passen, werden aus deiner norm
 So kannst du bestimmte Inhalte, zum Beispiel importierte Hashtags oder Feeds, aus deiner Haupt-Timeline heraushalten und trotzdem in einem eigenen Kanal betrachten.
 
 Als Filter-Kanal kannst du nur deine eigenen Kanäle nutzen, die voreingestellten Kanäle wie "Für Dich" oder "Entdecken" stehen hier nicht zur Verfügung.
-Als Timeline-Kanal kannst du außerdem nur eigene Kanäle nutzen, die auf dem Circle "Globale Gemeinschaft" oder "Folgende" basieren.
-Jeder andere Circle enthält ohnehin nur Beiträge, die bereits Teil deiner normalen Timeline sind, ihn hinzuzufügen würde also nichts Neues zeigen.
+Der Grund ist technischer Natur: Das Filtern nutzt einen internen Zwischenspeicher von Kanal-Beiträgen, der nur für deine eigenen Kanäle gepflegt wird.
+Das Filtern betrifft nur Beiträge, die noch innerhalb des Zeitfensters des Kanals liegen.
+Standardmäßig sind das 24 Stunden, der Administrator kann diesen Wert ändern.
+Ältere Beiträge werden nicht mehr im Zwischenspeicher gehalten, daher nicht gefiltert und erscheinen weiterhin in deiner normalen Network-Timeline.
 
-Der Kanal-Cache ist eine Einstellung in der Serverkonfiguration, die sich nicht über das Admin-Panel aktivieren lässt.
+Als Timeline-Kanal kannst du deine eigenen Kanäle nur nutzen, wenn ihre Datenquelle der Circle "Globale Gemeinschaft" oder "Folgende" ist.
+Jede andere Quelle ("Letzte Aktivität", "Letzte Beiträge", "Erstellung", "Folge ich" oder einer deiner eigenen Circles) enthält ohnehin nur Beiträge, die bereits Teil deiner normalen Timeline sind, sie hinzuzufügen würde also nichts Neues zeigen.
+Ein Kanal auf Basis von "Globale Gemeinschaft" kann daher sowohl als Timeline-Kanal als auch als Filter-Kanal genutzt werden, Kanäle auf anderen Quellen nur als Filter-Kanal.
+
+Die voreingestellten Kanäle stehen ebenfalls als Timeline-Kanäle zur Verfügung, wenn der Administrator den System-Kanal-Cache aktiviert hat.
+Die Kanäle "Für Dich" und "Ruhige teilende" sind davon ausgenommen.
+
+Die Auswahl als Timeline-Kanal ist unabhängig davon, ob der Kanal im "Kanäle"-Widget oder in der Menüleiste erscheint.
+Das legst du mit den übrigen Timeline-Einstellungen fest.
+
+Der Kanal-Cache ist die Konfigurationsoption `channel_cache` in der Datei `config/local.config.php`, der System-Kanal-Cache ist `system_channel_cache`.
+Beide sind standardmäßig deaktiviert und lassen sich nicht über das Admin-Panel aktivieren.
 Wenn dir diese Auswahlfelder fehlen, frag deinen Administrator, ob er sie aktivieren kann.
 
 ## Zusätzliche Schlüsselwörter für die Volltextsuche
