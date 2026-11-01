@@ -9,7 +9,7 @@
 	{{if $posts}}
 		<ul>
 			{{foreach $posts as $post}}
-			<li><a href="{{$post.url}}">{{$post.created}}</a> {{$post.text}}</li>
+			<li><a href="{{$post.url}}">{{$post.created}} {{$post.text}}</a></li>
 			{{/foreach}}
 		</ul>
 	{{else}}

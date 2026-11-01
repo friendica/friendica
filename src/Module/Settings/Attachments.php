@@ -7,20 +7,42 @@
 
 namespace Friendica\Module\Settings;
 
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
 use Friendica\Content\Pager;
-use Friendica\Content\Text\BBCode;
-use Friendica\Content\Text\Plaintext;
+use Friendica\Content\Post\MediaUsageRenderer;
+use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Attach;
-use Friendica\Model\Post;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
+use Friendica\Module\Response;
+use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
+use Psr\Log\LoggerInterface;
 
 class Attachments extends BaseSettings
 {
+	public function __construct(
+		private readonly MediaUsageRenderer $mediaUsageRenderer,
+		IHandleUserSessions $session,
+		Page $page,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
+		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	}
+
 	protected function post(array $request = [])
 	{
 		if (!DI::userSession()->isAuthenticated()) {
@@ -92,24 +114,12 @@ class Attachments extends BaseSettings
 			$attachments[$key]['created']  = $this->l10n->fullDateTime($attachment['created']);
 		}
 
-		$usage = '';
-		if (!empty($request['usage'])) {
-			$attachment = Attach::selectFirst(['id', 'filename'], ['id' => $request['usage'], 'uid' => $uid]);
+		$usage    = '';
+		$attachId = $this->getRequestValue($request, 'usage', 0);
+		if ($attachId) {
+			$attachment = Attach::selectFirst(['id', 'filename'], ['id' => $attachId, 'uid' => $uid]);
 			if (!empty($attachment)) {
-				$posts = [];
-				foreach (Post\Media::getPostsByAttachment($attachment['id'], $uid) as $post) {
-					$posts[] = [
-						'url'     => 'display/' . $post['guid'],
-						'created' => $this->l10n->fullDateTime($post['created']),
-						'text'    => $post['title'] ?: Plaintext::shorten(BBCode::toPlaintext($post['body'], false), 100),
-					];
-				}
-
-				$usage = Renderer::replaceMacros(Renderer::getMarkupTemplate('media_usage.tpl'), [
-					'$title'    => $this->t('Posts using %s', $attachment['filename']),
-					'$no_posts' => $this->t('This file isn\'t used in any of your posts.'),
-					'$posts'    => $posts,
-				]);
+				$usage = $this->mediaUsageRenderer->renderForAttachment($attachment['id'], $attachment['filename'], $uid);
 			}
 		}
 
