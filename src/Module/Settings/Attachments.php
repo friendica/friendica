@@ -7,17 +7,42 @@
 
 namespace Friendica\Module\Settings;
 
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\App\Page;
 use Friendica\Content\Pager;
+use Friendica\Content\Post\MediaUsageRenderer;
+use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
+use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Attach;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
+use Friendica\Module\Response;
+use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
+use Psr\Log\LoggerInterface;
 
 class Attachments extends BaseSettings
 {
+	public function __construct(
+		private readonly MediaUsageRenderer $mediaUsageRenderer,
+		IHandleUserSessions $session,
+		Page $page,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
+		parent::__construct($session, $page, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	}
+
 	protected function post(array $request = [])
 	{
 		if (!DI::userSession()->isAuthenticated()) {
@@ -89,6 +114,15 @@ class Attachments extends BaseSettings
 			$attachments[$key]['created']  = $this->l10n->fullDateTime($attachment['created']);
 		}
 
+		$usage    = '';
+		$attachId = $this->getRequestValue($request, 'usage', 0);
+		if ($attachId) {
+			$attachment = Attach::selectFirst(['id', 'filename'], ['id' => $attachId, 'uid' => $uid]);
+			if (!empty($attachment)) {
+				$usage = $this->mediaUsageRenderer->renderForAttachment($attachment['id'], $attachment['filename'], $uid);
+			}
+		}
+
 		$tpl = Renderer::getMarkupTemplate('settings/attachments.tpl');
 		return Renderer::replaceMacros($tpl, [
 			'$form_security_token' => self::getFormSecurityToken('settings_attachments'),
@@ -97,9 +131,11 @@ class Attachments extends BaseSettings
 			'$size'                => $this->t('Size'),
 			'$created'             => $this->t('Uploaded'),
 			'$delete'              => $this->t('Delete'),
+			'$show_usage'          => $this->t('Used in posts'),
 			'$no_attachments'      => $this->t('You have no uploaded files.'),
 			'$upload'              => $this->t('Upload'),
 			'$attachments'         => $attachments,
+			'$usage'               => $usage,
 			'$paginate'            => $pager->renderFull($total),
 		]);
 	}
