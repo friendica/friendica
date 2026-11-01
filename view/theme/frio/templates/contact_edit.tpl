@@ -6,7 +6,7 @@
   *}}
 
 <div class="generic-page-wrapper">
-	{{if $header}}<h3 class="heading">{{$header}}:&nbsp;{{$name}}{{if $account_type}}&nbsp;<small>({{$account_type}})</small>{{/if}}</h3>{{/if}}
+	{{if $header}}<h3>{{$header}}:&nbsp;{{$name}}{{if $account_type}}&nbsp;<small>({{$account_type}})</small>{{/if}}</h3>{{/if}}
 
 	<div id="contact-edit-wrapper">
 

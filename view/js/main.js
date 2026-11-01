@@ -21,11 +21,16 @@ if (!Element.prototype.matches) {
 }
 
 // Announce jGrowl toasts to screen readers instead of only showing them visually.
-// Set once on the shared prototype so every $.jGrowl() call across the theme picks it up.
+// Screen readers only announce changes inside a live region that already exists,
+// so the shared container is created up front with aria-live, jGrowl reuses it.
 if (typeof $ !== 'undefined' && $.fn.jGrowl) {
-	$.fn.jGrowl.prototype.defaults.open = function (e, m, o) {
-		$(e).attr('role', o.theme === 'notice' ? 'alert' : 'status');
-	};
+	$(function () {
+		if ($('#jGrowl').length === 0) {
+			$('<div id="jGrowl" aria-live="polite"></div>')
+				.addClass($.jGrowl.defaults.position)
+				.appendTo($.jGrowl.defaults.appendTo);
+		}
+	});
 }
 
 const ModuleLifecycleReadyEvent = Object.freeze({

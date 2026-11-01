@@ -30,6 +30,7 @@
 			.off('change' + calendarEventNS, '#id_nofinish')
 			.off('click' + calendarEventNS, '#event-nav > li > a')
 			.off('click' + calendarEventNS, '#event-nav a')
+			.off('keydown' + calendarEventNS, '#event-nav a[role="tab"]')
 			.off('dblclick' + calendarEventNS, 'td.fc-day');
 		$('#contact_allow, #contact_deny, #circle_allow, #circle_deny')
 			.off('change' + calendarEventNS);
@@ -213,6 +214,16 @@
 			.on('click' + calendarEventNS, '#event-nav a', function (e) {
 				$('#event-preview').empty();
 				e.preventDefault();
+			});
+
+		// The tabs are links without href, so activate them with Enter and Space like buttons.
+		$body
+			.off('keydown' + calendarEventNS, '#event-nav a[role="tab"]')
+			.on('keydown' + calendarEventNS, '#event-nav a[role="tab"]', function (e) {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					this.click();
+				}
 			});
 
 		const reflowCalendar = function () {

@@ -23,16 +23,16 @@
 		{{* Mark the first list entry as active because it is the first which is active after opening
 			the modal. Changing of the activity status is done by js in calendar_head.tpl *}}
 		<li class="active">
-			<a id="event-edit-lnk" role="tab" aria-selected="true" aria-controls="event-edit-wrapper" onclick="eventEditActive(); return false;">{{$basic}}</a>
+			<a id="event-edit-lnk" role="tab" tabindex="0" aria-selected="true" aria-controls="event-edit-wrapper" onclick="eventEditActive(); return false;">{{$basic}}</a>
 		</li>
 		{{if $acl}}
 		<li {{if !$sh_checked}} style="display: none"{{/if}}>
-			<a id="event-perms-lnk" role="tab" aria-selected="false" aria-controls="event-acl-wrapper" onclick="eventAclActive(); return false;">{{$permissions}}</a>
+			<a id="event-perms-lnk" role="tab" tabindex="0" aria-selected="false" aria-controls="event-acl-wrapper" onclick="eventAclActive(); return false;">{{$permissions}}</a>
 		</li>
 		{{/if}}
 		{{if $preview}}
 		<li>
-			<a id="event-preview-lnk" role="tab" aria-selected="false" aria-controls="event-preview" onclick="eventPreviewActive(); return false;">{{$preview}}</a>
+			<a id="event-preview-lnk" role="tab" tabindex="0" aria-selected="false" aria-controls="event-preview" onclick="eventPreviewActive(); return false;">{{$preview}}</a>
 		</li>
 		{{/if}}
 		{{* commented out because it isn't implemented yet
