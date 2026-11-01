@@ -62,12 +62,30 @@
 						{{include file="field_select.tpl" field=$text_spacing}}
 						{{include file="field_select.tpl" field=$attachment_icons}}
 						{{include file="field_checkbox.tpl" field=$embed_media}}
+						{{include file="field_checkbox.tpl" field=$filter_timeline_language}}
+						<div id="timeline-languages-wrapper">
+							{{include file="field_select.tpl" field=$timeline_languages}}
+						</div>
 					</div>
 					<div class="panel-footer">
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
 			</details>
+
+			<script type="text/javascript">
+				(function () {
+					let $filterTimelineLanguage = $("#id_filter_timeline_language");
+					let $timelineLanguages      = $("#timeline-languages-wrapper select");
+
+					function toggleTimelineLanguages() {
+						$timelineLanguages.prop('disabled', !$filterTimelineLanguage.is(':checked'));
+					}
+
+					toggleTimelineLanguages();
+					$filterTimelineLanguage.on('change', toggleTimelineLanguages);
+				})();
+			</script>
 
 			<details class="panel"{{if !$theme && !$mobile_theme && !$theme_config}} open{{/if}}>
 				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="timeline-settings-title"><h2>{{$timeline_title}}</h2></summary>
