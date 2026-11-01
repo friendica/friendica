@@ -2453,19 +2453,19 @@ msgid "Mark all system notifications as seen"
 msgstr ""
 
 #: src/Content/Nav.php:287
-msgid "Do not disturb"
+msgid "Pause live updates"
 msgstr ""
 
 #: src/Content/Nav.php:287
-msgid "Pause notifications until you turn this back on"
+msgid "Pause live updates until you turn this back on"
 msgstr ""
 
 #: src/Content/Nav.php:288
-msgid "Notifications paused"
+msgid "Live updates paused"
 msgstr ""
 
 #: src/Content/Nav.php:288
-msgid "Click to resume receiving notifications"
+msgid "Click to resume live updates"
 msgstr ""
 
 #: src/Content/Nav.php:291

@@ -202,6 +202,7 @@ var force_update = false;
 var update_item = 0;
 var stopped = false;
 var totStopped = false;
+var doNotDisturb = false;
 var timer = null;
 var pr = 0;
 var liking = 0;
@@ -487,9 +488,15 @@ window.onDocumentReady('body', function() {
 	});
 
 	// Restore a "do not disturb" state set before the last page reload
-	if (localStorage.getItem('donotdisturb') === '1') {
-		pause();
+	try {
+		if (localStorage.getItem('donotdisturb') === '1') {
+			pause();
+		}
+	} catch (e) {
+		// localStorage is not available, the state is then only kept until the next reload
 	}
+
+	$(document).off('click.friendica-dnd').on('click.friendica-dnd', '#notifications-pause', toggleDoNotDisturb);
 
 	// Asynchronous calls are deferred until the very end of the page load to ease on slower connections
 	// Only register once, not on every SPA navigation
@@ -509,12 +516,11 @@ window.onDocumentReady('body', function() {
 		if (event.which === 19 || (!event.metaKey && !event.shiftKey && !event.altKey && event.ctrlKey && event.which === 32)) {
 			event.preventDefault();
 			if (stopped === false) {
+				stopped = true;
 				if (event.ctrlKey) {
-					pause();
-				} else {
-					stopped = true;
-					$('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
+					totStopped = true;
 				}
+				$('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
 			} else {
 				unpause();
 			}
@@ -796,7 +802,7 @@ function isColumnMode() {
 }
 
 function NavUpdate() {
-	if (!stopped) {
+	if (!stopped && !doNotDisturb) {
 		if (force_update) {
 			showFetching();
 		}
@@ -2008,29 +2014,41 @@ function preview_masonry_rows(index) {
 		$(parentElement+" .wall-item-body").css({visibility: 'visible'});	// make container visible
 	}
 }
-function pause() {
-	// stop auto reloads until unpause() is called explicitly
-	stopped = true;
-	totStopped = true;
-	$('#pause').html('<img src="images/pause.gif" alt="pause" style="border: 1px solid black;" />');
-	var $btn = $('#notifications-pause');
-	$btn.addClass('active').attr('aria-pressed', 'true').attr('title', $btn.data('label-resume'));
-	$btn.find('i').removeClass('ri-notification-off-line').addClass('ri-notification-off-fill');
-	localStorage.setItem('donotdisturb', '1');
-}
 function unpause() {
 	// unpause auto reloads if they are currently stopped
 	totStopped = false;
 	stopped = false;
 	$('#pause').html('');
+}
+function pause() {
+	// stop the periodic polling until resume() is called explicitly
+	doNotDisturb = true;
 	var $btn = $('#notifications-pause');
-	$btn.removeClass('active').attr('aria-pressed', 'false').attr('title', $btn.data('label-pause'));
+	var label = $btn.data('label-resume');
+	$btn.addClass('active').attr('aria-checked', 'true').attr('aria-label', label).attr('data-original-title', label).attr('title', label);
+	$btn.find('i').removeClass('ri-notification-off-line').addClass('ri-notification-off-fill');
+	try {
+		localStorage.setItem('donotdisturb', '1');
+	} catch (e) {
+		// localStorage is not available, the state is then only kept until the next reload
+	}
+}
+function resume() {
+	doNotDisturb = false;
+	var $btn = $('#notifications-pause');
+	var label = $btn.data('label-pause');
+	$btn.removeClass('active').attr('aria-checked', 'false').attr('aria-label', label).attr('data-original-title', label).attr('title', label);
 	$btn.find('i').removeClass('ri-notification-off-fill').addClass('ri-notification-off-line');
-	localStorage.removeItem('donotdisturb');
+	try {
+		localStorage.removeItem('donotdisturb');
+	} catch (e) {
+		// localStorage is not available, the state is then only kept until the next reload
+	}
+	NavUpdate();
 }
 function toggleDoNotDisturb() {
-	if (stopped) {
-		unpause();
+	if (doNotDisturb) {
+		resume();
 	} else {
 		pause();
 	}
