@@ -22,18 +22,18 @@ VERSION_FILES="VERSION database.sql src/App.php ${MESSAGES_PO}"
 REBUILD_MESSAGES=0
 REBUILD_DATABASE=0
 
-# Rewrites the version in a copy of one of the VERSION_FILES
+# Rewrites the version in a copy of one of the VERSION_FILES, if the file still carries one
 # $1 = path the content belongs to, $2 = file to rewrite
 set_version() {
 	case "$1" in
 		VERSION)
 			sed -i "1s/.*/${DEV_VERSION}/" "$2" ;;
 		database.sql)
-			sed -i "2s/^-- Friendica [^ ]*/-- Friendica ${DEV_VERSION}/" "$2" ;;
+			sed -i "2s/^-- Friendica [0-9][^ ]*/-- Friendica ${DEV_VERSION}/" "$2" ;;
 		src/App.php)
 			sed -i "s/^\([[:space:]]*public const VERSION[[:space:]]*= '\)[^']*'/\1${DEV_VERSION}'/" "$2" ;;
 		view/lang/C/messages.po)
-			sed -i "s/^\(\"Project-Id-Version: \)[^\\\\\"]*/\1${DEV_VERSION}/" "$2" ;;
+			sed -i "s/^\(\"Project-Id-Version: \)[0-9][^\\\\\"]*/\1${DEV_VERSION}/" "$2" ;;
 	esac
 }
 
