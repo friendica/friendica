@@ -207,7 +207,9 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'enabled_timelines', $enabled_timelines);
 		$this->pConfig->set($uid, 'channel', 'languages', $channel_languages);
 		$this->pConfig->set($uid, 'system', 'filter_timeline_language', $filter_timeline_language);
-		$this->pConfig->set($uid, 'system', 'timeline_languages', $timeline_languages);
+		if ($filter_timeline_language) {
+			$this->pConfig->set($uid, 'system', 'timeline_languages', $timeline_languages);
+		}
 
 		if (!is_null($timeline_channels)) {
 			$this->pConfig->set($uid, 'channel', 'timeline_channels', $timeline_channels);
@@ -548,8 +550,8 @@ class Display extends BaseSettings
 			'$text_spacing'             => ['text_spacing', $this->t('Text spacing'), $text_spacing, $this->t('Increase the spacing between letters, words and lines to make texts easier to read. "Large" corresponds to the text spacing values of WCAG 2.1 success criterion 1.4.12.'), $text_spacings, false],
 			'$attachment_icons'         => ['attachment_icons', $this->t('Attachment icons style'), $attachment_icons, $this->t('Style of the file attachment icons'), $attachment_icon_modes, false],
 			'$embed_media'              => ['embed_media', $this->t('Embed supported media'), $embed_media, $this->t('When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos.')],
-			'$filter_timeline_language' => ['filter_timeline_language', $this->t('Filter timeline by language'), $filter_timeline_language, $this->t('When enabled, only posts in the selected languages are shown in the network and community timelines.')],
-			'$timeline_languages'       => ['timeline_languages[]', $this->t('Timeline languages:'), $timeline_languages, $this->t('Select all the languages you want to see in your timelines. "Unspecified" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language).'), $languages, 'multiple'],
+			'$filter_timeline_language' => ['filter_timeline_language', $this->t('Filter timeline by language'), $filter_timeline_language, $this->t('When enabled, only posts in the selected languages are shown in the network timeline.')],
+			'$timeline_languages'       => ['timeline_languages[]', $this->t('Timeline languages:'), $timeline_languages, $this->t('Select all the languages you want to see in your timelines. "Undetermined" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language).'), $languages, 'multiple'],
 
 			'$timeline_label'       => $this->t('Label'),
 			'$timeline_descriptiom' => $this->t('Description'),

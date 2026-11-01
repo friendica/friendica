@@ -497,7 +497,7 @@ class Network extends Timeline
 			? $this->pConfig->get($this->session->getLocalUserId(), 'system', 'timeline_languages') ?? []
 			: [];
 		if ($timelinelanguages) {
-			$commonCondition = DBA::mergeConditions($commonCondition, $this->getLanguageCondition($timelinelanguages));
+			$timelineCondition = DBA::mergeConditions($timelineCondition, $this->getLanguageCondition($timelinelanguages));
 		}
 
 		if ($this->network) {
@@ -573,8 +573,7 @@ class Network extends Timeline
 
 		$fields    = ['uri-id', 'created', 'received', 'commented', 'channel', 'contact-id'];
 		$condition = DBA::mergeConditions($timelineCondition, $commonCondition);
-		$this->logger->debug('Timeline condition: ', ['timelineCondition' => $timelineCondition, 'commonCondition' => $commonCondition]);
-		$timeline = $this->database->getSQL($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', $fields, $condition, $params);
+		$timeline  = $this->database->getSQL($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', $fields, $condition, $params);
 		array_shift($condition);
 		$sql = '(' . $timeline . ')';
 
@@ -592,14 +591,14 @@ class Network extends Timeline
 		}
 
 		if ($systemchannels) {
-			$channel_condition = DBA::mergeConditions(['channel' => $systemchannels, 'in-timeline' => false], $commonCondition);
+			$channel_condition = DBA::mergeConditions(['channel' => $systemchannels, 'in-timeline' => false] + ($timelinelanguages ? ['language' => $timelinelanguages] : []), $commonCondition);
 			$sql .= ' UNION ALL (' . $this->database->getSQL('system-channel-post-view', $fields, $channel_condition, $params) . ')';
 			array_shift($channel_condition);
 			$condition = array_merge($condition, $channel_condition);
 		}
 
 		if ($userchannels) {
-			$channel_condition = DBA::mergeConditions(['channel' => $userchannels, 'in-timeline' => false], $commonCondition);
+			$channel_condition = DBA::mergeConditions(['channel' => $userchannels, 'in-timeline' => false] + ($timelinelanguages ? ['language' => $timelinelanguages] : []), $commonCondition);
 			$sql .= ' UNION ALL (' . $this->database->getSQL('channel-post-view', $fields, $channel_condition, $params) . ')';
 			array_shift($channel_condition);
 			$condition = array_merge($condition, $channel_condition);
