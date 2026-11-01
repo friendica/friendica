@@ -9,13 +9,14 @@ namespace Friendica\Module;
 
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
+use Friendica\App\Page;
 use Friendica\BaseModule;
+use Friendica\Content\Conversation\Factory\Network as NetworkFactory;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\DI;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
@@ -27,6 +28,9 @@ class Channels extends BaseModule
 {
 	public function __construct(
 		private readonly IHandleUserSessions $session,
+		private readonly Widget\SidebarMenu $sidebarMenu,
+		private readonly NetworkFactory $networkFactory,
+		private Page $page,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -47,12 +51,12 @@ class Channels extends BaseModule
 		}
 
 		Nav::setSelected('network');
-		DI::page()['aside'] .= Widget\SidebarMenu::getHTML($uid, Widget\SidebarMenu::CHANNELS);
+		$this->page['aside'] .= $this->sidebarMenu->getHTML($uid, Widget\SidebarMenu::CHANNELS);
 
 		$items = [];
 		foreach (Widget::getChannelList($uid) as $channel) {
 			// The timelines of the network module are not available in the channel module
-			if (DI::NetworkFactory()->isTimeline($channel['ref'])) {
+			if ($this->networkFactory->isTimeline($channel['ref'])) {
 				continue;
 			}
 

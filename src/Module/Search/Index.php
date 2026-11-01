@@ -14,6 +14,7 @@ use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
@@ -36,7 +37,7 @@ class Index extends BaseSearch
 	/** @var string  */
 	private $remoteAddress;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Request $request, private readonly ConversationRenderer $conversationRenderer, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Request $request, private readonly ConversationRenderer $conversationRenderer, private readonly SidebarMenu $sidebarMenu, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -89,8 +90,8 @@ class Index extends BaseSearch
 		}
 
 		if (DI::userSession()->getLocalUserId()) {
-			if (Widget\SidebarMenu::isActive(DI::userSession()->getLocalUserId())) {
-				DI::page()['aside'] .= Widget\SidebarMenu::getHTML(DI::userSession()->getLocalUserId(), Widget\SidebarMenu::SEARCHES);
+			if ($this->sidebarMenu->isActive(DI::userSession()->getLocalUserId())) {
+				DI::page()['aside'] .= $this->sidebarMenu->getHTML(DI::userSession()->getLocalUserId(), Widget\SidebarMenu::SEARCHES);
 			} else {
 				DI::page()['aside'] .= Widget\SavedSearches::getHTML(Search::getSearchPath($search), $search);
 			}

@@ -9,6 +9,7 @@ namespace Friendica\Module\Search;
 
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
+use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
@@ -18,7 +19,6 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
-use Friendica\DI;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
@@ -32,6 +32,8 @@ class SavedList extends BaseModule
 	public function __construct(
 		private readonly IHandleUserSessions $session,
 		private readonly Database $database,
+		private readonly Widget\SidebarMenu $sidebarMenu,
+		private Page $page,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -52,9 +54,9 @@ class SavedList extends BaseModule
 		}
 
 		Nav::setSelected('search');
-		DI::page()['aside'] .= Widget\SidebarMenu::getHTML($uid, Widget\SidebarMenu::SEARCHES);
+		$this->page['aside'] .= $this->sidebarMenu->getHTML($uid, Widget\SidebarMenu::SEARCHES);
 		if (Feature::isEnabled($uid, Feature::TRENDING_TAGS)) {
-			DI::page()['aside'] .= Widget\TrendingTags::getHTML();
+			$this->page['aside'] .= Widget\TrendingTags::getHTML();
 		}
 
 		$returnUrl = bin2hex('search/saved');

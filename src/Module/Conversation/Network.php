@@ -31,6 +31,7 @@ use Friendica\Content\PagesManager;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
 use Friendica\Content\Text\HTML;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Content\Widget\TrendingTags;
 use Friendica\Core\ACL;
 use Friendica\Core\Cache\Capability\ICanCache;
@@ -77,6 +78,8 @@ class Network extends Timeline
 	protected $systemMessages;
 	/** @var Page */
 	protected $page;
+	/** @var SidebarMenu */
+	protected $sidebarMenu;
 	/** @var ConversationRenderer */
 	protected $conversationRenderer;
 	/** @var StatusEditor */
@@ -112,6 +115,7 @@ class Network extends Timeline
 		private readonly GroupManager $groupManager,
 		private readonly PagesManager $pagesManager,
 		Page $page,
+		SidebarMenu $sidebarMenu,
 		IHandleUserSessions $session,
 		Database $database,
 		IManagePersonalConfigValues $pConfig,
@@ -152,6 +156,7 @@ class Network extends Timeline
 		$this->conversationRenderer = $conversationRenderer;
 		$this->statusEditor         = $statusEditor;
 		$this->page                 = $page;
+		$this->sidebarMenu          = $sidebarMenu;
 		$this->channel              = $channelFactory;
 		$this->community            = $community;
 		$this->networkFactory       = $network;
@@ -195,14 +200,14 @@ class Network extends Timeline
 			];
 		}
 
-		$this->page['aside'] .= Widget\SidebarMenu::getHTML($this->session->getLocalUserId(), $this->circleId ? Widget\SidebarMenu::CIRCLES : Widget\SidebarMenu::HOME);
+		$this->page['aside'] .= $this->sidebarMenu->getHTML($this->session->getLocalUserId(), $this->circleId ? Widget\SidebarMenu::CIRCLES : Widget\SidebarMenu::HOME);
 
-		if ($this->circleId && Widget\SidebarMenu::isActive($this->session->getLocalUserId())) {
+		if ($this->circleId && $this->sidebarMenu->isActive($this->session->getLocalUserId())) {
 			$widgetorder = [];
 		}
 
 		foreach ($widgetorder as $widget) {
-			if (Feature::isEnabled($this->session->getLocalUserId(), $widget) && !Widget\SidebarMenu::replaces($this->session->getLocalUserId(), $widget)) {
+			if (Feature::isEnabled($this->session->getLocalUserId(), $widget) && !$this->sidebarMenu->replaces($this->session->getLocalUserId(), $widget)) {
 				switch ($widget) {
 					case Feature::CIRCLES:
 						$this->page['aside'] .= Circle::sidebarWidget($module, $module . '/circle', 'standard', $this->circleId);

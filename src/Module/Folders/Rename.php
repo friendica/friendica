@@ -9,13 +9,13 @@ namespace Friendica\Module\Folders;
 
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
+use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\DI;
 use Friendica\Model\Post;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
@@ -31,6 +31,8 @@ class Rename extends BaseModule
 	public function __construct(
 		private readonly IHandleUserSessions $session,
 		private readonly SystemMessages $systemMessages,
+		private readonly Widget\SidebarMenu $sidebarMenu,
+		private Page $page,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -72,7 +74,7 @@ class Rename extends BaseModule
 		}
 
 		Nav::setSelected('network');
-		DI::page()['aside'] .= Widget\SidebarMenu::getHTML($uid, Widget\SidebarMenu::FOLDERS);
+		$this->page['aside'] .= $this->sidebarMenu->getHTML($uid, Widget\SidebarMenu::FOLDERS);
 
 		$file = trim($request['file'] ?? '');
 

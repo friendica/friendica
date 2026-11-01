@@ -7,17 +7,36 @@
 
 namespace Friendica\Module;
 
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
 use Friendica\BaseModule;
 use Friendica\Content\Widget;
 use Friendica\Content\Widget\SidebarMenu;
+use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\System;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model;
+use Friendica\Util\Profiler;
+use Psr\Log\LoggerInterface;
 
 class Circle extends BaseModule
 {
+	public function __construct(
+		private readonly SidebarMenu $sidebarMenu,
+		L10n $l10n,
+		BaseURL $baseUrl,
+		Arguments $args,
+		LoggerInterface $logger,
+		Profiler $profiler,
+		Response $response,
+		array $server,
+		array $parameters = [],
+	) {
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	}
+
 	protected function post(array $request = [])
 	{
 		if (DI::mode()->isAjax()) {
@@ -189,15 +208,15 @@ class Circle extends BaseModule
 			throw new \Friendica\Network\HTTPException\ForbiddenException();
 		}
 
-		DI::page()['aside'] = SidebarMenu::getHTML(DI::userSession()->getLocalUserId(), SidebarMenu::CIRCLES);
+		DI::page()['aside'] = $this->sidebarMenu->getHTML(DI::userSession()->getLocalUserId(), SidebarMenu::CIRCLES);
 		DI::page()['aside'] .= Model\Circle::sidebarWidget('contact', 'circle', 'extended', ((DI::args()->getArgc() > 1) ? DI::args()->getArgv()[1] : 'everyone'));
 		DI::page()['aside'] .= Widget::contactRels($this->server['REQUEST_URI'], $relation);
 
 		// With no circle number provided we jump to the unassigned contacts as a starting point
 		// @TODO: Replace with parameter from router
 		if (DI::args()->getArgc() === 1) {
-			if (SidebarMenu::isActive(DI::userSession()->getLocalUserId())) {
-				DI::page()['aside'] = SidebarMenu::getHTML(DI::userSession()->getLocalUserId(), SidebarMenu::CIRCLES);
+			if ($this->sidebarMenu->isActive(DI::userSession()->getLocalUserId())) {
+				DI::page()['aside'] = $this->sidebarMenu->getHTML(DI::userSession()->getLocalUserId(), SidebarMenu::CIRCLES);
 
 				return $this->overview();
 			}
