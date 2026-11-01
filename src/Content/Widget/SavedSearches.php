@@ -43,7 +43,7 @@ class SavedSearches
 		$tpl = Renderer::getMarkupTemplate('widget/saved_searches.tpl');
 
 		return Renderer::replaceMacros($tpl, [
-			'$title'      => DI::l10n()->t('Saved Searches'),
+			'$title'      => DI::l10n()->t('Tags'),
 			'$add'        => '',
 			'$searchbox'  => '',
 			'$saved'      => $saved,

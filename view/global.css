@@ -1041,6 +1041,69 @@ summary.wall-item-summary {
 	text-align: center;
 }
 
+/* Sidebar menu replacing the widgets */
+.sidebar-menu-entry i {
+	display: inline-block;
+	width: 1.5em;
+}
+
+.sidebar-menu-entry a {
+	font-weight: bold;
+}
+
+/* Overview pages (circles, channels, saved searches, saved folders) */
+.overview-filter,
+.overview-add {
+	margin-bottom: 15px;
+}
+
+.overview-add {
+	display: flex;
+	gap: 8px;
+}
+
+.overview-links .btn {
+	margin-right: 5px;
+}
+
+.overview-list {
+	margin: 0 0 20px;
+	padding: 0;
+	list-style: none;
+}
+
+.overview-entry {
+	display: flex;
+	gap: 15px;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 0;
+	border-bottom: 1px solid rgba(127, 127, 127, 0.3);
+}
+
+.overview-entry[hidden] {
+	display: none;
+}
+
+.overview-title {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.overview-name {
+	font-size: 1.2em;
+}
+
+.overview-description {
+	opacity: 0.8;
+}
+
+.overview-actions {
+	display: flex;
+	gap: 10px;
+	white-space: nowrap;
+}
+
 /* Group overview */
 .group-list-server h2 {
 	margin-bottom: 0;
@@ -1069,6 +1132,10 @@ summary.wall-item-summary {
 	align-items: start;
 	padding: 15px 0;
 	border-bottom: 1px solid rgba(127, 127, 127, 0.3);
+}
+
+.group-list-entry[hidden] {
+	display: none;
 }
 
 .group-list-avatar {

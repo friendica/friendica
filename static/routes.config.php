@@ -525,6 +525,12 @@ return [
 		'/{circle:\d+}/{contact:\d+}'                      => [Module\Circle::class, [R::GET, R::POST]],
 		'/{circle:\d+}/{command:add|remove}/{contact:\d+}' => [Module\Circle::class, [R::GET, R::POST]],
 	],
+	'/channels' => [Module\Channels::class,        [R::GET]],
+	'/folders'  => [
+		'[/]'     => [Module\Folders::class,         [R::GET]],
+		'/remove' => [Module\Folders\Remove::class, [R::GET]],
+		'/rename' => [Module\Folders\Rename::class, [R::GET, R::POST]],
+	],
 	'/group/{id}'                   => [Module\Group::class,            [R::GET, R::POST]],
 	'/groups'                       => [Module\Groups::class,           [R::GET]],
 	'/groups/discover[/{gsid:\d+}]' => [Module\Groups\Discover::class, [R::GET]],
@@ -683,11 +689,12 @@ return [
 	'/poco' => [Module\User\PortableContacts::class,    [R::GET         ]],
 
 	'/search' => [
-		'[/]'           => [Module\Search\Index::class, [R::GET         ]],
-		'/acl'          => [Module\Search\Acl::class,   [R::GET, R::POST]],
-		'/saved/add'    => [Module\Search\Saved::class, [R::GET         ]],
-		'/saved/remove' => [Module\Search\Saved::class, [R::GET         ]],
-		'/user/tags'    => [Module\Search\Tags::class,  [        R::POST]],
+		'[/]'           => [Module\Search\Index::class,     [R::GET         ]],
+		'/acl'          => [Module\Search\Acl::class,       [R::GET, R::POST]],
+		'/saved'        => [Module\Search\SavedList::class, [R::GET         ]],
+		'/saved/add'    => [Module\Search\Saved::class,     [R::GET         ]],
+		'/saved/remove' => [Module\Search\Saved::class,     [R::GET         ]],
+		'/user/tags'    => [Module\Search\Tags::class,      [        R::POST]],
 	],
 
 	'/receive' => [
