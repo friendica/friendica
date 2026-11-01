@@ -168,7 +168,7 @@ class Page implements ArrayAccess
 	 */
 	public function registerStylesheet(string $path, string $media = 'screen')
 	{
-		$path = Network::appendQueryParam($path, ['v' => App::VERSION]);
+		$path = Network::appendQueryParam($path, ['v' => App::version()]);
 
 		if (mb_strpos($path, $this->basePath . DIRECTORY_SEPARATOR) === 0) {
 			$path = mb_substr($path, mb_strlen($this->basePath . DIRECTORY_SEPARATOR));
@@ -269,7 +269,7 @@ class Page implements ArrayAccess
 			],
 
 			'$local_user'     => $localUID,
-			'$generator'      => 'Friendica' . ' ' . App::VERSION,
+			'$generator'      => 'Friendica' . ' ' . App::version(),
 			'$update_content' => (int) $pConfig->get($localUID, 'system', 'update_content'),
 			'$spa_mode'       => ($_GET['mode'] ?? '') === 'column' ? 0 : (int) $pConfig->get($localUID, 'system', 'enable_spa'),
 			'$spa_router_ts'  => $this->getSpaModuleTimestamp(),
@@ -312,18 +312,18 @@ class Page implements ArrayAccess
 
 		$font = $pConfig->get($localUID, 'accessibility', 'font');
 		if (in_array($font, self::ACCESSIBILITY_FONTS, true)) {
-			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/fonts/accessibility/' . $font . '.css?v=' . App::VERSION . '" type="text/css" media="all" />' . "\n";
+			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/fonts/accessibility/' . $font . '.css?v=' . App::version() . '" type="text/css" media="all" />' . "\n";
 		}
 		$text_spacing = $pConfig->get($localUID, 'accessibility', 'text_spacing');
 		if (in_array($text_spacing, self::ACCESSIBILITY_TEXT_SPACINGS, true)) {
-			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/accessibility/text-spacing-' . $text_spacing . '.css?v=' . App::VERSION . '" type="text/css" media="all" />' . "\n";
+			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/accessibility/text-spacing-' . $text_spacing . '.css?v=' . App::version() . '" type="text/css" media="all" />' . "\n";
 		}
 		if ($pConfig->get($localUID, 'accessibility', 'hide_empty_descriptions')) {
 			$this->page['htmlhead'] .= "<style>a[data-alt='']{display:none;} a:has(.empty-description){display:none;} .empty-description {display: none;}</style>\n";
 		}
 		$attachment_icons = $pConfig->get($localUID, 'accessibility', 'attachment_icons');
 		if (in_array($attachment_icons, self::ACCESSIBILITY_ATTACHMENT_ICONS, true)) {
-			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/accessibility/attachment-icons-' . $attachment_icons . '.css?v=' . App::VERSION . '" type="text/css" media="all" />' . "\n";
+			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/accessibility/attachment-icons-' . $attachment_icons . '.css?v=' . App::version() . '" type="text/css" media="all" />' . "\n";
 		}
 		if ($pConfig->get($localUID, 'accessibility', 'hide_custom_emojis')) {
 			$this->page['htmlhead'] .= "<style>span.emoji.mastodon img {display: none;}</style>\n";
@@ -441,7 +441,7 @@ class Page implements ArrayAccess
 	 */
 	public function registerFooterScript($path)
 	{
-		$path = Network::appendQueryParam($path, ['v' => App::VERSION]);
+		$path = Network::appendQueryParam($path, ['v' => App::version()]);
 
 		$url = str_replace($this->basePath . DIRECTORY_SEPARATOR, '', $path);
 
@@ -457,7 +457,7 @@ class Page implements ArrayAccess
 	 */
 	private function getSpaModuleTimestamp(): string
 	{
-		return (filemtime($this->basePath . '/view/js/spa') ?: 0) . '-' . App::VERSION;
+		return (filemtime($this->basePath . '/view/js/spa') ?: 0) . '-' . App::version();
 	}
 
 	/**
@@ -583,7 +583,7 @@ class Page implements ArrayAccess
 		$page['section'] = htmlspecialchars($args->get(0) ?? 'generic');
 		$page['module']  = htmlspecialchars($args->getModuleName());
 
-		header("X-Friendica-Version: " . App::VERSION);
+		header("X-Friendica-Version: " . App::version());
 		header("Content-type: text/html; charset=utf-8");
 
 		if ($config->get('system', 'hsts') && ($baseURL->getScheme() === 'https')) {

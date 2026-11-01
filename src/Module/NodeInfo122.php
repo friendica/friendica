@@ -44,7 +44,7 @@ class NodeInfo122 extends BaseModule
 			],
 			'software' => [
 				'name'       => 'friendica',
-				'version'    => App::VERSION . '-' . DB_UPDATE_VERSION,
+				'version'    => App::version() . '-' . DB_UPDATE_VERSION,
 				'repository' => 'https://github.com/friendica/friendica',
 				'homepage'   => 'https://friendi.ca',
 			],

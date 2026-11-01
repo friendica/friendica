@@ -71,7 +71,7 @@ class Statistics extends BaseModule
 		$statistics = array_merge([
 			'name'                  => $this->config->get('config', 'sitename'),
 			'network'               => App::PLATFORM,
-			'version'               => App::VERSION . '-' . DB_UPDATE_VERSION,
+			'version'               => App::version() . '-' . DB_UPDATE_VERSION,
 			'registrations_open'    => $registration_open,
 			'total_users'           => $this->keyValue->get('nodeinfo_total_users'),
 			'active_users_halfyear' => $this->keyValue->get('nodeinfo_active_users_halfyear'),
