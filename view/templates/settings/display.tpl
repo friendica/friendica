@@ -64,7 +64,7 @@
 
 	<script>
 		(function () {
-			let $filterTimelineLanguage = $("#id_{{$filter_timeline_language.0}}");
+			let $filterTimelineLanguage = $("#id_filter_timeline_language");
 			let $timelineLanguages      = $("#timeline-languages-wrapper select");
 
 			function toggleTimelineLanguages() {
