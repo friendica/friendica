@@ -109,7 +109,7 @@ class Friendica extends BaseModule
 		return Renderer::replaceMacros($tpl, [
 			'about' => $this->t(
 				'This is Friendica, version %s that is running at the web location %s. The database version is %s, the post update version is %s.',
-				'<strong>' . App::VERSION . '</strong>',
+				'<strong>' . App::version() . '</strong>',
 				$this->baseUrl,
 				'<strong>' . $this->config->get('system', 'build') . '/' . DB_UPDATE_VERSION . '</strong>',
 				'<strong>' . $this->keyValue->get('post_update_version') . '/' . PostUpdate::VERSION . '</strong>',
@@ -180,7 +180,7 @@ class Friendica extends BaseModule
 		}
 
 		$data = [
-			'version'          => App::VERSION,
+			'version'          => App::version(),
 			'url'              => (string) $this->baseUrl,
 			'addons'           => $visible_addons,
 			'locked_features'  => $locked_features,

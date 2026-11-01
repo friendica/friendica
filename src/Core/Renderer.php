@@ -62,7 +62,7 @@ class Renderer
 		// Default template variables
 		$vars = array_merge([
 			'$baseurl' => DI::baseUrl(),
-			'$VERSION' => \Friendica\App::VERSION,
+			'$VERSION' => \Friendica\App::version(),
 		], $vars);
 
 		$t = self::getTemplateEngine();

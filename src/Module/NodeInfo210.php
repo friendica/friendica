@@ -41,7 +41,7 @@ class NodeInfo210 extends BaseModule
 			'server'  => [
 				'name'     => $this->config->get('config', 'sitename'),
 				'software' => 'friendica',
-				'version'  => App::VERSION . '-' . DB_UPDATE_VERSION,
+				'version'  => App::version() . '-' . DB_UPDATE_VERSION,
 			],
 			'organization'      => Nodeinfo::getOrganization($this->config),
 			'protocols'         => ['dfrn', 'activitypub'],

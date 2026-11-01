@@ -28,7 +28,7 @@ class DbaDefinitionSqlWriter
 	public static function create(DbaDefinition $definition): string
 	{
 		$sqlString = "-- ------------------------------------------\n";
-		$sqlString .= "-- " . App::PLATFORM . " " . App::VERSION . " (" . App::CODENAME . ")\n";
+		$sqlString .= "-- " . App::PLATFORM . "\n";
 		$sqlString .= "-- DB_UPDATE_VERSION " . DB_UPDATE_VERSION . "\n";
 		$sqlString .= "-- ------------------------------------------\n\n\n";
 
