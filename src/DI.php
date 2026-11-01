@@ -613,6 +613,11 @@ abstract class DI
 		return self::$dice->create(Security\Authentication::class);
 	}
 
+	public static function formSecurityToken(): Security\FormSecurityToken
+	{
+		return self::$dice->create(Security\FormSecurityToken::class);
+	}
+
 	//
 	// "User" namespace instances
 	//

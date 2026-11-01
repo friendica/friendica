@@ -10,8 +10,6 @@ deptrac:
       - Friendica\Module\HTTPException\MethodNotAllowed
       - Friendica\Module\HTTPException\PageNotFound
       - Friendica\Module\Special\Options
-    Friendica\BaseModule:
-      - Friendica\DI
     Friendica\Capabilities\ICanHandleRequests:
       - Friendica\Module\Special\HTTPException
     Friendica\Console\ArchiveContact:
@@ -143,6 +141,8 @@ deptrac:
       - Friendica\Protocol\ActivityPub\Processor
       - Friendica\Protocol\ActivityPub\Receiver
     Friendica\Database\View:
+      - Friendica\DI
+    Friendica\Event\LegacyEventDispatcher:
       - Friendica\DI
     Friendica\Event\ModuleContentEvent:
       - Friendica\BaseModule
@@ -329,25 +329,11 @@ deptrac:
       - Friendica\Object\Image
       - Friendica\Protocol\Delivery
       - Friendica\Security\TwoFactor\Model\AppSpecificPassword
-    Friendica\Module\About:
-      - Friendica\DI
-    Friendica\Module\AccountManagementControlDocument:
-      - Friendica\DI
-    Friendica\Module\Acctlink:
-      - Friendica\DI
-    Friendica\Module\ActivityPub\Featured:
-      - Friendica\DI
-    Friendica\Module\ActivityPub\Followers:
-      - Friendica\DI
-    Friendica\Module\ActivityPub\Following:
-      - Friendica\DI
     Friendica\Module\ActivityPub\Inbox:
       - Friendica\DI
     Friendica\Module\ActivityPub\Objects:
       - Friendica\DI
     Friendica\Module\ActivityPub\Outbox:
-      - Friendica\DI
-    Friendica\Module\ActivityPub\QuoteAuthorization:
       - Friendica\DI
     Friendica\Module\ActivityPub\Whoami:
       - Friendica\DI
@@ -710,93 +696,29 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Api\Twitter\Users\Show:
       - Friendica\DI
-    Friendica\Module\Apps:
-      - Friendica\DI
     Friendica\Module\Attach:
       - Friendica\DI
     Friendica\Module\BaseAdmin:
       - Friendica\DI
     Friendica\Module\BaseApi:
       - Friendica\DI
-    Friendica\Module\BaseModeration:
-      - Friendica\DI
-    Friendica\Module\BaseNotifications:
-      - Friendica\DI
     Friendica\Module\BaseProfile:
       - Friendica\DI
     Friendica\Module\BaseSearch:
       - Friendica\DI
-    Friendica\Module\BaseSettings:
-      - Friendica\DI
-    Friendica\Module\Blocklist\Domain\Download:
-      - Friendica\DI
     Friendica\Module\Bookmarklet:
-      - Friendica\DI
-    Friendica\Module\Calendar\Event\API:
-      - Friendica\DI
-    Friendica\Module\Calendar\Event\Form:
-      - Friendica\DI
-    Friendica\Module\Calendar\Event\Get:
-      - Friendica\DI
-    Friendica\Module\Calendar\Event\Show:
-      - Friendica\DI
-    Friendica\Module\Calendar\Export:
-      - Friendica\DI
-    Friendica\Module\Calendar\Show:
-      - Friendica\DI
-    Friendica\Module\Calendar\View:
       - Friendica\DI
     Friendica\Module\Circle:
       - Friendica\DI
     Friendica\Module\Contact:
       - Friendica\DI
-    Friendica\Module\Contact\Activities:
-      - Friendica\DI
     Friendica\Module\Contact\Advanced:
-      - Friendica\DI
-    Friendica\Module\Contact\BasePosts:
-      - Friendica\DI
-    Friendica\Module\Contact\Contacts:
-      - Friendica\DI
-    Friendica\Module\Contact\Conversations:
-      - Friendica\DI
-    Friendica\Module\Contact\Follow:
-      - Friendica\DI
-    Friendica\Module\Contact\Hovercard:
-      - Friendica\DI
-    Friendica\Module\Contact\MatchInterests:
       - Friendica\DI
     Friendica\Module\Contact\Media:
       - Friendica\DI
-    Friendica\Module\Contact\Original:
-      - Friendica\DI
-    Friendica\Module\Contact\Posts:
-      - Friendica\DI
-    Friendica\Module\Contact\Profile:
-      - Friendica\DI
-    Friendica\Module\Contact\Quotes:
-      - Friendica\DI
-    Friendica\Module\Contact\Redir:
-      - Friendica\DI
-    Friendica\Module\Contact\Reshares:
-      - Friendica\DI
     Friendica\Module\Contact\Revoke:
       - Friendica\DI
-    Friendica\Module\Contact\Suggestions:
-      - Friendica\DI
-    Friendica\Module\Contact\Unfollow:
-      - Friendica\DI
-    Friendica\Module\Conversation\Channel:
-      - Friendica\DI
-    Friendica\Module\Conversation\Community:
-      - Friendica\DI
-    Friendica\Module\Conversation\Network:
-      - Friendica\DI
-    Friendica\Module\Conversation\Timeline:
-      - Friendica\DI
     Friendica\Module\Credits:
-      - Friendica\DI
-    Friendica\Module\DFRN\Notify:
       - Friendica\DI
     Friendica\Module\Debug\ActivityPubConversion:
       - Friendica\DI
@@ -812,17 +734,9 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Debug\WebFinger:
       - Friendica\DI
-    Friendica\Module\Deck:
-      - Friendica\DI
     Friendica\Module\Diaspora\Fetch:
       - Friendica\DI
-    Friendica\Module\Diaspora\Receive:
-      - Friendica\DI
     Friendica\Module\Directory:
-      - Friendica\DI
-    Friendica\Module\Feed:
-      - Friendica\DI
-    Friendica\Module\Filer\RemoveTag:
       - Friendica\DI
     Friendica\Module\Filer\SaveTag:
       - Friendica\DI
@@ -832,20 +746,7 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Friendica:
       - Friendica\App
-      - Friendica\DI
-    Friendica\Module\Group:
-      - Friendica\DI
-    Friendica\Module\Groups:
-      - Friendica\DI
-    Friendica\Module\Groups\Discover:
-      - Friendica\DI
     Friendica\Module\HCard:
-      - Friendica\DI
-    Friendica\Module\HTTPException\MethodNotAllowed:
-      - Friendica\DI
-    Friendica\Module\HTTPException\PageNotFound:
-      - Friendica\DI
-    Friendica\Module\Hashtag:
       - Friendica\DI
     Friendica\Module\Help:
       - Friendica\DI
@@ -857,114 +758,43 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Item\Activity:
       - Friendica\DI
-    Friendica\Module\Item\Comment:
-      - Friendica\DI
-    Friendica\Module\Item\Comments:
-      - Friendica\DI
     Friendica\Module\Item\Complete:
       - Friendica\DI
-    Friendica\Module\Item\Compose:
-      - Friendica\DI
     Friendica\Module\Item\Display:
-      - Friendica\DI
-    Friendica\Module\Item\Feed:
       - Friendica\DI
     Friendica\Module\Item\Follow:
       - Friendica\DI
     Friendica\Module\Item\Ignore:
       - Friendica\DI
-    Friendica\Module\Item\Interactions:
-      - Friendica\DI
-    Friendica\Module\Item\Language:
-      - Friendica\DI
-    Friendica\Module\Item\Node:
-      - Friendica\DI
     Friendica\Module\Item\Pin:
       - Friendica\DI
-    Friendica\Module\Item\Searchtext:
-      - Friendica\DI
     Friendica\Module\Item\Star:
-      - Friendica\DI
-    Friendica\Module\LostPass:
-      - Friendica\DI
-    Friendica\Module\Magic:
       - Friendica\DI
     Friendica\Module\Maintenance:
       - Friendica\DI
     Friendica\Module\Manifest:
       - Friendica\DI
-    Friendica\Module\Media\Attachment\Browser:
-      - Friendica\DI
-    Friendica\Module\Media\Attachment\Upload:
-      - Friendica\DI
-    Friendica\Module\Media\BaseBrowser:
-      - Friendica\DI
-    Friendica\Module\Media\Photo\Browser:
-      - Friendica\DI
-    Friendica\Module\Media\Photo\Upload:
-      - Friendica\DI
-    Friendica\Module\Moderation\BaseUsers:
-      - Friendica\DI
-    Friendica\Module\Moderation\Blocklist\Contact:
-      - Friendica\DI
-    Friendica\Module\Moderation\Blocklist\Contact\Export:
-      - Friendica\DI
-    Friendica\Module\Moderation\Blocklist\Contact\Import:
-      - Friendica\DI
-    Friendica\Module\Moderation\Blocklist\Server\Add:
-      - Friendica\DI
-    Friendica\Module\Moderation\Blocklist\Server\Import:
-      - Friendica\DI
-    Friendica\Module\Moderation\Blocklist\Server\Index:
-      - Friendica\DI
-    Friendica\Module\Moderation\Item\Delete:
-      - Friendica\DI
-    Friendica\Module\Moderation\Item\Source:
-      - Friendica\DI
     Friendica\Module\Moderation\Report\Create:
       - Friendica\DI
     Friendica\Module\Moderation\Reports:
       - Friendica\DI
-    Friendica\Module\Moderation\Summary:
-      - Friendica\DI
-    Friendica\Module\Moderation\Users\Active:
-      - Friendica\DI
-    Friendica\Module\Moderation\Users\Blocked:
-      - Friendica\DI
     Friendica\Module\Moderation\Users\Create:
-      - Friendica\DI
-    Friendica\Module\Moderation\Users\Deleted:
-      - Friendica\DI
-    Friendica\Module\Moderation\Users\Index:
-      - Friendica\DI
-    Friendica\Module\Moderation\Users\Pending:
       - Friendica\DI
     Friendica\Module\NoScrape:
       - Friendica\DI
     Friendica\Module\NodeInfo110:
       - Friendica\App
-      - Friendica\DI
     Friendica\Module\NodeInfo120:
       - Friendica\App
-      - Friendica\DI
     Friendica\Module\NodeInfo121:
       - Friendica\App
-      - Friendica\DI
     Friendica\Module\NodeInfo122:
       - Friendica\App
-      - Friendica\DI
     Friendica\Module\NodeInfo210:
       - Friendica\App
-      - Friendica\DI
     Friendica\Module\Notifications\Introductions:
       - Friendica\DI
     Friendica\Module\Notifications\Notification:
-      - Friendica\DI
-    Friendica\Module\Notifications\Notifications:
-      - Friendica\DI
-    Friendica\Module\Notifications\Ping:
-      - Friendica\DI
-    Friendica\Module\Notifications\Stream:
       - Friendica\DI
     Friendica\Module\OAuth\Acknowledge:
       - Friendica\DI
@@ -974,41 +804,15 @@ deptrac:
       - Friendica\DI
     Friendica\Module\OAuth\Token:
       - Friendica\DI
-    Friendica\Module\OpenSearch:
-      - Friendica\DI
-    Friendica\Module\Owa:
-      - Friendica\DI
-    Friendica\Module\ParseUrl:
-      - Friendica\DI
     Friendica\Module\Photo:
       - Friendica\DI
-    Friendica\Module\Ping\Contact:
-      - Friendica\DI
-    Friendica\Module\Ping\Network:
-      - Friendica\DI
-    Friendica\Module\Ping\Notifications:
-      - Friendica\DI
     Friendica\Module\Ping\Search:
-      - Friendica\DI
-    Friendica\Module\Post\Edit:
-      - Friendica\DI
-    Friendica\Module\Post\Share:
-      - Friendica\DI
-    Friendica\Module\Post\Tag\Add:
-      - Friendica\DI
-    Friendica\Module\Post\Tag\Remove:
-      - Friendica\DI
-    Friendica\Module\Privacy\PermissionTooltip:
-      - Friendica\DI
-    Friendica\Module\Profile\CircleExport:
       - Friendica\DI
     Friendica\Module\Profile\Common:
       - Friendica\DI
     Friendica\Module\Profile\Contacts:
       - Friendica\DI
     Friendica\Module\Profile\Conversations:
-      - Friendica\DI
-    Friendica\Module\Profile\Index:
       - Friendica\DI
     Friendica\Module\Profile\Notes:
       - Friendica\DI
@@ -1018,10 +822,6 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Profile\Profile:
       - Friendica\DI
-    Friendica\Module\Profile\RemoteFollow:
-      - Friendica\DI
-    Friendica\Module\Profile\Restricted:
-      - Friendica\DI
     Friendica\Module\Profile\Schedule:
       - Friendica\DI
     Friendica\Module\RandomProfile:
@@ -1029,10 +829,6 @@ deptrac:
     Friendica\Module\ReallySimpleDiscovery:
       - Friendica\DI
     Friendica\Module\Register:
-      - Friendica\DI
-    Friendica\Module\RobotsTxt:
-      - Friendica\DI
-    Friendica\Module\Search\Acl:
       - Friendica\DI
     Friendica\Module\Search\Directory:
       - Friendica\DI
@@ -1042,45 +838,17 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Search\Saved:
       - Friendica\DI
-    Friendica\Module\Search\Tags:
-      - Friendica\DI
     Friendica\Module\Security\Login:
-      - Friendica\DI
-    Friendica\Module\Security\Logout:
       - Friendica\DI
     Friendica\Module\Security\OpenID:
       - Friendica\DI
-    Friendica\Module\Security\PasswordTooLong:
-      - Friendica\DI
     Friendica\Module\Security\TwoFactor\Recovery:
-      - Friendica\DI
-    Friendica\Module\Security\TwoFactor\SignOut:
       - Friendica\DI
     Friendica\Module\Security\TwoFactor\Trust:
       - Friendica\DI
-    Friendica\Module\Security\TwoFactor\Verify:
-      - Friendica\DI
     Friendica\Module\Settings\Account:
       - Friendica\DI
-    Friendica\Module\Settings\Addons:
-      - Friendica\DI
     Friendica\Module\Settings\Attachments:
-      - Friendica\DI
-    Friendica\Module\Settings\Channels:
-      - Friendica\DI
-    Friendica\Module\Settings\Connectors:
-      - Friendica\DI
-    Friendica\Module\Settings\ContactImport:
-      - Friendica\DI
-    Friendica\Module\Settings\Delegation:
-      - Friendica\DI
-    Friendica\Module\Settings\Display:
-      - Friendica\DI
-    Friendica\Module\Settings\Features:
-      - Friendica\DI
-    Friendica\Module\Settings\OAuth:
-      - Friendica\DI
-    Friendica\Module\Settings\Profile\Index:
       - Friendica\DI
     Friendica\Module\Settings\Profile\Photo\Crop:
       - Friendica\DI
@@ -1088,78 +856,29 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Settings\RemoveMe:
       - Friendica\DI
-    Friendica\Module\Settings\Server\Action:
-      - Friendica\DI
-    Friendica\Module\Settings\Server\Index:
-      - Friendica\DI
-    Friendica\Module\Settings\TrustedHosts\Add:
-      - Friendica\DI
-    Friendica\Module\Settings\TrustedHosts\Index:
-      - Friendica\DI
-    Friendica\Module\Settings\TwoFactor\AppSpecific:
-      - Friendica\DI
-    Friendica\Module\Settings\TwoFactor\Index:
-      - Friendica\DI
-    Friendica\Module\Settings\TwoFactor\Recovery:
-      - Friendica\DI
-    Friendica\Module\Settings\TwoFactor\Trusted:
-      - Friendica\DI
-    Friendica\Module\Settings\TwoFactor\Verify:
-      - Friendica\DI
     Friendica\Module\Settings\UserExport:
       - Friendica\App
-      - Friendica\DI
     Friendica\Module\Smilies:
-      - Friendica\DI
-    Friendica\Module\Special\DisplayNotFound:
-      - Friendica\DI
-    Friendica\Module\Special\Options:
       - Friendica\DI
     Friendica\Module\Statistics:
       - Friendica\App
-      - Friendica\DI
     Friendica\Module\Stats:
       - Friendica\App
-      - Friendica\DI
-    Friendica\Module\StatsCaching:
-      - Friendica\DI
-    Friendica\Module\Theme:
-      - Friendica\DI
-    Friendica\Module\ThemeDetails:
-      - Friendica\DI
-    Friendica\Module\ToggleMobile:
-      - Friendica\DI
-    Friendica\Module\Tos:
-      - Friendica\DI
-    Friendica\Module\Update\Channel:
-      - Friendica\DI
     Friendica\Module\Update\Community:
       - Friendica\DI
     Friendica\Module\Update\Contact:
       - Friendica\DI
     Friendica\Module\Update\Display:
       - Friendica\DI
-    Friendica\Module\Update\Network:
-      - Friendica\DI
     Friendica\Module\Update\Notes:
-      - Friendica\DI
-    Friendica\Module\Update\Notifications:
       - Friendica\DI
     Friendica\Module\Update\Profile:
       - Friendica\DI
     Friendica\Module\Update\Search:
       - Friendica\DI
-    Friendica\Module\User\Delegation:
-      - Friendica\DI
-    Friendica\Module\User\Import:
-      - Friendica\DI
-    Friendica\Module\User\PortableContacts:
-      - Friendica\DI
     Friendica\Module\Welcome:
       - Friendica\DI
     Friendica\Module\WellKnown\NodeInfo:
-      - Friendica\DI
-    Friendica\Module\WellKnown\SecurityTxt:
       - Friendica\DI
     Friendica\Module\WellKnown\XSocialRelay:
       - Friendica\DI
@@ -1263,6 +982,8 @@ deptrac:
     Friendica\Security\BasicAuth:
       - Friendica\DI
     Friendica\Security\ExAuth:
+      - Friendica\DI
+    Friendica\Security\LegacyFormSecurityToken:
       - Friendica\DI
     Friendica\Security\OAuth:
       - Friendica\DI

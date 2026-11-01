@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.11-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 10:43+0000\n"
+"POT-Creation-Date: 2026-11-01 20:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,7 +83,7 @@ msgstr ""
 msgid "Permission denied."
 msgstr ""
 
-#: mod/message.php:28 mod/message.php:124 src/Content/Nav.php:289
+#: mod/message.php:28 mod/message.php:124 src/Content/Nav.php:291
 #: src/Module/Deck.php:78 view/theme/frio/theme.php:231
 msgid "Messages"
 msgstr ""
@@ -657,15 +657,11 @@ msgstr ""
 msgid "No system theme config value set."
 msgstr ""
 
-#: src/BaseModule.php:505
-msgid "The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before submitting it."
-msgstr ""
-
-#: src/BaseModule.php:532
+#: src/BaseModule.php:500
 msgid "All contacts"
 msgstr ""
 
-#: src/BaseModule.php:537 src/Content/Conversation/Factory/Channel.php:33
+#: src/BaseModule.php:505 src/Content/Conversation/Factory/Channel.php:33
 #: src/Content/Widget.php:271 src/Core/ACL.php:183 src/Module/Contact.php:412
 #: src/Module/Privacy/PermissionTooltip.php:167
 #: src/Module/Privacy/PermissionTooltip.php:189
@@ -673,17 +669,17 @@ msgstr ""
 msgid "Followers"
 msgstr ""
 
-#: src/BaseModule.php:542 src/Content/Widget.php:272 src/Module/Contact.php:413
+#: src/BaseModule.php:510 src/Content/Widget.php:272 src/Module/Contact.php:413
 #: src/Module/Settings/Channels.php:153
 msgid "Following"
 msgstr ""
 
-#: src/BaseModule.php:547 src/Content/Widget.php:273 src/Model/User.php:1454
+#: src/BaseModule.php:515 src/Content/Widget.php:273 src/Model/User.php:1454
 #: src/Module/Contact.php:414
 msgid "Friends"
 msgstr ""
 
-#: src/BaseModule.php:555
+#: src/BaseModule.php:523
 msgid "Common"
 msgstr ""
 
@@ -2496,7 +2492,7 @@ msgstr ""
 msgid "Account settings"
 msgstr ""
 
-#: src/Content/Nav.php:307 view/theme/frio/theme.php:233
+#: src/Content/Nav.php:309 view/theme/frio/theme.php:233
 msgid "Manage/edit friends and contacts"
 msgstr ""
 
@@ -13231,6 +13227,10 @@ msgstr ""
 
 #: src/Security/Authentication.php:366
 msgid "Please upload a profile photo."
+msgstr ""
+
+#: src/Security/FormSecurityToken.php:91
+msgid "The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before submitting it."
 msgstr ""
 
 #: src/Security/OpenWebAuth.php:151

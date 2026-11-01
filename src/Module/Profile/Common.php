@@ -60,7 +60,7 @@ class Common extends BaseProfile
 
 		$o = self::getTabsHTML('contacts', false, $profile['nickname'], $profile['hide-friends']);
 
-		$tabs = self::getContactFilterTabs('profile/' . $nickname, 'common', $displayCommonTab);
+		$tabs = $this->getContactFilterTabs('profile/' . $nickname, 'common', $displayCommonTab);
 
 		$sourceId = Contact::getIdForURL($this->userSession->getMyUrl());
 		$targetId = Contact::getPublicIdByUserId($profile['uid']);
