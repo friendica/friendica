@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.11-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 20:50+0000\n"
+"POT-Creation-Date: 2026-11-01 21:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,13 +51,13 @@ msgstr ""
 #: src/Module/BaseSettings.php:38 src/Module/Calendar/Event/API.php:75
 #: src/Module/Calendar/Event/Form.php:73 src/Module/Calendar/Export.php:79
 #: src/Module/Calendar/Show.php:71 src/Module/Calendar/View.php:46
-#: src/Module/Channels.php:46 src/Module/Circle.php:28 src/Module/Circle.php:77
+#: src/Module/Channels.php:50 src/Module/Circle.php:47 src/Module/Circle.php:96
 #: src/Module/Contact/Advanced.php:46 src/Module/Contact/Follow.php:78
 #: src/Module/Contact/Follow.php:150 src/Module/Contact/MatchInterests.php:73
 #: src/Module/Contact/Suggestions.php:32 src/Module/Contact/Unfollow.php:47
 #: src/Module/Contact/Unfollow.php:61 src/Module/Contact/Unfollow.php:93
-#: src/Module/Folders.php:47 src/Module/Folders/Remove.php:46
-#: src/Module/Folders/Rename.php:50 src/Module/Folders/Rename.php:71
+#: src/Module/Folders.php:49 src/Module/Folders/Remove.php:46
+#: src/Module/Folders/Rename.php:52 src/Module/Folders/Rename.php:73
 #: src/Module/FollowConfirm.php:24 src/Module/FriendSuggest.php:44
 #: src/Module/Group.php:73 src/Module/Groups.php:50
 #: src/Module/Groups/Discover.php:56 src/Module/Invite.php:28
@@ -67,7 +67,7 @@ msgstr ""
 #: src/Module/Profile/Photos.php:73 src/Module/Profile/Schedule.php:27
 #: src/Module/Profile/Schedule.php:44 src/Module/Register.php:77
 #: src/Module/Register.php:278 src/Module/Register.php:315
-#: src/Module/Search/Directory.php:23 src/Module/Search/SavedList.php:51
+#: src/Module/Search/Directory.php:23 src/Module/Search/SavedList.php:53
 #: src/Module/Settings/Account.php:35 src/Module/Settings/Account.php:339
 #: src/Module/Settings/Channels.php:54 src/Module/Settings/Channels.php:135
 #: src/Module/Settings/ContactImport.php:45
@@ -279,9 +279,9 @@ msgstr ""
 msgid "Failed to delete the photo."
 msgstr ""
 
-#: mod/photos.php:333 src/Module/Conversation/Community.php:150
+#: mod/photos.php:333 src/Module/Conversation/Community.php:154
 #: src/Module/Directory.php:34 src/Module/Profile/Photos.php:251
-#: src/Module/Search/Index.php:57
+#: src/Module/Search/Index.php:58
 msgid "Public access denied."
 msgstr ""
 
@@ -335,7 +335,7 @@ msgstr ""
 
 #: mod/photos.php:557 mod/photos.php:656 src/Module/Contact/Follow.php:163
 #: src/Module/Contact/Revoke.php:92 src/Module/Contact/Unfollow.php:107
-#: src/Module/Folders/Rename.php:85 src/Module/Media/BaseBrowser.php:86
+#: src/Module/Folders/Rename.php:87 src/Module/Media/BaseBrowser.php:86
 #: src/Module/Post/Edit.php:186 src/Module/Post/Tag/Remove.php:101
 #: src/Module/Profile/RemoteFollow.php:110
 #: src/Module/Security/TwoFactor/SignOut.php:115
@@ -438,7 +438,7 @@ msgstr ""
 msgid "Rotate CCW (left)"
 msgstr ""
 
-#: mod/photos.php:839 src/Model/Event.php:669
+#: mod/photos.php:839 src/Content/Widget.php:223 src/Model/Event.php:669
 #: src/Module/Calendar/Event/Show.php:77
 msgid "Edit"
 msgstr ""
@@ -559,7 +559,7 @@ msgstr ""
 #: src/App/Page.php:277 src/Content/Nav.php:240 src/Content/Text/HTML.php:887
 #: src/Module/Deck.php:89 src/Module/Moderation/Blocklist/Contact.php:112
 #: src/Module/Moderation/Blocklist/Server/Index.php:103
-#: src/Module/Search/Index.php:108
+#: src/Module/Search/Index.php:109
 msgid "Search"
 msgstr ""
 
@@ -665,19 +665,19 @@ msgid "All contacts"
 msgstr ""
 
 #: src/BaseModule.php:505 src/Content/Conversation/Factory/Channel.php:33
-#: src/Content/Widget.php:271 src/Core/ACL.php:183 src/Module/Contact.php:412
+#: src/Content/Widget.php:274 src/Core/ACL.php:183 src/Module/Contact.php:412
 #: src/Module/Privacy/PermissionTooltip.php:167
 #: src/Module/Privacy/PermissionTooltip.php:189
 #: src/Module/Settings/Channels.php:154
 msgid "Followers"
 msgstr ""
 
-#: src/BaseModule.php:510 src/Content/Widget.php:272 src/Module/Contact.php:413
+#: src/BaseModule.php:510 src/Content/Widget.php:275 src/Module/Contact.php:413
 #: src/Module/Settings/Channels.php:153
 msgid "Following"
 msgstr ""
 
-#: src/BaseModule.php:515 src/Content/Widget.php:273 src/Model/User.php:1454
+#: src/BaseModule.php:515 src/Content/Widget.php:276 src/Model/User.php:1454
 #: src/Module/Contact.php:414
 msgid "Friends"
 msgstr ""
@@ -1430,9 +1430,9 @@ msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:394
 #: src/Module/BaseProfile.php:138 src/Module/Contact.php:409
-#: src/Module/Contact.php:531 src/Module/Conversation/Channel.php:98
-#: src/Module/Conversation/Community.php:92
-#: src/Module/Conversation/Network.php:398
+#: src/Module/Contact.php:531 src/Module/Conversation/Channel.php:102
+#: src/Module/Conversation/Community.php:95
+#: src/Module/Conversation/Network.php:403
 #: src/Module/Moderation/BaseUsers.php:127
 msgid "More"
 msgstr ""
@@ -1996,9 +1996,9 @@ msgstr ""
 msgid "Network Widgets"
 msgstr ""
 
-#: src/Content/Feature.php:128 src/Content/Widget.php:247
-#: src/Content/Widget/SidebarMenu.php:77 src/Model/Circle.php:593
-#: src/Module/Circle.php:165 src/Module/Circle.php:184
+#: src/Content/Feature.php:128 src/Content/Widget.php:250
+#: src/Content/Widget/SidebarMenu.php:81 src/Model/Circle.php:593
+#: src/Module/Circle.php:184 src/Module/Circle.php:203
 #: src/Module/Contact.php:399 src/Module/Welcome.php:63
 msgid "Circles"
 msgstr ""
@@ -2009,7 +2009,7 @@ msgstr ""
 
 #: src/Content/Feature.php:129 src/Content/GroupManager.php:116
 #: src/Content/Nav.php:249 src/Content/Nav.php:282
-#: src/Content/Text/HTML.php:902 src/Content/Widget.php:572
+#: src/Content/Text/HTML.php:902 src/Content/Widget.php:576
 #: src/Model/User.php:1468 src/Module/Groups.php:103
 msgid "Groups"
 msgstr ""
@@ -2026,7 +2026,7 @@ msgstr ""
 msgid "Display posts from Organization and News Pages."
 msgstr ""
 
-#: src/Content/Feature.php:131 src/Content/Widget.php:541
+#: src/Content/Feature.php:131 src/Content/Widget.php:545
 msgid "Archives"
 msgstr ""
 
@@ -2034,7 +2034,7 @@ msgstr ""
 msgid "Display an archive where posts can be selected by month and year."
 msgstr ""
 
-#: src/Content/Feature.php:132 src/Content/Widget.php:320
+#: src/Content/Feature.php:132 src/Content/Widget.php:323
 msgid "Protocols"
 msgstr ""
 
@@ -2042,7 +2042,7 @@ msgstr ""
 msgid "Display posts with the selected protocols."
 msgstr ""
 
-#: src/Content/Feature.php:133 src/Content/Widget.php:578
+#: src/Content/Feature.php:133 src/Content/Widget.php:582
 #: src/Module/Settings/Account.php:393
 msgid "Account Types"
 msgstr ""
@@ -2051,9 +2051,9 @@ msgstr ""
 msgid "Display posts done by accounts with the selected account type."
 msgstr ""
 
-#: src/Content/Feature.php:134 src/Content/Widget.php:644
-#: src/Content/Widget/SidebarMenu.php:78 src/Module/Admin/Site.php:476
-#: src/Module/BaseSettings.php:120 src/Module/Channels.php:67
+#: src/Content/Feature.php:134 src/Content/Widget.php:648
+#: src/Content/Widget/SidebarMenu.php:82 src/Module/Admin/Site.php:476
+#: src/Module/BaseSettings.php:120 src/Module/Channels.php:71
 #: src/Module/Settings/Channels.php:231 src/Module/Settings/Display.php:506
 msgid "Channels"
 msgstr ""
@@ -2062,18 +2062,20 @@ msgstr ""
 msgid "Display posts in the system channels and user defined channels."
 msgstr ""
 
-#: src/Content/Feature.php:135 src/Content/Widget/SavedSearches.php:46
-#: src/Module/Search/SavedList.php:77
-msgid "Saved Searches"
+#: src/Content/Feature.php:135 src/Content/Nav.php:244
+#: src/Content/Text/HTML.php:897 src/Content/Widget/SavedSearches.php:46
+#: src/Content/Widget/SidebarMenu.php:83 src/Content/Widget/TagCloud.php:54
+#: src/Module/Search/SavedList.php:79
+msgid "Tags"
 msgstr ""
 
 #: src/Content/Feature.php:135
 msgid "Display posts that contain subscribed hashtags."
 msgstr ""
 
-#: src/Content/Feature.php:136 src/Content/Widget.php:350
-#: src/Content/Widget/SidebarMenu.php:80 src/Module/Folders.php:77
-msgid "Saved Folders"
+#: src/Content/Feature.php:136 src/Content/Widget.php:353
+#: src/Content/Widget/SidebarMenu.php:84 src/Module/Folders.php:79
+msgid "Folders"
 msgstr ""
 
 #: src/Content/Feature.php:136
@@ -2133,12 +2135,12 @@ msgid "External link to group"
 msgstr ""
 
 #: src/Content/GroupManager.php:122 src/Content/PagesManager.php:101
-#: src/Content/Widget.php:547
+#: src/Content/Widget.php:551
 msgid "show less"
 msgstr ""
 
 #: src/Content/GroupManager.php:123 src/Content/PagesManager.php:102
-#: src/Content/Widget.php:442 src/Content/Widget.php:548
+#: src/Content/Widget.php:446 src/Content/Widget.php:552
 msgid "show more"
 msgstr ""
 
@@ -2258,7 +2260,7 @@ msgid "My Profile"
 msgstr ""
 
 #: src/Content/Nav.php:103 src/Content/Nav.php:278
-#: src/Content/Widget/SidebarMenu.php:104 src/Module/Help.php:70
+#: src/Content/Widget/SidebarMenu.php:108 src/Module/Help.php:70
 #: view/theme/frio/theme.php:229
 msgid "Home"
 msgstr ""
@@ -2365,11 +2367,6 @@ msgstr ""
 
 #: src/Content/Nav.php:243 src/Content/Text/HTML.php:896
 msgid "Full Text"
-msgstr ""
-
-#: src/Content/Nav.php:244 src/Content/Text/HTML.php:897
-#: src/Content/Widget/SidebarMenu.php:79 src/Content/Widget/TagCloud.php:54
-msgid "Tags"
 msgstr ""
 
 #: src/Content/Nav.php:245 src/Content/Nav.php:309
@@ -2687,7 +2684,7 @@ msgstr ""
 msgid "The end"
 msgstr ""
 
-#: src/Content/Text/HTML.php:881 src/Module/Search/SavedList.php:86
+#: src/Content/Text/HTML.php:881 src/Module/Search/SavedList.php:88
 msgid "Save search"
 msgstr ""
 
@@ -2762,64 +2759,64 @@ msgstr ""
 msgid "Local Directory"
 msgstr ""
 
-#: src/Content/Widget.php:249
+#: src/Content/Widget.php:252
 msgid "Everyone"
 msgstr ""
 
-#: src/Content/Widget.php:274 src/Module/Contact.php:415
+#: src/Content/Widget.php:277 src/Module/Contact.php:415
 msgid "No relationship"
 msgstr ""
 
-#: src/Content/Widget.php:279
+#: src/Content/Widget.php:282
 msgid "Relationships"
 msgstr ""
 
-#: src/Content/Widget.php:281 src/Module/Circle.php:355
+#: src/Content/Widget.php:284 src/Module/Circle.php:374
 #: src/Module/Contact.php:343
 msgid "All Contacts"
 msgstr ""
 
-#: src/Content/Widget.php:322
+#: src/Content/Widget.php:325
 msgid "All Protocols"
 msgstr ""
 
-#: src/Content/Widget.php:352 src/Content/Widget.php:383
-#: src/Module/Folders.php:55
+#: src/Content/Widget.php:355 src/Content/Widget.php:387
+#: src/Module/Folders.php:57
 msgid "Everything"
 msgstr ""
 
-#: src/Content/Widget.php:381
+#: src/Content/Widget.php:385
 msgid "Categories"
 msgstr ""
 
-#: src/Content/Widget.php:438
+#: src/Content/Widget.php:442
 #, php-format
 msgid "%d contact in common"
 msgid_plural "%d contacts in common"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Content/Widget.php:549
+#: src/Content/Widget.php:553
 msgid "On this date"
 msgstr ""
 
-#: src/Content/Widget.php:569
+#: src/Content/Widget.php:573
 msgid "Persons"
 msgstr ""
 
-#: src/Content/Widget.php:570
+#: src/Content/Widget.php:574
 msgid "Organisations"
 msgstr ""
 
-#: src/Content/Widget.php:571 src/Model/Contact.php:1990
+#: src/Content/Widget.php:575 src/Model/Contact.php:1990
 msgid "News"
 msgstr ""
 
-#: src/Content/Widget.php:573
+#: src/Content/Widget.php:577
 msgid "Relays"
 msgstr ""
 
-#: src/Content/Widget.php:580 src/Module/BaseProfile.php:170
+#: src/Content/Widget.php:584 src/Module/BaseProfile.php:170
 #: src/Module/Moderation/BaseUsers.php:73
 msgid "All"
 msgstr ""
@@ -2865,7 +2862,7 @@ msgstr ""
 msgid "Moderator"
 msgstr ""
 
-#: src/Content/Widget/SavedSearches.php:33 src/Module/Search/SavedList.php:69
+#: src/Content/Widget/SavedSearches.php:33 src/Module/Search/SavedList.php:71
 msgid "Remove term"
 msgstr ""
 
@@ -3471,20 +3468,20 @@ msgstr ""
 msgid "add"
 msgstr ""
 
-#: src/Model/Circle.php:597 src/Module/Circle.php:157
+#: src/Model/Circle.php:597 src/Module/Circle.php:176
 msgid "Edit circle"
 msgstr ""
 
-#: src/Model/Circle.php:598 src/Module/Circle.php:146 src/Module/Circle.php:245
+#: src/Model/Circle.php:598 src/Module/Circle.php:165 src/Module/Circle.php:264
 msgid "Contacts not in any circle"
 msgstr ""
 
-#: src/Model/Circle.php:600 src/Module/Circle.php:174
+#: src/Model/Circle.php:600 src/Module/Circle.php:193
 msgid "Create a new circle"
 msgstr ""
 
-#: src/Model/Circle.php:601 src/Module/Circle.php:173 src/Module/Circle.php:226
-#: src/Module/Circle.php:250 src/Module/Circle.php:336
+#: src/Model/Circle.php:601 src/Module/Circle.php:192 src/Module/Circle.php:245
+#: src/Module/Circle.php:269 src/Module/Circle.php:355
 msgid "Circle Name: "
 msgstr ""
 
@@ -6384,9 +6381,9 @@ msgstr ""
 msgid "Group Search - %s"
 msgstr ""
 
-#: src/Module/BaseSearch.php:132 src/Module/Conversation/Channel.php:127
-#: src/Module/Conversation/Community.php:116 src/Module/Search/Index.php:149
-#: src/Module/Search/Index.php:201
+#: src/Module/BaseSearch.php:132 src/Module/Conversation/Channel.php:131
+#: src/Module/Conversation/Community.php:119 src/Module/Search/Index.php:150
+#: src/Module/Search/Index.php:202
 msgid "No results."
 msgstr ""
 
@@ -6592,39 +6589,39 @@ msgstr ""
 msgid "New Event"
 msgstr ""
 
-#: src/Module/Channels.php:70
+#: src/Module/Channels.php:74
 msgid "Edit own channels"
 msgstr ""
 
-#: src/Module/Channels.php:71
+#: src/Module/Channels.php:75
 msgid "Select and order channels"
 msgstr ""
 
-#: src/Module/Channels.php:74
+#: src/Module/Channels.php:78
 msgid "Filter channels"
 msgstr ""
 
-#: src/Module/Channels.php:76
+#: src/Module/Channels.php:80
 msgid "There are no channels."
 msgstr ""
 
-#: src/Module/Circle.php:44
+#: src/Module/Circle.php:63
 msgid "Could not create circle."
 msgstr ""
 
-#: src/Module/Circle.php:55 src/Module/Circle.php:263 src/Module/Circle.php:298
+#: src/Module/Circle.php:74 src/Module/Circle.php:282 src/Module/Circle.php:317
 msgid "Circle not found."
 msgstr ""
 
-#: src/Module/Circle.php:67
+#: src/Module/Circle.php:86
 msgid "Circle settings were not changed."
 msgstr ""
 
-#: src/Module/Circle.php:87
+#: src/Module/Circle.php:106
 msgid "Unknown circle."
 msgstr ""
 
-#: src/Module/Circle.php:93 src/Module/Circle.php:102
+#: src/Module/Circle.php:112 src/Module/Circle.php:121
 #: src/Module/Contact/Advanced.php:56 src/Module/Contact/Advanced.php:95
 #: src/Module/Contact/BasePosts.php:70 src/Module/Contact/BasePosts.php:75
 #: src/Module/Contact/BasePosts.php:80 src/Module/Contact/Contacts.php:49
@@ -6639,92 +6636,92 @@ msgstr ""
 msgid "Contact not found."
 msgstr ""
 
-#: src/Module/Circle.php:97 src/Module/Contact/Contacts.php:44
+#: src/Module/Circle.php:116 src/Module/Contact/Contacts.php:44
 msgid "Invalid contact."
 msgstr ""
 
-#: src/Module/Circle.php:106 src/Module/Contact/Revoke.php:56
+#: src/Module/Circle.php:125 src/Module/Contact/Revoke.php:56
 msgid "Contact is deleted."
 msgstr ""
 
-#: src/Module/Circle.php:112
+#: src/Module/Circle.php:131
 msgid "Unable to add the contact to the circle."
 msgstr ""
 
-#: src/Module/Circle.php:115
+#: src/Module/Circle.php:134
 msgid "Contact successfully added to circle."
 msgstr ""
 
-#: src/Module/Circle.php:119
+#: src/Module/Circle.php:138
 msgid "Unable to remove the contact from the circle."
 msgstr ""
 
-#: src/Module/Circle.php:122
+#: src/Module/Circle.php:141
 msgid "Contact successfully removed from circle."
 msgstr ""
 
-#: src/Module/Circle.php:126
+#: src/Module/Circle.php:145
 msgid "Bad request."
 msgstr ""
 
-#: src/Module/Circle.php:176
+#: src/Module/Circle.php:195
 msgid "Filter circles"
 msgstr ""
 
-#: src/Module/Circle.php:218
+#: src/Module/Circle.php:237
 msgid "Save Circle"
 msgstr ""
 
-#: src/Module/Circle.php:219 src/Module/Moderation/Blocklist/Contact.php:113
+#: src/Module/Circle.php:238 src/Module/Moderation/Blocklist/Contact.php:113
 #: src/Module/Moderation/Blocklist/Server/Index.php:104
 msgid "Filter"
 msgstr ""
 
-#: src/Module/Circle.php:225
+#: src/Module/Circle.php:244
 msgid "Create a circle of contacts/friends."
 msgstr ""
 
-#: src/Module/Circle.php:268
+#: src/Module/Circle.php:287
 msgid "Unable to remove circle."
 msgstr ""
 
-#: src/Module/Circle.php:330
+#: src/Module/Circle.php:349
 msgid "Delete Circle"
 msgstr ""
 
-#: src/Module/Circle.php:337
+#: src/Module/Circle.php:356
 msgid "Public circle"
 msgstr ""
 
-#: src/Module/Circle.php:337
+#: src/Module/Circle.php:356
 msgid "Public circles can be downloaded by others as CSV files."
 msgstr ""
 
-#: src/Module/Circle.php:342
+#: src/Module/Circle.php:361
 msgid "Edit Circle Name"
 msgstr ""
 
-#: src/Module/Circle.php:343 src/Module/Group.php:199
+#: src/Module/Circle.php:362 src/Module/Group.php:199
 msgid "Mark all as read"
 msgstr ""
 
-#: src/Module/Circle.php:353
+#: src/Module/Circle.php:372
 msgid "Members"
 msgstr ""
 
-#: src/Module/Circle.php:356
+#: src/Module/Circle.php:375
 msgid "Circle is empty"
 msgstr ""
 
-#: src/Module/Circle.php:372
+#: src/Module/Circle.php:391
 msgid "Remove contact from circle"
 msgstr ""
 
-#: src/Module/Circle.php:395
+#: src/Module/Circle.php:414
 msgid "Click on a contact to add or remove."
 msgstr ""
 
-#: src/Module/Circle.php:413
+#: src/Module/Circle.php:432
 msgid "Add contact to circle"
 msgstr ""
 
@@ -6798,7 +6795,7 @@ msgstr ""
 msgid "Search your contacts"
 msgstr ""
 
-#: src/Module/Contact.php:449 src/Module/Search/Index.php:210
+#: src/Module/Contact.php:449 src/Module/Search/Index.php:211
 #, php-format
 msgid "Results for: %s"
 msgstr ""
@@ -6974,7 +6971,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: src/Module/Contact/Follow.php:57 src/Module/Contact/Redir.php:36
-#: src/Module/Contact/Redir.php:197 src/Module/Conversation/Community.php:157
+#: src/Module/Contact/Redir.php:197 src/Module/Conversation/Community.php:160
 #: src/Module/Debug/ItemBody.php:30 src/Module/Diaspora/Receive.php:45
 #: src/Module/Item/Comment.php:44 src/Module/Item/Comments.php:45
 #: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:92
@@ -7391,37 +7388,37 @@ msgstr ""
 msgid "Unable to unfollow this contact, please contact your administrator"
 msgstr ""
 
-#: src/Module/Conversation/Channel.php:165
+#: src/Module/Conversation/Channel.php:169
 msgid "Channel not available."
 msgstr ""
 
-#: src/Module/Conversation/Community.php:86
+#: src/Module/Conversation/Community.php:89
 msgid "This community stream shows all public posts received by this node. They may not reflect the opinions of this node’s users."
 msgstr ""
 
-#: src/Module/Conversation/Community.php:171
+#: src/Module/Conversation/Community.php:174
 msgid "Community option not available."
 msgstr ""
 
-#: src/Module/Conversation/Community.php:187
+#: src/Module/Conversation/Community.php:190
 msgid "Not available."
 msgstr ""
 
-#: src/Module/Conversation/Network.php:290
+#: src/Module/Conversation/Network.php:295
 msgid "No such circle"
 msgstr ""
 
-#: src/Module/Conversation/Network.php:294
+#: src/Module/Conversation/Network.php:299
 #, php-format
 msgid "Circle: %s"
 msgstr ""
 
-#: src/Module/Conversation/Network.php:314
+#: src/Module/Conversation/Network.php:319
 #, php-format
 msgid "Error %d (%s) while fetching the timeline."
 msgstr ""
 
-#: src/Module/Conversation/Network.php:410
+#: src/Module/Conversation/Network.php:415
 msgid "Network feed not available."
 msgstr ""
 
@@ -7557,7 +7554,7 @@ msgstr ""
 msgid "Personal notifications"
 msgstr ""
 
-#: src/Module/Deck.php:89 src/Module/Search/SavedList.php:85
+#: src/Module/Deck.php:89 src/Module/Search/SavedList.php:87
 msgid "Search term"
 msgstr ""
 
@@ -7638,15 +7635,15 @@ msgstr ""
 msgid "- select -"
 msgstr ""
 
-#: src/Module/Folders.php:63 src/Module/Folders/Rename.php:80
+#: src/Module/Folders.php:65 src/Module/Folders/Rename.php:82
 msgid "Rename this folder"
 msgstr ""
 
-#: src/Module/Folders.php:68
+#: src/Module/Folders.php:70
 msgid "Delete this folder"
 msgstr ""
 
-#: src/Module/Folders.php:81
+#: src/Module/Folders.php:83
 msgid "Filter folders"
 msgstr ""
 
@@ -7654,15 +7651,15 @@ msgstr ""
 msgid "Folder was not removed"
 msgstr ""
 
-#: src/Module/Folders/Rename.php:61
+#: src/Module/Folders/Rename.php:63
 msgid "Folder was not renamed"
 msgstr ""
 
-#: src/Module/Folders/Rename.php:83
+#: src/Module/Folders/Rename.php:85
 msgid "New folder name:"
 msgstr ""
 
-#: src/Module/Folders/Rename.php:84
+#: src/Module/Folders/Rename.php:86
 msgid "Rename"
 msgstr ""
 
@@ -10454,15 +10451,15 @@ msgstr ""
 msgid "You must be logged in to use this module."
 msgstr ""
 
-#: src/Module/Search/Index.php:61
+#: src/Module/Search/Index.php:62
 msgid "Only logged in users are permitted to perform a search."
 msgstr ""
 
-#: src/Module/Search/Index.php:83
+#: src/Module/Search/Index.php:84
 msgid "Only one search per minute is permitted for not logged in users."
 msgstr ""
 
-#: src/Module/Search/Index.php:208
+#: src/Module/Search/Index.php:209
 #, php-format
 msgid "Items tagged with: %s"
 msgstr ""
@@ -10479,11 +10476,11 @@ msgstr ""
 msgid "Search term was not removed."
 msgstr ""
 
-#: src/Module/Search/SavedList.php:88
+#: src/Module/Search/SavedList.php:90
 msgid "Filter searches"
 msgstr ""
 
-#: src/Module/Search/SavedList.php:90
+#: src/Module/Search/SavedList.php:92
 msgid "You have no saved searches."
 msgstr ""
 
@@ -11765,7 +11762,7 @@ msgid "Clicking the text of a post opens its own page. This applies to feeds wit
 msgstr ""
 
 #: src/Module/Settings/Display.php:537
-msgid "Show circles, channels, saved searches and folders as a menu"
+msgid "Show circles, channels, tags and folders as a menu"
 msgstr ""
 
 #: src/Module/Settings/Display.php:537

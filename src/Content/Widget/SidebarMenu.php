@@ -14,7 +14,7 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 
 /**
- * Menu that replaces the widgets for circles, channels, saved searches and saved folders.
+ * Menu that replaces the widgets for circles, channels, tags and folders.
  *
  * Each entry links to an overview page instead of expanding a list of entries in the sidebar.
  */
@@ -81,7 +81,7 @@ class SidebarMenu
 			self::CIRCLES  => ['circle',      'ri-bubble-chart-line', $this->l10n->t('Circles')],
 			self::CHANNELS => ['channels',    'ri-broadcast-line',    $this->l10n->t('Channels')],
 			self::SEARCHES => ['search/saved', 'ri-search-line',      $this->l10n->t('Tags')],
-			self::FOLDERS  => ['folders',     'ri-folder-line',       $this->l10n->t('Saved Folders')],
+			self::FOLDERS  => ['folders',     'ri-folder-line',       $this->l10n->t('Folders')],
 		];
 
 		$menu = [];

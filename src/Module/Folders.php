@@ -76,7 +76,7 @@ class Folders extends BaseModule
 		}
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('overview_list.tpl'), [
-			'$title'  => $this->t('Saved Folders'),
+			'$title'  => $this->t('Folders'),
 			'$intro'  => '',
 			'$links'  => [],
 			'$add'    => null,
