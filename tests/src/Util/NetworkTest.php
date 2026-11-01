@@ -93,6 +93,19 @@ class NetworkTest extends TestCase
 		DI::init($dice, true);
 	}
 
+	private function useForbiddenEmailConfig(string $forbidden): void
+	{
+		$config = \Mockery::mock(IManageConfigValues::class);
+		$config->shouldReceive('get')->with('system', 'forbidden_email')->andReturn($forbidden);
+		$dice = \Mockery::mock(Dice::class);
+		$dice->shouldReceive('create')->with(IManageConfigValues::class)->andReturn($config);
+
+		$property = new \ReflectionProperty(DI::class, 'dice');
+		$this->previousDice ??= $property->getValue();
+
+		DI::init($dice, true);
+	}
+
 	public function testEmailDomainAllowedWithoutLists(): void
 	{
 		$this->useEmailDomainConfig('', '');
@@ -150,5 +163,65 @@ class NetworkTest extends TestCase
 
 		self::assertFalse(Network::isEmailDomainAllowed('example.org@evil.com'));
 		self::assertTrue(Network::isEmailDomainAllowed('"a@b"@example.org'));
+	}
+
+	public function testForbiddenEmailEmptyList(): void
+	{
+		$this->useForbiddenEmailConfig('');
+
+		self::assertTrue(Network::isEmailAddressAllowed('user@example.org'));
+	}
+
+	public function testForbiddenEmailExactAddress(): void
+	{
+		$this->useForbiddenEmailConfig('user@example.org');
+
+		self::assertFalse(Network::isEmailAddressAllowed('user@example.org'));
+		self::assertTrue(Network::isEmailAddressAllowed('superuser@example.org'));
+		self::assertTrue(Network::isEmailAddressAllowed('user@example.com'));
+		self::assertTrue(Network::isEmailAddressAllowed('user+tag@example.org'));
+	}
+
+	public function testForbiddenEmailPlusAddressing(): void
+	{
+		$this->useForbiddenEmailConfig('user@example.org, user+*@example.org');
+
+		self::assertFalse(Network::isEmailAddressAllowed('user@example.org'));
+		self::assertFalse(Network::isEmailAddressAllowed('user+a@example.org'));
+		self::assertFalse(Network::isEmailAddressAllowed('user+blabla@example.org'));
+		self::assertTrue(Network::isEmailAddressAllowed('other+a@example.org'));
+		self::assertTrue(Network::isEmailAddressAllowed('user+a@example.com'));
+	}
+
+	public function testForbiddenEmailWildcardInLocalpart(): void
+	{
+		$this->useForbiddenEmailConfig('*porn*@*');
+
+		self::assertFalse(Network::isEmailAddressAllowed('porn@example.org'));
+		self::assertFalse(Network::isEmailAddressAllowed('best-porn-site@example.com'));
+		self::assertTrue(Network::isEmailAddressAllowed('user@porn.example.org'));
+	}
+
+	public function testForbiddenEmailWildcardInDomain(): void
+	{
+		$this->useForbiddenEmailConfig('*@*.junk.example');
+
+		self::assertFalse(Network::isEmailAddressAllowed('user@mail.junk.example'));
+		self::assertTrue(Network::isEmailAddressAllowed('user@junk.example'));
+	}
+
+	public function testForbiddenEmailIsCaseInsensitive(): void
+	{
+		$this->useForbiddenEmailConfig('User+*@Example.ORG');
+
+		self::assertFalse(Network::isEmailAddressAllowed('USER+Tag@example.org'));
+	}
+
+	public function testForbiddenEmailIgnoresEmptyListEntries(): void
+	{
+		$this->useForbiddenEmailConfig(' , user@example.org,, ');
+
+		self::assertFalse(Network::isEmailAddressAllowed('user@example.org'));
+		self::assertTrue(Network::isEmailAddressAllowed('other@example.org'));
 	}
 }

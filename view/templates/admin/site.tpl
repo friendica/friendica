@@ -51,6 +51,7 @@
 			{{include file="field_checkbox.tpl" field=$register_notification}}
 			{{include file="field_textarea.tpl" field=$allowed_email}}
 			{{include file="field_textarea.tpl" field=$disallowed_email}}
+			{{include file="field_textarea.tpl" field=$forbidden_email}}
 			{{include file="field_textarea.tpl" field=$forbidden_nicknames}}
 		</div>
 		<div class="settings-submit-wrapper"><input type="submit" class="settings-submit btn btn-default" name="page_site" value="{{$submit}}"/></div>

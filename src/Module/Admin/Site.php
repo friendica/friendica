@@ -64,11 +64,12 @@ class Site extends BaseAdmin
 
 		$register_text = (!empty($_POST['register_text'])           ? strip_tags(trim((string) $_POST['register_text']))           : '');
 
-		$allowed_sites           = (!empty($_POST['allowed_sites'])           ? trim((string) $_POST['allowed_sites'])  : '');
-		$allowed_email           = (!empty($_POST['allowed_email'])           ? trim((string) $_POST['allowed_email'])  : '');
-		$disallowed_email        = (!empty($_POST['disallowed_email'])        ? trim((string) $_POST['disallowed_email'])  : '');
-		$forbidden_nicknames     = (!empty($_POST['forbidden_nicknames'])     ? strtolower(trim((string) $_POST['forbidden_nicknames'])) : '');
-		$system_actor_name       = (!empty($_POST['system_actor_name'])       ? trim((string) $_POST['system_actor_name']) : '');
+		$allowed_sites           = (!empty($_POST['allowed_sites'])             ? trim((string) $_POST['allowed_sites'])  : '');
+		$allowed_email           = (!empty($_POST['allowed_email'])             ? trim((string) $_POST['allowed_email'])  : '');
+		$disallowed_email        = (!empty($_POST['disallowed_email'])          ? trim((string) $_POST['disallowed_email'])  : '');
+		$forbidden_email         = (!empty($_POST['forbidden_email']) ? strtolower(trim((string) $_POST['forbidden_email'])) : '');
+		$forbidden_nicknames     = (!empty($_POST['forbidden_nicknames'])       ? strtolower(trim((string) $_POST['forbidden_nicknames'])) : '');
+		$system_actor_name       = (!empty($_POST['system_actor_name'])         ? trim((string) $_POST['system_actor_name']) : '');
 		$block_public            = !empty($_POST['block_public']);
 		$force_publish           = !empty($_POST['publish_all']);
 		$global_directory        = (!empty($_POST['directory'])               ? trim((string) $_POST['directory'])      : '');
@@ -248,6 +249,7 @@ class Site extends BaseAdmin
 		$transactionConfig->set('system', 'allowed_sites', $allowed_sites);
 		$transactionConfig->set('system', 'allowed_email', $allowed_email);
 		$transactionConfig->set('system', 'disallowed_email', $disallowed_email);
+		$transactionConfig->set('system', 'forbidden_email', $forbidden_email);
 		$transactionConfig->set('system', 'forbidden_nicknames', $forbidden_nicknames);
 		if (!empty($system_actor_name) && !DBA::exists('contact', ['uid' => 0, 'self' => true])) {
 			$transactionConfig->set('system', 'actor_name', $system_actor_name);
@@ -514,6 +516,7 @@ class Site extends BaseAdmin
 			'$allowed_sites'                   => ['allowed_sites', DI::l10n()->t('Allowed friend domains'), DI::config()->get('system', 'allowed_sites'), DI::l10n()->t('Comma separated list of domains which are allowed to establish friendships with this site. Wildcards are accepted. Empty to allow any domains')],
 			'$allowed_email'                   => ['allowed_email', DI::l10n()->t('Allowed email domains'), DI::config()->get('system', 'allowed_email'), DI::l10n()->t('Comma separated list of domains which are allowed in email addresses for registrations to this site. Wildcards are accepted. Empty to allow any domains')],
 			'$disallowed_email'                => ['disallowed_email', DI::l10n()->t('Disallowed email domains'), DI::config()->get('system', 'disallowed_email'), DI::l10n()->t('Comma separated list of domains which are rejected as email addresses for registrations to this site. Wildcards are accepted.')],
+			'$forbidden_email'                 => ['forbidden_email', DI::l10n()->t('Forbidden email addresses'), DI::config()->get('system', 'forbidden_email'), DI::l10n()->t('Comma separated list of email addresses that are rejected for registrations to this site. Wildcards are accepted, e.g. "user@example.com", "user+*@example.com" or "*porn*@*".')],
 			'$block_public'                    => ['block_public', DI::l10n()->t('Block public'), DI::config()->get('system', 'block_public'), DI::l10n()->t('Check to block public access to all otherwise public personal pages on this site unless you are currently logged in.')],
 			'$force_publish'                   => ['publish_all', DI::l10n()->t('Force publish'), DI::config()->get('system', 'publish_all'), DI::l10n()->t('Check to force all profiles on this site to be listed in the site directory.') . '<strong>' . DI::l10n()->t('Enabling this may violate privacy laws like the GDPR') . '</strong>'],
 			'$global_directory'                => ['directory', DI::l10n()->t('Global directory URL'), DI::config()->get('system', 'directory'), DI::l10n()->t('URL to the global directory. If this is not set, the global directory is completely unavailable to the application.')],
