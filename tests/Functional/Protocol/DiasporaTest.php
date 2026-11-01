@@ -13,6 +13,7 @@ use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Contact;
+use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
@@ -160,6 +161,35 @@ class DiasporaTest extends FixtureTestCase
 		self::assertSame(['https://bob.example/fetch/post/parent-guid'], array_values($fetches));
 	}
 
+	public function testPublicLikeOnUnknownParentIsDroppedWithoutFetch(): void
+	{
+		$this->followAuthor();
+
+		$envelope = Diaspora::buildMagicEnvelope(
+			$this->statusMessage('liked-guid', 'Liked post'),
+			['addr' => self::AUTHOR, 'uprvkey' => $this->privateKey],
+		);
+		$this->responses['https://bob.example/fetch/post/liked-guid']   = $envelope;
+		$this->responses['https://alice.example/fetch/post/liked-guid'] = $envelope;
+
+		self::assertFalse($this->dispatch(self::COMMENTER, $this->like('like-guid', 'liked-guid'), Diaspora::PUSHED));
+
+		$fetches = array_filter($this->requests, fn (string $url): bool => str_contains($url, '/fetch/post/'));
+		self::assertSame([], array_values($fetches));
+		self::assertFalse(Post::exists(['guid' => 'liked-guid']));
+		self::assertFalse(Post::exists(['guid' => 'like-guid']));
+	}
+
+	public function testPublicLikeOnKnownParentIsStored(): void
+	{
+		$this->followAuthor();
+
+		self::assertNotFalse($this->dispatch(self::AUTHOR, $this->statusMessage('liked-guid', 'Liked post'), Diaspora::PUSHED));
+		self::assertNotFalse($this->dispatch(self::COMMENTER, $this->like('like-guid', 'liked-guid'), Diaspora::PUSHED));
+
+		self::assertTrue(Post::exists(['guid' => 'like-guid', 'gravity' => Item::GRAVITY_ACTIVITY]));
+	}
+
 	/**
 	 * Records an outgoing request and answers it from the prepared responses, otherwise with 404.
 	 */
@@ -189,6 +219,36 @@ class DiasporaTest extends FixtureTestCase
 			. '<text>' . htmlspecialchars($text, ENT_XML1) . '</text>'
 			. '<public>true</public>'
 			. '</status_message>';
+	}
+
+	private function like(string $guid, string $parentGuid): string
+	{
+		return '<like>'
+			. '<positive>true</positive>'
+			. '<guid>' . $guid . '</guid>'
+			. '<parent_type>Post</parent_type>'
+			. '<parent_guid>' . $parentGuid . '</parent_guid>'
+			. '<author>' . self::COMMENTER . '</author>'
+			. '</like>';
+	}
+
+	/**
+	 * Lets the local user follow the author, so posts of the author are solicited.
+	 */
+	private function followAuthor(): void
+	{
+		$author = Contact::getByURL(self::AUTHOR, false, ['url', 'nurl']);
+		DBA::insert('contact', [
+			'uid'     => self::LOCAL_UID,
+			'url'     => $author['url'],
+			'nurl'    => $author['nurl'],
+			'addr'    => self::AUTHOR,
+			'network' => Protocol::DIASPORA,
+			'rel'     => Contact::SHARING,
+			'blocked' => false,
+			'pending' => false,
+			'created' => DateTimeFormat::utcNow(),
+		]);
 	}
 
 	/**
