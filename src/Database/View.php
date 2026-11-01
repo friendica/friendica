@@ -21,30 +21,41 @@ class View
 	 */
 	public static function create(bool $verbose, bool $action)
 	{
-		// Delete previously used views that aren't used anymore
-		foreach (['post-view', 'post-thread-view'] as $view) {
-			if (self::isView($view)) {
-				$sql = sprintf("DROP VIEW IF EXISTS `%s`", DBA::escape($view));
-				if ($verbose) {
-					echo $sql . ";\n";
-				}
-
-				if ($action) {
-					DBA::e($sql);
-				}
-			}
-		}
-
 		// just for Create purpose, reload the view definition with addons to explicit get the whole definition
 		$definition = DI::viewDefinition()->load(true)->getAll();
 
-		foreach ($definition as $name => $structure) {
-			if (self::isView($name)) {
-				DBA::e(sprintf("DROP VIEW IF EXISTS `%s`", DBA::escape($name)));
-			} elseif (self::isTable($name)) {
-				DBA::e(sprintf("DROP TABLE IF EXISTS `%s`", DBA::escape($name)));
+		// Delete previously used views that aren't used anymore
+		foreach (['post-view', 'post-thread-view'] as $view) {
+			if (!isset($definition[$view]) && self::isView($view)) {
+				self::execute(sprintf("DROP VIEW IF EXISTS `%s`;\n", DBA::escape($view)), $verbose, $action);
 			}
-			DBA::e(ViewDefinitionSqlWriter::createView($name, $structure));
+		}
+
+		// Existing views are replaced in place, so concurrent queries never miss them
+		foreach ($definition as $name => $structure) {
+			if (self::isTable($name)) {
+				self::execute(sprintf("DROP TABLE IF EXISTS `%s`;\n", DBA::escape($name)), $verbose, $action);
+			}
+			self::execute(ViewDefinitionSqlWriter::createView($name, $structure, true), $verbose, $action);
+		}
+	}
+
+	/**
+	 * Shows and/or executes an SQL statement
+	 *
+	 * @param string $sql     SQL statement
+	 * @param bool   $verbose Whether to show the SQL statement
+	 * @param bool   $action  Whether to execute the SQL statement
+	 * @return void
+	 */
+	private static function execute(string $sql, bool $verbose, bool $action)
+	{
+		if ($verbose) {
+			echo $sql;
+		}
+
+		if ($action) {
+			DBA::e($sql);
 		}
 	}
 
