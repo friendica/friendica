@@ -75,6 +75,13 @@
 		</div>
 		<div id="register-nickname-end"></div>
 
+		<div id="register-timezone-wrapper" class="form-group">
+			{{include file="field_custom.tpl" field=$timezone}}
+		</div>
+		<div id="register-language-wrapper" class="form-group">
+			{{include file="field_select.tpl" field=$language}}
+		</div>
+
 		{{if $additional}}
 			<div id="register-type-wrapper" class="form-group">
 				{{include file="field_select.tpl" field=$acct_type}}
