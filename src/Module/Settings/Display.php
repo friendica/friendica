@@ -106,7 +106,7 @@ class Display extends BaseSettings
 		$bookmark                 = (array) $request['bookmark'];
 		$channel_languages        = (array) $request['channel_languages'];
 		$filter_timeline_language = (bool) $request['filter_timeline_language'];
-		$timeline_languages       = (array) ($request['timeline_languages'] ?? []);
+		$timeline_languages       = array_values(array_intersect((array) ($request['timeline_languages'] ?? []), array_keys($this->l10n->getLanguageCodes())));
 		$timeline_channels        = isset($request['timeline_channels']) ? (array) $request['timeline_channels'] : null;
 		$filter_channels          = isset($request['filter_channels']) ? (array) $request['filter_channels'] : null;
 		$first_day_of_week        = (int) $request['first_day_of_week'];
