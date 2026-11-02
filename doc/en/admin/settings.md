@@ -87,6 +87,14 @@ By default, OpenID may be used for both registration and logins.
 If you do not wish to make OpenID facilities available on your system (at all), set 'no_openid' to true.
 Default is false.
 
+#### Login with an e-mail code
+
+Users can sign in without a password by requesting a one time code that is sent to their e-mail address.
+The code is valid for ten minutes and can only be used once.
+If the user has enabled two-factor authentication, it is still requested afterwards.
+You can switch this off in the admin settings (Registration section) or by setting 'enable_login_code' to false.
+Default is false.
+
 #### Multiple Registrations
 
 The ability to create "Pages" requires a person to register more than once.

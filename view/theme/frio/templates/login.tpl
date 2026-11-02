@@ -28,8 +28,15 @@
 		{{include file="field_input.tpl" field=$lname label=false}}
 		{{include file="field_password.tpl" field=$lpassword label=false}}
 		<div id="login-end"></div>
-		<div id="login-lost-password-link">
-			<a href="lostpass" id="lost-password-link">{{$lostlink}}</a>
+		<div id="login-links">
+			{{if $codelink}}
+			<div id="login-code-link">
+				<a href="login/code" id="login-code-link-anchor">{{$codelink}}</a>
+			</div>
+			{{/if}}
+			<div id="login-lost-password-link">
+				<a href="lostpass" id="lost-password-link">{{$lostlink}}</a>
+			</div>
 		</div>
 
 		{{if $openid}}

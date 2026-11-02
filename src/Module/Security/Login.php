@@ -174,6 +174,8 @@ class Login extends BaseModule
 				'$lostpass' => DI::l10n()->t('Forgot your password?'),
 				'$lostlink' => DI::l10n()->t('Password Reset'),
 
+				'$codelink' => DI::config()->get('system', 'enable_login_code') ? DI::l10n()->t('Sign in with an e-mail code') : '',
+
 				'$tostitle' => DI::l10n()->t('Website Terms of Service'),
 				'$toslink'  => DI::l10n()->t('terms of service'),
 

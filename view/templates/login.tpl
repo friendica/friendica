@@ -30,6 +30,11 @@
 	<div id="login-lost-password-link">
 		<a href="lostpass" title="{{$lostpass}}" id="lost-password-link">{{$lostlink}}</a>
 	</div>
+	{{if $codelink}}
+	<div id="login-code-link">
+		<a href="login/code" id="login-code-link-anchor">{{$codelink}}</a>
+	</div>
+	{{/if}}
 	</div>
 
 	{{if $openid}}

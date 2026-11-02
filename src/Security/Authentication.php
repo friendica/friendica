@@ -238,6 +238,52 @@ class Authentication
 			$this->baseUrl->redirect();
 		}
 
+		$this->completeLogin($record, $username, $remember, $return_path, strlen($password) > 72);
+	}
+
+	/**
+	 * Attempts to authenticate using a verified one time code that was sent by e-mail
+	 *
+	 * The caller has to make sure that the code is valid.
+	 *
+	 * @param int    $uid         The user id the code was issued for
+	 * @param bool   $remember    Whether to set the session remember flag
+	 * @param string $return_path The relative path to redirect the user to after authentication
+	 *
+	 * @throws HTTPException\ForbiddenException
+	 * @throws HTTPException\FoundException
+	 * @throws HTTPException\InternalServerErrorException In case of Friendica internal exceptions
+	 * @throws HTTPException\MovedPermanentlyException
+	 * @throws HTTPException\TemporaryRedirectException
+	 */
+	public function withLoginCode(int $uid, bool $remember, string $return_path = '')
+	{
+		$record = $this->dba->selectFirst('user', [], [
+			'uid'             => $uid,
+			'verified'        => true,
+			'account_expired' => false,
+			'account_removed' => false,
+		]);
+		if (!$this->dba->isResult($record)) {
+			$this->logger->warning('authenticate: login code for unknown user', ['action' => 'login', 'uid' => $uid, 'ip' => $this->remoteAddress]);
+			DI::sysmsg()->addNotice($this->l10n->t('Login failed.'));
+			$this->baseUrl->redirect();
+		}
+
+		$this->completeLogin($record, $record['nickname'], $remember, $return_path, false);
+	}
+
+	/**
+	 * Logs in an already verified user record
+	 *
+	 * @param array  $record       The "user" record
+	 * @param string $username     Name used for logging
+	 * @param bool   $remember     Whether to set the session remember flag
+	 * @param string $return_path  The relative path to redirect the user to after authentication
+	 * @param bool   $password_long Whether the used password exceeds the length limit of the hash
+	 */
+	private function completeLogin(array $record, string $username, bool $remember, string $return_path, bool $password_long): void
+	{
 		if ($record['blocked']) {
 			$this->logger->warning('authenticate: user is blocked', ['action' => 'login', 'username' => $username, 'ip' => $this->remoteAddress]);
 			DI::sysmsg()->addNotice($this->l10n->t('Login failed because your account is blocked.'));
@@ -266,7 +312,7 @@ class Authentication
 		 * @see User::getPasswordRegExp()
 		 */
 		/** @phpstan-ignore identical.alwaysTrue(value of PASSWORD_DEFAULT will be change in a future PHP version) */
-		if (PASSWORD_DEFAULT === PASSWORD_BCRYPT && strlen($password) > 72) {
+		if (PASSWORD_DEFAULT === PASSWORD_BCRYPT && $password_long) {
 			$return_path = '/security/password_too_long?' . http_build_query(['return_path' => $return_path]);
 		}
 
