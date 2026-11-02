@@ -221,6 +221,7 @@ class Register extends BaseModule
 			'$openid'                => $openid_url,
 			'$namelabel'             => DI::l10n()->t('Your Display Name (as you would like it to be displayed on this system):'),
 			'$addrlabel'             => DI::l10n()->t('Your Email Address (initial information will be sent there, so this must be a valid address):'),
+			'$addrlabel2'            => DI::l10n()->t('Please repeat your e-mail address:'),
 			'$ask_password'          => $ask_password,
 			'$password1'             => ['password1', DI::l10n()->t('New Password:'), '', DI::l10n()->t('Leave empty for an auto generated password.')],
 			'$password2'             => ['confirm', DI::l10n()->t('Confirm:'), '', ''],
@@ -338,10 +339,17 @@ class Register extends BaseModule
 			$verified = 1;
 
 			$post['password1'] = $post['confirm'] = $post['parent_password'];
-			$post['email']     = $user['email'];
+			$post['repeat']    = $post['email'] = $user['email'];
 		} else {
 			// Overwriting the "tar pit" field with the real one
 			$post['email'] = $post['field1'];
+		}
+
+		if ($post['email'] != $post['repeat']) {
+			$this->logger->info('Mail mismatch', $post);
+			DI::sysmsg()->addNotice(DI::l10n()->t('Please enter the identical mail address in the second field.'));
+
+			DI::baseUrl()->redirect('register?' . http_build_query($regdata));
 		}
 
 		//Check if nickname contains only US-ASCII and do not start with a digit

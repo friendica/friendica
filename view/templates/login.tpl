@@ -14,8 +14,7 @@
 
 {{if $register}}
 <div id="login-extra-links">
-	<h3 id="register-head" class="sr-only">{{$register.title}}</h3>
-	<button type="button" id="register-link" title="{{$register.title}}" onclick="location.href='{{$register.url|escape:'quotes'}}'">{{$register.desc}}</button>
+	<a href="{{$register.url}}" id="register-link" class="button" title="{{$register.title}}">{{$register.desc}}</a>
 </div>
 {{/if}}
 
