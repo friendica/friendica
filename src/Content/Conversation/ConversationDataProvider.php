@@ -379,6 +379,7 @@ final readonly class ConversationDataProvider
 		$uriIds        = [];
 		$parentAuthors = [];
 		$postChannels  = [];
+		$activityRoots = [];
 		$uriId         = 0;
 
 		// Initialize items array with parent items, ensuring they have pagedrop set
@@ -386,7 +387,8 @@ final readonly class ConversationDataProvider
 		foreach ($this->addMissingFields($parents, $uid) as $parent) {
 			$items[$parent['uri-id']] = $parent;
 			if (!empty($parent['thr-parent-id']) && !empty($parent['gravity']) && ($parent['gravity'] === ItemModel::GRAVITY_ACTIVITY)) {
-				$uriId = $parent['thr-parent-id'];
+				$uriId                 = $parent['thr-parent-id'];
+				$activityRoots[$uriId] = $uriId;
 				if (!empty($parent['author-id'])) {
 					$activities[$uriId] = ['causer-id' => $parent['author-id']];
 					foreach (['commented', 'received', 'created'] as $field) {
@@ -402,6 +404,13 @@ final readonly class ConversationDataProvider
 			$uriIds[]              = $uriId;
 			$postChannels[$uriId]  = $parent['channel'] ?? '';
 			$parentAuthors[$uriId] = $parent['author-id'];
+		}
+
+		// For activities (like reshares) the author of the activity isn't the author of the displayed thread
+		if (!empty($activityRoots)) {
+			foreach (Post::selectToArray(['uri-id', 'author-id'], ['uri-id' => array_values($activityRoots)]) as $root) {
+				$parentAuthors[$root['uri-id']] = $root['author-id'];
+			}
 		}
 
 		$filterAuthors = array_values($parentAuthors);
