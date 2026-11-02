@@ -818,7 +818,6 @@ textarea.profile-jot-text,
 
 	/* Hide distracting writing helpers (Advanced Composer panel, and other core editor widgets) */
 	.mod-compose.ec-distraction-free #easy-compose-panel,
-	.mod-compose.ec-distraction-free #permissions-section,
 	.mod-compose.ec-distraction-free #profile-jot-perms,
 	.mod-compose.ec-distraction-free #jot-category,
 	.mod-compose.ec-distraction-free #jot-title,
@@ -1241,8 +1240,7 @@ textarea.profile-jot-text,
 
 	.ec-split-layout > #profile-jot-submit-wrapper,
 	.ec-split-layout > .comment-edit-submit-wrapper,
-	.ec-split-layout > [id^="profile-jot-submit-wrapper"],
-	.ec-split-layout > #permissions-section {
+	.ec-split-layout > [id^="profile-jot-submit-wrapper"] {
 		order: 4 !important;
 		grid-column: 1 / -1 !important;
 		width: 100% !important;
