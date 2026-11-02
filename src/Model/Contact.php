@@ -99,6 +99,12 @@ class Contact
 	public const SHARING  = 2; // The contact shares their content with this user (the user is the subscriber)
 	public const FRIEND   = 3; // There is a mutual relationship between the contact and the user
 	public const SELF     = 4; // This is the user theirself
+
+	// Notify New Posts options, not a binary flag
+	public const NOTIFY_NEW_POSTS_NONE   = 0;
+	public const NOTIFY_NEW_POSTS_ALL    = 1;
+	public const NOTIFY_NEW_POSTS_POSTS  = 2;
+	public const NOTIFY_NEW_POSTS_SHARES = 3;
 	/**
 	 * @}
 	 */
