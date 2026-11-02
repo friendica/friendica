@@ -5,10 +5,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+declare(strict_types=1);
+
 namespace Friendica\Content\Widget;
 
 use Friendica\Content\Feature;
-use Friendica\Content\Nav;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
@@ -27,7 +28,11 @@ class SidebarMenu
 	public const SEARCHES = 'searches';
 	public const FOLDERS  = 'folders';
 
-	/** Widgets that are replaced by a menu entry, in the order of the menu */
+	/**
+	 * Widgets that are replaced by a menu entry, in the order of the menu
+	 *
+	 * The groups have no entry, since they are linked in the main navigation.
+	 */
 	private const WIDGETS = [
 		self::CIRCLES  => Feature::CIRCLES,
 		self::GROUPS   => Feature::GROUPS,
@@ -75,10 +80,8 @@ class SidebarMenu
 			return '';
 		}
 
-		Nav::setSelected('network');
-
 		$entries = [
-			self::CIRCLES  => ['circle',      'ri-bubble-chart-line', $this->l10n->t('Circles')],
+			self::CIRCLES  => ['circles',     'ri-bubble-chart-line', $this->l10n->t('Circles')],
 			self::CHANNELS => ['channels',    'ri-broadcast-line',    $this->l10n->t('Channels')],
 			self::SEARCHES => ['search/saved', 'ri-search-line',      $this->l10n->t('Tags')],
 			self::FOLDERS  => ['folders',     'ri-folder-line',       $this->l10n->t('Folders')],
@@ -110,6 +113,7 @@ class SidebarMenu
 		]);
 
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('widget/sidebar_menu.tpl'), [
+			'$label'   => $this->l10n->t('Sidebar menu'),
 			'$entries' => $menu,
 		]);
 	}

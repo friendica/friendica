@@ -17,6 +17,7 @@ use Friendica\Content\Conversation\Factory\Community as CommunityFactory;
 use Friendica\Content\Conversation\Factory\Network as NetworkFactory;
 use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Content\Nav;
+use Friendica\Content\Post\Repository\SavedSearch;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
@@ -24,7 +25,6 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Protocol;
 use Friendica\Core\Search;
 use Friendica\Core\Theme;
-use Friendica\Database\Database;
 use Friendica\Model\Circle;
 use Friendica\Model\Contact;
 use Friendica\Module\Security\Login;
@@ -46,7 +46,7 @@ class Deck extends BaseModule
 	/** @var AppHelper */
 	protected $appHelper;
 
-	public function __construct(private readonly NetworkFactory $network, private readonly ChannelFactory $channel, private readonly UserDefinedChannel $userDefinedChannel, private readonly CommunityFactory $community, private readonly Database $database, private readonly IManagePersonalConfigValues $pConfig, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, Page $page, AppHelper $appHelper, array $server, array $parameters = [])
+	public function __construct(private readonly NetworkFactory $network, private readonly ChannelFactory $channel, private readonly UserDefinedChannel $userDefinedChannel, private readonly CommunityFactory $community, private readonly SavedSearch $savedSearch, private readonly IManagePersonalConfigValues $pConfig, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, Page $page, AppHelper $appHelper, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -142,10 +142,10 @@ class Deck extends BaseModule
 	 */
 	private function getSavedSearches(int $uid): array
 	{
-		return array_map(fn (array $search): array => [
-			'path'  => Search::getSearchPath($search['term']),
-			'title' => $search['term'],
-		], $this->database->selectToArray('search', ['term'], ['uid' => $uid], ['order' => ['term']]));
+		return array_map(fn (string $term): array => [
+			'path'  => Search::getSearchPath($term),
+			'title' => $term,
+		], $this->savedSearch->selectTermsByUid($uid));
 	}
 
 	/**

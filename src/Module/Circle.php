@@ -19,6 +19,7 @@ use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 class Circle extends BaseModule
@@ -32,9 +33,10 @@ class Circle extends BaseModule
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = [],
+		array $parameters,
+		EventDispatcherInterface $eventDispatcher,
 	) {
-		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters, $eventDispatcher);
 	}
 
 	protected function post(array $request = [])
@@ -154,50 +156,6 @@ class Circle extends BaseModule
 		$this->earlyJsonExit(['status' => 'OK', 'message' => $message]);
 	}
 
-	/**
-	 * Overview of all circles of the user, used when the circles are shown as menu
-	 *
-	 * @return string
-	 */
-	private function overview(): string
-	{
-		$items = [[
-			'name' => DI::l10n()->t('Contacts not in any circle'),
-			'href' => 'circle/none',
-		]];
-
-		$circles = DBA::select('group', ['id', 'name'], ['deleted' => false, 'uid' => DI::userSession()->getLocalUserId(), 'cid' => null], ['order' => ['name']]);
-		while ($circle = DBA::fetch($circles)) {
-			$items[] = [
-				'name'    => $circle['name'],
-				'href'    => 'network/circle/' . $circle['id'],
-				'actions' => [[
-					'href'  => 'circle/' . $circle['id'],
-					'label' => DI::l10n()->t('Edit circle'),
-					'icon'  => 'ri-pencil-line',
-				]],
-			];
-		}
-		DBA::close($circles);
-
-		return Renderer::replaceMacros(Renderer::getMarkupTemplate('overview_list.tpl'), [
-			'$title' => DI::l10n()->t('Circles'),
-			'$intro' => '',
-			'$links' => [],
-			'$add'   => [
-				'action'      => 'circle/new',
-				'method'      => 'post',
-				'hidden'      => [['name' => 'form_security_token', 'value' => BaseModule::getFormSecurityToken('circle_edit')]],
-				'name'        => 'circle_name',
-				'placeholder' => DI::l10n()->t('Circle Name: '),
-				'submit'      => DI::l10n()->t('Create a new circle'),
-			],
-			'$filter' => DI::l10n()->t('Filter circles'),
-			'$items'  => $items,
-			'$empty'  => '',
-		]);
-	}
-
 	protected function content(array $request = []): string
 	{
 		DI::page()['title'] = DI::l10n()->t("Circles");
@@ -215,12 +173,6 @@ class Circle extends BaseModule
 		// With no circle number provided we jump to the unassigned contacts as a starting point
 		// @TODO: Replace with parameter from router
 		if (DI::args()->getArgc() === 1) {
-			if ($this->sidebarMenu->isActive(DI::userSession()->getLocalUserId())) {
-				DI::page()['aside'] = $this->sidebarMenu->getHTML(DI::userSession()->getLocalUserId(), SidebarMenu::CIRCLES);
-
-				return $this->overview();
-			}
-
 			DI::baseUrl()->redirect('circle/none');
 		}
 

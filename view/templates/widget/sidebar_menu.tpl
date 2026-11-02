@@ -4,7 +4,7 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
-<nav id="sidebar-menu" class="widget">
+<nav id="sidebar-menu" class="widget" aria-label="{{$label}}">
 	<ul class="sidebar-menu-list">
 		{{foreach $entries as $entry}}
 			<li class="sidebar-menu-entry{{if $entry.selected}} selected{{/if}}">

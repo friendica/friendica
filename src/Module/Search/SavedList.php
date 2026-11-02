@@ -5,6 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+declare(strict_types=1);
+
 namespace Friendica\Module\Search;
 
 use Friendica\App\Arguments;
@@ -13,15 +15,16 @@ use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Content\Feature;
 use Friendica\Content\Nav;
+use Friendica\Content\Post\Repository\SavedSearch;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Database\Database;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -31,7 +34,7 @@ class SavedList extends BaseModule
 {
 	public function __construct(
 		private readonly IHandleUserSessions $session,
-		private readonly Database $database,
+		private readonly SavedSearch $savedSearch,
 		private readonly Widget\SidebarMenu $sidebarMenu,
 		private Page $page,
 		L10n $l10n,
@@ -41,9 +44,10 @@ class SavedList extends BaseModule
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = [],
+		array $parameters,
+		EventDispatcherInterface $eventDispatcher,
 	) {
-		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters, $eventDispatcher);
 	}
 
 	protected function content(array $request = []): string
@@ -62,12 +66,12 @@ class SavedList extends BaseModule
 		$returnUrl = bin2hex('search/saved');
 
 		$items = [];
-		foreach ($this->database->selectToArray('search', ['term'], ['uid' => $uid], ['order' => ['term']]) as $search) {
+		foreach ($this->savedSearch->selectTermsByUid($uid) as $term) {
 			$items[] = [
-				'name'    => $search['term'],
-				'href'    => Search::getSearchPath($search['term']),
+				'name'    => $term,
+				'href'    => Search::getSearchPath($term),
 				'actions' => [[
-					'href'    => 'search/saved/remove?term=' . urlencode((string) $search['term']) . '&return_url=' . $returnUrl,
+					'href'    => 'search/saved/remove?term=' . urlencode($term) . '&return_url=' . $returnUrl,
 					'label'   => $this->t('Remove term'),
 					'icon'    => 'ri-delete-bin-line',
 					'confirm' => true,

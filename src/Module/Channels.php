@@ -5,6 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+declare(strict_types=1);
+
 namespace Friendica\Module;
 
 use Friendica\App\Arguments;
@@ -19,6 +21,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -38,9 +41,10 @@ class Channels extends BaseModule
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = [],
+		array $parameters,
+		EventDispatcherInterface $eventDispatcher,
 	) {
-		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters, $eventDispatcher);
 	}
 
 	protected function content(array $request = []): string

@@ -5,6 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+declare(strict_types=1);
+
 namespace Friendica\Module\Folders;
 
 use Friendica\App\Arguments;
@@ -12,15 +14,16 @@ use Friendica\App\BaseURL;
 use Friendica\App\Page;
 use Friendica\BaseModule;
 use Friendica\Content\Nav;
+use Friendica\Content\Post\Repository\PostCategory;
 use Friendica\Content\Widget;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Model\Post;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -30,6 +33,7 @@ class Rename extends BaseModule
 {
 	public function __construct(
 		private readonly IHandleUserSessions $session,
+		private readonly PostCategory $postCategory,
 		private readonly SystemMessages $systemMessages,
 		private readonly Widget\SidebarMenu $sidebarMenu,
 		private Page $page,
@@ -40,9 +44,10 @@ class Rename extends BaseModule
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = [],
+		array $parameters,
+		EventDispatcherInterface $eventDispatcher,
 	) {
-		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters, $eventDispatcher);
 	}
 
 	protected function post(array $request = [])
@@ -59,7 +64,11 @@ class Rename extends BaseModule
 
 		$this->logger->info('Rename folder', ['uid' => $uid, 'old' => $oldname, 'new' => $newname]);
 
-		if ($oldname === '' || $newname === '' || $oldname === $newname || !Post\Category::renameFolder($uid, $oldname, $newname)) {
+		$oldTagId = $this->postCategory->findFolderId($oldname);
+		if ($oldTagId !== null && $oldTagId === $this->postCategory->findFolderId($newname)) {
+			// Folder names are tags and these are compared case insensitive
+			$this->systemMessages->addNotice($this->t('Folder names that only differ in upper and lower case are the same folder.'));
+		} elseif ($oldname === '' || $newname === '' || !$this->postCategory->renameFolder($uid, $oldname, $newname)) {
 			$this->systemMessages->addNotice($this->t('Folder was not renamed'));
 		}
 

@@ -13,7 +13,7 @@
 	{{if !$groups}}
 		<p>{{$no_groups}}</p>
 	{{else}}
-		<input type="search" class="form-control overview-filter" placeholder="{{$filter}}" aria-label="{{$filter}}" oninput="filterOverviewList(this)">
+		<input type="search" class="form-control overview-filter" placeholder="{{$filter}}" aria-label="{{$filter}}">
 		{{foreach $groups as $server}}
 		<div class="group-list-server">
 			<h2>

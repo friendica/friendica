@@ -27,7 +27,7 @@
 	{{/if}}
 
 	{{if $items}}
-		<input type="search" class="form-control overview-filter" placeholder="{{$filter}}" aria-label="{{$filter}}" oninput="filterOverviewList(this)">
+		<input type="search" class="form-control overview-filter" placeholder="{{$filter}}" aria-label="{{$filter}}">
 		<ul class="overview-list">
 			{{foreach $items as $item}}
 				<li class="overview-entry{{if $item.selected}} selected{{/if}}" data-filter-item>
@@ -38,7 +38,7 @@
 					{{if $item.actions}}
 						<div class="overview-actions">
 							{{foreach $item.actions as $action}}
-								<a href="{{$action.href}}" class="overview-action" title="{{$action.label}}"{{if $action.confirm}} onclick="return confirmDelete();"{{/if}}>
+								<a href="{{$action.href}}" class="overview-action{{if $action.confirm}} overview-action-confirm{{/if}}" title="{{$action.label}}">
 									<i class="ri {{$action.icon}}" aria-hidden="true"></i>
 									<span class="sr-only">{{$action.label}}</span>
 								</a>

@@ -5,18 +5,21 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+declare(strict_types=1);
+
 namespace Friendica\Module\Folders;
 
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\BaseModule;
+use Friendica\Content\Post\Repository\PostCategory;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Model\Post;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -26,6 +29,7 @@ class Remove extends BaseModule
 {
 	public function __construct(
 		private readonly IHandleUserSessions $session,
+		private readonly PostCategory $postCategory,
 		private readonly SystemMessages $systemMessages,
 		L10n $l10n,
 		BaseURL $baseUrl,
@@ -34,9 +38,10 @@ class Remove extends BaseModule
 		Profiler $profiler,
 		Response $response,
 		array $server,
-		array $parameters = [],
+		array $parameters,
+		EventDispatcherInterface $eventDispatcher,
 	) {
-		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters, $eventDispatcher);
 	}
 
 	protected function rawContent(array $request = [])
@@ -52,7 +57,7 @@ class Remove extends BaseModule
 
 		$this->logger->info('Remove folder', ['uid' => $uid, 'file' => $file]);
 
-		if ($file === '' || !Post\Category::deleteFolder($uid, $file)) {
+		if ($file === '' || !$this->postCategory->deleteFolder($uid, $file)) {
 			$this->systemMessages->addNotice($this->t('Folder was not removed'));
 		}
 

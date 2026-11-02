@@ -525,6 +525,7 @@ return [
 		'/{circle:\d+}/{contact:\d+}'                      => [Module\Circle::class, [R::GET, R::POST]],
 		'/{circle:\d+}/{command:add|remove}/{contact:\d+}' => [Module\Circle::class, [R::GET, R::POST]],
 	],
+	'/circles'  => [Module\Circles::class,         [R::GET]],
 	'/channels' => [Module\Channels::class,        [R::GET]],
 	'/folders'  => [
 		'[/]'     => [Module\Folders::class,         [R::GET]],
