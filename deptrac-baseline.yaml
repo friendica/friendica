@@ -981,8 +981,6 @@ deptrac:
       - Friendica\DI
     Friendica\Security\BasicAuth:
       - Friendica\DI
-    Friendica\Security\ExAuth:
-      - Friendica\DI
     Friendica\Security\LegacyFormSecurityToken:
       - Friendica\DI
     Friendica\Security\OAuth:
