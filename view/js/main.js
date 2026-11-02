@@ -166,6 +166,33 @@ function openCloseWidget(name) {
 	}
 }
 
+/**
+ * Hides all entries of an overview page that don't contain the entered text
+ */
+document.addEventListener("input", function (event) {
+	const input = event.target.closest(".overview-filter");
+	if (!input) {
+		return;
+	}
+
+	const term = input.value.trim().toLowerCase();
+	const page = input.closest(".generic-page-wrapper");
+
+	page.querySelectorAll("[data-filter-item]").forEach(function (entry) {
+		entry.hidden = term !== "" && !entry.textContent.toLowerCase().includes(term);
+	});
+});
+
+/**
+ * Asks for confirmation before an action link of an overview page is followed
+ */
+document.addEventListener("click", function (event) {
+	const action = event.target.closest(".overview-action-confirm");
+	if (action && !confirmDelete()) {
+		event.preventDefault();
+	}
+});
+
 function openClose(theID) {
 	var el = document.getElementById(theID);
 	if (el) {

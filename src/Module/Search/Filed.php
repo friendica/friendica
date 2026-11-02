@@ -14,6 +14,7 @@ use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -31,6 +32,7 @@ class Filed extends BaseSearch
 {
 	public function __construct(
 		private readonly ConversationRenderer $conversationRenderer,
+		private readonly SidebarMenu $sidebarMenu,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -50,7 +52,11 @@ class Filed extends BaseSearch
 			return Login::form();
 		}
 
-		DI::page()['aside'] .= Widget::fileAs(DI::args()->getCommand(), $_GET['file'] ?? '');
+		if ($this->sidebarMenu->isActive(DI::userSession()->getLocalUserId())) {
+			DI::page()['aside'] .= $this->sidebarMenu->getHTML(DI::userSession()->getLocalUserId(), Widget\SidebarMenu::FOLDERS);
+		} else {
+			DI::page()['aside'] .= Widget::fileAs(DI::args()->getCommand(), $_GET['file'] ?? '');
+		}
 
 		$file = $_GET['file'] ?? '';
 
