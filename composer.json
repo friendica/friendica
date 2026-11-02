@@ -203,7 +203,7 @@
 		],
 		"phpstan:check-ignores": "sh -c '! grep -n \"^ *count:\" .phpstan.neon || { echo \"Ignores in .phpstan.neon must not use count, list the files with paths instead\" >&2; exit 1; }' --",
 		"phpstan:generate-baseline": "phpstan --generate-baseline=.phpstan-baseline.neon --memory-limit=1024M --configuration=.phpstan.neon",
-		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './view/asset/*' -print0 | xargs -0 -n1 php -l",
+		"lint": "find . -name \\*.php -not -path './vendor/*' -not -path './view/asset/*' -print0 | xargs -0 -n1 -P\"$(getconf _NPROCESSORS_ONLN)\" php -l",
 		"docker:translate": "docker run --rm -v $PWD:/data -w /data friendicaci/transifex bin/run_xgettext.sh",
 		"lang:recreate": "bin/run_xgettext.sh",
 		"cs:check": "php-cs-fixer check --diff",
