@@ -76,6 +76,9 @@
 	</div>
 	<div id="register-nickname-end"></div>
 
+	{{include file="field_custom.tpl" field=$timezone}}
+	{{include file="field_select.tpl" field=$language}}
+
 	<input type="input" id=tarpit" name="email" style="display: none;" placeholder="Don't enter anything here"/>
 
 	{{if $additional}}
@@ -114,4 +117,13 @@
 			<a href="user/import" class="button">{{$importt}}</a>
 		</div>
 	{{/if}}
+<script>
+	(function () {
+		var select = document.getElementById('timezone_select');
+		var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		if (select && timezone && Array.prototype.some.call(select.options, function (option) { return option.value === timezone; })) {
+			select.value = timezone;
+		}
+	})();
+</script>
 </form>
