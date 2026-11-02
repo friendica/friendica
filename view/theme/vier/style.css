@@ -3689,6 +3689,10 @@ video {
 	background-repeat: no-repeat;
 }
 .iframe-placeholder-dialog {
+	box-sizing: border-box;
+	min-width: 0;
+	max-width: 100%;
+	overflow-wrap: anywhere;
 	padding: 15px 20px;
 	background-color: rgba(0, 0, 0, .65);
 	color: #fff;
