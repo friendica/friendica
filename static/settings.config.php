@@ -125,6 +125,12 @@ return [
 		// Set this to announce that your node is used mostly for explicit content that might not be suited for minors.
 		'explicit_content' => false,
 
+		// forbidden_email (Comma-separated list)
+		// Prevents registrations with an email address matching one of these patterns.
+		// Patterns are matched against the whole address and may contain wildcards,
+		// e.g. "user@example.com", "user+*@example.com" or "*porn*@*".
+		'forbidden_email' => '',
+
 		// forbidden_nicknames (Comma-separated list)
 		// Prevents users from registering the specified usernames on this node.
 		// Default value comprises classic role names from RFC 2142.

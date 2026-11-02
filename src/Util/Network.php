@@ -379,6 +379,26 @@ class Network
 		return $found;
 	}
 
+	/**
+	 * Check if an email address is not on the list of forbidden email addresses.
+	 *
+	 * The list contains patterns for the whole address (wildcards allowed), e.g. "user@example.com",
+	 * "user+*@example.com" or "*porn*@*". Matching is case-insensitive.
+	 *
+	 * @param  string $email email address
+	 * @return boolean False if the address matches a forbidden pattern, true otherwise
+	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 */
+	public static function isEmailAddressAllowed(string $email): bool
+	{
+		$forbidden = trim((string) DI::config()->get('system', 'forbidden_email'));
+		if ($forbidden === '') {
+			return true;
+		}
+
+		return !self::isDomainMatch(strtolower(trim($email)), explode(',', $forbidden));
+	}
+
 	public static function lookupAvatarByEmail(string $email): string
 	{
 		$avatar['size']    = 300;

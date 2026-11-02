@@ -61,6 +61,7 @@
 						{{include file="field_checkbox.tpl" field=$register_notification}}
 						{{include file="field_textarea.tpl" field=$allowed_email}}
 						{{include file="field_textarea.tpl" field=$disallowed_email}}
+						{{include file="field_textarea.tpl" field=$forbidden_email}}
 						{{include file="field_textarea.tpl" field=$forbidden_nicknames}}
 					</div>
 					<div class="panel-footer">

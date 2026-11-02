@@ -25,6 +25,7 @@ use Friendica\Module\BaseSettings;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Delivery;
+use Friendica\Util\Network;
 use Friendica\Util\Temporal;
 
 class Account extends BaseSettings
@@ -94,6 +95,11 @@ class Account extends BaseSettings
 				//  check the email is valid
 				if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 					$err .= DI::l10n()->t('Invalid email.');
+				}
+				//  ensure new email is not on the list of forbidden addresses
+				if (!Network::isEmailAddressAllowed($email)) {
+					$err .= DI::l10n()->t('Cannot change to that email.');
+					$email = $user['email'];
 				}
 				//  ensure new email is not the admin mail
 				if (in_array(strtolower((string) $email), User::getAdminEmailList())) {
