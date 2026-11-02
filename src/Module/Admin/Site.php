@@ -64,12 +64,12 @@ class Site extends BaseAdmin
 
 		$register_text = (!empty($_POST['register_text'])           ? strip_tags(trim((string) $_POST['register_text']))           : '');
 
-		$allowed_sites           = (!empty($_POST['allowed_sites'])             ? trim((string) $_POST['allowed_sites'])  : '');
-		$allowed_email           = (!empty($_POST['allowed_email'])             ? trim((string) $_POST['allowed_email'])  : '');
-		$disallowed_email        = (!empty($_POST['disallowed_email'])          ? trim((string) $_POST['disallowed_email'])  : '');
-		$forbidden_email         = (!empty($_POST['forbidden_email']) ? strtolower(trim((string) $_POST['forbidden_email'])) : '');
-		$forbidden_nicknames     = (!empty($_POST['forbidden_nicknames'])       ? strtolower(trim((string) $_POST['forbidden_nicknames'])) : '');
-		$system_actor_name       = (!empty($_POST['system_actor_name'])         ? trim((string) $_POST['system_actor_name']) : '');
+		$allowed_sites           = (!empty($_POST['allowed_sites'])           ? trim((string) $_POST['allowed_sites'])  : '');
+		$allowed_email           = (!empty($_POST['allowed_email'])           ? trim((string) $_POST['allowed_email'])  : '');
+		$disallowed_email        = (!empty($_POST['disallowed_email'])        ? trim((string) $_POST['disallowed_email'])  : '');
+		$forbidden_email         = (!empty($_POST['forbidden_email'])         ? strtolower(trim((string) $_POST['forbidden_email'])) : '');
+		$forbidden_nicknames     = (!empty($_POST['forbidden_nicknames'])     ? strtolower(trim((string) $_POST['forbidden_nicknames'])) : '');
+		$system_actor_name       = (!empty($_POST['system_actor_name'])       ? trim((string) $_POST['system_actor_name']) : '');
 		$block_public            = !empty($_POST['block_public']);
 		$force_publish           = !empty($_POST['publish_all']);
 		$global_directory        = (!empty($_POST['directory'])               ? trim((string) $_POST['directory'])      : '');
