@@ -44,9 +44,7 @@ use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ATProtocol\DID;
 use Friendica\Security\Authentication;
-use Friendica\Security\ExAuth;
 use Friendica\Security\OpenWebAuth;
-use Friendica\Util\BasePath;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\HTTPInputData;
 use Friendica\Util\HTTPSignature;
@@ -233,48 +231,6 @@ class App
 		(\Friendica\Core\Console::create($this->container, $argv))->execute();
 	}
 
-	/**
-	 * @internal
-	 */
-	public function processEjabberd(array $serverParams): void
-	{
-		$this->setupContainerForAddons();
-
-		$this->setupLogChannel(LogChannel::AUTH_JABBERED);
-
-		$this->setupLegacyServiceLocator();
-
-		$this->registerErrorHandler();
-
-		$this->registerEventDispatcher();
-
-		$this->load(
-			$serverParams,
-			$this->container->create(DbaDefinition::class),
-			$this->container->create(ViewDefinition::class),
-			$this->container->create(Mode::class),
-			$this->container->create(IManageConfigValues::class),
-			$this->container->create(Profiler::class),
-			$this->container->create(EventDispatcherInterface::class),
-			$this->container->create(AppHelper::class),
-			$this->container->create(AddonHelper::class),
-		);
-
-		/** @var BasePath */
-		$basePath = $this->container->create(BasePath::class);
-
-		// Check the database structure and possibly fixes it
-		Update::check($basePath->getPath(), true);
-
-		$appMode = $this->container->create(Mode::class);
-
-		if ($appMode->isNormal()) {
-			/** @var ExAuth $oAuth */
-			$oAuth = $this->container->create(ExAuth::class);
-			$oAuth->readStdin();
-		}
-	}
-
 	private function setupContainerForAddons(): void
 	{
 		/** @var AddonHelper $addonHelper */
@@ -303,6 +259,10 @@ class App
 
 		if ($command === 'jetstream') {
 			return LogChannel::JETSTREAM;
+		}
+
+		if ($command === 'auth_ejabberd') {
+			return LogChannel::AUTH_JABBERED;
 		}
 
 		return LogChannel::CONSOLE;

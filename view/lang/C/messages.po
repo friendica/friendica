@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.11-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-02 16:43+0000\n"
+"POT-Creation-Date: 2026-11-02 19:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -462,7 +462,7 @@ msgstr ""
 msgid "Back to viewing"
 msgstr ""
 
-#: src/App.php:465
+#: src/App.php:425
 msgid "Apologies but the website is unavailable at the moment."
 msgstr ""
 
@@ -1435,7 +1435,7 @@ msgstr ""
 #: src/Module/BaseProfile.php:138 src/Module/Contact.php:409
 #: src/Module/Contact.php:531 src/Module/Conversation/Channel.php:98
 #: src/Module/Conversation/Community.php:91
-#: src/Module/Conversation/Network.php:392
+#: src/Module/Conversation/Network.php:393
 #: src/Module/Moderation/BaseUsers.php:127
 msgid "More"
 msgstr ""
@@ -2055,7 +2055,7 @@ msgstr ""
 
 #: src/Content/Feature.php:134 src/Content/Widget.php:640
 #: src/Module/Admin/Site.php:478 src/Module/BaseSettings.php:120
-#: src/Module/Settings/Channels.php:231 src/Module/Settings/Display.php:504
+#: src/Module/Settings/Channels.php:231 src/Module/Settings/Display.php:512
 msgid "Channels"
 msgstr ""
 
@@ -4789,11 +4789,11 @@ msgstr ""
 msgid "%s is no valid input for maximum image size"
 msgstr ""
 
-#: src/Module/Admin/Site.php:368 src/Module/Settings/Display.php:272
+#: src/Module/Admin/Site.php:368 src/Module/Settings/Display.php:278
 msgid "No special theme for mobile devices"
 msgstr ""
 
-#: src/Module/Admin/Site.php:385 src/Module/Settings/Display.php:282
+#: src/Module/Admin/Site.php:385 src/Module/Settings/Display.php:288
 #, php-format
 msgid "%s - (Experimental)"
 msgstr ""
@@ -5730,7 +5730,7 @@ msgid "Can be \"all\" or \"tags\". \"all\" means that every public post should b
 msgstr ""
 
 #: src/Module/Admin/Site.php:601 src/Module/Contact/Profile.php:329
-#: src/Module/Settings/Display.php:330 src/Module/Settings/Display.php:361
+#: src/Module/Settings/Display.php:336 src/Module/Settings/Display.php:367
 #: src/Module/Settings/TwoFactor/Index.php:132
 msgid "Disabled"
 msgstr ""
@@ -7412,21 +7412,21 @@ msgstr ""
 msgid "Not available."
 msgstr ""
 
-#: src/Module/Conversation/Network.php:284
+#: src/Module/Conversation/Network.php:285
 msgid "No such circle"
 msgstr ""
 
-#: src/Module/Conversation/Network.php:288
+#: src/Module/Conversation/Network.php:289
 #, php-format
 msgid "Circle: %s"
 msgstr ""
 
-#: src/Module/Conversation/Network.php:308
+#: src/Module/Conversation/Network.php:309
 #, php-format
 msgid "Error %d (%s) while fetching the timeline."
 msgstr ""
 
-#: src/Module/Conversation/Network.php:404
+#: src/Module/Conversation/Network.php:405
 msgid "Network feed not available."
 msgstr ""
 
