@@ -12,6 +12,14 @@
 	{{/foreach}}
 {{/if}}
 
+{{if $register}}
+<div id="login-extra-links">
+	<p id="new-here">{{$new}}</p>
+	<a href="{{$register.url}}" id="register-link" class="btn btn-default">{{$register.title}}</a>
+</div>
+<hr>
+{{/if}}
+
 <form id="login-form" action="{{$dest_url}}" role="form" method="post">
 	<div id="login-group" role="group" aria-labelledby="login-head">
 		<input type="hidden" name="auth-params" value="login" />
@@ -41,12 +49,3 @@
 		<div id="login-end"></div>
 	</div>
 </form>
-
-{{if $register}}
-<hr>
-<div id="login-extra-links">
-	<p id="new-here">{{$new}}</p>
-	<h3 id="login-head" class="sr-only">{{$register.title}}</h3>
-	<a href="{{$register.url}}" id="register-link" class="btn btn-default">{{$register.title}}</a>
-</div>
-{{/if}}
