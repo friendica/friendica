@@ -24,7 +24,7 @@ class SidebarMenuTest extends TestCase
 	{
 		$pConfig = $this->createStub(IManagePersonalConfigValues::class);
 		$pConfig->method('get')->willReturnCallback(
-			fn (int $uid, string $cat, string $key) => $uid === self::UID && $cat === 'system' && $key === 'widgets_as_menu' ? $enabled : null,
+			fn (int $uid, string $cat, string $key): ?bool => $uid === self::UID && $cat === 'system' && $key === 'widgets_as_menu' ? $enabled : null,
 		);
 
 		return new SidebarMenu($this->createStub(L10n::class), $pConfig);

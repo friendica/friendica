@@ -47,7 +47,7 @@ class PostCategoryTest extends FixtureTestCase
 
 		$rows = DI::dba()->selectToArray('post-category', ['uri-id'], ['uid' => $uid, 'type' => Category::FILE, 'tid' => $tagId], ['order' => ['uri-id']]);
 
-		return array_map('intval', array_column($rows, 'uri-id'));
+		return array_map(intval(...), array_column($rows, 'uri-id'));
 	}
 
 	public function testFindFolderIdDoesNotCreateTag(): void
