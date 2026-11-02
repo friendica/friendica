@@ -99,6 +99,8 @@ class ActivityPub
 			'quoteUrl'                  => 'as:quoteUrl',
 			'conversation'              => 'ostatus:conversation',
 			'directMessage'             => 'litepub:directMessage',
+			'EmojiReact'                => 'litepub:EmojiReact',
+			'emojiReactions'            => ['@id' => 'http://fedibird.com/ns#emojiReactions', '@type' => '@id'],
 			'discoverable'              => 'toot:discoverable',
 			'indexable'                 => 'toot:indexable',
 			'PropertyValue'             => 'schema:PropertyValue',

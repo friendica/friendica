@@ -613,6 +613,11 @@ abstract class DI
 		return self::$dice->create(Security\Authentication::class);
 	}
 
+	public static function formSecurityToken(): Security\FormSecurityToken
+	{
+		return self::$dice->create(Security\FormSecurityToken::class);
+	}
+
 	//
 	// "User" namespace instances
 	//
@@ -662,6 +667,12 @@ abstract class DI
 	public static function postMediaFactory(): Content\Post\Factory\PostMedia
 	{
 		return self::$dice->create(Content\Post\Factory\PostMedia::class);
+	}
+
+	// @todo Only for the procedural mod/photos.php; remove once photos is migrated to a module with constructor injection.
+	public static function mediaUsageRenderer(): Content\Post\MediaUsageRenderer
+	{
+		return self::$dice->create(Content\Post\MediaUsageRenderer::class);
 	}
 
 	public static function passwordExposedChecker(): Util\IPasswordExposedChecker

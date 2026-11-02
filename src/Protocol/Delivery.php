@@ -403,6 +403,11 @@ class Delivery
 			return true;
 		}
 
+		// Diaspora doesn't support emoji reactions
+		if (($target_item['verb'] ?? '') === Activity::EMOJIREACT) {
+			return true;
+		}
+
 		if (!$contact['pubkey'] && !$public_message) {
 			return true;
 		}

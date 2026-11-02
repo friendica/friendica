@@ -10,7 +10,7 @@
 	<p class="connector_statusmsg">{{$diasp_enabled}}</p>
 	<p class="connector_statusmsg">{{$ostat_enabled}}</p>
 
-	<div class="panel-group panel-group-settings" id="settings-connectors" role="tablist" aria-multiselectable="true">
+	<div class="panel-group panel-group-settings" id="settings-connectors">
 
 		<form action="settings/connectors" method="post" autocomplete="off" class="panel">
 			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">

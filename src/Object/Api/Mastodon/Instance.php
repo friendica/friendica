@@ -38,6 +38,10 @@ class Instance extends BaseDataTransferObject
 	protected bool $registrations;
 	protected bool $approval_required;
 	protected bool $invites_enabled;
+	/** Pleroma extension, clients use it to detect the support of emoji reactions */
+	protected array $pleroma;
+	/** Fedibird extension, used by clients of Fedibird and kmyblue */
+	protected array $fedibird_capabilities;
 
 	public function __construct(IManageConfigValues $config, BaseURL $baseUrl, Database $database, protected Configuration $configuration, protected ?Account $contact_account, protected array $rules)
 	{
@@ -56,5 +60,9 @@ class Instance extends BaseDataTransferObject
 		$this->registrations     = ($register_policy !== Register::CLOSED);
 		$this->approval_required = ($register_policy === Register::APPROVE);
 		$this->invites_enabled   = false;
+
+		// Signal the support of emoji reactions
+		$this->pleroma               = ['metadata' => ['features' => ['pleroma_emoji_reactions']]];
+		$this->fedibird_capabilities = ['emoji_reaction'];
 	}
 }

@@ -19,7 +19,7 @@ User specific public contact data
 | pending                   |                                                                            | boolean            | YES  |     | NULL    |       |
 | rel                       | The kind of the relation between the user and the contact                  | tinyint unsigned   | YES  |     | NULL    |       |
 | info                      |                                                                            | mediumtext         | YES  |     | NULL    |       |
-| notify_new_posts          |                                                                            | boolean            | YES  |     | NULL    |       |
+| notify_new_posts          | 0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only    | tinyint unsigned   | YES  |     | NULL    |       |
 | remote_self               | 0 => No mirroring, 1-2 => Mirror as own post, 3 => Mirror as reshare       | tinyint unsigned   | YES  |     | NULL    |       |
 | fetch_further_information | 0 => None, 1 => Fetch information, 3 => Fetch keywords, 2 => Fetch both    | tinyint unsigned   | YES  |     | NULL    |       |
 | ffi_keyword_denylist      |                                                                            | text               | YES  |     | NULL    |       |

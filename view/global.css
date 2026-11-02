@@ -1304,3 +1304,107 @@ summary.wall-item-summary {
 		align-self: center;
 	}
 }
+
+/* file attachment icons, see view/templates/content/attachments.tpl */
+.attachtype {
+	display: inline-block;
+	flex-shrink: 0;
+	width: 32px;
+	height: 32px;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-position: center;
+	mask-position: center;
+	-webkit-mask-size: contain;
+	mask-size: contain;
+}
+.attach-pdf {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-pdf-2-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-pdf-2-fill.svg);
+	background-color: #e5484d;
+}
+.attach-word {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-word-2-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-word-2-fill.svg);
+	background-color: #2f6fed;
+}
+.attach-excel {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-excel-2-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-excel-2-fill.svg);
+	background-color: #2f9e44;
+}
+.attach-ppt {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-ppt-2-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-ppt-2-fill.svg);
+	background-color: #f08c00;
+}
+.attach-zip {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-zip-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-zip-fill.svg);
+	background-color: #d4a017;
+}
+.attach-audio {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-music-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-music-fill.svg);
+	background-color: #ae3ec9;
+}
+.attach-video {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-video-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-video-fill.svg);
+	background-color: #e64980;
+}
+.attach-image {
+	-webkit-mask-image: url(asset/remixicon/icons/Media/image-fill.svg);
+	mask-image: url(asset/remixicon/icons/Media/image-fill.svg);
+	background-color: #15aabf;
+}
+.attach-text {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-text-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-text-fill.svg);
+	background-color: #868e96;
+}
+.attach-torrent {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-download-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-download-fill.svg);
+	background-color: #0ca678;
+}
+.attach-feed {
+	-webkit-mask-image: url(asset/remixicon/icons/Device/rss-fill.svg);
+	mask-image: url(asset/remixicon/icons/Device/rss-fill.svg);
+	background-color: #f76707;
+}
+.attach-code {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-code-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-code-fill.svg);
+	background-color: #5f3dc4;
+}
+.attach-calendar {
+	-webkit-mask-image: url(asset/remixicon/icons/Business/calendar-fill.svg);
+	mask-image: url(asset/remixicon/icons/Business/calendar-fill.svg);
+	background-color: #0c8599;
+}
+.attach-link {
+	-webkit-mask-image: url(asset/remixicon/icons/Business/global-fill.svg);
+	mask-image: url(asset/remixicon/icons/Business/global-fill.svg);
+	background-color: #339af0;
+}
+.attach-markdown {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/markdown-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/markdown-fill.svg);
+	background-color: #9c6644;
+}
+.attach-generic {
+	-webkit-mask-image: url(asset/remixicon/icons/Document/file-fill.svg);
+	mask-image: url(asset/remixicon/icons/Document/file-fill.svg);
+	background-color: #868e96;
+}
+.body-attach > .attachlink {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 8px;
+}
+/* the file kind is shown as text only when the icons are disabled, see view/accessibility/attachment-icons-none.css */
+.attachkind {
+	display: none;
+}

@@ -191,6 +191,12 @@
 				{
 					selector: '.emojis',
 					insertInto: ['#comment-edit-text-0', '#profile-jot-text', '.profile-jot-text-full', '.comment-edit-text-full', '.prvmail-text', '.emojis-target']
+				},
+				{
+					selector: '.emoji-react',
+					onSelect: function (emoji, trigger) {
+						doEmojiReaction(trigger.dataset.itemId, emoji);
+					}
 				}
 			],
 			closeButton: true,

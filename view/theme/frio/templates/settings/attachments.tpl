@@ -19,6 +19,8 @@
 		<div class="clear"></div>
 	</form>
 
+	{{if $usage}}{{$usage nofilter}}{{/if}}
+
 	{{if !$attachments}}
 		<p>{{$no_attachments}}</p>
 	{{else}}
@@ -40,6 +42,9 @@
 						<td>{{$attachment.filesize}}</td>
 						<td>{{$attachment.created}}</td>
 						<td>
+							<a class="btn" title="{{$show_usage}}" href="settings/attachments?usage={{$attachment.id}}">
+								<i class="ri ri-links-line" aria-hidden="true"></i>
+							</a>
 							<button type="submit" class="btn" title="{{$delete}}" name="delete" value="{{$attachment.id}}">
 								<i class="ri ri-delete-bin-line" aria-hidden="true"></i>
 							</button>

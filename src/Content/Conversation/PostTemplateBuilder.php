@@ -38,7 +38,7 @@ use Psr\Log\LoggerInterface;
 final class PostTemplateBuilder
 {
 	/** Number of columns in the action button grid; the reactions below must fit into it */
-	private const MAX_DISPLAYED_REACTIONS = 5;
+	private const MAX_DISPLAYED_REACTIONS = 6;
 
 	public function __construct(
 		private readonly L10n $l10n,
@@ -209,6 +209,7 @@ final class PostTemplateBuilder
 		$buttons = [
 			'like'     => null,
 			'dislike'  => null,
+			'react'    => null,
 			'share'    => null,
 			'announce' => null,
 		];
@@ -385,6 +386,7 @@ final class PostTemplateBuilder
 			'switchcomment'          => $this->l10n->t('Comment'),
 			'like_label'             => $this->l10n->t('Like'),
 			'dislike_label'          => $this->l10n->t('Dislike'),
+			'react_label'            => $this->l10n->t('React'),
 			'announce_label'         => $this->l10n->t('Reshare'),
 			'reply_label'            => $this->l10n->t('Reply to %s', $profileName),
 			'comment_html'           => $comment_html,
@@ -821,6 +823,7 @@ final class PostTemplateBuilder
 		$buttons = [
 			'like'     => null,
 			'dislike'  => null,
+			'react'    => null,
 			'share'    => null,
 			'announce' => null,
 		];
@@ -829,6 +832,9 @@ final class PostTemplateBuilder
 			if ($likeable) {
 				$buttons['like']    = [$this->l10n->t("I like this (toggle)"), $this->l10n->t('Like')];
 				$buttons['dislike'] = [$this->l10n->t("I don't like this (toggle)"), $this->l10n->t('Dislike')];
+				if (in_array($item['network'] ?? '', [Protocol::ACTIVITYPUB, Protocol::DFRN])) {
+					$buttons['react'] = [$this->l10n->t('React with an emoji'), $this->l10n->t('React')];
+				}
 			}
 			if ($shareable) {
 				$buttons['share'] = [$this->l10n->t('Quote share this'), $this->l10n->t('Quote Share')];
@@ -943,7 +949,7 @@ final class PostTemplateBuilder
 					$key   = $element['emoji'];
 					break;
 			}
-			$emojis[$key] = ['emoji' => $element['emoji'], 'total' => $element['total'], 'title' => $title, 'icon' => $icon];
+			$emojis[$key] = ['emoji' => $element['emoji'], 'total' => $element['total'], 'title' => $title, 'icon' => $icon, 'self' => $element['self'] ?? false];
 		}
 
 		return $emojis;
@@ -1077,7 +1083,7 @@ final class PostTemplateBuilder
 			'$edemojis'       => $this->l10n->t('Add emojis'),
 			'$edcode'         => $this->l10n->t('Code'),
 			'$edimg'          => $this->l10n->t('Image'),
-			'$edurl'          => $this->l10n->t('Link'),
+			'$edurl'          => $this->l10n->t('Web link'),
 			'$edattach'       => $this->l10n->t('Link or Media'),
 			'$prompttext'     => $this->l10n->t('Please enter a image/video/audio/webpage URL:'),
 			'$preview'        => $this->l10n->t('Preview'),

@@ -394,6 +394,21 @@ class Event
 	}
 
 	/**
+	 * Returns the selectable calendar views with their translated labels.
+	 *
+	 * @return array<string, string> Labels indexed by the FullCalendar view name
+	 */
+	public static function getCalendarViews(): array
+	{
+		return [
+			'month'      => DI::l10n()->t('month'),
+			'agendaWeek' => DI::l10n()->t('week'),
+			'agendaDay'  => DI::l10n()->t('day'),
+			'listMonth'  => DI::l10n()->t('list'),
+		];
+	}
+
+	/**
 	 * Create an array with translation strings used for events.
 	 *
 	 * @return array Array with translations strings.

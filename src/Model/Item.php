@@ -11,6 +11,7 @@ use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Image;
 use Friendica\Content\Post\Collection\PostMedias;
+use Friendica\Content\Post\Entity\FileKind;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
@@ -30,6 +31,7 @@ use Friendica\Protocol\ActivityPub\Processor;
 use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\EmojiReaction;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy;
@@ -155,6 +157,9 @@ class Item
 	public const CANT_LIKE     = 2;
 	public const CANT_ANNOUNCE = 4;
 	public const CANT_QUOTE    = 8;
+
+	// Number of non-visual attachments from which the list is collapsed by default
+	public const ATTACHMENTS_COLLAPSED = 4;
 
 	/**
 	 * Update existing item entries
@@ -446,6 +451,33 @@ class Item
 		DI::logger()->info('Item has been marked for deletion.', ['id' => $item_id]);
 
 		return true;
+	}
+
+	/**
+	 * Mastodon knows only one favourite per account, so there is only one "Like" per user and post.
+	 * Every further Like with an emoji is stored (and sent) as an "EmojiReact".
+	 *
+	 * @param array $item Item that is about to be stored
+	 * @return string Verb of the item
+	 */
+	private static function getVerbForLike(array $item): string
+	{
+		$verb = $item['verb'] ?? '';
+
+		if (($item['gravity'] != self::GRAVITY_ACTIVITY) || ($verb != Activity::LIKE) || !EmojiReaction::isReaction((string) ($item['body'] ?? ''))) {
+			return $verb;
+		}
+
+		$exists = Post::exists(DBA::mergeConditions(
+			['thr-parent-id' => $item['thr-parent-id'], 'author-id' => $item['author-id'], 'uid' => $item['uid'], 'gravity' => self::GRAVITY_ACTIVITY, 'vid' => Verb::getID(Activity::LIKE), 'deleted' => false],
+			['NOT `uri-id` = ?', $item['uri-id']],
+		));
+		if (!$exists) {
+			return $verb;
+		}
+
+		DI::logger()->debug('There already is a like from this author, storing the reaction as an emoji reaction', ['uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'author-id' => $item['author-id']]);
+		return Activity::EMOJIREACT;
 	}
 
 	/**
@@ -751,6 +783,8 @@ class Item
 		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
 		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
 
+		$item['verb'] = self::getVerbForLike($item);
+
 		// Local comments on a sensitive post are sensitive as well
 		if ($item['origin'] && ($item['gravity'] == self::GRAVITY_COMMENT) && empty($item['sensitive']) && Post::exists(['uri-id' => $item['thr-parent-id'], 'sensitive' => true])) {
 			$item['sensitive'] = true;
@@ -952,7 +986,7 @@ class Item
 		}
 
 		// The content of activities normally doesn't matter - except for emoji activities
-		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) || in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT]) && !empty($item['body']) && (mb_strlen((string) $item['body']) == 1)) {
+		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) || in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT]) && EmojiReaction::isReaction((string) $item['body'])) {
 			if (!Post\Content::exists($item['uri-id']) && !Post\Content::insert($item['uri-id'], $item)) {
 				DI::logger()->error('Post-Content entry was not inserted', ['uri-id' => $item['uri-id']]);
 			}
@@ -2573,23 +2607,30 @@ class Item
 	 *            Activity verb. One of
 	 *            like, unlike, dislike, undislike, attendyes, unattendyes,
 	 *            attendno, unattendno, attendmaybe, unattendmaybe,
-	 *            announce, unannounce
+	 *            announce, unannounce, react, unreact
 	 * @param int    $uid
 	 * @param string $allow_cid
 	 * @param string $allow_gid
 	 * @param string $deny_cid
 	 * @param string $deny_gid
+	 * @param string $reaction  Emoji for the "react" and "unreact" verbs
 	 * @return bool
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function performActivity(int $item_id, string $verb, int $uid, ?string $allow_cid = null, ?string $allow_gid = null, ?string $deny_cid = null, ?string $deny_gid = null): bool
+	public static function performActivity(int $item_id, string $verb, int $uid, ?string $allow_cid = null, ?string $allow_gid = null, ?string $deny_cid = null, ?string $deny_gid = null, string $reaction = ''): bool
 	{
 		if (empty($uid)) {
 			return false;
 		}
 
-		DI::logger()->notice('Start create activity', ['verb' => $verb, 'item' => $item_id, 'user' => $uid]);
+		DI::logger()->notice('Start create activity', ['verb' => $verb, 'item' => $item_id, 'user' => $uid, 'reaction' => $reaction]);
+
+		$isReactionVerb = in_array($verb, ['react', 'unreact']);
+		if ($isReactionVerb ? !EmojiReaction::isReaction($reaction) : $reaction !== '') {
+			DI::logger()->notice('Invalid reaction', ['reaction' => $reaction, 'item' => $item_id]);
+			return false;
+		}
 
 		$item = Post::selectFirst(self::ITEM_FIELDLIST, ['id' => $item_id]);
 		if (!DBA::isResult($item)) {
@@ -2662,6 +2703,11 @@ class Item
 			case 'unview':
 				$activity = Activity::VIEW;
 				break;
+			case 'react':
+			case 'unreact':
+				// Positive reactions are sent as likes, so that systems without emoji reactions show them as well
+				$activity = EmojiReaction::isPositiveReaction($reaction) ? Activity::LIKE : Activity::EMOJIREACT;
+				break;
 			default:
 				DI::logger()->warning('unknown verb', ['verb' => $verb, 'item' => $item_id]);
 				return false;
@@ -2682,6 +2728,9 @@ class Item
 			foreach ($verbs as $verb) {
 				$vids[] = Verb::getID($verb);
 			}
+		} elseif ($reaction !== '') {
+			// A reaction is stored as "Like", unless the user already has a like on the post
+			$vids = [Verb::getID(Activity::LIKE), Verb::getID(Activity::EMOJIREACT)];
 		} else {
 			$vids = Verb::getID($activity);
 		}
@@ -2690,9 +2739,19 @@ class Item
 			'vid'       => $vids, 'deleted' => false, 'gravity' => self::GRAVITY_ACTIVITY,
 			'author-id' => $author_id, 'uid' => $uid, 'thr-parent-id' => $uri_id,
 		];
+		if ($reaction !== '') {
+			$condition = DBA::mergeConditions($condition, ['BINARY `body` = ?', $reaction]);
+		} elseif (in_array($activity, [Activity::LIKE, Activity::DISLIKE])) {
+			// Likes with an emoji are reactions, plain likes have no body or the verb as body
+			$condition = DBA::mergeConditions($condition, ["(`body` IS NULL OR `body` IN ('', ?))", $activity]);
+		}
 		$like_item = Post::selectFirst(['id', 'guid', 'verb'], $condition);
 
 		if (DBA::isResult($like_item)) {
+			if ($reaction !== '') {
+				$activity = $like_item['verb'];
+			}
+
 			/**
 			 * Truth table for existing activities
 			 *
@@ -2747,7 +2806,7 @@ class Item
 			'thr-parent'  => $item['uri'],
 			'owner-id'    => $author_id,
 			'author-id'   => $author_id,
-			'body'        => $activity,
+			'body'        => $reaction ?: $activity,
 			'verb'        => $activity,
 			'object-type' => $objtype,
 			'allow_cid'   => $allow_cid ?? $item['allow_cid'],
@@ -3568,7 +3627,8 @@ class Item
 	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$trailing = '';
+		$attachments = [];
+
 		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if (strpos((string) $item['body'], (string) $PostMedia->url)) {
@@ -3584,19 +3644,26 @@ class Item
 			];
 			$the_url = Contact::magicLinkByContact($author, $PostMedia->url);
 
-			$title = Strings::escapeHtml(trim($PostMedia->description ?? '' ?: $PostMedia->url));
+			$name = trim($PostMedia->description ?? '' ?: $PostMedia->name ?? '' ?: basename(parse_url($PostMedia->url, PHP_URL_PATH) ?: $PostMedia->url));
 
-			if ($PostMedia->size) {
-				$title .= ' ' . $PostMedia->size . ' ' . DI::l10n()->t('bytes');
-			}
+			$kind = FileKind::fromMimeType($PostMedia->mimetype);
 
-			/// @todo Use a template
-			$icon = '<div class="attachtype icon s22 type-' . $PostMedia->mimetype->type . ' subtype-' . $PostMedia->mimetype->subtype . '"></div>';
-			$trailing .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" rel="noopener noreferrer" >' . $icon . '</a>';
+			$attachments[] = [
+				'url'  => strip_tags($the_url),
+				'name' => $name,
+				'size' => $PostMedia->size ? Strings::formatBytes($PostMedia->size) : '',
+				'kind' => $kind->value,
+				'type' => $kind->label(DI::l10n()),
+			];
 		}
 
-		if ($trailing != '') {
-			$content .= '<div class="body-attach">' . $trailing . '</div>';
+		if (!empty($attachments)) {
+			$content .= Renderer::replaceMacros(Renderer::getMarkupTemplate('content/attachments.tpl'), [
+				'$collapsible' => count($attachments) > 1,
+				'$open'        => count($attachments) < self::ATTACHMENTS_COLLAPSED,
+				'$summary'     => DI::l10n()->tt('%d attachment', '%d attachments', count($attachments)),
+				'$attachments' => $attachments,
+			]);
 		}
 
 		DI::profiler()->stopRecording();

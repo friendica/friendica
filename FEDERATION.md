@@ -21,6 +21,7 @@
 - [FEP-044f: Consent-respecting quote posts](https://codeberg.org/fediverse/fep/src/branch/main/fep/044f/fep-044f.md) - initial support: incoming quote requests are accepted automatically and a `QuoteAuthorization` is provided; `canQuote` always allows everybody for public posts, no outgoing `QuoteRequest`, no verification of received `quoteAuthorization` stamps, no revocation, no `Reject` or manual approval
 - [FEP-3b86: Activity Intents](https://codeberg.org/fediverse/fep/src/branch/main/fep/3b86/fep-3b86.md) - partial support (Follow, Create); no `on-success` and `on-cancel` handling
 - [FEP-5feb: Search indexing consent for actors](https://codeberg.org/fediverse/fep/src/branch/main/fep/5feb/fep-5feb.md) - basic support (no index rebuilding when the indexable attribute is enabled; a missing attribute is treated as indexable, the FEP says not indexable)
+- [FEP-c0e0: Emoji reactions](https://codeberg.org/fediverse/fep/src/branch/main/fep/c0e0/fep-c0e0.md) - only Unicode emojis, custom emojis are received as a reaction without content
 
 ## ActivityPub
 

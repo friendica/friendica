@@ -183,6 +183,16 @@ class NavTest extends TestCase
 		self::assertNotNull($this->getInfo(authenticated: true)['nav']['notifications']);
 	}
 
+	public function testLoggedInHasNotificationsPauseAndResume(): void
+	{
+		$notifications = $this->getInfo(authenticated: true)['nav']['notifications'];
+
+		self::assertNotEmpty($notifications['pause'][1]);
+		self::assertNotEmpty($notifications['pause'][3]);
+		self::assertNotEmpty($notifications['resume'][1]);
+		self::assertNotEmpty($notifications['resume'][3]);
+	}
+
 	public function testLoggedInHasCalendarLink(): void
 	{
 		$nav = $this->getInfo(authenticated: true)['nav'];

@@ -11,6 +11,7 @@
  * Version: V.1.0
  * Author: Rabuzarus <https://friendica.kommune4.de/profile/rabuzarus>
  * Maintainer: Hypolite Petovan <https://friendica.mrpetovan.com/profile/hypolite>
+ * Features: compose_page, advanced_composer
  */
 
 use Friendica\App\Mode;

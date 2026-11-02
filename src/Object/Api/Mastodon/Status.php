@@ -88,6 +88,10 @@ class Status extends BaseDataTransferObject
 	protected $poll = null;
 	/** @var FriendicaExtension */
 	protected $friendica;
+	/** @var array|null - Pleroma extension for emoji reactions */
+	protected $pleroma = null;
+	/** @var array - Fedibird extension for emoji reactions */
+	protected $emoji_reactions = [];
 
 	/**
 	 * Creates a status record from an item record.
@@ -112,6 +116,7 @@ class Status extends BaseDataTransferObject
 		?array $quote = null,
 		?array $poll = null,
 		?array $emojis = null,
+		?array $emoji_reactions = null,
 	) {
 		$reblogged        = !empty($reblog);
 		$this->id         = (string) $item['uri-id'];
@@ -159,6 +164,10 @@ class Status extends BaseDataTransferObject
 		$this->card              = $reblogged ? null : ($card->toArray() ?: null);
 		$this->poll              = $reblogged ? null : $poll;
 		$this->friendica         = $reblogged ? null : $friendica;
+		$this->emoji_reactions   = $reblogged ? [] : ($emoji_reactions ?: []);
+		$this->pleroma           = $reblogged ? null : ['emoji_reactions' => array_map(function ($reaction) {
+			return ['name' => $reaction['name'], 'count' => $reaction['count'], 'me' => $reaction['me']];
+		}, $this->emoji_reactions)];
 	}
 
 	/**

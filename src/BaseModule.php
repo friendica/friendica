@@ -14,13 +14,14 @@ use Friendica\Capabilities\IRequestHandler;
 use Friendica\Core\EarlyExitException;
 use Friendica\Core\L10n;
 use Friendica\Core\System;
+use Friendica\Event\LegacyEventDispatcher;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
-use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
 use Friendica\Network\HTTPException;
+use Friendica\Security\LegacyFormSecurityToken;
 use Friendica\Util\HTTPInputData;
 use Friendica\Util\Profiler;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -55,7 +56,6 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 	protected $server;
 	/** @var Response */
 	protected $response;
-	private readonly EventDispatcherInterface $eventDispatcher;
 
 	public function __construct(
 		L10n $l10n,
@@ -66,17 +66,32 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 		Response $response,
 		array $server,
 		array $parameters = [],
-		?EventDispatcherInterface $eventDispatcher = null,
+		private ?EventDispatcherInterface $eventDispatcher = null,
 	) {
-		$this->parameters      = $parameters;
-		$this->l10n            = $l10n;
-		$this->baseUrl         = $baseUrl;
-		$this->args            = $args;
-		$this->logger          = $logger;
-		$this->profiler        = $profiler;
-		$this->server          = $server;
-		$this->response        = $response;
-		$this->eventDispatcher = $eventDispatcher ?? DI::eventDispatcher();
+		$this->parameters = $parameters;
+		$this->l10n       = $l10n;
+		$this->baseUrl    = $baseUrl;
+		$this->args       = $args;
+		$this->logger     = $logger;
+		$this->profiler   = $profiler;
+		$this->server     = $server;
+		$this->response   = $response;
+	}
+
+	/**
+	 * Sets the event dispatcher for modules whose constructor doesn't pass it on.
+	 *
+	 * The DI container calls this for every module (see static/dependencies.config.php), a dispatcher from the constructor is kept.
+	 */
+	public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
+	{
+		$this->eventDispatcher ??= $eventDispatcher;
+	}
+
+	private function getEventDispatcher(): EventDispatcherInterface
+	{
+		// Modules created with new instead of the DI container, e.g. in tests
+		return $this->eventDispatcher ??= LegacyEventDispatcher::get();
 	}
 
 	/**
@@ -275,7 +290,7 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 		$this->profiler->set(microtime(true), 'ready');
 		$timestamp = microtime(true);
 
-		$this->eventDispatcher->dispatch(
+		$this->getEventDispatcher()->dispatch(
 			new ModuleInitEvent(ModuleInitEvent::MODULE_INIT, $this->args->getModuleName(), static::class),
 		);
 
@@ -289,7 +304,7 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 				$this->patch($request);
 				break;
 			case Router::POST:
-				$request = $this->eventDispatcher->dispatch(
+				$request = $this->getEventDispatcher()->dispatch(
 					new ModulePostEvent(ModulePostEvent::MODULE_POST, $this->args->getModuleName(), static::class, $request),
 				)->getPost();
 
@@ -319,7 +334,7 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 		}
 
 		try {
-			$content = $this->eventDispatcher->dispatch(
+			$content = $this->getEventDispatcher()->dispatch(
 				new ModuleContentEvent(ModuleContentEvent::MODULE_CONTENT, $this->args->getModuleName(), static::class, ''),
 			)->getContent();
 			$this->response->addContent($content);
@@ -439,112 +454,65 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 	}
 
 	/**
-	 * Functions used to protect against Cross-Site Request Forgery
-	 * The security token has to base on at least one value that an attacker can't know - here it's the session ID and the private key.
-	 * In this implementation, a security token is reusable (if the user submits a form, goes back and resubmits the form, maybe with small changes;
-	 * or if the security token is used for ajax-calls that happen several times), but only valid for a certain amount of time (3hours).
-	 * The "typename" separates the security tokens of different types of forms. This could be relevant in the following case:
-	 *    A security token is used to protect a link from CSRF (e.g. the "delete this profile"-link).
-	 *    If the new page contains by any chance external elements, then the used security token is exposed by the referrer.
-	 *    Actually, important actions should not be triggered by Links / GET-Requests at all, but sometimes they still are,
-	 *    so this mechanism brings in some damage control (the attacker would be able to forge a request to a form of this type, but not to forms of other types).
+	 * Returns a security token that protects a form against Cross-Site Request Forgery.
+	 *
+	 * New code injects {@see \Friendica\Security\FormSecurityToken} instead.
 	 *
 	 * @param string $typename Type name
 	 * @return string Security hash with timestamp
 	 */
 	public static function getFormSecurityToken(string $typename = ''): string
 	{
-		$user      = User::getById(DI::userSession()->getLocalUserId(), ['guid', 'prvkey']);
-		$timestamp = time();
-		$sec_hash  = hash('whirlpool', ($user['guid'] ?? '') . ($user['prvkey'] ?? '') . session_id() . $timestamp . $typename);
-
-		return $timestamp . '.' . $sec_hash;
+		return LegacyFormSecurityToken::create($typename);
 	}
 
 	/**
 	 * Checks if form's security (CSRF) token is valid.
 	 *
-	 * @param string $typename ???
-	 * @param string $formname Name of form/field (???)
+	 * @param string $typename Type name the token was created for
+	 * @param string $formname Name of the form field that carries the token
 	 * @return bool Whether it is valid
 	 */
 	public static function checkFormSecurityToken(string $typename = '', string $formname = 'form_security_token'): bool
 	{
-		$hash = null;
-
-		if (!empty($_REQUEST[$formname])) {
-			/// @TODO Careful, not secured!
-			$hash = $_REQUEST[$formname];
-		}
-
-		if (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
-			/// @TODO Careful, not secured!
-			$hash = $_SERVER['HTTP_X_CSRF_TOKEN'];
-		}
-
-		if (empty($hash)) {
-			return false;
-		}
-
-		$max_livetime = 10800; // 3 hours
-
-		$user = User::getById(DI::userSession()->getLocalUserId(), ['guid', 'prvkey']);
-
-		$x = explode('.', (string) $hash);
-		if (time() > (intval($x[0]) + $max_livetime)) {
-			return false;
-		}
-
-		$sec_hash = hash('whirlpool', ($user['guid'] ?? '') . ($user['prvkey'] ?? '') . session_id() . $x[0] . $typename);
-
-		return ($sec_hash == $x[1]);
+		return LegacyFormSecurityToken::check($typename, $formname);
 	}
 
 	public static function getFormSecurityStandardErrorMessage(): string
 	{
-		return DI::l10n()->t("The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before submitting it.");
+		return LegacyFormSecurityToken::getErrorMessage();
 	}
 
 	public static function checkFormSecurityTokenRedirectOnError(string $err_redirect, string $typename = '', string $formname = 'form_security_token')
 	{
-		if (!self::checkFormSecurityToken($typename, $formname)) {
-			DI::logger()->notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
-			DI::logger()->debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
-			DI::sysmsg()->addNotice(self::getFormSecurityStandardErrorMessage());
-			DI::baseUrl()->redirect($err_redirect);
-		}
+		LegacyFormSecurityToken::checkRedirectOnError($err_redirect, $typename, $formname);
 	}
 
 	public static function checkFormSecurityTokenForbiddenOnError(string $typename = '', string $formname = 'form_security_token')
 	{
-		if (!self::checkFormSecurityToken($typename, $formname)) {
-			DI::logger()->notice('checkFormSecurityToken failed: user ' . DI::userSession()->getLocalUserNickname() . ' - form element ' . $typename);
-			DI::logger()->debug('checkFormSecurityToken failed', ['request' => $_REQUEST]);
-
-			throw new \Friendica\Network\HTTPException\ForbiddenException();
-		}
+		LegacyFormSecurityToken::checkForbiddenOnError($typename, $formname);
 	}
 
-	protected static function getContactFilterTabs(string $baseUrl, string $current, bool $displayCommonTab): array
+	protected function getContactFilterTabs(string $baseUrl, string $current, bool $displayCommonTab): array
 	{
 		$tabs = [
 			[
-				'label' => DI::l10n()->t('All contacts'),
+				'label' => $this->t('All contacts'),
 				'url'   => $baseUrl . '/contacts',
 				'sel'   => !$current || $current == 'all' ? 'active' : '',
 			],
 			[
-				'label' => DI::l10n()->t('Followers'),
+				'label' => $this->t('Followers'),
 				'url'   => $baseUrl . '/contacts/followers',
 				'sel'   => $current == 'followers' ? 'active' : '',
 			],
 			[
-				'label' => DI::l10n()->t('Following'),
+				'label' => $this->t('Following'),
 				'url'   => $baseUrl . '/contacts/following',
 				'sel'   => $current == 'following' ? 'active' : '',
 			],
 			[
-				'label' => DI::l10n()->t('Friends'),
+				'label' => $this->t('Friends'),
 				'url'   => $baseUrl . '/contacts/mutuals',
 				'sel'   => $current == 'mutuals' ? 'active' : '',
 			],
@@ -552,7 +520,7 @@ abstract class BaseModule implements ICanHandleRequests, IRequestHandler
 
 		if ($displayCommonTab) {
 			$tabs[] = [
-				'label' => DI::l10n()->t('Common'),
+				'label' => $this->t('Common'),
 				'url'   => $baseUrl . '/contacts/common',
 				'sel'   => $current == 'common' ? 'active' : '',
 			];

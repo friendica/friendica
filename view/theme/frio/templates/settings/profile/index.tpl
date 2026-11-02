@@ -25,7 +25,7 @@
 		3 => The additional help text (if available)
 	*}}
 
-	<div class="panel-group panel-group-settings" id="profile-photo-edit-wrapper" role="tablist" aria-multiselectable="false">
+	<div class="panel-group panel-group-settings" id="profile-photo-edit-wrapper">
 		{{* Change profile picture *}}
 		<details class="panel"{{if $change_profile_picture}} open{{/if}}>
 			<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="photo-upload"><h2>{{$l10n.profpic_header}}</h2></summary>
@@ -61,7 +61,7 @@
 	<form id="profile-edit-form" name="form1" action="" method="post">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
-		<div class="panel-group panel-group-settings" id="profile-edit-wrapper" role="tablist" aria-multiselectable="false">
+		<div class="panel-group panel-group-settings" id="profile-edit-wrapper">
 			{{* The personal settings *}}
 			<details class="panel">
 				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="personal"><h2>{{$l10n.personal_section}}</h2></summary>

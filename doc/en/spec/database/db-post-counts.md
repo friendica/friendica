@@ -8,7 +8,7 @@ Original remote activity
 | ------------- | ----------------------------------------------------------- | ----------------- | ---- | --- | ------- | ----- |
 | uri-id        | Id of the item-uri table entry that contains the item uri   | int unsigned      | NO   | PRI | NULL    |       |
 | vid           | Id of the verb table entry that contains the activity verbs | smallint unsigned | NO   | PRI | NULL    |       |
-| reaction      | Emoji Reaction                                              | varchar(4)        | NO   | PRI | NULL    |       |
+| reaction      | Emoji Reaction                                              | varbinary(64)     | NO   | PRI | NULL    |       |
 | parent-uri-id | Id of the item-uri table that contains the parent uri       | int unsigned      | YES  |     | NULL    |       |
 | count         | Number of activities                                        | int unsigned      | YES  |     | 0       |       |
 

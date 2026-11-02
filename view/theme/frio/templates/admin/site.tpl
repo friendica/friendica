@@ -16,7 +16,7 @@
 
 <div id="adminpage" class="adminpage generic-page-wrapper">
 	<h1>{{$title}} - {{$page}}</h1>
-	<div class="panel-group panel-group-settings" id="admin-settings" role="tablist" aria-multiselectable="true">
+	<div class="panel-group panel-group-settings" id="admin-settings">
 		<form action="{{$baseurl}}/admin/site" method="post">
 			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 			{{* General Information *}}
@@ -61,6 +61,7 @@
 						{{include file="field_checkbox.tpl" field=$register_notification}}
 						{{include file="field_textarea.tpl" field=$allowed_email}}
 						{{include file="field_textarea.tpl" field=$disallowed_email}}
+						{{include file="field_textarea.tpl" field=$forbidden_email}}
 						{{include file="field_textarea.tpl" field=$forbidden_nicknames}}
 					</div>
 					<div class="panel-footer">

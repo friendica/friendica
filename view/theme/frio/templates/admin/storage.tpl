@@ -22,14 +22,14 @@
 	<form action="{{$baseurl}}/admin/storage/{{$storage.prefix}}" method="post">
 		<input type='hidden' name='form_security_token' value="{{$form_security_token}}">
 		<div class="panel">
-			<div class="section-subtitle-wrapper panel-title" role="tab" id="admin-settings-{{$storage.prefix}}">
+			<div class="section-subtitle-wrapper panel-title" id="admin-settings-{{$storage.prefix}}">
 				<h3>
 					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-{{$storage.prefix}}-collapse" aria-expanded="false" aria-controls="admin-settings-{{$storage.prefix}}-collapse">
 						{{$storage.name}}
 					</button>
 				</h3>
 			</div>
-			<div id="admin-settings-{{$storage.prefix}}-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-{{$storage.prefix}}">
+			<div id="admin-settings-{{$storage.prefix}}-collapse" class="panel-collapse collapse" aria-labelledby="admin-settings-{{$storage.prefix}}">
 				<div class="panel-body">
 					{{if $storage.form}}
 						{{foreach from=$storage.form item=$field}}

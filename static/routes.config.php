@@ -295,6 +295,8 @@ return [
 			'/notifications/requests/{id:\d+}/accept'                => [Module\Api\Mastodon\Unimplemented::class,                [        R::POST]], // not supported
 			'/notifications/requests/{id:\d+}/dismiss'               => [Module\Api\Mastodon\Unimplemented::class,                [        R::POST]], // not supported
 			'/notifications/unread_count'                            => [Module\Api\Mastodon\Unimplemented::class,                [R::GET         ]], // not supported
+			'/pleroma/statuses/{id:\d+}/reactions'                   => [Module\Api\Mastodon\Statuses\Reactions::class,           [R::GET         ]],
+			'/pleroma/statuses/{id:\d+}/reactions/{emoji}'           => [Module\Api\Mastodon\Statuses\Reactions::class,           [R::GET, R::PUT, R::DELETE]],
 			'/polls/{id:\d+}'                                        => [Module\Api\Mastodon\Polls::class,                        [R::GET         ]],
 			'/polls/{id:\d+}/votes'                                  => [Module\Api\Mastodon\Unimplemented::class,                [        R::POST]], // not supported
 			'/preferences'                                           => [Module\Api\Mastodon\Preferences::class,                  [R::GET         ]],
@@ -309,6 +311,7 @@ return [
 			'/statuses/{id:\d+}'                                     => [Module\Api\Mastodon\Statuses::class,                     [R::GET, R::PUT, R::DELETE]],
 			'/statuses/{id:\d+}/card'                                => [Module\Api\Mastodon\Statuses\Card::class,                [R::GET         ]],
 			'/statuses/{id:\d+}/context'                             => [Module\Api\Mastodon\Statuses\Context::class,             [R::GET         ]],
+			'/statuses/{id:\d+}/{action:react|unreact}/{emoji}'      => [Module\Api\Mastodon\Statuses\Reactions::class,           [        R::POST]],
 			'/statuses/{id:\d+}/reblogged_by'                        => [Module\Api\Mastodon\Statuses\RebloggedBy::class,         [R::GET         ]],
 			'/statuses/{id:\d+}/favourited_by'                       => [Module\Api\Mastodon\Statuses\FavouritedBy::class,        [R::GET         ]],
 			'/statuses/{id:\d+}/favourite'                           => [Module\Api\Mastodon\Statuses\Favourite::class,           [        R::POST]],
@@ -433,6 +436,7 @@ return [
 		'/api/{action:ignore|unignore|delete}/{id:\d+}' => [Module\Calendar\Event\API::class,  [R::GET         ]],
 		'/api/{action:create}'                          => [Module\Calendar\Event\API::class,  [        R::POST]],
 		'/api/get[/{nickname}]'                         => [Module\Calendar\Event\Get::class,  [R::GET         ]],
+		'/api/view'                                     => [Module\Calendar\View::class,       [        R::POST]],
 		'/event/show/{id:\d+}'                          => [Module\Calendar\Event\Show::class, [R::GET         ]],
 		'/event/show/{nickname}/{id:\d+}'               => [Module\Calendar\Event\Show::class, [R::GET         ]],
 		'/event/{mode:new}'                             => [Module\Calendar\Event\Form::class, [R::GET         ]],

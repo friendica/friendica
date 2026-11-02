@@ -62,6 +62,7 @@ function theme_post(AppHelper $appHelper): void
 			} elseif (in_array($current_scheme, ['light']) && in_array($icon_style, [ContactSelector::SVG_COLOR_WHITE])) {
 				DI::pConfig()->set(DI::userSession()->getLocalUserId(), 'accessibility', 'platform_icon_style', ContactSelector::SVG_COLOR_BLACK);
 			}
+
 		}
 	}
 }

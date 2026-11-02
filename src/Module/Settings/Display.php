@@ -30,6 +30,7 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
+use Friendica\Model\Event;
 use Friendica\Model\Post\Engagement;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
@@ -133,6 +134,11 @@ class Display extends BaseSettings
 			$font = '';
 		}
 
+		$attachment_icons = is_string($request['attachment_icons'] ?? null) ? trim($request['attachment_icons']) : '';
+		if (!in_array($attachment_icons, Page::ACCESSIBILITY_ATTACHMENT_ICONS, true)) {
+			$attachment_icons = '';
+		}
+
 		$text_spacing = is_string($request['text_spacing'] ?? null) ? trim($request['text_spacing']) : '';
 		if (!in_array($text_spacing, Page::ACCESSIBILITY_TEXT_SPACINGS, true)) {
 			$text_spacing = '';
@@ -209,7 +215,7 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'accessibility', 'hide_empty_descriptions', $hide_empty_descriptions);
 		$this->pConfig->set($uid, 'accessibility', 'hide_custom_emojis', $hide_custom_emojis);
 		$this->pConfig->set($uid, 'accessibility', 'platform_icon_style', $platform_icon_style);
-		foreach (['font' => $font, 'text_spacing' => $text_spacing] as $key => $value) {
+		foreach (['font' => $font, 'text_spacing' => $text_spacing, 'attachment_icons' => $attachment_icons] as $key => $value) {
 			if ($value === '') {
 				$this->pConfig->delete($uid, 'accessibility', $key);
 			} else {
@@ -348,6 +354,12 @@ class Display extends BaseSettings
 			'increased' => $this->t('Increased'),
 			'large'     => $this->t('Large'),
 		];
+		$attachment_icons      = $this->pConfig->get($uid, 'accessibility', 'attachment_icons', '');
+		$attachment_icon_modes = [
+			''           => $this->t('Color'),
+			'monochrome' => $this->t('Monochrome'),
+			'none'       => $this->t('Disabled'),
+		];
 
 		$preview_mode  = $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_AUTO);
 		$preview_modes = [
@@ -471,12 +483,7 @@ class Display extends BaseSettings
 		];
 
 		$calendar_default_view = $this->pConfig->get($uid, 'calendar', 'default_view', 'month');
-		$calendarViews         = [
-			'month'      => $this->t('month'),
-			'agendaWeek' => $this->t('week'),
-			'agendaDay'  => $this->t('day'),
-			'listMonth'  => $this->t('list'),
-		];
+		$calendarViews         = Event::getCalendarViews();
 
 		$theme_config = '';
 		if ($themeconfigfile = Theme::getConfigFile($theme_selected)) {
@@ -533,6 +540,7 @@ class Display extends BaseSettings
 			'$platform_icon_style'      => ['platform_icon_style', $this->t('Platform icons style'), $platform_icon_style, $this->t('Style of the platform icons'), $platform_icon_styles, false],
 			'$font'                     => ['font', $this->t('Font'), $font, $this->t('Replace the font of the theme with a font that is easier to read. OpenDyslexic is designed for people with dyslexia, Atkinson Hyperlegible and Luciole for people with low vision, Lexend for a smoother reading flow, Andika for beginning readers.'), $fonts, false],
 			'$text_spacing'             => ['text_spacing', $this->t('Text spacing'), $text_spacing, $this->t('Increase the spacing between letters, words and lines to make texts easier to read. "Large" corresponds to the text spacing values of WCAG 2.1 success criterion 1.4.12.'), $text_spacings, false],
+			'$attachment_icons'         => ['attachment_icons', $this->t('Attachment icons style'), $attachment_icons, $this->t('Style of the file attachment icons'), $attachment_icon_modes, false],
 			'$embed_media'              => ['embed_media', $this->t('Embed supported media'), $embed_media, $this->t('When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos.')],
 
 			'$timeline_label'       => $this->t('Label'),
@@ -549,7 +557,7 @@ class Display extends BaseSettings
 			'$has_filter_channels'   => !empty($filter),
 
 			'$first_day_of_week'     => ['first_day_of_week', $this->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],
-			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, '', $calendarViews, false],
+			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, $this->t('This setting is also updated whenever you switch the view in your calendar.'), $calendarViews, false],
 		]);
 	}
 

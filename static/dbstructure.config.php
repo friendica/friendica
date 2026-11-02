@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1601);
+	define('DB_UPDATE_VERSION', 1603);
 }
 
 return [
@@ -237,7 +237,7 @@ return [
 			"pending"                   => ["type" => "boolean", "not null" => "1", "default" => "1", "comment" => "Contact request is pending"],
 			"deleted"                   => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Contact has been deleted"],
 			"info"                      => ["type" => "mediumtext", "comment" => ""],
-			"notify_new_posts"          => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
+			"notify_new_posts"          => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => "0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only"],
 			"fetch_further_information" => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => ""],
 			"ffi_keyword_denylist"      => ["type" => "text", "comment" => ""],
 			// Deprecated, but still in use
@@ -1281,7 +1281,7 @@ return [
 		"fields"  => [
 			"uri-id"        => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item uri"],
 			"vid"           => ["type" => "smallint unsigned", "not null" => "1", "primary" => "1", "foreign" => ["verb" => "id", "on delete" => "restrict"], "comment" => "Id of the verb table entry that contains the activity verbs"],
-			"reaction"      => ["type" => "varchar(4)", "not null" => "1", "primary" => "1", "comment" => "Emoji Reaction"],
+			"reaction"      => ["type" => "varbinary(64)", "not null" => "1", "primary" => "1", "comment" => "Emoji Reaction"],
 			"parent-uri-id" => ["type" => "int unsigned", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table that contains the parent uri"],
 			"count"         => ["type" => "int unsigned", "default" => 0, "comment" => "Number of activities"],
 		],
@@ -2073,7 +2073,7 @@ return [
 			"pending"                   => ["type" => "boolean", "comment" => ""],
 			"rel"                       => ["type" => "tinyint unsigned", "comment" => "The kind of the relation between the user and the contact"],
 			"info"                      => ["type" => "mediumtext", "comment" => ""],
-			"notify_new_posts"          => ["type" => "boolean", "comment" => ""],
+			"notify_new_posts"          => ["type" => "tinyint unsigned", "comment" => "0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only"],
 			"remote_self"               => ["type" => "tinyint unsigned", "comment" => "0 => No mirroring, 1-2 => Mirror as own post, 3 => Mirror as reshare"],
 			"fetch_further_information" => ["type" => "tinyint unsigned", "comment" => "0 => None, 1 => Fetch information, 3 => Fetch keywords, 2 => Fetch both"],
 			"ffi_keyword_denylist"      => ["type" => "text", "comment" => ""],

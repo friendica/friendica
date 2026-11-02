@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Unit;
 
+use Dice\Dice;
 use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core\EarlyExitException;
 use Friendica\Core\L10n;
+use Friendica\Module\Calendar\Show;
 use Friendica\Module\Response;
 use Friendica\Util\Profiler;
 use PHPUnit\Framework\TestCase;
@@ -120,6 +122,62 @@ final class BaseModuleTest extends TestCase
 
 		self::assertSame(['get', 'content'], $calls->getArrayCopy());
 		self::assertStringContainsString('page', (string) $response->getBody());
+	}
+
+	public function testSetterProvidesTheDispatcherWhenTheConstructorHasNone(): void
+	{
+		$module = self::createPlainModule(null);
+
+		$eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+		$eventDispatcher->expects(self::atLeastOnce())->method('dispatch')->willReturnArgument(0);
+		$module->setEventDispatcher($eventDispatcher);
+
+		$module->handleRequest(self::createStub(ServerRequestInterface::class));
+	}
+
+	public function testConstructorDispatcherIsKeptOverSetter(): void
+	{
+		$constructorDispatcher = $this->createMock(EventDispatcherInterface::class);
+		$constructorDispatcher->expects(self::atLeastOnce())->method('dispatch')->willReturnArgument(0);
+		$module = self::createPlainModule($constructorDispatcher);
+
+		$setterDispatcher = $this->createMock(EventDispatcherInterface::class);
+		$setterDispatcher->expects(self::never())->method('dispatch');
+		$module->setEventDispatcher($setterDispatcher);
+
+		$module->handleRequest(self::createStub(ServerRequestInterface::class));
+	}
+
+	public function testDiContainerPassesTheDispatcherToEveryModule(): void
+	{
+		$rules = require __DIR__ . '/../../static/dependencies.config.php';
+		$rule  = (new Dice())->addRules($rules)->getRule(Show::class);
+
+		self::assertTrue($rule['shared']);
+		self::assertContains(
+			['setEventDispatcher', [[Dice::INSTANCE => EventDispatcherInterface::class]]],
+			$rule['call'],
+		);
+	}
+
+	private static function createPlainModule(?EventDispatcherInterface $eventDispatcher): BaseModule
+	{
+		$args = self::createStub(App\Arguments::class);
+		$args->method('getMethod')->willReturn('GET');
+		$args->method('getModuleName')->willReturn('test');
+		$args->method('getQueryString')->willReturn('');
+
+		return new class (
+			self::createStub(L10n::class),
+			self::createStub(App\BaseURL::class),
+			$args,
+			self::createStub(LoggerInterface::class),
+			self::createStub(Profiler::class),
+			new Response(),
+			[],
+			[],
+			$eventDispatcher,
+		) extends BaseModule {};
 	}
 
 	/** @param \ArrayObject<int, string> $calls */

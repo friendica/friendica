@@ -633,6 +633,7 @@ final readonly class ConversationDataProvider
 			$emojis[$count['uri-id']][$count['reaction']]['total'] = $count['count'];
 			$emojis[$count['uri-id']][$count['reaction']]['count'] = 0;
 			$emojis[$count['uri-id']][$count['reaction']]['title'] = [];
+			$emojis[$count['uri-id']][$count['reaction']]['self']  = false;
 		}
 
 		$activityVerbs = [
@@ -649,9 +650,9 @@ final readonly class ConversationDataProvider
 		$condition = DBA::mergeConditions(array_merge(['parent-uri-id' => $uriIds, 'gravity' => [ItemModel::GRAVITY_ACTIVITY, ItemModel::GRAVITY_COMMENT], 'verb' => $verbs], $targetCondition), ["NOT `deleted`"]);
 		$condition = DBA::mergeConditions($condition, ["((`uid` = ? AND `global`) OR (`uid` = ? AND NOT `global`))", 0, $uid]);
 		$separator = chr(255) . chr(255) . chr(255);
-		$sql       = "SELECT `parent-uri-id`, `thr-parent-id`, `body`, `verb`, `gravity`, `private`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-user-view` WHERE " . array_shift($condition) . " GROUP BY `parent-uri-id`, `thr-parent-id`, `verb`, `body`, `gravity`, `private`";
+		$sql       = "SELECT `parent-uri-id`, `thr-parent-id`, `body`, `verb`, `gravity`, `private`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title`, MAX(`author-id` = ?) AS `self` FROM `post-user-view` WHERE " . array_shift($condition) . " GROUP BY `parent-uri-id`, `thr-parent-id`, `verb`, BINARY `body`, `gravity`, `private`";
 
-		$rows = DBA::p($sql, $condition);
+		$rows = DBA::p($sql, array_merge([(int) Contact::getPublicIdByUserId($uid)], $condition));
 		while ($row = DBA::fetch($rows)) {
 			$emoji = $row['gravity'] === ItemModel::GRAVITY_ACTIVITY ? ($row['body'] ?: $row['verb']) : '';
 			if (!isset($emojis[$row['thr-parent-id']][$emoji]['title'])) {
@@ -668,6 +669,9 @@ final readonly class ConversationDataProvider
 				$emojis[$row['thr-parent-id']][$emoji]['total'] += count($names);
 			}
 			$emojis[$row['thr-parent-id']][$emoji]['count'] += count($names);
+			if ($row['self']) {
+				$emojis[$row['thr-parent-id']][$emoji]['self'] = true;
+			}
 		}
 		DBA::close($rows);
 

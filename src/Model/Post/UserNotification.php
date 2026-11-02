@@ -117,7 +117,7 @@ class UserNotification
 	{
 		$fields = ['id', 'uri-id', 'parent-uri-id', 'uid', 'body', 'parent', 'gravity', 'vid', 'gravity',
 			'contact-id', 'author-id', 'author-gsid', 'owner-id', 'owner-gsid', 'causer-id', 'causer-gsid',
-			'private', 'thr-parent', 'thr-parent-id', 'parent-uri-id', 'parent-uri', 'verb'];
+			'private', 'thr-parent', 'thr-parent-id', 'parent-uri-id', 'parent-uri', 'verb', 'quote-uri-id'];
 		$item = Post::selectFirst($fields, ['uri-id' => $uri_id, 'uid' => $uid, 'origin' => false]);
 		if (!DBA::isResult($item)) {
 			return;
@@ -455,7 +455,13 @@ class UserNotification
 		}
 
 		// Check if the contact posted or shared something directly
-		if (DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => true])) {
+		// Diaspora reshares arrive as a post with an empty body that quotes the original post
+		$is_reshare = ($item['verb'] == Activity::ANNOUNCE) || (empty($item['body']) && !empty($item['quote-uri-id']));
+
+		$notify_new_posts   = [Contact::NOTIFY_NEW_POSTS_ALL];
+		$notify_new_posts[] = $is_reshare ? Contact::NOTIFY_NEW_POSTS_SHARES : Contact::NOTIFY_NEW_POSTS_POSTS;
+
+		if (DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => $notify_new_posts])) {
 			return true;
 		}
 

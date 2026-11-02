@@ -572,13 +572,14 @@ class Item
 			// we tagged a group in a top level post. Now we change the post
 			$item['private'] = $private_group ? ItemModel::PRIVATE : ItemModel::UNLISTED;
 
-			if ($only_to_group) {
-				$pcid = Contact::getPublicContactId($group_contact['id'], $item['uid']);
-				if ($pcid) {
-					$item['owner-id'] = $pcid;
-					unset($item['owner-link']);
-					unset($item['owner-name']);
-					unset($item['owner-avatar']);
+			if ($only_to_group && $pcid = Contact::getPublicContactId($group_contact['id'], $item['uid'])) {
+				$owner = Contact::getById($pcid, ['url', 'name', 'avatar', 'alias', 'network', 'contact-type']);
+				if ($owner) {
+					$item['owner-id']      = $pcid;
+					$item['owner-link']    = $owner['url'];
+					$item['owner-name']    = $owner['name'];
+					$item['owner-alias']   = $owner['alias'];
+					$item['owner-network'] = $owner['network'];
 				}
 
 				$item['postopts'] = '';

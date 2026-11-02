@@ -34,6 +34,7 @@ use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Relay;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\EmojiReaction;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\JsonLD;
 use Friendica\Util\Network;
@@ -794,6 +795,18 @@ class Processor
 	 */
 	public static function createActivity(array $activity, string $verb)
 	{
+		$reaction = '';
+		if (in_array($verb, [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT]) && !empty($activity['content'])) {
+			$reaction = trim(HTML::toBBCode($activity['content']));
+			if (!EmojiReaction::isReaction($reaction)) {
+				// Custom emojis aren't supported, since they aren't accessible
+				DI::logger()->info('Unsupported reaction content, processing it as a plain activity', ['id' => $activity['id'], 'verb' => $verb, 'content' => $activity['content']]);
+				$reaction = '';
+			} else {
+				DI::logger()->info('Emoji reaction received', ['id' => $activity['id'], 'verb' => $verb, 'reaction' => $reaction]);
+			}
+		}
+
 		$activity['reply-to-id'] = $activity['object_id'];
 		$item                    = self::createItem($activity, false);
 		if (empty($item)) {
@@ -807,7 +820,9 @@ class Processor
 		unset($item['post-type']);
 		$item['object-type'] = Activity\ObjectType::NOTE;
 
-		if (!empty($activity['content'])) {
+		if (in_array($verb, [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT])) {
+			$item['body'] = $reaction;
+		} elseif (!empty($activity['content'])) {
 			$item['body'] = HTML::toBBCode($activity['content']);
 		}
 

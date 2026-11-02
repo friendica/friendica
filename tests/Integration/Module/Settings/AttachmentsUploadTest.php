@@ -83,7 +83,7 @@ class AttachmentsUploadTest extends FixtureTestCase
 
 		// Rendering the settings sidebar is unrelated to upload validation.
 		$module = $this->getMockBuilder(Attachments::class)
-			->setConstructorArgs([DI::userSession(), DI::page(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), new Response(), []])
+			->setConstructorArgs([DI::mediaUsageRenderer(), DI::userSession(), DI::page(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), new Response(), []])
 			->onlyMethods(['content'])
 			->getMock();
 		$module->method('content')->willReturn('');

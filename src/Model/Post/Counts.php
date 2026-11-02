@@ -7,16 +7,22 @@
 
 namespace Friendica\Model\Post;
 
-use Friendica\Content\Smilies;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Protocol\Activity;
+use Friendica\Util\EmojiReaction;
 
 class Counts
 {
+	/**
+	 * Maximum number of reaction activities that are evaluated per post
+	 */
+	private const MAX_REACTION_ACTIVITIES = 500;
+
 	/**
 	 * Insert or update a post-counts entry
 	 *
@@ -38,8 +44,8 @@ class Counts
 		} elseif ($verb == Activity::POST) {
 			$condition['gravity'] = Item::GRAVITY_COMMENT;
 			$body                 = '';
-		} elseif ($body && mb_strlen($body) == 1 && Smilies::isEmojiPost($body)) {
-			$condition['body'] = $body;
+		} elseif ($body && EmojiReaction::isReaction($body)) {
+			$condition = DBA::mergeConditions($condition, ['BINARY `body` = ?', $body]);
 		} else {
 			$body = '';
 		}
@@ -109,5 +115,44 @@ class Counts
 		}
 		DBA::close($countquery);
 		return $counts;
+	}
+
+	/**
+	 * Retrieves the emoji reactions on a post that are visible to the given user
+	 *
+	 * @param int $uri_id
+	 * @param int $uid
+	 *
+	 * @return array List of reactions with the fields "name", "count", "me" and "account_ids"
+	 */
+	public static function getReactions(int $uri_id, int $uid): array
+	{
+		$self      = Contact::getPublicIdByUserId($uid);
+		$reactions = [];
+
+		$condition  = ['thr-parent-id' => $uri_id, 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => [Activity::LIKE, Activity::EMOJIREACT], 'deleted' => false];
+		$condition  = DBA::mergeConditions($condition, ["`body` NOT IN ('', ?)", Activity::LIKE]);
+		$activities = Post::selectForUser($uid, ['body', 'author-id'], $condition, ['order' => ['received'], 'limit' => self::MAX_REACTION_ACTIVITIES]);
+		while ($activity = Post::fetch($activities)) {
+			$body = (string) $activity['body'];
+			if (!EmojiReaction::isReaction($body)) {
+				continue;
+			}
+			$reactions[$body][$activity['author-id']] = true;
+		}
+		DBA::close($activities);
+
+		$result = [];
+		foreach ($reactions as $name => $authors) {
+			$account_ids = array_keys($authors);
+
+			$result[] = [
+				'name'        => $name,
+				'count'       => count($account_ids),
+				'me'          => in_array($self, $account_ids),
+				'account_ids' => $account_ids,
+			];
+		}
+		return $result;
 	}
 }

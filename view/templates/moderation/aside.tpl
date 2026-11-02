@@ -19,9 +19,9 @@
 
 {{foreach $subpages as $page}}
 	<h4>{{$page.0}}</h4>
-	<ul class="admin linklist" role="menu">
+	<ul class="admin linklist">
 		{{foreach $page.1 as $item}}
-			<li class="admin link button {{$item.2}}" role="menuitem"><a href="{{$item.0}}">{{$item.1}}</a></li>
+			<li class="admin link button {{$item.2}}"><a href="{{$item.0}}">{{$item.1}}</a></li>
 		{{/foreach}}
 	</ul>
 {{/foreach}}

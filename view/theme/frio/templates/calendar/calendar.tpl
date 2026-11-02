@@ -59,5 +59,5 @@
 	</div>
 
 	{{* This is the container where the fullCalendar is inserted through js *}}
-	<div id="events-calendar"></div>
+	<div id="events-calendar" data-token="{{$form_security_token}}"></div>
 </div>

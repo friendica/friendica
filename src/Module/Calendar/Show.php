@@ -109,10 +109,11 @@ class Show extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate("calendar/calendar.tpl");
 		$o   = Renderer::replaceMacros($tpl, [
-			'$tabs'      => $tabs,
-			'$title'     => $this->t('Calendar'),
-			'$view'      => $this->t('View'),
-			'$new_event' => ['calendar/event/new', $this->t('New Event'), '', ''],
+			'$tabs'                => $tabs,
+			'$title'               => $this->t('Calendar'),
+			'$view'                => $this->t('View'),
+			'$form_security_token' => self::getFormSecurityToken('calendar-view'),
+			'$new_event'           => ['calendar/event/new', $this->t('New Event'), '', ''],
 
 			'$today' => Strings::ucFirst($this->t('today')),
 			'$month' => Strings::ucFirst($this->t('month')),

@@ -22,6 +22,9 @@
 	{{if $tools.profile}}
 		| <a id="photo-toprofile-link" href="{{$tools.profile.0}}">{{$tools.profile.1}}</a>
 	{{/if}}
+	{{if $tools.usage}}
+		| <a id="photo-usage-link" href="{{$tools.usage.0}}">{{$tools.usage.1}}</a>
+	{{/if}}
 	{{if $tools.lock}}
 		| <img src="images/lock_icon.gif" class="lockview" alt="{{$tools.lock}}" onclick="lockview(event, 'photo', {{$id}});" />
 	{{/if}}
@@ -34,4 +37,5 @@
 <div id="photo-photo-end"></div>
 <div id="photo-caption">{{$desc}}</div>
 {{if $edit}}{{$edit nofilter}}{{/if}}
+{{if $usage}}{{$usage nofilter}}{{/if}}
 

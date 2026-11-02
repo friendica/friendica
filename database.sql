@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.11-dev (Blutwurz)
--- DB_UPDATE_VERSION 1601
+-- DB_UPDATE_VERSION 1603
 -- ------------------------------------------
 
 
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`pending` boolean NOT NULL DEFAULT '1' COMMENT 'Contact request is pending',
 	`deleted` boolean NOT NULL DEFAULT '0' COMMENT 'Contact has been deleted',
 	`info` mediumtext COMMENT '',
-	`notify_new_posts` boolean NOT NULL DEFAULT '0' COMMENT '',
+	`notify_new_posts` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only',
 	`fetch_further_information` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`ffi_keyword_denylist` text COMMENT '',
 	`photo` varbinary(383) DEFAULT '' COMMENT 'Link to the profile photo of the contact',
@@ -1270,7 +1270,7 @@ CREATE TABLE IF NOT EXISTS `post-category` (
 CREATE TABLE IF NOT EXISTS `post-counts` (
 	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the item uri',
 	`vid` smallint unsigned NOT NULL COMMENT 'Id of the verb table entry that contains the activity verbs',
-	`reaction` varchar(4) NOT NULL COMMENT 'Emoji Reaction',
+	`reaction` varbinary(64) NOT NULL COMMENT 'Emoji Reaction',
 	`parent-uri-id` int unsigned COMMENT 'Id of the item-uri table that contains the parent uri',
 	`count` int unsigned DEFAULT 0 COMMENT 'Number of activities',
 	 PRIMARY KEY(`uri-id`,`vid`,`reaction`),
@@ -2113,7 +2113,7 @@ CREATE TABLE IF NOT EXISTS `user-contact` (
 	`pending` boolean COMMENT '',
 	`rel` tinyint unsigned COMMENT 'The kind of the relation between the user and the contact',
 	`info` mediumtext COMMENT '',
-	`notify_new_posts` boolean COMMENT '',
+	`notify_new_posts` tinyint unsigned COMMENT '0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only',
 	`remote_self` tinyint unsigned COMMENT '0 => No mirroring, 1-2 => Mirror as own post, 3 => Mirror as reshare',
 	`fetch_further_information` tinyint unsigned COMMENT '0 => None, 1 => Fetch information, 3 => Fetch keywords, 2 => Fetch both',
 	`ffi_keyword_denylist` text COMMENT '',

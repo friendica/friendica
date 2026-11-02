@@ -29,6 +29,7 @@ class Mode
 	public const WORKER    = 3;
 
 	public const BACKEND_CONTENT_TYPES = ['application/jrd+json', 'text/xml',
+		'application/rdf+xml', 'application/ld+json', 'application/xrd+xml',
 		'application/rss+xml', 'application/atom+xml', 'application/activity+json'];
 
 	/**

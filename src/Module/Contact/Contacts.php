@@ -125,7 +125,7 @@ class Contacts extends BaseModule
 
 		$o = Module\Contact::getTabsHTML($contact, Module\Contact::TAB_CONTACTS);
 
-		$tabs = self::getContactFilterTabs('contact/' . $cid, $type, true);
+		$tabs = $this->getContactFilterTabs('contact/' . $cid, $type, true);
 
 		// Contact list is obtained from the visited contact, but the contact display is visitor dependent
 		$contacts = array_map(

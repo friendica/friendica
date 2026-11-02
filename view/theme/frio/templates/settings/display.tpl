@@ -9,7 +9,7 @@
 	<form action="settings/display" id="settings-form" method="post" autocomplete="off">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
-		<div class="panel-group panel-group-settings" id="settings" role="tablist" aria-multiselectable="true">
+		<div class="panel-group panel-group-settings" id="settings">
 			<details class="panel">
 				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="theme-settings-title"><h2>{{$themes_title}}</h2></summary>
 				<div id="theme-settings-content">
@@ -60,6 +60,7 @@
 						{{include file="field_select.tpl" field=$platform_icon_style}}
 						{{include file="field_select.tpl" field=$font}}
 						{{include file="field_select.tpl" field=$text_spacing}}
+						{{include file="field_select.tpl" field=$attachment_icons}}
 						{{include file="field_checkbox.tpl" field=$embed_media}}
 					</div>
 					<div class="panel-footer">

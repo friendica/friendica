@@ -1343,8 +1343,8 @@ class User
 			}
 		}
 
-		if (!Network::isEmailDomainAllowed($email)) {
-			throw new Exception(DI::l10n()->t('Your email domain is not among those allowed on this site.'));
+		if (!Network::isEmailDomainAllowed($email) || !Network::isEmailAddressAllowed($email)) {
+			throw new Exception(DI::l10n()->t('This email address cannot be used for a registration on this site.'));
 		}
 
 		if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !Network::isEmailDomainValid($email)) {

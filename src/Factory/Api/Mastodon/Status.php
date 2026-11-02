@@ -113,7 +113,8 @@ class Status extends BaseFactory
 		$count_announce = Post::count(DBA::mergeConditions($condition, ['vid' => Verb::getID(Activity::ANNOUNCE)]))
 			+ Post::countPosts(['quote-uri-id' => $uriId, 'body' => '', 'deleted' => false]);
 
-		$count_like    = Post::count(DBA::mergeConditions($condition, ['vid' => Verb::getID(Activity::LIKE)]));
+		$plain_like    = DBA::mergeConditions(['vid' => Verb::getID(Activity::LIKE)], ["(`body` IS NULL OR `body` IN ('', ?))", Activity::LIKE]);
+		$count_like    = Post::count(DBA::mergeConditions($condition, $plain_like));
 		$count_dislike = Post::count(DBA::mergeConditions($condition, ['vid' => Verb::getID(Activity::DISLIKE)]));
 
 		$counts = new \Friendica\Object\Api\Mastodon\Status\Counts(
@@ -123,14 +124,13 @@ class Status extends BaseFactory
 			$count_dislike,
 		);
 
-		$origin_like = $count_like > 0 && Post::exists([
+		$origin_like = $count_like > 0 && Post::exists(DBA::mergeConditions([
 			'thr-parent-id' => $uriId,
 			'uid'           => $uid,
 			'origin'        => true,
 			'gravity'       => Item::GRAVITY_ACTIVITY,
-			'vid'           => Verb::getID(Activity::LIKE),
 			'deleted'       => false,
-		]);
+		], $plain_like));
 		$origin_dislike = $count_dislike > 0 && Post::exists([
 			'thr-parent-id' => $uriId,
 			'uid'           => $uid,
@@ -276,7 +276,13 @@ class Status extends BaseFactory
 		$visibility_data = $uid != $item['uid'] ? null : new FriendicaVisibility($this->aclFormatter->expand($item['allow_cid']), $this->aclFormatter->expand($item['deny_cid']), $this->aclFormatter->expand($item['allow_gid']), $this->aclFormatter->expand($item['deny_gid']));
 		$friendica       = new FriendicaExtension($item['title'] ?? '', $item['changed'], $item['commented'], $item['received'], $counts->dislikes, $origin_dislike, $network, $platform, $version, $sitename, $delivery_data, $visibility_data, BBCode::convertForUriId($item['uri-id'], $item['body'], BBCode::EXTERNAL));
 
-		return new \Friendica\Object\Api\Mastodon\Status($item, $account, $counts, $userAttributes, $sensitive, $application, $mentions, $tags, $card, $attachments, $in_reply, $reshare, $friendica, $quote, $poll, $emojis);
+		$emoji_reactions = [];
+		foreach (Post\Counts::getReactions($item['uri-id'], $uid) as $reaction) {
+			$reaction['account_ids'] = array_map(strval(...), $reaction['account_ids']);
+			$emoji_reactions[]       = $reaction;
+		}
+
+		return new \Friendica\Object\Api\Mastodon\Status($item, $account, $counts, $userAttributes, $sensitive, $application, $mentions, $tags, $card, $attachments, $in_reply, $reshare, $friendica, $quote, $poll, $emojis, $emoji_reactions);
 	}
 
 	/**

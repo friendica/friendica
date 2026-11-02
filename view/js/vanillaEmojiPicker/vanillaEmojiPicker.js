@@ -8604,10 +8604,13 @@ const EmojiPicker = function(options) {
         
         render: (e, attr) => {
             // attr is empty in friendica, no idea why..
-            if (!attr) attr='.emojis'
+            const clicked = this.options.trigger.find(item => e.target && e.target.closest(item.selector));
+            attr = clicked ? clicked.selector : (attr || '.emojis');
             emojiList = undefined;
             const index = this.options.trigger.findIndex(item => item.selector === attr);
             this.insertInto = this.options.trigger[index].insertInto;
+            this.onSelect = this.options.trigger[index].onSelect;
+            this.selectTrigger = e.target && e.target.closest(attr);
 
             const insertSelector = Array.isArray(this.insertInto) ? this.insertInto.join(',') : this.insertInto;
             const triggerElement = e.target && e.target.closest(attr);
@@ -8776,6 +8779,14 @@ const EmojiPicker = function(options) {
             const emoji = e.target.innerText.trim();
             // Skin tone variants are counted as their base emoji, so that they follow the selected skin tone
             functions.recordUsage(e.target.getAttribute('data-base') || emoji);
+
+            // Triggers with a callback receive the emoji instead of inserting it into a textarea
+            if (this.onSelect) {
+                this.onSelect(emoji, this.selectTrigger);
+                functions.closePicker.call(this, e);
+                return;
+            }
+
             const insertSelector = Array.isArray(this.insertInto) ? this.insertInto.join(',') : this.insertInto;
             const myFields = Array.from(document.querySelectorAll(insertSelector));
             const myValue = emoji;

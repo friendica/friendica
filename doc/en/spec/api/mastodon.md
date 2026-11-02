@@ -17,6 +17,11 @@ Please find a list of supported apps at [FAQ](help/user/faq#clients).
 These endpoints use the [Mastodon API entities](https://docs.joinmastodon.org/entities/).
 With some additional extensions listed below.
 
+### Instance Entities
+Extensions to the [Mastodon Instance::V1 Entities](https://docs.joinmastodon.org/entities/V1_Instance/)
+* `pleroma`: Pleroma extension, `metadata.features` contains `pleroma_emoji_reactions` to signal the support of emoji reactions
+* `fedibird_capabilities`: Fedibird extension, contains `emoji_reaction` to signal the support of emoji reactions
+
 ### Instance (Version 2) Entities
 Extensions to the [Mastodon Instance::V2 Entities](https://docs.joinmastodon.org/entities/Instance/)
 * `friendica`: Friendica specific properties of the V2 Instance including:
@@ -54,6 +59,9 @@ Extensions to the [Mastodon Status Entities](https://docs.joinmastodon.org/entit
     * `delivery_queue_failed`: Total number of remote servers that have we failed to federate to so far.
   * `dislikes_count`: The number of dislikes that a status has accumulated according to the server.
   * `disliked`: Whether the API user disliked the status.
+* `pleroma`: Pleroma extension including:
+  * `emoji_reactions`: The emoji reactions to the status, each with `name` (the emoji), `count` and `me` (whether the API user reacted with it). Only Unicode emojis are supported.
+* `emoji_reactions`: Fedibird extension, the same list as `pleroma.emoji_reactions` with the additional field `account_ids`.
 
 Example:
 ```json
@@ -187,6 +195,11 @@ Example:
 - [`GET /api/v1/notifications/:id`](https://docs.joinmastodon.org/methods/notifications/)
 - [`POST /api/v1/notifications/clear`](https://docs.joinmastodon.org/methods/notifications/)
 - [`POST /api/v1/notifications/:id/dismiss`](https://docs.joinmastodon.org/methods/notifications/)
+- [`GET /api/v1/pleroma/statuses/:id/reactions`](https://docs-develop.pleroma.social/backend/development/API/differences_in_mastoapi_responses/#emoji-reactions)
+- [`GET /api/v1/pleroma/statuses/:id/reactions/:emoji`](https://docs-develop.pleroma.social/backend/development/API/differences_in_mastoapi_responses/#emoji-reactions)
+- [`PUT /api/v1/pleroma/statuses/:id/reactions/:emoji`](https://docs-develop.pleroma.social/backend/development/API/differences_in_mastoapi_responses/#emoji-reactions)
+    - Only Unicode emojis are supported, custom emojis are rejected
+- [`DELETE /api/v1/pleroma/statuses/:id/reactions/:emoji`](https://docs-develop.pleroma.social/backend/development/API/differences_in_mastoapi_responses/#emoji-reactions)
 - [`GET /api/v1/polls/:id`](https://docs.joinmastodon.org/methods/polls/)
 - [`GET /api/v1/preferences`](https://docs.joinmastodon.org/methods/preferences/)
 - [`DELETE /api/v1/push/subscription`](https://docs.joinmastodon.org/methods/push/)
@@ -210,6 +223,10 @@ Example:
        - `title`: Explicitly sets the title for a post status, ignored if used on a comment status. For post statuses the legacy behavior is to use any "spoiler text" as the title if it is provided. If both the title and spoiler text are provided for a post status then they will each be used for their respective roles. If no title is provided then the legacy behavior will persist. If you want to create a post with no title but spoiler text then explicitly set the title but set it to an empty string `""`.
 - [`GET /api/v1/statuses/:id`](https://docs.joinmastodon.org/methods/statuses/#get)
 - [`DELETE /api/v1/statuses/:id`](https://docs.joinmastodon.org/methods/statuses/#delete)
+- `POST /api/v1/statuses/:id/react/:emoji`
+    - Fedibird, kmyblue and Chuckya extension to add an emoji reaction, only Unicode emojis are supported
+- `POST /api/v1/statuses/:id/unreact/:emoji`
+    - Fedibird, kmyblue and Chuckya extension to remove an emoji reaction
 - [`GET /api/v1/statuses/:id/context`](https://docs.joinmastodon.org/methods/statuses/#context)
     - Additional support for paging using `min_id`, `max_id`, `since_id` parameters
     - Additional support for previous/next Link Headers to support paging

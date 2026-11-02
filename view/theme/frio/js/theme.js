@@ -383,9 +383,11 @@ function initTheme() {
 		.off("shown.bs.offcanvas.frio-theme hidden.bs.offcanvas.frio-theme")
 		.on("shown.bs.offcanvas.frio-theme", function () {
 			$body.addClass("aside-out");
+			$('[data-toggle="offcanvas"][data-target="aside"]').attr("aria-expanded", "true");
 		})
 		.on("hidden.bs.offcanvas.frio-theme", function () {
 			$body.removeClass("aside-out");
+			$('[data-toggle="offcanvas"][data-target="aside"]').attr("aria-expanded", "false");
 		});
 
 	// Right offcanvas elements
@@ -741,6 +743,30 @@ function htmlToText(htmlString) {
 	text = text.replace(/<[^>]*>/g, "");
 
 	return text;
+}
+
+/**
+ * Adds or removes an emoji reaction and refreshes the reactions of the item
+ *
+ * @param {int}     ident The id of the relevant item
+ * @param {string}  emoji The emoji of the reaction
+ * @param {boolean} un    Whether to remove the reaction instead of adding it
+ */
+function doEmojiReaction(ident, emoji, un) {
+	showPosting();
+	$.post('item/' + ident.toString() + '/activity/' + (un ? 'unreact' : 'react'), {emoji: emoji})
+		.done(function(data) {
+			showProcessing();
+			if (!refreshItemActivity(ident, data)) {
+				updateItem(ident.toString());
+			}
+		})
+		.fail(function() {
+			$.jGrowl(aErrType['netErr'], {sticky: false, theme: 'info', life: 5000});
+		})
+		.always(function() {
+			hideLoading();
+		});
 }
 
 /**

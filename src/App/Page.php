@@ -52,6 +52,8 @@ class Page implements ArrayAccess
 	 */
 	public const ACCESSIBILITY_TEXT_SPACINGS = ['increased', 'large'];
 
+	public const ACCESSIBILITY_ATTACHMENT_ICONS = ['monochrome', 'none'];
+
 	/**
 	 * @var array Contains all stylesheets, which should get loaded during page
 	 */
@@ -318,6 +320,10 @@ class Page implements ArrayAccess
 		}
 		if ($pConfig->get($localUID, 'accessibility', 'hide_empty_descriptions')) {
 			$this->page['htmlhead'] .= "<style>a[data-alt='']{display:none;} a:has(.empty-description){display:none;} .empty-description {display: none;}</style>\n";
+		}
+		$attachment_icons = $pConfig->get($localUID, 'accessibility', 'attachment_icons');
+		if (in_array($attachment_icons, self::ACCESSIBILITY_ATTACHMENT_ICONS, true)) {
+			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/accessibility/attachment-icons-' . $attachment_icons . '.css?v=' . App::VERSION . '" type="text/css" media="all" />' . "\n";
 		}
 		if ($pConfig->get($localUID, 'accessibility', 'hide_custom_emojis')) {
 			$this->page['htmlhead'] .= "<style>span.emoji.mastodon img {display: none;}</style>\n";

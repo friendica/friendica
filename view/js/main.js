@@ -20,6 +20,27 @@ if (!Element.prototype.matches) {
 		};
 }
 
+// Announce jGrowl toasts to screen readers instead of only showing them visually.
+// Screen readers only announce changes inside a live region that already exists,
+// so the shared container is created up front with aria-live, jGrowl reuses it.
+// Error notices additionally keep role="alert" so they are announced assertively.
+if (typeof $ !== 'undefined' && $.fn.jGrowl) {
+	$.jGrowl.defaults.beforeOpen = function (element, message, options) {
+		if (options && options.theme === 'notice') {
+			$(element).attr('role', 'alert');
+		}
+		$(element).parent().attr('aria-live', 'polite');
+	};
+
+	$(function () {
+		if ($('#jGrowl').length === 0) {
+			$('<div id="jGrowl" aria-live="polite"></div>')
+				.addClass($.jGrowl.defaults.position)
+				.appendTo($.jGrowl.defaults.appendTo);
+		}
+	});
+}
+
 const ModuleLifecycleReadyEvent = Object.freeze({
 	DOCUMENT: 'document',
 	WINDOW: 'window'
@@ -202,6 +223,7 @@ var force_update = false;
 var update_item = 0;
 var stopped = false;
 var totStopped = false;
+var doNotDisturb = false;
 var timer = null;
 var pr = 0;
 var liking = 0;
@@ -485,6 +507,17 @@ window.onDocumentReady('body', function() {
 		// Update the js scrollbars
 		$('#nav-notifications-menu').perfectScrollbar('update');
 	});
+
+	// Restore a "do not disturb" state set before the last page reload
+	try {
+		if ($('#notifications-pause').length && localStorage.getItem('donotdisturb') === '1') {
+			pause();
+		}
+	} catch (e) {
+		// localStorage is not available, the state is then only kept until the next reload
+	}
+
+	$(document).off('click.friendica-dnd').on('click.friendica-dnd', '#notifications-pause', toggleDoNotDisturb);
 
 	// Asynchronous calls are deferred until the very end of the page load to ease on slower connections
 	// Only register once, not on every SPA navigation
@@ -790,7 +823,7 @@ function isColumnMode() {
 }
 
 function NavUpdate() {
-	if (!stopped) {
+	if (!stopped && !doNotDisturb) {
 		if (force_update) {
 			showFetching();
 		}
@@ -2007,6 +2040,39 @@ function unpause() {
 	totStopped = false;
 	stopped = false;
 	$('#pause').html('');
+}
+function pause() {
+	// stop the periodic polling until resume() is called explicitly
+	doNotDisturb = true;
+	var $btn = $('#notifications-pause');
+	var label = $btn.data('label-resume');
+	$btn.addClass('active').attr('aria-checked', 'true').attr('aria-label', label).attr('data-original-title', label).attr('title', label);
+	$btn.find('i').removeClass('ri-notification-off-line').addClass('ri-notification-off-fill');
+	try {
+		localStorage.setItem('donotdisturb', '1');
+	} catch (e) {
+		// localStorage is not available, the state is then only kept until the next reload
+	}
+}
+function resume() {
+	doNotDisturb = false;
+	var $btn = $('#notifications-pause');
+	var label = $btn.data('label-pause');
+	$btn.removeClass('active').attr('aria-checked', 'false').attr('aria-label', label).attr('data-original-title', label).attr('title', label);
+	$btn.find('i').removeClass('ri-notification-off-fill').addClass('ri-notification-off-line');
+	try {
+		localStorage.removeItem('donotdisturb');
+	} catch (e) {
+		// localStorage is not available, the state is then only kept until the next reload
+	}
+	NavUpdate();
+}
+function toggleDoNotDisturb() {
+	if (doNotDisturb) {
+		resume();
+	} else {
+		pause();
+	}
 }
 
 // load more network content (used for infinite scroll)
