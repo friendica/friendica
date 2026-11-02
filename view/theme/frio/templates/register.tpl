@@ -75,6 +75,13 @@
 		</div>
 		<div id="register-nickname-end"></div>
 
+		<div id="register-timezone-wrapper" class="form-group">
+			{{include file="field_custom.tpl" field=$timezone}}
+		</div>
+		<div id="register-language-wrapper" class="form-group">
+			{{include file="field_select.tpl" field=$language}}
+		</div>
+
 		{{if $additional}}
 			<div id="register-type-wrapper" class="form-group">
 				{{include file="field_select.tpl" field=$acct_type}}
@@ -113,5 +120,14 @@
 				<a href="user/import">{{$importt}}</a>
 			</div>
 		{{/if}}
+	<script>
+		(function () {
+			var select = document.getElementById('timezone_select');
+			var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+			if (select && timezone && Array.prototype.some.call(select.options, function (option) { return option.value === timezone; })) {
+				select.value = timezone;
+			}
+		})();
+	</script>
 	</form>
 </div>
