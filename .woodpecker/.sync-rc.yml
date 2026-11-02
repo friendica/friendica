@@ -4,6 +4,7 @@
 
 # After each push to a *-rc branch, updates the branch "merge-<rc>-into-develop" (develop with <rc> merged in,
 # keeping the version of develop) and opens a PR for it, unless one is already open.
+# A merge conflict is reported as comment in that PR, or in an issue if no PR is open.
 # Runs at the releaser location because it needs a token with write access
 labels:
   location: friendica
@@ -38,22 +39,52 @@ steps:
       - >-
         LOGIN="$(curl -sS --fail-with-body -H "Authorization: token $${TOKEN}" "$${API_ROOT}/user")"
         || { echo "$${LOGIN}"; exit 1; }
-      - LOGIN="$(echo "$${LOGIN}" | jq -r .login)"
+      - LOGIN="$(printf '%s\n' "$${LOGIN}" | jq -r .login)"
       - git clone --quiet --filter=blob:none --single-branch --branch develop "${CI_FORGE_URL}/${CI_REPO}.git" /tmp/sync
       - cd /tmp/sync
       - git fetch --quiet origin "${CI_COMMIT_BRANCH}:refs/remotes/origin/${CI_COMMIT_BRANCH}"
       - git config user.name "$${LOGIN}"
       - git config user.email "no-reply@friendi.ca"
-      - RESULT=0
-      - sh "$${SCRIPT}" "${CI_COMMIT_BRANCH}" || RESULT=$$?
-      - if [ "$${RESULT}" -eq 3 ]; then exit 0; fi
-      - if [ "$${RESULT}" -ne 0 ]; then exit "$${RESULT}"; fi
-      - git push --quiet --force "https://$${LOGIN}:$${TOKEN}@$${FORGE_URL#https://}/${CI_REPO}.git" "$${SYNC_BRANCH}"
       - >-
         PULLS="$(curl -sS --fail-with-body -H "Authorization: token $${TOKEN}"
         "$${API}/pulls?state=open&base=develop&head=$${PR_HEAD}")" || { echo "$${PULLS}"; exit 1; }
-      - OPEN="$(echo "$${PULLS}" | jq length)"
-      - if [ "$${OPEN}" -gt 0 ]; then echo "Sync PR already open, branch updated"; exit 0; fi
+      - PR_NUMBER="$(printf '%s\n' "$${PULLS}" | jq -r '.[0].number // empty')"
+      - RESULT=0
+      - OUTPUT="$(sh "$${SCRIPT}" "${CI_COMMIT_BRANCH}" 2>&1)" || RESULT=$$?
+      - printf '%s\n' "$${OUTPUT}"
+      - if [ "$${RESULT}" -eq 3 ]; then exit 0; fi
+      # On a conflict, ask for a manual merge in the sync PR (or in an issue, if no PR is open)
+      - |
+        if [ "$${RESULT}" -ne 0 ]; then
+          if [ -n "$${PR_NUMBER}" ] && git fetch --quiet origin "$${SYNC_BRANCH}" \
+            && git merge-base --is-ancestor "origin/${CI_COMMIT_BRANCH}" FETCH_HEAD; then
+            echo "Sync PR already contains ${CI_COMMIT_BRANCH}"
+            exit 0
+          fi
+          START="origin/develop"
+          if [ -n "$${PR_NUMBER}" ]; then START="origin/$${SYNC_BRANCH}"; fi
+          REASON="$(printf '%s\n' "$${OUTPUT}" | grep -m1 'resolve the sync manually' || echo "see ${CI_PIPELINE_URL}")"
+          jq -n --arg rc "${CI_COMMIT_BRANCH}" --arg sha "${CI_COMMIT_SHA}" --arg branch "$${SYNC_BRANCH}" \
+            --arg start "$${START}" --arg reason "$${REASON}" \
+            '{title: "Merge \($$rc) into develop needs manual resolution",
+            body: "Merging `\($$rc)` (\($$sha)) into `develop` needs manual work: \($$reason)\n\n```sh\ngit fetch origin\ngit checkout -B \($$branch) \($$start)\ngit merge --no-ff origin/\($$rc)\n# resolve the conflicts, keep the version of develop\ngit push origin \($$branch)\n```"}' \
+            > /tmp/notice.json
+          if [ -z "$${PR_NUMBER}" ]; then
+            # creator and per_page are GitHub parameters, created_by and limit their Forgejo counterparts
+            QUERY="state=open&creator=$${LOGIN}&per_page=100&created_by=$${LOGIN}&limit=50"
+            ISSUES="$(curl -sS --fail-with-body -H "Authorization: token $${TOKEN}" "$${API}/issues?$${QUERY}")" \
+              || { echo "$${ISSUES}"; exit 1; }
+            PR_NUMBER="$(printf '%s\n' "$${ISSUES}" | jq -r --slurpfile n /tmp/notice.json \
+              'map(select(.pull_request == null and .title == $$n[0].title)) | .[0].number // empty')"
+          fi
+          TARGET="$${API}/issues"
+          if [ -n "$${PR_NUMBER}" ]; then TARGET="$${API}/issues/$${PR_NUMBER}/comments"; fi
+          curl -sS --fail-with-body -o /dev/null -X POST -H "Authorization: token $${TOKEN}" \
+            -H "Content-Type: application/json" -d @/tmp/notice.json "$${TARGET}"
+          exit 0
+        fi
+      - git push --quiet --force "https://$${LOGIN}:$${TOKEN}@$${FORGE_URL#https://}/${CI_REPO}.git" "$${SYNC_BRANCH}"
+      - if [ -n "$${PR_NUMBER}" ]; then echo "Sync PR already open, branch updated"; exit 0; fi
       - >-
         jq -n --arg head "$${SYNC_BRANCH}" --arg rc "${CI_COMMIT_BRANCH}"
         '{base: "develop", head: $$head, title: "Merge \($$rc) into develop",
