@@ -44,7 +44,7 @@ steps:
       - mkdir addon # create empty addon folder to appease composer
       - export COMPOSER_HOME=.composer
       - ./bin/composer.phar validate
-      - ./bin/composer.phar install --prefer-dist
+      - ./bin/composer.phar install --prefer-dist || { ./bin/composer.phar clear-cache && ./bin/composer.phar install --prefer-dist; }
     volumes:
       - /etc/hosts:/etc/hosts
   rebuild_cache:
