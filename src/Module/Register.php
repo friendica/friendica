@@ -131,12 +131,9 @@ class Register extends BaseModule
 		} else {
 			$publish_tpl     = Renderer::getMarkupTemplate('profile/publish.tpl');
 			$profile_publish = Renderer::replaceMacros($publish_tpl, [
-				'$instance'     => 'reg',
-				'$pubdesc'      => DI::l10n()->t('Include your profile in member directory?'),
-				'$yes_selected' => '',
-				'$no_selected'  => ' checked="checked"',
-				'$str_yes'      => DI::l10n()->t('Yes'),
-				'$str_no'       => DI::l10n()->t('No'),
+				'$instance' => 'reg',
+				'$pubdesc'  => DI::l10n()->t('Include your profile in member directory?'),
+				'$checked'  => '',
 			]);
 		}
 

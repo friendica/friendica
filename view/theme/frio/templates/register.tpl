@@ -52,13 +52,13 @@
 		{{if !$additional}}
 			<div id="register-email-wrapper" class="form-group">
 				<label for="register-email" id="label-register-email">{{$addrlabel}}</label>
-				<input type="text" maxlength="60" name="field1" id="register-email" class="form-control" value="{{$email}}" required>
+				<input type="email" autocomplete="email" maxlength="60" name="field1" id="register-email" class="form-control" value="{{$email}}" required>
 			</div>
 			<div id="register-email-end"></div>
 
 			<div id="register-repeat-wrapper" class="form-group">
 				<label for="register-repeat" id="label-register-repeat">{{$addrlabel2}}</label>
-				<input type="text" maxlength="60" name="repeat" id="register-repeat" class="form-control" value="" required>
+				<input type="email" autocomplete="email" maxlength="60" name="repeat" id="register-repeat" class="form-control" value="" required>
 			</div>
 			<div id="register-repeat-end"></div>
 		{{/if}}
@@ -117,7 +117,7 @@
 		{{if !$additional}}
 			<h3>{{$importh}}</h3>
 			<div id ="import-profile">
-				<a href="user/import">{{$importt}}</a>
+				<a href="user/import" class="btn btn-default">{{$importt}}</a>
 			</div>
 		{{/if}}
 	<script>
