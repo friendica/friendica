@@ -1191,11 +1191,12 @@ class Diaspora
 	 * @param string       $guid    message guid
 	 * @param WebFingerUri $author
 	 * @param array        $contact The contact of the item owner
+	 * @param bool         $fetch   Fetch the item from remote when it isn't stored
 	 *
 	 * @return array|bool the item record or false on failure
 	 * @throws \Exception
 	 */
-	private static function parentItem(int $uid, string $guid, WebFingerUri $author, array $contact)
+	private static function parentItem(int $uid, string $guid, WebFingerUri $author, array $contact, bool $fetch = true)
 	{
 		$fields = [
 			'id', 'parent', 'body', 'wall', 'uri', 'guid', 'private', 'origin',
@@ -1207,7 +1208,7 @@ class Diaspora
 		$condition = ['uid' => $uid, 'guid' => $guid];
 		$item      = Post::selectFirst($fields, $condition);
 
-		if (!DBA::isResult($item)) {
+		if (!DBA::isResult($item) && $fetch) {
 			try {
 				$msg = self::fetchByGuid($guid, DI::dsprContact()->getByAddr($author)->url);
 
@@ -1792,7 +1793,8 @@ class Diaspora
 			return true;
 		}
 
-		$toplevel_parent_item = self::parentItem($importer['uid'], $parent_guid, $author, $contact);
+		// Like ActivityPub, a public like on an unknown post is dropped instead of fetching the post
+		$toplevel_parent_item = self::parentItem($importer['uid'], $parent_guid, $author, $contact, $importer['uid'] !== 0);
 		if (!$toplevel_parent_item) {
 			return false;
 		}
