@@ -233,7 +233,7 @@
 			"@lang:recreate",
 			"@db:update-structure"
 		],
-		"db:update-structure": "bin/console.php dbstructure dumpsql > database.sql",
+		"db:update-structure": "php -d display_errors=stderr bin/console.php dbstructure dumpsql > database.sql.tmp && mv database.sql.tmp database.sql || (rm -f database.sql.tmp; exit 1)",
 		"install:prod": "@composer install -o --no-dev"
 	}
 }
