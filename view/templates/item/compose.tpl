@@ -42,7 +42,7 @@
 						<i class="ri ri-emotion-line"></i>
 					</button>
 					{{if !$enableAdvancedComposer}}
-					<button type="button" class="btn btn-default" id="wide-editor-toggle" aria-label="{{$l10n.btnZen}}" title="{{$l10n.btnZen}}" onclick="toggleWideEditor()">
+					<button type="button" class="btn btn-default hidden-xs hidden-sm" id="wide-editor-toggle" aria-label="{{$l10n.btnZen}}" title="{{$l10n.btnZen}}" onclick="toggleWideEditor()">
 						<i class="ri ri-fullscreen-line"></i>
 					</button>
 					{{/if}}
@@ -85,7 +85,7 @@
 			<div class="comment-edit-submit-wrapper clearfix">
 				{{if $type == 'post'}}
 				<div id="compose-additional-settings-location">
-					<button type="button" name="permissions" class="btn btn-default" id="toggle-permissions" title="{{$l10n.toggle_permissions_tooltip}}" onclick="togglePermissionsModal()" tabindex="5">
+					<button type="button" name="permissions" class="btn btn-default" id="toggle-permissions" title="{{$l10n.toggle_permissions_tooltip}}" data-toggle="modal" data-target="#permissions-modal-{{$id}}" tabindex="5">
 						<i class="ri ri-more-line"></i> {{$l10n.toggle_permissions}}
 					</button>
 					<input type="text" name="location" class="form-control" id="jot-location" value="{{$location}}" placeholder="{{$l10n.location_set}}" tabindex="6" />
@@ -110,7 +110,7 @@
 						<img role="presentation" id="profile-rotator" src="images/rotator.gif" alt="{{$l10n.wait}}" title="{{$l10n.wait}}" style="display: none;" />
 					</span>
 					<span role="presentation" id="character-counter" class="grey text-info"></span>
-					<button type="button" class="btn btn-default" onclick="preview_comment_toggle({{$id}}, '{{$l10n.preview}}');" id="comment-edit-preview-link-{{$id}}" tabindex="8">
+					<button type="button" class="btn btn-default" onclick="preview_comment_toggle({{$id}}, '{{$l10n.preview}}', '{{$l10n.close_preview}}');" id="comment-edit-preview-link-{{$id}}" tabindex="8">
 						<i class="ri ri-eye-line"></i> <span id="preview-btn-text-{{$id}}">{{$l10n.preview}}</span>
 					</button>
 					{{if $enableAdvancedComposer}}
@@ -168,7 +168,7 @@
 <script>
 	dzFactory.setupDropzone('#dropzone-{{$id}}', 'comment-edit-text-{{$id}}');
 
-	function preview_comment_toggle(id, originalText) {
+	function preview_comment_toggle(id, originalText, closeText) {
 		var previewPane = document.getElementById('comment-edit-preview-' + id);
 		var btnTextSpan = document.getElementById('preview-btn-text-' + id);
 
@@ -180,7 +180,7 @@
 			} else {
 				document.body.classList.add('wide-preview-active');
 				previewPane.style.display = 'block';
-				btnTextSpan.textContent = "Close preview";
+				btnTextSpan.textContent = closeText;
 				updateWidePreview();
 			}
 			sizeWideEditor();
@@ -192,7 +192,7 @@
 			btnTextSpan.textContent = originalText;
 		} else {
 			preview_comment(id);
-			btnTextSpan.textContent = "Close preview";
+			btnTextSpan.textContent = closeText;
 			previewPane.style.display = 'block';
 		}
 	}
@@ -222,7 +222,7 @@
 	function sizeWideEditor() {
 		var textarea = document.getElementById('comment-edit-text-{{$id}}');
 		var height = Math.max(300, window.innerHeight - textarea.getBoundingClientRect().top - 140);
-		// Pin height and maxHeight to keep the autosize library from expanding the textarea
+		// Pin height and maxHeight so the textarea keeps its size while typing
 		textarea.style.height = height + 'px';
 		textarea.style.maxHeight = height + 'px';
 		var previewPane = document.getElementById('comment-edit-preview-{{$id}}');
@@ -276,9 +276,6 @@
 		});
 	}
 
-	function togglePermissionsModal() {
-		$('#permissions-modal-{{$id}}').modal('show');
-	}
 
 	function autosizeTextarea(textarea) {
 		textarea.style.height = "auto";
