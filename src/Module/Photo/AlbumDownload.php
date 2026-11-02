@@ -5,6 +5,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+declare(strict_types=1);
+
 namespace Friendica\Module\Photo;
 
 use Friendica\App\Arguments;
@@ -20,8 +22,8 @@ use Friendica\Network\HTTPException;
 use Friendica\Util\Images;
 use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
+use Friendica\Util\ZipDownload;
 use Psr\Log\LoggerInterface;
-use ZipArchive;
 
 class AlbumDownload extends BaseModule
 {
@@ -39,7 +41,7 @@ class AlbumDownload extends BaseModule
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 	}
 
-	protected function rawContent(array $request = [])
+	protected function rawContent(array $request = []): never
 	{
 		$nickname = $this->parameters['nickname'] ?? '';
 		$hexalbum = $this->parameters['album']    ?? '';
@@ -67,15 +69,12 @@ class AlbumDownload extends BaseModule
 			throw new HTTPException\NotFoundException($this->t('Album not found.'));
 		}
 
-		$tempfile = tempnam(System::getTempPath(), 'photo-album-');
+		$zip = new ZipDownload(System::getTempPath());
 
-		$zip = new ZipArchive();
-		$zip->open($tempfile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-		$names = [];
 		foreach ($photos as $photo) {
 			$data = Photo::getImageDataForPhoto($photo);
 			if (empty($data)) {
+				$this->logger->notice('Photo without data skipped in album download', ['id' => $photo['id']]);
 				continue;
 			}
 
@@ -84,32 +83,23 @@ class AlbumDownload extends BaseModule
 				$name = $photo['resource-id'] . Images::getExtensionByMimeType($photo['type']);
 			}
 
-			// Avoid overwriting entries when several photos share the same original file name
-			if (isset($names[$name])) {
-				$names[$name]++;
-				$extension = strrpos($name, '.') !== false ? substr($name, strrpos($name, '.')) : '';
-				$basename  = strrpos($name, '.') !== false ? substr($name, 0, strrpos($name, '.')) : $name;
-				$name      = $basename . '-' . $names[$name] . $extension;
-			} else {
-				$names[$name] = 0;
-			}
-
-			$zip->addFromString($name, $data);
+			$zip->add($name, $data);
 		}
 
-		$zip->close();
+		$zipfile = $zip->close();
 
-		$content = file_get_contents($tempfile);
-		unlink($tempfile);
-
-		$filename = preg_replace('/[^a-z0-9_-]+/i', '-', (string) $album !== '' ? $album : $nickname);
-		$filename = trim((string) $filename, '-');
-		if ($filename === '') {
-			$filename = 'album';
+		$filename = $album !== '' ? $album : $nickname;
+		$ascii    = trim((string) preg_replace('/[^a-z0-9_-]+/i', '-', (string) $filename), '-');
+		if ($ascii === '') {
+			$ascii = 'album';
 		}
 
-		$this->response->setHeader(sprintf('Content-Disposition: attachment; filename="%s.zip"', $filename));
-		$this->response->setType(Response::TYPE_BLANK, 'application/zip');
-		$this->response->addContent($content);
+		header('Content-Type: application/zip');
+		header(sprintf('Content-Disposition: attachment; filename="%s.zip"; filename*=UTF-8\'\'%s', $ascii, rawurlencode($filename . '.zip')));
+		header('Content-Length: ' . filesize($zipfile));
+
+		readfile($zipfile);
+		unlink($zipfile);
+		exit;
 	}
 }

@@ -100,9 +100,7 @@ class Installer
 
 		$this->checkAPCu();
 
-		if (!$this->checkZip()) {
-			$returnVal = false;
-		}
+		$this->checkZip();
 
 		if (!$this->checkLocalIni()) {
 			$returnVal = false;
@@ -693,20 +691,15 @@ class Installer
 	/**
 	 * Zip Check
 	 *
-	 * Checks, if the zip module is available
-	 *
-	 * @return bool false if something required failed
+	 * Checks, if the zip module is available (optional)
 	 */
-	public function checkZip()
+	public function checkZip(): void
 	{
 		if (!class_exists('ZipArchive')) {
 			$this->addCheck(DI::l10n()->t('Zip PHP extension is not installed'), false, false, "");
 		} else {
 			$this->addCheck(DI::l10n()->t('Zip PHP extension is installed'), true, false, "");
 		}
-
-		// Zip is not required
-		return true;
 	}
 
 	/**

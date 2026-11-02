@@ -30,7 +30,7 @@
 		</button>
 		{{/if}}
 		{{if $download}}
-		<a id="album-download-link" class="btn btn-primary page-action" href="{{$download.1}}">
+		<a id="album-download-link" class="btn btn-primary page-action" href="{{$download.1}}" download>
 			<i class="ri ri-file-zip-line"></i>
 			{{$download.0}}
 		</a>
