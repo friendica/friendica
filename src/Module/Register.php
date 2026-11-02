@@ -390,8 +390,11 @@ class Register extends BaseModule
 
 		$post['blocked']  = $blocked;
 		$post['verified'] = $verified;
-		if (empty($post['language'])) {
+		if (empty($post['language']) || !array_key_exists($post['language'], DI::l10n()->getAvailableLanguages())) {
 			$post['language'] = L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language'));
+		}
+		if (!in_array($post['timezone'] ?? '', \DateTimeZone::listIdentifiers(), true)) {
+			unset($post['timezone']);
 		}
 
 		try {

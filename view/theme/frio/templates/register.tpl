@@ -120,5 +120,14 @@
 				<a href="user/import">{{$importt}}</a>
 			</div>
 		{{/if}}
+	<script>
+		(function () {
+			var select = document.getElementById('timezone_select');
+			var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+			if (select && timezone && Array.prototype.some.call(select.options, function (option) { return option.value === timezone; })) {
+				select.value = timezone;
+			}
+		})();
+	</script>
 	</form>
 </div>
