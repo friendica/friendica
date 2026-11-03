@@ -8,6 +8,7 @@
 namespace Friendica\Test;
 
 use Friendica\Database\Database;
+use Friendica\Model\Verb;
 use Friendica\Test\Util\Database\StaticDatabase;
 
 /**
@@ -24,6 +25,8 @@ trait DatabaseTestTrait
 		StaticDatabase::getGlobConnection()->rollback();
 		// Start the first, outer transaction
 		StaticDatabase::getGlobConnection()->beginTransaction();
+		// Verb IDs cached by a previous test are gone after its rollback
+		Verb::$verbs = [];
 	}
 
 	protected function tearDownDb()
@@ -52,7 +55,7 @@ trait DatabaseTestTrait
 			}
 
 			if (!is_array($rows)) {
-				$dba->e('TRUNCATE TABLE `' . $tableName . '``');
+				$dba->e('TRUNCATE TABLE `' . $tableName . '`');
 				continue;
 			}
 
