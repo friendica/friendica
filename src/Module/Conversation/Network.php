@@ -14,6 +14,7 @@ use Friendica\App\Page;
 use Friendica\AppHelper;
 use Friendica\Content\BoundariesPager;
 use Friendica\Content\Conversation\ConversationRenderer;
+use Friendica\Content\Conversation\LanguageCondition;
 use Friendica\Content\Conversation\StatusEditor;
 use Friendica\Content\Conversation\Entity\Channel;
 use Friendica\Content\Conversation\Entity\Network as NetworkEntity;
@@ -30,6 +31,7 @@ use Friendica\Content\PagesManager;
 use Friendica\Content\Nav;
 use Friendica\Content\Widget;
 use Friendica\Content\Text\HTML;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Content\Widget\TrendingTags;
 use Friendica\Core\ACL;
 use Friendica\Core\Cache\Capability\ICanCache;
@@ -76,6 +78,8 @@ class Network extends Timeline
 	protected $systemMessages;
 	/** @var Page */
 	protected $page;
+	/** @var SidebarMenu */
+	protected $sidebarMenu;
 	/** @var ConversationRenderer */
 	protected $conversationRenderer;
 	/** @var StatusEditor */
@@ -111,6 +115,7 @@ class Network extends Timeline
 		private readonly GroupManager $groupManager,
 		private readonly PagesManager $pagesManager,
 		Page $page,
+		SidebarMenu $sidebarMenu,
 		IHandleUserSessions $session,
 		Database $database,
 		IManagePersonalConfigValues $pConfig,
@@ -151,6 +156,7 @@ class Network extends Timeline
 		$this->conversationRenderer = $conversationRenderer;
 		$this->statusEditor         = $statusEditor;
 		$this->page                 = $page;
+		$this->sidebarMenu          = $sidebarMenu;
 		$this->channel              = $channelFactory;
 		$this->community            = $community;
 		$this->networkFactory       = $network;
@@ -194,8 +200,14 @@ class Network extends Timeline
 			];
 		}
 
+		$this->page['aside'] .= $this->sidebarMenu->getHTML($this->session->getLocalUserId(), $this->circleId ? Widget\SidebarMenu::CIRCLES : Widget\SidebarMenu::HOME);
+
+		if ($this->circleId && $this->sidebarMenu->isActive($this->session->getLocalUserId())) {
+			$widgetorder = [];
+		}
+
 		foreach ($widgetorder as $widget) {
-			if (Feature::isEnabled($this->session->getLocalUserId(), $widget)) {
+			if (Feature::isEnabled($this->session->getLocalUserId(), $widget) && !$this->sidebarMenu->replaces($this->session->getLocalUserId(), $widget)) {
 				switch ($widget) {
 					case Feature::CIRCLES:
 						$this->page['aside'] .= Circle::sidebarWidget($module, $module . '/circle', 'standard', $this->circleId);
@@ -492,6 +504,15 @@ class Network extends Timeline
 		if ($this->mention) {
 			$timelineCondition['mention'] = true;
 		}
+
+		$timelinelanguages = $this->pConfig->get($this->session->getLocalUserId(), 'system', 'filter_timeline_language', false)
+			? $this->pConfig->get($this->session->getLocalUserId(), 'system', 'timeline_languages') ?? []
+			: [];
+		$languageCondition = new LanguageCondition();
+		if ($timelinelanguages) {
+			$timelineCondition = DBA::mergeConditions($timelineCondition, $languageCondition->getTimelineCondition($timelinelanguages));
+		}
+
 		if ($this->network) {
 			$commonCondition['network'] = $this->network;
 		}
@@ -565,8 +586,7 @@ class Network extends Timeline
 
 		$fields    = ['uri-id', 'created', 'received', 'commented', 'channel', 'contact-id'];
 		$condition = DBA::mergeConditions($timelineCondition, $commonCondition);
-
-		$timeline = $this->database->getSQL($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', $fields, $condition, $params);
+		$timeline  = $this->database->getSQL($this->circleId ? 'network-thread-circle-view' : 'network-thread-view', $fields, $condition, $params);
 		array_shift($condition);
 		$sql = '(' . $timeline . ')';
 
@@ -584,14 +604,14 @@ class Network extends Timeline
 		}
 
 		if ($systemchannels) {
-			$channel_condition = DBA::mergeConditions(['channel' => $systemchannels, 'in-timeline' => false], $commonCondition);
+			$channel_condition = DBA::mergeConditions(['channel' => $systemchannels, 'in-timeline' => false] + $languageCondition->getChannelCondition($timelinelanguages), $commonCondition);
 			$sql .= ' UNION ALL (' . $this->database->getSQL('system-channel-post-view', $fields, $channel_condition, $params) . ')';
 			array_shift($channel_condition);
 			$condition = array_merge($condition, $channel_condition);
 		}
 
 		if ($userchannels) {
-			$channel_condition = DBA::mergeConditions(['channel' => $userchannels, 'in-timeline' => false], $commonCondition);
+			$channel_condition = DBA::mergeConditions(['channel' => $userchannels, 'in-timeline' => false] + $languageCondition->getChannelCondition($timelinelanguages), $commonCondition);
 			$sql .= ' UNION ALL (' . $this->database->getSQL('channel-post-view', $fields, $channel_condition, $params) . ')';
 			array_shift($channel_condition);
 			$condition = array_merge($condition, $channel_condition);

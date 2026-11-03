@@ -45,6 +45,7 @@ For alternative server configurations (such as Nginx server and MariaDB database
 ### Optional
 
 * PHP ImageMagick extension (php-imagick) for animated GIF and animated WebP support.
+* PHP Zip extension (php-zip) to allow downloading a whole photo album as a ZIP file.
 
 ## Installation procedure
 

@@ -274,6 +274,7 @@ HELP;
 			$checked = false;
 		}
 		$installer->checkAPCu();
+		$installer->checkZip();
 		if (!$installer->checkLocalIni()) {
 			$checked = false;
 		}

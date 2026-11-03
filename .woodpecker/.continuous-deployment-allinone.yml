@@ -49,7 +49,7 @@ steps:
     commands:
       - export COMPOSER_HOME=.composer
       - ./bin/composer.phar validate
-      - ./bin/composer.phar install --no-dev --optimize-autoloader
+      - ./bin/composer.phar install --no-dev --optimize-autoloader || { ./bin/composer.phar clear-cache && ./bin/composer.phar install --no-dev --optimize-autoloader; }
     volumes:
       - /etc/hosts:/etc/hosts
   create_artifacts:

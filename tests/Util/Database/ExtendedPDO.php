@@ -80,7 +80,7 @@ class ExtendedPDO extends PDO
 
 		$this->_transactionDepth--;
 
-		return $this->exec("RELEASE SAVEPOINT LEVEL{$this->_transactionDepth}");
+		return $this->exec("RELEASE SAVEPOINT LEVEL{$this->_transactionDepth}") !== false;
 	}
 
 	/**
@@ -101,7 +101,7 @@ class ExtendedPDO extends PDO
 				// this shouldn't happen, but it does ...
 			}
 		} else {
-			return $this->exec("ROLLBACK TO SAVEPOINT LEVEL{$this->_transactionDepth}");
+			return $this->exec("ROLLBACK TO SAVEPOINT LEVEL{$this->_transactionDepth}") !== false;
 		}
 		return false;
 	}

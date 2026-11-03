@@ -36,7 +36,7 @@ steps:
       - git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
       - export COMPOSER_HOME=.composer
       - ./bin/composer.phar validate
-      - ./bin/composer.phar install --prefer-dist
+      - ./bin/composer.phar install --prefer-dist || { ./bin/composer.phar clear-cache && ./bin/composer.phar install --prefer-dist; }
 
   rebuild_cache:
     image: meltwater/drone-cache:dev
