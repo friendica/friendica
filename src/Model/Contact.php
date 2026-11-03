@@ -690,8 +690,19 @@ class Contact
 	 */
 	public static function getPublicIdByUserId(int $uid)
 	{
+		// The public contact of a user never changes, so it is safe to remember it for the whole process
+		static $publicIds = [];
+
+		if (isset($publicIds[$uid])) {
+			return $publicIds[$uid];
+		}
+
 		$self = self::selectFirstAccountUser(['pid'], ['self' => true, 'uid' => $uid]);
-		return $self['pid'] ?? false;
+		if (!isset($self['pid'])) {
+			return false;
+		}
+
+		return $publicIds[$uid] = $self['pid'];
 	}
 
 	/**

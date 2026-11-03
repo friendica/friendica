@@ -82,6 +82,9 @@ class L10n
 	 */
 	private $strings = [];
 
+	/** @var int Number of translation requests, see getTranslationCount() */
+	private int $translationCount = 0;
+
 	public function __construct(private IManageConfigValues $config, private Database $dba, private IHandleSessions $session, private array $server, array $get)
 	{
 		$this->loadTranslationTable(L10n::detectLanguage($server, $get, $this->config->get('system', 'language', self::DEFAULT)));
@@ -98,6 +101,19 @@ class L10n
 	public function getCurrentLang()
 	{
 		return $this->lang;
+	}
+
+	/**
+	 * Returns how often texts have been translated so far
+	 *
+	 * Compare the value before and after generating some output to find out whether the output contains
+	 * translated texts and therefore depends on the language.
+	 *
+	 * @return int Number of calls of t() and tt()
+	 */
+	public function getTranslationCount(): int
+	{
+		return $this->translationCount;
 	}
 
 	/**
@@ -350,6 +366,8 @@ class L10n
 			return '';
 		}
 
+		$this->translationCount++;
+
 		if (!empty($this->strings[$s])) {
 			$t = $this->strings[$s];
 			$s = is_array($t) ? $t[0] : $t;
@@ -386,6 +404,8 @@ class L10n
 	public function tt(string $singular, string $plural, float $count, ...$vars): string
 	{
 		$s = null;
+
+		$this->translationCount++;
 
 		if (!empty($this->strings[$singular])) {
 			$t = $this->strings[$singular];

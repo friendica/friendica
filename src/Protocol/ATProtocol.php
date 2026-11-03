@@ -599,11 +599,11 @@ final class ATProtocol
 	 * Get the web address for a given user ID
 	 *
 	 * @param integer $uid
-	 * @return string
+	 * @return string Empty if no frontend is configured
 	 */
 	public function getWebForUser(int $uid): string
 	{
-		return $this->pConfig->get($uid, 'bluesky', 'web') ?? $this->config->get('atprotocol', 'web');
+		return (string) ($this->pConfig->get($uid, 'bluesky', 'web') ?? $this->config->get('atprotocol', 'web'));
 	}
 
 	/**

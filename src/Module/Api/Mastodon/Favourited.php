@@ -9,8 +9,9 @@ namespace Friendica\Module\Api\Mastodon;
 
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Model\Contact;
 use Friendica\Model\Item;
-use Friendica\Model\Post;
+use Friendica\Model\Verb;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
@@ -36,9 +37,15 @@ class Favourited extends BaseApi
 			'with_muted' => false, // Pleroma extension: return activities by muted (not by blocked!) users.
 		], $request);
 
-		$params = ['order' => ['thr-parent-id' => true], 'limit' => $request['limit']];
+		// The likes are selected directly from the table by the author, so that the index "author-id_uid" can be used.
+		// Without this the optimizer can decide to walk through the activities of all users in the order of the sorting.
+		$self = Contact::getPublicIdByUserId($uid);
+		if (empty($self)) {
+			$this->setPaginationLinkHeader();
+			$this->earlyJsonExit([]);
+		}
 
-		$condition = ['gravity' => Item::GRAVITY_ACTIVITY, 'origin' => true, 'verb' => Activity::LIKE, 'uid' => $uid];
+		$condition = ['author-id' => $self, 'uid' => $uid, 'gravity' => Item::GRAVITY_ACTIVITY, 'origin' => true, 'deleted' => false];
 
 		if (!empty($request['max_id'])) {
 			$condition = DBA::mergeConditions($condition, ["`thr-parent-id` < ?", $request['max_id']]);
@@ -50,22 +57,35 @@ class Favourited extends BaseApi
 
 		if (!empty($request['min_id'])) {
 			$condition = DBA::mergeConditions($condition, ["`thr-parent-id` > ?", $request['min_id']]);
-
-			$params['order'] = ['thr-parent-id'];
 		}
 
-		$items = Post::selectForUser($uid, ['thr-parent-id'], $condition, $params);
-
-		$statuses = [];
-		while ($item = Post::fetch($items)) {
-			self::setBoundaries($item['thr-parent-id']);
-			try {
-				$statuses[] = DI::mstdnStatus()->createFromUriId($item['thr-parent-id'], $uid);
-			} catch (\Exception $exception) {
-				$this->logger->info('Post not fetchable', ['uri-id' => $item['thr-parent-id'], 'uid' => $uid, 'exception' => $exception]);
+		// There is deliberately no ordering and no limit in the query: With them the optimizer prefers the index of
+		// the sorting field and filters through the activities of all users. The own likes are few enough to sort them here.
+		// The verb is checked here as well and not in the query, since the optimizer would then intersect the index of
+		// the verb, which contains the likes of all users, with the index of the author.
+		$vid_like = Verb::getID(Activity::LIKE);
+		$uriIds   = [];
+		foreach (DBA::selectToArray('post-user', ['thr-parent-id', 'vid'], $condition) as $row) {
+			if ($row['vid'] == $vid_like) {
+				$uriIds[$row['thr-parent-id']] = $row['thr-parent-id'];
 			}
 		}
-		DBA::close($items);
+		$uriIds = array_values($uriIds);
+		if (empty($request['min_id'])) {
+			rsort($uriIds);
+		} else {
+			sort($uriIds);
+		}
+
+		$statuses = [];
+		foreach (array_slice($uriIds, 0, $request['limit']) as $uriId) {
+			self::setBoundaries($uriId);
+			try {
+				$statuses[] = DI::mstdnStatus()->createFromUriId($uriId, $uid);
+			} catch (\Exception $exception) {
+				$this->logger->info('Post not fetchable', ['uri-id' => $uriId, 'uid' => $uid, 'exception' => $exception]);
+			}
+		}
 
 		if (!empty($request['min_id'])) {
 			$statuses = array_reverse($statuses);

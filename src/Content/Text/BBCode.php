@@ -1330,8 +1330,11 @@ class BBCode
 
 		$ev = Event::fromBBCode($text);
 
-		$text = self::performWithEscapedTags($text, ['code'], function ($text) use ($simple_html, $for_plaintext, $uriid, $ev) {
-			$text = self::performWithEscapedTags($text, ['noparse', 'nobb', 'pre'], function ($text) use ($simple_html, $for_plaintext, $uriid, $ev) {
+		// The original text is only needed for the debug logging of invalid URLs
+		$source = $text;
+
+		$text = self::performWithEscapedTags($text, ['code'], function ($text) use ($simple_html, $for_plaintext, $uriid, $ev, $source) {
+			$text = self::performWithEscapedTags($text, ['noparse', 'nobb', 'pre'], function ($text) use ($simple_html, $for_plaintext, $uriid, $ev, $source) {
 				// Extract the private images which use data urls since preg has issues with
 				// large data sizes. Stash them away while we do bbcode conversion, and then put them back
 				// in after we've done all the regex matching. We cannot use any preg functions to do this.
@@ -1379,12 +1382,12 @@ class BBCode
 				$text = self::convertUrlToHtml($text, $simple_html, $for_plaintext);
 
 				// If the post only consists of an emoji, we display it larger than normal.
-				if (!$for_plaintext && DI::config()->get('system', 'big_emojis') && ($simple_html != self::DIASPORA) && Smilies::isEmojiPost($text)) {
+				if (!$for_plaintext && DI::config()->get('system', 'big_emojis') && ($simple_html === self::INTERNAL) && Smilies::isEmojiPost($text)) {
 					$text = '<span style="font-size: xx-large; line-height: normal;">' . $text . '</span>';
 				}
 
 				// Sanitize the created HTML.
-				$text = self::cleanupHtml($text);
+				$text = self::cleanupHtml($text, ['uri-id' => $uriid, 'mode' => $simple_html, 'bbcode' => $source]);
 
 				// This needs to be called after the cleanup, since otherwise some links are invalidated
 				$text = self::convertSharesToHtml($text, $simple_html, $uriid);
@@ -1734,14 +1737,11 @@ class BBCode
 
 	private static function convertSpoilersToHtml(string $text): string
 	{
-		// Declare the format for [spoiler] layout
-		$SpoilerLayout = '<details class="spoiler"><summary>' . DI::l10n()->t('Click to open/close') . '</summary>$1</details>';
-
 		// Check for [spoiler] text
 		// handle nested quotes
 		$endlessloop = 0;
 		while ((str_contains((string) $text, "[/spoiler]")) && (str_contains((string) $text, "[spoiler]")) && (++$endlessloop < 20)) {
-			$text = preg_replace("/\[spoiler\](.*?)\[\/spoiler\]/ism", $SpoilerLayout, (string) $text);
+			$text = preg_replace("/\[spoiler\](.*?)\[\/spoiler\]/ism", '<details class="spoiler"><summary>' . DI::l10n()->t('Click to open/close') . '</summary>$1</details>', (string) $text);
 		}
 
 		// Check for [spoiler=Title] text
@@ -1790,14 +1790,12 @@ class BBCode
 
 		// Check for [quote=Author] text
 
-		$t_wrote = DI::l10n()->t('$1 wrote:');
-
 		// handle nested quotes
 		$endlessloop = 0;
 		while ((str_contains((string) $text, "[/quote]")) && (str_contains((string) $text, "[quote=")) && (++$endlessloop < 20)) {
 			$text = preg_replace(
 				"/\[quote=[\"\']*(.*?)[\"\']*\](.*?)\[\/quote\]/ism",
-				"<p><strong class=" . '"author"' . ">" . $t_wrote . "</strong></p><blockquote>$2</blockquote>",
+				"<p><strong class=" . '"author"' . ">" . DI::l10n()->t('$1 wrote:') . "</strong></p><blockquote>$2</blockquote>",
 				(string) $text,
 			);
 		}
@@ -1864,8 +1862,11 @@ class BBCode
 
 	private static function convertCryptToHtml(string $text): string
 	{
-		$text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism", '<br><img src="' . DI::baseUrl() . '/images/lock_icon.gif" alt="' . DI::l10n()->t('Encrypted content') . '" title="' . DI::l10n()->t('Encrypted content') . '" /><br>', $text);
-		$text = preg_replace("/\[crypt(.*?)\](.*?)\[\/crypt\]/ism", '<br><img src="' . DI::baseUrl() . '/images/lock_icon.gif" alt="' . DI::l10n()->t('Encrypted content') . '" title="' . '$1' . ' ' . DI::l10n()->t('Encrypted content') . '" /><br>', (string) $text);
+		if (str_contains($text, '[crypt')) {
+			$text = preg_replace("/\[crypt\](.*?)\[\/crypt\]/ism", '<br><img src="' . DI::baseUrl() . '/images/lock_icon.gif" alt="' . DI::l10n()->t('Encrypted content') . '" title="' . DI::l10n()->t('Encrypted content') . '" /><br>', $text);
+			$text = preg_replace("/\[crypt(.*?)\](.*?)\[\/crypt\]/ism", '<br><img src="' . DI::baseUrl() . '/images/lock_icon.gif" alt="' . DI::l10n()->t('Encrypted content') . '" title="' . '$1' . ' ' . DI::l10n()->t('Encrypted content') . '" /><br>', (string) $text);
+		}
+
 		return $text;
 	}
 
@@ -1949,20 +1950,14 @@ class BBCode
 				'<a href="$2" class="mention hashtag" rel="tag">$1<span>$3</span></a>',
 				(string) $text,
 			);
-		} elseif (in_array($simple_html, [self::EXTERNAL, self::TWITTER_API])) {
-			$text = preg_replace(
-				"/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism",
-				'<bdi>$1<a href="$2" class="userinfo mention" title="$3">$3</a></bdi>',
-				(string) $text,
-			);
-		} elseif ($simple_html == self::INTERNAL) {
+		} elseif (in_array($simple_html, [self::INTERNAL, self::EXTERNAL, self::TWITTER_API])) {
 			if (preg_match_all("/([@!])\[url\=(.*?)\](.*?)\[\/url\]/ism", (string) $text, $matches, PREG_SET_ORDER)) {
 				foreach ($matches as $match) {
 					$contact = Contact::getByURL($match[2], false, ['network', 'url', 'alias']);
 					if (!empty($contact)) {
 						$url = Contact::getProfileLink($contact);
 					} else {
-						$url = $match[2];
+						$url = DI::atpActor()->getProfileLink($match[2]) ?: $match[2];
 					}
 					$text = str_replace($match[0], '<bdi>' . $match[1] . '<a href="' . $url . '" class="userinfo mention" title="' . $match[3] . '">' . $match[3] . '</a></bdi>', $text);
 				}
@@ -2163,7 +2158,14 @@ class BBCode
 		return $text;
 	}
 
-	private static function cleanupHtml(string $text): string
+	/**
+	 * Cleans up the generated HTML and invalidates links and sources with a protocol that isn't allowed
+	 *
+	 * @param string $text    The generated HTML
+	 * @param array  $context Information that is logged when an invalid protocol is found: "uri-id", "mode" and the original "bbcode"
+	 * @return string Cleaned up HTML
+	 */
+	private static function cleanupHtml(string $text, array $context = []): string
 	{
 		/// @todo What is the meaning of these lines?
 		$text = preg_replace('/\[\&amp\;([#a-z0-9]+)\;\]/', '&$1;', $text);
@@ -2182,9 +2184,12 @@ class BBCode
 			$value = preg_quote($value, '#');
 		});
 
-		$text = preg_replace(
+		$text = preg_replace_callback(
 			'#<([^>]*?)(src)="(?!' . implode('|', $allowed_src_protocols) . ')(.*?)"(.*?)>#ism',
-			'<$1$2=""$4 data-original-src="$3" class="invalid-src" title="' . DI::l10n()->t('Invalid source protocol') . '">',
+			function (array $matches) use ($context): string {
+				DI::logger()->debug('Invalid source protocol', ['src' => $matches[3], 'tag' => $matches[0]] + $context);
+				return '<' . $matches[1] . $matches[2] . '=""' . $matches[4] . ' data-original-src="' . $matches[3] . '" class="invalid-src" title="' . DI::l10n()->t('Invalid source protocol') . '">';
+			},
 			(string) $text,
 		);
 
@@ -2203,7 +2208,14 @@ class BBCode
 		});
 
 		$regex = '#<([^>]*?)(href)="(?!' . implode('|', $allowed_link_protocols) . ')(.*?)"(.*?)>#ism';
-		$text  = preg_replace($regex, '<$1$2="javascript:void(0)"$4 data-original-href="$3" class="invalid-href" title="' . DI::l10n()->t('Invalid link protocol') . '">', (string) $text);
+		$text  = preg_replace_callback(
+			$regex,
+			function (array $matches) use ($context): string {
+				DI::logger()->debug('Invalid link protocol', ['href' => $matches[3], 'tag' => $matches[0]] + $context);
+				return '<' . $matches[1] . $matches[2] . '="javascript:void(0)"' . $matches[4] . ' data-original-href="' . $matches[3] . '" class="invalid-href" title="' . DI::l10n()->t('Invalid link protocol') . '">';
+			},
+			(string) $text,
+		);
 
 		return $text;
 	}

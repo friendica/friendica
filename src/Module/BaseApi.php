@@ -31,6 +31,7 @@ use Friendica\Security\OAuth;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 abstract class BaseApi extends BaseModule
@@ -112,7 +113,37 @@ abstract class BaseApi extends BaseModule
 	 */
 	public function run(ModuleHTTPException $httpException, array $request = [], bool $scopecheck = true): ResponseInterface
 	{
-		return parent::run($httpException, $request);
+		try {
+			return parent::run($httpException, $request);
+		} finally {
+			$this->saveProfilingLog();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function handleRequest(ServerRequestInterface $request): ResponseInterface
+	{
+		try {
+			return parent::handleRequest($request);
+		} finally {
+			$this->saveProfilingLog();
+		}
+	}
+
+	/**
+	 * Writes the profiling data of this API call to the log, using the called URL as message,
+	 * if the call lasted at least as long as configured in system.api_profiler_limit
+	 */
+	private function saveProfilingLog(): void
+	{
+		$limit = (float) DI::config()->get('system', 'api_profiler_limit');
+		if ($limit > 0 && (microtime(true) - $this->profiler->get('start')) < $limit) {
+			return;
+		}
+
+		$this->profiler->saveLog($this->logger, ($this->server['REQUEST_METHOD'] ?? $this->args->getMethod()) . ' ' . ($this->server['REQUEST_URI'] ?? $this->args->getQueryString()));
 	}
 
 	/**

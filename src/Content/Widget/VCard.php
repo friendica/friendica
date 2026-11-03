@@ -117,7 +117,7 @@ class VCard
 			'$moderator_title'     => DI::l10n()->t('Moderator'),
 			'$photo'               => $photo,
 			'$url'                 => Contact::magicLinkByContact($contact, $contact_url),
-			'$about'               => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['about'] ?? ''),
+			'$about'               => DI::renderedContent()->convert($contact['uri-id'] ?? 0, $contact['about'] ?? '', BBCode::INTERNAL),
 			'$xmpp'                => DI::l10n()->t('XMPP:'),
 			'$matrix'              => DI::l10n()->t('Matrix:'),
 			'$location'            => DI::l10n()->t('Location:'),

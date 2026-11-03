@@ -16,6 +16,7 @@ use Friendica\Content\GroupManager;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\RenderedContent;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -54,6 +55,7 @@ class Group extends BaseModule
 		private readonly StatusEditor $statusEditor,
 		private readonly GroupManager $groupManager,
 		private readonly SystemMessages $systemMessages,
+		private readonly RenderedContent $renderedContent,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -202,7 +204,7 @@ class Group extends BaseModule
 			'$title'         => $contact['name'],
 			'$profile'       => Contact::magicLinkByContact($contact),
 			'$thumb'         => Contact::getThumb($contact),
-			'$about'         => BBCode::convertForUriId($contact['uri-id'], $contact['about'], BBCode::EXTERNAL),
+			'$about'         => $this->renderedContent->convert($contact['uri-id'], $contact['about'], BBCode::EXTERNAL),
 			'$id'            => rawurlencode((string) $this->parameters['id']),
 			'$threads_label' => $this->t('Threads'),
 			'$threads_count' => $groupStats['threads'],

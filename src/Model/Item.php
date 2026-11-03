@@ -1216,6 +1216,7 @@ class Item
 			// Fill the cache with the rendered content.
 			if (in_array($posted_item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT])) {
 				self::updateDisplayCache($posted_item['uri-id']);
+				self::updateApiCache($posted_item);
 			}
 
 			if (in_array($posted_item['gravity'], [self::GRAVITY_ACTIVITY, self::GRAVITY_COMMENT])) {
@@ -1241,7 +1242,11 @@ class Item
 			}
 		}
 
-		if ($posted_item['uid'] !== 0 && ($posted_item['origin'] || !in_array($posted_item['network'], Protocol::FEDERATED))) {
+		// Technical activities like "view" don't change anything for the channels
+		if ($posted_item['uid'] !== 0
+			&& ($posted_item['origin'] || !in_array($posted_item['network'], Protocol::FEDERATED))
+			&& !in_array($posted_item['verb'], Activity::TECHNICAL_ACTIVITIES)
+		) {
 			self::addPostToChannel($posted_item['uri-id'], $posted_item['uid']);
 		}
 
@@ -1373,6 +1378,26 @@ class Item
 		}
 
 		self::prepareBody($item, false, false, true);
+	}
+
+	/**
+	 * Fill the cache with the content as it is rendered for the API
+	 *
+	 * @param array $item Item array with the fields "uri-id" and "uid"
+	 * @return void
+	 */
+	private static function updateApiCache(array $item): void
+	{
+		// The API renders the same fields as it fetches them here, otherwise the cached entry would never be used.
+		$content = Post::selectFirst(['body', 'raw-body'], ['uri-id' => $item['uri-id'], 'uid' => $item['uid']]);
+		if (!$content) {
+			return;
+		}
+
+		$renderedContent = DI::renderedContent();
+
+		$renderedContent->convert($item['uri-id'], $content['body'], BBCode::EXTERNAL);
+		$renderedContent->convert($item['uri-id'], BBCode::setMentionsToNicknames($content['raw-body'] ?? $content['body']), BBCode::MASTODON_API);
 	}
 
 	/**

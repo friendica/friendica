@@ -282,6 +282,23 @@ class Profiler implements ContainerInterface
 	}
 
 	/**
+	 * Returns the callstack data as JSON array string
+	 *
+	 * @return string JSON array of objects with the keys "type", "function" and "time"
+	 */
+	private function getCallstackJson(): string
+	{
+		$entries = [];
+		foreach ($this->callstack as $type => $functions) {
+			foreach ($functions as $function => $time) {
+				$entries[] = ['type' => $type, 'function' => $function, 'time' => round($time, 3)];
+			}
+		}
+
+		return json_encode($entries);
+	}
+
+	/**
 	 * Save the current profiling data to a log entry
 	 *
 	 * @param LoggerInterface $logger  The logger to save the current log
@@ -305,7 +322,8 @@ class Profiler implements ContainerInterface
 				'other_io'       => round($duration - ($this->get('database')
 													   + $this->get('cache') + $this->get('cache_write')
 													   + $this->get('network') + $this->get('file')), 2),
-				'total' => round($duration, 2),
+				'total'     => round($duration, 2),
+				'callstack' => $this->getCallstackJson(),
 			],
 		);
 

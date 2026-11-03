@@ -126,10 +126,16 @@ class Counts
 	 */
 	public static function getReactions(int $uri_id, int $uid): array
 	{
+		// The counts table keeps an entry as long as any reaction exists, even if it is only visible to some users.
+		// So without an entry the expensive visibility query below can be skipped.
+		if (!DBA::exists('post-counts', ["`uri-id` = ? AND `reaction` != ''", $uri_id])) {
+			return [];
+		}
+
 		$self      = Contact::getPublicIdByUserId($uid);
 		$reactions = [];
 
-		$condition  = ['thr-parent-id' => $uri_id, 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => [Activity::LIKE, Activity::EMOJIREACT], 'deleted' => false];
+		$condition  = ['thr-parent-id' => $uri_id, 'gravity' => Item::GRAVITY_ACTIVITY, 'vid' => [Verb::getID(Activity::LIKE), Verb::getID(Activity::EMOJIREACT)], 'deleted' => false];
 		$condition  = DBA::mergeConditions($condition, ["`body` NOT IN ('', ?)", Activity::LIKE]);
 		$activities = Post::selectForUser($uid, ['body', 'author-id'], $condition, ['order' => ['received'], 'limit' => self::MAX_REACTION_ACTIVITIES]);
 		while ($activity = Post::fetch($activities)) {

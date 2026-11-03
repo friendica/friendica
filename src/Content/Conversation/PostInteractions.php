@@ -230,7 +230,7 @@ final readonly class PostInteractions
 	 * The deletion state is not stored in post-quote, but in the post of the quoting item.
 	 * The same visibility is used for the counter at the post button (see ConversationDataProvider::getQuoteShares)
 	 */
-	private function getQuoteCondition(int $uriId, int $uid): array
+	public function getQuoteCondition(int $uriId, int $uid): array
 	{
 		$condition = [
 			'quote-uri-id' => $uriId,

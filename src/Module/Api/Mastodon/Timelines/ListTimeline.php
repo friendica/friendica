@@ -133,10 +133,14 @@ class ListTimeline extends BaseApi
 
 	private function getStatusesForCircle(int $uid, array $request): array
 	{
-		$condition = [
-			"`uid` = ? AND `gravity` IN (?, ?) AND `contact-id` IN (SELECT `contact-id` FROM `group_member` WHERE `gid` = ?)",
-			$uid, Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT, $this->parameters['id'],
-		];
+		// The members are fetched separately: With a subquery the optimizer can decide to walk through the whole
+		// post table in the order of the sorting, which takes very long for circles with only few or old posts.
+		$cids = array_column(DBA::selectToArray('group_member', ['contact-id'], ['gid' => $this->parameters['id']]), 'contact-id');
+		if (empty($cids)) {
+			return [];
+		}
+
+		$condition = ['uid' => $uid, 'gravity' => [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT], 'contact-id' => $cids];
 
 		$condition = $this->addPagingConditions($request, $condition);
 		$params    = $this->buildOrderAndLimitParams($request);

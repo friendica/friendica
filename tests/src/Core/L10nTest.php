@@ -169,6 +169,24 @@ class L10nTest extends MockedTestCase
 		self::assertSame($assert, $l10n->normaliseLocale($locale));
 	}
 
+	public function testTranslationCount(): void
+	{
+		unset($_GET['lang']);
+
+		$l10n = $this->createL10n([]);
+
+		self::assertSame(0, $l10n->getTranslationCount());
+
+		$l10n->t('');
+		self::assertSame(0, $l10n->getTranslationCount(), 'Empty texts are not translated');
+
+		$l10n->t('Example');
+		self::assertSame(1, $l10n->getTranslationCount());
+
+		$l10n->tt('Like', 'Likes', 2);
+		self::assertSame(2, $l10n->getTranslationCount());
+	}
+
 	private function createL10n(array $server): L10n
 	{
 		$config = $this->createMock(IManageConfigValues::class);

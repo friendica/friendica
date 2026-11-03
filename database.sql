@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica
--- DB_UPDATE_VERSION 1605
+-- Friendica 2026.11-dev (Blutwurz)
+-- DB_UPDATE_VERSION 1606
 -- ------------------------------------------
 
 
@@ -1954,6 +1954,21 @@ CREATE TABLE IF NOT EXISTS `register` (
 	 INDEX `uid` (`uid`),
 	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='registrations requiring admin approval';
+
+--
+-- TABLE rendered-content
+--
+CREATE TABLE IF NOT EXISTS `rendered-content` (
+	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the item or contact uri',
+	`mode` tinyint unsigned NOT NULL COMMENT 'Simple HTML mode of the rendering, see BBCode::EXTERNAL and BBCode::MASTODON_API',
+	`lang` varchar(10) NOT NULL DEFAULT '' COMMENT 'Language of the translated texts in the html, empty if the html doesn\'t contain translated texts',
+	`hash` varchar(32) NOT NULL DEFAULT '' COMMENT 'Hash of the rendered text and the BBCode version',
+	`html` mediumtext COMMENT 'Text converted to html',
+	`last-access` date NOT NULL DEFAULT '0001-01-01' COMMENT 'Day of the last access',
+	 PRIMARY KEY(`uri-id`,`mode`,`lang`),
+	 INDEX `last-access` (`last-access`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Rendered HTML for content that is requested via the API';
 
 --
 -- TABLE report

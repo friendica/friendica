@@ -10,6 +10,7 @@ namespace Friendica\Test\Integration\Module;
 use Dice\Dice;
 use Friendica\App;
 use Friendica\AppHelper;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\DI;
 use Friendica\Event\EventDispatcher;
@@ -48,7 +49,15 @@ class BaseApiTest extends TestCase
 			'instanceOf' => EventDispatcher::class,
 			'shared'     => true,
 		]);
-		DI::init($dice, true);
+
+		$config = $this->createStub(IManageConfigValues::class);
+		$config->method('get')->willReturn(null);
+
+		$diceMock = $this->createMock(Dice::class);
+		$diceMock->method('create')->willReturnCallback(
+			static fn (string $name, array $args = [], array $share = []) => $name === IManageConfigValues::class ? $config : $dice->create($name, $args, $share),
+		);
+		DI::init($diceMock, true);
 
 		$args = $this->createMock(App\Arguments::class);
 		$args->method('getQueryString')->willReturn('api/test');

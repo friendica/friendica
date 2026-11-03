@@ -25,7 +25,6 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
 use Friendica\Model\Post\Category;
-use Friendica\Model\Verb;
 use Friendica\Protocol\Activity;
 use Friendica\User\Settings\Entity\UserGServer as UserGServerEntity;
 use Friendica\User\Settings\Repository\UserGServer as UserGServerRepository;
@@ -50,6 +49,7 @@ final readonly class ConversationDataProvider
 		private IHandleUserSessions $session,
 		private PostTemplateBuilder $postTemplateBuilder,
 		private Activity $activity,
+		private PostInteractionCounts $interactionCounts,
 	) {}
 
 	/**
@@ -193,9 +193,9 @@ final readonly class ConversationDataProvider
 
 		if (!$preview) {
 			$parentUriIds = array_values(array_unique(array_column($items, 'parent-uri-id')));
-			$emojis       = $this->getEmojis($parentUriIds, $viewerUid, $uriIds);
-			$quoteshares  = $this->getQuoteShares($uriIds, $viewerUid);
-			$counts       = $this->getCounts($parentUriIds);
+			$emojis       = $this->interactionCounts->getEmojis($parentUriIds, $viewerUid, $uriIds);
+			$quoteshares  = $this->interactionCounts->getQuoteShares($uriIds, $viewerUid);
+			$counts       = $this->interactionCounts->getCounts($parentUriIds);
 
 			if ($viewerUid) {
 				$verbs = [Activity::LIKE => 'like', Activity::DISLIKE => 'dislike', Activity::ANNOUNCE => 'announce'];
@@ -423,9 +423,9 @@ final readonly class ConversationDataProvider
 			$condition['author-hidden'] = false;
 		}
 
-		$emojis      = $this->getEmojis($uriIds, $uid);
-		$quoteshares = $this->getQuoteShares($uriIds, $uid);
-		$counts      = $this->getCounts($uriIds);
+		$emojis      = $this->interactionCounts->getEmojis($uriIds, $uid);
+		$quoteshares = $this->interactionCounts->getQuoteShares($uriIds, $uid);
+		$counts      = $this->interactionCounts->getCounts($uriIds);
 
 		$commentsMode = !in_array($mode, [ConversationRenderer::MODE_DISPLAY, ConversationRenderer::MODE_COMMENTS])
 			? ConversationRenderer::normalizeCommentsMode($this->pConfig->get($uid, 'system', 'compact_timeline', ConversationRenderer::COMMENTS_MODE_ALL))
@@ -620,127 +620,6 @@ final readonly class ConversationDataProvider
 		}
 
 		return $added;
-	}
-
-	/**
-	 * Get emoji reactions for the given URI IDs.
-	 *
-	 * @param array<int, int> $uriIds The URI IDs to get emojis for
-	 * @param int $uid The user ID of the viewer
-	 * @param array<int, int> $targetUriIds Restrict the reactions to these reacted posts, empty for all posts of the threads
-	 * @return array<int, array> The emoji reactions data
-	 */
-	private function getEmojis(array $uriIds, int $uid, array $targetUriIds = []): array
-	{
-		$targetCondition = $targetUriIds ? ['thr-parent-id' => $targetUriIds] : [];
-		$countCondition  = $targetUriIds ? ['uri-id' => $targetUriIds] : [];
-
-		$emojis = [];
-		foreach (Post\Counts::get(array_merge(['parent-uri-id' => $uriIds], $countCondition)) as $count) {
-			$emojis[$count['uri-id']][$count['reaction']]['emoji'] = $count['reaction'];
-			$emojis[$count['uri-id']][$count['reaction']]['verb']  = Verb::getByID($count['vid']);
-			$emojis[$count['uri-id']][$count['reaction']]['total'] = $count['count'];
-			$emojis[$count['uri-id']][$count['reaction']]['count'] = 0;
-			$emojis[$count['uri-id']][$count['reaction']]['title'] = [];
-			$emojis[$count['uri-id']][$count['reaction']]['self']  = false;
-		}
-
-		$activityVerbs = [
-			Activity::LIKE,
-			Activity::DISLIKE,
-			Activity::ATTEND,
-			Activity::ATTENDMAYBE,
-			Activity::ATTENDNO,
-			Activity::ANNOUNCE,
-			Activity::VIEW,
-			Activity::READ,
-		];
-		$verbs     = array_merge($activityVerbs, [Activity::EMOJIREACT, Activity::POST]);
-		$condition = DBA::mergeConditions(array_merge(['parent-uri-id' => $uriIds, 'gravity' => [ItemModel::GRAVITY_ACTIVITY, ItemModel::GRAVITY_COMMENT], 'verb' => $verbs], $targetCondition), ["NOT `deleted`"]);
-		$condition = DBA::mergeConditions($condition, ["((`uid` = ? AND `global`) OR (`uid` = ? AND NOT `global`))", 0, $uid]);
-		$separator = chr(255) . chr(255) . chr(255);
-		$sql       = "SELECT `parent-uri-id`, `thr-parent-id`, `body`, `verb`, `gravity`, `private`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title`, MAX(`author-id` = ?) AS `self` FROM `post-user-view` WHERE " . array_shift($condition) . " GROUP BY `parent-uri-id`, `thr-parent-id`, `verb`, BINARY `body`, `gravity`, `private`";
-
-		$rows = DBA::p($sql, array_merge([(int) Contact::getPublicIdByUserId($uid)], $condition));
-		while ($row = DBA::fetch($rows)) {
-			$emoji = $row['gravity'] === ItemModel::GRAVITY_ACTIVITY ? ($row['body'] ?: $row['verb']) : '';
-			if (!isset($emojis[$row['thr-parent-id']][$emoji]['title'])) {
-				continue;
-			}
-
-			if (($emoji === Activity::VIEW) && ($row['private'] === ItemModel::PRIVATE)) {
-				continue;
-			}
-
-			$names                                          = explode($separator, (string) $row['title']);
-			$emojis[$row['thr-parent-id']][$emoji]['title'] = array_unique(array_merge($emojis[$row['thr-parent-id']][$emoji]['title'], $names));
-			if ($row['private'] === ItemModel::PRIVATE) {
-				$emojis[$row['thr-parent-id']][$emoji]['total'] += count($names);
-			}
-			$emojis[$row['thr-parent-id']][$emoji]['count'] += count($names);
-			if ($row['self']) {
-				$emojis[$row['thr-parent-id']][$emoji]['self'] = true;
-			}
-		}
-		DBA::close($rows);
-
-		foreach ($emojis as $uriId => $row) {
-			foreach ($row as $emoji => $value) {
-				if (($value['count'] < $value['total']) && ($value['count'] < 50)) {
-					$emojis[$uriId][$emoji]['total'] = $value['count'];
-				}
-				if ($emojis[$uriId][$emoji]['total'] === 0) {
-					unset($emojis[$uriId][$emoji]);
-				}
-			}
-		}
-
-		return $emojis;
-	}
-
-	/**
-	 * Get quote shares for the given URI IDs.
-	 *
-	 * Contacts the viewer blocked or ignored are left out, like in the interaction lists (see PostInteractions)
-	 *
-	 * @param array<int, int> $uriIds The URI IDs to get quote shares for
-	 * @param int $uid The user ID of the viewer
-	 * @return array<int, array> The quote shares data
-	 */
-	private function getQuoteShares(array $uriIds, int $uid): array
-	{
-		$condition = DBA::mergeConditions(['quote-uri-id' => $uriIds], ["NOT `quote-uri-id` IS NULL AND NOT `post`.`deleted` AND `post`.`private` IN (?, ?) AND NOT `contact`.`blocked`", ItemModel::PUBLIC, ItemModel::UNLISTED]);
-		if ($uid) {
-			$condition = DBA::mergeConditions($condition, ["NOT `post`.`author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored`))", $uid]);
-		}
-		$separator = chr(255) . chr(255) . chr(255);
-		$sql       = "SELECT `quote-uri-id`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-quote` INNER JOIN `post` ON `post`.`uri-id` = `post-quote`.`uri-id` INNER JOIN `contact` ON `post`.`author-id` = `contact`.`id` WHERE " . array_shift($condition) . " GROUP BY `quote-uri-id`";
-		$quotes    = [];
-
-		$rows = DBA::p($sql, $condition);
-		while ($row = DBA::fetch($rows)) {
-			$quotes[$row['quote-uri-id']]['total'] = $row['total'];
-			$quotes[$row['quote-uri-id']]['title'] = array_unique(explode($separator, (string) $row['title']));
-		}
-		DBA::close($rows);
-
-		return $quotes;
-	}
-
-	/**
-	 * Get comment counts for the given URI IDs.
-	 *
-	 * @param array<int, int> $uriIds The URI IDs to get counts for
-	 * @return array<int, int> The comment counts per URI ID
-	 */
-	private function getCounts(array $uriIds): array
-	{
-		$counts = [];
-		foreach (Post\Counts::get(['parent-uri-id' => $uriIds, 'vid' => Verb::getID(Activity::POST)]) as $count) {
-			$counts[$count['parent-uri-id']] = ($counts[$count['parent-uri-id']] ?? 0) + $count['count'];
-		}
-
-		return $counts;
 	}
 
 	/**
