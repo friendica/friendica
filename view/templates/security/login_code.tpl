@@ -17,6 +17,7 @@
 	<p>{{$desc}}</p>
 
 	<form id="login-code-form" action="login/code" method="post">
+		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 		<input type="hidden" name="return_path" value="{{$return_path}}">
 
 {{if $step == 'verify'}}

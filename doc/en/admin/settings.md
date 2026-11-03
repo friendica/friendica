@@ -92,8 +92,15 @@ Default is false.
 Users can sign in without a password by requesting a one time code that is sent to their e-mail address.
 The code is valid for ten minutes and can only be used once.
 If the user has enabled two-factor authentication, it is still requested afterwards.
-You can switch this off in the admin settings (Registration section) or by setting 'enable_login_code' to false.
-Default is false.
+A code can only be used in the browser session that requested it.
+After ten failed attempts within 24 hours the account accepts no more codes until the failures have expired.
+Only one code per minute is sent for an account.
+You can switch this on in the admin settings (Registration section) or by setting 'enable_login_code' to true.
+Default is off.
+
+Please note that an e-mail code as the only factor doesn't meet the requirements of NIST 800-63B or OWASP ASVS.
+It is as strong as the password reset by e-mail, so the security of an account then depends on the security of its mailbox.
+Users should enable two-factor authentication, which is still requested after the code.
 
 #### Multiple Registrations
 

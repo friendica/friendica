@@ -1783,10 +1783,12 @@ msgstr ""
 #: src/Content/Conversation/PostTemplateBuilder.php:1084
 #: src/Content/Conversation/StatusEditor.php:164
 #: src/Content/Post/Entity/FileKind.php:144 src/Module/Item/Compose.php:184
-#: src/Module/Post/Edit.php:195 src/Module/Settings/Profile/Index.php:252
+#: src/Module/Post/Edit.php:195 src/Module/Security/LoginCode.php:109
+#: src/Module/Settings/Profile/Index.php:252
 msgid "Code"
 msgstr ""
 
+#: src/Content/Conversation/PostTemplateBuilder.php:1085
 #: src/Content/Post/Entity/FileKind.php:139 src/Module/Item/Compose.php:185
 #: src/Module/Settings/Profile/Index.php:253
 #: src/Module/Settings/Profile/Index.php:254
@@ -2295,7 +2297,7 @@ msgid "End this session"
 msgstr ""
 
 #: src/Content/Nav.php:207 src/Module/Bookmarklet.php:34
-#: src/Module/Security/Login.php:160 src/Module/Security/LoginCode.php:112
+#: src/Module/Security/Login.php:160 src/Module/Security/LoginCode.php:111
 msgid "Sign in"
 msgstr ""
 
@@ -6553,7 +6555,7 @@ msgstr ""
 #: src/Module/Moderation/Blocklist/Server/Index.php:109
 #: src/Module/Moderation/Blocklist/Server/Index.php:110
 #: src/Module/Moderation/Item/Delete.php:53 src/Module/Register.php:216
-#: src/Module/Security/LoginCode.php:110 src/Module/Security/LoginCode.php:119
+#: src/Module/Security/LoginCode.php:109 src/Module/Security/LoginCode.php:118
 #: src/Module/Security/TwoFactor/Verify.php:86
 #: src/Module/Settings/Channels.php:184 src/Module/Settings/Channels.php:217
 #: src/Module/Settings/TwoFactor/Index.php:147
@@ -8500,7 +8502,7 @@ msgid "Enter your email address and submit to have your password reset. Then che
 msgstr ""
 
 #: src/Module/LostPass.php:168 src/Module/Security/Login.php:163
-#: src/Module/Security/LoginCode.php:119
+#: src/Module/Security/LoginCode.php:118
 msgid "Username or email"
 msgstr ""
 
@@ -10590,7 +10592,7 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-#: src/Module/Security/Login.php:165 src/Module/Security/LoginCode.php:111
+#: src/Module/Security/Login.php:165 src/Module/Security/LoginCode.php:110
 msgid "Remember me"
 msgstr ""
 
@@ -10598,7 +10600,7 @@ msgstr ""
 msgid "Forgot your password?"
 msgstr ""
 
-#: src/Module/Security/Login.php:177 src/Module/Security/LoginCode.php:101
+#: src/Module/Security/Login.php:177 src/Module/Security/LoginCode.php:99
 msgid "Sign in with an e-mail code"
 msgstr ""
 
@@ -10618,60 +10620,32 @@ msgstr ""
 msgid "privacy policy"
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:103
+#: src/Module/Security/LoginCode.php:101
 msgid "Sign in with a password"
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:109
+#: src/Module/Security/LoginCode.php:108
 #, php-format
 msgid "Enter the code we sent you by e-mail. It is valid for %d minutes."
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:113
+#: src/Module/Security/LoginCode.php:112
 msgid "Request a new code"
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:118
+#: src/Module/Security/LoginCode.php:117
 msgid "Enter your username or e-mail address. We will send you a code to sign in without a password."
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:120
+#: src/Module/Security/LoginCode.php:119
 msgid "Send code"
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:134
+#: src/Module/Security/LoginCode.php:137
 msgid "If an account with this name exists and a code hasn't been requested recently, we have sent a code by e-mail."
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:160
-#, php-format
-msgid ""
-"\n"
-"\t\t\tDear %1$s,\n"
-"\t\t\t\tA request was recently received at \"%2$s\" to sign in to your account\n"
-"\t\t\twith a one time code.\n"
-"\n"
-"\t\t\tIf you did NOT request this, please ignore and/or delete this email.\n"
-"\t\t\tNobody can sign in without this code."
-msgstr ""
-
-#: src/Module/Security/LoginCode.php:167
-#, php-format
-msgid ""
-"\n"
-"\t\t\tYour code is:\n"
-"\n"
-"\t\t\t%1$s\n"
-"\n"
-"\t\t\tIt is valid for %2$d minutes and can only be used once."
-msgstr ""
-
-#: src/Module/Security/LoginCode.php:175
-#, php-format
-msgid "Your sign in code for %s"
-msgstr ""
-
-#: src/Module/Security/LoginCode.php:206
+#: src/Module/Security/LoginCode.php:144
 msgid "Invalid or expired code, please retry."
 msgstr ""
 
@@ -13429,7 +13403,7 @@ msgstr ""
 msgid "The folder %s must be writable by webserver."
 msgstr ""
 
-#: src/Security/Authentication.php:192 src/Security/Authentication.php:269
+#: src/Security/Authentication.php:192 src/Security/Authentication.php:272
 msgid "Login failed."
 msgstr ""
 
@@ -13437,21 +13411,49 @@ msgstr ""
 msgid "Login failed. Please check your credentials."
 msgstr ""
 
-#: src/Security/Authentication.php:289
+#: src/Security/Authentication.php:292
 msgid "Login failed because your account is blocked."
 msgstr ""
 
-#: src/Security/Authentication.php:411
+#: src/Security/Authentication.php:414
 #, php-format
 msgid "Welcome %s"
 msgstr ""
 
-#: src/Security/Authentication.php:412
+#: src/Security/Authentication.php:415
 msgid "Please upload a profile photo."
 msgstr ""
 
 #: src/Security/FormSecurityToken.php:91
 msgid "The form security token was not correct. This probably happened because the form has been opened for too long (>3 hours) before submitting it."
+msgstr ""
+
+#: src/Security/LoginCode/CodeMail.php:32
+#, php-format
+msgid ""
+"\n"
+"\t\t\tDear %1$s,\n"
+"\t\t\t\tA request was recently received at \"%2$s\" to sign in to your account\n"
+"\t\t\twith a one time code.\n"
+"\n"
+"\t\t\tIf you did NOT request this, please ignore and/or delete this email.\n"
+"\t\t\tNobody can sign in without this code."
+msgstr ""
+
+#: src/Security/LoginCode/CodeMail.php:39
+#, php-format
+msgid ""
+"\n"
+"\t\t\tYour code is:\n"
+"\n"
+"\t\t\t%1$s\n"
+"\n"
+"\t\t\tIt is valid for %2$d minutes and can only be used once."
+msgstr ""
+
+#: src/Security/LoginCode/CodeMail.php:47
+#, php-format
+msgid "Your sign in code for %s"
 msgstr ""
 
 #: src/Security/OpenWebAuth.php:151

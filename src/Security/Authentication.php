@@ -256,8 +256,11 @@ class Authentication
 	 * @throws HTTPException\MovedPermanentlyException
 	 * @throws HTTPException\TemporaryRedirectException
 	 */
-	public function withLoginCode(int $uid, bool $remember, string $return_path = '')
+	public function withLoginCode(int $uid, bool $remember, string $return_path = ''): void
 	{
+		// Like in the password login, don't keep anything (like a 2FA verification) from a previous session
+		$this->session->clear();
+
 		$record = $this->dba->selectFirst('user', [], [
 			'uid'             => $uid,
 			'verified'        => true,
