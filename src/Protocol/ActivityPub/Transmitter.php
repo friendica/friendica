@@ -708,7 +708,7 @@ class Transmitter
 			foreach ($terms as $term) {
 				self::addTermReceiver($term, $item, $is_group, $data, $exclusive, $mention);
 			}
-			if (!$exclusive && ($item['private'] == Item::UNLISTED)) {
+			if (!$exclusive && ($item['private'] == Item::UNLISTED) && !empty($actor_profile['followers'])) {
 				$data['to'][] = $actor_profile['followers'];
 			}
 		} else {
@@ -735,7 +735,9 @@ class Transmitter
 			} elseif (!$exclusive) {
 				foreach ($receiver_list as $receiver) {
 					if ($receiver == -1) {
-						$data['to'][] = $actor_profile['followers'];
+						if (!empty($actor_profile['followers'])) {
+							$data['to'][] = $actor_profile['followers'];
+						}
 						continue;
 					}
 
@@ -786,7 +788,7 @@ class Transmitter
 							}
 						} elseif (!$exclusive && !$is_group_thread) {
 							// Public thread parent post always are directed to the followers.
-							if ($item['private'] != Item::PRIVATE) {
+							if (($item['private'] != Item::PRIVATE) && !empty($actor_profile['followers'])) {
 								$data['cc'][] = $actor_profile['followers'];
 							}
 						}
