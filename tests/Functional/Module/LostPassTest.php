@@ -43,6 +43,7 @@ final class LostPassTest extends FixtureTestCase
 	private const NEW_PASSWORD = 'Correct-Horse-Battery-77';
 
 	private ArrayCache $cache;
+	/** @var Emailer&object{sent: IEmail[]} */
 	private Emailer $emailer;
 
 	protected function setUp(): void
