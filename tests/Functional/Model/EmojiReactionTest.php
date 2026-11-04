@@ -13,7 +13,6 @@ use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Post\Counts;
-use Friendica\Model\Verb;
 use Friendica\Test\FixtureTestCase;
 
 /**
@@ -25,14 +24,6 @@ class EmojiReactionTest extends FixtureTestCase
 	private const UID     = 42;
 	private const ITEM_ID = 1;
 	private const URI_ID  = 1;
-
-	protected function setUp(): void
-	{
-		parent::setUp();
-
-		// Verbs that were created in a previous test are gone after its rollback, but are still cached
-		Verb::$verbs = [];
-	}
 
 	private function getReactions(): array
 	{
