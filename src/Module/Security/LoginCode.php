@@ -63,19 +63,21 @@ final class LoginCode extends BaseModule
 
 		if (!$this->formSecurityToken->isRequestValid($request, $this->server, self::FORM_TOKEN)) {
 			$this->sysMessages->addNotice($this->formSecurityToken->getErrorMessage());
-			$this->baseUrl->redirect('login/code');
+			$this->baseUrl->redirect($this->pagePath($request['return_path'] ?? ''));
 		}
+
+		$return_path = $request['return_path'] ?? '';
 
 		switch ($request['action'] ?? '') {
 			case 'request':
 				$this->requestCode(trim($request['username'] ?? ''));
 				break;
 			case 'verify':
-				$this->verifyCode(trim($request['code'] ?? ''), !empty($request['remember']), $request['return_path'] ?? '');
+				$this->verifyCode(trim($request['code'] ?? ''), !empty($request['remember']), $return_path);
 				break;
 		}
 
-		$this->baseUrl->redirect('login/code');
+		$this->baseUrl->redirect($this->pagePath($return_path));
 	}
 
 	protected function content(array $request = []): string
@@ -90,14 +92,15 @@ final class LoginCode extends BaseModule
 
 		if (!empty($request['new'])) {
 			$this->session->remove(self::SESSION_UID);
-			$this->session->remove(self::SESSION_NONCE);
 		}
+
+		$return_path = $request['return_path'] ?? '';
 
 		$data = [
 			'$notices'             => $this->sysMessages->flushNotices(),
 			'$infos'               => $this->sysMessages->flushInfos(),
 			'$title'               => $this->t('Sign in with an e-mail code'),
-			'$return_path'         => $request['return_path'] ?? '',
+			'$return_path'         => $return_path,
 			'$back'                => $this->t('Sign in with a password'),
 			'$form_security_token' => $this->formSecurityToken->create(self::FORM_TOKEN),
 		];
@@ -110,6 +113,7 @@ final class LoginCode extends BaseModule
 				'$remember' => ['remember', $this->t('Remember me'), 0, ''],
 				'$submit'   => $this->t('Sign in'),
 				'$again'    => $this->t('Request a new code'),
+				'$new_path' => 'login/code?' . http_build_query(['new' => 1, 'return_path' => $return_path]),
 			];
 		} else {
 			$data += [
@@ -123,13 +127,18 @@ final class LoginCode extends BaseModule
 		return Renderer::replaceMacros(Renderer::getMarkupTemplate('security/login_code.tpl'), $data);
 	}
 
+	private function pagePath(string $return_path): string
+	{
+		return 'login/code' . ($return_path !== '' ? '?' . http_build_query(['return_path' => $return_path]) : '');
+	}
+
 	private function requestCode(string $login): void
 	{
 		if ($login === '') {
 			return;
 		}
 
-		$ticket = $this->emailCodeLogin->request($login, $this->request->getRemoteAddress());
+		$ticket = $this->emailCodeLogin->request($login, $this->request->getRemoteAddress(), (string) $this->session->get(self::SESSION_NONCE));
 		$this->session->set(self::SESSION_UID, $ticket->uid);
 		$this->session->set(self::SESSION_NONCE, $ticket->nonce);
 

@@ -34,20 +34,40 @@ class Attempts
 
 	public function countFailures(string $scope, int $uid): int
 	{
-		return (int) $this->cache->get($this->failureKey($scope, $uid));
+		return $this->selectFailures($scope, $uid)['count'] ?? 0;
 	}
 
 	/**
+	 * Counts the failure in a fixed window that starts with the first failure, later failures don't extend it.
+	 *
 	 * The read and write aren't atomic, callers hold a lock.
 	 */
-	public function recordFailure(string $scope, int $uid, int $ttl): void
+	public function recordFailure(string $scope, int $uid, int $window): void
 	{
-		$this->cache->set($this->failureKey($scope, $uid), $this->countFailures($scope, $uid) + 1, $ttl);
+		$failures = $this->selectFailures($scope, $uid) ?? ['count' => 0, 'until' => time() + $window];
+
+		$ttl = $failures['until'] - time();
+		if ($ttl > 0) {
+			$this->cache->set($this->failureKey($scope, $uid), ['count' => $failures['count'] + 1, 'until' => $failures['until']], $ttl);
+		}
 	}
 
 	public function resetFailures(string $scope, int $uid): void
 	{
 		$this->cache->delete($this->failureKey($scope, $uid));
+	}
+
+	/**
+	 * @return array{count: int, until: int}|null
+	 */
+	private function selectFailures(string $scope, int $uid): ?array
+	{
+		$failures = $this->cache->get($this->failureKey($scope, $uid));
+		if (!is_array($failures) || !is_int($failures['count'] ?? null) || !is_int($failures['until'] ?? null) || $failures['until'] <= time()) {
+			return null;
+		}
+
+		return $failures;
 	}
 
 	private function requestKey(string $scope, string $subject): string

@@ -41,6 +41,8 @@ final class EmailCodeLoginTest extends TestCase
 		$this->sentCodes = [];
 	}
 
+	private bool $mailWorks = true;
+
 	private function service(?ICanLock $lock = null): EmailCodeLogin
 	{
 		$accounts = $this->createStub(Account::class);
@@ -51,7 +53,7 @@ final class EmailCodeLoginTest extends TestCase
 		$mail = $this->createStub(CodeMail::class);
 		$mail->method('send')->willReturnCallback(function (AccountObject $account, string $code): bool {
 			$this->sentCodes[] = $code;
-			return true;
+			return $this->mailWorks;
 		});
 
 		$factory = new PendingCodeFactory(new NullLogger());
@@ -59,7 +61,6 @@ final class EmailCodeLoginTest extends TestCase
 		return new EmailCodeLogin(
 			$accounts,
 			new PendingCodeRepository($this->cache, $factory),
-			$factory,
 			new AttemptLimiter(new Attempts($this->cache), $lock ?? new CacheLock(new ArrayCache('localhost'))),
 			$mail,
 			new NullLogger(),
@@ -101,9 +102,11 @@ final class EmailCodeLoginTest extends TestCase
 
 	public function testCodeIsNotStoredInPlainText(): void
 	{
-		$this->service()->request(self::LOGIN, self::IP);
+		$ticket = $this->service()->request(self::LOGIN, self::IP);
+		$stored = $this->cache->get('login-code:' . self::UID . ':' . $ticket->nonce);
 
-		self::assertStringNotContainsString($this->sentCodes[0], serialize($this->cache->get('login-code:' . self::UID)));
+		self::assertNotNull($stored);
+		self::assertStringNotContainsString($this->sentCodes[0], serialize($stored));
 	}
 
 	public function testSameAddressIsThrottled(): void
@@ -171,15 +174,35 @@ final class EmailCodeLoginTest extends TestCase
 		self::assertFalse($service->verify($ticket, '123456', self::IP));
 	}
 
-	public function testNewCodeReplacesPendingCode(): void
+	public function testNewCodeReplacesPendingCodeOfTheSameSession(): void
 	{
 		$service = $this->service();
 		$first   = $service->request(self::LOGIN, self::IP);
 		$this->waitForNextRequest();
-		$second = $service->request(self::LOGIN, self::IP);
+		$second = $service->request(self::LOGIN, self::IP, $first->nonce);
 
-		self::assertFalse($service->verify($first, $this->sentCodes[0], self::IP));
+		self::assertFalse($service->verify($second, $this->sentCodes[0], self::IP));
 		self::assertTrue($service->verify($second, $this->sentCodes[1], self::IP));
+	}
+
+	public function testThrottledRequestOfTheSameSessionKeepsTheMailedCodeValid(): void
+	{
+		$service = $this->service();
+		$first   = $service->request(self::LOGIN, self::IP);
+		$second  = $service->request(self::LOGIN, self::IP, $first->nonce);
+
+		self::assertCount(1, $this->sentCodes);
+		self::assertTrue($service->verify($second, $this->sentCodes[0], self::IP));
+	}
+
+	public function testRequestFromAnotherSessionDoesNotInvalidateThePendingCode(): void
+	{
+		$service = $this->service();
+		$victim  = $service->request(self::LOGIN, self::IP);
+		$this->waitForNextRequest();
+		$service->request(self::LOGIN, '198.51.100.7');
+
+		self::assertTrue($service->verify($victim, $this->sentCodes[0], self::IP));
 	}
 
 	public function testFailureLimitSpansNewCodes(): void
@@ -196,12 +219,35 @@ final class EmailCodeLoginTest extends TestCase
 		}
 
 		self::assertFalse($service->verify($ticket, $code, self::IP));
-		self::assertTrue($service->isLockedOut(self::UID));
+	}
+
+	public function testCodeIsDiscardedIfMailCannotBeSent(): void
+	{
+		$this->mailWorks = false;
+		$service         = $this->service();
+		$ticket          = $service->request(self::LOGIN, self::IP);
+
+		self::assertFalse($service->verify($ticket, $this->sentCodes[0], self::IP));
+	}
+
+	public function testFailureWindowIsNotExtendedByLaterFailures(): void
+	{
+		$service = $this->service();
+		$ticket  = $service->request(self::LOGIN, self::IP);
+		$service->verify($ticket, $this->wrongCode($this->sentCodes[0]), self::IP);
+
+		$key   = 'throttle:login-code:failures:' . self::UID;
+		$until = $this->cache->get($key)['until'];
+
+		$service->verify($ticket, $this->wrongCode($this->sentCodes[0]), self::IP);
+
+		self::assertSame($until, $this->cache->get($key)['until']);
+		self::assertSame(2, $this->cache->get($key)['count']);
 	}
 
 	public function testLockedOutAccountGetsNoNewCode(): void
 	{
-		$this->cache->set('throttle:login-code:failures:' . self::UID, EmailCodeLogin::MAX_FAILURES);
+		$this->cache->set('throttle:login-code:failures:' . self::UID, ['count' => EmailCodeLogin::MAX_FAILURES, 'until' => time() + 3600], 3600);
 
 		$ticket = $this->service()->request(self::LOGIN, self::IP);
 
@@ -229,6 +275,6 @@ final class EmailCodeLoginTest extends TestCase
 		$busy->method('acquire')->willReturn(false);
 
 		self::assertFalse($this->service($busy)->verify($ticket, $this->sentCodes[0], self::IP));
-		self::assertIsArray($this->cache->get('login-code:' . self::UID));
+		self::assertIsArray($this->cache->get('login-code:' . self::UID . ':' . $ticket->nonce));
 	}
 }

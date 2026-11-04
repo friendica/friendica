@@ -9,10 +9,8 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Unit\Security\LoginCode\ValueObject;
 
-use Friendica\Security\LoginCode\Factory\PendingCode as PendingCodeFactory;
 use Friendica\Security\LoginCode\ValueObject\Ticket;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 
 final class PendingCodeTest extends TestCase
 {
@@ -21,18 +19,17 @@ final class PendingCodeTest extends TestCase
 
 	public function testCodeIsBoundToAccountNonceAndValue(): void
 	{
-		$factory = new PendingCodeFactory(new NullLogger());
-		$code    = $factory->createForTicket(new Ticket(self::UID, 'nonce'), self::CODE);
+		$code = (new Ticket(self::UID, 'nonce'))->pendingCodeFor(self::CODE);
 
-		self::assertTrue($code->equals($factory->createForTicket(new Ticket(self::UID, 'nonce'), self::CODE)));
-		self::assertFalse($code->equals($factory->createForTicket(new Ticket(self::UID, 'other'), self::CODE)));
-		self::assertFalse($code->equals($factory->createForTicket(new Ticket(self::UID + 1, 'nonce'), self::CODE)));
-		self::assertFalse($code->equals($factory->createForTicket(new Ticket(self::UID, 'nonce'), '654321')));
+		self::assertTrue($code->equals((new Ticket(self::UID, 'nonce'))->pendingCodeFor(self::CODE)));
+		self::assertFalse($code->equals((new Ticket(self::UID, 'other'))->pendingCodeFor(self::CODE)));
+		self::assertFalse($code->equals((new Ticket(self::UID + 1, 'nonce'))->pendingCodeFor(self::CODE)));
+		self::assertFalse($code->equals((new Ticket(self::UID, 'nonce'))->pendingCodeFor('654321')));
 	}
 
 	public function testOnlyTheHashIsKept(): void
 	{
-		$code = (new PendingCodeFactory(new NullLogger()))->createForTicket(new Ticket(self::UID, 'nonce'), self::CODE);
+		$code = (new Ticket(self::UID, 'nonce'))->pendingCodeFor(self::CODE);
 
 		self::assertStringNotContainsString(self::CODE, serialize($code));
 	}

@@ -32,7 +32,7 @@
 	</div>
 	{{if $codelink}}
 	<div id="login-code-link">
-		<a href="login/code" id="login-code-link-anchor">{{$codelink}}</a>
+		<a href="{{$codepath}}" id="login-code-link-anchor">{{$codelink}}</a>
 	</div>
 	{{/if}}
 	</div>

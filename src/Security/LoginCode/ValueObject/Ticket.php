@@ -23,4 +23,12 @@ final readonly class Ticket
 		public int $uid,
 		public string $nonce,
 	) {}
+
+	/**
+	 * Binds the code to the account and the nonce of this ticket.
+	 */
+	public function pendingCodeFor(#[\SensitiveParameter] string $code): PendingCode
+	{
+		return new PendingCode($this->uid, $this->nonce, hash_hmac('sha256', $code, $this->nonce));
+	}
 }

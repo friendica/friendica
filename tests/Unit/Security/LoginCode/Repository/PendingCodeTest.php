@@ -39,25 +39,25 @@ final class PendingCodeTest extends TestCase
 
 	public function testSavedCodeIsFoundAgain(): void
 	{
-		$code = $this->factory->createForTicket(new Ticket(self::UID, 'nonce'), self::CODE);
+		$code = (new Ticket(self::UID, 'nonce'))->pendingCodeFor(self::CODE);
 		$this->repository()->save($code, self::TTL);
 
-		self::assertTrue($code->equals($this->repository()->selectByUid(self::UID)));
+		self::assertTrue($code->equals($this->repository()->selectByTicket(new Ticket(self::UID, 'nonce'))));
 	}
 
 	public function testDeletedCodeIsGone(): void
 	{
-		$this->repository()->save($this->factory->createForTicket(new Ticket(self::UID, 'nonce'), self::CODE), self::TTL);
-		$this->repository()->deleteByUid(self::UID);
+		$this->repository()->save((new Ticket(self::UID, 'nonce'))->pendingCodeFor(self::CODE), self::TTL);
+		$this->repository()->deleteByTicket(new Ticket(self::UID, 'nonce'));
 
-		self::assertNull($this->repository()->selectByUid(self::UID));
+		self::assertNull($this->repository()->selectByTicket(new Ticket(self::UID, 'nonce')));
 	}
 
 	public function testMalformedEntryIsIgnored(): void
 	{
-		$this->cache->set('login-code:' . self::UID, ['hash' => 'abc']);
+		$this->cache->set('login-code:' . self::UID . ':nonce', ['hash' => 'abc']);
 
-		self::assertNull($this->repository()->selectByUid(self::UID));
+		self::assertNull($this->repository()->selectByTicket(new Ticket(self::UID, 'nonce')));
 	}
 
 }

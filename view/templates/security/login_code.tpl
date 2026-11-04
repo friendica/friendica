@@ -27,7 +27,7 @@
 		<div class="form-group settings-submit-wrapper">
 			<button type="submit" name="action" id="login-code-submit-button" class="btn btn-primary" value="verify">{{$submit}}</button>
 		</div>
-		<p><a href="login/code?new=1">{{$again}}</a></p>
+		<p><a href="{{$new_path}}">{{$again}}</a></p>
 {{else}}
 		{{include file="field_input.tpl" field=$username}}
 

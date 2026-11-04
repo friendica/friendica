@@ -11,18 +11,9 @@ namespace Friendica\Security\LoginCode\Factory;
 
 use Friendica\BaseFactory;
 use Friendica\Security\LoginCode\ValueObject\PendingCode as PendingCodeObject;
-use Friendica\Security\LoginCode\ValueObject\Ticket;
 
 class PendingCode extends BaseFactory
 {
-	/**
-	 * Binds the code to the account and the nonce of the ticket.
-	 */
-	public function createForTicket(Ticket $ticket, #[\SensitiveParameter] string $code): PendingCodeObject
-	{
-		return new PendingCodeObject($ticket->uid, $ticket->nonce, hash_hmac('sha256', $code, $ticket->nonce));
-	}
-
 	/**
 	 * @param array{nonce: string, hash: string} $entry
 	 */
