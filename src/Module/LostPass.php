@@ -9,26 +9,29 @@ namespace Friendica\Module;
 
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
+use Friendica\App\Request;
 use Friendica\BaseModule;
 use Friendica\Core\Renderer;
-use Friendica\Database\DBA;
-use Friendica\Model\User;
-use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Strings;
-use Friendica\Navigation\SystemMessages;
-use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\Worker;
+use Friendica\Security\Throttle\AttemptLimiter;
+use Friendica\Security\Throttle\ValueObject\Limit;
 use Friendica\Core\L10n;
-use Friendica\Util\Emailer;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
 /**
  * Lost password module
  *
- * This module handles password reset functionality for users who have forgotten their passwords.
+ * This module handles requests for a password reset link, the link leads to Security\ResetPassword.
  */
 final class LostPass extends BaseModule
 {
+	/** Minimum time between two reset requests of an IP address in seconds */
+	private const IP_REQUEST_INTERVAL = 60;
+
+	/** Replaces the form with this message */
+	private string $result = '';
+
 	/**
 	 * Initialize the module
 	 *
@@ -38,13 +41,12 @@ final class LostPass extends BaseModule
 	 * @param LoggerInterface $logger
 	 * @param Profiler $profiler
 	 * @param Response $response
-	 * @param SystemMessages $sysMessages
-	 * @param IManageConfigValues $config
-	 * @param Emailer $emailer
+	 * @param AttemptLimiter $attemptLimiter
+	 * @param Request $request
 	 * @param array $server
 	 * @param array $parameters
 	 */
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private readonly SystemMessages $sysMessages, private readonly IManageConfigValues $config, private readonly Emailer $emailer, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private readonly AttemptLimiter $attemptLimiter, private readonly Request $request, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 	}
@@ -57,64 +59,20 @@ final class LostPass extends BaseModule
 	 */
 	protected function post(array $request = [])
 	{
-		$loginame = trim($request['login-name'] ?? '');
-		if (!$loginame) {
-			$this->baseUrl->redirect();
+		self::checkFormSecurityTokenRedirectOnError('lostpass', 'lostpass');
+
+		$loginame = $request['login-name'] ?? '';
+		if (!is_string($loginame) || !mb_check_encoding($loginame, 'UTF-8') || trim($loginame) === '') {
+			return;
 		}
 
-		$condition = ['(`email` = ? OR `nickname` = ?) AND `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`', $loginame, $loginame];
-		$user      = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'language'], $condition);
-		if (!DBA::isResult($user)) {
-			$this->sysMessages->addNotice($this->l10n->t('No valid account found.'));
-			$this->baseUrl->redirect();
+		// The account is only looked up by the worker, so neither the response nor its timing reveal if it exists
+		$ipLimit = new Limit('lostpass-ip', 0, 0, self::IP_REQUEST_INTERVAL);
+		if ($this->attemptLimiter->tryRequest($ipLimit, $this->request->getRemoteAddress())) {
+			Worker::add(Worker::PRIORITY_HIGH, 'SendPasswordResetLink', trim($loginame));
 		}
 
-		$pwdreset_token = Strings::getRandomHex(32);
-
-		$fields = [
-			'pwdreset'      => hash('sha256', $pwdreset_token),
-			'pwdreset_time' => DateTimeFormat::utcNow(),
-		];
-		$result = DBA::update('user', $fields, ['uid' => $user['uid']]);
-		if ($result) {
-			$this->sysMessages->addInfo($this->l10n->t('Password reset request issued. Check your email.'));
-		}
-
-		$sitename  = $this->config->get('config', 'sitename');
-		$resetlink = $this->baseUrl . '/lostpass/' . $pwdreset_token;
-
-		$preamble = Strings::deindent($this->l10n->t('
-			Dear %1$s,
-				A request was recently received at "%2$s" to reset your account
-			password. In order to confirm this request, please select the verification link
-			below or paste it into your web browser address bar.
-
-			If you did NOT request this change, please DO NOT follow the link
-			provided and ignore and/or delete this email, the request will expire shortly.
-
-			Your password will not be changed unless we can verify that you
-			issued this request.', $user['username'], $sitename));
-		$body = Strings::deindent($this->l10n->t('
-			Follow this link soon to verify your identity:
-
-			%1$s
-
-			You will then receive a follow-up message containing the new password.
-			You may change that password from your account settings page after logging in.
-
-			The login details are as follows:
-
-			URL: %2$s
-			Username: %3$s', $resetlink, $this->baseUrl, $user['nickname']));
-
-		$email = $this->emailer->newSystemMail()
-			->withMessage($this->l10n->t('Password reset requested at %s', $sitename), $preamble, $body)
-			->forUser($user)
-			->withRecipient($user['email'])
-			->build();
-
-		$this->emailer->send($email);
-		$this->baseUrl->redirect();
+		$this->result = $this->l10n->t('If the account exists, a message with a password reset link has been sent to its email address.');
 	}
 
 	/**
@@ -125,33 +83,16 @@ final class LostPass extends BaseModule
 	 */
 	protected function content(array $request = []): string
 	{
-		if (isset($this->parameters['token'])) {
-			$pwdreset_token = $this->parameters['token'];
-
-			$user = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'pwdreset_time', 'language'], ['pwdreset' => hash('sha256', $pwdreset_token)]);
-			if (!DBA::isResult($user)) {
-				$this->sysMessages->addNotice($this->l10n->t("Request could not be verified. (You may have previously submitted it.) Password reset failed."));
-
-				return $this->form();
-			}
-
-			// Password reset requests expire in 60 minutes
-			if ($user['pwdreset_time'] < DateTimeFormat::utc('now - 1 hour')) {
-				$fields = [
-					'pwdreset'      => null,
-					'pwdreset_time' => null,
-				];
-				DBA::update('user', $fields, ['uid' => $user['uid']]);
-
-				$this->sysMessages->addNotice($this->l10n->t('Request has expired, please make a new one.'));
-
-				return $this->form();
-			}
-
-			return $this->generatePassword($user);
-		} else {
-			return $this->form();
+		if ($this->result !== '') {
+			return Renderer::replaceMacros(Renderer::getMarkupTemplate('lostpass_result.tpl'), [
+				'$title'      => $this->l10n->t('Password Reset'),
+				'$message'    => $this->result,
+				'$link'       => 'login',
+				'$link_label' => $this->l10n->t('Sign in'),
+			]);
 		}
+
+		return $this->form();
 	}
 
 	/**
@@ -167,60 +108,9 @@ final class LostPass extends BaseModule
 			'$desc'   => $this->l10n->t('Enter your email address and submit to have your password reset. Then check your email for further instructions.'),
 			'$name'   => $this->l10n->t('Username or email'),
 			'$submit' => $this->l10n->t('Reset my password'),
+
+			'$form_security_token' => self::getFormSecurityToken('lostpass'),
 		]);
-
-		return $o;
-	}
-
-	/**
-	 * Generate and send a new password to the user
-	 *
-	 * @param array $user User data array
-	 * @return string Rendered success message HTML
-	 */
-	private function generatePassword(array $user): string
-	{
-		$o = '';
-
-		$new_password = User::generateNewPassword();
-		$result       = User::updatePassword($user['uid'], $new_password);
-		if (DBA::isResult($result)) {
-			$tpl = Renderer::getMarkupTemplate('pwdreset.tpl');
-			$o .= Renderer::replaceMacros($tpl, [
-				'$lbl1'    => $this->l10n->t('Password Reset'),
-				'$lbl2'    => $this->l10n->t('Your password has been reset as requested.'),
-				'$lbl3'    => $this->l10n->t('Your new password is'),
-				'$lbl4'    => $this->l10n->t('Save or copy your new password - and then'),
-				'$lbl5'    => '<a href="' . $this->baseUrl . '">' . $this->l10n->t('click here to login') . '</a>.',
-				'$lbl6'    => $this->l10n->t('Your password may be changed from the <em>Settings</em> page after successful login.'),
-				'$newpass' => $new_password,
-			]);
-
-			$this->sysMessages->addInfo($this->l10n->t("Your password has been reset."));
-
-			$sitename = $this->config->get('config', 'sitename');
-			$preamble = Strings::deindent($this->l10n->t('
-				Dear %1$s,
-					Your password has been changed as requested. Please retain this
-				information for your records (or change your password immediately to
-				something that you will remember).', $user['username']));
-			$body = Strings::deindent($this->l10n->t('
-				Your login details are as follows:
-
-				URL: %1$s
-				Username: %2$s
-				Password: %3$s
-
-				You may change that password from your account settings page after logging in.
-			', $this->baseUrl, $user['nickname'], $new_password));
-
-			$email = $this->emailer->newSystemMail()
-				->withMessage($this->l10n->t('Your password has been changed at %s', $sitename), $preamble, $body)
-				->forUser($user)
-				->withRecipient($user['email'])
-				->build();
-			$this->emailer->send($email);
-		}
 
 		return $o;
 	}
