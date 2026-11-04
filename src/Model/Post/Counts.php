@@ -36,7 +36,7 @@ class Counts
 			return true;
 		}
 
-		$condition = ['thr-parent-id' => $uri_id, 'vid' => $vid, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]];
+		$condition = ['thr-parent-id' => $uri_id, 'vid' => $vid, 'deleted' => false];
 
 		if ($body == $verb) {
 			$condition['body'] = null;
@@ -55,10 +55,9 @@ class Counts
 			'vid'           => $vid,
 			'reaction'      => $body,
 			'parent-uri-id' => $parent_uri_id,
-			'count'         => Post::countPosts($condition),
+			'count'         => Post::countPosts(DBA::mergeConditions($condition, ['private' => [Item::PUBLIC, Item::UNLISTED]])),
 		];
 
-		unset($condition['private']);
 		if ($fields['count'] === 0 && Post::countPosts($condition) === 0) {
 			DBA::delete('post-counts', ['uri-id' => $uri_id, 'vid' => $vid, 'reaction' => $body]);
 			return true;
