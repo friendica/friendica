@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.11-dev\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 14:26+0000\n"
+"POT-Creation-Date: 2026-11-04 08:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1796,7 +1796,8 @@ msgstr ""
 
 #: src/Content/Conversation/PostTemplateBuilder.php:1086
 #: src/Content/Conversation/StatusEditor.php:165
-#: src/Content/Conversation/StatusEditor.php:172 src/Module/Post/Edit.php:196
+#: src/Content/Conversation/StatusEditor.php:172
+#: src/Module/Item/Compose.php:186 src/Module/Post/Edit.php:196
 #: src/Module/Settings/Profile/Index.php:255
 msgid "Web link"
 msgstr ""
@@ -8113,10 +8114,6 @@ msgstr ""
 
 #: src/Module/Item/Compose.php:177
 msgid "Done"
-msgstr ""
-
-#: src/Module/Item/Compose.php:186
-msgid "Link"
 msgstr ""
 
 #: src/Module/Item/Compose.php:190
