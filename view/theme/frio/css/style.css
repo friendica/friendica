@@ -4347,6 +4347,15 @@ div.login-form, .login-content-wrapper {
 #login-lost-password-link {
 	text-align: right;
 }
+#login-links {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 0 15px;
+}
+#login-links #login-lost-password-link {
+	margin-left: auto;
+}
 #div_id_remember {
 	margin: 20px 0;
 }
@@ -4589,7 +4598,8 @@ div.login-form, .login-content-wrapper,
 	font-size: 13px;
 }
 
-.generic-page-wrapper.contact-follow-wrapper {
+.generic-page-wrapper.contact-follow-wrapper,
+.generic-page-wrapper.login-code-wrapper {
 	min-height: auto;
 }
 

@@ -47,6 +47,7 @@
 			{{include file="field_input.tpl" field=$daily_registrations}}
 			{{include file="field_checkbox.tpl" field=$enable_multi_reg}}
 			{{include file="field_checkbox.tpl" field=$enable_openid}}
+			{{include file="field_checkbox.tpl" field=$enable_login_code}}
 			{{include file="field_checkbox.tpl" field=$enable_regfullname}}
 			{{include file="field_checkbox.tpl" field=$register_notification}}
 			{{include file="field_textarea.tpl" field=$allowed_email}}

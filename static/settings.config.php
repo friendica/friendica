@@ -121,6 +121,10 @@ return [
 		// Display non local media to visitors.
 		'display_remote_media' => false,
 
+		// enable_login_code (Boolean)
+		// Enables the login with a one time code that is sent by e-mail.
+		'enable_login_code' => false,
+
 		// explicit_content (Boolean)
 		// Set this to announce that your node is used mostly for explicit content that might not be suited for minors.
 		'explicit_content' => false,

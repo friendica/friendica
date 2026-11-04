@@ -566,6 +566,7 @@ return [
 
 	'/localtime'             => [Module\Debug\Localtime::class, [R::GET, R::POST]],
 	'/login'                 => [Module\Security\Login::class,  [R::GET, R::POST]],
+	'/login/code'            => [Module\Security\LoginCode::class, [R::GET, R::POST]],
 	'/logout'                => [Module\Security\Logout::class, [R::GET, R::POST]],
 	'/lostpass[/{token}]'    => [Module\LostPass::class, [R::GET, R::POST]],
 	'/magic'                 => [Module\Magic::class,           [R::GET]],

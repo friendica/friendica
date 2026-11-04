@@ -88,6 +88,7 @@ class Site extends BaseAdmin
 
 		$enable_multi_reg                = !empty($_POST['enable_multi_reg']);
 		$enable_openid                   = !empty($_POST['enable_openid']);
+		$enable_login_code               = !empty($_POST['enable_login_code']);
 		$enable_regfullname              = !empty($_POST['enable_regfullname']);
 		$register_notification           = !empty($_POST['register_notification']);
 		$community_page_style            = (!empty($_POST['community_page_style']) ? intval(trim((string) $_POST['community_page_style'])) : 0);
@@ -271,6 +272,7 @@ class Site extends BaseAdmin
 
 		$transactionConfig->set('system', 'block_extended_register', !$enable_multi_reg);
 		$transactionConfig->set('system', 'no_openid', !$enable_openid);
+		$transactionConfig->set('system', 'enable_login_code', $enable_login_code);
 		$transactionConfig->set('system', 'no_regfullname', !$enable_regfullname);
 		$transactionConfig->set('system', 'register_notification', $register_notification);
 		$transactionConfig->set('system', 'community_page_style', $community_page_style);
@@ -534,6 +536,7 @@ class Site extends BaseAdmin
 			'$min_poll_interval'               => ['min_poll_interval', DI::l10n()->t('Minimum poll interval'), DI::config()->get('system', 'min_poll_interval'), DI::l10n()->t('Minimal distance in minutes between two polls for mail and feed contacts. Reasonable values are between 1 and 59.')],
 			'$enable_multi_reg'                => ['enable_multi_reg', DI::l10n()->t('Enable multiple registrations'), !DI::config()->get('system', 'block_extended_register'), DI::l10n()->t('Enable users to register additional accounts for use as pages.')],
 			'$enable_openid'                   => ['enable_openid', DI::l10n()->t('Enable OpenID'), !DI::config()->get('system', 'no_openid'), DI::l10n()->t('Enable OpenID support for registration and logins.')],
+			'$enable_login_code'               => ['enable_login_code', DI::l10n()->t('Enable login with e-mail code'), DI::config()->get('system', 'enable_login_code'), DI::l10n()->t('Allow users to sign in with a one time code that is sent to their e-mail address instead of a password.')],
 			'$enable_regfullname'              => ['enable_regfullname', DI::l10n()->t('Enable full name check'), !DI::config()->get('system', 'no_regfullname'), DI::l10n()->t('Prevents users from registering with a display name with fewer than two parts separated by spaces.')],
 			'$register_notification'           => ['register_notification', DI::l10n()->t('Email administrators on new registration'), DI::config()->get('system', 'register_notification'), DI::l10n()->t('If enabled and the system is set to an open registration, an email for each new registration is sent to the administrators.')],
 			'$community_page_style'            => ['community_page_style', DI::l10n()->t('Community pages for visitors'), DI::config()->get('system', 'community_page_style'), DI::l10n()->t('Which community pages should be available for visitors. Local users always see both pages.'), $community_page_style_choices],
