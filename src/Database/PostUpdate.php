@@ -1477,14 +1477,20 @@ class PostUpdate
 			return false;
 		}
 
+		$posts = [];
+
 		while ($activity = Post::fetch($activities)) {
 			$id = $activity['uri-id'];
 			if (EmojiReaction::isReaction($activity['body'])) {
-				Counts::updateForPost($activity['thr-parent-id'], $activity['parent-uri-id']);
+				$posts[$activity['thr-parent-id']] = $activity['parent-uri-id'];
 			}
 			++$rows;
 		}
 		DBA::close($activities);
+
+		foreach ($posts as $uri_id => $parent_uri_id) {
+			Counts::updateForPost($uri_id, $parent_uri_id);
+		}
 
 		DI::keyValue()->set('post_update_version_1604_id', $id);
 
