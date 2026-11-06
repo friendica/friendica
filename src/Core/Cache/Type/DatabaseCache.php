@@ -36,7 +36,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 			if (empty($prefix)) {
 				$where = ['`expires` >= ?', DateTimeFormat::utcNow()];
 			} else {
-				$where = ['`expires` >= ? AND `k` LIKE CONCAT(?, \'%\')', DateTimeFormat::utcNow(), $prefix];
+				$where = ['`expires` >= ? AND `k` LIKE ?', DateTimeFormat::utcNow(), $prefix . '%'];
 			}
 
 			$stmt = $this->dba->select('cache', ['k'], $where);
