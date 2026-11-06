@@ -13,6 +13,7 @@ use Friendica\Database\DBA;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
 use Friendica\Model\Attach;
+use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Util\DateTimeFormat;
@@ -305,7 +306,7 @@ class ExpirePosts
 					WHERE `uri-id` = `post-thread`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `uri-id` FROM `post-collection`
 					WHERE `uri-id` = `post-thread`.`uri-id`)
-				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user` INNER JOIN `contact` ON `contact`.`id` = `contact-id` AND `notify_new_posts`
+				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user` INNER JOIN `contact` ON `contact`.`id` = `contact-id` AND `notify_new_posts` != ?
 					WHERE `parent-uri-id` = `post-thread`.`uri-id`)
 				AND NOT `uri-id` IN (SELECT `parent-uri-id` FROM `post-user`
 					WHERE (`origin` OR `event-id` != 0 OR `post-type` = ?) AND `parent-uri-id` = `post-thread`.`uri-id`)
@@ -316,7 +317,7 @@ class ExpirePosts
 					INNER JOIN `post-origin` ON `post-origin`.`uri-id` = `post-quote`.`quote-uri-id`
 					WHERE `post`.`parent-uri-id` = `post-thread`.`uri-id`)
 				AND NOT EXISTS (SELECT 1 FROM `contact` WHERE `contact`.`uri-id` = `post-thread`.`uri-id`)",
-				DateTimeFormat::utc('now - ' . (int) $expire_days . ' days'), Item::PT_PERSONAL_NOTE,
+				DateTimeFormat::utc('now - ' . (int) $expire_days . ' days'), Contact::NOTIFY_NEW_POSTS_NONE, Item::PT_PERSONAL_NOTE,
 			];
 			$pass = 0;
 			do {
