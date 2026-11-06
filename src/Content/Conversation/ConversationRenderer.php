@@ -144,7 +144,7 @@ final readonly class ConversationRenderer
 			return '';
 		}
 
-		$page_dropping = $viewerUid && $this->pConfig->get($viewerUid, 'system', 'show_page_drop', true);
+		$page_dropping = $this->isPageDropEnabled($viewerUid);
 		$root          = $this->dataProvider->getRootTemplateDataFromItem($item, $viewerUid, self::MODE_COMMENTS, $existing, $page_dropping);
 		if (empty($root['children'])) {
 			$this->profiler->stopRecording();
@@ -200,7 +200,7 @@ final readonly class ConversationRenderer
 		// so a flattened subtree would move the new reply out of its parent.
 		$smartThreading = self::normalizeCommentsMode($this->pConfig->get($viewerUid, 'system', 'compact_timeline')) === self::COMMENTS_MODE_ALL;
 
-		$page_dropping = $viewerUid && $this->pConfig->get($viewerUid, 'system', 'show_page_drop', true);
+		$page_dropping = $this->isPageDropEnabled($viewerUid);
 		$root          = $this->dataProvider->getRootTemplateDataFromItem($comment, $viewerUid, self::MODE_DISPLAY, [], $page_dropping, $smartThreading);
 
 		$parent = $root ? $this->selectInsertNode($root, $comment) : null;
@@ -240,7 +240,7 @@ final readonly class ConversationRenderer
 
 		$smartThreading = self::normalizeCommentsMode($this->pConfig->get($viewerUid, 'system', 'compact_timeline')) === self::COMMENTS_MODE_ALL;
 
-		$page_dropping = $viewerUid && $this->pConfig->get($viewerUid, 'system', 'show_page_drop', true);
+		$page_dropping = $this->isPageDropEnabled($viewerUid);
 		$root          = $this->dataProvider->getRootTemplateDataFromItem($item, $viewerUid, self::MODE_DISPLAY, [], $page_dropping, $smartThreading);
 
 		$node = $root ? $this->findNodeByUriId($root, $uriId) : null;
@@ -367,7 +367,7 @@ final readonly class ConversationRenderer
 
 		$live_update_div = $this->getLiveUpdateHtml($mode, $update, $viewerUid, []);
 
-		$page_dropping = $viewerUid && $this->pConfig->get($viewerUid, 'system', 'show_page_drop', true);
+		$page_dropping = $this->isPageDropEnabled($viewerUid);
 		$root          = $this->dataProvider->getRootTemplateDataFromItem($item, $viewerUid, $mode, [], $page_dropping);
 		if (empty($root)) {
 			$this->profiler->stopRecording();
@@ -537,7 +537,7 @@ final readonly class ConversationRenderer
 	 */
 	private function renderTimelineByItems(array $items, int $uid, string $mode, string $order, bool $update): string
 	{
-		$page_dropping = $uid && $this->pConfig->get($uid, 'system', 'show_page_drop', true);
+		$page_dropping = $this->isPageDropEnabled($uid);
 		$roots         = $this->dataProvider->getRootTemplateDataFromItems($items, $uid, $mode, $order, $page_dropping);
 		if (empty($roots)) {
 			return '';
@@ -576,6 +576,18 @@ final readonly class ConversationRenderer
 	 * @param bool $commentsAlwaysHidden Whether the list never shows any comments
 	 * @return bool
 	 */
+	/**
+	 * The checkboxes for deleting several posts are not shown in the columns of the deck.
+	 */
+	private function isPageDropEnabled(int $uid): bool
+	{
+		if (!$uid || ($_GET['mode'] ?? '') === 'column') {
+			return false;
+		}
+
+		return (bool) $this->pConfig->get($uid, 'system', 'show_page_drop', true);
+	}
+
 	private function isClickToDisplayEnabled(int $uid, bool $commentsAlwaysHidden = false): bool
 	{
 		if (!$uid) {
