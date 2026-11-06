@@ -54,7 +54,7 @@ contact table
 | bd                        |                                                                                                                | date               | NO   |     | 0001-01-01          |                |
 | reason                    |                                                                                                                | text               | YES  |     | NULL                |                |
 | self                      | 1 if the contact is the user him/her self                                                                      | boolean            | NO   |     | 0                   |                |
-| remote_self               |                                                                                                                | boolean            | NO   |     | 0                   |                |
+| remote_self               | 0 => No mirroring, 1-2 => Mirror as own post, 3 => Mirror as reshare                                           | tinyint            | NO   |     | 0                   |                |
 | rel                       | The kind of the relation between the user and the contact                                                      | tinyint unsigned   | NO   |     | 0                   |                |
 | protocol                  | Protocol of the contact                                                                                        | char(4)            | NO   |     |                     |                |
 | hub-verify                |                                                                                                                | varbinary(383)     | NO   |     |                     |                |
