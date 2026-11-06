@@ -4873,14 +4873,6 @@ div.login-form, .login-content-wrapper,
 }
 @media (max-width: 767px) {
 	/* Narrow layouts (mobile, deck columns): use less padding so that more filters fit into one line */
-	.posts-filter .nav-tabs {
-		display: flex;
-		flex-wrap: wrap;
-	}
-	.posts-filter .nav-tabs > li {
-		float: none;
-		flex: 0 1 auto;
-	}
 	.posts-filter .nav-tabs > li > a {
 		padding-left: 8px;
 		padding-right: 8px;

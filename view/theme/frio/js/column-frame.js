@@ -61,8 +61,7 @@
 		} else if (url.pathname === window.location.pathname) {
 			window.location.href = withMode(url.href);
 		} else {
-			url.searchParams.delete("mode");
-			post({ action: "open", url: url.pathname + url.search });
+			window.columnFrameOpen(url.href);
 		}
 	});
 
