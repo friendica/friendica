@@ -70,7 +70,7 @@ class Counts
 	{
 		self::update($uri_id, $parent_uri_id, Verb::getID(Activity::POST), Activity::POST);
 
-		$activities = DBA::p("SELECT `parent-uri-id`, `vid`, `verb`, `body` FROM `post-view` WHERE `thr-parent-id` = ? AND `gravity` = ? AND `vid` IS NOT NULL GROUP BY `parent-uri-id`, `vid`, `verb`, `body`", $uri_id, Item::GRAVITY_ACTIVITY);
+		$activities = DBA::p("SELECT DISTINCT `parent-uri-id`, `vid`, `verb`, BINARY `body` AS `body` FROM `post-view` WHERE `thr-parent-id` = ? AND `gravity` = ? AND `vid` IS NOT NULL", $uri_id, Item::GRAVITY_ACTIVITY);
 		while ($activity = DBA::fetch($activities)) {
 			self::update($uri_id, $activity['parent-uri-id'], $activity['vid'], $activity['verb'], $activity['body']);
 		}
