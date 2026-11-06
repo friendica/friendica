@@ -171,6 +171,13 @@ class Authentication
 				$this->baseUrl->redirect();
 			}
 
+			// The password was changed after this session has been started
+			if ((string) $this->session->get(User::PASSWORD_GENERATION) !== (string) $this->pConfig->get($user['uid'], 'system', User::PASSWORD_GENERATION)) {
+				$this->logger->notice('Session ended by a password change.', ['user' => $user['uid']]);
+				$this->session->clear();
+				$this->baseUrl->redirect();
+			}
+
 			$this->setForUser($user);
 		}
 	}
@@ -300,6 +307,11 @@ class Authentication
 		// restored from a cookie or an API credential keep their id.
 		if ($login_initial) {
 			$this->session->regenerateId();
+		}
+
+		// Sessions that are already running keep the value they started with until withSession() compares it
+		if ($login_initial || !$this->session->isAuthenticated()) {
+			$this->session->set(User::PASSWORD_GENERATION, $this->pConfig->get($user_record['uid'], 'system', User::PASSWORD_GENERATION));
 		}
 
 		$this->session->setMultiple([
