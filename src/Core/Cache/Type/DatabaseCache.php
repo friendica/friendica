@@ -20,6 +20,9 @@ class DatabaseCache extends AbstractCache implements ICanCache
 {
 	public const NAME = 'database';
 
+	/** Expiry date for entries without a TTL. */
+	private const NEVER_EXPIRES = '9999-12-31 23:59:59';
+
 	public function __construct(string $hostname, private readonly Database $dba)
 	{
 		parent::__construct($hostname);
@@ -65,7 +68,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 	{
 		try {
 			$cache = $this->dba->selectFirst('cache', ['v'], [
-				'`k` = ? AND (`expires` >= ? OR `expires` = -1)', $key, DateTimeFormat::utcNow(),
+				'`k` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow(),
 			]);
 
 			if ($this->dba->isResult($cache)) {
@@ -101,7 +104,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 			} else {
 				$fields = [
 					'v'       => serialize($value),
-					'expires' => -1,
+					'expires' => self::NEVER_EXPIRES,
 					'updated' => DateTimeFormat::utcNow(),
 				];
 			}
