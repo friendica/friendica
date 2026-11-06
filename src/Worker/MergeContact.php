@@ -83,13 +83,11 @@ class MergeContact
 		}
 
 		$ctarget['rel'] = $c1['rel'] | $c2['rel'];
-		foreach (['prvkey', 'hub-verify', 'priority', 'rating', 'fetch_further_information', 'notify_new_posts', 'ffi_keyword_denylist', 'block_reason'] as $field) {
+		foreach (['remote_self', 'prvkey', 'hub-verify', 'priority', 'rating', 'fetch_further_information', 'notify_new_posts', 'ffi_keyword_denylist', 'block_reason'] as $field) {
 			$ctarget[$field] = $c1[$field] ?: $c2[$field];
 		}
 
-		foreach (['remote_self', 'writable'] as $field) {
-			$ctarget[$field] = $c1[$field] || $c2[$field];
-		}
+		$ctarget['writable'] = $c1['writable'] || $c2['writable'];
 
 		foreach (['archive', 'pending'] as $field) {
 			$ctarget[$field] = $c1[$field] && $c2[$field];
