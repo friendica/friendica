@@ -327,6 +327,35 @@
 		window.jQuery(composeModal).modal("show");
 	});
 
+	// The entries of the notification menu in the navigation (which is part of this page, not of a column)
+	// keep their /notification/<id> link, since that marks them as seen, but open the target in a new column.
+	// The redirect of that module keeps the column mode.
+	// Capturing, since the popup menus stop the propagation of clicks (see main.js) and Unpoly would follow the link.
+	document.addEventListener("click", function (e) {
+		if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
+			return;
+		}
+
+		const link = e.target.closest ? e.target.closest("#nav-notifications-menu a[href]") : null;
+		if (!link) {
+			return;
+		}
+
+		const url = normalize(link.href);
+		if (!url || !/\/(notification|notify)\/\d+$/.test(url.split("?")[0])) {
+			return;
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
+		add(url);
+		// Close the dropdown, since the click doesn't reach Bootstrap
+		const dropdown = link.closest(".dropdown");
+		if (dropdown && dropdown.classList.contains("open")) {
+			window.jQuery(dropdown).find("[data-toggle=dropdown]").first().dropdown("toggle");
+		}
+	}, true);
+
 	window.addEventListener("message", function (e) {
 		if (e.origin !== window.location.origin || !e.data || !e.data.friendicaColumns) {
 			return;

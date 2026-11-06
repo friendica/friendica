@@ -146,7 +146,7 @@ class Notification extends BaseModule
 		}
 
 		if ((string) $Notify->link) {
-			System::externalRedirect($Notify->link);
+			System::externalRedirect($this->keepColumnMode((string) $Notify->link));
 		}
 
 		$this->baseUrl->redirect();
@@ -174,9 +174,27 @@ class Notification extends BaseModule
 		$message = $this->notificationFactory->getMessageFromNotification($Notification);
 
 		if ($message['link']) {
-			System::externalRedirect($message['link']);
+			System::externalRedirect($this->keepColumnMode($message['link']));
 		}
 
 		$this->baseUrl->redirect();
+	}
+
+	/**
+	 * Keeps the column mode of the deck, so that the target opens in the column frame as well.
+	 */
+	private function keepColumnMode(string $link): string
+	{
+		if (($_GET['mode'] ?? '') !== 'column' || !str_starts_with($link, $this->baseUrl . '/')) {
+			return $link;
+		}
+
+		$fragment = '';
+		if (($pos = strpos($link, '#')) !== false) {
+			$fragment = substr($link, $pos);
+			$link     = substr($link, 0, $pos);
+		}
+
+		return $link . (str_contains($link, '?') ? '&' : '?') . 'mode=column' . $fragment;
 	}
 }
