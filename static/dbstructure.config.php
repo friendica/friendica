@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1604);
+	define('DB_UPDATE_VERSION', 1605);
 }
 
 return [
@@ -226,7 +226,7 @@ return [
 			// User depending fields
 			"reason"                    => ["type" => "text", "comment" => ""],
 			"self"                      => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "1 if the contact is the user him/her self"],
-			"remote_self"               => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => ""],
+			"remote_self"               => ["type" => "tinyint", "not null" => "1", "default" => "0", "comment" => "0 => No mirroring, 1-2 => Mirror as own post, 3 => Mirror as reshare"],
 			"rel"                       => ["type" => "tinyint unsigned", "not null" => "1", "default" => "0", "comment" => "The kind of the relation between the user and the contact"],
 			"protocol"                  => ["type" => "char(4)", "not null" => "1", "default" => "", "comment" => "Protocol of the contact"],
 			"hub-verify"                => ["type" => "varbinary(383)", "not null" => "1", "default" => "", "comment" => ""],

@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica 2026.11-dev (Blutwurz)
--- DB_UPDATE_VERSION 1604
+-- DB_UPDATE_VERSION 1605
 -- ------------------------------------------
 
 
@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`bd` date NOT NULL DEFAULT '0001-01-01' COMMENT '',
 	`reason` text COMMENT '',
 	`self` boolean NOT NULL DEFAULT '0' COMMENT '1 if the contact is the user him/her self',
-	`remote_self` boolean NOT NULL DEFAULT '0' COMMENT '',
+	`remote_self` tinyint NOT NULL DEFAULT 0 COMMENT '0 => No mirroring, 1-2 => Mirror as own post, 3 => Mirror as reshare',
 	`rel` tinyint unsigned NOT NULL DEFAULT 0 COMMENT 'The kind of the relation between the user and the contact',
 	`protocol` char(4) NOT NULL DEFAULT '' COMMENT 'Protocol of the contact',
 	`hub-verify` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
