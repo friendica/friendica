@@ -11,6 +11,7 @@ use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Enum;
 use Friendica\Core\Cache\Exception\CachePersistenceException;
 use Friendica\Database\Database;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -19,9 +20,6 @@ use Friendica\Util\DateTimeFormat;
 class DatabaseCache extends AbstractCache implements ICanCache
 {
 	public const NAME = 'database';
-
-	/** Expiry date for entries without a TTL. */
-	private const NEVER_EXPIRES = '9999-12-31 23:59:59';
 
 	public function __construct(string $hostname, private readonly Database $dba)
 	{
@@ -104,7 +102,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 			} else {
 				$fields = [
 					'v'       => serialize($value),
-					'expires' => self::NEVER_EXPIRES,
+					'expires' => DBA::MAX_DATETIME,
 					'updated' => DateTimeFormat::utcNow(),
 				];
 			}
