@@ -49,6 +49,11 @@ class Processor
 {
 	public const CACHEKEY_FETCH_ACTIVITY = 'processor:fetchMissingActivity:';
 	public const CACHEKEY_JUST_FETCHED   = 'processor:isJustFetched:';
+	public const CACHEKEY_HOST_FAILURES  = 'processor:hostFailures:';
+	public const CACHEKEY_HOST_SUSPENDED = 'processor:hostSuspended:';
+
+	// Consecutive server errors of a host after which fetching from this host is suspended
+	public const HOST_FAILURE_LIMIT = 10;
 
 	public const FETCH_REPLIES_ALL         = 0;
 	public const FETCH_REPLIES_NONE        = 1;
@@ -1774,6 +1779,12 @@ class Processor
 			return null;
 		}
 
+		$host = (string) parse_url($url, PHP_URL_HOST);
+		if (DI::distributedCache()->get(self::CACHEKEY_HOST_SUSPENDED . $host)) {
+			DI::logger()->info('Fetching from host is suspended after repeated server errors', ['url' => $url]);
+			return '';
+		}
+
 		try {
 			$curlResult = HTTPSignature::fetchRaw($url, $uid);
 		} catch (\Exception $exception) {
@@ -1781,9 +1792,12 @@ class Processor
 			return '';
 		}
 
+		self::trackHostFailures($host, (int) $curlResult->getReturnCode());
+
 		$body = $curlResult->getBodyString();
 		if (!$curlResult->isSuccess() || empty($body)) {
-			if (in_array($curlResult->getReturnCode(), [403, 404, 406, 410])) {
+			// A 401 is returned after the request had been signed in every supported variant
+			if (in_array($curlResult->getReturnCode(), [401, 403, 404, 406, 410])) {
 				return null;
 			}
 			return '';
@@ -1809,6 +1823,31 @@ class Processor
 		}
 
 		return self::processActivity($object, $url, $child, $relay_actor, $completion, $uid);
+	}
+
+	/**
+	 * Count consecutive server errors of a host and suspend fetching from it for an hour when the limit is reached
+	 *
+	 * @param string $host        Host of the fetched URL
+	 * @param int    $return_code HTTP return code of the fetch
+	 * @return void
+	 */
+	private static function trackHostFailures(string $host, int $return_code)
+	{
+		if ($return_code < 500) {
+			if ($return_code >= 200 && $return_code < 300) {
+				DI::distributedCache()->delete(self::CACHEKEY_HOST_FAILURES . $host);
+			}
+			return;
+		}
+
+		$failures = (int) DI::distributedCache()->get(self::CACHEKEY_HOST_FAILURES . $host) + 1;
+		DI::distributedCache()->set(self::CACHEKEY_HOST_FAILURES . $host, $failures, Duration::DAY);
+
+		if ($failures >= self::HOST_FAILURE_LIMIT) {
+			DI::logger()->notice('Suspend fetching from host after repeated server errors', ['host' => $host, 'failures' => $failures]);
+			DI::distributedCache()->set(self::CACHEKEY_HOST_SUSPENDED . $host, true, Duration::HOUR);
+		}
 	}
 
 	private static function processActivity(array $object, string $url, array $child, string $relay_actor, int $completion, int $uid = 0): ?string

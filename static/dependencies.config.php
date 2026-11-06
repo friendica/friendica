@@ -199,6 +199,12 @@ return (function (string $basepath, array $getVars, array $serverVars, array $co
 				['createLocal', [], Dice::CHAIN_CALL],
 			],
 		],
+		'$distributedCache' => [
+			'instanceOf' => \Friendica\Core\Cache\Factory\Cache::class,
+			'call'       => [
+				['createDistributed', [], Dice::CHAIN_CALL],
+			],
+		],
 		\Friendica\Core\Cache\Capability\ICanCacheInMemory::class => [
 			'instanceOf' => \Friendica\Core\Cache\Factory\Cache::class,
 			'call'       => [
