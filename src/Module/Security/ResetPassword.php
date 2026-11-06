@@ -43,6 +43,9 @@ final class ResetPassword extends BaseModule
 	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private readonly IManageConfigValues $config, private readonly Emailer $emailer, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+
+		// The token is part of the URL and must not leak to other sites
+		$this->response->setHeader('no-referrer', 'Referrer-Policy');
 	}
 
 	protected function post(array $request = []): void

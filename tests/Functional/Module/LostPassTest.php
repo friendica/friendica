@@ -22,14 +22,12 @@ use Friendica\DI;
 use Friendica\Module\LostPass;
 use Friendica\Module\Response;
 use Friendica\Module\Security\ResetPassword;
-use Friendica\Object\EMail\IEmail;
 use Friendica\Render\FriendicaSmartyEngine;
 use Friendica\Security\PasswordReset\ResetLinkSender;
 use Friendica\Security\Throttle\AttemptLimiter;
 use Friendica\Security\Throttle\Repository\Attempts;
 use Friendica\Test\FixtureTestCase;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\Emailer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -43,8 +41,7 @@ final class LostPassTest extends FixtureTestCase
 	private const NEW_PASSWORD = 'Correct-Horse-Battery-77';
 
 	private ArrayCache $cache;
-	/** @var Emailer&object{sent: IEmail[]} */
-	private Emailer $emailer;
+	private RecordingEmailer $emailer;
 
 	protected function setUp(): void
 	{
@@ -54,19 +51,9 @@ final class LostPassTest extends FixtureTestCase
 
 		DBA::update('user', ['email' => self::EMAIL, 'language' => 'en'], ['uid' => self::UID]);
 		DI::config()->set('system', 'disable_password_exposed', true);
-		DI::config()->set('system', 'worker_dont_fork', true);
 
 		$this->cache   = new ArrayCache('localhost');
-		$this->emailer = new class (DI::config(), $this->createStub(IManagePersonalConfigValues::class), DI::baseUrl(), new NullLogger(), DI::l10n(), $this->events()) extends Emailer {
-			/** @var IEmail[] */
-			public array $sent = [];
-
-			public function send(IEmail $email): bool
-			{
-				$this->sent[] = $email;
-				return true;
-			}
-		};
+		$this->emailer = new RecordingEmailer(DI::config(), $this->createStub(IManagePersonalConfigValues::class), DI::baseUrl(), new NullLogger(), DI::l10n(), $this->events());
 	}
 
 	protected function tearDown(): void
@@ -109,6 +96,7 @@ final class LostPassTest extends FixtureTestCase
 			DI::profiler(),
 			new Response(),
 			$this->limiter(),
+			new ResetLinkSender($this->limiter(), DI::config(), DI::baseUrl(), DI::l10n(), $this->emailer, new NullLogger()),
 			$request,
 			[],
 			$parameters,
@@ -118,23 +106,6 @@ final class LostPassTest extends FixtureTestCase
 	private function limiter(): AttemptLimiter
 	{
 		return new AttemptLimiter(new Attempts($this->cache), new CacheLock(new ArrayCache('localhost')));
-	}
-
-	/**
-	 * Runs the queued jobs like the worker does.
-	 *
-	 * @return int Number of processed jobs
-	 */
-	private function runQueuedJobs(): int
-	{
-		$sender = new ResetLinkSender($this->limiter(), DI::config(), DI::baseUrl(), DI::l10n(), $this->emailer, new NullLogger());
-		$jobs   = DBA::selectToArray('workerqueue', ['id', 'parameter'], ['command' => 'SendPasswordResetLink', 'done' => false]);
-		foreach ($jobs as $job) {
-			$sender->send(json_decode((string) $job['parameter'], true)[0]);
-			DBA::delete('workerqueue', ['id' => $job['id']]);
-		}
-
-		return count($jobs);
 	}
 
 	private function serverRequest(array $request): ServerRequestInterface
@@ -157,10 +128,7 @@ final class LostPassTest extends FixtureTestCase
 
 	private function requestReset(string $login = self::NICKNAME, string $ip = '192.0.2.1'): string
 	{
-		$page = $this->post(['login-name' => $login], [], 'lostpass', $ip);
-		$this->runQueuedJobs();
-
-		return $page;
+		return $this->post(['login-name' => $login], [], 'lostpass', $ip);
 	}
 
 	private function page(array $parameters = []): string
@@ -200,15 +168,15 @@ final class LostPassTest extends FixtureTestCase
 		self::assertCount(1, $this->emailer->sent);
 	}
 
-	public function testRequestOnlyQueuesAJobForKnownAndUnknownAccounts(): void
+	public function testFailingMailDoesNotChangeTheResponse(): void
 	{
-		$this->post(['login-name' => self::NICKNAME], [], 'lostpass', '192.0.2.1');
-		$this->post(['login-name' => 'doesnotexist'], [], 'lostpass', '192.0.2.2');
+		$unknown = $this->requestReset('doesnotexist', '192.0.2.2');
 
+		$this->emailer->failure = new \RuntimeException('Mail transport failed');
+		$known                  = $this->requestReset(self::NICKNAME, '192.0.2.1');
+
+		self::assertSame($unknown, $known);
 		self::assertSame([], $this->emailer->sent);
-		self::assertNull(DBA::selectFirst('user', ['pwdreset'], ['uid' => self::UID])['pwdreset']);
-		self::assertSame(2, $this->runQueuedJobs());
-		self::assertCount(1, $this->emailer->sent);
 	}
 
 	public function testRepeatedRequestFromAnotherAddressSendsNoSecondMail(): void
@@ -242,12 +210,12 @@ final class LostPassTest extends FixtureTestCase
 	}
 
 	#[DataProvider('invalidLogins')]
-	public function testInvalidLoginQueuesNothing(mixed $login): void
+	public function testInvalidLoginSendsNothing(mixed $login): void
 	{
 		$page = $this->post(['login-name' => $login], [], 'lostpass');
 
 		self::assertStringContainsString('name="login-name"', $page);
-		self::assertSame(0, $this->runQueuedJobs());
+		self::assertSame([], $this->emailer->sent);
 	}
 
 	public function testOpeningTheLinkChangesNothing(): void
@@ -262,6 +230,13 @@ final class LostPassTest extends FixtureTestCase
 		self::assertSame($hash, $this->passwordHash());
 		self::assertCount(1, $this->emailer->sent);
 		self::assertSame(hash('sha256', $token), DBA::selectFirst('user', ['pwdreset'], ['uid' => self::UID])['pwdreset']);
+	}
+
+	public function testLinkPageSendsNoReferrer(): void
+	{
+		$response = $this->module('GET', ['token' => str_repeat('0', 64)])->handleRequest($this->serverRequest([]));
+
+		self::assertSame('no-referrer', $response->getHeaderLine('Referrer-Policy'));
 	}
 
 	public function testOpeningAnUnknownLinkShowsNoForm(): void

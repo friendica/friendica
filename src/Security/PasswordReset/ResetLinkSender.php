@@ -85,12 +85,17 @@ final readonly class ResetLinkSender
 			URL: %2$s
 			Username: %3$s', $this->baseUrl . '/lostpass/' . $token, (string) $this->baseUrl, $user['nickname']));
 
-		$email = $this->emailer->newSystemMail()
-			->withMessage($l10n->t('Password reset requested at %s', $sitename), $preamble, $body)
-			->forUser($user)
-			->withRecipient($user['email'])
-			->build();
+		// A failure must not change the response, as it would reveal the account
+		try {
+			$email = $this->emailer->newSystemMail()
+				->withMessage($l10n->t('Password reset requested at %s', $sitename), $preamble, $body)
+				->forUser($user)
+				->withRecipient($user['email'])
+				->build();
 
-		$this->emailer->send($email);
+			$this->emailer->send($email);
+		} catch (\Exception $e) {
+			$this->logger->warning('Password reset mail could not be sent', ['uid' => $user['uid'], 'exception' => $e]);
+		}
 	}
 }

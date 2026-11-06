@@ -12,7 +12,7 @@ use Friendica\App\BaseURL;
 use Friendica\App\Request;
 use Friendica\BaseModule;
 use Friendica\Core\Renderer;
-use Friendica\Core\Worker;
+use Friendica\Security\PasswordReset\ResetLinkSender;
 use Friendica\Security\Throttle\AttemptLimiter;
 use Friendica\Security\Throttle\ValueObject\Limit;
 use Friendica\Core\L10n;
@@ -42,11 +42,12 @@ final class LostPass extends BaseModule
 	 * @param Profiler $profiler
 	 * @param Response $response
 	 * @param AttemptLimiter $attemptLimiter
+	 * @param ResetLinkSender $resetLinkSender
 	 * @param Request $request
 	 * @param array $server
 	 * @param array $parameters
 	 */
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private readonly AttemptLimiter $attemptLimiter, private readonly Request $request, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, private readonly AttemptLimiter $attemptLimiter, private readonly ResetLinkSender $resetLinkSender, private readonly Request $request, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 	}
@@ -66,12 +67,12 @@ final class LostPass extends BaseModule
 			return;
 		}
 
-		// The account is only looked up by the worker, so neither the response nor its timing reveal if it exists
 		$ipLimit = new Limit('lostpass-ip', 0, 0, self::IP_REQUEST_INTERVAL);
 		if ($this->attemptLimiter->tryRequest($ipLimit, $this->request->getRemoteAddress())) {
-			Worker::add(Worker::PRIORITY_HIGH, 'SendPasswordResetLink', trim($loginame));
+			$this->resetLinkSender->send(trim($loginame));
 		}
 
+		// The same answer for every login, so it doesn't reveal if the account exists
 		$this->result = $this->l10n->t('If the account exists, a message with a password reset link has been sent to its email address.');
 	}
 
