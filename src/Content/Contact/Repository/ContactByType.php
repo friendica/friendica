@@ -95,9 +95,9 @@ class ContactByType
 		);
 
 		$stmtContacts = $this->database->p(
-			"SELECT `contact`.`id`, `contact`.`name`, COUNT(*) AS `count` FROM `post-user-view`
-				INNER JOIN `contact` ON `post-user-view`.`contact-id` = `contact`.`id`
-				WHERE `post-user-view`.`uid` = ? AND `post-user-view`.`visible` AND NOT `post-user-view`.`deleted` AND `post-user-view`.`unseen`
+			"SELECT `contact`.`id`, `contact`.`name`, COUNT(*) AS `count` FROM `contact`
+				INNER JOIN `post-user` ON `post-user`.`contact-id` = `contact`.`id`
+				WHERE `post-user`.`uid` = ? AND `post-user`.`unseen` AND `post-user`.`visible` AND NOT `post-user`.`deleted`
 				AND `contact`.`network` IN (?, ?) AND `contact`.`contact-type` IN (" . $typePlaceholders . ")
 				AND NOT `contact`.`blocked` AND NOT `contact`.`hidden`
 				AND NOT `contact`.`pending` AND NOT `contact`.`archive`
