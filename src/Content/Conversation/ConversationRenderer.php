@@ -567,6 +567,19 @@ final readonly class ConversationRenderer
 	}
 
 	/**
+	 * Reloaded content ("mode=raw") is marked with "column" by main.js, since the mode is already used.
+	 * The checkboxes for deleting several posts are not shown in the columns of the deck.
+	 */
+	private function isPageDropEnabled(int $uid): bool
+	{
+		if (!$uid || ($_GET['mode'] ?? '') === 'column' || !empty($_GET['column'])) {
+			return false;
+		}
+
+		return (bool) $this->pConfig->get($uid, 'system', 'show_page_drop', true);
+	}
+
+	/**
 	 * Whether clicking a post's body should open its own page instead of the
 	 * usual in-feed behavior. Only takes effect together with the compact or
 	 * hidden comments modes; with all comments shown, it has no purpose.
@@ -576,18 +589,6 @@ final readonly class ConversationRenderer
 	 * @param bool $commentsAlwaysHidden Whether the list never shows any comments
 	 * @return bool
 	 */
-	/**
-	 * The checkboxes for deleting several posts are not shown in the columns of the deck.
-	 */
-	private function isPageDropEnabled(int $uid): bool
-	{
-		if (!$uid || ($_GET['mode'] ?? '') === 'column') {
-			return false;
-		}
-
-		return (bool) $this->pConfig->get($uid, 'system', 'show_page_drop', true);
-	}
-
 	private function isClickToDisplayEnabled(int $uid, bool $commentsAlwaysHidden = false): bool
 	{
 		if (!$uid) {

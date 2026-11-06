@@ -1539,6 +1539,7 @@ function loadMoreComments(uriId, itemId, existing) {
 		url: 'item/' + uriId + '/comments',
 		data: {
 			'mode': 'raw',
+			'column': isColumnMode() ? 1 : 0,
 			'existing': existingArray.join(','),
 			'display': onDisplayPage() ? 1 : 0
 		}
@@ -1719,7 +1720,7 @@ function refreshItemActivity(itemId, data) {
 		return false;
 	}
 
-	$.get('item/' + data['uri-id'] + '/node', {'display': onDisplayPage() ? 1 : 0})
+	$.get('item/' + data['uri-id'] + '/node', {'column': isColumnMode() ? 1 : 0, 'display': onDisplayPage() ? 1 : 0})
 		.done(function(html) {
 			var $newArticle = $('<div>').append($.parseHTML(html)).find(item + ' > article.media').first();
 			if (!$newArticle.length) {
@@ -2152,6 +2153,7 @@ function loadScrollContent() {
 
 	var scrollData = {
 		'mode'          : 'raw',
+		'column'        : isColumnMode() ? 1 : 0,
 		'last_received' : received,
 		'last_commented': commented,
 		'last_created'  : created,
