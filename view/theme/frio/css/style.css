@@ -4871,3 +4871,11 @@ div.login-form, .login-content-wrapper,
 .posts-filter {
 	margin: 10px 0;
 }
+@media (max-width: 767px) {
+	/* Narrow layouts (mobile, deck columns): use less padding so that more filters fit into one line */
+	.posts-filter .nav-tabs > li > a {
+		padding-left: 8px;
+		padding-right: 8px;
+		margin-right: 0;
+	}
+}
