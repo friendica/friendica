@@ -26,6 +26,17 @@
 		window.parent.postMessage(Object.assign({ friendicaColumns: true }, message), window.location.origin);
 	}
 
+	// Used by main.js for posts that open on click: opens the url in a new column
+	window.columnFrameOpen = function (href) {
+		const url = new URL(href, document.baseURI);
+		if (url.origin !== window.location.origin) {
+			return false;
+		}
+		url.searchParams.delete("mode");
+		post({ action: "open", url: url.pathname + url.search });
+		return true;
+	};
+
 	// Links stay in the column when they lead to the same module, otherwise they open in a new column.
 	window.addEventListener("click", function (e) {
 		if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {

@@ -1500,6 +1500,10 @@ $(document).on('click', '.click-to-display[data-display-url]', function(event) {
 		window.open(url, '_blank');
 		return;
 	}
+	// Inside a deck column the post opens in a new column (see column-frame.js)
+	if (typeof window.columnFrameOpen === 'function' && window.columnFrameOpen(url)) {
+		return;
+	}
 	if (typeof window.up !== 'undefined' && typeof up.visit === 'function') {
 		up.error.muteUncriticalRejection(up.visit(url));
 		return;
