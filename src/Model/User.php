@@ -52,6 +52,9 @@ class User
 	 *
 	 * @{
 	 */
+	/** Personal config and session key of the random value that a password change renews */
+	public const PASSWORD_GENERATION = 'password_generation';
+
 	public const PAGE_FLAGS_NORMAL    = 0;
 	public const PAGE_FLAGS_SOAPBOX   = 1;
 	public const PAGE_FLAGS_COMMUNITY = 2;
@@ -1055,7 +1058,60 @@ class User
 			throw new Exception(DI::l10n()->t("The password can't contain white spaces nor accentuated letters"));
 		}
 
-		return self::updatePasswordHashed($uid, self::hashPassword($password));
+		if (!self::updatePasswordHashed($uid, self::hashPassword($password))) {
+			return false;
+		}
+
+		// Sessions with another generation are logged out, only the current session stays valid
+		$generation = Strings::getRandomHex(16);
+		DI::pConfig()->set($uid, 'system', self::PASSWORD_GENERATION, $generation);
+		if (DI::userSession()->getLocalUserId() === $uid) {
+			DI::userSession()->set(self::PASSWORD_GENERATION, $generation);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns the account a password reset can be requested for
+	 *
+	 * @param string $login Email address or nickname
+	 * @return array{uid: int, username: string, nickname: string, email: string, language: string}|null
+	 */
+	public static function getForPasswordReset(string $login): ?array
+	{
+		$condition = ['(`email` = ? OR `nickname` = ?) AND `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`', $login, $login];
+		$user      = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'language'], $condition);
+
+		return DBA::isResult($user) ? $user : null;
+	}
+
+	/**
+	 * Returns the account a password reset token belongs to
+	 *
+	 * @return array{uid: int, username: string, nickname: string, email: string, pwdreset_time: string, language: string}|null
+	 */
+	public static function getByPasswordResetToken(string $tokenHash): ?array
+	{
+		$user = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'pwdreset_time', 'language'], ['pwdreset' => $tokenHash]);
+
+		return DBA::isResult($user) ? $user : null;
+	}
+
+	/**
+	 * Removes the password reset token of an account
+	 */
+	public static function clearPasswordResetToken(int $uid): bool
+	{
+		return DBA::update('user', ['pwdreset' => null, 'pwdreset_time' => null], ['uid' => $uid]);
+	}
+
+	/**
+	 * Stores the hash of a new password reset token
+	 */
+	public static function setPasswordResetToken(int $uid, string $tokenHash): bool
+	{
+		return DBA::update('user', ['pwdreset' => $tokenHash, 'pwdreset_time' => DateTimeFormat::utcNow()], ['uid' => $uid]);
 	}
 
 	/**
