@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Test\Functional\Model;
 
+use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -28,6 +29,21 @@ class EmojiReactionTest extends FixtureTestCase
 	private function getReactions(): array
 	{
 		return array_column(Counts::getReactions(self::URI_ID, self::UID), 'count', 'name');
+	}
+
+	private function getStoredCount(string $reaction): ?int
+	{
+		$counts = DBA::selectFirst('post-counts', ['count'], ['uri-id' => self::URI_ID, 'reaction' => $reaction]);
+		return DBA::isResult($counts) ? (int) $counts['count'] : null;
+	}
+
+	public function testPrivateReactionKeepsCountEntry(): void
+	{
+		self::assertTrue(Item::performActivity(self::ITEM_ID, 'react', self::UID, '<43>', null, null, null, '🔥'));
+		self::assertSame(0, $this->getStoredCount('🔥'));
+
+		self::assertTrue(Item::performActivity(self::ITEM_ID, 'unreact', self::UID, null, null, null, null, '🔥'));
+		self::assertNull($this->getStoredCount('🔥'));
 	}
 
 	public function testDifferentEmojisAreDistinct(): void

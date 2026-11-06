@@ -36,7 +36,7 @@ class Counts
 			return true;
 		}
 
-		$condition = ['thr-parent-id' => $uri_id, 'vid' => $vid, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]];
+		$condition = ['thr-parent-id' => $uri_id, 'vid' => $vid, 'deleted' => false];
 
 		if ($body == $verb) {
 			$condition['body'] = null;
@@ -55,10 +55,9 @@ class Counts
 			'vid'           => $vid,
 			'reaction'      => $body,
 			'parent-uri-id' => $parent_uri_id,
-			'count'         => Post::countPosts($condition),
+			'count'         => Post::countPosts(DBA::mergeConditions($condition, ['private' => [Item::PUBLIC, Item::UNLISTED]])),
 		];
 
-		unset($condition['private']);
 		if ($fields['count'] === 0 && Post::countPosts($condition) === 0) {
 			DBA::delete('post-counts', ['uri-id' => $uri_id, 'vid' => $vid, 'reaction' => $body]);
 			return true;
@@ -71,7 +70,7 @@ class Counts
 	{
 		self::update($uri_id, $parent_uri_id, Verb::getID(Activity::POST), Activity::POST);
 
-		$activities = DBA::p("SELECT `parent-uri-id`, `vid`, `verb`, `body` FROM `post-view` WHERE `thr-parent-id` = ? AND `gravity` = ? AND `vid` IS NOT NULL GROUP BY `parent-uri-id`, `vid`, `verb`, `body`", $uri_id, Item::GRAVITY_ACTIVITY);
+		$activities = DBA::p("SELECT DISTINCT `parent-uri-id`, `vid`, `verb`, BINARY `body` AS `body` FROM `post-view` WHERE `thr-parent-id` = ? AND `gravity` = ? AND `vid` IS NOT NULL", $uri_id, Item::GRAVITY_ACTIVITY);
 		while ($activity = DBA::fetch($activities)) {
 			self::update($uri_id, $activity['parent-uri-id'], $activity['vid'], $activity['verb'], $activity['body']);
 		}

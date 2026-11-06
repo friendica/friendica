@@ -22,6 +22,7 @@ use Friendica\Model\Tag;
 use Friendica\Model\Verb;
 use Friendica\Protocol\ActivityPub\Processor;
 use Friendica\Protocol\ActivityPub\Receiver;
+use Friendica\Util\EmojiReaction;
 use Friendica\Util\JsonLD;
 use Friendica\Util\Strings;
 use GuzzleHttp\Psr7\Uri;
@@ -37,7 +38,7 @@ class PostUpdate
 	// Needed for the helper function to read from the legacy term table
 	public const OBJECT_TYPE_POST = 1;
 
-	public const VERSION = 1550;
+	public const VERSION = 1604;
 
 	/**
 	 * Calls the post update functions
@@ -114,6 +115,9 @@ class PostUpdate
 			return false;
 		}
 		if (!self::update1550()) {
+			return false;
+		}
+		if (!self::update1604()) {
 			return false;
 		}
 		return true;
@@ -1435,6 +1439,65 @@ class PostUpdate
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1550);
+			DI::logger()->info('Done');
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Recreate the "post-counts" entries of posts that only have private emoji reactions.
+	 * These entries had been removed, so that the reactions weren't displayed.
+	 *
+	 * @return bool "true" when the job is done
+	 */
+	private static function update1604()
+	{
+		// Was the script completed?
+		if (DI::keyValue()->get('post_update_version') >= 1604) {
+			return true;
+		}
+
+		$id = (int) (DI::keyValue()->get('post_update_version_1604_id') ?? 0);
+		if ($id == 0) {
+			$post = Post::selectFirstPost(['uri-id'], [], ['order' => ['uri-id' => true]]);
+			$id   = (int) ($post['uri-id'] ?? 0) + 1;
+		}
+
+		DI::logger()->info('Start', ['uri-id' => $id]);
+
+		$rows = 0;
+
+		$condition  = ["`uri-id` < ? AND `gravity` = ? AND `private` = ? AND `body` != ? AND NOT `deleted`", $id, Item::GRAVITY_ACTIVITY, Item::PRIVATE, ''];
+		$activities = Post::selectPosts(['uri-id', 'thr-parent-id', 'parent-uri-id', 'body'], $condition, ['order' => ['uri-id' => true], 'limit' => 1000]);
+
+		if (DBA::errorNo() != 0) {
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			return false;
+		}
+
+		$posts = [];
+
+		while ($activity = Post::fetch($activities)) {
+			$id = $activity['uri-id'];
+			if (EmojiReaction::isReaction($activity['body'])) {
+				$posts[$activity['thr-parent-id']] = $activity['parent-uri-id'];
+			}
+			++$rows;
+		}
+		DBA::close($activities);
+
+		foreach ($posts as $uri_id => $parent_uri_id) {
+			Counts::updateForPost($uri_id, $parent_uri_id);
+		}
+
+		DI::keyValue()->set('post_update_version_1604_id', $id);
+
+		DI::logger()->info('Processed', ['rows' => $rows, 'last' => $id]);
+
+		if ($rows <= 100) {
+			DI::keyValue()->set('post_update_version', 1604);
 			DI::logger()->info('Done');
 			return true;
 		}
