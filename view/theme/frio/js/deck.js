@@ -301,6 +301,24 @@
 		return column;
 	}
 
+	/** Updates the notification counters of the navigation and the columns that show notifications. */
+	function refreshNotifications() {
+		if (typeof window.NavUpdate === "function") {
+			window.NavUpdate();
+		}
+
+		columns.forEach(function (column) {
+			try {
+				const frameWindow = column.frame.contentWindow;
+				if (frameWindow.document.getElementById("live-notifications") && typeof frameWindow.triggerLiveUpdates === "function") {
+					frameWindow.triggerLiveUpdates(true);
+				}
+			} catch (e) {
+				// Frame not accessible, it is updated with its next load.
+			}
+		});
+	}
+
 	/** Adds a column, directly right of "after" if given, at the end otherwise. */
 	function add(path, titleText, after) {
 		const url = normalize(path);
@@ -309,6 +327,10 @@
 		}
 
 		const column = createColumn({ url: url, title: titleText, pending: true });
+		if (/\/(notification|notify)\/\d+$/.test(url.split("?")[0])) {
+			// Opening the target marks the notification as seen, so show that right away
+			column.frame.addEventListener("load", refreshNotifications, { once: true });
+		}
 		const index = after ? columns.indexOf(after) + 1 : columns.length;
 		columns.splice(index, 0, column);
 		scroller.insertBefore(column.element, scroller.children[index] || null);
