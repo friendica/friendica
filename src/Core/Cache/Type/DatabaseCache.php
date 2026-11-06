@@ -11,6 +11,7 @@ use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Enum;
 use Friendica\Core\Cache\Exception\CachePersistenceException;
 use Friendica\Database\Database;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -65,7 +66,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 	{
 		try {
 			$cache = $this->dba->selectFirst('cache', ['v'], [
-				'`k` = ? AND (`expires` >= ? OR `expires` = -1)', $key, DateTimeFormat::utcNow(),
+				'`k` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow(),
 			]);
 
 			if ($this->dba->isResult($cache)) {
@@ -101,7 +102,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 			} else {
 				$fields = [
 					'v'       => serialize($value),
-					'expires' => -1,
+					'expires' => DBA::MAX_DATETIME,
 					'updated' => DateTimeFormat::utcNow(),
 				];
 			}
