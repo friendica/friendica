@@ -11,6 +11,7 @@ use Dice\Dice;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Model\Contact;
 use Friendica\Test\DatabaseTestCase;
 use Friendica\Test\Util\Database\StaticDatabase;
 use Friendica\Worker\ExpirePosts;
@@ -104,6 +105,20 @@ class ExpirePostsTest extends DatabaseTestCase
 		self::assertFalse(DBA::exists('item-uri', ['id' => 9008]));
 	}
 
+	public function testExpiredThreadWithNotifyingContactIsKept(): void
+	{
+		$this->insertThread(9009, 9109, false);
+		$this->insertNotifyingPost(9009, 9209, Contact::NOTIFY_NEW_POSTS_POSTS);
+		$this->insertThread(9010, 9110, false);
+		$this->insertNotifyingPost(9010, 9210, Contact::NOTIFY_NEW_POSTS_NONE);
+
+		DBA::e('SET FOREIGN_KEY_CHECKS = 1');
+		$this->runExpiry();
+
+		self::assertTrue(DBA::exists('item-uri', ['id' => 9009]));
+		self::assertFalse(DBA::exists('item-uri', ['id' => 9010]));
+	}
+
 	private function runExpiry(): void
 	{
 		$method = new \ReflectionMethod(ExpirePosts::class, 'deleteExpiredExternalPosts');
@@ -145,6 +160,16 @@ class ExpirePostsTest extends DatabaseTestCase
 		}
 		DBA::insert('post', ['uri-id' => $uriId, 'parent-uri-id' => $uriId, 'thr-parent-id' => $uriId, 'received' => self::OLD]);
 		DBA::insert('post-quote', ['uri-id' => $uriId, 'quote-uri-id' => $quotedUriId]);
+	}
+
+	private function insertNotifyingPost(int $uriId, int $contactId, int $notifyNewPosts): void
+	{
+		$this->insertContact($contactId, 0);
+		DBA::update('contact', ['notify_new_posts' => $notifyNewPosts], ['id' => $contactId]);
+		DBA::insert('post-user', [
+			'uri-id'   => $uriId, 'parent-uri-id' => $uriId, 'thr-parent-id' => $uriId, 'uid' => 1, 'gravity' => 0, 'contact-id' => $contactId,
+			'owner-id' => $contactId, 'author-id' => $contactId, 'received' => self::OLD,
+		]);
 	}
 
 	private function insertUnclaimed(int $uriId, int $contactId, bool $contactUsesUri): void
