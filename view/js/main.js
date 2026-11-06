@@ -984,6 +984,10 @@ function getUpdateUrl(src)
 
 	var update_url = src + udargs + '&p=' + profile_uid + '&force=1&item=' + update_item;
 
+	if (isColumnMode()) {
+		update_url += '&column=1';
+	}
+
 	if (getUrlParameter('page')) {
 		update_url += '&page=' + getUrlParameter('page');
 	}
