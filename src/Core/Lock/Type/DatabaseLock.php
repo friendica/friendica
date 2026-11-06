@@ -176,7 +176,7 @@ class DatabaseLock extends AbstractLock
 			if (empty($prefix)) {
 				$where = ['`expires` >= ?', DateTimeFormat::utcNow()];
 			} else {
-				$where = ['`expires` >= ? AND `name` LIKE CONCAT(?, \'%\')', DateTimeFormat::utcNow(), $prefix];
+				$where = ['`expires` >= ? AND `name` LIKE ?', DateTimeFormat::utcNow(), $prefix . '%'];
 			}
 
 			$stmt = $this->dba->select('locks', ['name'], $where);
