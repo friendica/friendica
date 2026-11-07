@@ -496,7 +496,13 @@ window.onDocumentReady('body', function() {
 						});
 						notification['url'] = navNotif.href;
 						notification.addEventListener("click", function(ev) {
-							window.location = ev.target.url;
+							// In the deck the target opens in a new column instead of replacing the deck
+							if (typeof window.deckOpen === 'function') {
+								window.deckOpen(ev.target.url);
+								window.focus();
+							} else {
+								window.location = ev.target.url;
+							}
 						});
 					}
 				}

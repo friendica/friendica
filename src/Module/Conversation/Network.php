@@ -464,7 +464,7 @@ class Network extends Timeline
 		}
 
 		// The columns of the deck must not overwrite what the single view remembers
-		$isColumn = ($request['mode'] ?? '') === 'column';
+		$isColumn = ($request['mode'] ?? '') === 'column' || !empty($request['column']);
 
 		if (!$isColumn) {
 			$this->session->set('network-tab', $this->selectedTab);

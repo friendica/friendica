@@ -337,6 +337,9 @@
 		column.element.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
 	}
 
+	// Used by main.js to open the target of a desktop notification in the deck instead of leaving it
+	window.deckOpen = add;
+
 	function closeCompose() {
 		window.jQuery(composeModal).modal("hide");
 		composeFrame.src = "about:blank";
