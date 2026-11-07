@@ -301,6 +301,24 @@
 		return column;
 	}
 
+	/** Updates the notification counters of the navigation and the columns that show notifications. */
+	function refreshNotifications() {
+		if (typeof window.NavUpdate === "function") {
+			window.NavUpdate();
+		}
+
+		columns.forEach(function (column) {
+			try {
+				const frameWindow = column.frame.contentWindow;
+				if (frameWindow.document.getElementById("live-notifications") && typeof frameWindow.triggerLiveUpdates === "function") {
+					frameWindow.triggerLiveUpdates(true);
+				}
+			} catch (e) {
+				// Frame not accessible, it is updated with its next load.
+			}
+		});
+	}
+
 	/** Adds a column, directly right of "after" if given, at the end otherwise. */
 	function add(path, titleText, after) {
 		const url = normalize(path);
@@ -309,11 +327,18 @@
 		}
 
 		const column = createColumn({ url: url, title: titleText, pending: true });
+		if (/\/(notification|notify)\/\d+$/.test(url.split("?")[0])) {
+			// Opening the target marks the notification as seen, so show that right away
+			column.frame.addEventListener("load", refreshNotifications, { once: true });
+		}
 		const index = after ? columns.indexOf(after) + 1 : columns.length;
 		columns.splice(index, 0, column);
 		scroller.insertBefore(column.element, scroller.children[index] || null);
 		column.element.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
 	}
+
+	// Used by main.js to open the target of a desktop notification in the deck instead of leaving it
+	window.deckOpen = add;
 
 	function closeCompose() {
 		window.jQuery(composeModal).modal("hide");
@@ -326,6 +351,35 @@
 		composeFrame.src = frameUrl(this.dataset.composeUrl);
 		window.jQuery(composeModal).modal("show");
 	});
+
+	// The entries of the notification menu in the navigation (which is part of this page, not of a column)
+	// keep their /notification/<id> link, since that marks them as seen, but open the target in a new column.
+	// The redirect of that module keeps the column mode.
+	// Capturing, since the popup menus stop the propagation of clicks (see main.js) and Unpoly would follow the link.
+	document.addEventListener("click", function (e) {
+		if (e.defaultPrevented || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
+			return;
+		}
+
+		const link = e.target.closest ? e.target.closest("#nav-notifications-menu a[href]") : null;
+		if (!link) {
+			return;
+		}
+
+		const url = normalize(link.href);
+		if (!url || !/\/(notification|notify)\/\d+$/.test(url.split("?")[0])) {
+			return;
+		}
+
+		e.preventDefault();
+		e.stopPropagation();
+		add(url);
+		// Close the dropdown, since the click doesn't reach Bootstrap
+		const dropdown = link.closest(".dropdown");
+		if (dropdown && dropdown.classList.contains("open")) {
+			window.jQuery(dropdown).find("[data-toggle=dropdown]").first().dropdown("toggle");
+		}
+	}, true);
 
 	window.addEventListener("message", function (e) {
 		if (e.origin !== window.location.origin || !e.data || !e.data.friendicaColumns) {

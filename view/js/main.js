@@ -496,7 +496,13 @@ window.onDocumentReady('body', function() {
 						});
 						notification['url'] = navNotif.href;
 						notification.addEventListener("click", function(ev) {
-							window.location = ev.target.url;
+							// In the deck the target opens in a new column instead of replacing the deck
+							if (typeof window.deckOpen === 'function') {
+								window.deckOpen(ev.target.url);
+								window.focus();
+							} else {
+								window.location = ev.target.url;
+							}
 						});
 					}
 				}
@@ -983,6 +989,10 @@ function getUpdateUrl(src)
 	var udargs = ((netargs.length) ? '/' + netargs : '');
 
 	var update_url = src + udargs + '&p=' + profile_uid + '&force=1&item=' + update_item;
+
+	if (isColumnMode()) {
+		update_url += '&column=1';
+	}
 
 	if (getUrlParameter('page')) {
 		update_url += '&page=' + getUrlParameter('page');

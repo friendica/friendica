@@ -21,6 +21,7 @@ use Friendica\Navigation\Notifications\Factory;
 use Friendica\Navigation\Notifications\Repository;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
+use GuzzleHttp\Psr7\Uri;
 use Psr\Log\LoggerInterface;
 
 class Notification extends BaseModule
@@ -145,11 +146,7 @@ class Notification extends BaseModule
 			$this->notificationRepo->setAllSeenForUser($Notify->uid, ['target-uri-id' => $Notify->uriId]);
 		}
 
-		if ((string) $Notify->link) {
-			System::externalRedirect($Notify->link);
-		}
-
-		$this->baseUrl->redirect();
+		$this->redirectToLink((string) $Notify->link);
 	}
 
 	private function handleNotification(int $notificationId)
@@ -173,10 +170,31 @@ class Notification extends BaseModule
 
 		$message = $this->notificationFactory->getMessageFromNotification($Notification);
 
-		if ($message['link']) {
-			System::externalRedirect($message['link']);
+		$this->redirectToLink((string) ($message['link'] ?? ''));
+	}
+
+	/**
+	 * Keeps the column mode of the deck, so that the target opens in the column frame as well.
+	 */
+	private function keepColumnMode(string $link): string
+	{
+		if (($_GET['mode'] ?? '') !== 'column' || !$this->baseUrl->isLocalUrl($link)) {
+			return $link;
 		}
 
-		$this->baseUrl->redirect();
+		return (string) Uri::withQueryValue(new Uri($link), 'mode', 'column');
+	}
+
+	/**
+	 * Redirects to the given link, or to the network page if there is none.
+	 */
+	private function redirectToLink(string $link): void
+	{
+		if ($link !== '') {
+			System::externalRedirect($this->keepColumnMode($link));
+		}
+
+		// An empty target must not load the full page with the navigation inside a column
+		$this->baseUrl->redirect(($_GET['mode'] ?? '') === 'column' ? 'network?mode=column' : '');
 	}
 }
