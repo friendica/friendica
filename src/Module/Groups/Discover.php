@@ -72,14 +72,21 @@ class Discover extends BaseModule
 		$condition = $this->getCondition($uid, $gsid, $search);
 
 		$pager = new Pager($this->l10n, $this->args->getQueryString());
-		$total = $this->database->count('account-view', $condition);
+		$found = $this->database->selectToArray('account-view', ['id', 'last-item'], $condition);
+		$total = count($found);
 
-		$contacts = $this->database->selectToArray(
-			'account-view',
-			['id', 'url', 'addr', 'name', 'about', 'thumb', 'avatar', 'updated', 'gsid', 'last-item', 'manually-approve'],
-			$condition,
-			['order' => ['last-item' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]],
-		);
+		usort($found, static fn (array $a, array $b): int => strcmp((string) $b['last-item'], (string) $a['last-item']));
+		$ids = array_column(array_slice($found, $pager->getStart(), $pager->getItemsPerPage()), 'id');
+
+		$contacts = [];
+		if (!empty($ids)) {
+			$contacts = $this->database->selectToArray(
+				'account-view',
+				['id', 'url', 'addr', 'name', 'about', 'thumb', 'avatar', 'updated', 'gsid', 'last-item', 'manually-approve'],
+				['id'    => $ids],
+				['order' => ['last-item' => true]],
+			);
+		}
 
 		$servers = $gsid ? [] : $this->groupManager->getServers(array_column($contacts, 'gsid'));
 
@@ -91,7 +98,7 @@ class Discover extends BaseModule
 				'id'      => $contact['id'],
 				'link'    => $this->groupManager->getLink($contact),
 				'name'    => $contact['name'],
-				'thumb'   => Contact::getThumb($contact),
+				'thumb'   => Contact::getThumb($contact, true),
 				'about'   => Plaintext::shorten(BBCode::toPlaintext($contact['about'], false), 200),
 				'server'  => $gsid ? '' : $this->groupManager->getServerDescription($servers[$contact['gsid']] ?? [], $host)['name'],
 				'host'    => $host,

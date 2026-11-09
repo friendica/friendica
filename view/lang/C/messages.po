@@ -2740,7 +2740,7 @@ msgid "Examples: Robert Morgenstein, Fishing"
 msgstr ""
 
 #: src/Content/Widget.php:73 src/Module/Contact.php:450
-#: src/Module/Directory.php:81 src/Module/Groups/Discover.php:118
+#: src/Module/Directory.php:81 src/Module/Groups/Discover.php:125
 #: view/theme/vier/theme.php:184
 msgid "Find"
 msgstr ""
@@ -7821,7 +7821,7 @@ msgstr ""
 msgid "No posts yet"
 msgstr ""
 
-#: src/Module/Groups.php:107 src/Module/Groups/Discover.php:109
+#: src/Module/Groups.php:107 src/Module/Groups/Discover.php:116
 msgid "Discover groups"
 msgstr ""
 
@@ -7841,28 +7841,28 @@ msgstr ""
 msgid "Server not found."
 msgstr ""
 
-#: src/Module/Groups/Discover.php:106
+#: src/Module/Groups/Discover.php:113
 #, php-format
 msgid "Discover groups on %s"
 msgstr ""
 
-#: src/Module/Groups/Discover.php:119
+#: src/Module/Groups/Discover.php:126
 msgid "Search in name and description"
 msgstr ""
 
-#: src/Module/Groups/Discover.php:122
+#: src/Module/Groups/Discover.php:129
 msgid "Latest activity"
 msgstr ""
 
-#: src/Module/Groups/Discover.php:124
+#: src/Module/Groups/Discover.php:131
 msgid "Membership requires approval"
 msgstr ""
 
-#: src/Module/Groups/Discover.php:125
+#: src/Module/Groups/Discover.php:132
 msgid "No groups found."
 msgstr ""
 
-#: src/Module/Groups/Discover.php:125
+#: src/Module/Groups/Discover.php:132
 msgid "No further groups are known."
 msgstr ""
 

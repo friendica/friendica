@@ -239,9 +239,10 @@ class GroupManager
 		}
 		$this->database->close($posts);
 
-		// The global copy has no seen state, so the unread posts are counted on the copy of the user
+		// The global copy has no seen state, so the unread posts are counted on the copy of the user.
+		// The index is given explicitly, since the database otherwise walks through all unread posts of the user.
 		$unread = $this->database->p(
-			"SELECT `parent-uri-id`, COUNT(*) AS `unread` FROM `post-user`
+			"SELECT `parent-uri-id`, COUNT(*) AS `unread` FROM `post-user` USE INDEX (`parent-uri-id_uid`)
 				WHERE `uid` = ? AND `unseen` AND `visible` AND NOT `deleted` AND `gravity` IN (" . $gravityPlaceholders . ")
 				AND `parent-uri-id` IN (" . $parentPlaceholders . ")
 				GROUP BY `parent-uri-id`",
@@ -335,7 +336,7 @@ class GroupManager
 	public function getLink(array $contact): string
 	{
 		$id = (string) $contact['addr'] ?: (string) $contact['id'];
-		if (Contact::isLocal($contact['url'])) {
+		if ($this->baseUrl->isLocalUrl($contact['url'])) {
 			$id = strstr($id, '@', true) ?: $id;
 		}
 
