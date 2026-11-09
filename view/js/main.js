@@ -1064,10 +1064,15 @@ function liveUpdate(src, force, guid) {
 		force_update = false;
 	}
 
-	showFetching();
+	var showIndicator = !!(force || guid);
+	if (showIndicator) {
+		showFetching();
+	}
 	$.get('update_' + update_url)
 		.done(function(data) {
-			showProcessing();
+			if (showIndicator) {
+				showProcessing();
+			}
 			in_progress = false;
 			update_item = 0;
 
@@ -1114,7 +1119,9 @@ function liveUpdate(src, force, guid) {
 		})
 		.always(function() {
 			in_progress = false;
-			hideLoading();
+			if (showIndicator) {
+				hideLoading();
+			}
 		});
 }
 
