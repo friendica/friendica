@@ -49,15 +49,7 @@ class BaseApiTest extends TestCase
 			'instanceOf' => EventDispatcher::class,
 			'shared'     => true,
 		]);
-
-		$config = $this->createStub(IManageConfigValues::class);
-		$config->method('get')->willReturn(null);
-
-		$diceMock = $this->createMock(Dice::class);
-		$diceMock->method('create')->willReturnCallback(
-			static fn (string $name, array $args = [], array $share = []) => $name === IManageConfigValues::class ? $config : $dice->create($name, $args, $share),
-		);
-		DI::init($diceMock, true);
+		DI::init($dice, true);
 
 		$args = $this->createMock(App\Arguments::class);
 		$args->method('getQueryString')->willReturn('api/test');
@@ -70,6 +62,7 @@ class BaseApiTest extends TestCase
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(App\BaseURL::class),
 			$this->createStub(TwitterUser::class),
+			$this->createStub(IManageConfigValues::class),
 		);
 
 		return $this->getMockBuilder(BaseApi::class)

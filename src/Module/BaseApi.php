@@ -138,7 +138,7 @@ abstract class BaseApi extends BaseModule
 	 */
 	private function saveProfilingLog(): void
 	{
-		$limit = (float) DI::config()->get('system', 'api_profiler_limit');
+		$limit = $this->response->getProfilerLimit();
 		if ($limit > 0 && (microtime(true) - $this->profiler->get('start')) < $limit) {
 			return;
 		}

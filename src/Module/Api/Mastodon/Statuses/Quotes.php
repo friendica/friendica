@@ -7,16 +7,30 @@
 
 namespace Friendica\Module\Api\Mastodon\Statuses;
 
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\AppHelper;
+use Friendica\Content\Conversation\PostInteractions;
+use Friendica\Core\L10n;
 use Friendica\Database\DBA;
-use Friendica\DI;
+use Friendica\Factory\Api\Mastodon\Error;
+use Friendica\Factory\Api\Mastodon\Status;
 use Friendica\Model\Post;
+use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
+use Friendica\Util\Profiler;
+use Psr\Log\LoggerInterface;
 
 /**
  * @see https://docs.joinmastodon.org/methods/statuses/#quotes
  */
 class Quotes extends BaseApi
 {
+	public function __construct(private readonly PostInteractions $postInteractions, private readonly Status $mstdnStatus, Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	{
+		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	}
+
 	/**
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
@@ -40,7 +54,7 @@ class Quotes extends BaseApi
 		}
 
 		// The quotes are selected like in the interaction lists of the web interface, so that visibility and blocked contacts are handled in the same way
-		$condition = DI::postInteractions()->getQuoteCondition($post['uri-id'], $uid);
+		$condition = $this->postInteractions->getQuoteCondition($post['uri-id'], $uid);
 
 		if (!empty($request['max_id'])) {
 			$condition = DBA::mergeConditions($condition, ["`uri-id` < ?", $request['max_id']]);
@@ -60,7 +74,7 @@ class Quotes extends BaseApi
 		foreach (array_column(Post::toArray(Post::selectPosts(['uri-id'], $condition, $params)), 'uri-id') as $uriId) {
 			self::setBoundaries($uriId);
 			try {
-				$statuses[] = DI::mstdnStatus()->createFromUriId($uriId, $uid);
+				$statuses[] = $this->mstdnStatus->createFromUriId($uriId, $uid);
 			} catch (\Exception $exception) {
 				$this->logger->info('Post not fetchable', ['uri-id' => $uriId, 'uid' => $uid, 'exception' => $exception]);
 			}
