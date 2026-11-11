@@ -240,9 +240,8 @@ class GroupManager
 		$this->database->close($posts);
 
 		// The global copy has no seen state, so the unread posts are counted on the copy of the user.
-		// The index is given explicitly, since the database otherwise walks through all unread posts of the user.
 		$unread = $this->database->p(
-			"SELECT `parent-uri-id`, COUNT(*) AS `unread` FROM `post-user` USE INDEX (`parent-uri-id_uid`)
+			"SELECT `parent-uri-id`, COUNT(*) AS `unread` FROM `post-user`
 				WHERE `uid` = ? AND `unseen` AND `visible` AND NOT `deleted` AND `gravity` IN (" . $gravityPlaceholders . ")
 				AND `parent-uri-id` IN (" . $parentPlaceholders . ")
 				GROUP BY `parent-uri-id`",

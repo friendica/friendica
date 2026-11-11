@@ -8,11 +8,8 @@
 namespace Friendica\Test\Functional\Content;
 
 use Friendica\Content\GroupManager;
-use Friendica\Core\Protocol;
-use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Test\FixtureTestCase;
-use Friendica\Util\Strings;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class GroupManagerTest extends FixtureTestCase
@@ -30,17 +27,6 @@ class GroupManagerTest extends FixtureTestCase
 			'addr' => 'localgroup@' . DI::baseUrl()->getHost(),
 		];
 
-		// Contact::isLocal() takes the base url from the public contact
-		DBA::insert('contact', [
-			'uid'     => 0,
-			'name'    => 'localgroup',
-			'nick'    => 'localgroup',
-			'url'     => $contact['url'],
-			'nurl'    => Strings::normaliseLink($contact['url']),
-			'baseurl' => (string) DI::baseUrl(),
-			'network' => Protocol::DFRN,
-		]);
-
 		self::assertSame('group/localgroup', $this->getGroupManager()->getLink($contact));
 	}
 
@@ -53,6 +39,18 @@ class GroupManagerTest extends FixtureTestCase
 		];
 
 		self::assertSame('group/remotegroup%40example.org', $this->getGroupManager()->getLink($contact));
+	}
+
+	public function testGetLinkForRemoteGroupOnHostStartingWithLocalHost(): void
+	{
+		$host    = DI::baseUrl()->getHost();
+		$contact = [
+			'id'   => 123,
+			'url'  => 'https://' . $host . '.example/c/remotegroup',
+			'addr' => 'remotegroup@' . $host . '.example',
+		];
+
+		self::assertSame('group/' . rawurlencode('remotegroup@' . $host . '.example'), $this->getGroupManager()->getLink($contact));
 	}
 
 	public function testGetLinkWithoutAddress(): void

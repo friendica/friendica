@@ -72,20 +72,22 @@ class Discover extends BaseModule
 		$condition = $this->getCondition($uid, $gsid, $search);
 
 		$pager = new Pager($this->l10n, $this->args->getQueryString());
-		$found = $this->database->selectToArray('account-view', ['id', 'last-item'], $condition);
-		$total = count($found);
+		$where = $condition;
+		$sql   = DBA::buildCondition($where);
 
-		usort($found, static fn (array $a, array $b): int => strcmp((string) $b['last-item'], (string) $a['last-item']));
-		$ids = array_column(array_slice($found, $pager->getStart(), $pager->getItemsPerPage()), 'id');
+		// The total is determined in the same scan, so that the matching accounts don't have to be loaded
+		$contacts = $this->database->toArray($this->database->p(
+			"SELECT `id`, `url`, `addr`, `name`, `about`, `thumb`, `avatar`, `updated`, `gsid`, `last-item`, `manually-approve`, COUNT(*) OVER () AS `total`
+				FROM `account-view`" . $sql . " ORDER BY `last-item` DESC LIMIT ?, ?",
+			...$where,
+			...[$pager->getStart(), $pager->getItemsPerPage()],
+		));
 
-		$contacts = [];
-		if (!empty($ids)) {
-			$contacts = $this->database->selectToArray(
-				'account-view',
-				['id', 'url', 'addr', 'name', 'about', 'thumb', 'avatar', 'updated', 'gsid', 'last-item', 'manually-approve'],
-				['id'    => $ids],
-				['order' => ['last-item' => true]],
-			);
+		if (!empty($contacts)) {
+			$total = (int) $contacts[0]['total'];
+		} else {
+			// Behind the last page the window function has no row to report the total
+			$total = $this->database->count('account-view', $condition);
 		}
 
 		$servers = $gsid ? [] : $this->groupManager->getServers(array_column($contacts, 'gsid'));
