@@ -15,10 +15,15 @@ use Friendica\Util\DateTimeFormat;
 class ExpireRenderedContent
 {
 	/**
-	 * Delete rendered content that hasn't been accessed for 30 days
+	 * Number of days after which rendered content that hasn't been accessed is deleted
+	 */
+	public const EXPIRE_DAYS = 30;
+
+	/**
+	 * Delete rendered content that hasn't been accessed for EXPIRE_DAYS days
 	 */
 	public static function execute(): void
 	{
-		DBA::delete('rendered-content', ["`last-access` < ?", DateTimeFormat::utc('now - 30 days', 'Y-m-d')]);
+		DBA::delete('rendered-content', ["`last-access` < ?", DateTimeFormat::utc('now - ' . self::EXPIRE_DAYS . ' days', 'Y-m-d')]);
 	}
 }

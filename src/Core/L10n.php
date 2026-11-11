@@ -85,6 +85,9 @@ class L10n
 	/** @var int Number of translation requests, see getTranslationCount() */
 	private int $translationCount = 0;
 
+	/** @var int Number of date/time formattings, see getDateFormatCount() */
+	private int $dateFormatCount = 0;
+
 	public function __construct(private IManageConfigValues $config, private Database $dba, private IHandleSessions $session, private array $server, array $get)
 	{
 		$this->loadTranslationTable(L10n::detectLanguage($server, $get, $this->config->get('system', 'language', self::DEFAULT)));
@@ -114,6 +117,20 @@ class L10n
 	public function getTranslationCount(): int
 	{
 		return $this->translationCount;
+	}
+
+	/**
+	 * Returns how often dates have been formatted so far
+	 *
+	 * The formatting depends on the time zone of the current session.
+	 * Compare the value before and after generating some output to find out whether the output contains
+	 * formatted dates and therefore depends on the viewer.
+	 *
+	 * @return int Number of calls of formatDateTime()
+	 */
+	public function getDateFormatCount(): int
+	{
+		return $this->dateFormatCount;
 	}
 
 	/**
@@ -790,6 +807,8 @@ class L10n
 	 */
 	public function formatDateTime(string $datestring, int $dateType, int $timeType, ?string $pattern = null): string
 	{
+		$this->dateFormatCount++;
+
 		$formatter = new IntlDateFormatter(
 			$this->normaliseLocale($this->session->get('language')),
 			$dateType,

@@ -669,6 +669,11 @@ abstract class DI
 		return self::$dice->create(Content\Text\RenderedContent::class);
 	}
 
+	public static function renderedContentRepository(): Content\Text\Repository\RenderedContent
+	{
+		return self::$dice->create(Content\Text\Repository\RenderedContent::class);
+	}
+
 	public static function postMediaRepository(): Content\Post\Repository\PostMedia
 	{
 		return self::$dice->create(Content\Post\Repository\PostMedia::class);

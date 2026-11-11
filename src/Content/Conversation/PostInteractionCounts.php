@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Content\Conversation;
 
-use Friendica\Database\DBA;
+use Friendica\Content\Conversation\Repository\InteractionCounts;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
@@ -25,6 +25,8 @@ use Friendica\Protocol\Activity;
  */
 final readonly class PostInteractionCounts
 {
+	public function __construct(private InteractionCounts $repository) {}
+
 	/**
 	 * Totals of reshares, likes and dislikes of a single post, as they are visible to the viewer
 	 *
@@ -67,7 +69,7 @@ final readonly class PostInteractionCounts
 			$emojis[$count['uri-id']][$count['reaction']]['self']  = false;
 		}
 
-		$activityVerbs = [
+		$verbs = [
 			Activity::LIKE,
 			Activity::DISLIKE,
 			Activity::ATTEND,
@@ -76,15 +78,12 @@ final readonly class PostInteractionCounts
 			Activity::ANNOUNCE,
 			Activity::VIEW,
 			Activity::READ,
+			Activity::EMOJIREACT,
+			Activity::POST,
 		];
-		$verbs     = array_merge($activityVerbs, [Activity::EMOJIREACT, Activity::POST]);
-		$condition = DBA::mergeConditions(array_merge(['parent-uri-id' => $uriIds, 'gravity' => [ItemModel::GRAVITY_ACTIVITY, ItemModel::GRAVITY_COMMENT], 'verb' => $verbs], $targetCondition), ["NOT `deleted`"]);
-		$condition = DBA::mergeConditions($condition, ["((`uid` = ? AND `global`) OR (`uid` = ? AND NOT `global`))", 0, $uid]);
-		$separator = chr(255) . chr(255) . chr(255);
-		$sql       = "SELECT `parent-uri-id`, `thr-parent-id`, `body`, `verb`, `gravity`, `private`, GROUP_CONCAT(REPLACE(`author-name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title`, MAX(`author-id` = ?) AS `self` FROM `post-user-view` WHERE " . array_shift($condition) . " GROUP BY `parent-uri-id`, `thr-parent-id`, `verb`, BINARY `body`, `gravity`, `private`";
 
-		$rows = DBA::p($sql, array_merge([(int) Contact::getPublicIdByUserId($uid)], $condition));
-		while ($row = DBA::fetch($rows)) {
+		$separator = $this->repository->getSeparator();
+		foreach ($this->repository->findActivities($uriIds, $uid, (int) Contact::getPublicIdByUserId($uid), $verbs, $targetUriIds) as $row) {
 			$emoji = $row['gravity'] === ItemModel::GRAVITY_ACTIVITY ? ($row['body'] ?: $row['verb']) : '';
 			if (!isset($emojis[$row['thr-parent-id']][$emoji]['title'])) {
 				continue;
@@ -104,7 +103,6 @@ final readonly class PostInteractionCounts
 				$emojis[$row['thr-parent-id']][$emoji]['self'] = true;
 			}
 		}
-		DBA::close($rows);
 
 		foreach ($emojis as $uriId => $row) {
 			foreach ($row as $emoji => $value) {
@@ -131,20 +129,12 @@ final readonly class PostInteractionCounts
 	 */
 	public function getQuoteShares(array $uriIds, int $uid): array
 	{
-		$condition = DBA::mergeConditions(['quote-uri-id' => $uriIds], ["NOT `quote-uri-id` IS NULL AND NOT `post`.`deleted` AND `post`.`private` IN (?, ?) AND NOT `contact`.`blocked`", ItemModel::PUBLIC, ItemModel::UNLISTED]);
-		if ($uid) {
-			$condition = DBA::mergeConditions($condition, ["NOT `post`.`author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored`))", $uid]);
-		}
-		$separator = chr(255) . chr(255) . chr(255);
-		$sql       = "SELECT `quote-uri-id`, COUNT(*) AS `total`, GROUP_CONCAT(REPLACE(`name`, '" . $separator . "', ' ') SEPARATOR '" . $separator . "' LIMIT 50) AS `title` FROM `post-quote` INNER JOIN `post` ON `post`.`uri-id` = `post-quote`.`uri-id` INNER JOIN `contact` ON `post`.`author-id` = `contact`.`id` WHERE " . array_shift($condition) . " GROUP BY `quote-uri-id`";
+		$separator = $this->repository->getSeparator();
 		$quotes    = [];
-
-		$rows = DBA::p($sql, $condition);
-		while ($row = DBA::fetch($rows)) {
+		foreach ($this->repository->findQuoteShares($uriIds, $uid) as $row) {
 			$quotes[$row['quote-uri-id']]['total'] = $row['total'];
 			$quotes[$row['quote-uri-id']]['title'] = array_unique(explode($separator, (string) $row['title']));
 		}
-		DBA::close($rows);
 
 		return $quotes;
 	}

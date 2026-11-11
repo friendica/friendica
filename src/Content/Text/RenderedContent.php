@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Friendica\Content\Text;
 
+use Friendica\Content\Text\Repository\RenderedContent as RenderedContentRepository;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
-use Friendica\Database\Database;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -26,7 +26,7 @@ class RenderedContent
 	 */
 	private const CACHED_MODES = [BBCode::INTERNAL, BBCode::EXTERNAL, BBCode::MASTODON_API];
 
-	public function __construct(private readonly Database $database, private readonly IManageConfigValues $config, private readonly L10n $l10n) {}
+	public function __construct(private readonly RenderedContentRepository $repository, private readonly IManageConfigValues $config, private readonly L10n $l10n) {}
 
 	/**
 	 * Converts a BBCode message for a given URI-ID to a HTML message and caches the result
@@ -38,38 +38,37 @@ class RenderedContent
 	 */
 	public function convert(?int $uriId, ?string $text, int $simpleHtml): string
 	{
-		if (!$uriId || ($text ?? '') === '' || !in_array($simpleHtml, self::CACHED_MODES, true)) {
+		if (!$uriId || ($text ?? '') === '' || !in_array($simpleHtml, self::CACHED_MODES, true) || $this->config->get('system', 'ignore_cache')) {
 			return BBCode::convertForUriId($uriId, $text, $simpleHtml);
 		}
 
-		$hash      = hash('md5', BBCode::VERSION . '::' . $text);
-		$condition = ['uri-id' => $uriId, 'mode' => $simpleHtml];
-		$today     = DateTimeFormat::utcNow('Y-m-d');
-		$lang      = $this->l10n->getCurrentLang();
+		$hash  = hash('md5', BBCode::VERSION . '::' . $text);
+		$today = DateTimeFormat::utcNow('Y-m-d');
+		$lang  = $this->l10n->getCurrentLang();
 
-		if (!$this->config->get('system', 'ignore_cache')) {
-			// The entry without a language is valid for every language, an entry with a language only for this language
-			$rendered = $this->database->selectFirst('rendered-content', ['lang', 'hash', 'html', 'last-access'], $condition + ['lang' => ['', $lang], 'hash' => $hash], ['order' => ['lang']]);
-			if (!empty($rendered) && ($rendered['html'] !== null)) {
-				// Only one write per day, so that reading doesn't cause a database write every time
-				if ($rendered['last-access'] !== $today) {
-					$this->database->update('rendered-content', ['last-access' => $today], $condition + ['lang' => $rendered['lang']]);
-				}
-				return $rendered['html'];
+		$rendered = $this->repository->find($uriId, $simpleHtml, $hash, $lang);
+		if ($rendered) {
+			// Only one write per day, so that reading doesn't cause a database write every time
+			if ($rendered['last-access'] !== $today) {
+				$this->repository->touch($uriId, $simpleHtml, $rendered['lang'], $today);
 			}
+			return $rendered['html'];
 		}
 
 		$translations = $this->l10n->getTranslationCount();
+		$dateFormats  = $this->l10n->getDateFormatCount();
 
 		$html = BBCode::convertForUriId($uriId, $text, $simpleHtml);
+
+		// Formatted dates depend on the time zone of the viewer, so the result is not stored.
+		if ($this->l10n->getDateFormatCount() !== $dateFormats) {
+			return $html;
+		}
 
 		// There is only one entry per language when the html contains translated texts, otherwise one entry is used for all languages.
 		$lang = ($this->l10n->getTranslationCount() === $translations) ? '' : $lang;
 
-		$this->database->insert('rendered-content', $condition + ['lang' => $lang, 'hash' => $hash, 'html' => $html, 'last-access' => $today], Database::INSERT_UPDATE);
-
-		// Entries for a previous version of the text are outdated
-		$this->database->delete('rendered-content', ["`uri-id` = ? AND `mode` = ? AND `hash` != ?", $uriId, $simpleHtml, $hash]);
+		$this->repository->save($uriId, $simpleHtml, $lang, $hash, $html, $today);
 
 		return $html;
 	}
