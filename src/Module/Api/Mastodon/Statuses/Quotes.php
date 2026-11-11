@@ -47,7 +47,12 @@ class Quotes extends BaseApi
 			'max_id'   => 0,  // Return results older than this ID
 			'since_id' => 0,  // Return results newer than this ID
 			'min_id'   => 0,  // Return results immediately newer than this ID
+			'offset'   => 0,  // Not part of the Mastodon API. Tusky sends the ID of the last loaded status here, so it is handled like "max_id".
 		], $request);
+
+		if (empty($request['max_id']) && empty($request['min_id']) && empty($request['since_id']) && !empty($request['offset'])) {
+			$request['max_id'] = $request['offset'];
+		}
 
 		if (!$post = Post::selectOriginal(['uri-id'], ['uri-id' => $this->parameters['id'], 'uid' => [0, $uid]])) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
