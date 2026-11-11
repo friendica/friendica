@@ -1,0 +1,91 @@
+# ejabberd config for local Friendica development and ExtAuth testing.
+#
+# Architecture (same-host / same-container production model — no bridge):
+#   ejabberd → php bin/console.php auth_ejabberd   (direct stdin/stdout)
+#
+# This image bundles the PHP CLI next to ejabberd (see ./Dockerfile), so ejabberd spawns
+# the Friendica auth daemon directly via Erlang open_port — exactly as it would on a host
+# where ejabberd and Friendica are installed side by side. No socat, no nc, no TCP bridge.
+# ejabberd keeps `extauth_pool_size` daemons alive and recycles one by closing its stdin,
+# upon which the daemon's read loop terminates naturally.
+#
+# The vhost "localhost" must match Friendica's SERVER_NAME (.docker/.dist.env).
+
+hosts:
+  - "localhost"
+
+loglevel: info
+
+listen:
+  - port: 5222
+    module: ejabberd_c2s
+    # TLS is optional; clients may connect plaintext for local testing.
+    starttls_required: false
+
+  - port: 5281
+    module: ejabberd_http
+    request_handlers:
+      /api: mod_http_api
+
+auth_method:
+  - external
+# Full path required: ejabberd spawns via Erlang open_port without a shell or PATH.
+# /usr/bin/php is the php85 CLI installed alongside ejabberd (see ./Dockerfile); the
+# Friendica code is mounted at /var/www/html (see compose.ejabberd.yaml).
+extauth_program: "/usr/bin/php /var/www/html/bin/console.php auth_ejabberd"
+extauth_pool_size: 3
+# Friendica supports per-account XMPP application passwords; ejabberd's auth cache would
+# silently break them, so it must stay disabled.
+auth_use_cache: false
+
+modules:
+  mod_adhoc: {}
+  mod_admin_extra: {}
+  mod_caps: {}
+  mod_carboncopy: {}
+  mod_client_state: {}
+  mod_configure: {}
+  mod_disco: {}
+  mod_http_api: {}
+  mod_last: {}
+  mod_mam:
+    default: always
+  mod_ping: {}
+  mod_roster: {}
+  mod_stream_mgmt: {}
+  mod_version:
+    show_os: false
+
+acl:
+  local:
+    user_regexp: ""
+
+access_rules:
+  c2s:
+    deny: blocked
+    allow: all
+  # Account creation happens in Friendica, not via XMPP registration.
+  register:
+    deny: all
+
+# Open HTTP API for local integration testing (check_password etc.).
+api_permissions:
+  "local":
+    from:
+      - mod_http_api
+    who:
+      ip: 0.0.0.0/0
+    what:
+      - "*"
+
+shaper:
+  normal:
+    rate: 3000
+    burst_size: 20000
+  fast: 100000
+
+shaper_rules:
+  max_user_sessions: 10
+  c2s_shaper:
+    none: admin
+    normal: all

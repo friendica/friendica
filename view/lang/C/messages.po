@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-04 08:20+0100\n"
+"POT-Creation-Date: 2026-11-11 23:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,8 +62,8 @@ msgstr ""
 #: src/Module/FollowConfirm.php:24 src/Module/FriendSuggest.php:44
 #: src/Module/Group.php:73 src/Module/Groups.php:50
 #: src/Module/Groups/Discover.php:56 src/Module/Invite.php:28
-#: src/Module/Invite.php:117 src/Module/Notifications/Notification.php:58
-#: src/Module/Notifications/Notification.php:89
+#: src/Module/Invite.php:117 src/Module/Notifications/Notification.php:59
+#: src/Module/Notifications/Notification.php:90
 #: src/Module/Photo/AlbumDownload.php:55 src/Module/Post/Edit.php:85
 #: src/Module/Profile/Common.php:52 src/Module/Profile/Contacts.php:52
 #: src/Module/Profile/Photos.php:73 src/Module/Profile/Schedule.php:27
@@ -467,7 +467,7 @@ msgstr ""
 msgid "Back to viewing"
 msgstr ""
 
-#: src/App.php:486
+#: src/App.php:446
 msgid "Apologies but the website is unavailable at the moment."
 msgstr ""
 
@@ -686,7 +686,7 @@ msgstr ""
 msgid "Following"
 msgstr ""
 
-#: src/BaseModule.php:515 src/Content/Widget.php:276 src/Model/User.php:1455
+#: src/BaseModule.php:515 src/Content/Widget.php:276 src/Model/User.php:1511
 #: src/Module/Contact.php:414
 msgid "Friends"
 msgstr ""
@@ -845,7 +845,7 @@ msgstr ""
 msgid "Enter user nickname: "
 msgstr ""
 
-#: src/Console/User.php:144 src/Model/User.php:918
+#: src/Console/User.php:144 src/Model/User.php:921
 #: src/Module/Api/Twitter/ContactEndpoint.php:72
 #: src/Module/Moderation/Users/Active.php:137
 #: src/Module/Moderation/Users/Blocked.php:136
@@ -859,7 +859,7 @@ msgid "Enter new password: "
 msgstr ""
 
 #: src/Console/User.php:172 src/Module/Security/PasswordTooLong.php:47
-#: src/Module/Settings/Account.php:59
+#: src/Module/Security/ResetPassword.php:71 src/Module/Settings/Account.php:59
 msgid "Password update failed. Please try again."
 msgstr ""
 
@@ -1139,7 +1139,7 @@ msgstr ""
 msgid "Delete Selected Items"
 msgstr ""
 
-#: src/Content/Conversation/ConversationRenderer.php:606
+#: src/Content/Conversation/ConversationRenderer.php:619
 msgid "remove"
 msgstr ""
 
@@ -1783,7 +1783,7 @@ msgstr ""
 #: src/Content/Conversation/PostTemplateBuilder.php:1084
 #: src/Content/Conversation/StatusEditor.php:164
 #: src/Content/Post/Entity/FileKind.php:144 src/Module/Item/Compose.php:184
-#: src/Module/Post/Edit.php:195 src/Module/Security/LoginCode.php:109
+#: src/Module/Post/Edit.php:195 src/Module/Security/LoginCode.php:112
 #: src/Module/Settings/Profile/Index.php:252
 msgid "Code"
 msgstr ""
@@ -2020,7 +2020,7 @@ msgstr ""
 #: src/Content/Feature.php:129 src/Content/GroupManager.php:116
 #: src/Content/Nav.php:249 src/Content/Nav.php:282
 #: src/Content/Text/HTML.php:902 src/Content/Widget.php:576
-#: src/Model/User.php:1469 src/Module/Groups.php:103
+#: src/Model/User.php:1525 src/Module/Groups.php:103
 msgid "Groups"
 msgstr ""
 
@@ -2287,7 +2287,7 @@ msgstr ""
 msgid "Search: @name, !group, #tags, content"
 msgstr ""
 
-#: src/Content/Nav.php:205 src/Module/Security/Login.php:159
+#: src/Content/Nav.php:205 src/Module/Security/Login.php:161
 #: src/Module/Security/TwoFactor/SignOut.php:114
 msgid "Sign out"
 msgstr ""
@@ -2297,7 +2297,9 @@ msgid "End this session"
 msgstr ""
 
 #: src/Content/Nav.php:207 src/Module/Bookmarklet.php:34
-#: src/Module/Security/Login.php:160 src/Module/Security/LoginCode.php:111
+#: src/Module/LostPass.php:92 src/Module/Security/Login.php:162
+#: src/Module/Security/LoginCode.php:114
+#: src/Module/Security/ResetPassword.php:86
 msgid "Sign in"
 msgstr ""
 
@@ -2342,18 +2344,18 @@ msgid "My profile"
 msgstr ""
 
 #: src/Content/Nav.php:226 src/Module/Group.php:197
-#: src/Module/Security/Login.php:124
+#: src/Module/Security/Login.php:126
 msgid "Register"
 msgstr ""
 
 #: src/Content/Nav.php:226 src/Module/Register.php:220
-#: src/Module/Security/Login.php:123
+#: src/Module/Security/Login.php:125
 msgid "Create an account"
 msgstr ""
 
 #: src/Content/Nav.php:232 src/Module/Help.php:42
 #: src/Module/Settings/TwoFactor/AppSpecific.php:130
-#: src/Module/Settings/TwoFactor/Index.php:125
+#: src/Module/Settings/TwoFactor/Index.php:127
 #: src/Module/Settings/TwoFactor/Recovery.php:96
 #: src/Module/Settings/TwoFactor/Verify.php:140 view/theme/vier/theme.php:221
 msgid "Help"
@@ -4040,135 +4042,135 @@ msgstr ""
 msgid "Responsible account: %s"
 msgstr ""
 
-#: src/Model/User.php:282 src/Model/User.php:1389
+#: src/Model/User.php:285 src/Model/User.php:1445
 msgid "SERIOUS ERROR: Generation of security keys failed."
 msgstr ""
 
-#: src/Model/User.php:820 src/Model/User.php:857
+#: src/Model/User.php:823 src/Model/User.php:860
 msgid "Login failed"
 msgstr ""
 
-#: src/Model/User.php:890
+#: src/Model/User.php:893
 msgid "Not enough information to authenticate"
 msgstr ""
 
-#: src/Model/User.php:999
+#: src/Model/User.php:1002
 msgid "Password can't be empty"
 msgstr ""
 
-#: src/Model/User.php:1042
+#: src/Model/User.php:1045
 msgid "Empty passwords are not allowed."
 msgstr ""
 
-#: src/Model/User.php:1046
+#: src/Model/User.php:1049
 msgid "The new password has been exposed in a public data dump, please choose another."
 msgstr ""
 
-#: src/Model/User.php:1051
+#: src/Model/User.php:1054
 msgid "The password length is limited to 72 characters."
 msgstr ""
 
-#: src/Model/User.php:1055
+#: src/Model/User.php:1058
 msgid "The password can't contain white spaces nor accentuated letters"
 msgstr ""
 
-#: src/Model/User.php:1269
+#: src/Model/User.php:1325
 msgid "Passwords do not match. Password unchanged."
 msgstr ""
 
-#: src/Model/User.php:1278
+#: src/Model/User.php:1334
 msgid "An invitation is required."
 msgstr ""
 
-#: src/Model/User.php:1282
+#: src/Model/User.php:1338
 msgid "Invitation could not be verified."
 msgstr ""
 
-#: src/Model/User.php:1290
+#: src/Model/User.php:1346
 msgid "Invalid OpenID url"
 msgstr ""
 
-#: src/Model/User.php:1304 src/Security/Authentication.php:207
+#: src/Model/User.php:1360 src/Security/Authentication.php:214
 msgid "We encountered a problem while logging in with the OpenID you provided. Please check the correct spelling of the ID."
 msgstr ""
 
-#: src/Model/User.php:1304 src/Security/Authentication.php:207
+#: src/Model/User.php:1360 src/Security/Authentication.php:214
 msgid "The error message was:"
 msgstr ""
 
-#: src/Model/User.php:1310
+#: src/Model/User.php:1366
 msgid "Please enter the required information."
 msgstr ""
 
-#: src/Model/User.php:1324
+#: src/Model/User.php:1380
 #, php-format
 msgid "system.username_min_length (%s) and system.username_max_length (%s) are excluding each other, swapping values."
 msgstr ""
 
-#: src/Model/User.php:1331
+#: src/Model/User.php:1387
 #, php-format
 msgid "Username should be at least %s character."
 msgid_plural "Username should be at least %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/User.php:1335
+#: src/Model/User.php:1391
 #, php-format
 msgid "Username should be at most %s character."
 msgid_plural "Username should be at most %s characters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Model/User.php:1343
+#: src/Model/User.php:1399
 msgid "That doesn't appear to be your full (First Last) name."
 msgstr ""
 
-#: src/Model/User.php:1348
+#: src/Model/User.php:1404
 msgid "This email address cannot be used for a registration on this site."
 msgstr ""
 
-#: src/Model/User.php:1352
+#: src/Model/User.php:1408
 msgid "Not a valid email address."
 msgstr ""
 
-#: src/Model/User.php:1355
+#: src/Model/User.php:1411
 msgid "The nickname was blocked from registration by the nodes admin."
 msgstr ""
 
-#: src/Model/User.php:1359 src/Model/User.php:1365
+#: src/Model/User.php:1415 src/Model/User.php:1421
 #: src/Module/User/Import.php:221
 msgid "Cannot use that email."
 msgstr ""
 
-#: src/Model/User.php:1371
+#: src/Model/User.php:1427
 msgid "Your nickname can only contain a-z, 0-9 and _."
 msgstr ""
 
-#: src/Model/User.php:1379 src/Model/User.php:1429
+#: src/Model/User.php:1435 src/Model/User.php:1485
 msgid "Nickname is already registered. Please choose another."
 msgstr ""
 
-#: src/Model/User.php:1416 src/Model/User.php:1420
+#: src/Model/User.php:1472 src/Model/User.php:1476
 msgid "An error occurred during registration. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1443
+#: src/Model/User.php:1499
 msgid "An error occurred creating your default profile. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1450
+#: src/Model/User.php:1506
 msgid "An error occurred creating your self contact. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1459
+#: src/Model/User.php:1515
 msgid "An error occurred creating your default contact circle. Please try again."
 msgstr ""
 
-#: src/Model/User.php:1507
+#: src/Model/User.php:1563
 msgid "Profile Photos"
 msgstr ""
 
-#: src/Model/User.php:1705
+#: src/Model/User.php:1761
 #, php-format
 msgid ""
 "\n"
@@ -4176,7 +4178,7 @@ msgid ""
 "\t\t\tthe administrator of %2$s has set up an account for you."
 msgstr ""
 
-#: src/Model/User.php:1708
+#: src/Model/User.php:1764
 #, php-format
 msgid ""
 "\n"
@@ -4207,12 +4209,12 @@ msgid ""
 "\t\tThank you and welcome to %4$s."
 msgstr ""
 
-#: src/Model/User.php:1740 src/Model/User.php:1847
+#: src/Model/User.php:1796 src/Model/User.php:1903
 #, php-format
 msgid "Registration details for %s"
 msgstr ""
 
-#: src/Model/User.php:1760
+#: src/Model/User.php:1816
 #, php-format
 msgid ""
 "\n"
@@ -4227,12 +4229,12 @@ msgid ""
 "\t\t"
 msgstr ""
 
-#: src/Model/User.php:1779
+#: src/Model/User.php:1835
 #, php-format
 msgid "Registration at %s"
 msgstr ""
 
-#: src/Model/User.php:1803
+#: src/Model/User.php:1859
 #, php-format
 msgid ""
 "\n"
@@ -4241,7 +4243,7 @@ msgid ""
 "\t\t\t"
 msgstr ""
 
-#: src/Model/User.php:1811
+#: src/Model/User.php:1867
 #, php-format
 msgid ""
 "\n"
@@ -4272,7 +4274,7 @@ msgid ""
 "\t\t\tThank you and welcome to %2$s."
 msgstr ""
 
-#: src/Model/User.php:1874
+#: src/Model/User.php:1930
 msgid "User with delegates can't be removed, please remove delegate users first"
 msgstr ""
 
@@ -4757,7 +4759,7 @@ msgstr ""
 
 #: src/Module/Admin/Roles.php:138 src/Module/Contact/Profile.php:453
 #: src/Module/Moderation/Reports.php:353
-#: src/Module/Settings/TwoFactor/Index.php:146
+#: src/Module/Settings/TwoFactor/Index.php:148
 msgid "Actions"
 msgstr ""
 
@@ -5753,7 +5755,7 @@ msgstr ""
 
 #: src/Module/Admin/Site.php:604 src/Module/Contact/Profile.php:329
 #: src/Module/Settings/Display.php:338 src/Module/Settings/Display.php:369
-#: src/Module/Settings/TwoFactor/Index.php:132
+#: src/Module/Settings/TwoFactor/Index.php:134
 msgid "Disabled"
 msgstr ""
 
@@ -6436,8 +6438,8 @@ msgstr[1] ""
 msgid "Account"
 msgstr ""
 
-#: src/Module/BaseSettings.php:73 src/Module/Security/TwoFactor/Verify.php:81
-#: src/Module/Settings/TwoFactor/Index.php:124
+#: src/Module/BaseSettings.php:73 src/Module/Security/TwoFactor/Verify.php:80
+#: src/Module/Settings/TwoFactor/Index.php:126
 msgid "Two-factor authentication"
 msgstr ""
 
@@ -6555,10 +6557,12 @@ msgstr ""
 #: src/Module/Moderation/Blocklist/Server/Index.php:109
 #: src/Module/Moderation/Blocklist/Server/Index.php:110
 #: src/Module/Moderation/Item/Delete.php:53 src/Module/Register.php:216
-#: src/Module/Security/LoginCode.php:109 src/Module/Security/LoginCode.php:118
-#: src/Module/Security/TwoFactor/Verify.php:86
+#: src/Module/Security/LoginCode.php:112 src/Module/Security/LoginCode.php:122
+#: src/Module/Security/ResetPassword.php:102
+#: src/Module/Security/ResetPassword.php:103
+#: src/Module/Security/TwoFactor/Verify.php:85
 #: src/Module/Settings/Channels.php:184 src/Module/Settings/Channels.php:217
-#: src/Module/Settings/TwoFactor/Index.php:147
+#: src/Module/Settings/TwoFactor/Index.php:149
 #: src/Module/Settings/TwoFactor/Verify.php:149
 msgid "Required"
 msgstr ""
@@ -7307,7 +7311,7 @@ msgid "Comma separated list of keywords that should not be converted to hashtags
 msgstr ""
 
 #: src/Module/Contact/Profile.php:455 src/Module/Moderation/Reports.php:247
-#: src/Module/Settings/TwoFactor/Index.php:126
+#: src/Module/Settings/TwoFactor/Index.php:128
 msgid "Status"
 msgstr ""
 
@@ -7511,7 +7515,8 @@ msgstr ""
 
 #: src/Module/Debug/ActivityPubConversion.php:123
 #: src/Module/Moderation/Item/Source.php:78
-#: src/Module/Security/TwoFactor/Verify.php:83
+#: src/Module/Security/TwoFactor/Recovery.php:96
+#: src/Module/Security/TwoFactor/Verify.php:82
 msgid "Error"
 msgid_plural "Errors"
 msgstr[0] ""
@@ -8439,28 +8444,31 @@ msgstr ""
 msgid "No search text found for this item. This can happen when the author has set their account to be non-discoverable or their posts to be non-indexable for searches."
 msgstr ""
 
-#: src/Module/LostPass.php:75
+#: src/Module/LostPass.php:76
 msgid "If the account exists, a message with a password reset link has been sent to its email address."
 msgstr ""
 
-#: src/Module/LostPass.php:190 src/Module/Security/Login.php:175
+#: src/Module/LostPass.php:89 src/Module/Security/Login.php:177
+#: src/Module/Security/ResetPassword.php:99
+#: src/Module/Security/ResetPassword.php:114
 msgid "Password Reset"
 msgstr ""
 
-#: src/Module/LostPass.php:166
+#: src/Module/LostPass.php:108
 msgid "Forgot your Password?"
 msgstr ""
 
-#: src/Module/LostPass.php:167
+#: src/Module/LostPass.php:109
 msgid "Enter your email address and submit to have your password reset. Then check your email for further instructions."
 msgstr ""
 
-#: src/Module/LostPass.php:168 src/Module/Security/Login.php:163
-#: src/Module/Security/LoginCode.php:118
+#: src/Module/LostPass.php:110 src/Module/Security/Login.php:165
+#: src/Module/Security/LoginCode.php:122
 msgid "Username or email"
 msgstr ""
 
-#: src/Module/LostPass.php:169
+#: src/Module/LostPass.php:111 src/Module/Security/ResetPassword.php:95
+#: src/Module/Security/ResetPassword.php:104
 msgid "Reset my password"
 msgstr ""
 
@@ -9805,7 +9813,7 @@ msgstr ""
 msgid "No more %s notifications."
 msgstr ""
 
-#: src/Module/Notifications/Notification.php:117
+#: src/Module/Notifications/Notification.php:118
 msgid "You must be logged in to show this page."
 msgstr ""
 
@@ -10328,6 +10336,7 @@ msgid "Please repeat your e-mail address:"
 msgstr ""
 
 #: src/Module/Register.php:230 src/Module/Security/PasswordTooLong.php:79
+#: src/Module/Security/ResetPassword.php:102
 #: src/Module/Settings/Account.php:525
 msgid "New Password:"
 msgstr ""
@@ -10337,6 +10346,7 @@ msgid "Leave empty for an auto generated password."
 msgstr ""
 
 #: src/Module/Register.php:231 src/Module/Security/PasswordTooLong.php:80
+#: src/Module/Security/ResetPassword.php:103
 #: src/Module/Settings/Account.php:526
 msgid "Confirm:"
 msgstr ""
@@ -10465,84 +10475,84 @@ msgstr ""
 msgid "You have no saved searches."
 msgstr ""
 
-#: src/Module/Security/Login.php:142
+#: src/Module/Security/Login.php:144
 msgid "Your OpenID: "
 msgstr ""
 
-#: src/Module/Security/Login.php:145
+#: src/Module/Security/Login.php:147
 msgid "Please enter your username and password to add the OpenID to your existing account."
 msgstr ""
 
-#: src/Module/Security/Login.php:147
+#: src/Module/Security/Login.php:149
 msgid "Or sign in using OpenID"
 msgstr ""
 
-#: src/Module/Security/Login.php:152
+#: src/Module/Security/Login.php:154
 msgid "OpenID"
 msgstr ""
 
-#: src/Module/Security/Login.php:161
+#: src/Module/Security/Login.php:163
 msgid "New here?"
 msgstr ""
 
-#: src/Module/Security/Login.php:164
+#: src/Module/Security/Login.php:166
 msgid "Password"
 msgstr ""
 
-#: src/Module/Security/Login.php:165 src/Module/Security/LoginCode.php:110
+#: src/Module/Security/Login.php:167 src/Module/Security/LoginCode.php:113
 msgid "Remember me"
 msgstr ""
 
-#: src/Module/Security/Login.php:174
+#: src/Module/Security/Login.php:176
 msgid "Forgot your password?"
 msgstr ""
 
-#: src/Module/Security/Login.php:177 src/Module/Security/LoginCode.php:99
+#: src/Module/Security/Login.php:179 src/Module/Security/LoginCode.php:102
 msgid "Sign in with an e-mail code"
 msgstr ""
 
-#: src/Module/Security/Login.php:179
+#: src/Module/Security/Login.php:182
 msgid "Website Terms of Service"
 msgstr ""
 
-#: src/Module/Security/Login.php:180
+#: src/Module/Security/Login.php:183
 msgid "terms of service"
 msgstr ""
 
-#: src/Module/Security/Login.php:182
+#: src/Module/Security/Login.php:185
 msgid "Website Privacy Policy"
 msgstr ""
 
-#: src/Module/Security/Login.php:183
+#: src/Module/Security/Login.php:186
 msgid "privacy policy"
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:101
+#: src/Module/Security/LoginCode.php:104
 msgid "Sign in with a password"
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:108
+#: src/Module/Security/LoginCode.php:111
 #, php-format
 msgid "Enter the code we sent you by e-mail. It is valid for %d minutes."
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:112
+#: src/Module/Security/LoginCode.php:115
 msgid "Request a new code"
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:117
+#: src/Module/Security/LoginCode.php:121
 msgid "Enter your username or e-mail address. We will send you a code to sign in without a password."
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:119
+#: src/Module/Security/LoginCode.php:123
 msgid "Send code"
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:137
+#: src/Module/Security/LoginCode.php:146
 msgid "If an account with this name exists and a code hasn't been requested recently, we have sent a code by e-mail."
 msgstr ""
 
-#: src/Module/Security/LoginCode.php:144
+#: src/Module/Security/LoginCode.php:153
 msgid "Invalid or expired code, please retry."
 msgstr ""
 
@@ -10559,7 +10569,7 @@ msgid "Account not found. Please register a new account or login to your existin
 msgstr ""
 
 #: src/Module/Security/PasswordTooLong.php:35
-#: src/Module/Settings/Account.php:51
+#: src/Module/Security/ResetPassword.php:67 src/Module/Settings/Account.php:51
 msgid "Passwords do not match."
 msgstr ""
 
@@ -10568,7 +10578,7 @@ msgid "Password does not need changing."
 msgstr ""
 
 #: src/Module/Security/PasswordTooLong.php:55
-#: src/Module/Settings/Account.php:65
+#: src/Module/Security/ResetPassword.php:75 src/Module/Settings/Account.php:65
 msgid "Password unchanged."
 msgstr ""
 
@@ -10595,32 +10605,34 @@ msgid "Your current password to confirm the changes"
 msgstr ""
 
 #: src/Module/Security/PasswordTooLong.php:79
+#: src/Module/Security/ResetPassword.php:102
 #: src/Module/Settings/Account.php:507
 msgid "Allowed characters are a-z, A-Z, 0-9 and special characters except white spaces and accentuated letters."
 msgstr ""
 
 #: src/Module/Security/PasswordTooLong.php:79
+#: src/Module/Security/ResetPassword.php:102
 #: src/Module/Settings/Account.php:511
 msgid "Password length is limited to 72 characters."
 msgstr ""
 
-#: src/Module/LostPass.php:199
+#: src/Module/Security/ResetPassword.php:80
 msgid "Your password has been reset."
 msgstr ""
 
-#: src/Module/Security/ResetPassword.php:97
+#: src/Module/Security/ResetPassword.php:100
 msgid "Please choose a new password."
 msgstr ""
 
-#: src/Module/LostPass.php:133
+#: src/Module/Security/ResetPassword.php:130
 msgid "Request could not be verified. (You may have previously submitted it.) Password reset failed."
 msgstr ""
 
-#: src/Module/LostPass.php:146
+#: src/Module/Security/ResetPassword.php:138
 msgid "Request has expired, please make a new one."
 msgstr ""
 
-#: src/Module/Security/ResetPassword.php:151
+#: src/Module/Security/ResetPassword.php:154
 #, php-format
 msgid ""
 "\n"
@@ -10629,7 +10641,7 @@ msgid ""
 "\t\t\tIf you did not request this change, please contact the site administrator."
 msgstr ""
 
-#: src/Module/Security/ResetPassword.php:155
+#: src/Module/Security/ResetPassword.php:158
 #, php-format
 msgid ""
 "\n"
@@ -10639,12 +10651,12 @@ msgid ""
 "\t\t\tUsername: %2$s"
 msgstr ""
 
-#: src/Module/LostPass.php:218
+#: src/Module/Security/ResetPassword.php:165
 #, php-format
 msgid "Your password has been changed at %s"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Recovery.php:62
+#: src/Module/Security/TwoFactor/Recovery.php:68
 #, php-format
 msgid "Remaining recovery codes: %d"
 msgstr ""
@@ -10654,30 +10666,30 @@ msgstr ""
 msgid "Too many failed attempts, please try again later."
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Recovery.php:68
-#: src/Module/Security/TwoFactor/Verify.php:62
+#: src/Module/Security/TwoFactor/Recovery.php:76
+#: src/Module/Security/TwoFactor/Verify.php:61
 #: src/Module/Settings/TwoFactor/Verify.php:84
 msgid "Invalid code, please retry."
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Recovery.php:87
+#: src/Module/Security/TwoFactor/Recovery.php:95
 msgid "Two-factor recovery"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Recovery.php:88
+#: src/Module/Security/TwoFactor/Recovery.php:98
 msgid "<p>You can enter one of your one-time recovery codes in case you lost access to your mobile device.</p>"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Recovery.php:89
+#: src/Module/Security/TwoFactor/Recovery.php:99
 #, php-format
 msgid "Don’t have your phone? <a href=\"%s\">Enter a two-factor recovery code</a>"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Recovery.php:90
+#: src/Module/Security/TwoFactor/Recovery.php:100
 msgid "Please enter a recovery code"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Recovery.php:91
+#: src/Module/Security/TwoFactor/Recovery.php:101
 msgid "Submit recovery code and complete login"
 msgstr ""
 
@@ -10717,21 +10729,21 @@ msgstr ""
 msgid "Trust"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Verify.php:82
+#: src/Module/Security/TwoFactor/Verify.php:81
 msgid "<p>Open the two-factor authentication app on your device to get an authentication code and verify your identity.</p>"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Verify.php:85
+#: src/Module/Security/TwoFactor/Verify.php:84
 #, php-format
 msgid "If you do not have access to your authentication code you can use a <a href=\"%s\">two-factor recovery code</a>."
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Verify.php:86
+#: src/Module/Security/TwoFactor/Verify.php:85
 #: src/Module/Settings/TwoFactor/Verify.php:149
 msgid "Please enter a code from your authentication app"
 msgstr ""
 
-#: src/Module/Security/TwoFactor/Verify.php:87
+#: src/Module/Security/TwoFactor/Verify.php:86
 msgid "Verify code and complete login"
 msgstr ""
 
@@ -12357,87 +12369,87 @@ msgstr ""
 msgid "Generate"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:74
+#: src/Module/Settings/TwoFactor/Index.php:76
 msgid "Two-factor authentication successfully disabled."
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:127
+#: src/Module/Settings/TwoFactor/Index.php:129
 msgid "<p>Use an application on a mobile device to get two-factor authentication codes when prompted on login.</p>"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:131
+#: src/Module/Settings/TwoFactor/Index.php:133
 msgid "Authenticator app"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:132
+#: src/Module/Settings/TwoFactor/Index.php:134
 msgid "Configured"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:132
+#: src/Module/Settings/TwoFactor/Index.php:134
 msgid "Not Configured"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:133
+#: src/Module/Settings/TwoFactor/Index.php:135
 msgid "<p>You haven't finished configuring your authenticator app.</p>"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:134
+#: src/Module/Settings/TwoFactor/Index.php:136
 msgid "<p>Your authenticator app is correctly configured.</p>"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:136
+#: src/Module/Settings/TwoFactor/Index.php:138
 msgid "Recovery codes"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:137
+#: src/Module/Settings/TwoFactor/Index.php:139
 msgid "Remaining valid codes"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:139
+#: src/Module/Settings/TwoFactor/Index.php:141
 msgid "<p>These one-use codes can replace an authenticator app code in case you have lost access to it.</p>"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:141
+#: src/Module/Settings/TwoFactor/Index.php:143
 msgid "App-specific passwords"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:142
+#: src/Module/Settings/TwoFactor/Index.php:144
 msgid "Generated app-specific passwords"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:144
+#: src/Module/Settings/TwoFactor/Index.php:146
 msgid "<p>These randomly generated passwords allow you to authenticate on apps not supporting two-factor authentication.</p>"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:147
+#: src/Module/Settings/TwoFactor/Index.php:149
 msgid "Current password:"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:147
+#: src/Module/Settings/TwoFactor/Index.php:149
 msgid "You need to provide your current password to change two-factor authentication settings."
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:148
+#: src/Module/Settings/TwoFactor/Index.php:150
 msgid "Enable two-factor authentication"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:149
+#: src/Module/Settings/TwoFactor/Index.php:151
 msgid "Disable two-factor authentication"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:150
+#: src/Module/Settings/TwoFactor/Index.php:152
 msgid "Show recovery codes"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:151
+#: src/Module/Settings/TwoFactor/Index.php:153
 msgid "Manage app-specific passwords"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:152
+#: src/Module/Settings/TwoFactor/Index.php:154
 msgid "Manage trusted browsers"
 msgstr ""
 
-#: src/Module/Settings/TwoFactor/Index.php:153
+#: src/Module/Settings/TwoFactor/Index.php:155
 msgid "Finish app configuration"
 msgstr ""
 
@@ -13345,24 +13357,24 @@ msgstr ""
 msgid "The folder %s must be writable by webserver."
 msgstr ""
 
-#: src/Security/Authentication.php:192 src/Security/Authentication.php:272
+#: src/Security/Authentication.php:199 src/Security/Authentication.php:279
 msgid "Login failed."
 msgstr ""
 
-#: src/Security/Authentication.php:237
+#: src/Security/Authentication.php:244
 msgid "Login failed. Please check your credentials."
 msgstr ""
 
-#: src/Security/Authentication.php:292
+#: src/Security/Authentication.php:299
 msgid "Login failed because your account is blocked."
 msgstr ""
 
-#: src/Security/Authentication.php:414
+#: src/Security/Authentication.php:426
 #, php-format
 msgid "Welcome %s"
 msgstr ""
 
-#: src/Security/Authentication.php:415
+#: src/Security/Authentication.php:427
 msgid "Please upload a profile photo."
 msgstr ""
 
@@ -13403,7 +13415,7 @@ msgstr ""
 msgid "OpenWebAuth: %1$s welcomes %2$s"
 msgstr ""
 
-#: src/Module/LostPass.php:86
+#: src/Security/PasswordReset/ResetLinkSender.php:65
 #, php-format
 msgid ""
 "\n"
@@ -13419,7 +13431,7 @@ msgid ""
 "\t\t\tissued this request."
 msgstr ""
 
-#: src/Security/PasswordReset/ResetLinkSender.php:77
+#: src/Security/PasswordReset/ResetLinkSender.php:76
 #, php-format
 msgid ""
 "\n"
@@ -13435,7 +13447,7 @@ msgid ""
 "\t\t\tUsername: %3$s"
 msgstr ""
 
-#: src/Module/LostPass.php:111
+#: src/Security/PasswordReset/ResetLinkSender.php:91
 #, php-format
 msgid "Password reset requested at %s"
 msgstr ""
