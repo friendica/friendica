@@ -24,4 +24,9 @@ class AppTest extends TestCase
 
 		$this->assertInstanceOf(App::class, $app); // @phpstan-ignore method.alreadyNarrowedType
 	}
+
+	public function testVersionIsReadFromVersionFile(): void
+	{
+		$this->assertSame(trim((string) file_get_contents(dirname(__DIR__, 2) . '/VERSION')), App::version());
+	}
 }

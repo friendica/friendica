@@ -70,7 +70,28 @@ class App
 {
 	public const PLATFORM = 'Friendica';
 	public const CODENAME = 'Blutwurz';
-	public const VERSION  = '2026.11-dev';
+	/**
+	 * @deprecated 2026.11 - Use App::version(), this value is no longer updated
+	 */
+	public const VERSION = '2026.11-dev';
+
+	private static ?string $version = null;
+
+	/**
+	 * Returns the version from the VERSION file, the single source of the Friendica version.
+	 */
+	public static function version(): string
+	{
+		if (self::$version === null) {
+			$version = file_get_contents(dirname(__DIR__) . '/VERSION');
+			if ($version === false) {
+				throw new \RuntimeException('The VERSION file is not readable');
+			}
+			self::$version = trim($version);
+		}
+
+		return self::$version;
+	}
 
 	/**
 	 * @internal

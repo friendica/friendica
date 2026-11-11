@@ -263,7 +263,7 @@ class UserExport extends BaseSettings
 		);
 
 		$output = [
-			'version'        => App::VERSION,
+			'version'        => App::version(),
 			'schema'         => DB_UPDATE_VERSION,
 			'baseurl'        => $this->baseUrl,
 			'user'           => $user,
