@@ -2212,7 +2212,7 @@ blockquote.shared_content {
 
 /* wall items content */
 .wall-item-content {
-	overflow-wrap: break-word;
+	overflow-wrap: anywhere;
 }
 .wall-item-content img {
 	object-fit: contain;
