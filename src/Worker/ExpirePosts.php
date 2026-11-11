@@ -240,10 +240,7 @@ class ExpirePosts
 	 * The range should be small, so that the query is short.
 	 * Long running queries are holding metadata locks that can block other processes.
 	 *
-	 * @param integer $start Lower id (exclusive)
-	 * @param integer $end   Upper id (inclusive)
-	 *
-	 * @return array ids of unused item-uri entries
+	 * @return int[] ids of unused item-uri entries
 	 */
 	private static function getUnusedItemUriIds(int $start, int $end): array
 	{

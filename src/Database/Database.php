@@ -1788,7 +1788,12 @@ class Database
 		$lock_wait_timeout = $this->fetchFirst("SELECT @@SESSION.`lock_wait_timeout` AS `timeout`");
 		$this->e("SET SESSION `lock_wait_timeout` = " . self::OPTIMIZE_LOCK_WAIT_TIMEOUT);
 
-		$result = $this->e("OPTIMIZE TABLE " . DBA::buildTableString([$table])) !== false;
+		$rows   = $this->toArray($this->p("OPTIMIZE TABLE " . DBA::buildTableString([$table])));
+		$errors = array_column(array_filter($rows, fn ($row): bool => ($row['Msg_type'] ?? '') === 'error'), 'Msg_text');
+		if (!empty($errors)) {
+			$this->logger->notice('Table optimization failed', ['table' => $table, 'errors' => $errors]);
+		}
+		$result = !empty($rows) && empty($errors);
 
 		if (!empty($lock_wait_timeout['timeout'])) {
 			$this->e("SET SESSION `lock_wait_timeout` = " . (int) $lock_wait_timeout['timeout']);
