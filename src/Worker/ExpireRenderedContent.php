@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Worker;
 
-use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Util\DateTimeFormat;
 
 class ExpireRenderedContent
@@ -24,6 +24,6 @@ class ExpireRenderedContent
 	 */
 	public static function execute(): void
 	{
-		DBA::delete('rendered-content', ["`last-access` < ?", DateTimeFormat::utc('now - ' . self::EXPIRE_DAYS . ' days', 'Y-m-d')]);
+		DI::renderedContentRepository()->deleteNotAccessedSince(DateTimeFormat::utc('now - ' . self::EXPIRE_DAYS . ' days', 'Y-m-d'));
 	}
 }

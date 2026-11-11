@@ -234,6 +234,7 @@ Example:
 - [`GET /api/v1/statuses/:id/reblogged_by`](https://docs.joinmastodon.org/methods/statuses/#reblogged_by)
 - [`GET /api/v1/statuses/:id/favourited_by`](https://docs.joinmastodon.org/methods/statuses/#favourited_by)
 - [`GET /api/v1/statuses/:id/quotes`](https://docs.joinmastodon.org/methods/statuses/#quotes)
+    - Additional support for the `offset` parameter, which is sent by Tusky. In contrast to the usual meaning, it is not a number of skipped results but the ID of the last loaded status and is handled like `max_id`
 - [`POST /api/v1/statuses/:id/favourite`](https://docs.joinmastodon.org/methods/statuses/#favourite)
 - [`POST /api/v1/statuses/:id/unfavourite`](https://docs.joinmastodon.org/methods/statuses/#unfavourite)
 - [`POST /api/v1/statuses/:id/reblog`](https://docs.joinmastodon.org/methods/statuses/#boost)

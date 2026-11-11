@@ -55,4 +55,12 @@ final readonly class RenderedContent
 
 		$this->database->delete('rendered-content', ["`uri-id` = ? AND `mode` = ? AND `hash` != ?", $uriId, $mode, $hash]);
 	}
+
+	/**
+	 * Delete the entries that haven't been accessed since before the given day
+	 */
+	public function deleteNotAccessedSince(string $day): void
+	{
+		$this->database->delete('rendered-content', ["`last-access` < ?", $day]);
+	}
 }
