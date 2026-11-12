@@ -11,6 +11,7 @@ namespace Friendica\Test\Functional\Content\Text;
 
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\RenderedContent;
+use Friendica\Content\Text\Repository\RenderedContent as RenderedContentRepository;
 use Friendica\Core\L10n;
 use Friendica\DI;
 use Friendica\Test\FixtureTestCase;
@@ -45,7 +46,7 @@ class RenderedContentTest extends FixtureTestCase
 		$l10n->method('getTranslationCount')->willReturnOnConsecutiveCalls(...array_values($translationCounts));
 		$l10n->method('getDateFormatCount')->willReturnOnConsecutiveCalls(...array_values($dateFormatCounts));
 
-		return new RenderedContent(DI::renderedContentRepository(), DI::config(), $l10n);
+		return new RenderedContent(new RenderedContentRepository(DI::dba()), DI::config(), $l10n);
 	}
 
 	private function rows(): array
