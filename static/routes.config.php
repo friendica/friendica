@@ -314,6 +314,7 @@ return [
 			'/statuses/{id:\d+}/{action:react|unreact}/{emoji}'      => [Module\Api\Mastodon\Statuses\Reactions::class,           [        R::POST]],
 			'/statuses/{id:\d+}/reblogged_by'                        => [Module\Api\Mastodon\Statuses\RebloggedBy::class,         [R::GET         ]],
 			'/statuses/{id:\d+}/favourited_by'                       => [Module\Api\Mastodon\Statuses\FavouritedBy::class,        [R::GET         ]],
+			'/statuses/{id:\d+}/quotes'                              => [Module\Api\Mastodon\Statuses\Quotes::class,              [R::GET         ]],
 			'/statuses/{id:\d+}/favourite'                           => [Module\Api\Mastodon\Statuses\Favourite::class,           [        R::POST]],
 			'/statuses/{id:\d+}/unfavourite'                         => [Module\Api\Mastodon\Statuses\Unfavourite::class,         [        R::POST]],
 			'/statuses/{id:\d+}/reblog'                              => [Module\Api\Mastodon\Statuses\Reblog::class,              [        R::POST]],

@@ -7,11 +7,10 @@
 
 namespace Friendica\Module\Api\Mastodon\Statuses;
 
+use Friendica\Content\Conversation\PostInteractions;
 use Friendica\DI;
-use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Module\BaseApi;
-use Friendica\Protocol\Activity;
 
 /**
  * @see https://docs.joinmastodon.org/methods/statuses/
@@ -29,16 +28,21 @@ class RebloggedBy extends BaseApi
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
+		$request = $this->getRequest([
+			'limit' => 40, // Maximum number of results to return. Defaults to 40, the maximum is 80.
+		], $request);
+
 		if (!$post = Post::selectOriginal(['uri-id'], ['uri-id' => $this->parameters['id'], 'uid' => [0, $uid]])) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}
 
-		$activities = Post::selectPosts(['author-id'], ['thr-parent-id' => $post['uri-id'], 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => Activity::ANNOUNCE]);
+		// The actors are selected like in the interaction lists of the web interface, so that visibility and blocked contacts are handled in the same way
+		$actors = DI::postInteractions()->getActorIds(PostInteractions::RESHARES, $post['uri-id'], $uid, 0, min(max((int) $request['limit'], 1), 80));
 
 		$accounts = [];
 
-		while ($activity = Post::fetch($activities)) {
-			$accounts[] = DI::mstdnAccount()->createFromContactId($activity['author-id'], $uid);
+		foreach (array_keys($actors) as $authorId) {
+			$accounts[] = DI::mstdnAccount()->createFromContactId($authorId, $uid);
 		}
 
 		$this->earlyJsonExit($accounts);

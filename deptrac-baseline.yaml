@@ -560,6 +560,8 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Api\Mastodon\Statuses\Pin:
       - Friendica\DI
+    Friendica\Module\Api\Mastodon\Statuses\Quotes:
+      - Friendica\DI
     Friendica\Module\Api\Mastodon\Statuses\Reactions:
       - Friendica\DI
     Friendica\Module\Api\Mastodon\Statuses\Reblog:

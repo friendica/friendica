@@ -108,6 +108,11 @@ return [
 		// Addresses non-mentioned ActivityPub receivers by BCC instead of CC. Increases privacy, decreases performance.
 		'ap_always_bcc' => false,
 
+		// api_profiler_limit (Float)
+		// If an API call lasts longer than this value in seconds, its profiling data is logged.
+		// A value of 0 logs every API call.
+		'api_profiler_limit' => 1,
+
 		// auth_cookie_lifetime (Integer)
 		// Number of days that should pass without any activity before a user who
 		// chose "Remember me" when logging in is considered logged out.

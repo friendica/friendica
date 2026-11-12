@@ -158,6 +158,11 @@ abstract class DI
 		return self::$dice->create(Content\Conversation\ConversationDataProvider::class);
 	}
 
+	public static function postInteractions(): Content\Conversation\PostInteractions
+	{
+		return self::$dice->create(Content\Conversation\PostInteractions::class);
+	}
+
 	public static function conversationRenderer(): Content\Conversation\ConversationRenderer
 	{
 		return self::$dice->create(Content\Conversation\ConversationRenderer::class);
@@ -657,6 +662,11 @@ abstract class DI
 	public static function emailer(): Util\Emailer
 	{
 		return self::$dice->create(Util\Emailer::class);
+	}
+
+	public static function renderedContent(): Content\Text\RenderedContent
+	{
+		return self::$dice->create(Content\Text\RenderedContent::class);
 	}
 
 	public static function postMediaRepository(): Content\Post\Repository\PostMedia

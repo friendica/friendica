@@ -228,10 +228,14 @@ class Actor
 	 *
 	 * @param string  $did The contact DID
 	 * @param integer $uid User ID to get the web for (0 for global)
-	 * @return string Profile link
+	 * @return string Profile link, empty if the value isn't a DID or no frontend is configured
 	 */
 	public function getProfileLink(string $did, int $uid = 0): string
 	{
+		if (parse_url($did, PHP_URL_SCHEME) !== 'did') {
+			return '';
+		}
+
 		$web       = $this->atprotocol->getWebForUser($uid);
 		$frontends = $this->config->get('atprotocol', 'frontends');
 		if ($web && is_array($frontends) && isset($frontends[$web])) {

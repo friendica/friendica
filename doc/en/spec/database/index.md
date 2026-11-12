@@ -81,6 +81,7 @@
 | [profile](help/spec/database/db-profile) | user profiles data |
 | [profile_field](help/spec/database/db-profile_field) | Custom profile fields |
 | [register](help/spec/database/db-register) | registrations requiring admin approval |
+| [rendered-content](help/spec/database/db-rendered-content) | Rendered HTML for content that is requested via the API |
 | [report](help/spec/database/db-report) |  |
 | [report-post](help/spec/database/db-report-post) | Individual posts attached to a moderation report |
 | [report-rule](help/spec/database/db-report-rule) | Terms of service rule lines relevant to a moderation report |

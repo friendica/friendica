@@ -233,6 +233,8 @@ Example:
     - Additional flag `show_all` to allow including posts from blocked and ignored/muted users, defaults to `false`
 - [`GET /api/v1/statuses/:id/reblogged_by`](https://docs.joinmastodon.org/methods/statuses/#reblogged_by)
 - [`GET /api/v1/statuses/:id/favourited_by`](https://docs.joinmastodon.org/methods/statuses/#favourited_by)
+- [`GET /api/v1/statuses/:id/quotes`](https://docs.joinmastodon.org/methods/statuses/#quotes)
+    - Additional support for the `offset` parameter, which is sent by Tusky. In contrast to the usual meaning, it is not a number of skipped results but the ID of the last loaded status and is handled like `max_id`
 - [`POST /api/v1/statuses/:id/favourite`](https://docs.joinmastodon.org/methods/statuses/#favourite)
 - [`POST /api/v1/statuses/:id/unfavourite`](https://docs.joinmastodon.org/methods/statuses/#unfavourite)
 - [`POST /api/v1/statuses/:id/reblog`](https://docs.joinmastodon.org/methods/statuses/#boost)
@@ -288,7 +290,6 @@ These endpoints are planned to be implemented somewhere in the future.
 - [`GET /api/v1/notifications/unread_count`](https://docs.joinmastodon.org/methods/notifications/#unread-count)
 - [`POST /api/v1/polls/:id/votes`](https://docs.joinmastodon.org/methods/polls/)
 - [`GET /api/v1/statuses`](https://docs.joinmastodon.org/methods/statuses/#index)
-- [`GET /api/v1/statuses/:id/quotes`](https://docs.joinmastodon.org/methods/statuses/#quotes)
 - [`POST /api/v1/statuses/:id/quotes/:quoting_status_id/revoke`](https://docs.joinmastodon.org/methods/statuses/#quotes)
 - [`POST /api/v1/tags/:id/feature`](https://docs.joinmastodon.org/methods/tags/)
 - [`POST /api/v1/tags/:id/unfeature`](https://docs.joinmastodon.org/methods/tags/)

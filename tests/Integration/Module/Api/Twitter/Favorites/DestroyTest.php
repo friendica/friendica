@@ -54,7 +54,7 @@ final class DestroyTest extends ApiTestCase
 			DI::args(),
 			DI::logger(),
 			DI::profiler(),
-			new ApiResponse(DI::l10n(), DI::args(), DI::logger(), DI::baseUrl(), DI::twitterUser()),
+			new ApiResponse(DI::l10n(), DI::args(), DI::logger(), DI::baseUrl(), DI::twitterUser(), DI::config()),
 			[],
 		);
 

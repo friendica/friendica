@@ -8,7 +8,6 @@
 namespace Friendica\Object\Api\Mastodon;
 
 use Friendica\BaseDataTransferObject;
-use Friendica\Content\Text\BBCode;
 use Friendica\Model\Item;
 use Friendica\Object\Api\Mastodon\Status\Counts;
 use Friendica\Object\Api\Mastodon\Status\FriendicaExtension;
@@ -52,6 +51,8 @@ class Status extends BaseDataTransferObject
 	protected $reblogs_count = 0;
 	/** @var int */
 	protected $favourites_count = 0;
+	/** @var int */
+	protected $quotes_count = 0;
 	/** @var bool */
 	protected $favourited = false;
 	/** @var bool */
@@ -113,6 +114,7 @@ class Status extends BaseDataTransferObject
 		array $in_reply,
 		array $reblog,
 		FriendicaExtension $friendica,
+		string $content,
 		?array $quote = null,
 		?array $poll = null,
 		?array $emojis = null,
@@ -147,12 +149,13 @@ class Status extends BaseDataTransferObject
 		$this->replies_count     = $reblogged ? 0 : $counts->replies;
 		$this->reblogs_count     = $reblogged ? 0 : $counts->reblogs;
 		$this->favourites_count  = $reblogged ? 0 : $counts->favourites;
+		$this->quotes_count      = $reblogged ? 0 : $counts->quotes;
 		$this->favourited        = $userAttributes->favourited;
 		$this->reblogged         = $userAttributes->reblogged;
 		$this->muted             = $userAttributes->muted;
 		$this->bookmarked        = $userAttributes->bookmarked;
 		$this->pinned            = $userAttributes->pinned;
-		$this->content           = $reblogged ? '' : BBCode::convertForUriId($item['uri-id'], BBCode::setMentionsToNicknames($item['raw-body'] ?? $item['body']), BBCode::MASTODON_API);
+		$this->content           = $reblogged ? '' : $content;
 		$this->reblog            = $reblog;
 		$this->quote             = $quote;
 		$this->application       = $application->toArray();

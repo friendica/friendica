@@ -52,7 +52,16 @@ class Bookmarks extends BaseApi
 			$params['order'] = ['uri-id'];
 		}
 
-		$items = Post::selectThreadForUser($uid, ['uri-id'], $condition, $params);
+		// The bookmarked posts are determined first via the index on "uid" and "starred".
+		// When this is done in the same query with the joins of the view, the optimizer can decide to walk through
+		// all posts of the user until enough bookmarks are found.
+		$candidates = array_column(DBA::selectToArray('post-thread-user', ['uri-id'], $condition, ['order' => $params['order'], 'limit' => 1000]), 'uri-id');
+		if (empty($candidates)) {
+			$this->setPaginationLinkHeader();
+			$this->earlyJsonExit([]);
+		}
+
+		$items = Post::selectThreadForUser($uid, ['uri-id'], ['uid' => $uid, 'uri-id' => $candidates], $params);
 
 		$statuses = [];
 		while ($item = Post::fetch($items)) {

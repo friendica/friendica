@@ -10,6 +10,7 @@ namespace Friendica\Test\Integration\Module;
 use Dice\Dice;
 use Friendica\App;
 use Friendica\AppHelper;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\DI;
 use Friendica\Event\EventDispatcher;
@@ -61,6 +62,7 @@ class BaseApiTest extends TestCase
 			$this->createStub(LoggerInterface::class),
 			$this->createStub(App\BaseURL::class),
 			$this->createStub(TwitterUser::class),
+			$this->createStub(IManageConfigValues::class),
 		);
 
 		return $this->getMockBuilder(BaseApi::class)

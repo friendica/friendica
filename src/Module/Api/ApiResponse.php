@@ -9,6 +9,7 @@ namespace Friendica\Module\Api;
 
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
+use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException;
@@ -44,6 +45,7 @@ class ApiResponse extends Response
 		LoggerInterface $logger,
 		BaseURL $baseUrl,
 		TwitterUser $twitterUser,
+		private readonly IManageConfigValues $config,
 		array $server = [],
 		string $jsonpCallback = '',
 	) {
@@ -54,6 +56,14 @@ class ApiResponse extends Response
 		$this->twitterUser   = $twitterUser;
 		$this->server        = $server;
 		$this->jsonpCallback = $jsonpCallback;
+	}
+
+	/**
+	 * Minimum duration in seconds of an API call to be written to the profiling log (system.api_profiler_limit)
+	 */
+	public function getProfilerLimit(): float
+	{
+		return (float) $this->config->get('system', 'api_profiler_limit');
 	}
 
 	/**

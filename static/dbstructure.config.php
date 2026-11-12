@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1605);
+	define('DB_UPDATE_VERSION', 1606);
 }
 
 return [
@@ -1917,6 +1917,21 @@ return [
 		"indexes" => [
 			"PRIMARY" => ["id"],
 			"uid"     => ["uid"],
+		],
+	],
+	"rendered-content" => [
+		"comment" => "Rendered HTML for content that is requested via the API",
+		"fields"  => [
+			"uri-id"      => ["type" => "int unsigned", "not null" => "1", "primary" => "1", "foreign" => ["item-uri" => "id"], "comment" => "Id of the item-uri table entry that contains the item or contact uri"],
+			"mode"        => ["type" => "tinyint unsigned", "not null" => "1", "primary" => "1", "comment" => "Simple HTML mode of the rendering, see BBCode::EXTERNAL and BBCode::MASTODON_API"],
+			"lang"        => ["type" => "varchar(10)", "not null" => "1", "default" => "", "primary" => "1", "comment" => "Language of the translated texts in the html, empty if the html doesn't contain translated texts"],
+			"hash"        => ["type" => "varchar(32)", "not null" => "1", "default" => "", "comment" => "Hash of the rendered text and the BBCode version"],
+			"html"        => ["type" => "mediumtext", "comment" => "Text converted to html"],
+			"last-access" => ["type" => "date", "not null" => "1", "default" => DBA::NULL_DATE, "comment" => "Day of the last access"],
+		],
+		"indexes" => [
+			"PRIMARY"     => ["uri-id", "mode", "lang"],
+			"last-access" => ["last-access"],
 		],
 	],
 	"report" => [

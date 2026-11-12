@@ -499,8 +499,6 @@ class Timeline extends BaseModule
 			$items = array_reverse($items, true);
 		}
 
-		$this->setItemsSeenForUser($uid);
-
 		return $items;
 	}
 

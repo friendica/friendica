@@ -24,6 +24,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile as ProfileModel;
@@ -196,7 +197,7 @@ class Profile extends BaseProfile
 		}
 
 		if ($profile['about']) {
-			$basic_fields += self::buildField('about', $this->t('Description:'), BBCode::convertForUriId($profile['uri-id'], $profile['about']));
+			$basic_fields += self::buildField('about', $this->t('Description:'), DI::renderedContent()->convert($profile['uri-id'], $profile['about'], BBCode::INTERNAL));
 		}
 
 		if ($profile['xmpp']) {

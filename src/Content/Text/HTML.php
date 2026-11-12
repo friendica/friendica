@@ -950,6 +950,14 @@ class HTML
 	 */
 	public static function purify(string $text, array $allowedIframeDomains = []): string
 	{
+		// Creating the purifier and loading its definitions is expensive, but it can be reused for any number of texts.
+		static $purifiers = [];
+
+		$key = implode('|', $allowedIframeDomains);
+		if (isset($purifiers[$key])) {
+			return $purifiers[$key]->purify($text);
+		}
+
 		// Allows cid: URL scheme
 		\HTMLPurifier_URISchemeRegistry::instance()->register('cid', new HTMLPurifier_URIScheme_cid());
 
@@ -997,6 +1005,8 @@ class HTML
 		//$config->set('Core.MaintainLineNumbers', true);
 
 		$HTMLPurifier = new \HTMLPurifier($config);
+
+		$purifiers[$key] = $HTMLPurifier;
 
 		$text = $HTMLPurifier->purify($text);
 

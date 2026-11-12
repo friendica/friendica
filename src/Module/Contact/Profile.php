@@ -16,6 +16,7 @@ use Friendica\Contact\LocalRelationship\Repository\LocalRelationship as LocalRel
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\RenderedContent;
 use Friendica\Content\Widget;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -61,6 +62,7 @@ class Profile extends BaseModule
 		Response $response,
 		private Page $page,
 		private readonly IManageConfigValues $config,
+		private readonly RenderedContent $renderedContent,
 		array $server,
 		array $parameters = [],
 	) {
@@ -446,7 +448,7 @@ class Profile extends BaseModule
 			'$xmpp_label'                => $this->t('XMPP:'),
 			'$matrix'                    => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['matrix']),
 			'$matrix_label'              => $this->t('Matrix:'),
-			'$about'                     => BBCode::convertForUriId($contact['uri-id'] ?? 0, $contact['about'], BBCode::EXTERNAL),
+			'$about'                     => $this->renderedContent->convert($contact['uri-id'] ?? 0, $contact['about'], BBCode::EXTERNAL),
 			'$about_label'               => $this->t('About:'),
 			'$keywords'                  => $contact['keywords'],
 			'$keywords_label'            => $this->t('Tags:'),
