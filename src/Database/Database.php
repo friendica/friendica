@@ -40,6 +40,9 @@ class Database
 
 	public const LOCK_OPTIMIZE = 'database::optimize_tables';
 
+	// Maximum number of seconds a table optimization waits for the metadata lock
+	public const OPTIMIZE_LOCK_WAIT_TIMEOUT = 10;
+
 	protected $connected = false;
 
 	/**
@@ -1780,7 +1783,21 @@ class Database
 			return false;
 		}
 
-		$result = $this->e("OPTIMIZE TABLE " . DBA::buildTableString([$table])) !== false;
+		// A waiting optimization blocks every further access to the table and to the tables that are connected via foreign keys.
+		// So we don't wait for long running queries to finish.
+		$lock_wait_timeout = $this->fetchFirst("SELECT @@SESSION.`lock_wait_timeout` AS `timeout`");
+		$this->e("SET SESSION `lock_wait_timeout` = " . self::OPTIMIZE_LOCK_WAIT_TIMEOUT);
+
+		$rows   = $this->toArray($this->p("OPTIMIZE TABLE " . DBA::buildTableString([$table])));
+		$errors = array_column(array_filter($rows, fn ($row): bool => ($row['Msg_type'] ?? '') === 'error'), 'Msg_text');
+		if (!empty($errors)) {
+			$this->logger->notice('Table optimization failed', ['table' => $table, 'errors' => $errors]);
+		}
+		$result = !empty($rows) && empty($errors);
+
+		if (!empty($lock_wait_timeout['timeout'])) {
+			$this->e("SET SESSION `lock_wait_timeout` = " . (int) $lock_wait_timeout['timeout']);
+		}
 
 		$this->releaseOptimizeLock();
 

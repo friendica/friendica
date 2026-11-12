@@ -213,70 +213,68 @@ class ExpirePosts
 		}
 		DI::logger()->notice('Start collecting orphaned URI-ID', ['last-id' => $item['uri-id']]);
 
-		$sql = [
-			'SELECT i.id
-			FROM `item-uri` i
-			LEFT JOIN `post-user` pu1 ON i.id = pu1.`uri-id`
-			LEFT JOIN `post-user` pu2 ON i.id = pu2.`parent-uri-id`
-			LEFT JOIN `post-user` pu3 ON i.id = pu3.`thr-parent-id`
-			LEFT JOIN `post-user` pu4 ON i.id = pu4.`external-id`
-			LEFT JOIN `post-user` pu5 ON i.id = pu5.`replies-id`
-			LEFT JOIN `post-thread` pt1 ON i.id = pt1.`context-id`
-			LEFT JOIN `post-thread` pt2 ON i.id = pt2.`conversation-id`
-			LEFT JOIN `post-quote` pq ON i.id = pq.`quote-uri-id`
-			LEFT JOIN `mail` m1 ON i.id = m1.`uri-id`
-			LEFT JOIN `event` e ON i.id = e.`uri-id`
-			LEFT JOIN `user-contact` uc ON i.id = uc.`uri-id`
-			LEFT JOIN `contact` c ON i.id = c.`uri-id`
-			LEFT JOIN `apcontact` ac ON i.id = ac.`uri-id`
-			LEFT JOIN `diaspora-contact` dc ON i.id = dc.`uri-id`
-			LEFT JOIN `inbox-status` ins ON i.id = ins.`uri-id`
-			LEFT JOIN `post-delivery` pd1 ON i.id = pd1.`uri-id`
-			LEFT JOIN `post-delivery` pd2 ON i.id = pd2.`inbox-id`
-			LEFT JOIN `mail` m2 ON i.id = m2.`parent-uri-id`
-			LEFT JOIN `mail` m3 ON i.id = m3.`thr-parent-id`
-			WHERE
-			  i.id < ? AND
-			  pu1.`uri-id` IS NULL AND
-			  pu2.`parent-uri-id` IS NULL AND
-			  pu3.`thr-parent-id` IS NULL AND
-			  pu4.`external-id` IS NULL AND
-			  pu5.`replies-id` IS NULL AND
-			  pt1.`context-id` IS NULL AND
-			  pt2.`conversation-id` IS NULL AND
-			  pq.`quote-uri-id` IS NULL AND
-			  m1.`uri-id` IS NULL AND
-			  e.`uri-id` IS NULL AND
-			  uc.`uri-id` IS NULL AND
-			  c.`uri-id` IS NULL AND
-			  ac.`uri-id` IS NULL AND
-			  dc.`uri-id` IS NULL AND
-			  ins.`uri-id` IS NULL AND
-			  pd1.`uri-id` IS NULL AND
-			  pd2.`inbox-id` IS NULL AND
-			  m2.`parent-uri-id` IS NULL AND
-			  m3.`thr-parent-id` IS NULL
-			LIMIT ?',
-			$item['uri-id'],
-			$limit,
-		];
-		$pass = 0;
-		do {
-			++$pass;
-			$uris  = DBA::p(...$sql);
-			$total = DBA::numRows($uris);
-			DI::logger()->notice('Start deleting orphaned URI-ID', ['pass' => $pass, 'last-id' => $item['uri-id']]);
-			$affected_count = 0;
-			while ($rows = DBA::toArray($uris, false, 100)) {
-				$ids = array_column($rows, 'id');
-				DBA::delete('item-uri', ['id' => $ids]);
-				$affected_count += DBA::affectedRows();
-				DI::logger()->debug('Deleted', ['pass' => $pass, 'affected_count' => $affected_count, 'total' => $total]);
+		$affected_count = 0;
+		for ($start = 0; $start < $item['uri-id']; $start += $limit) {
+			$end  = min($start + $limit, $item['uri-id'] - 1);
+			$rows = self::getUnusedItemUriIds($start, $end);
+			if (empty($rows)) {
+				continue;
 			}
-			DBA::close($uris);
+
+			$deleted = 0;
+			foreach (array_chunk($rows, 100) as $ids) {
+				DBA::delete('item-uri', ['id' => $ids]);
+				$deleted += DBA::affectedRows();
+			}
 			DBA::commit();
-			DI::logger()->notice('Orphaned URI-ID entries removed', ['pass' => $pass, 'rows' => $affected_count]);
-		} while ($affected_count);
+
+			$affected_count += $deleted;
+			DI::logger()->debug('Deleted', ['start' => $start, 'end' => $end, 'deleted' => $deleted, 'affected_count' => $affected_count]);
+		}
+		DI::logger()->notice('Orphaned URI-ID entries removed', ['rows' => $affected_count]);
+	}
+
+	/**
+	 * Fetch the ids of unused item-uri entries in the given id range.
+	 *
+	 * The range should be small, so that the query is short.
+	 * Long running queries are holding metadata locks that can block other processes.
+	 *
+	 * @return int[] ids of unused item-uri entries
+	 */
+	private static function getUnusedItemUriIds(int $start, int $end): array
+	{
+		// Fields that are referencing "item-uri" entries that we must not delete
+		$references = [
+			['post-user', 'uri-id'],
+			['post-user', 'parent-uri-id'],
+			['post-user', 'thr-parent-id'],
+			['post-user', 'external-id'],
+			['post-user', 'replies-id'],
+			['post-thread', 'context-id'],
+			['post-thread', 'conversation-id'],
+			['post-quote', 'quote-uri-id'],
+			['contact', 'uri-id'],
+			['apcontact', 'uri-id'],
+			['diaspora-contact', 'uri-id'],
+			['user-contact', 'uri-id'],
+			['inbox-status', 'uri-id'],
+			['post-delivery', 'uri-id'],
+			['post-delivery', 'inbox-id'],
+			['event', 'uri-id'],
+			['mail', 'uri-id'],
+			['mail', 'parent-uri-id'],
+			['mail', 'thr-parent-id'],
+		];
+
+		$condition = '';
+		foreach ($references as $reference) {
+			$condition .= ' AND NOT EXISTS (SELECT 1 FROM ' . DBA::buildTableString([$reference[0]]) . ' WHERE ' . DBA::quoteIdentifier($reference[1]) . ' = `item-uri`.`id`)';
+		}
+
+		$sql = 'SELECT `id` FROM `item-uri` WHERE `id` > ? AND `id` <= ?' . $condition;
+
+		return array_column(DBA::toArray(DBA::p($sql, $start, $end)), 'id');
 	}
 
 	/**
