@@ -263,8 +263,10 @@ var originalTitle = document.title;
 
 // Update original title on SPA navigation to prevent ping handler from resetting to stale title
 if (window.addEventListener) {
-	window.addEventListener('spa:navigate', function () {
-		originalTitle = document.title;
+	['spa:navigate', 'spa:restore'].forEach(function (name) {
+		window.addEventListener(name, function () {
+			originalTitle = document.title;
+		});
 	});
 }
 

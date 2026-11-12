@@ -43,14 +43,6 @@ const NAVIGATE_TARGET =
   'nav#topbar-first, div#topbar-second:maybe, main:maybe, ' +
   '#content-section:maybe, #aside-section:maybe, #right-aside-section:maybe';
 
-const SNAPSHOT_SELECTORS = [
-  'nav#topbar-first',
-  'div#topbar-second',
-  'main',
-  '#content-section',
-  '#aside-section',
-  '#right-aside-section',
-];
 const SNAPSHOT_LIMIT = 3;
 const SNAPSHOT_MAX_AGE = 30 * 60 * 1000;
 
@@ -404,7 +396,7 @@ function focusContentAfterNavigation() {
  * out-of-band scripts are ready. Also used when a page is restored from a
  * snapshot, see bindListSnapshots().
  */
-function completeNavigation(path, scriptSyncPromise) {
+function completeNavigation(path, scriptSyncPromise, restored = false) {
   Promise.resolve(scriptSyncPromise).then(() => {
     runBlockedFragmentScripts();
 
@@ -412,7 +404,9 @@ function completeNavigation(path, scriptSyncPromise) {
 
     focusContentAfterNavigation();
 
-    window.dispatchEvent(new CustomEvent('spa:navigate', { detail: { path } }));
+    // A restored page was initialised before, running the theme and module
+    // initialisation again would duplicate parts of it
+    window.dispatchEvent(new CustomEvent(restored ? 'spa:restore' : 'spa:navigate', { detail: { path } }));
     window.dispatchEvent(new CustomEvent('spa:initInfiniteScroll'));
 
     if (typeof initInfiniteScroll === 'function') {
@@ -547,7 +541,7 @@ function bindListSnapshots() {
   const isDisplayUrl = (url) => /\/display\//.test(new URL(url, document.baseURI).pathname);
 
   const captureSnapshot = () => {
-    const elements = SNAPSHOT_SELECTORS
+    const elements = MAIN_TARGETS
       .map((selector) => ({ selector, element: document.querySelector(selector) }))
       .filter((entry) => entry.element);
 
@@ -627,12 +621,16 @@ function bindListSnapshots() {
       // up.fragment.markAsDestroying() marked it when Unpoly swapped it out
       element.classList.remove('up-destroying');
       element.removeAttribute('inert');
-      document.querySelector(selector).replaceWith(element);
-      up.hello(element);
+      const current = document.querySelector(selector);
+      // Unpoly doesn't know about this replacement, so run the destructors
+      up.script.clean(current);
+      current.replaceWith(element);
+      // The restored page completes below, not through up:fragment:inserted
+      up.hello(element, { insertedEvent: false });
     });
 
     window.scrollTo(0, snapshot.scrollY);
-    completeNavigation(window.location.pathname, Promise.resolve());
+    completeNavigation(window.location.pathname, Promise.resolve(), true);
   });
 }
 
