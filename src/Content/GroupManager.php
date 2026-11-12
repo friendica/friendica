@@ -34,10 +34,6 @@ class GroupManager
 {
 	private const CONTACT_TYPES = [Contact::TYPE_COMMUNITY];
 
-	// Like on the contact page: public threads come from the global copy, private ones from the copy of the user
-	private const THREADS = "FROM `post-thread-user` INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
-		WHERE (`post-thread-user`.`uid` = 0 OR (`post-thread-user`.`uid` = ? AND NOT `post-user`.`global`)) AND " . self::THREAD_VISIBLE;
-
 	// Like in Post::selectForUser(): hidden, deleted and blocked or ignored threads are skipped
 	private const THREAD_VISIBLE = "`post-user`.`visible` AND NOT `post-user`.`deleted`
 		AND NOT `post-user`.`author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored`))";
@@ -239,10 +235,9 @@ class GroupManager
 		}
 		$this->database->close($posts);
 
-		// The global copy has no seen state, so the unread posts are counted on the copy of the user.
 		$unread = $this->database->p(
-			"SELECT `parent-uri-id`, COUNT(*) AS `unread` FROM `post-user`
-				WHERE `uid` = ? AND `unseen` AND `visible` AND NOT `deleted` AND `gravity` IN (" . $gravityPlaceholders . ")
+			"SELECT `parent-uri-id`, COUNT(CASE WHEN `unseen` THEN 1 END) AS `unread` FROM `post-user`
+				WHERE `uid` = ? AND `visible` AND NOT `deleted` AND `gravity` IN (" . $gravityPlaceholders . ")
 				AND `parent-uri-id` IN (" . $parentPlaceholders . ")
 				GROUP BY `parent-uri-id`",
 			$uid,
@@ -373,29 +368,48 @@ class GroupManager
 	 */
 	public function getThreadIds(int $uid, int $pcid, int $start, int $limit): array
 	{
-		// Both parts are served by the index on uid, owner-id and commented, so they are combined afterwards
-		$join    = "FROM `post-thread-user` INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id` WHERE ";
-		$threads = $this->database->p(
-			"(SELECT `post-thread-user`.`uri-id`, `post-thread-user`.`commented` " . $join . "`post-thread-user`.`uid` = 0
-				AND `post-thread-user`.`owner-id` = ? AND " . self::THREAD_VISIBLE . "
-				ORDER BY `post-thread-user`.`commented` DESC LIMIT ?)
-			UNION ALL
-			(SELECT `post-thread-user`.`uri-id`, `post-thread-user`.`commented` " . $join . "`post-thread-user`.`uid` = ?
-				AND `post-thread-user`.`owner-id` = ? AND NOT `post-user`.`global` AND " . self::THREAD_VISIBLE . "
-				ORDER BY `post-thread-user`.`commented` DESC LIMIT ?)
-			ORDER BY `commented` DESC LIMIT ?, ?",
-			$pcid,
-			$uid,
-			$start + $limit,
-			$uid,
-			$pcid,
-			$uid,
-			$start + $limit,
-			$start,
-			$limit,
-		);
+		$wanted  = $start + $limit;
+		$size    = max(2 * $limit, 20);
+		$offset  = 0;
+		$visible = [];
 
-		return array_column($this->database->toArray($threads), 'uri-id');
+		do {
+			$candidates = $this->database->toArray($this->database->p(
+				"(SELECT `uri-id`, `post-user-id`, `commented` FROM `post-thread-user` WHERE `uid` = 0 AND `owner-id` = ?
+					ORDER BY `commented` DESC, `uri-id` DESC LIMIT ?)
+				UNION ALL
+				(SELECT `uri-id`, `post-user-id`, `commented` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` = ?
+					ORDER BY `commented` DESC, `uri-id` DESC LIMIT ?)
+				ORDER BY `commented` DESC, `uri-id` DESC LIMIT ?, ?",
+				$pcid,
+				$offset + $size,
+				$uid,
+				$pcid,
+				$offset + $size,
+				$offset,
+				$size,
+			));
+
+			$postUserIds = array_filter(array_column($candidates, 'post-user-id'));
+			if (!empty($postUserIds)) {
+				$ids = array_column($this->database->toArray($this->database->p(
+					"SELECT `post-user`.`id` FROM `post-user`
+						WHERE `post-user`.`id` IN (" . implode(', ', array_fill(0, count($postUserIds), '?')) . ")
+						AND (`post-user`.`uid` = 0 OR NOT `post-user`.`global`) AND " . self::THREAD_VISIBLE,
+					...array_merge(array_values($postUserIds), [$uid]),
+				)), 'id', 'id');
+
+				foreach ($candidates as $candidate) {
+					if (isset($ids[$candidate['post-user-id']])) {
+						$visible[] = $candidate['uri-id'];
+					}
+				}
+			}
+
+			$offset += $size;
+		} while (count($candidates) == $size && count($visible) < $wanted);
+
+		return array_slice($visible, $start, $limit);
 	}
 
 	/**
@@ -415,22 +429,7 @@ class GroupManager
 
 		$stats = [];
 
-		$counts  = [];
-		$missing = [];
-		foreach ($pcids as $pcid) {
-			$cached = $this->cache->get('group-threads:' . $uid . ':' . $pcid);
-			if (is_array($cached)) {
-				$counts[$pcid] = $cached;
-			} else {
-				$missing[] = $pcid;
-			}
-		}
-
-		if (!empty($missing)) {
-			$counts += $this->countThreads($uid, $missing);
-		}
-
-		foreach ($counts as $pcid => $count) {
+		foreach ($this->countThreads($uid, $pcids) as $pcid => $count) {
 			$stats[$pcid] = [
 				'threads'   => $count['threads'],
 				'unread'    => 0,
@@ -464,6 +463,9 @@ class GroupManager
 	/**
 	 * Counts the threads and fetches the latest activity of the given groups
 	 *
+	 * The numbers are taken from the index of the thread table alone, so threads that are deleted or from blocked authors are still included.
+	 * Visibility is only checked when the threads are really displayed.
+	 *
 	 * @param int   $uid   User id
 	 * @param int[] $pcids Public contact ids of the groups
 	 *
@@ -474,19 +476,30 @@ class GroupManager
 	{
 		$counts = [];
 
-		$threads = $this->database->p(
-			"SELECT `post-thread-user`.`owner-id`, COUNT(*) AS `threads`, MAX(`post-thread-user`.`commented`) AS `commented` " . self::THREADS . "
-				AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
-				GROUP BY `post-thread-user`.`owner-id`",
-			$uid,
-			$uid,
-			...$pcids,
-		);
-		while ($row = $this->database->fetch($threads)) {
-			$counts[$row['owner-id']] = ['threads' => (int) $row['threads'], 'commented' => $row['commented']];
-			$this->cache->set('group-threads:' . $uid . ':' . $row['owner-id'], $counts[$row['owner-id']], Duration::FIVE_MINUTES);
+		// Public threads come from the global copy, private ones from the copy of the user
+		$parts = [
+			"`post-thread-user`.`uid` = 0",
+			"`post-thread-user`.`uid` = " . $uid . " AND NOT EXISTS (SELECT 1 FROM `post-thread-user` AS `global-thread` WHERE `global-thread`.`uid` = 0 AND `global-thread`.`uri-id` = `post-thread-user`.`uri-id`)",
+		];
+
+		foreach ($parts as $where) {
+			$threads = $this->database->p(
+				"SELECT `post-thread-user`.`owner-id`, COUNT(*) AS `threads`, MAX(`post-thread-user`.`commented`) AS `commented`
+					FROM `post-thread-user` WHERE " . $where . "
+					AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
+					GROUP BY `post-thread-user`.`owner-id`",
+				...$pcids,
+			);
+			while ($row = $this->database->fetch($threads)) {
+				$count = $counts[$row['owner-id']] ?? ['threads' => 0, 'commented' => ''];
+
+				$counts[$row['owner-id']] = [
+					'threads'   => $count['threads'] + (int) $row['threads'],
+					'commented' => max((string) $count['commented'], (string) $row['commented']),
+				];
+			}
+			$this->database->close($threads);
 		}
-		$this->database->close($threads);
 
 		return $counts;
 	}
@@ -502,29 +515,14 @@ class GroupManager
 	 */
 	public function getLatestThreads(int $uid, array $stats): array
 	{
-		if (empty($stats)) {
-			return [];
-		}
+		$latest = [];
 
-		$latest    = [];
-		$pcids     = array_keys($stats);
-		$commented = array_values(array_unique(array_column($stats, 'commented')));
-
-		$threads = $this->database->p(
-			"SELECT `post-thread-user`.`owner-id`, `post-thread-user`.`uri-id`, `post-thread-user`.`commented` " . self::THREADS . "
-				AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
-				AND `post-thread-user`.`commented` IN (" . implode(', ', array_fill(0, count($commented), '?')) . ")",
-			$uid,
-			$uid,
-			...$pcids,
-			...$commented,
-		);
-		while ($thread = $this->database->fetch($threads)) {
-			if (!isset($latest[$thread['owner-id']]) && ($thread['commented'] === $stats[$thread['owner-id']]['commented'])) {
-				$latest[$thread['owner-id']] = $thread['uri-id'];
+		foreach (array_keys($stats) as $pcid) {
+			$threadIds = $this->getThreadIds($uid, $pcid, 0, 1);
+			if (!empty($threadIds)) {
+				$latest[$pcid] = $threadIds[0];
 			}
 		}
-		$this->database->close($threads);
 
 		return $latest;
 	}
