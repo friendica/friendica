@@ -38,6 +38,9 @@ class GroupManager
 	private const THREAD_VISIBLE = "`post-user`.`visible` AND NOT `post-user`.`deleted`
 		AND NOT `post-user`.`author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored`))";
 
+	/** @var int[][] Blocked or ignored authors per user, so that they are only fetched once per request */
+	private array $ignoredAuthors = [];
+
 	public function __construct(
 		private readonly ContactByType $contacts,
 		private readonly AddonHelper $addonHelper,
@@ -215,18 +218,21 @@ class GroupManager
 	 */
 	private function countUnreadThreadsPerGroup(int $uid, array $pcids): array
 	{
-		$counts = [];
+		$counts  = [];
+		$authors = $this->getIgnoredAuthors($uid);
 
 		$unread = $this->database->p(
 			"SELECT `post-thread-user`.`owner-id`, COUNT(DISTINCT `post-user`.`parent-uri-id`) AS `unread` FROM `post-user`
 				INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
 				WHERE `post-user`.`uid` = ? AND `post-user`.`unseen` AND NOT `post-user`.`hidden` AND NOT `post-user`.`deleted`
 				AND `post-user`.`gravity` IN (?, ?) AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
+				AND NOT `post-thread-user`.`deleted`" . $this->excludeAuthors($authors) . "
 				GROUP BY `post-thread-user`.`owner-id`",
 			$uid,
 			Item::GRAVITY_PARENT,
 			Item::GRAVITY_COMMENT,
 			...$pcids,
+			...$authors,
 		);
 		while ($row = $this->database->fetch($unread)) {
 			$counts[$row['owner-id']] = (int) $row['unread'];
@@ -421,16 +427,18 @@ class GroupManager
 	public function getThreadIds(int $uid, int $pcid, int $start, int $limit): array
 	{
 		$wanted  = $start + $limit;
-		$size    = max(2 * $limit, 20);
+		$size    = $wanted + 5;
 		$offset  = 0;
 		$visible = [];
 
+		$authors = array_flip($this->getIgnoredAuthors($uid));
+
 		do {
 			$candidates = $this->database->toArray($this->database->p(
-				"(SELECT `uri-id`, `post-user-id`, `commented` FROM `post-thread-user` WHERE `uid` = 0 AND `owner-id` = ?
+				"(SELECT `uri-id`, `post-user-id`, `author-id`, `commented` FROM `post-thread-user` WHERE `uid` = 0 AND `owner-id` = ? AND NOT `deleted`
 					ORDER BY `commented` DESC, `uri-id` DESC LIMIT ?)
 				UNION ALL
-				(SELECT `uri-id`, `post-user-id`, `commented` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` = ?
+				(SELECT `uri-id`, `post-user-id`, `author-id`, `commented` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` = ? AND NOT `deleted`
 					ORDER BY `commented` DESC, `uri-id` DESC LIMIT ?)
 				ORDER BY `commented` DESC, `uri-id` DESC LIMIT ?, ?",
 				$pcid,
@@ -441,6 +449,9 @@ class GroupManager
 				$offset,
 				$size,
 			));
+
+			$complete   = count($candidates) < $size;
+			$candidates = array_filter($candidates, fn (array $candidate): bool => !isset($authors[$candidate['author-id']]));
 
 			$postUserIds = array_filter(array_column($candidates, 'post-user-id'));
 			if (!empty($postUserIds)) {
@@ -459,7 +470,9 @@ class GroupManager
 			}
 
 			$offset += $size;
-		} while (count($candidates) == $size && count($visible) < $wanted);
+
+			$size *= 2;
+		} while (!$complete && count($visible) < $wanted);
 
 		return array_slice($visible, $start, $limit);
 	}
@@ -501,8 +514,8 @@ class GroupManager
 	/**
 	 * Counts the threads and fetches the latest activity of the given groups
 	 *
-	 * The numbers are taken from the index of the thread table alone, so threads that are deleted or from blocked authors are still included.
-	 * Visibility is only checked when the threads are really displayed.
+	 * The numbers are taken from the index of the thread table alone. Deleted threads and threads from blocked or ignored authors are left out,
+	 * other visibility criteria are only checked when the threads are really displayed.
 	 *
 	 * @param int   $uid   User id
 	 * @param int[] $pcids Public contact ids of the groups
@@ -514,32 +527,67 @@ class GroupManager
 	{
 		$counts = [];
 
-		// Public threads come from the global copy, private ones from the copy of the user
-		$parts = [
-			"`post-thread-user`.`uid` = 0",
-			"`post-thread-user`.`uid` = " . $uid . " AND NOT EXISTS (SELECT 1 FROM `post-thread-user` AS `global-thread` WHERE `global-thread`.`uid` = 0 AND `global-thread`.`uri-id` = `post-thread-user`.`uri-id`)",
-		];
+		$authors = $this->getIgnoredAuthors($uid);
 
-		foreach ($parts as $where) {
-			$threads = $this->database->p(
-				"SELECT `post-thread-user`.`owner-id`, COUNT(*) AS `threads`, MAX(`post-thread-user`.`commented`) AS `commented`
-					FROM `post-thread-user` WHERE " . $where . "
-					AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
-					GROUP BY `post-thread-user`.`owner-id`",
-				...$pcids,
-			);
-			while ($row = $this->database->fetch($threads)) {
-				$count = $counts[$row['owner-id']] ?? ['threads' => 0, 'commented' => ''];
-
-				$counts[$row['owner-id']] = [
-					'threads'   => $count['threads'] + (int) $row['threads'],
-					'commented' => max((string) $count['commented'], (string) $row['commented']),
-				];
-			}
-			$this->database->close($threads);
+		// Public threads are in the global copy, private ones in the copy of the user. Threads that are in both copies are counted once.
+		$threads = $this->database->p(
+			"SELECT `owner-id`, COUNT(DISTINCT `uri-id`) AS `threads`, MAX(`commented`) AS `commented`
+				FROM `post-thread-user` WHERE `uid` IN (0, ?)
+				AND `owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
+				AND NOT `deleted`" . $this->excludeAuthors($authors) . "
+				GROUP BY `owner-id`",
+			$uid,
+			...$pcids,
+			...$authors,
+		);
+		while ($row = $this->database->fetch($threads)) {
+			$counts[$row['owner-id']] = [
+				'threads'   => (int) $row['threads'],
+				'commented' => (string) $row['commented'],
+			];
 		}
+		$this->database->close($threads);
 
 		return $counts;
+	}
+
+	/**
+	 * Fetches the contacts that the user has blocked or ignored
+	 *
+	 * The list is fetched separately and then used as a fixed list, so that the counting queries can be done on the index alone.
+	 *
+	 * @param int $uid User id
+	 *
+	 * @return int[] Public contact ids
+	 * @throws \Exception
+	 */
+	private function getIgnoredAuthors(int $uid): array
+	{
+		if ($uid === 0) {
+			return [];
+		}
+
+		if (!isset($this->ignoredAuthors[$uid])) {
+			$this->ignoredAuthors[$uid] = array_map(intval(...), array_column($this->database->selectToArray('user-contact', ['cid'], ["`uid` = ? AND (`blocked` OR `ignored`)", $uid]), 'cid'));
+		}
+
+		return $this->ignoredAuthors[$uid];
+	}
+
+	/**
+	 * Creates the condition that excludes threads from the given authors
+	 *
+	 * @param int[] $authors Public contact ids of the authors
+	 *
+	 * @return string SQL condition with placeholders for the authors, empty when there are no authors
+	 */
+	private function excludeAuthors(array $authors): string
+	{
+		if (empty($authors)) {
+			return '';
+		}
+
+		return " AND NOT `post-thread-user`.`author-id` IN (" . implode(', ', array_fill(0, count($authors), '?')) . ")";
 	}
 
 	/**
