@@ -84,8 +84,13 @@
 						{{if $nav.groups}}
 							<li class="nav-segment">
 								<a class="nav-menu {{$sel.groups}}" href="{{$nav.groups.0}}"
-									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.groups.3}}" title="{{$nav.groups.3}}"><i
-									  class="ri ri-xl ri-discuss-{{if $sel.groups}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i> <span class="nav-label">{{$nav.groups.1}}</span></a>
+									data-toggle="tooltip" data-viewport="#topbar-first" aria-label="{{$nav.groups.3}}" title="{{$nav.groups.3}}">
+									<span class="icon-badge-container">
+										<i class="ri ri-xl ri-discuss-{{if $sel.groups}}fill{{else}}line{{/if}} ri-fw" aria-hidden="true"></i>
+										<span id="groups-update" class="badge nav-notification"></span>
+									</span>
+									<span class="nav-label">{{$nav.groups.1}}</span>
+								</a>
 							</li>
 						{{/if}}
 

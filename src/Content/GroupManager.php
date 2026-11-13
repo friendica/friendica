@@ -185,6 +185,58 @@ class GroupManager
 	}
 
 	/**
+	 * Counts the threads with unread posts in all groups of the user
+	 *
+	 * This is the sum of the "unread" numbers of getGroupStats() and is meant for the navigation bar.
+	 *
+	 * @param int $uid User id
+	 *
+	 * @return int
+	 * @throws \Exception
+	 */
+	public function countUnreadThreads(int $uid): int
+	{
+		$pcids = array_column($this->getList($uid, false, true, true), 'pid');
+		if (empty($pcids)) {
+			return 0;
+		}
+
+		return array_sum($this->countUnreadThreadsPerGroup($uid, $pcids));
+	}
+
+	/**
+	 * Counts the threads with unread posts per group
+	 *
+	 * @param int   $uid   User id
+	 * @param int[] $pcids Public contact ids of the groups
+	 *
+	 * @return int[] Number of threads with unread posts, keyed by the public contact id. Groups without unread threads are missing.
+	 * @throws \Exception
+	 */
+	private function countUnreadThreadsPerGroup(int $uid, array $pcids): array
+	{
+		$counts = [];
+
+		$unread = $this->database->p(
+			"SELECT `post-thread-user`.`owner-id`, COUNT(DISTINCT `post-user`.`parent-uri-id`) AS `unread` FROM `post-user`
+				INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+				WHERE `post-user`.`uid` = ? AND `post-user`.`unseen` AND NOT `post-user`.`hidden` AND NOT `post-user`.`deleted`
+				AND `post-user`.`gravity` IN (?, ?) AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
+				GROUP BY `post-thread-user`.`owner-id`",
+			$uid,
+			Item::GRAVITY_PARENT,
+			Item::GRAVITY_COMMENT,
+			...$pcids,
+		);
+		while ($row = $this->database->fetch($unread)) {
+			$counts[$row['owner-id']] = (int) $row['unread'];
+		}
+		$this->database->close($unread);
+
+		return $counts;
+	}
+
+	/**
 	 * Marks all posts in the threads of a group as seen
 	 *
 	 * @param int $uid  User id
@@ -437,25 +489,11 @@ class GroupManager
 			];
 		}
 
-		$placeholders = implode(', ', array_fill(0, count($pcids), '?'));
-
-		$unread = $this->database->p(
-			"SELECT `post-thread-user`.`owner-id`, COUNT(DISTINCT `post-user`.`parent-uri-id`) AS `unread` FROM `post-user`
-				INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
-				WHERE `post-user`.`uid` = ? AND `post-user`.`unseen` AND NOT `post-user`.`hidden` AND NOT `post-user`.`deleted`
-				AND `post-user`.`gravity` IN (?, ?) AND `post-thread-user`.`owner-id` IN (" . $placeholders . ")
-				GROUP BY `post-thread-user`.`owner-id`",
-			$uid,
-			Item::GRAVITY_PARENT,
-			Item::GRAVITY_COMMENT,
-			...$pcids,
-		);
-		while ($row = $this->database->fetch($unread)) {
-			if (isset($stats[$row['owner-id']])) {
-				$stats[$row['owner-id']]['unread'] = (int) $row['unread'];
+		foreach ($this->countUnreadThreadsPerGroup($uid, $pcids) as $pcid => $unread) {
+			if (isset($stats[$pcid])) {
+				$stats[$pcid]['unread'] = $unread;
 			}
 		}
-		$this->database->close($unread);
 
 		return $stats;
 	}

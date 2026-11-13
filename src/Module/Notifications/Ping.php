@@ -77,6 +77,7 @@ class Ping extends BaseModule
 		$sysnotify_count = 0;
 		$circles_unseen  = [];
 		$groups_unseen   = [];
+		$groups_unread   = 0;
 
 		$event_count          = 0;
 		$today_event_count    = 0;
@@ -112,6 +113,8 @@ class Ping extends BaseModule
 					}
 				}
 			}
+
+			$groups_unread = $this->groupManager->countUnreadThreads($this->session->getLocalUserId());
 
 			$intros = $this->introductionRepo->selectForUser($this->session->getLocalUserId());
 
@@ -235,6 +238,7 @@ class Ping extends BaseModule
 		$data['birthdays-today'] = $today_birthday_count;
 		$data['circles']         = $circles_unseen;
 		$data['groups']          = $groups_unseen;
+		$data['groups-unread']   = ($groups_unread < 1000) ? $groups_unread : '999+';
 		$data['notification']    = ($notification_count < 50) ? $notification_count : '49+';
 
 		$data['notifications'] = $navNotifications;
