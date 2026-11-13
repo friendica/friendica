@@ -5,16 +5,19 @@
 # Prepares the branch "merge-<rc>-into-develop": develop with <rc> merged in,
 # while keeping the version of develop.
 #
-# Usage: bin/dev/sync-rc-into-develop.sh <rc-branch> [<remote>]
+# Usage: bin/dev/sync-rc-into-develop.sh <rc-branch> [<remote>] [<start>]
 #
-# Expects <remote>/develop and <remote>/<rc-branch> to be fetched.
+# <start> is the ref the branch is built on, <remote>/develop by default.
+# Pass the existing sync branch, so conflicts resolved there stay resolved.
+# Expects <remote>/develop, <remote>/<rc-branch> and <start> to be fetched.
 # Needs xgettext when view/lang/C/messages.po conflicts, PHP when database.sql or its docs conflict.
-# Exit codes: 0 = branch prepared, 3 = develop already contains <rc-branch>, 1 = error
+# Exit codes: 0 = branch prepared, 3 = <start> already contains <rc-branch>, 1 = error
 
 set -eu
 
 RC_BRANCH="${1:?Usage: $0 <rc-branch> [<remote>]}"
 REMOTE="${2:-origin}"
+START="${3:-${REMOTE}/develop}"
 SYNC_BRANCH="merge-${RC_BRANCH}-into-develop"
 MESSAGES_PO="view/lang/C/messages.po"
 DATABASE_DOC="doc/en/spec/database"
@@ -53,13 +56,13 @@ is_version_file() {
 	esac
 }
 
-if git merge-base --is-ancestor "${REMOTE}/${RC_BRANCH}" "${REMOTE}/develop"; then
-	echo "develop already contains ${RC_BRANCH}"
+if git merge-base --is-ancestor "${REMOTE}/${RC_BRANCH}" "${START}"; then
+	echo "${START} already contains ${RC_BRANCH}"
 	exit 3
 fi
 
-git checkout -q -B "${SYNC_BRANCH}" "${REMOTE}/develop"
-DEV_VERSION="$(cat VERSION)"
+git checkout -q -B "${SYNC_BRANCH}" "${START}"
+DEV_VERSION="$(git show "${REMOTE}/develop:VERSION")"
 
 if ! git merge -q --no-ff --no-commit "${REMOTE}/${RC_BRANCH}"; then
 	# Version lines conflict whenever both branches changed their version since the last sync.
