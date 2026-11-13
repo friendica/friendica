@@ -11,11 +11,12 @@
 # Pass the existing sync branch, so conflicts resolved there stay resolved.
 # Expects <remote>/develop, <remote>/<rc-branch> and <start> to be fetched.
 # Needs xgettext when view/lang/C/messages.po conflicts, PHP when database.sql or its docs conflict.
-# Exit codes: 0 = branch prepared, 3 = <start> already contains <rc-branch>, 1 = error
+# Exit codes: 0 = branch prepared, 3 = <start> already contains <rc-branch>, 1 = error.
+# A merge conflict exits with 1 and prints "Merge conflict in <file>, resolve the sync manually".
 
 set -eu
 
-RC_BRANCH="${1:?Usage: $0 <rc-branch> [<remote>]}"
+RC_BRANCH="${1:?Usage: $0 <rc-branch> [<remote>] [<start>]}"
 REMOTE="${2:-origin}"
 START="${3:-${REMOTE}/develop}"
 SYNC_BRANCH="merge-${RC_BRANCH}-into-develop"

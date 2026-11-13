@@ -6,6 +6,7 @@
 # keeping the version of develop) and opens a PR for it, unless one is already open.
 # An open PR is extended in place, so conflicts resolved there stay resolved.
 # A merge conflict marks that PR as WIP with a failed "sync-rc" status and a comment, or opens an issue if no PR is open.
+# The WIP prefix only blocks merging on Forgejo, on GitHub the failed status does if "sync-rc" is a required check.
 # The same conflict is reported only once.
 # Runs at the releaser location because it needs a token with write access
 labels:
@@ -55,6 +56,11 @@ steps:
           jq -n --arg title "$$1" '{title: $$title}' > /tmp/title.json
           api -o /dev/null -X PATCH -d @/tmp/title.json "$${API}/pulls/$${PR_NUMBER}"
         }
+      # Removes the WIP prefix set on a conflict, keeps any other title change
+      - |
+        clear_wip() {
+          case "$${PR_TITLE}" in "WIP: "*) set_title "$${PR_TITLE#WIP: }" ;; esac
+        }
       - LOGIN="$(api "$${API_ROOT}/user")" || { echo "$${LOGIN}"; exit 1; }
       - LOGIN="$(printf '%s\n' "$${LOGIN}" | jq -r .login)"
       - git clone --quiet --filter=blob:none --single-branch --branch develop "${CI_FORGE_URL}/${CI_REPO}.git" /tmp/sync
@@ -78,23 +84,25 @@ steps:
       # The PR already contains the rc branch, e.g. after a manual resolution: clear the conflict mark
       - |
         if [ "$${RESULT}" -eq 3 ]; then
-          if [ -n "$${PR_NUMBER}" ] && [ "$${PR_TITLE}" != "$${TITLE}" ]; then
+          if [ -n "$${PR_NUMBER}" ]; then
             set_status success "Contains ${CI_COMMIT_BRANCH} up to ${CI_COMMIT_SHA}" "$(git rev-parse "$${START}")"
-            set_title "$${TITLE}"
+            clear_wip
           fi
           exit 0
         fi
+      # Only a merge conflict needs manual work, any other error fails the step with its own log
+      - REASON="$(printf '%s\n' "$${OUTPUT}" | grep -m1 'resolve the sync manually' || true)"
+      - if [ "$${RESULT}" -ne 0 ] && { [ "$${RESULT}" -ne 1 ] || [ -z "$${REASON}" ]; }; then exit "$${RESULT}"; fi
       # On a conflict, mark the sync PR and ask for a manual merge there (or in an issue, if no PR is open)
       - |
         if [ "$${RESULT}" -ne 0 ]; then
-          REASON="$(printf '%s\n' "$${OUTPUT}" | grep -m1 'resolve the sync manually' || echo "see ${CI_PIPELINE_URL}")"
           START_SHA="$(git rev-parse "$${START}")"
           if [ -n "$${PR_NUMBER}" ]; then
             SYNCED="$(git merge-base "$${START}" "origin/${CI_COMMIT_BRANCH}")"
             STATE="This PR is not up to date: it contains \`${CI_COMMIT_BRANCH}\` up to $${SYNCED}, merging the newer commits up to ${CI_COMMIT_SHA} needs manual work. $${REASON}"
             MARKER="<!-- sync-rc $${START_SHA} $${REASON} -->"
             set_status failure "Newer ${CI_COMMIT_BRANCH} commits conflict with develop, see the PR comments" "$${START_SHA}"
-            if [ "$${PR_TITLE}" != "WIP: $${TITLE}" ]; then set_title "WIP: $${TITLE}"; fi
+            case "$${PR_TITLE}" in "WIP: "*) ;; *) set_title "WIP: $${PR_TITLE}" ;; esac
           else
             STATE="Merging \`${CI_COMMIT_BRANCH}\` (${CI_COMMIT_SHA}) into \`develop\` needs manual work: $${REASON}"
             MARKER="<!-- sync-rc $${REASON} -->"
@@ -119,7 +127,7 @@ steps:
             SEEN="$(printf '%s\n' "$${ISSUE}" | jq -r --arg m "$${MARKER}" 'select(.body // "" | contains($$m)) | .number')"
           fi
           if [ -z "$${SEEN}" ]; then
-            COMMENTS="$(api "$${API}/issues/$${PR_NUMBER}/comments?per_page=100")" || { echo "$${COMMENTS}"; exit 1; }
+            COMMENTS="$(api "$${API}/issues/$${PR_NUMBER}/comments?per_page=100&limit=50")" || { echo "$${COMMENTS}"; exit 1; }
             SEEN="$(printf '%s\n' "$${COMMENTS}" | jq -r --arg m "$${MARKER}" 'map(select(.body | contains($$m))) | .[0].id // empty')"
           fi
           if [ -n "$${SEEN}" ]; then
@@ -129,14 +137,15 @@ steps:
           api -o /dev/null -X POST -d @/tmp/notice.json "$${API}/issues/$${PR_NUMBER}/comments"
           exit 0
         fi
-      # An open PR is only extended, so it needs no force push
+      # An open PR is only extended, so it needs no force push.
+      # A push racing with a second rc push is rejected, the next rc push catches up.
       - FORCE="--force"
       - if [ -n "$${PR_NUMBER}" ]; then FORCE=""; fi
       - git push --quiet $${FORCE} "https://$${LOGIN}:$${TOKEN}@$${FORGE_URL#https://}/${CI_REPO}.git" "$${SYNC_BRANCH}"
       - |
         if [ -n "$${PR_NUMBER}" ]; then
           set_status success "Contains ${CI_COMMIT_BRANCH} up to ${CI_COMMIT_SHA}" "$(git rev-parse HEAD)"
-          if [ "$${PR_TITLE}" != "$${TITLE}" ]; then set_title "$${TITLE}"; fi
+          clear_wip
           echo "Sync PR already open, branch updated"
           exit 0
         fi
