@@ -1,6 +1,6 @@
 -- ------------------------------------------
 -- Friendica
--- DB_UPDATE_VERSION 1606
+-- DB_UPDATE_VERSION 1607
 -- ------------------------------------------
 
 
@@ -1801,6 +1801,7 @@ CREATE TABLE IF NOT EXISTS `post-thread-user` (
 	`contact-id` int unsigned NOT NULL DEFAULT 0 COMMENT 'contact.id',
 	`unseen` boolean NOT NULL DEFAULT '1' COMMENT 'post has not been seen',
 	`hidden` boolean NOT NULL DEFAULT '0' COMMENT 'Marker to hide the post from the user',
+	`deleted` boolean NOT NULL DEFAULT '0' COMMENT 'item has been marked for deletion',
 	`origin` boolean NOT NULL DEFAULT '0' COMMENT 'item originated at this site',
 	`psid` int unsigned COMMENT 'ID of the permission set of this post',
 	`post-user-id` int unsigned COMMENT 'Id of the post-user table',
@@ -1822,7 +1823,7 @@ CREATE TABLE IF NOT EXISTS `post-thread-user` (
 	 INDEX `uid_received` (`uid`,`received`),
 	 INDEX `uid_wall_received` (`uid`,`wall`,`received`),
 	 INDEX `uid_commented` (`uid`,`commented`),
-	 INDEX `uid_owner-id_commented` (`uid`,`owner-id`,`commented`),
+	 INDEX `uid_owner-id_commented` (`uid`,`owner-id`,`commented`,`uri-id`,`deleted`,`author-id`),
 	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `uid_starred` (`uid`,`starred`),
 	 INDEX `uid_mention` (`uid`,`mention`),

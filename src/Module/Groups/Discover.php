@@ -72,14 +72,23 @@ class Discover extends BaseModule
 		$condition = $this->getCondition($uid, $gsid, $search);
 
 		$pager = new Pager($this->l10n, $this->args->getQueryString());
-		$total = $this->database->count('account-view', $condition);
+		$where = $condition;
+		$sql   = DBA::buildCondition($where);
 
-		$contacts = $this->database->selectToArray(
-			'account-view',
-			['id', 'url', 'addr', 'name', 'about', 'thumb', 'avatar', 'updated', 'gsid', 'last-item', 'manually-approve'],
-			$condition,
-			['order' => ['last-item' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]],
-		);
+		// The total is determined in the same scan, so that the matching accounts don't have to be loaded
+		$contacts = $this->database->toArray($this->database->p(
+			"SELECT `id`, `url`, `addr`, `name`, `about`, `thumb`, `avatar`, `updated`, `gsid`, `last-item`, `manually-approve`, COUNT(*) OVER () AS `total`
+				FROM `account-view`" . $sql . " ORDER BY `last-item` DESC LIMIT ?, ?",
+			...$where,
+			...[$pager->getStart(), $pager->getItemsPerPage()],
+		));
+
+		if (!empty($contacts)) {
+			$total = (int) $contacts[0]['total'];
+		} else {
+			// Behind the last page the window function has no row to report the total
+			$total = $this->database->count('account-view', $condition);
+		}
 
 		$servers = $gsid ? [] : $this->groupManager->getServers(array_column($contacts, 'gsid'));
 
@@ -91,7 +100,7 @@ class Discover extends BaseModule
 				'id'      => $contact['id'],
 				'link'    => $this->groupManager->getLink($contact),
 				'name'    => $contact['name'],
-				'thumb'   => Contact::getThumb($contact),
+				'thumb'   => Contact::getThumb($contact, true),
 				'about'   => Plaintext::shorten(BBCode::toPlaintext($contact['about'], false), 200),
 				'server'  => $gsid ? '' : $this->groupManager->getServerDescription($servers[$contact['gsid']] ?? [], $host)['name'],
 				'host'    => $host,
