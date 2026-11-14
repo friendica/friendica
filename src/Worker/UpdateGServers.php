@@ -44,8 +44,18 @@ class UpdateGServers
 			return;
 		}
 
+		$abandoned_days = (int) DI::config()->get('system', 'gserver_abandoned_days');
+		$now            = DateTimeFormat::utcNow();
+
 		$count = 0;
 		while ($gserver = DBA::fetch($gservers)) {
+			if ($gserver['failed'] && GServer::isAbandoned($gserver['created'], $gserver['last_contact'], $abandoned_days, $now) && !Contact::exists(['gsid' => $gserver['id'], 'local-data' => true])) {
+				$next_update = GServer::getNextUpdateDate(false, $gserver['created'], $gserver['last_contact']);
+				DI::logger()->debug('Skip abandoned server without contacts with local data', ['url' => $gserver['url'], 'next_update' => $next_update]);
+				GServer::update(['next_contact' => $next_update], ['nurl' => $gserver['nurl']]);
+				continue;
+			}
+
 			if (DI::config()->get('system', 'update_active_contacts') && !Contact::exists(['gsid' => $gserver['id'], 'local-data' => true])) {
 				$next_update = GServer::getNextUpdateDate(!$gserver['failed'], $gserver['created'], $gserver['last_contact']);
 				DI::logger()->debug('Skip server without contacts with local data', ['url' => $gserver['url'], 'failed' => $gserver['failed'], 'next_update' => $next_update]);
