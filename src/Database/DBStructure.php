@@ -690,12 +690,12 @@ class DBStructure
 	}
 
 	/**
-	 *    Check if the columns of the table exists
+	 * Check if all the provided columns exist in a single table
 	 *
-	 * @param string $table   Table name
-	 * @param array  $columns Columns to check ( Syntax: [ $col1, $col2, .. ] )
+	 * @param string   $table   Table name
+	 * @param string[] $columns Columns to check
 	 *
-	 * @return boolean Does the table exist?
+	 * @return boolean
 	 * @throws Exception
 	 */
 	public static function existsColumn(string $table, array $columns = []): bool
@@ -708,27 +708,9 @@ class DBStructure
 			return self::existsTable($table);
 		}
 
-		$table = DBA::escape($table);
+		$condition = ['table_schema' => DBA::databaseName(), 'table_name' => $table, 'column_name' => $columns];
 
-		foreach ($columns as $column) {
-			$sql = "SHOW COLUMNS FROM `" . $table . "` LIKE '" . $column . "';";
-
-			$stmt = DBA::p($sql);
-
-			if (is_bool($stmt)) {
-				$retval = $stmt;
-			} else {
-				$retval = (DBA::numRows($stmt) > 0);
-			}
-
-			DBA::close($stmt);
-
-			if (!$retval) {
-				return false;
-			}
-		}
-
-		return true;
+		return DBA::count('information_schema.columns', $condition) === count($columns) ;
 	}
 
 	/**
@@ -775,7 +757,7 @@ class DBStructure
 	 */
 	public static function getColumns(string $table): array
 	{
-		$stmtColumns = DBA::p("SHOW COLUMNS FROM `" . $table . "`");
+		$stmtColumns = DBA::p("SHOW COLUMNS FROM " . DBA::quoteIdentifier($table));
 		return DBA::toArray($stmtColumns);
 	}
 

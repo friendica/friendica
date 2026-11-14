@@ -93,7 +93,7 @@ class Edit extends BaseModule
 
 		$fields = [
 			'allow_cid', 'allow_gid', 'deny_cid', 'deny_gid', 'gravity', 'sensitive',
-			'body', 'title', 'content-warning', 'uri-id', 'wall', 'post-type', 'guid',
+			'body', 'title', 'content-warning', 'uri-id', 'wall', 'post-type', 'guid', 'language',
 		];
 
 		$item = Post::selectFirstForUser($this->session->getLocalUserId(), $fields, [
@@ -128,6 +128,12 @@ class Edit extends BaseModule
 
 		$item['body'] = Post\Media::addAttachmentsToBody($item['uri-id'], $item['body']);
 		$item         = Post\Media::addHTMLAttachmentToItem($item);
+
+		$languages = $this->l10n->getLanguageSelection();
+		$language  = !empty($item['language']) ? array_key_first(json_decode((string) $item['language'], true) ?? []) : null;
+		if (!array_key_exists((string) $language, $languages)) {
+			$language = L10n::UNDETERMINED_LANGUAGE;
+		}
 
 		$jotplugins = $this->eventDispatcher->dispatch(new JotToolEvent(''))->getHtml();
 
@@ -185,13 +191,17 @@ class Edit extends BaseModule
 			'$edquote'  => $this->t('Quote'),
 			'$edemojis' => $this->t('Add emojis'),
 			'$edcode'   => $this->t('Code'),
-			'$edurl'    => $this->t('Link'),
+			'$edurl'    => $this->t('Web link'),
 			'$edattach' => $this->t('Link or Media'),
 
 			//jot nav tab (used in some themes)
 			'$message'      => $this->t('Message'),
 			'$browser'      => $this->t('Add file'),
 			'$shortpermset' => $this->t('Permissions'),
+
+			'$language_label' => $this->t('Language'),
+			'$language'       => $language,
+			'$languages'      => $languages,
 
 			'$compose_link_title' => $this->t('Open Compose page'),
 		]);

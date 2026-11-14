@@ -19,8 +19,8 @@
   <div class="intro-note" id="intro-note-{{$contact_id}}">{{$note}}</div>
   <div class="intro-wrapper-end" id="intro-wrapper-end-{{$contact_id}}"></div>
   <form class="intro-form" action="notification/{{$intro_id}}" method="post">
-    <button class="intro-submit-ignore" type="submit" name="submit" value="{{$ignore}}">{{$ignore}}</button>
-   {{if $discard}}<button class="intro-submit-discard" type="submit" name="submit" value="{{$discard}}">{{$discard}}</button>{{/if}}
+    <button class="intro-submit-ignore" type="submit" name="submit" value="ignore">{{$ignore}}</button>
+    {{if $discard}}<button class="intro-submit-discard" type="submit" name="submit" value="discard">{{$discard}}</button>{{/if}}
   </form>
   <div class="intro-form-end"></div>
 

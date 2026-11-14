@@ -11,11 +11,8 @@
 
 <form action="settings/connectors" method="post" autocomplete="off">
 	<input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
-	<h2 class="settings-heading">
-		<a onclick="openClose('settings_general_expanded'); openClose('settings_general_inflated');">{{$general_settings}}</a>
-	</h2>
-
-	<div id="settings_general_expanded" class="settings-block" style="display: none;">
+	<details class="settings-section">
+		<summary class="settings-heading"><h2>{{$general_settings}}</h2></summary>
 
 		{{include file="field_select.tpl" field=$accept_only_sharer}}
 		{{include file="field_checkbox.tpl" field=$enable_cw}}
@@ -28,48 +25,45 @@
 		{{include file="field_input.tpl" field=$minimum_posting_interval}}
 
 		<div class="settings-submit-wrapper">
-			<input type="submit" id="general-submit" name="general-submit" class="settings-submit" value="{{$submit}}"/>
+			<input type="submit" id="general-submit" name="general-submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
 		</div>
-	</div>
+	</details>
 </form>
 <div class="clear"></div>
 
 <form action="settings/connectors" method="post" autocomplete="off">
 	<input type='hidden' name='form_security_token' value='{{$form_security_token}}'>
-	<span id="settings_mail_inflated" class="settings-block fakelink" style="display: block;"
-	      onclick="openClose('settings_mail_expanded'); openClose('settings_mail_inflated');">
-		<img class="connector" src="images/mail.png"/><h3 class="settings-heading connector">{{$h_mail}}</h3>
-	</span>
-	<div id="settings_mail_expanded" class="settings-block" style="display: none;">
-		<span class="fakelink" onclick="openClose('settings_mail_expanded'); openClose('settings_mail_inflated');">
-			<img class="connector" src="images/mail.png"/><h3 class="settings-heading connector">{{$h_mail}}</h3>
-		</span>
-    {{if $mail_disabled}}
-		<p>{{$mail_disabled}}</p>
-	{{else}}
-		<p>{{$mail_desc nofilter}}</p>
-		{{include file="field_custom.tpl" field=$mail_lastcheck}}
-		{{include file="field_input.tpl" field=$mail_server}}
-		{{include file="field_input.tpl" field=$mail_port}}
-		{{include file="field_select.tpl" field=$mail_ssl}}
-		{{include file="field_input.tpl" field=$mail_user}}
-		{{include file="field_password.tpl" field=$mail_pass}}
-		{{include file="field_input.tpl" field=$mail_replyto}}
-		{{include file="field_checkbox.tpl" field=$mail_pubmail}}
-		{{include file="field_select.tpl" field=$mail_action}}
-		{{include file="field_input.tpl" field=$mail_movetofolder}}
+	<details class="settings-section">
+		<summary class="settings-heading"><h2><i class="ri ri-mail-line"></i> {{$h_mail}}</h2></summary>
 
-		<div class="settings-submit-wrapper">
-			<input type="submit" id="mail-submit" name="mail-submit" class="settings-submit" value="{{$submit}}"/>
-		</div>
-	{{/if}}
-	</div>
+    	{{if $mail_disabled}}
+			<p>{{$mail_disabled}}</p>
+		{{else}}
+			<p>{{$mail_desc nofilter}}</p>
+			{{include file="field_custom.tpl" field=$mail_lastcheck}}
+			{{include file="field_input.tpl" field=$mail_server}}
+			{{include file="field_input.tpl" field=$mail_port}}
+			{{include file="field_select.tpl" field=$mail_ssl}}
+			{{include file="field_input.tpl" field=$mail_user}}
+			{{include file="field_password.tpl" field=$mail_pass}}
+			{{include file="field_input.tpl" field=$mail_replyto}}
+			{{include file="field_checkbox.tpl" field=$mail_pubmail}}
+			{{include file="field_select.tpl" field=$mail_action}}
+			{{include file="field_input.tpl" field=$mail_movetofolder}}
+
+			<div class="settings-submit-wrapper">
+				<input type="submit" id="mail-submit" name="mail-submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
+			</div>
+		{{/if}}
+	</details>
 </form>
 
 {{foreach $connector_settings_forms as $addon => $connector_settings_form}}
 <form action="settings/connectors/{{$addon}}" method="post" autocomplete="off">
 	<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-    {{$connector_settings_form nofilter}}
+	<details class="settings-section">
+    	{{$connector_settings_form nofilter}}
+	</details>
 	<div class="clear"></div>
 </form>
 {{/foreach}}

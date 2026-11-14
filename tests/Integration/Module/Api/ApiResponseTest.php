@@ -22,7 +22,7 @@ final class ApiResponseTest extends ApiTestCase
 
 	private function createApiResponse(array $server = [], string $jsonpCallback = '', ?LoggerInterface $logger = null): ApiResponse
 	{
-		return new ApiResponse(DI::l10n(), DI::args(), $logger ?? DI::logger(), DI::baseUrl(), DI::twitterUser(), $server, $jsonpCallback);
+		return new ApiResponse(DI::l10n(), DI::args(), $logger ?? DI::logger(), DI::baseUrl(), DI::twitterUser(), DI::config(), $server, $jsonpCallback);
 	}
 
 	public function testErrorWithJson(): void

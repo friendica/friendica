@@ -57,7 +57,7 @@ class ConfigFileManagerTest extends MockedTestCase
 		$this->delConfigFile('local.config.php');
 
 		vfsStream::newFile('local.config.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent('<?php return true;');
 
 		$configFileLoader = new ConfigFileManager(
@@ -87,7 +87,7 @@ class ConfigFileManagerTest extends MockedTestCase
 				. 'A.config.php';
 
 		vfsStream::newFile('local.config.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent(file_get_contents($file));
 
 		$configFileLoader = new ConfigFileManager(
@@ -125,7 +125,7 @@ class ConfigFileManagerTest extends MockedTestCase
 				. 'A.ini.php';
 
 		vfsStream::newFile('local.ini.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent(file_get_contents($file));
 
 		$configFileLoader = new ConfigFileManager(
@@ -216,12 +216,8 @@ class ConfigFileManagerTest extends MockedTestCase
 				. 'config' . DIRECTORY_SEPARATOR
 				. 'A.config.php';
 
-		/** @var \org\bovigo\vfs\vfsStreamDirectory $addonDir */
-		$addonDir = $this->root->getChild('addon');
-		/** @var \org\bovigo\vfs\vfsStreamDirectory $testDir */
-		$testDir = $addonDir->getChild('test');
 		vfsStream::newFile('test.config.php')
-				 ->at($testDir->getChild('config'))
+				 ->at($this->getVfsDirectory('addon/test/config'))
 				 ->setContent(file_get_contents($file));
 
 		$configFileLoader = new ConfigFileManager(
@@ -256,10 +252,10 @@ class ConfigFileManagerTest extends MockedTestCase
 				   . 'config' . DIRECTORY_SEPARATOR;
 
 		vfsStream::newFile('A.config.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent(file_get_contents($fileDir . 'A.config.php'));
 		vfsStream::newFile('B.config.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent(file_get_contents($fileDir . 'B.config.php'));
 
 		$configFileLoader = new ConfigFileManager(
@@ -291,10 +287,10 @@ class ConfigFileManagerTest extends MockedTestCase
 				   . 'config' . DIRECTORY_SEPARATOR;
 
 		vfsStream::newFile('A.ini.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent(file_get_contents($fileDir . 'A.ini.php'));
 		vfsStream::newFile('B.ini.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent(file_get_contents($fileDir . 'B.ini.php'));
 
 		$configFileLoader = new ConfigFileManager(
@@ -326,10 +322,10 @@ class ConfigFileManagerTest extends MockedTestCase
 				   . 'config' . DIRECTORY_SEPARATOR;
 
 		vfsStream::newFile('A.ini.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent(file_get_contents($fileDir . 'A.ini.php'));
 		vfsStream::newFile('B-sample.ini.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent(file_get_contents($fileDir . 'B.ini.php'));
 
 		$configFileLoader = new ConfigFileManager(
@@ -381,7 +377,7 @@ class ConfigFileManagerTest extends MockedTestCase
 				   . 'config' . DIRECTORY_SEPARATOR;
 
 		vfsStream::newFile('B.config.php')
-				 ->at($this->root->getChild('config2'))
+				 ->at($this->getVfsDirectory('config2'))
 				 ->setContent(file_get_contents($fileDir . 'B.config.php'));
 
 		$configFileManager = (new Config())->createConfigFileManager(
@@ -404,7 +400,7 @@ class ConfigFileManagerTest extends MockedTestCase
 		$this->delConfigFile('node.config.php');
 
 		vfsStream::newFile('node.config.php')
-				 ->at($this->root->getChild('config'))
+				 ->at($this->getVfsDirectory('config'))
 				 ->setContent('');
 
 		$configFileManager = new ConfigFileManager(

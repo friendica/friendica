@@ -136,7 +136,7 @@ class Email implements IEmail
 	{
 		$newMail          = clone $this;
 		$newMail->msgText = $plaintext;
-		$newMail->msgHtml = $html;
+		$newMail->msgHtml = $html ?? '';
 
 		return $newMail;
 	}

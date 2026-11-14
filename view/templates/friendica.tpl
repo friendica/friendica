@@ -39,7 +39,7 @@
 			{{/foreach}}
 			</tbody>
 		</table>
-		<p><a rel="nofollow" href="/blocklist/domain/download"><i class="ri ri-download-line"></i> {{$block_list.download}}</a></p>
+		<p><a rel="nofollow" href="/blocklist/domain/download" download><i class="ri ri-download-line"></i> {{$block_list.download}}</a></p>
 	</div>
 {{/if}}
 

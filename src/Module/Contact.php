@@ -41,6 +41,13 @@ class Contact extends BaseModule
 	public const TAB_CONTACTS      = 4;
 	public const TAB_ADVANCED      = 5;
 	public const TAB_MEDIA         = 6;
+	public const TAB_ACTIVITIES    = 7;
+	public const TAB_RESHARES      = 8;
+	public const TAB_QUOTES        = 9;
+	public const TAB_ORIGINAL      = 10;
+
+	/** Tabs that are displayed as filters below the "Posts" tab */
+	private const POSTS_TABS = [self::TAB_CONVERSATIONS, self::TAB_POSTS, self::TAB_MEDIA, self::TAB_ACTIVITIES, self::TAB_RESHARES, self::TAB_QUOTES, self::TAB_ORIGINAL];
 
 	public function __construct(private readonly StatusEditor $statusEditor, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, array $server, array $parameters)
 	{
@@ -494,26 +501,10 @@ class Contact extends BaseModule
 			[
 				'label'     => DI::l10n()->t('Posts'),
 				'url'       => 'contact/' . $pcid . '/conversations',
-				'sel'       => (($active_tab == self::TAB_CONVERSATIONS) ? 'active' : ''),
+				'sel'       => (in_array($active_tab, self::POSTS_TABS) ? 'active' : ''),
 				'title'     => DI::l10n()->t('All posts'),
 				'id'        => 'status-tab',
 				'accesskey' => 'm',
-			],
-			[
-				'label'     => DI::l10n()->t('Posts and Comments'),
-				'url'       => 'contact/' . $pcid . '/posts',
-				'sel'       => (($active_tab == self::TAB_POSTS) ? 'active' : ''),
-				'title'     => DI::l10n()->t('Individual Posts and Replies'),
-				'id'        => 'posts-tab',
-				'accesskey' => 'p',
-			],
-			[
-				'label'     => DI::l10n()->t('Media posts'),
-				'url'       => 'contact/' . $pcid . '/media',
-				'sel'       => (($active_tab == self::TAB_MEDIA) ? 'active' : ''),
-				'title'     => DI::l10n()->t('Posts containing media'),
-				'id'        => 'media-tab',
-				'accesskey' => 'd',
 			],
 			[
 				'label'     => DI::l10n()->t('Contacts'),
@@ -538,6 +529,20 @@ class Contact extends BaseModule
 
 		$tab_tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
 		$tab_str = Renderer::replaceMacros($tab_tpl, ['$tabs' => $tabs, '$more' => DI::l10n()->t('More')]);
+
+		if (in_array($active_tab, self::POSTS_TABS)) {
+			$current = match ($active_tab) {
+				self::TAB_RESHARES   => 'reshares',
+				self::TAB_QUOTES     => 'quotes',
+				self::TAB_ORIGINAL   => 'original',
+				self::TAB_POSTS      => 'posts',
+				self::TAB_ACTIVITIES => 'activities',
+				self::TAB_MEDIA      => 'media',
+				default              => 'status',
+			};
+
+			$tab_str .= BaseProfile::getPostsFilterHTML('contact/' . $pcid . '/conversations', 'contact/' . $pcid, $current, $contact);
+		}
 
 		return $tab_str;
 	}

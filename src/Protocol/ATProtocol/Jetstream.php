@@ -100,11 +100,13 @@ class Jetstream
 
 			$this->syncContacts();
 			try {
+				$configuration = new \WebSocket\Configuration($this->logger, null, $timeout);
 				// @todo make the path configurable
-				$this->client = new \WebSocket\Client('wss://' . $this->atprotocol->getJetstream() . '/subscribe?requireHello=true' . $cursor);
-				$this->client->setTimeout($timeout);
-				$this->client->setLogger($this->logger);
-			} catch (\WebSocket\ConnectionException $e) {
+				$this->client = new \WebSocket\Client('wss://' . $this->atprotocol->getJetstream() . '/subscribe?requireHello=true' . $cursor, $configuration);
+				// The library no longer answers pings or the close handshake on its own
+				$this->client->addMiddleware(new \WebSocket\Middleware\CloseHandler());
+				$this->client->addMiddleware(new \WebSocket\Middleware\PingResponder());
+			} catch (\WebSocket\Exception\Exception $e) {
 				$this->logger->error('Error while trying to establish the connection', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 				echo "Connection wasn't established.\n";
 				exit(1);
@@ -115,11 +117,21 @@ class Jetstream
 				try {
 					$message = $this->client->receive();
 
-					if (empty($message)) {
+					// Ignore ping, pong and close frames, but stop once the connection is gone
+					if (!$message instanceof \WebSocket\Message\Text) {
+						if (!$this->client->isConnected()) {
+							$this->logger->notice('Connection closed');
+							break;
+						}
+						continue;
+					}
+
+					$content = $message->getContent();
+					if (empty($content)) {
 						$this->logger->notice('Empty message received');
 						break;
 					}
-					$data = json_decode((string) $message);
+					$data = json_decode($content);
 					if (is_object($data)) {
 						$timestamp = $data->time_us;
 						$this->route($data);
@@ -129,19 +141,17 @@ class Jetstream
 						$this->logger->warning('Unexpected return value', ['data' => $data]);
 						break;
 					}
-				} catch (\WebSocket\ConnectionException $e) {
-					if ($e->getCode() == 1024) {
-						$timeout_duration = time() - $last_timeout;
-						if ($timeout_duration < $timeout_limit) {
-							$this->logger->notice('Timeout - connection lost', ['duration' => $timeout_duration, 'timestamp' => $timestamp, 'code' => $e->getCode(), 'message' => $e->getMessage()]);
-							break;
-						}
-						$this->logger->notice('Timeout', ['duration' => $timeout_duration, 'timestamp' => $timestamp, 'code' => $e->getCode(), 'message' => $e->getMessage()]);
-						break;
+				} catch (\WebSocket\Exception\ConnectionTimeoutException $e) {
+					$timeout_duration = time() - $last_timeout;
+					if ($timeout_duration < $timeout_limit) {
+						$this->logger->notice('Timeout - connection lost', ['duration' => $timeout_duration, 'timestamp' => $timestamp, 'message' => $e->getMessage()]);
 					} else {
-						$this->logger->error('Error while trying to receive a message', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
-						break;
+						$this->logger->notice('Timeout', ['duration' => $timeout_duration, 'timestamp' => $timestamp, 'message' => $e->getMessage()]);
 					}
+					break;
+				} catch (\WebSocket\Exception\Exception $e) {
+					$this->logger->error('Error while trying to receive a message', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+					break;
 				} catch (\Exception $e) {
 					$this->logger->error('General error while trying to receive a message', ['capped' => $this->capped, 'code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 					break;
@@ -150,8 +160,8 @@ class Jetstream
 			}
 
 			try {
-				$this->client->close();
-			} catch (\WebSocket\ConnectionException $e) {
+				$this->client->disconnect();
+			} catch (\WebSocket\Exception\Exception $e) {
 				$this->logger->error('Error while trying to close the connection', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 			}
 		}
@@ -248,8 +258,8 @@ class Jetstream
 			],
 		];
 		try {
-			$this->client->send(json_encode($update));
-		} catch (\WebSocket\ConnectionException $e) {
+			$this->client->text(json_encode($update));
+		} catch (\WebSocket\Exception\Exception $e) {
 			$this->logger->error('Error while trying to send options.', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
 		}
 	}

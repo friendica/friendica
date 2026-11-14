@@ -1113,7 +1113,7 @@ class Feed
 				break;
 		}
 
-		$attributes = ['uri' => 'https://friendi.ca', 'version' => App::VERSION . '-' . DB_UPDATE_VERSION];
+		$attributes = ['uri' => 'https://friendi.ca', 'version' => App::version() . '-' . DB_UPDATE_VERSION];
 		XML::addElement($doc, $root, 'generator', App::PLATFORM, $attributes);
 		XML::addElement($doc, $root, 'id', DI::baseUrl() . '/profile/' . $owner['nick']);
 		XML::addElement($doc, $root, 'title', $title);

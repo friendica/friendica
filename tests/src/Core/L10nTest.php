@@ -99,6 +99,35 @@ class L10nTest extends MockedTestCase
 		self::assertEquals($assert, L10n::detectLanguage($server, $get, $default));
 	}
 
+	public static function dataToDirectoryName(): array
+	{
+		return [
+			'directory name'            => ['da-dk', 'da-dk'],
+			'parent code'               => ['da', 'da-dk'],
+			'mixed case'                => ['da-DK', 'da-dk'],
+			'underscore'                => ['fi_FI', 'fi-fi'],
+			'finnish parent'            => ['fi', 'fi-fi'],
+			'norwegian parent'          => ['nb', 'nb-no'],
+			'portuguese parent'         => ['pt', 'pt-br'],
+			'unknown region'            => ['pt-PT', 'pt-br'],
+			'first variant is used'     => ['zh', 'zh-cn'],
+			'second variant is kept'    => ['zh-tw', 'zh-tw'],
+			'english parent'            => ['en', 'en-gb'],
+			'english us is kept'        => ['en-us', 'en-us'],
+			'english variant is kept'   => ['en-gb', 'en-gb'],
+			'language without variants' => ['de', 'de'],
+			'region of such language'   => ['de-AT', 'de'],
+			'surrounding whitespace'    => [' fr ', 'fr'],
+			'empty'                     => ['', ''],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataToDirectoryName')]
+	public function testToDirectoryName(string $lang, string $assert): void
+	{
+		self::assertSame($assert, L10n::toDirectoryName($lang));
+	}
+
 	public static function dataNormaliseLocale(): array
 	{
 		return [
@@ -138,6 +167,24 @@ class L10nTest extends MockedTestCase
 		$l10n = $this->createL10n($server);
 
 		self::assertSame($assert, $l10n->normaliseLocale($locale));
+	}
+
+	public function testTranslationCount(): void
+	{
+		unset($_GET['lang']);
+
+		$l10n = $this->createL10n([]);
+
+		self::assertSame(0, $l10n->getTranslationCount());
+
+		$l10n->t('');
+		self::assertSame(0, $l10n->getTranslationCount(), 'Empty texts are not translated');
+
+		$l10n->t('Example');
+		self::assertSame(1, $l10n->getTranslationCount());
+
+		$l10n->tt('Like', 'Likes', 2);
+		self::assertSame(2, $l10n->getTranslationCount());
 	}
 
 	private function createL10n(array $server): L10n

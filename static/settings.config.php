@@ -121,9 +121,19 @@ return [
 		// Display non local media to visitors.
 		'display_remote_media' => false,
 
+		// enable_login_code (Boolean)
+		// Enables the login with a one time code that is sent by e-mail.
+		'enable_login_code' => false,
+
 		// explicit_content (Boolean)
 		// Set this to announce that your node is used mostly for explicit content that might not be suited for minors.
 		'explicit_content' => false,
+
+		// forbidden_email (Comma-separated list)
+		// Prevents registrations with an email address matching one of these patterns.
+		// Patterns are matched against the whole address and may contain wildcards,
+		// e.g. "user@example.com", "user+*@example.com" or "*porn*@*".
+		'forbidden_email' => '',
 
 		// forbidden_nicknames (Comma-separated list)
 		// Prevents users from registering the specified usernames on this node.
@@ -167,7 +177,8 @@ return [
 
 		// logfile (String)
 		// The logfile for storing logs.
-		// Can be a full path or a relative path to the Friendica home directory
+		// Can be a full path, a relative path to the Friendica home directory,
+		// or a stream wrapper URL like 'php://stdout' to log to the process' output.
 		'logfile' => 'log/friendica.log',
 
 		// loglevel (String)
@@ -198,6 +209,10 @@ return [
 		// Maximum numbers of comments per post on the display page
 		'max_display_comments' => 1000,
 
+		// maxfilesize (Integer)
+		// Maximum size in bytes of uploaded media files. 0 means no limit.
+		'maxfilesize' => 0,
+
 		// maximagesize (Integer)
 		// Maximum size in bytes of an uploaded photo.
 		'maximagesize' => 800000,
@@ -225,6 +240,15 @@ return [
 		// process_view (Boolean)
 		// Process the "View" activity that is used by Peertube.
 		'process_view' => false,
+
+		// proxy (String)
+		// Address of the proxy server that is used for outgoing HTTP requests.
+		// Leave empty to send the requests directly.
+		'proxy' => '',
+
+		// proxyuser (String)
+		// Optional "user:password" that is prepended to the proxy address.
+		'proxyuser' => '',
 
 		// register_notification (Boolean)
 		// Send a notification mail to the admin for each new registration.
@@ -286,6 +310,11 @@ return [
 		// The fully-qualified URL of this Friendica node.
 		// Used by the worker in a non-HTTP execution environment.
 		'url' => '',
+
+		// verifyssl (Boolean)
+		// Verify the certificate of a server before sending requests to it.
+		// Disabled by default, so that servers with a self-signed certificate stay reachable.
+		'verifyssl' => false,
 
 		// poco_discovery (Boolean)
 		// If enabled, the system will check for the existance of other contacts and servers

@@ -10,7 +10,6 @@ namespace Friendica\Object\Api\Mastodon;
 use Friendica\App\BaseURL;
 use Friendica\BaseDataTransferObject;
 use Friendica\Collection\Api\Mastodon\Fields;
-use Friendica\Content\Text\BBCode;
 use Friendica\Database\DBA;
 use Friendica\Model\Contact;
 use Friendica\Util\DateTimeFormat;
@@ -82,9 +81,10 @@ class Account extends BaseDataTransferObject
 	 * @param BaseURL $baseUrl
 	 * @param array   $account entry of "account-user-view"
 	 * @param Fields  $fields  Profile fields
+	 * @param string  $note    Rendered profile description
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(BaseURL $baseUrl, array $account, Fields $fields, ?Source $source)
+	public function __construct(BaseURL $baseUrl, array $account, Fields $fields, ?Source $source, string $note)
 	{
 		$this->id       = (string) $account['pid'];
 		$this->username = $account['nick'];
@@ -100,7 +100,7 @@ class Account extends BaseDataTransferObject
 
 		$this->created_at = DateTimeFormat::utc($account['created'] ?: DBA::NULL_DATETIME, DateTimeFormat::JSON);
 
-		$this->note            = BBCode::convertForUriId($account['uri-id'], $account['about'], BBCode::EXTERNAL);
+		$this->note            = $note;
 		$this->url             = Contact::getProfileLink($account);
 		$this->uri             = $account['url'];
 		$this->avatar          = Contact::getAvatarUrlForId($account['id'] ?? 0 ?: $account['pid'], Proxy::SIZE_SMALL, $account['updated'], $account['guid'] ?? '');

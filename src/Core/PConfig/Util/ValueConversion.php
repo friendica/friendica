@@ -20,21 +20,17 @@ class ValueConversion
 	 * - string = The db-value is a string
 	 *
 	 * Keep in mind that there aren't any numeric/integer config values in the database
-	 *
-	 * @param string|null $value
-	 *
-	 * @return null|array|string
 	 */
-	public static function toConfigValue(?string $value)
+	public static function toConfigValue(?string $value): mixed
 	{
 		if (!isset($value)) {
 			return null;
 		}
 
-		return match (true) {
-			preg_match("|^a:[0-9]+:{.*}$|s", $value) === 1 => unserialize($value),
-			default                                        => $value,
-		};
+		// CWE-502: Other classes are explicitly disallowed from unserialize to prevent malicious exploitation
+		return preg_match("|^a:[0-9]+:{.*}$|s", $value)
+			? unserialize($value, ['allowed_classes' => [\stdClass::class]])
+			: $value;
 	}
 
 	/**

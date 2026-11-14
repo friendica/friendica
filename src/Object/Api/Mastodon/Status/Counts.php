@@ -16,6 +16,7 @@ namespace Friendica\Object\Api\Mastodon\Status;
  * @property-read int $reblogs
  * @property-read int $favourites
  * @property-read int $dislikes
+ * @property-read int $quotes
  */
 class Counts
 {
@@ -29,20 +30,26 @@ class Counts
 	/** @var int */
 	protected $dislikes;
 
+	/** @var int */
+	protected $quotes;
+
 	/**
 	 * Creates a status count object
 	 *
 	 * @param int $replies
 	 * @param int $reblogs
 	 * @param int $favourites
+	 * @param int $dislikes
+	 * @param int $quotes
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public function __construct(int $replies, int $reblogs, int $favourites, int $dislikes)
+	public function __construct(int $replies, int $reblogs, int $favourites, int $dislikes, int $quotes = 0)
 	{
 		$this->replies    = $replies;
 		$this->reblogs    = $reblogs;
 		$this->favourites = $favourites;
 		$this->dislikes   = $dislikes;
+		$this->quotes     = $quotes;
 	}
 
 	public function __get($name)

@@ -100,7 +100,7 @@ class Actor
 	/**
 	 * Update a contact for a given DID and user id
 	 *
-	 * @param string  $did         DID (did:plc:...)
+	 * @param string  $did         DID (did:plc:... or did:web:...)
 	 * @param integer $contact_uid User id of the contact to be updated
 	 * @return void
 	 */
@@ -130,7 +130,7 @@ class Actor
 			$fields['header'] = $profile->banner;
 		}
 
-		$directory = $this->atprotocol->get($this->atprotocol->getPLCDirectory() . '/' . $profile->did);
+		$directory = $this->atprotocol->getDidDocument($profile->did);
 		if (!empty($directory->service)) {
 			foreach ($directory->service as $service) {
 				if (($service->id == '#atproto_pds') && ($service->type == 'AtprotoPersonalDataServer') && !empty($service->serviceEndpoint)) {
@@ -228,10 +228,14 @@ class Actor
 	 *
 	 * @param string  $did The contact DID
 	 * @param integer $uid User ID to get the web for (0 for global)
-	 * @return string Profile link
+	 * @return string Profile link, empty if the value isn't a DID or no frontend is configured
 	 */
 	public function getProfileLink(string $did, int $uid = 0): string
 	{
+		if (parse_url($did, PHP_URL_SCHEME) !== 'did') {
+			return '';
+		}
+
 		$web       = $this->atprotocol->getWebForUser($uid);
 		$frontends = $this->config->get('atprotocol', 'frontends');
 		if ($web && is_array($frontends) && isset($frontends[$web])) {

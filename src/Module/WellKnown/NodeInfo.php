@@ -9,6 +9,7 @@ namespace Friendica\Module\WellKnown;
 
 use Friendica\BaseModule;
 use Friendica\DI;
+use Friendica\Util\HTTPCache;
 
 /**
  * Standardized way of exposing metadata about a server running one of the distributed social networks.
@@ -36,9 +37,15 @@ class NodeInfo extends BaseModule
 					'rel'  => 'http://nodeinfo.diaspora.software/ns/schema/2.2',
 					'href' => DI::baseUrl() . '/nodeinfo/2.2',
 				],
+				// @see https://codeberg.org/fediverse/fep/src/branch/main/fep/2677/fep-2677.md
+				[
+					'rel'  => 'https://www.w3.org/ns/activitystreams#Application',
+					'href' => DI::baseUrl() . '/friendica',
+				],
 			],
 		];
 
+		header(sprintf('Cache-Control: max-age=%d, public, immutable', HTTPCache::DISCOVERY_MAX_AGE));
 		$this->earlyJsonExit($nodeinfo);
 	}
 }

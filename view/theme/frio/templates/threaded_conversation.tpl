@@ -8,22 +8,12 @@
 {{if $mode == display}}
 <script type="text/javascript">
 // Display module: Scroll to item by GUID
-window.itemGuid = window.location.pathname.split("/").pop();
-window.scrollToDisplayGuid = () => scrollToItem("item-" + window.itemGuid);
-
-// 1. Try immediately (works for SPA after content replacement)
-window.scrollToDisplayGuid();
-
-// 2. Try on window.load (works for non-SPA)
-$(window).load(window.scrollToDisplayGuid);
-
-// 3. Listen for SPA navigation
-window.addEventListener('spa:navigate', (e) => {
-    if (e.detail?.path?.includes('/display/')) {
-        const newGuid = e.detail.path.split("/").pop();
-        scrollToItem("item-" + newGuid);
-    }
-});
+window.scrollToDisplayGuid = function scrollToDisplayGuid() {
+  var itemGuid = window.location.pathname.split("/").pop();
+  console.trace('[Threaded Conversation] Scrolling to item with GUID:', itemGuid);
+  scrollToItem("item-" + itemGuid);
+};
+window.onWindowLoad('#live-display', window.scrollToDisplayGuid);
 </script>
 {{/if}}
 {{$live_update nofilter}}

@@ -130,9 +130,12 @@ class Notifications extends BaseApi
 			);
 
 			foreach ($Notifications as $Notification) {
+				// Always advance the paging boundary, even when a notification can't be converted below,
+				// so a run of unconvertible notifications doesn't make the pagination get stuck on the same page.
+				self::setBoundaries($Notification->id);
+
 				try {
 					$mstdnNotifications[] = DI::mstdnNotification()->createFromNotification($Notification);
-					self::setBoundaries($Notification->id);
 				} catch (\Exception) {
 					// Skip this notification
 				}

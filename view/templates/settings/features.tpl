@@ -10,7 +10,8 @@
 	<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
 	{{foreach $features as $key => $f}}
-		<h2 class="settings-heading"><a href="javascript:;">{{$f.0}}</a></h2>
+	<details class="settings-section">
+		<summary class="settings-heading"><h2>{{$f.0}}</h2></summary>
 		<div class="settings-content-block {{if $key == $network_mode}}network sortable{{/if}}">
 			{{if $key == $network_mode}}
 			<input type="hidden" id="feature_widgetorder" name="feature_widgetorder" value=""/>
@@ -23,8 +24,9 @@
 				{{if $key == $network_mode}}
 					{{include file="field_checkbox.tpl" field=$reset}}
 				{{/if}}
-				<input type="submit" name="submit" class="settings-features-submit" value="{{$submit}}"/>
+				<input type="submit" name="submit" class="settings-features-submit settings-submit btn btn-default" value="{{$submit}}"/>
 			</div>
 		</div>
+	</details>
 	{{/foreach}}
 </form>

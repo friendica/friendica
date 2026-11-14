@@ -35,6 +35,13 @@ return (function (string $basepath, array $getVars, array $serverVars, array $co
 			// one instance for the whole execution
 			'shared' => true,
 		],
+		// Inherited by every module, so BaseModule doesn't need DI:: for modules that don't pass the dispatcher on.
+		// Keep it before rules for module subclasses, Dice merges a rule with its parent rule when the rule is added.
+		\Friendica\BaseModule::class => [
+			'call' => [
+				['setEventDispatcher', [[Dice::INSTANCE => \Psr\EventDispatcher\EventDispatcherInterface::class]]],
+			],
+		],
 		\Friendica\Core\Addon\AddonHelper::class => [
 			'instanceOf'      => \Friendica\Core\Addon\AddonManagerHelper::class,
 			'constructParams' => [

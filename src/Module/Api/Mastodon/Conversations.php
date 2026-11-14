@@ -22,12 +22,20 @@ class Conversations extends BaseApi
 		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		if (!empty($this->parameters['id'])) {
+		if (empty($this->parameters['id'])) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		DBA::delete('conv', ['id' => $this->parameters['id'], 'uid' => $uid]);
-		DBA::delete('mail', ['convid' => $this->parameters['id'], 'uid' => $uid]);
+		$mail = DBA::selectFirst('mail', ['parent-uri', 'convid'], ['id' => $this->parameters['id'], 'uid' => $uid]);
+		if (!$mail) {
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
+		}
+
+		DBA::delete('mail', ['parent-uri' => $mail['parent-uri'], 'uid' => $uid]);
+
+		if (!empty($mail['convid']) && !DBA::exists('mail', ['convid' => $mail['convid']])) {
+			DBA::delete('conv', ['id' => $mail['convid'], 'uid' => $uid]);
+		}
 
 		$this->earlyJsonExit([]);
 	}
@@ -47,32 +55,39 @@ class Conversations extends BaseApi
 			'min_id'   => 0,  // Return results immediately newer than this ID. Use HTTP Link header to paginate.
 		], $request);
 
-		$params = ['order' => ['id' => true], 'limit' => $request['limit']];
-
-		$condition = ['uid' => $uid];
+		// Same grouping as in the message module: one conversation per parent URI.
+		// The conversation id is the id of its newest message.
+		$having = [];
+		$args   = [$uid];
 
 		if (!empty($request['max_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`id` < ?", $request['max_id']]);
+			$having[] = '`last_id` < ?';
+			$args[]   = (int) $request['max_id'];
 		}
 
 		if (!empty($request['since_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`id` > ?", $request['since_id']]);
+			$having[] = '`last_id` > ?';
+			$args[]   = (int) $request['since_id'];
 		}
 
 		if (!empty($request['min_id'])) {
-			$condition = DBA::mergeConditions($condition, ["`id` > ?", $request['min_id']]);
-
-			$params['order'] = ['id'];
+			$having[] = '`last_id` > ?';
+			$args[]   = (int) $request['min_id'];
 		}
 
-		$convs = DBA::select('conv', ['id'], $condition, $params);
+		$args[] = (int) $request['limit'];
+
+		$convs = DBA::p('SELECT MAX(`id`) AS `last_id` FROM `mail` WHERE `uid` = ? GROUP BY `parent-uri`'
+			. ($having ? ' HAVING ' . implode(' AND ', $having) : '')
+			. (empty($request['min_id']) ? ' ORDER BY `last_id` DESC' : ' ORDER BY `last_id`')
+			. ' LIMIT ?', ...$args);
 
 		$conversations = [];
 
 		try {
 			while ($conv = DBA::fetch($convs)) {
-				self::setBoundaries($conv['id']);
-				$conversations[] = DI::mstdnConversation()->createFromConvId($conv['id']);
+				self::setBoundaries($conv['last_id']);
+				$conversations[] = DI::mstdnConversation()->createFromMailId($uid, $conv['last_id']);
 			}
 		} catch (NotFoundException) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());

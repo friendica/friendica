@@ -7,7 +7,6 @@
 
 namespace Friendica\Module;
 
-use Exception;
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
 use Friendica\BaseModule;
@@ -143,18 +142,23 @@ abstract class BaseNotifications extends BaseModule
 	/**
 	 * List of pages for the Notifications TabBar
 	 *
+	 * @param L10n   $l10n     The translation class
+	 * @param string $selected The URL part of the active tab
+	 *
 	 * @return array with notifications TabBar data
-	 * @throws Exception
 	 */
-	private function getTabs()
+	public static function getTabBar(L10n $l10n, string $selected): array
 	{
-		$selected = $this->args->get(1, '');
-
-		$tabs = [];
+		$tabs = [[
+			'label' => $l10n->t('Stream'),
+			'url'   => 'notifications/stream',
+			'sel'   => ($selected == 'stream') ? 'active' : '',
+			'id'    => 'stream-tab',
+		]];
 
 		foreach (self::URL_TYPES as $type => $url) {
 			$tabs[] = [
-				'label'     => $this->t(self::PRINT_TYPES[$type]),
+				'label'     => $l10n->t(self::PRINT_TYPES[$type]),
 				'url'       => 'notifications/' . $url . (($url == "personal") ? "?show=all" : ""),
 				'sel'       => (($selected == $url) ? 'active' : ''),
 				'id'        => $type . '-tab',
@@ -163,5 +167,10 @@ abstract class BaseNotifications extends BaseModule
 		}
 
 		return $tabs;
+	}
+
+	private function getTabs(): array
+	{
+		return self::getTabBar($this->l10n, $this->args->get(1, ''));
 	}
 }

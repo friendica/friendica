@@ -43,6 +43,12 @@
 					<a title="{{$edquote}}" data-role="insert-formatting" data-bbcode="quote" data-id="{{$id}}"><i class="icon-quote-left"></i></a>
 					<a title="{{$edemojis}}" class="emojis"><i class="icon-smile"></i></a>
 				</div>
+				<select id="jot-language-{{$id}}" title="{{$language_label}}">
+					{{foreach $languages as $code => $name}}
+						<option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$name}}</option>
+					{{/foreach}}
+				</select>
+				<span id="character-counter-{{$id}}" class="grey"></span>
 				<input type="submit" onclick="post_comment({{$id}}); return false;" id="comment-edit-submit-{{$id}}" class="comment-edit-submit" name="submit" value="{{$submit}}" />
 				{{if $preview}}<input type="submit" onclick="preview_comment({{$id}}); return false;" id="comment-edit-preview-link-{{$id}}" class="comment-edit-submit" value="{{$preview}}" />{{/if}}
 				<!-- {{if $preview}}<span onclick="preview_comment({{$id}});" id="comment-edit-preview-link-{{$id}}" class="fakelink">{{$preview}}</span>{{/if}} -->
@@ -51,4 +57,10 @@
 
 				<div class="comment-edit-end"></div>
 			</form>
+			<script>
+				$('#comment-edit-text-{{$id}}').off('keyup.comment-counter').on('keyup.comment-counter', function () {
+					$('#character-counter-{{$id}}').text($(this).val().length);
+				});
+				initLanguageDetection($('#comment-edit-text-{{$id}}'), $('#jot-language-{{$id}}'), 'keyup');
+			</script>
 		</div>

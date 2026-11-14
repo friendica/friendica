@@ -12,6 +12,7 @@
 </p>
 
 <form action="lostpass" method="post">
+<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 <div id="login-name-wrapper">
    <input type="text" name="login-name" id="login-name" placeholder="{{$name}}" value="" class="form-control" autofocus />
 </div>

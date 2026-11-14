@@ -87,7 +87,13 @@ final class StatusEditor
 		$formData['allow_location'] ??= $user['allow_location'];
 		$formData['default_location'] ??= $user['default-location'];
 		$formData['nickname'] ??= $user['nickname'];
-		$formData['lockstate'] = $formData['lockstate'] ?? ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
+		$formData['group_cid'] ??= 0;
+		if ($formData['group_cid']) {
+			// The permissions are set by the group, so there is nothing to choose
+			$formData['lockstate'] = 'unlock';
+			$formData['acl']       = '';
+		}
+		$formData['lockstate'] ??= ACL::getLockstateForUserId($user['uid']) ? 'lock' : 'unlock';
 		$formData['acl'] ??= ACL::getFullSelectorHTML($this->page, $user['uid'], true);
 		$formData['bang'] ??= '';
 		$formData['visitor'] ??= 'block';
@@ -154,11 +160,14 @@ final class StatusEditor
 			'$edemojis'            => $this->l10n->t('Add emojis'),
 			'$contentwarn'         => $this->l10n->t('Content Warning'),
 			'$edcode'              => $this->l10n->t('Code'),
-			'$edurl'               => $this->l10n->t('Link'),
+			'$edurl'               => $this->l10n->t('Web link'),
 			'$edattach'            => $this->l10n->t('Link or Media'),
 			'$setloc'              => $this->l10n->t('Set your location'),
 			'$noloc'               => $this->l10n->t('Clear browser location'),
-			'$weblink'             => $this->l10n->t('Link'),
+			'$language_label'      => $this->l10n->t('Language'),
+			'$language'            => L10n::UNDETERMINED_LANGUAGE,
+			'$languages'           => $this->l10n->getLanguageSelection(),
+			'$weblink'             => $this->l10n->t('Web link'),
 			'$video'               => $this->l10n->t('Video'),
 			'$audio'               => $this->l10n->t('Audio'),
 			'$jot'                 => 1,
@@ -192,6 +201,7 @@ final class StatusEditor
 			'$preview'      => $this->l10n->t('Preview'),
 			'$jotplugins'   => $jotplugins,
 			'$notes_cid'    => $notesContactId,
+			'$group_cid'    => $formData['group_cid'],
 			'$rand_num'     => Crypto::randomDigits(12),
 
 			// ACL permissions box

@@ -42,7 +42,7 @@ class NodeInfoTest extends FixtureTestCase
 		self::assertEquals('1.0', $json->version);
 
 		self::assertEquals('friendica', $json->software->name);
-		self::assertEquals(App::VERSION . '-' . DB_UPDATE_VERSION, $json->software->version);
+		self::assertEquals(App::version() . '-' . DB_UPDATE_VERSION, $json->software->version);
 
 		self::assertIsArray($json->protocols->inbound);
 		self::assertIsArray($json->protocols->outbound);
@@ -63,7 +63,7 @@ class NodeInfoTest extends FixtureTestCase
 		self::assertEquals('2.0', $json->version);
 
 		self::assertEquals('friendica', $json->software->name);
-		self::assertEquals(App::VERSION . '-' . DB_UPDATE_VERSION, $json->software->version);
+		self::assertEquals(App::version() . '-' . DB_UPDATE_VERSION, $json->software->version);
 
 		self::assertIsArray($json->protocols);
 		self::assertIsArray($json->services->inbound);
@@ -83,7 +83,7 @@ class NodeInfoTest extends FixtureTestCase
 		self::assertEquals('1.0', $json->version);
 
 		self::assertEquals('friendica', $json->server->software);
-		self::assertEquals(App::VERSION . '-' . DB_UPDATE_VERSION, $json->server->version);
+		self::assertEquals(App::version() . '-' . DB_UPDATE_VERSION, $json->server->version);
 
 		self::assertIsArray($json->protocols);
 		self::assertIsArray($json->services->inbound);

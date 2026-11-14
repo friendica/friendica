@@ -55,7 +55,7 @@ final class Contact extends ContactModule
 	/**
 	 * Return the HTML update for a contact thread.
 	 *
-	 * @param array $request Request parameters; expects 'item' and optional 'last_received'
+	 * @param array $request Request parameters; expects 'item' for a single thread or 'first_created' for new threads
 	 * @return void Sends HTML update and exits
 	 * @throws ForbiddenException If no local user is logged in
 	 * @throws NotFoundException If the contact or item cannot be found
@@ -71,11 +71,16 @@ final class Contact extends ContactModule
 			throw new NotFoundException();
 		}
 
-		$item = Post::selectFirst(['parent'], ['id' => $request['item']]);
+		// Without an item the page looks for new threads
+		if (empty($request['item'])) {
+			System::htmlUpdateExit(ModelContact::getThreadsFromId($pcid, $this->userSession->getLocalUserId(), 1, 0, $request));
+		}
+
+		$item = Post::selectFirst(['parent-uri-id'], ['id' => $request['item']]);
 		if (!DBA::isResult($item)) {
 			throw new NotFoundException();
 		}
 
-		System::htmlUpdateExit(ModelContact::getThreadsFromId($pcid, $this->userSession->getLocalUserId(), 1, $item['parent'] ?? 0, $request));
+		System::htmlUpdateExit(ModelContact::getThreadsFromId($pcid, $this->userSession->getLocalUserId(), 1, $item['parent-uri-id'] ?? 0, $request));
 	}
 }

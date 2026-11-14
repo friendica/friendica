@@ -14,6 +14,7 @@ use Friendica\Core\Cache\Type;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hooks\Capability\ICanCreateInstances;
 use Friendica\Util\Profiler;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class CacheFactory
@@ -34,15 +35,26 @@ class Cache
 	protected $config;
 	/** @var Profiler */
 	protected $profiler;
+	/** @var LoggerInterface */
+	protected $logger;
+	/**
+	 * Strategies whose driver isn't available, shared by all factory instances.
+	 * Dice registers a shared instance before calling its constructor, so a second create() returns the half-constructed driver instead of throwing again.
+	 *
+	 * @var array<string, true>
+	 */
+	private static array $unavailable = [];
 
 	public function __construct(
 		ICanCreateInstances $instanceCreator,
 		IManageConfigValues $config,
 		Profiler $profiler,
+		LoggerInterface $logger,
 	) {
 		$this->config          = $config;
 		$this->instanceCreator = $instanceCreator;
 		$this->profiler        = $profiler;
+		$this->logger          = $logger;
 	}
 
 	/**
@@ -76,17 +88,35 @@ class Cache
 	/**
 	 * Creates a new Cache instance
 	 *
+	 * Falls back to the default cache if the configured driver isn't available (e.g. a missing PHP extension).
+	 *
 	 * @param string $strategy The strategy, which cache instance should be used
 	 *
 	 * @return ICanCache
 	 *
-	 * @throws InvalidCacheDriverException In case the underlying cache driver isn't valid or not configured properly
+	 * @throws InvalidCacheDriverException In case the default cache driver isn't valid or not configured properly
 	 * @throws CachePersistenceException In case the underlying cache has errors during persistence
 	 */
 	protected function create(string $strategy): ICanCache
 	{
-		/** @var ICanCache $cache */
-		$cache = $this->instanceCreator->create(ICanCache::class, $strategy);
+		if (isset(self::$unavailable[$strategy])) {
+			$strategy = self::DEFAULT_TYPE;
+		}
+
+		try {
+			/** @var ICanCache $cache */
+			$cache = $this->instanceCreator->create(ICanCache::class, $strategy);
+		} catch (InvalidCacheDriverException $exception) {
+			if ($strategy === self::DEFAULT_TYPE) {
+				throw $exception;
+			}
+
+			self::$unavailable[$strategy] = true;
+			$this->logger->warning('Cache driver not available, falling back to the default cache.', ['driver' => $strategy, 'fallback' => self::DEFAULT_TYPE, 'exception' => $exception]);
+
+			/** @var ICanCache $cache */
+			$cache = $this->instanceCreator->create(ICanCache::class, self::DEFAULT_TYPE);
+		}
 
 		$profiling = $this->config->get('system', 'profiling', false);
 

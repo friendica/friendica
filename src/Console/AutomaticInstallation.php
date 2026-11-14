@@ -273,6 +273,8 @@ HELP;
 		if (!$installer->checkImagick()) {
 			$checked = false;
 		}
+		$installer->checkAPCu();
+		$installer->checkZip();
 		if (!$installer->checkLocalIni()) {
 			$checked = false;
 		}

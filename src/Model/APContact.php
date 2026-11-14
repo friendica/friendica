@@ -98,6 +98,17 @@ class APContact
 	}
 
 	/**
+	 * Cache key that marks a recent fetch attempt for the given profile url
+	 *
+	 * @param string $url profile url
+	 * @return string
+	 */
+	private static function getRequestCacheKey(string $url): string
+	{
+		return 'apcontact:' . ItemURI::getIdByURI($url);
+	}
+
+	/**
 	 * Fetches a profile from a given url
 	 *
 	 * @param string   $url    profile url
@@ -148,6 +159,12 @@ class APContact
 			}
 		}
 
+		// A repeated request must not pay for WebFinger before the check below returns the stored contact.
+		if (!empty($fetched_contact) && !is_null(DI::cache()->get(self::getRequestCacheKey($fetched_contact['url'])))) {
+			DI::logger()->info('Multiple requests for the address', ['url' => $url, 'update' => $update]);
+			return $fetched_contact;
+		}
+
 		$apcontact = self::fetchWebfingerData($url);
 		if (!Network::isValidHttpUrl($url) && !isset($apcontact['url'])) {
 			return $fetched_contact;
@@ -165,7 +182,7 @@ class APContact
 
 		// Detect multiple fast repeating request to the same address
 		// See https://github.com/friendica/friendica/issues/9303
-		$cachekey = 'apcontact:' . ItemURI::getIdByURI($url);
+		$cachekey = self::getRequestCacheKey($url);
 		$result   = DI::cache()->get($cachekey);
 		if (!is_null($result)) {
 			DI::logger()->info('Multiple requests for the address', ['url' => $url, 'update' => $update, 'result' => $result]);
@@ -350,13 +367,7 @@ class APContact
 			$apcontact['addr'] = JsonLD::fetchElement($compacted, 'https://webfinger.net/#');
 		}
 
-		$apcontact['pubkey'] = null;
-		if (!empty($compacted['w3id:publicKey'])) {
-			$apcontact['pubkey'] = trim(JsonLD::fetchElement($compacted['w3id:publicKey'], 'w3id:publicKeyPem', '@value') ?? '');
-			if (str_contains($apcontact['pubkey'], 'RSA ')) {
-				$apcontact['pubkey'] = Crypto::rsaToPem($apcontact['pubkey']);
-			}
-		}
+		$apcontact['pubkey'] = self::getPublicKey($compacted);
 
 		$apcontact['manually-approve']   = (int) JsonLD::fetchElement($compacted, 'as:manuallyApprovesFollowers');
 		$apcontact['posting-restricted'] = (int) JsonLD::fetchElement($compacted, 'lemmy:postingRestrictedToMods');
@@ -523,6 +534,37 @@ class APContact
 		DI::logger()->info('Updated profile', ['url' => $url]);
 
 		return DBA::selectFirst('apcontact', [], ['url' => $apcontact['url']]) ?: [];
+	}
+
+	/**
+	 * Fetches the public key from a compacted actor
+	 *
+	 * @param array $compacted Compacted actor
+	 * @return string|null RSA public key in PEM format or, for Ed25519 only actors, the Multikey in multibase form
+	 */
+	public static function getPublicKey(array $compacted): ?string
+	{
+		$pubkey = null;
+		if (!empty($compacted['w3id:publicKey'])) {
+			$pubkey = trim(JsonLD::fetchElement($compacted['w3id:publicKey'], 'w3id:publicKeyPem', '@value') ?? '');
+			if (str_contains($pubkey, 'RSA ')) {
+				$pubkey = Crypto::rsaToPem($pubkey);
+			}
+		}
+
+		// When there is no RSA key, look for an Ed25519 key published as a "Multikey"
+		// in "assertionMethod" and return its multibase form instead.
+		if (empty($pubkey) && !empty($compacted['w3id:assertionMethod'])) {
+			foreach (JsonLD::fetchElementArray($compacted, 'w3id:assertionMethod') ?? [] as $method) {
+				$multibase = JsonLD::fetchElement($method, 'w3id:publicKeyMultibase', '@value');
+				if (is_string($multibase) && str_starts_with($multibase, 'z6Mk')) {
+					$pubkey = $multibase;
+					break;
+				}
+			}
+		}
+
+		return $pubkey;
 	}
 
 	public static function removeCustomEmojis(string $name, array $tags): string

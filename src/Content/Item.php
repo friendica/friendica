@@ -430,7 +430,7 @@ class Item
 				$this->l10n->t('View Profile')                                => $profile_link,
 				$this->l10n->t('View Photos')                                 => $photos_link,
 				$this->l10n->t('Posts')                                       => $posts_link,
-				$this->l10n->t('View Contact')                                => $contact_url,
+				$this->l10n->t('Settings')                                    => $contact_url,
 				$this->l10n->t('Message')                                     => $pm_url,
 				$this->l10n->t('Collapse')                                    => $collapse_link,
 				$this->l10n->t('Ignore user')                                 => $ignore_link,
@@ -491,7 +491,7 @@ class Item
 		);
 	}
 
-	public function expandTags(array $item, bool $setPermissions = false): array
+	public function expandTags(array $item, bool $setPermissions = false, bool $groupPost = false): array
 	{
 		// Look for any tags and linkify them
 		$item['inform'] = '';
@@ -544,19 +544,40 @@ class Item
 				$this->logger->info('Post with group mention will not be converted to a group post', ['url' => $tag[2], 'mention' => $tag[1]]);
 			}
 		}
+
+		// A top-level post from the group editor is a group post, even without a mention in the body
+		if ($groupPost && ($item['gravity'] == ItemModel::GRAVITY_PARENT) && empty($group_contact) && preg_match('/^<(\d+)>$/', $item['allow_cid'] ?? '', $matches)) {
+			$contact = Contact::selectFirst(['id', 'url', 'prv'], ['id' => $matches[1], 'uid' => $item['uid'], 'contact-type' => Contact::TYPE_COMMUNITY]);
+			if (!empty($contact) && Contact::isSharing($contact['id'], $item['uid'], true)) {
+				$private_group = $contact['prv'];
+				$only_to_group = true;
+				$private_id    = $contact['id'];
+				$group_contact = $contact;
+
+				// Stored as audience after the post has been created
+				$item['audience'] = $contact['url'];
+
+				if (!empty($item['inform'])) {
+					$item['inform'] .= ',';
+				}
+				$item['inform'] .= 'cid:' . $contact['id'];
+				$this->logger->info('Post is only addressed to a group', ['url' => $contact['url'], 'private' => $private_group]);
+			}
+		}
 		$this->logger->info('Got inform', ['inform' => $item['inform']]);
 
 		if (($item['gravity'] == ItemModel::GRAVITY_PARENT) && !empty($group_contact) && ($private_group || $only_to_group)) {
 			// we tagged a group in a top level post. Now we change the post
 			$item['private'] = $private_group ? ItemModel::PRIVATE : ItemModel::UNLISTED;
 
-			if ($only_to_group) {
-				$pcid = Contact::getPublicContactId($group_contact['id'], $item['uid']);
-				if ($pcid) {
-					$item['owner-id'] = $pcid;
-					unset($item['owner-link']);
-					unset($item['owner-name']);
-					unset($item['owner-avatar']);
+			if ($only_to_group && $pcid = Contact::getPublicContactId($group_contact['id'], $item['uid'])) {
+				$owner = Contact::getById($pcid, ['url', 'name', 'avatar', 'alias', 'network', 'contact-type']);
+				if ($owner) {
+					$item['owner-id']      = $pcid;
+					$item['owner-link']    = $owner['url'];
+					$item['owner-name']    = $owner['name'];
+					$item['owner-alias']   = $owner['alias'];
+					$item['owner-network'] = $owner['network'];
 				}
 
 				$item['postopts'] = '';
@@ -1016,16 +1037,16 @@ class Item
 		return $post;
 	}
 
-	public function finalizePost(array $post, bool $preview): array
+	public function finalizePost(array $post, bool $preview, bool $groupPost = false): array
 	{
 		if ($preview) {
 			$post['body'] = Attach::addAttachmentToBody($post['body'], $post['uid']);
 		} else {
 			Attach::setPermissionFromBody($post);
 		}
-		if (preg_match("/\[attachment\](.*?)\[\/attachment\]/ism", (string) $post['body'], $matches)) {
-			$post['body'] = preg_replace("/\[attachment].*?\[\/attachment\]/ism", PageInfo::getFooterFromUrl($matches[1]), (string) $post['body']);
-		}
+		$post['body'] = preg_replace_callback("/\[attachment\](.*?)\[\/attachment\]/ism", function ($matches) {
+			return PageInfo::getFooterFromUrl($matches[1]);
+		}, (string) $post['body']);
 
 		// Convert links with empty descriptions to links without an explicit description
 		$post['body'] = trim((string) preg_replace('#\[url=([^\]]*?)\]\[/url\]#ism', '[url]$1[/url]', (string) $post['body']));
@@ -1035,7 +1056,7 @@ class Item
 		// Personal notes must never be altered to a group post.
 		if ($post['post-type'] != ItemModel::PT_PERSONAL_NOTE) {
 			// Look for any tags and linkify them
-			$post = $this->expandTags($post);
+			$post = $this->expandTags($post, false, $groupPost);
 		}
 
 		return $post;
@@ -1470,7 +1491,7 @@ class Item
 			return trim($text);
 		};
 
-		$summary_norm = $normalize($summary ?? '');
+		$summary_norm = $normalize(BBCode::toPlaintext($summary ?? '', false));
 		if ($summary_norm === '') {
 			return false;
 		}

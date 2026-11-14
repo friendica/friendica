@@ -65,17 +65,19 @@
 			</div>
 			<div class="wall-item-bottom">
 				<div class="wall-item-links"></div>
+			{{if $row.item.hashtags || $row.item.mentions || $row.item.implicit_mentions}}
 				<div class="tags wall-item-tags">
-					{{foreach $row.item.hashtags as $tag}}
-						<span class="tag hashtag label border border-default">{{$tag nofilter}}</span>
-					{{/foreach}}
-					{{foreach $row.item.mentions as $tag}}
-						<span class="tag mention label border border-primary">{{$tag nofilter}}</span>
-					{{/foreach}}
-					{{foreach $row.item.implicit_mentions as $tag}}
-						<span class="tag mention label border border-info">{{$tag nofilter}}</span>
-					{{/foreach}}
+				{{foreach $row.item.hashtags as $tag}}
+					<span class="tag hashtag label border border-default">{{$tag nofilter}}</span>
+				{{/foreach}}
+				{{foreach $row.item.mentions as $tag}}
+					<span class="tag mention label border border-primary">{{$tag nofilter}}</span>
+				{{/foreach}}
+				{{foreach $row.item.implicit_mentions as $tag}}
+					<span class="tag mention label border border-info">{{$tag nofilter}}</span>
+				{{/foreach}}
 				</div>
+			{{/if}}
 			</div>
 			<div class="wall-item-actions" style="display:block;width:100%;">
 						<div class="wall-item-actions-tools">

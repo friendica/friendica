@@ -4,16 +4,26 @@
   *
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
+{{if $item.thread_level==1}}
+	{{assign var="top_child_total" value=count($item.children)}}
+	{{assign var="top_child_nr" value=0}}
+{{/if}}
+{{if $item.thread_level==2}}
+	{{assign var="top_child_nr" value=$top_child_nr+1 scope=parent}}
+{{/if}}
+{{if $item.thread_level==2 && $top_child_nr==1}}
+<div class="comment-container {{if $item.smart_threading}} smart-threaded{{/if}}"> <!--top-child-begin-->
+{{/if}}
 {{if $mode == display}}
 {{else}}
 {{if $item.comment_firstcollapsed}}
 {{if $item.thread_level<3}}
 <button type="button" class="hide-comments-outer fakelink" onclick="showHideComments({{$item.id}});">
 			<span id="hide-comments-total-{{$item.id}}" class="hide-comments-total">
-				{{$item.num_comments}} - {{$item.show_text}}
+				{{$item.show_text}}
 			</span>
 	<span id="hide-comments-{{$item.id}}" class="hide-comments" style="display: none">
-				{{$item.num_comments}} - {{$item.hide_text}}
+				{{$item.hide_text}}
 			</span>
 </button>
 <div id="collapsed-comments-{{$item.id}}" class="collapsed-comments" style="display: none;">
@@ -30,9 +40,9 @@
 			</div>
 
             {{if $item.thread_level<7}}
-			<div class="wall-item-container {{$item.indent}} {{$item.shiny}} {{$item.network}} thread_level_{{$item.thread_level}}" id="item-{{$item.guid}}">
+			<div class="wall-item-container {{$item.indent}} {{$item.shiny}} {{$item.network}} thread_level_{{$item.thread_level}}" id="item-{{$item.guid}}" data-uri-id="{{$item.uriid}}">
                 {{else}}
-				<div class="wall-item-container {{$item.indent}} {{$item.shiny}} {{$item.network}} thread_level_7" id="item-{{$item.guid}}">
+				<div class="wall-item-container {{$item.indent}} {{$item.shiny}} {{$item.network}} thread_level_7" id="item-{{$item.guid}}" data-uri-id="{{$item.uriid}}">
                     {{/if}}
                     {{if $item.thread_level==1}}
 						<span class="commented" style="display: none;">{{$item.commented}}</span>
@@ -82,7 +92,7 @@
 							<div class="wall-item-network-end"></div>
 						</div>
 
-						<div itemprop="description" class="wall-item-content">
+						<div itemprop="description" class="wall-item-content{{if $click_to_display}} click-to-display{{/if}}"{{if $click_to_display}} data-display-url="{{$item.plink.orig}}"{{/if}}>
                             {{if $item.title}}<h2 dir="auto"><a href="{{$item.plink.href}}" class="{{$item.sparkle}} p-name" dir="auto">{{$item.title}}</a></h2>{{/if}}
 							{{if $item.summary}}<summary class="wall-item-summary" id="wall-item-summary-{{$item.id}}">{{$item.summary}}</summary>{{/if}}
 							<div class="wall-item-body e-content {{if !$item.title}}p-name{{/if}}" dir="auto">{{$item.body_html nofilter}}</div>
@@ -91,22 +101,24 @@
 					<div class="wall-item-bottom">
 						<div class="wall-item-links">
 						</div>
+					{{if (!$item.suppress_tags && ($item.hashtags || $item.mentions)) || $item.folders || $item.categories}}
 						<div class="tags wall-item-tags">
-							{{if !$item.suppress_tags}}
-								{{foreach $item.hashtags as $tag}}
-									<span class="tag">{{$tag nofilter}}</span>
-								{{/foreach}}
-								{{foreach $item.mentions as $tag}}
-									<span class="mention">{{$tag nofilter}}</span>
-								{{/foreach}}
-							{{/if}}
-							{{foreach $item.folders as $cat}}
-								<span class="folder"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+						{{if !$item.suppress_tags}}
+							{{foreach $item.hashtags as $tag}}
+								<span class="tag">{{$tag nofilter}}</span>
 							{{/foreach}}
-							{{foreach $item.categories as $cat}}
-								<span class="category"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+							{{foreach $item.mentions as $tag}}
+								<span class="mention">{{$tag nofilter}}</span>
 							{{/foreach}}
+						{{/if}}
+						{{foreach $item.folders as $cat}}
+							<span class="folder"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+						{{/foreach}}
+						{{foreach $item.categories as $cat}}
+							<span class="category"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+						{{/foreach}}
 						</div>
+					{{/if}}
                         {{if $item.edited}}
 							<div class="itemedited text-muted">{{$item.edited['label']}} (<span title="{{$item.edited['date']}}">{{$item.edited['relative']}}</span>)</div>
                         {{/if}}
@@ -125,6 +137,8 @@
 
                                 {{if $item.comment_html}}
 									<a role="button" id="comment-{{$item.id}}" class="fakelink togglecomment" onclick="openClose('item-comments-{{$item.id}}'); commentExpand({{$item.id}});" title="{{$item.switchcomment}}"><i class="icon-commenting"><span class="sr-only">{{$item.switchcomment}}</span></i></a>
+                                {{elseif $item.flat && !$item.previewing}}
+									<a role="button" id="comment-{{$item.id}}" href="{{$item.plink.orig}}" title="{{$item.switchcomment}}"><i class="icon-commenting"><span class="sr-only">{{$item.switchcomment}}</span></i></a>
                                 {{/if}}
 
                                 {{if $item.isevent}}
@@ -201,11 +215,14 @@
 									<span class="wall-item-emoji" title="{{$emoji.title}}">{{$emoji.emoji}} {{$emoji.total}}</span>
 								{{/if}}
 							{{/foreach}}
-                        {{elseif $item.responses}}
-                            {{foreach $item.responses as $verb=>$response}}
-								<div class="wall-item-{{$verb}}" id="wall-item-{{$verb}}-{{$item.id}}">{{$response.output nofilter}}</div>
-                            {{/foreach}}
                         {{/if}}
+						{{if isset($item.interactions)}}
+							<div class="wall-item-interactions">
+							{{foreach $item.interactions as $interaction}}
+								<a class="wall-item-interaction wall-item-interaction-{{$interaction.type}}" href="{{$interaction.url}}"><strong>{{$interaction.total}}</strong> {{$interaction.label}}</a>
+							{{/foreach}}
+							</div>
+						{{/if}}
 
 					</div>
 
@@ -262,3 +279,7 @@
 				<div class="wall-item-comment-wrapper" id="item-comments-{{$item.id}}" style="display: none;">{{$item.comment_html nofilter}}</div>
             {{/if}}
         {{/if}}
+{{* close the comment-container div if no more thread_level = 2 children are left *}}
+{{if $item.thread_level==2 && $top_child_nr==$top_child_total}}
+</div><!--./comment-container-->
+{{/if}}

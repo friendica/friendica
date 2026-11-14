@@ -71,7 +71,7 @@
 					<div id="dfrn-request-link-button">
 						{{if $unfollow_link}}
 							<a id="dfrn-request-link" class="btn btn-labeled btn-primary" href="{{$unfollow_link}}">
-								<span><i class="ri ri-user-unfollow-line"></i></span>
+								<span><i class="ri ri-user-minus-fill"></i></span>
 								<span>{{$unfollow}}</span>
 							</a>
 						{{else}}
@@ -84,7 +84,7 @@
 				{{/if}}
 				{{if $subscribe_feed_link}}
 					<div id="subscribe-feed-link-button">
-						<a id="subscribe-feed-link" class="btn btn-labeled btn-primary" href="{{$subscribe_feed_link}}">
+						<a id="subscribe-feed-link" class="btn btn-labeled btn-primary" href="{{$subscribe_feed_link}}" up-follow="false">
 							<span><i class="ri ri-rss-line"></i></span>
 							<span>{{$subscribe_feed}}</span>
 						</a>

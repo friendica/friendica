@@ -52,6 +52,6 @@ class Comments extends BaseModule
 
 		$viewerUid = $this->session->getLocalUserId();
 		$existing  = !empty($request['existing']) ? array_map(intval(...), explode(',', $request['existing'])) : [];
-		$this->earlyHttpExit($this->htmlRenderer->renderCommentsByUriId($uriId, $viewerUid, $existing));
+		$this->earlyHttpExit($this->htmlRenderer->renderCommentsByUriId($uriId, $viewerUid, $existing, !empty($request['display'])));
 	}
 }

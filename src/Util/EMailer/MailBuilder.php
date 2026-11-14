@@ -71,7 +71,7 @@ abstract class MailBuilder
 			'Precedence'           => ['list'],
 			'X-Friendica-Host'     => [$hostname],
 			'X-Friendica-Platform' => [App::PLATFORM],
-			'X-Friendica-Version'  => [App::VERSION],
+			'X-Friendica-Version'  => [App::version()],
 			'List-ID'              => ['<notification.' . $hostname . '>'],
 			'List-Archive'         => ['<' . $baseUrl . '/notifications/system>'],
 		];

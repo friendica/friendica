@@ -164,7 +164,7 @@ class Delivery
 					}
 
 					DI::logger()->notice('Delivery failed', [
-						'retcode'       => $response->getReturnCode(),
+						'retcode'       => $response?->getReturnCode(),
 						'serverfailure' => $serverfail,
 						'drop'          => $drop,
 						'runtime'       => round($runtime, 3),

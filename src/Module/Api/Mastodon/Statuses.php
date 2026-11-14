@@ -9,6 +9,7 @@ namespace Friendica\Module\Api\Mastodon;
 
 use Friendica\App\Arguments;
 use Friendica\App\BaseURL;
+use Friendica\App\Router;
 use Friendica\AppHelper;
 use Friendica\Content\Item as ContentItem;
 use Friendica\Content\PageInfo;
@@ -411,11 +412,12 @@ class Statuses extends BaseApi
 	 */
 	protected function get(array $request = [])
 	{
-		$uid = self::getCurrentUserID();
-
 		if (empty($this->parameters['id'])) {
-			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
+			$this->response->unsupported(Router::GET, $request);
+			return;
 		}
+
+		$uid = self::getCurrentUserID();
 
 		if ($uid != 0) {
 			if ($this->notification->existsForUser($uid, ['target-uri-id' => $this->parameters['id'], 'seen' => false])) {

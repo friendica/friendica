@@ -28,6 +28,7 @@ use Friendica\Protocol\Activity;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Protocol\Relay;
 use Friendica\Util\DateTimeFormat;
+use Friendica\Util\EmojiReaction;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\LDSignature;
 use Friendica\Util\Map;
@@ -323,7 +324,7 @@ class Transmitter
 		return [
 			'id'   => (string) DI::baseUrl() . '/friendica',
 			'type' => 'Application',
-			'name' => App::PLATFORM . " '" . App::CODENAME . "' " . App::VERSION . '-' . DB_UPDATE_VERSION,
+			'name' => App::PLATFORM . " '" . App::CODENAME . "' " . App::version() . '-' . DB_UPDATE_VERSION,
 			'url'  => (string) DI::baseUrl(),
 		];
 	}
@@ -390,7 +391,13 @@ class Transmitter
 			}
 		}
 
-		$data['url']                       = $owner['url'];
+		// Groups are presented by their thread overview
+		if ($owner['account-type'] == User::ACCOUNT_TYPE_COMMUNITY) {
+			$data['url'] = DI::baseUrl() . '/group/' . $owner['nick'];
+		} else {
+			$data['url'] = $owner['url'];
+		}
+
 		$data['manuallyApprovesFollowers'] = in_array($owner['page-flags'], [User::PAGE_FLAGS_NORMAL, User::PAGE_FLAGS_PRVGROUP]);
 		$data['discoverable']              = (bool) $owner['net-publish'] && $full;
 		$data['indexable']                 = (bool) $owner['net-publish'] && $full;
@@ -542,6 +549,44 @@ class Transmitter
 	}
 
 	/**
+	 * Adds the receiver and the audience data of a single mention or audience term
+	 *
+	 * @param array   $term      Tag entry
+	 * @param array   $item      Item array
+	 * @param boolean $is_group  Is the item owner a group?
+	 * @param array   $data      Permission data that is extended
+	 * @param boolean $exclusive Is the post exclusively addressed to a group?
+	 * @param boolean $mention   Is a group mentioned?
+	 */
+	private static function addTermReceiver(array $term, array $item, bool $is_group, array &$data, bool &$exclusive, bool &$mention)
+	{
+		$profile = APContact::getByURL($term['url'], false);
+		if (empty($profile)) {
+			return;
+		}
+
+		if (($term['type'] == Tag::AUDIENCE) && ($profile['type'] == 'Group')) {
+			$data['audience'][] = $profile['url'];
+			// A starting post that is addressed to a group via the audience is handled like an exclusive mention
+			if (!$is_group && ($item['gravity'] == Item::GRAVITY_PARENT) && !empty($profile['followers'])) {
+				$exclusive    = true;
+				$data['cc'][] = $profile['followers'];
+				DI::logger()->debug('Group post via audience', ['uri-id' => $item['uri-id'], 'group' => $profile['url']]);
+			}
+		}
+		if ($term['type'] == Tag::EXCLUSIVE_MENTION) {
+			$exclusive = true;
+			if (!empty($profile['followers']) && ($profile['type'] == 'Group')) {
+				$data['cc'][]       = $profile['followers'];
+				$data['audience'][] = $profile['url'];
+			}
+		} elseif (($term['type'] == Tag::MENTION) && ($profile['type'] == 'Group')) {
+			$mention = true;
+		}
+		$data['to'][] = $profile['url'];
+	}
+
+	/**
 	 * Creates an array of permissions from an item thread
 	 *
 	 * @param array   $item             Item array
@@ -661,24 +706,9 @@ class Transmitter
 			}
 
 			foreach ($terms as $term) {
-				$profile = APContact::getByURL($term['url'], false);
-				if (!empty($profile)) {
-					if (($term['type'] == Tag::AUDIENCE) && ($profile['type'] == 'Group')) {
-						$data['audience'][] = $profile['url'];
-					}
-					if ($term['type'] == Tag::EXCLUSIVE_MENTION) {
-						$exclusive = true;
-						if (!empty($profile['followers']) && ($profile['type'] == 'Group')) {
-							$data['cc'][]       = $profile['followers'];
-							$data['audience'][] = $profile['url'];
-						}
-					} elseif (($term['type'] == Tag::MENTION) && ($profile['type'] == 'Group')) {
-						$mention = true;
-					}
-					$data['to'][] = $profile['url'];
-				}
+				self::addTermReceiver($term, $item, $is_group, $data, $exclusive, $mention);
 			}
-			if (!$exclusive && ($item['private'] == Item::UNLISTED)) {
+			if (!$exclusive && ($item['private'] == Item::UNLISTED) && !empty($actor_profile['followers'])) {
 				$data['to'][] = $actor_profile['followers'];
 			}
 		} else {
@@ -692,22 +722,7 @@ class Transmitter
 						continue;
 					}
 
-					$profile = APContact::getByURL($term['url'], false);
-					if (!empty($profile)) {
-						if (($term['type'] == Tag::AUDIENCE) && ($profile['type'] == 'Group')) {
-							$data['audience'][] = $profile['url'];
-						}
-						if ($term['type'] == Tag::EXCLUSIVE_MENTION) {
-							$exclusive = true;
-							if (!empty($profile['followers']) && ($profile['type'] == 'Group')) {
-								$data['cc'][]       = $profile['followers'];
-								$data['audience'][] = $profile['url'];
-							}
-						} elseif (($term['type'] == Tag::MENTION) && ($profile['type'] == 'Group')) {
-							$mention = true;
-						}
-						$data['to'][] = $profile['url'];
-					}
+					self::addTermReceiver($term, $item, $is_group, $data, $exclusive, $mention);
 				}
 			}
 
@@ -720,7 +735,9 @@ class Transmitter
 			} elseif (!$exclusive) {
 				foreach ($receiver_list as $receiver) {
 					if ($receiver == -1) {
-						$data['to'][] = $actor_profile['followers'];
+						if (!empty($actor_profile['followers'])) {
+							$data['to'][] = $actor_profile['followers'];
+						}
 						continue;
 					}
 
@@ -771,7 +788,7 @@ class Transmitter
 							}
 						} elseif (!$exclusive && !$is_group_thread) {
 							// Public thread parent post always are directed to the followers.
-							if ($item['private'] != Item::PRIVATE) {
+							if (($item['private'] != Item::PRIVATE) && !empty($actor_profile['followers'])) {
 								$data['cc'][] = $actor_profile['followers'];
 							}
 						}
@@ -1276,6 +1293,8 @@ class Transmitter
 			$type = 'Like';
 		} elseif ($item['verb'] == Activity::DISLIKE) {
 			$type = 'Dislike';
+		} elseif ($item['verb'] == Activity::EMOJIREACT) {
+			$type = 'EmojiReact';
 		} elseif ($item['verb'] == Activity::ATTEND) {
 			$type = 'Accept';
 		} elseif ($item['verb'] == Activity::ATTENDNO) {
@@ -1438,7 +1457,12 @@ class Transmitter
 			$data['actor'] = $link;
 		}
 
-		$data['published'] = DateTimeFormat::utc($item['created'] . '+00:00', DateTimeFormat::ATOM);
+		// @see https://github.com/friendica/friendica/issues/16150
+		if (in_array($data['type'], ['Undo', 'Delete'])) {
+			$data['published'] = DateTimeFormat::utc($item['edited'] . '+00:00', DateTimeFormat::ATOM);
+		} else {
+			$data['published'] = DateTimeFormat::utc($item['created'] . '+00:00', DateTimeFormat::ATOM);
+		}
 
 		$data['instrument'] = self::getService();
 
@@ -1468,6 +1492,9 @@ class Transmitter
 			$data['diaspora:guid'] = $item['guid'];
 			if (!empty($item['signed_text'])) {
 				$data['diaspora:like'] = $item['signed_text'];
+			}
+			if (in_array($data['type'], ['Like', 'EmojiReact']) && EmojiReaction::isReaction((string) $item['body'])) {
+				$data['content'] = $item['body'];
 			}
 			$data['object'] = $item['thr-parent'];
 		}
@@ -1931,6 +1958,8 @@ class Transmitter
 			'type'       => 'Collection',
 			'totalItems' => Post::countPosts(['thr-parent-id' => $item['uri-id'], 'gravity' => Item::GRAVITY_COMMENT, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]]),
 		];
+
+		$data['emojiReactions'] = $item['uri'] . '/reactions';
 
 		if (empty($data['location']) && (!empty($item['coord']) || !empty($item['location']))) {
 			$data['location'] = self::createLocation($item);

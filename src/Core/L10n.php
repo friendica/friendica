@@ -82,6 +82,12 @@ class L10n
 	 */
 	private $strings = [];
 
+	/** @var int Number of translation requests, see getTranslationCount() */
+	private int $translationCount = 0;
+
+	/** @var int Number of date/time formattings, see getDateFormatCount() */
+	private int $dateFormatCount = 0;
+
 	public function __construct(private IManageConfigValues $config, private Database $dba, private IHandleSessions $session, private array $server, array $get)
 	{
 		$this->loadTranslationTable(L10n::detectLanguage($server, $get, $this->config->get('system', 'language', self::DEFAULT)));
@@ -98,6 +104,45 @@ class L10n
 	public function getCurrentLang()
 	{
 		return $this->lang;
+	}
+
+	/**
+	 * Returns how often texts have been translated so far
+	 *
+	 * Compare the value before and after generating some output to find out whether the output contains
+	 * translated texts and therefore depends on the language.
+	 *
+	 * @return int Number of calls of t() and tt()
+	 */
+	public function getTranslationCount(): int
+	{
+		return $this->translationCount;
+	}
+
+	/**
+	 * Returns how often dates have been formatted so far
+	 *
+	 * The formatting depends on the time zone of the current session.
+	 * Compare the value before and after generating some output to find out whether the output contains
+	 * formatted dates and therefore depends on the viewer.
+	 *
+	 * @return int Number of calls of formatDateTime()
+	 */
+	public function getDateFormatCount(): int
+	{
+		return $this->dateFormatCount;
+	}
+
+	/**
+	 * Returns the languages offered in the language selector of the post editors.
+	 * The undetermined language is labelled "Auto", since choosing it leaves the
+	 * language detection to the server.
+	 *
+	 * @return array Language names, indexed by their ISO 639-1 code
+	 */
+	public function getLanguageSelection(): array
+	{
+		return [self::UNDETERMINED_LANGUAGE => $this->t('Auto')] + $this->getLanguageCodes(true, true);
 	}
 
 	/**
@@ -130,13 +175,13 @@ class L10n
 			if ($session->get('uid')) {
 				$user = $this->dba->selectFirst('user', ['language'], ['uid' => $_SESSION['uid']]);
 				if ($this->dba->isResult($user)) {
-					$session->set('language', $this->normaliseLocale($user['language']));
+					$session->set('language', self::toDirectoryName($this->normaliseLocale($user['language'])));
 				}
 			}
 		}
 
 		if (isset($_GET['lang'])) {
-			$session->set('language', $this->normaliseLocale($_GET['lang']));
+			$session->set('language', self::toDirectoryName($this->normaliseLocale($_GET['lang'])));
 		}
 	}
 
@@ -170,10 +215,7 @@ class L10n
 		$a          = new \stdClass();
 		$a->strings = [];
 
-		$child = array_search($lang, $this::LANG_PARENTS);
-		if ($child) {
-			$lang = $child;
-		}
+		$lang = self::toDirectoryName($lang);
 
 		// load enabled addons strings
 		$addons = array_keys($this->config->get('addons') ?? []);
@@ -192,6 +234,37 @@ class L10n
 		$this->strings = $a->strings;
 
 		unset($a);
+	}
+
+	/**
+	 * Converts a language code to the name of the matching directory below view/lang.
+	 *
+	 * Handles different spellings (case, "_" instead of "-") and codes without or with a different region,
+	 * e.g. "da", "da-DK" and "da_dk" all result in "da-dk". If a language has got several variants, the first one is used.
+	 * "en" results in "en-gb", the same as it did before.
+	 *
+	 * @param string $lang Language code
+	 * @return string Directory name, or the normalised code if there is no matching directory
+	 */
+	public static function toDirectoryName(string $lang): string
+	{
+		$lang = strtolower(str_replace('_', '-', trim($lang)));
+
+		if (isset(self::LANG_PARENTS[$lang]) || is_dir(__DIR__ . '/../../view/lang/' . $lang)) {
+			return $lang;
+		}
+
+		$child = array_search($lang, self::LANG_PARENTS);
+		if ($child) {
+			return $child;
+		}
+
+		// Unknown region, e.g. "de-at" or "pt-pt": Try it with the plain language
+		if (str_contains($lang, '-')) {
+			return self::toDirectoryName(explode('-', $lang)[0]);
+		}
+
+		return $lang;
 	}
 
 	/**
@@ -310,6 +383,8 @@ class L10n
 			return '';
 		}
 
+		$this->translationCount++;
+
 		if (!empty($this->strings[$s])) {
 			$t = $this->strings[$s];
 			$s = is_array($t) ? $t[0] : $t;
@@ -346,6 +421,8 @@ class L10n
 	public function tt(string $singular, string $plural, float $count, ...$vars): string
 	{
 		$s = null;
+
+		$this->translationCount++;
 
 		if (!empty($this->strings[$singular])) {
 			$t = $this->strings[$singular];
@@ -730,6 +807,8 @@ class L10n
 	 */
 	public function formatDateTime(string $datestring, int $dateType, int $timeType, ?string $pattern = null): string
 	{
+		$this->dateFormatCount++;
+
 		$formatter = new IntlDateFormatter(
 			$this->normaliseLocale($this->session->get('language')),
 			$dateType,

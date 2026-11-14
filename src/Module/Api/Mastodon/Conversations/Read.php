@@ -22,14 +22,19 @@ class Read extends BaseApi
 		$this->checkAllowedScope(self::SCOPE_WRITE);
 		$uid = self::getCurrentUserID();
 
-		if (!empty($this->parameters['id'])) {
+		if (empty($this->parameters['id'])) {
 			$this->logAndJsonError(422, $this->errorFactory->UnprocessableEntity());
 		}
 
-		DBA::update('mail', ['seen' => true], ['convid' => $this->parameters['id'], 'uid' => $uid]);
+		$mail = DBA::selectFirst('mail', ['parent-uri'], ['id' => $this->parameters['id'], 'uid' => $uid]);
+		if (!$mail) {
+			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
+		}
+
+		DBA::update('mail', ['seen' => true], ['parent-uri' => $mail['parent-uri'], 'uid' => $uid]);
 
 		try {
-			$this->earlyJsonExit(DI::mstdnConversation()->createFromConvId($this->parameters['id'])->toArray());
+			$this->earlyJsonExit(DI::mstdnConversation()->createFromMailId($uid, (int) $this->parameters['id'])->toArray());
 		} catch (NotFoundException) {
 			$this->logAndJsonError(404, $this->errorFactory->RecordNotFound());
 		}

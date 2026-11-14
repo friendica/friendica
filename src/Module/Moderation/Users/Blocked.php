@@ -79,7 +79,7 @@ class Blocked extends BaseUsers
 
 		$users = array_map($this->setupUserCallback(), $users);
 
-		$th_users = array_map(null, [$this->t('Name'), $this->t('Email'), $this->t('Register date'), $this->t('Last login'), $this->t('Last public item'), $this->t('Type')], $valid_orders);
+		$th_users = array_map(null, [$this->t('Name'), $this->t('Email'), $this->t('Register date'), $this->t('Last activity'), $this->t('Last public item'), $this->t('Type')], $valid_orders);
 
 		$count = $this->database->count('user', ['blocked' => true, 'verified' => true]);
 

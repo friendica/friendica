@@ -11,6 +11,7 @@ use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Image;
 use Friendica\Content\Post\Collection\PostMedias;
+use Friendica\Content\Post\Entity\FileKind;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
@@ -21,7 +22,6 @@ use Friendica\Core\Worker;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\CacheItemEvent;
-use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Event\InsertPostRemoteEvent;
 use Friendica\Event\ItemTaggedEvent;
 use Friendica\Event\InsertPostRemoteEndEvent;
@@ -31,9 +31,6 @@ use Friendica\Event\PreparePostFilterContentEvent;
 use Friendica\Event\PreparePostStartEvent;
 use Friendica\Event\InsertPostLocalEvent;
 use Friendica\Model\Post\Category;
-use Friendica\Network\HTTPClient\Client\HttpClientAccept;
-use Friendica\Network\HTTPClient\Client\HttpClientOptions;
-use Friendica\Network\HTTPClient\Client\HttpClientRequest;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Network\HTTPException\ServiceUnavailableException;
 use Friendica\Protocol\Activity;
@@ -42,7 +39,7 @@ use Friendica\Protocol\ActivityPub\Processor;
 use Friendica\Protocol\Delivery;
 use Friendica\Protocol\Diaspora;
 use Friendica\Util\DateTimeFormat;
-use Friendica\Util\HTTPSignature;
+use Friendica\Util\EmojiReaction;
 use Friendica\Util\Map;
 use Friendica\Util\Network;
 use Friendica\Util\Proxy;
@@ -168,6 +165,9 @@ class Item
 	public const CANT_LIKE     = 2;
 	public const CANT_ANNOUNCE = 4;
 	public const CANT_QUOTE    = 8;
+
+	// Number of non-visual attachments from which the list is collapsed by default
+	public const ATTACHMENTS_COLLAPSED = 4;
 
 	/**
 	 * Update existing item entries
@@ -408,6 +408,10 @@ class Item
 			self::markForDeletion(['uri-id' => $item['uri-id'], 'uid' => 0, 'deleted' => false], $priority);
 		}
 
+		if ($item['gravity'] == self::GRAVITY_PARENT && !Post::exists(["`uri-id` = ? AND NOT `deleted`", $item['uri-id']])) {
+			Post\Engagement::delete($item['uri-id']);
+		}
+
 		Post\DeliveryData::delete($item['uri-id']);
 
 		// If it's the parent of a comment thread, kill all the kids
@@ -455,6 +459,33 @@ class Item
 		DI::logger()->info('Item has been marked for deletion.', ['id' => $item_id]);
 
 		return true;
+	}
+
+	/**
+	 * Mastodon knows only one favourite per account, so there is only one "Like" per user and post.
+	 * Every further Like with an emoji is stored (and sent) as an "EmojiReact".
+	 *
+	 * @param array $item Item that is about to be stored
+	 * @return string Verb of the item
+	 */
+	private static function getVerbForLike(array $item): string
+	{
+		$verb = $item['verb'] ?? '';
+
+		if (($item['gravity'] != self::GRAVITY_ACTIVITY) || ($verb != Activity::LIKE) || !EmojiReaction::isReaction((string) ($item['body'] ?? ''))) {
+			return $verb;
+		}
+
+		$exists = Post::exists(DBA::mergeConditions(
+			['thr-parent-id' => $item['thr-parent-id'], 'author-id' => $item['author-id'], 'uid' => $item['uid'], 'gravity' => self::GRAVITY_ACTIVITY, 'vid' => Verb::getID(Activity::LIKE), 'deleted' => false],
+			['NOT `uri-id` = ?', $item['uri-id']],
+		));
+		if (!$exists) {
+			return $verb;
+		}
+
+		DI::logger()->debug('There already is a like from this author, storing the reaction as an emoji reaction', ['uri-id' => $item['uri-id'], 'thr-parent-id' => $item['thr-parent-id'], 'author-id' => $item['author-id']]);
+		return Activity::EMOJIREACT;
 	}
 
 	/**
@@ -733,6 +764,8 @@ class Item
 			$parent_id     = (int) $toplevel_parent['id'];
 			$item          = $itemHelper->handleToplevelParent($item, $toplevel_parent, $defined_permissions);
 			$parent_origin = $toplevel_parent['origin'];
+
+			Post\ThreadUser::ensure($toplevel_parent['uri-id'], $toplevel_parent['uid'], $parent_id);
 		} else {
 			$parent_id     = 0;
 			$parent_origin = $item['origin'];
@@ -757,6 +790,13 @@ class Item
 
 		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
 		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
+
+		$item['verb'] = self::getVerbForLike($item);
+
+		// Local comments on a sensitive post are sensitive as well
+		if ($item['origin'] && ($item['gravity'] == self::GRAVITY_COMMENT) && empty($item['sensitive']) && Post::exists(['uri-id' => $item['thr-parent-id'], 'sensitive' => true])) {
+			$item['sensitive'] = true;
+		}
 
 		if (!empty($item['conversation']) && empty($item['conversation-id'])) {
 			$item['conversation-id'] = ItemURI::getIdByURI($item['conversation']);
@@ -858,7 +898,7 @@ class Item
 		}
 
 		if (empty($item['quote-uri-id'])) {
-			$quote_id = self::getQuoteUriId($item['body']);
+			$quote_id = DI::postFetcher()->getQuoteUriId($item['body']);
 			if (!empty($quote_id)) {
 				// This is one of these "should not happen" situations.
 				// The protocol implementations should already have done this job.
@@ -924,6 +964,11 @@ class Item
 			Tag::storeFromBody($item['uri-id'], $item['body']);
 		}
 
+		if (!empty($item['audience'])) {
+			DI::logger()->debug('Store group audience', ['uri-id' => $item['uri-id'], 'audience' => $item['audience']]);
+			Tag::store($item['uri-id'], Tag::AUDIENCE, $item['audience'], $item['audience']);
+		}
+
 		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) && (!isset($item['sensitive']) || is_null($item['sensitive']))) {
 			$item['sensitive'] = Tag::existsTagForPost($item['uri-id'], 'nsfw');
 		}
@@ -943,7 +988,7 @@ class Item
 		}
 
 		// The content of activities normally doesn't matter - except for emoji activities
-		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) || in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT]) && !empty($item['body']) && (mb_strlen((string) $item['body']) == 1)) {
+		if (in_array($item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT]) || in_array($item['verb'], [Activity::LIKE, Activity::DISLIKE, Activity::EMOJIREACT]) && EmojiReaction::isReaction((string) $item['body'])) {
 			if (!Post\Content::exists($item['uri-id']) && !Post\Content::insert($item['uri-id'], $item)) {
 				DI::logger()->error('Post-Content entry was not inserted', ['uri-id' => $item['uri-id']]);
 			}
@@ -994,7 +1039,7 @@ class Item
 		if ($item['gravity'] == self::GRAVITY_PARENT) {
 			$item['post-user-id'] = $post_user_id;
 			if (!Post\ThreadUser::insert($item['uri-id'], $item['uid'], $item)) {
-				DI::logger()->error('Post-Thread-User entry was not inserted', ['uri-id' => $item['uri-id']]);
+				DI::logger()->error('Post-Thread-User entry was not inserted', ['uri-id' => $item['uri-id'], 'uid' => $item['uid'], 'network' => $item['network'], 'post-user-id' => $post_user_id, 'error' => DBA::errorNo() . ': ' . DBA::errorMessage()]);
 			}
 		}
 
@@ -1172,6 +1217,7 @@ class Item
 			// Fill the cache with the rendered content.
 			if (in_array($posted_item['gravity'], [self::GRAVITY_PARENT, self::GRAVITY_COMMENT])) {
 				self::updateDisplayCache($posted_item['uri-id']);
+				self::updateApiCache($posted_item);
 			}
 
 			if (in_array($posted_item['gravity'], [self::GRAVITY_ACTIVITY, self::GRAVITY_COMMENT])) {
@@ -1197,7 +1243,11 @@ class Item
 			}
 		}
 
-		if ($posted_item['uid'] !== 0 && ($posted_item['origin'] || !in_array($posted_item['network'], Protocol::FEDERATED))) {
+		// Technical activities like "view" don't change anything for the channels
+		if ($posted_item['uid'] !== 0
+			&& ($posted_item['origin'] || !in_array($posted_item['network'], Protocol::FEDERATED))
+			&& !in_array($posted_item['verb'], Activity::TECHNICAL_ACTIVITIES)
+		) {
 			self::addPostToChannel($posted_item['uri-id'], $posted_item['uid']);
 		}
 
@@ -1329,6 +1379,26 @@ class Item
 		}
 
 		self::prepareBody($item, false, false, true);
+	}
+
+	/**
+	 * Fill the cache with the content as it is rendered for the API
+	 *
+	 * @param array $item Item array with the fields "uri-id" and "uid"
+	 * @return void
+	 */
+	private static function updateApiCache(array $item): void
+	{
+		// The API renders the same fields as it fetches them here, otherwise the cached entry would never be used.
+		$content = Post::selectFirst(['body', 'raw-body'], ['uri-id' => $item['uri-id'], 'uid' => $item['uid']]);
+		if (!$content) {
+			return;
+		}
+
+		$renderedContent = DI::renderedContent();
+
+		$renderedContent->convert($item['uri-id'], $content['body'], BBCode::EXTERNAL);
+		$renderedContent->convert($item['uri-id'], BBCode::setMentionsToNicknames($content['raw-body'] ?? $content['body']), BBCode::MASTODON_API);
 	}
 
 	/**
@@ -1977,9 +2047,13 @@ class Item
 
 		if ($update) {
 			// The "self" contact id is used (for example in the connectors) when the contact is unknown
-			// So we have to ensure to only update the last item when it had been our own post,
+			// So we have to ensure to only update the last item when it had been our own content,
 			// or it had been done by a "regular" contact.
-			if (!empty($arr['wall'])) {
+			// Our own content is a post or activity we created for a federated network, but not a technical activity like "view".
+			$own_content = !empty($arr['origin'])
+				&& in_array($arr['network'], Protocol::FEDERATED)
+				&& !in_array($arr['verb'], Activity::TECHNICAL_ACTIVITIES);
+			if ($own_content) {
 				$condition = ['id' => $arr['contact-id']];
 			} else {
 				$condition = ['id' => $arr['contact-id'], 'self' => false];
@@ -2552,23 +2626,30 @@ class Item
 	 *            Activity verb. One of
 	 *            like, unlike, dislike, undislike, attendyes, unattendyes,
 	 *            attendno, unattendno, attendmaybe, unattendmaybe,
-	 *            announce, unannounce
+	 *            announce, unannounce, react, unreact
 	 * @param int    $uid
 	 * @param string $allow_cid
 	 * @param string $allow_gid
 	 * @param string $deny_cid
 	 * @param string $deny_gid
+	 * @param string $reaction  Emoji for the "react" and "unreact" verbs
 	 * @return bool
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	public static function performActivity(int $item_id, string $verb, int $uid, ?string $allow_cid = null, ?string $allow_gid = null, ?string $deny_cid = null, ?string $deny_gid = null): bool
+	public static function performActivity(int $item_id, string $verb, int $uid, ?string $allow_cid = null, ?string $allow_gid = null, ?string $deny_cid = null, ?string $deny_gid = null, string $reaction = ''): bool
 	{
 		if (empty($uid)) {
 			return false;
 		}
 
-		DI::logger()->notice('Start create activity', ['verb' => $verb, 'item' => $item_id, 'user' => $uid]);
+		DI::logger()->notice('Start create activity', ['verb' => $verb, 'item' => $item_id, 'user' => $uid, 'reaction' => $reaction]);
+
+		$isReactionVerb = in_array($verb, ['react', 'unreact']);
+		if ($isReactionVerb ? !EmojiReaction::isReaction($reaction) : $reaction !== '') {
+			DI::logger()->notice('Invalid reaction', ['reaction' => $reaction, 'item' => $item_id]);
+			return false;
+		}
 
 		$item = Post::selectFirst(self::ITEM_FIELDLIST, ['id' => $item_id]);
 		if (!DBA::isResult($item)) {
@@ -2641,6 +2722,11 @@ class Item
 			case 'unview':
 				$activity = Activity::VIEW;
 				break;
+			case 'react':
+			case 'unreact':
+				// Positive reactions are sent as likes, so that systems without emoji reactions show them as well
+				$activity = EmojiReaction::isPositiveReaction($reaction) ? Activity::LIKE : Activity::EMOJIREACT;
+				break;
 			default:
 				DI::logger()->warning('unknown verb', ['verb' => $verb, 'item' => $item_id]);
 				return false;
@@ -2661,6 +2747,9 @@ class Item
 			foreach ($verbs as $verb) {
 				$vids[] = Verb::getID($verb);
 			}
+		} elseif ($reaction !== '') {
+			// A reaction is stored as "Like", unless the user already has a like on the post
+			$vids = [Verb::getID(Activity::LIKE), Verb::getID(Activity::EMOJIREACT)];
 		} else {
 			$vids = Verb::getID($activity);
 		}
@@ -2669,9 +2758,19 @@ class Item
 			'vid'       => $vids, 'deleted' => false, 'gravity' => self::GRAVITY_ACTIVITY,
 			'author-id' => $author_id, 'uid' => $uid, 'thr-parent-id' => $uri_id,
 		];
+		if ($reaction !== '') {
+			$condition = DBA::mergeConditions($condition, ['BINARY `body` = ?', $reaction]);
+		} elseif (in_array($activity, [Activity::LIKE, Activity::DISLIKE])) {
+			// Likes with an emoji are reactions, plain likes have no body or the verb as body
+			$condition = DBA::mergeConditions($condition, ["(`body` IS NULL OR `body` IN ('', ?))", $activity]);
+		}
 		$like_item = Post::selectFirst(['id', 'guid', 'verb'], $condition);
 
 		if (DBA::isResult($like_item)) {
+			if ($reaction !== '') {
+				$activity = $like_item['verb'];
+			}
+
 			/**
 			 * Truth table for existing activities
 			 *
@@ -2726,7 +2825,7 @@ class Item
 			'thr-parent'  => $item['uri'],
 			'owner-id'    => $author_id,
 			'author-id'   => $author_id,
-			'body'        => $activity,
+			'body'        => $reaction ?: $activity,
 			'verb'        => $activity,
 			'object-type' => $objtype,
 			'allow_cid'   => $allow_cid ?? $item['allow_cid'],
@@ -2763,32 +2862,12 @@ class Item
 	 *
 	 * @param integer $owner_id User ID for which the permissions should be fetched
 	 * @return array condition
+	 * @deprecated 2026.11 - Use \Friendica\Security\PostPermissions::getConditionArray() instead
+	 * @see \Friendica\Security\PostPermissions::getConditionArray()
 	 */
 	public static function getPermissionsConditionArrayByUserId(int $owner_id): array
 	{
-		$local_user  = DI::userSession()->getLocalUserId();
-		$remote_user = DI::userSession()->getRemoteContactID($owner_id);
-
-		// default permissions - anonymous user
-		$condition = ["`private` != ?", self::PRIVATE];
-
-		if ($local_user && ($local_user == $owner_id)) {
-			// Profile owner - everything is visible
-			$condition = [];
-		} elseif ($remote_user) {
-			// Authenticated visitor - fetch the matching permissionsets
-			$permissionSets = DI::permissionSet()->selectByContactId($remote_user, $owner_id);
-			if (count($permissionSets) > 0) {
-				$condition = [
-					"(`private` != ? OR (`private` = ? AND `wall`
-					AND `psid` IN (" . implode(', ', array_fill(0, count($permissionSets), '?')) . ")))",
-					self::PRIVATE, self::PRIVATE,
-				];
-				$condition = array_merge($condition, $permissionSets->column('id'));
-			}
-		}
-
-		return $condition;
+		return DI::postPermissions()->getConditionArray($owner_id);
 	}
 
 	/**
@@ -2797,46 +2876,12 @@ class Item
 	 * @param int $owner_id
 	 * @param string $table
 	 * @return string
+	 * @deprecated 2026.11 - Use \Friendica\Security\PostPermissions::getSQL() instead
+	 * @see \Friendica\Security\PostPermissions::getSQL()
 	 */
 	public static function getPermissionsSQLByUserId(int $owner_id, string $table = ''): string
 	{
-		$local_user  = DI::userSession()->getLocalUserId();
-		$remote_user = DI::userSession()->getRemoteContactID($owner_id);
-
-		if (!empty($table)) {
-			$table = DBA::quoteIdentifier($table) . '.';
-		}
-
-		// Profile owner - everything is visible
-		if ($local_user && ($local_user == $owner_id)) {
-			return '';
-		}
-
-		if ($remote_user) {
-			/*
-			 * Authenticated visitor. Unless pre-verified,
-			 * check that the contact belongs to this $owner_id
-			 * and load the circles the visitor belongs to.
-			 * If pre-verified, the caller is expected to have already
-			 * done this and passed the circles into this function.
-			 */
-			$permissionSets = DI::permissionSet()->selectByContactId($remote_user, $owner_id);
-
-			$sql_set = '';
-
-			if (count($permissionSets) > 0) {
-				$sql_set = sprintf(" OR (" . $table . "`private` = %d AND " . $table . "`wall` AND " . $table . "`psid` IN (", self::PRIVATE) . implode(',', $permissionSets->column('id')) . "))";
-			}
-
-			return sprintf(" AND (" . $table . "`private` != %d", self::PRIVATE) . $sql_set . ")";
-		}
-
-		/*
-		 * Construct permissions
-		 *
-		 * default permissions - anonymous user
-		 */
-		return sprintf(" AND " . $table . "`private` != %d", self::PRIVATE);
+		return DI::postPermissions()->getSQL($owner_id, $table);
 	}
 
 	/**
@@ -2859,6 +2904,29 @@ class Item
 		}
 
 		return $l10n->t('post');
+	}
+
+	/**
+	 * Convert the given body to HTML and let addons modify the result
+	 *
+	 * @param array  $item          Item array
+	 * @param string $render_body   Body to be converted
+	 * @param string $original_body Original body used for the cache hash
+	 * @return array Item array with updated "rendered-html" and "rendered-hash"
+	 */
+	private static function renderBody(array $item, string $render_body, string $original_body): array
+	{
+		$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $render_body);
+		$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $original_body);
+
+		$event = DI::eventDispatcher()->dispatch(
+			new CacheItemEvent($item, $item['rendered-html'], $item['rendered-hash']),
+		);
+
+		$item['rendered-html'] = $event->getRenderedHtml();
+		$item['rendered-hash'] = $event->getRenderedHash();
+
+		return $item;
 	}
 
 	/**
@@ -2885,17 +2953,7 @@ class Item
 			|| $rendered_hash != hash('md5', BBCode::VERSION . '::' . $body)
 			|| DI::config()->get('system', 'ignore_cache')
 		) {
-			$item['rendered-html'] = BBCode::convertForUriId($item['uri-id'], $item['body']);
-			$item['rendered-hash'] = hash('md5', BBCode::VERSION . '::' . $body);
-
-			$eventDispatcher = DI::eventDispatcher();
-
-			$event = $eventDispatcher->dispatch(
-				new CacheItemEvent($item, $item['rendered-html'], $item['rendered-hash']),
-			);
-
-			$item['rendered-html'] = $event->getRenderedHtml();
-			$item['rendered-hash'] = $event->getRenderedHash();
+			$item = self::renderBody($item, (string) $item['body'], (string) $body);
 
 			// Update if the generated values differ from the existing ones
 			if ((($rendered_hash != $item['rendered-hash']) || ($rendered_html != $item['rendered-html'])) && !empty($item['id'])) {
@@ -2937,18 +2995,28 @@ class Item
 		$preparePostStartEvent = $eventDispatcher->dispatch(new PreparePostStartEvent($item));
 		$item                  = $preparePostStartEvent->getItemArray();
 
+		$tags = Tag::populateFromItem($item);
+
+		$item['tags']              = $tags['tags'];
+		$item['hashtags']          = $tags['hashtags'];
+		$item['mentions']          = $tags['mentions'];
+		$item['implicit_mentions'] = $tags['implicit_mentions'];
+
 		// In order to provide theme developers more possibilities, event items
 		// are treated differently.
 		if ($item['object-type'] === Activity\ObjectType::EVENT && isset($item['event-id'])) {
 			$ev = Event::getItemHTML($item);
+
+			if ($attach) {
+				$splitAttachments = DI::postMediaRepository()->splitAttachments($item['uri-id'], [], $item['has-media'] ?? false, $uid != 0);
+
+				$ev = self::addVisualAttachments($splitAttachments['visual'], $item, $ev, false, $uid);
+				$ev = self::addNonVisualAttachments($splitAttachments['additional'], $item, $ev);
+				$ev = self::addHiddenAttachments($splitAttachments['hidden'], $item, $ev);
+			}
+
 			return $ev;
 		}
-
-		$tags = Tag::populateFromItem($item);
-
-		$item['tags']     = $tags['tags'];
-		$item['hashtags'] = $tags['hashtags'];
-		$item['mentions'] = $tags['mentions'];
 
 		if (!$is_preview) {
 			$item['body'] = preg_replace("#\s*\[attachment .*?].*?\[/attachment]\s*#ism", "\n", (string) $item['body']);
@@ -3028,7 +3096,17 @@ class Item
 		$itemSplitAttachments = DI::postMediaRepository()->splitAttachments($item['uri-id'], $shared_links, $item['has-media'] ?? false, $uid != 0);
 		$item['body']         = self::replaceVisualAttachments($itemSplitAttachments['visual'], $item['body'] ?? '');
 
-		self::putInCache($item);
+		// Images that are hidden from the visitor must not be rendered from the body.
+		// The result differs per viewer, so it must not be stored in the shared cache.
+		$hidden_urls  = self::getHiddenImageUrls($itemSplitAttachments['hidden']);
+		$hidden_urls  = array_merge($hidden_urls, self::getHiddenImageUrls($sharedSplitAttachments['hidden'] ?? new PostMedias()));
+		$visible_body = Post\Media::removeImagesByUrl($hidden_urls, $item['body']);
+
+		if (!$only_cache && ($visible_body !== $item['body'])) {
+			$item = self::renderBody($item, $visible_body, $body);
+		} else {
+			self::putInCache($item);
+		}
 		$item['body'] = $body;
 		$s            = $item["rendered-html"];
 
@@ -3124,6 +3202,7 @@ class Item
 		}
 
 		$s = DI::postMediaRepository()->addEmbed($s, $uid, $item['uri-id'], $uid != 0);
+		$s = DI::postMediaRepository()->gateEmbeddedIframes($s, $uid);
 
 		$s = HTML::applyContentFilter($s, $filter_reasons);
 
@@ -3187,7 +3266,7 @@ class Item
 			}
 
 			if ($PostMedia->hasDimensions()) {
-				$pattern = '#<a href="' . preg_quote($PostMedia->url) . '">(.*?)"></a>#';
+				$pattern = '#<a href="' . preg_quote($PostMedia->url) . '"[^>]*>(.*?)"></a>#';
 
 				$s = preg_replace_callback($pattern, function () use ($PostMedia) {
 					return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/image/single_with_height_allocation.tpl'), [
@@ -3312,6 +3391,28 @@ class Item
 	}
 
 	/**
+	 * Get the URLs (including previews) of the hidden images
+	 *
+	 * @param PostMedias $PostMedias
+	 * @return string[]
+	 */
+	private static function getHiddenImageUrls(PostMedias $PostMedias): array
+	{
+		$urls = [];
+		/** @var PostMedia $PostMedia */
+		foreach ($PostMedias as $PostMedia) {
+			if ($PostMedia->type !== PostMedia::TYPE_IMAGE) {
+				continue;
+			}
+			$urls[] = (string) $PostMedia->url;
+			if ($PostMedia->preview) {
+				$urls[] = (string) $PostMedia->preview;
+			}
+		}
+		return $urls;
+	}
+
+	/**
 	 * Add visual attachments to the content
 	 *
 	 * @param PostMedias $PostMedias
@@ -3356,7 +3457,7 @@ class Item
 					$trailing .= $media;
 				}
 			} elseif ($PostMedia->type == PostMedia::TYPE_AUDIO) {
-				$media = DI::postMediaRepository()->getAudioAttachment($PostMedia);
+				$media = DI::postMediaRepository()->getAudioAttachment($PostMedia, $uid);
 				if (($item['post-type'] ?? null) == Item::PT_AUDIO) {
 					$leading .= $media;
 				} else {
@@ -3460,7 +3561,7 @@ class Item
 					$preview_mode = $attachment->isArticle() ? BBCode::PREVIEW_SMALL : BBCode::PREVIEW_LARGE;
 				}
 				if (!$has_media && $preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $attachment->url)) {
-					$rendered = BBCode::convertAttachmentFromPostMedia($attachment, BBCode::INTERNAL, $uriid, $preview_mode, DI::pConfig()->get($uid, 'system', 'embed_remote_media', false), self::hideDescription($attachment, $content));
+					$rendered = BBCode::convertAttachmentFromPostMedia($attachment, BBCode::INTERNAL, $uriid, $preview_mode, $uid != 0, self::hideDescription($attachment, $content));
 				} elseif (!self::containsLink($content, $attachment->url, PostMedia::TYPE_HTML)) {
 					$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
 						'$url'   => $attachment->url,
@@ -3518,7 +3619,8 @@ class Item
 	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content): string
 	{
 		DI::profiler()->startRecording('rendering');
-		$trailing = '';
+		$attachments = [];
+
 		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
 			if (strpos((string) $item['body'], (string) $PostMedia->url)) {
@@ -3534,19 +3636,26 @@ class Item
 			];
 			$the_url = Contact::magicLinkByContact($author, $PostMedia->url);
 
-			$title = Strings::escapeHtml(trim($PostMedia->description ?? '' ?: $PostMedia->url));
+			$name = trim($PostMedia->description ?? '' ?: $PostMedia->name ?? '' ?: basename(parse_url($PostMedia->url, PHP_URL_PATH) ?: $PostMedia->url));
 
-			if ($PostMedia->size) {
-				$title .= ' ' . $PostMedia->size . ' ' . DI::l10n()->t('bytes');
-			}
+			$kind = FileKind::fromMimeType($PostMedia->mimetype);
 
-			/// @todo Use a template
-			$icon = '<div class="attachtype icon s22 type-' . $PostMedia->mimetype->type . ' subtype-' . $PostMedia->mimetype->subtype . '"></div>';
-			$trailing .= '<a href="' . strip_tags($the_url) . '" title="' . $title . '" class="attachlink" target="_blank" rel="noopener noreferrer" >' . $icon . '</a>';
+			$attachments[] = [
+				'url'  => strip_tags($the_url),
+				'name' => $name,
+				'size' => $PostMedia->size ? Strings::formatBytes($PostMedia->size) : '',
+				'kind' => $kind->value,
+				'type' => $kind->label(DI::l10n()),
+			];
 		}
 
-		if ($trailing != '') {
-			$content .= '<div class="body-attach">' . $trailing . '</div>';
+		if (!empty($attachments)) {
+			$content .= Renderer::replaceMacros(Renderer::getMarkupTemplate('content/attachments.tpl'), [
+				'$collapsible' => count($attachments) > 1,
+				'$open'        => count($attachments) < self::ATTACHMENTS_COLLAPSED,
+				'$summary'     => DI::l10n()->tt('%d attachment', '%d attachments', count($attachments)),
+				'$attachments' => $attachments,
+			]);
 		}
 
 		DI::profiler()->stopRecording();
@@ -3716,23 +3825,12 @@ class Item
 	 * @param integer $uid
 	 *
 	 * @return integer item id
+	 * @deprecated 2026.11 - Use \Friendica\Post\LinkResolver::searchByLink() instead
+	 * @see \Friendica\Post\LinkResolver::searchByLink()
 	 */
 	public static function searchByLink(string $uri, int $uid = 0): int
 	{
-		$ssl_uri = str_replace('http://', 'https://', $uri);
-		$uris    = [$uri, $ssl_uri, Strings::normaliseLink($uri)];
-
-		$item = Post::selectFirst(['id'], ['uri' => $uris, 'uid' => $uid]);
-		if (DBA::isResult($item)) {
-			return $item['id'];
-		}
-
-		$item = Post::selectFirst(['id'], ['plink' => $uris, 'uid' => $uid]);
-		if (DBA::isResult($item)) {
-			return $item['id'];
-		}
-
-		return 0;
+		return DI::postLinkResolver()->searchByLink($uri, $uid);
 	}
 
 	/**
@@ -3741,23 +3839,12 @@ class Item
 	 * @param string $uri URI or link to post
 	 *
 	 * @return string URI
+	 * @deprecated 2026.11 - Use \Friendica\Post\LinkResolver::getURIByLink() instead
+	 * @see \Friendica\Post\LinkResolver::getURIByLink()
 	 */
 	public static function getURIByLink(string $uri): string
 	{
-		$ssl_uri = str_replace('http://', 'https://', $uri);
-		$uris    = [$uri, $ssl_uri, Strings::normaliseLink($uri)];
-
-		$item = Post::selectFirst(['uri'], ['uri' => $uris]);
-		if (DBA::isResult($item)) {
-			return $item['uri'];
-		}
-
-		$item = Post::selectFirst(['uri'], ['plink' => $uris]);
-		if (DBA::isResult($item)) {
-			return $item['uri'];
-		}
-
-		return '';
+		return DI::postLinkResolver()->getURIByLink($uri);
 	}
 
 	/**
@@ -3769,69 +3856,12 @@ class Item
 	 * @param string $mimetype
 	 *
 	 * @return integer item id
+	 * @deprecated 2026.11 - Use \Friendica\Protocol\PostFetcher::fetchByLink() instead
+	 * @see \Friendica\Protocol\PostFetcher::fetchByLink()
 	 */
 	public static function fetchByLink(string $uri, int $uid = 0, int $completion = ActivityPub\Receiver::COMPLETION_MANUAL, string $mimetype = ''): int
 	{
-		DI::logger()->info('Trying to fetch link', ['uid' => $uid, 'uri' => $uri]);
-		$item_id = self::searchByLink($uri, $uid);
-		if (!empty($item_id)) {
-			DI::logger()->info('Link found', ['uid' => $uid, 'uri' => $uri, 'id' => $item_id]);
-			return $item_id;
-		}
-
-		if (ActivityPub\Processor::alreadyKnown($uri, '')) {
-			return 0;
-		}
-
-		$event = DI::eventDispatcher()->dispatch(
-			new FetchItemByLinkEvent($uri, $uid, null),
-		);
-
-		if ($event->getItemId() !== null) {
-			DI::logger()->info('Hook link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $event->getItemId()]);
-			return $event->getItemId();
-		}
-
-		if (!$mimetype) {
-			try {
-				$curlResult = DI::httpClient()->head($uri, [HttpClientOptions::ACCEPT_CONTENT => HttpClientAccept::JSON_AS, HttpClientOptions::REQUEST => HttpClientRequest::ACTIVITYPUB]);
-				$mimetype   = $curlResult->getContentType();
-			} catch (\Throwable $th) {
-				DI::logger()->info('Error while fetching HTTP link via HEAD', ['uid' => $uid, 'uri' => $uri, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
-				return 0;
-			}
-		}
-
-		if (!HTTPSignature::isValidContentType($mimetype, $uri) && (current(explode(';', $mimetype)) == 'application/json')) {
-			try {
-				// Issue 14126: Workaround for Mastodon servers that return "application/json" on a "head" request.
-				$curlResult = HTTPSignature::fetchRaw($uri, $uid);
-				$mimetype   = $curlResult->getContentType();
-			} catch (\Throwable $th) {
-				DI::logger()->info('Error while fetching HTTP link via signed GET', ['uid' => $uid, 'uri' => $uri, 'code' => $th->getCode(), 'message' => $th->getMessage()]);
-				return 0;
-			}
-		}
-
-		if (HTTPSignature::isValidContentType($mimetype, $uri)) {
-			$fetched_uri = ActivityPub\Processor::fetchMissingActivity($uri, [], '', $completion, $uid);
-			if (!empty($fetched_uri)) {
-				$item_id = self::searchByLink($fetched_uri, $uid);
-				if ($item_id) {
-					DI::logger()->info('ActivityPub link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $item_id]);
-					return $item_id;
-				}
-			}
-		}
-
-		$item_id = Diaspora::fetchByURL($uri);
-		if ($item_id) {
-			DI::logger()->info('Diaspora link fetched', ['uid' => $uid, 'uri' => $uri, 'id' => $item_id]);
-			return $item_id;
-		}
-
-		DI::logger()->info('This is not an item link', ['uid' => $uid, 'uri' => $uri]);
-		return 0;
+		return DI::postFetcher()->fetchByLink($uri, $uid, $completion, $mimetype);
 	}
 
 	/**
@@ -3840,58 +3870,12 @@ class Item
 	 * @param string $body   The body of the
 	 * @param int    $uid    The id of the user
 	 * @return integer
+	 * @deprecated 2026.11 - Use \Friendica\Protocol\PostFetcher::getQuoteUriId() instead
+	 * @see \Friendica\Protocol\PostFetcher::getQuoteUriId()
 	 */
 	public static function getQuoteUriId(string $body, int $uid = 0): int
 	{
-		$shared = BBCode::fetchShareAttributes($body);
-		if (empty($shared['guid']) && empty($shared['message_id'])) {
-			return 0;
-		}
-
-		if (empty($shared['link']) && empty($shared['message_id'])) {
-			DI::logger()->notice('Invalid share block.', ['share' => $shared]);
-			return 0;
-		}
-
-		if (!empty($shared['guid'])) {
-			$shared_item = Post::selectFirst(['uri-id'], ['guid' => $shared['guid'], 'uid' => [0, $uid]]);
-			if (!empty($shared_item['uri-id'])) {
-				DI::logger()->debug('Found post by guid', ['guid' => $shared['guid'], 'uid' => $uid]);
-				return $shared_item['uri-id'];
-			}
-		}
-
-		if (!empty($shared['message_id'])) {
-			$shared_item = Post::selectFirst(['uri-id'], ['uri' => $shared['message_id'], 'uid' => [0, $uid]]);
-			if (!empty($shared_item['uri-id'])) {
-				DI::logger()->debug('Found post by message_id', ['message_id' => $shared['message_id'], 'uid' => $uid]);
-				return $shared_item['uri-id'];
-			}
-		}
-
-		if (!empty($shared['link'])) {
-			$shared_item = Post::selectFirst(['uri-id'], ['plink' => $shared['link'], 'uid' => [0, $uid]]);
-			if (!empty($shared_item['uri-id'])) {
-				DI::logger()->debug('Found post by link', ['link' => $shared['link'], 'uid' => $uid]);
-				return $shared_item['uri-id'];
-			}
-		}
-
-		$url = $shared['message_id'] ?: $shared['link'];
-		$id  = self::fetchByLink($url, 0, ActivityPub\Receiver::COMPLETION_ASYNC);
-		if (!$id) {
-			DI::logger()->notice('Post could not be fetched.', ['url' => $url, 'uid' => $uid]);
-			return 0;
-		}
-
-		$shared_item = Post::selectFirst(['uri-id'], ['id' => $id]);
-		if (!empty($shared_item['uri-id'])) {
-			DI::logger()->debug('Fetched shared post', ['id' => $id, 'url' => $url, 'uid' => $uid]);
-			return $shared_item['uri-id'];
-		}
-
-		DI::logger()->warning('Post does not exist although it was supposed to had been fetched.', ['id' => $id, 'url' => $url, 'uid' => $uid]);
-		return 0;
+		return DI::postFetcher()->getQuoteUriId($body, $uid);
 	}
 
 	public static function incrementInbound(string $network)

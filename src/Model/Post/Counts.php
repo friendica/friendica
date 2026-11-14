@@ -7,16 +7,22 @@
 
 namespace Friendica\Model\Post;
 
-use Friendica\Content\Smilies;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
 use Friendica\Model\Verb;
 use Friendica\Protocol\Activity;
+use Friendica\Util\EmojiReaction;
 
 class Counts
 {
+	/**
+	 * Maximum number of reaction activities that are evaluated per post
+	 */
+	private const MAX_REACTION_ACTIVITIES = 500;
+
 	/**
 	 * Insert or update a post-counts entry
 	 *
@@ -30,7 +36,7 @@ class Counts
 			return true;
 		}
 
-		$condition = ['thr-parent-id' => $uri_id, 'vid' => $vid, 'deleted' => false, 'private' => [Item::PUBLIC, Item::UNLISTED]];
+		$condition = ['thr-parent-id' => $uri_id, 'vid' => $vid, 'deleted' => false];
 
 		if ($body == $verb) {
 			$condition['body'] = null;
@@ -38,8 +44,8 @@ class Counts
 		} elseif ($verb == Activity::POST) {
 			$condition['gravity'] = Item::GRAVITY_COMMENT;
 			$body                 = '';
-		} elseif ($body && mb_strlen($body) == 1 && Smilies::isEmojiPost($body)) {
-			$condition['body'] = $body;
+		} elseif ($body && EmojiReaction::isReaction($body)) {
+			$condition = DBA::mergeConditions($condition, ['BINARY `body` = ?', $body]);
 		} else {
 			$body = '';
 		}
@@ -49,10 +55,9 @@ class Counts
 			'vid'           => $vid,
 			'reaction'      => $body,
 			'parent-uri-id' => $parent_uri_id,
-			'count'         => Post::countPosts($condition),
+			'count'         => Post::countPosts(DBA::mergeConditions($condition, ['private' => [Item::PUBLIC, Item::UNLISTED]])),
 		];
 
-		unset($condition['private']);
 		if ($fields['count'] === 0 && Post::countPosts($condition) === 0) {
 			DBA::delete('post-counts', ['uri-id' => $uri_id, 'vid' => $vid, 'reaction' => $body]);
 			return true;
@@ -65,7 +70,7 @@ class Counts
 	{
 		self::update($uri_id, $parent_uri_id, Verb::getID(Activity::POST), Activity::POST);
 
-		$activities = DBA::p("SELECT `parent-uri-id`, `vid`, `verb`, `body` FROM `post-view` WHERE `thr-parent-id` = ? AND `gravity` = ? AND `vid` IS NOT NULL GROUP BY `parent-uri-id`, `vid`, `verb`, `body`", $uri_id, Item::GRAVITY_ACTIVITY);
+		$activities = DBA::p("SELECT DISTINCT `parent-uri-id`, `vid`, `verb`, BINARY `body` AS `body` FROM `post-view` WHERE `thr-parent-id` = ? AND `gravity` = ? AND `vid` IS NOT NULL", $uri_id, Item::GRAVITY_ACTIVITY);
 		while ($activity = DBA::fetch($activities)) {
 			self::update($uri_id, $activity['parent-uri-id'], $activity['vid'], $activity['verb'], $activity['body']);
 		}
@@ -109,5 +114,50 @@ class Counts
 		}
 		DBA::close($countquery);
 		return $counts;
+	}
+
+	/**
+	 * Retrieves the emoji reactions on a post that are visible to the given user
+	 *
+	 * @param int $uri_id
+	 * @param int $uid
+	 *
+	 * @return array List of reactions with the fields "name", "count", "me" and "account_ids"
+	 */
+	public static function getReactions(int $uri_id, int $uid): array
+	{
+		// The counts table keeps an entry as long as any reaction exists, even if it is only visible to some users.
+		// So without an entry the expensive visibility query below can be skipped.
+		if (!DBA::exists('post-counts', ["`uri-id` = ? AND `reaction` != ''", $uri_id])) {
+			return [];
+		}
+
+		$self      = Contact::getPublicIdByUserId($uid);
+		$reactions = [];
+
+		$condition  = ['thr-parent-id' => $uri_id, 'gravity' => Item::GRAVITY_ACTIVITY, 'vid' => [Verb::getID(Activity::LIKE), Verb::getID(Activity::EMOJIREACT)], 'deleted' => false];
+		$condition  = DBA::mergeConditions($condition, ["`body` NOT IN ('', ?)", Activity::LIKE]);
+		$activities = Post::selectForUser($uid, ['body', 'author-id'], $condition, ['order' => ['received'], 'limit' => self::MAX_REACTION_ACTIVITIES]);
+		while ($activity = Post::fetch($activities)) {
+			$body = (string) $activity['body'];
+			if (!EmojiReaction::isReaction($body)) {
+				continue;
+			}
+			$reactions[$body][$activity['author-id']] = true;
+		}
+		DBA::close($activities);
+
+		$result = [];
+		foreach ($reactions as $name => $authors) {
+			$account_ids = array_keys($authors);
+
+			$result[] = [
+				'name'        => $name,
+				'count'       => count($account_ids),
+				'me'          => in_array($self, $account_ids),
+				'account_ids' => $account_ids,
+			];
+		}
+		return $result;
 	}
 }

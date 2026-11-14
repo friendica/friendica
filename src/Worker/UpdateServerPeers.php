@@ -54,6 +54,12 @@ class UpdateServerPeers
 		$total = 0;
 		$added = 0;
 		foreach ($peers as $peer) {
+			if (!self::isValidPeer($peer)) {
+				// Remote servers list peers in a broken form (with scheme, empty, or not a string)
+				DI::logger()->debug('Skipping invalid peer', ['url' => $url]);
+				continue;
+			}
+
 			if (Network::isUriBlocked(new Uri('https://' . $peer))) {
 				// Ignore blocked systems as soon as possible in the loop to avoid being slowed down by tar pits
 				continue;
@@ -70,5 +76,16 @@ class UpdateServerPeers
 			Worker::coolDown();
 		}
 		DI::logger()->info('Server peer update ended', ['total' => $total, 'added' => $added, 'url' => $url]);
+	}
+
+	/**
+	 * The peers endpoint lists bare hostnames (optionally with a port), without a schema.
+	 *
+	 * @param mixed $peer Entry of the peers list
+	 * @return bool
+	 */
+	public static function isValidPeer($peer): bool
+	{
+		return is_string($peer) && preg_match('~^[^\s\x00-\x1f\x7f/:@?#]+(?::\d{1,5})?$~u', $peer) === 1;
 	}
 }

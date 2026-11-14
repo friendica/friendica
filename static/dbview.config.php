@@ -736,7 +736,8 @@ return [
 			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-origin`.`uri-id`
-			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`",
+			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`
+			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`",
 	],
 	"post-user-view" => [
 		"fields" => [
@@ -1510,12 +1511,14 @@ return [
 			"author-id"    => ["post-thread-user", "author-id"],
 			"contact-id"   => ["post-thread-user", "contact-id"],
 			"contact-type" => ["ownercontact", "contact-type"],
+			"language"     => ["post-content", "language"],
 		],
 		"query" => "FROM `post-thread-user`
 			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
+			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-thread-user`.`uri-id`
 			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
@@ -1539,12 +1542,14 @@ return [
 			"author-id"    => ["post-thread-user", "author-id"],
 			"contact-id"   => ["post-thread-user", "contact-id"],
 			"contact-type" => ["ownercontact", "contact-type"],
+			"language"     => ["post-content", "language"],
 		],
 		"query" => "FROM `post-thread-user`
 			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
+			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-thread-user`.`uri-id`
 			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)

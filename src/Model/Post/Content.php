@@ -96,9 +96,10 @@ class Content
 	 * @param integer $start
 	 * @param integer $limit
 	 * @param integer $last_uriid
+	 * @param integer $first_uriid Only posts that are newer than this URI-ID
 	 * @return array
 	 */
-	public static function getURIIdListBySearch(string $search, int $uid = 0, int $start = 0, int $limit = 100, int $last_uriid = 0)
+	public static function getURIIdListBySearch(string $search, int $uid = 0, int $start = 0, int $limit = 100, int $last_uriid = 0, int $first_uriid = 0)
 	{
 		$search = Post\Engagement::escapeKeywords($search);
 		if ($uid != 0) {
@@ -109,6 +110,10 @@ class Content
 
 		if (!empty($last_uriid)) {
 			$condition = DBA::mergeConditions($condition, ["`uri-id` < ?", $last_uriid]);
+		}
+
+		if (!empty($first_uriid)) {
+			$condition = DBA::mergeConditions($condition, ["`uri-id` > ?", $first_uriid]);
 		}
 
 		$params = [

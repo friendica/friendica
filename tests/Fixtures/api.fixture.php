@@ -955,11 +955,6 @@ return [
 	],
 	'group_member' => [
 		[
-			'id'         => 1,
-			'gid'        => 1,
-			'contact-id' => 43,
-		],
-		[
 			'id'         => 2,
 			'gid'        => 1,
 			'contact-id' => 43,

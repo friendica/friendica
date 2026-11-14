@@ -18,14 +18,14 @@ use Friendica\Database\DBA;
  */
 class ContactByType
 {
-	private const FIELDS = ['id', 'url', 'alias', 'name', 'micro', 'thumb', 'avatar', 'network', 'uid'];
+	private const FIELDS = ['id', 'pid', 'url', 'addr', 'alias', 'name', 'micro', 'thumb', 'avatar', 'network', 'uid', 'about', 'gsid'];
 
 	public function __construct(private readonly Database $database) {}
 
 	/**
 	 * Selects visible user contacts for the provided contact types.
 	 *
-	 * @return array<int, array{url: string, alias: string, name: string, id: int, micro: string, thumb: string, network: string}>
+	 * @return array<int, array{url: string, alias: string, name: string, id: int, pid: int, micro: string, thumb: string, network: string, about: string, addr: string, gsid: int|null}>
 	 * @throws \Exception
 	 */
 	public function selectForUser(int $uid, array $contactTypes, bool $lastItem, bool $showHidden = true, bool $showPrivate = false): array
@@ -59,12 +59,16 @@ class ContactByType
 		foreach ($contacts as $key => $contact) {
 			$contacts[$key] = [
 				'url'     => $contact['url'],
+				'addr'    => $contact['addr'],
 				'alias'   => $contact['alias'],
 				'name'    => $contact['name'],
 				'id'      => $contact['id'],
+				'pid'     => $contact['pid'],
 				'micro'   => $contact['micro'],
 				'thumb'   => $contact['thumb'],
 				'network' => $contact['network'],
+				'about'   => $contact['about'] ?? '',
+				'gsid'    => $contact['gsid'],
 			];
 		}
 
@@ -91,9 +95,9 @@ class ContactByType
 		);
 
 		$stmtContacts = $this->database->p(
-			"SELECT `contact`.`id`, `contact`.`name`, COUNT(*) AS `count` FROM `post-user-view`
-				INNER JOIN `contact` ON `post-user-view`.`contact-id` = `contact`.`id`
-				WHERE `post-user-view`.`uid` = ? AND `post-user-view`.`visible` AND NOT `post-user-view`.`deleted` AND `post-user-view`.`unseen`
+			"SELECT `contact`.`id`, `contact`.`name`, COUNT(*) AS `count` FROM `contact`
+				INNER JOIN `post-user` ON `post-user`.`contact-id` = `contact`.`id`
+				WHERE `post-user`.`uid` = ? AND `post-user`.`unseen` AND `post-user`.`visible` AND NOT `post-user`.`deleted`
 				AND `contact`.`network` IN (?, ?) AND `contact`.`contact-type` IN (" . $typePlaceholders . ")
 				AND NOT `contact`.`blocked` AND NOT `contact`.`hidden`
 				AND NOT `contact`.`pending` AND NOT `contact`.`archive`

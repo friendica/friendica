@@ -63,7 +63,7 @@ class ZOT
 			'sitename'        => $config->get('config', 'sitename'),
 			'about'           => $config->get('config', 'info'),
 			'project'         => App::PLATFORM,
-			'version'         => App::VERSION,
+			'version'         => App::version(),
 		];
 	}
 }

@@ -23,6 +23,10 @@
 		{{if $notes_cid}}
 		<input type="hidden" name="contact_allow[]" value="<{{$notes_cid}}>" />
 		{{/if}}
+		{{if $group_cid}}
+		<input type="hidden" name="contact_allow[]" value="<{{$group_cid}}>" />
+		<input type="hidden" name="group_post" value="1" />
+		{{/if}}
 		<div id="jot-title-wrap"><input name="title" id="jot-title" type="text" placeholder="{{$placeholdertitle}}" value="{{$title}}" class="jothidden" style="display:none" dir="auto"></div>
 		{{if $placeholdersummary}}
 		<div id="jot-summary-wrap"><input name="summary" id="jot-summary" type="text" placeholder="{{$placeholdersummary}}" value="{{$summary}}" class="jothidden" style="display:none" dir="auto"></div>
@@ -63,6 +67,13 @@
 	<div id="profile-emojis-wrapper" style="display: {{$visitor}};">
 		<a id="profile-emojis" class="icon icon-smile emojis-post" title="{{$edemojis}}"></a>
 	</div>
+	<div id="jot-language-wrapper">
+		<select id="jot-language"{{if $is_edit}} data-no-detect="1"{{/if}} title="{{$language_label}}">
+			{{foreach $languages as $code => $label}}
+				<option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$label}}</option>
+			{{/foreach}}
+		</select>
+	</div>
 	<div id="post-length">
 		<span id="character-counter" class="grey"></span>
 	</div>
@@ -99,4 +110,12 @@
 <div id="profile-jot-end"></div>
 </form>
 </div>
-{{if $content}}<script>initEditor();</script>{{/if}}
+{{if $content}}
+<script>
+	window.onDocumentReady('#profile-jot-form', function () {
+		if (typeof initEditor === 'function') {
+			initEditor();
+		}
+	});
+</script>
+{{/if}}

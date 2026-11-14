@@ -143,7 +143,7 @@ HELP;
 		$command = null;
 
 		if ($this->getOption('version')) {
-			$this->out('Friendica Console version ' . App::VERSION);
+			$this->out('Friendica Console version ' . App::version());
 
 			return 0;
 		} elseif ((count($this->options) === 0 || $this->getOption($this->customHelpOptions) === true || $this->getOption($this->customHelpOptions) === 1) && count($this->args) === 0

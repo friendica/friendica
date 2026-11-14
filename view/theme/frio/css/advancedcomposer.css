@@ -529,10 +529,6 @@ textarea.profile-jot-text,
 	color: var(--text-color-muted, #99aab5) !important;
 }
 
-.easy-compose-panel.dark-theme .ec-help-summary:hover {
-	color: var(--text-color, #ffffff) !important;
-}
-
 .easy-compose-panel.dark-theme .ec-help-privacy-text {
 	color: var(--text-color, #e1e8ed) !important;
 }
@@ -541,9 +537,6 @@ textarea.profile-jot-text,
 	color: var(--text-color, #ffffff) !important;
 }
 
-.easy-compose-panel.dark-theme .ec-help-criteria dd {
-	color: var(--text-color-muted, #99aab5) !important;
-}
 /* Dark theme detail overrides — see individual dark-theme rules below */
 
 /* Standalone Compose Page layout enhancements */
@@ -825,7 +818,6 @@ textarea.profile-jot-text,
 
 	/* Hide distracting writing helpers (Advanced Composer panel, and other core editor widgets) */
 	.mod-compose.ec-distraction-free #easy-compose-panel,
-	.mod-compose.ec-distraction-free #permissions-section,
 	.mod-compose.ec-distraction-free #profile-jot-perms,
 	.mod-compose.ec-distraction-free #jot-category,
 	.mod-compose.ec-distraction-free #jot-title,
@@ -1248,8 +1240,7 @@ textarea.profile-jot-text,
 
 	.ec-split-layout > #profile-jot-submit-wrapper,
 	.ec-split-layout > .comment-edit-submit-wrapper,
-	.ec-split-layout > [id^="profile-jot-submit-wrapper"],
-	.ec-split-layout > #permissions-section {
+	.ec-split-layout > [id^="profile-jot-submit-wrapper"] {
 		order: 4 !important;
 		grid-column: 1 / -1 !important;
 		width: 100% !important;
@@ -1296,7 +1287,7 @@ textarea.profile-jot-text,
 	.ec-split-layout #jot-preview-content .wall-item-container .wall-item-body {
 		padding: 0 !important;
 		margin: 0 !important;
-		font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+		font-family: inherit !important;
 		font-size: 15px !important;
 		line-height: 1.75 !important; /* Ideal reading line-height */
 		color: var(--text-color, #2c3e50) !important;
@@ -1458,6 +1449,7 @@ details[open] > .ec-help-summary::after {
 
 /* Dark theme adjustments */
 .easy-compose-panel.dark-theme .ec-help-summary:hover {
+	color: var(--text-color, #ffffff) !important;
 	background: rgba(255,255,255,0.05);
 }
 
@@ -1472,6 +1464,7 @@ details[open] > .ec-help-summary::after {
 }
 
 .easy-compose-panel.dark-theme .ec-help-criteria dd {
+	color: var(--text-color-muted, #99aab5) !important;
 	border-color: rgba(255,255,255,0.12);
 }
 
@@ -1780,18 +1773,14 @@ details[open] > .ec-help-summary::after {
 
 /* Simulated Body */
 .ec-preview-card-body {
-	font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+	font-family: inherit !important;
 	font-size: 15px !important;
 	line-height: 1.75 !important;
 	color: #2c3e50 !important;
-	word-wrap: break-word !important;
-	word-break: break-word !important;
 	overflow-wrap: anywhere !important;
 }
 
 .ec-preview-card-body * {
-	word-wrap: break-word !important;
-	word-break: break-word !important;
 	overflow-wrap: anywhere !important;
 }
 
@@ -1816,7 +1805,6 @@ details[open] > .ec-help-summary::after {
    ========================================================================== */
 
 .ec-bbcode-body {
-	word-break: break-word !important;
 	overflow-wrap: anywhere !important;
 }
 

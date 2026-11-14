@@ -14,6 +14,7 @@
  * - ACL autocomplete (@-mentions)
  * - BBCode autocomplete
  * - Location button with geolocation support
+ * - Language selector with automatic detection
  *
  * @requires jQuery
  * @requires linkPreview.js
@@ -27,6 +28,8 @@
 	let $textarea = null;
 	let locationButton = null;
 	let locationInput = null;
+	let $languageSelect = null;
+	let languageDetection = null;
 
 	/**
 	 * Initialize the compose page functionality.
@@ -34,6 +37,7 @@
 	function init() {
 		initTextarea();
 		initLocation();
+		initLanguageSelector();
 		initFormReset();
 	}
 
@@ -45,6 +49,10 @@
 	 */
 	function initFormReset() {
 		const $form = $("form.comment-edit-form");
+
+		// Prevent duplicate bindings when init() runs multiple times in SPA mode.
+		$form.off(".compose-draft");
+		$form.off(".compose");
 
 		// Check if sessionStorage is available and if a post was submitted
 		// This flag is set in the submit handler below
@@ -66,6 +74,11 @@
 				if (locationInput) {
 					locationInput.value = "";
 					updateLocationButtonDisplay(locationButton, locationInput);
+				}
+
+				// Reset the language selector back to automatic detection
+				if (languageDetection) {
+					languageDetection.reset();
 				}
 
 				// Clear any link preview
@@ -128,6 +141,7 @@
 			body: $textarea.val(),
 			location: locationInput ? locationInput.value : "",
 			scheduled_at: $('[name="scheduled_at"]').val(),
+			language: languageDetection && languageDetection.isManual() ? $languageSelect.val() : "",
 		};
 
 		try {
@@ -142,6 +156,11 @@
 	 */
 	function restoreDraft() {
 		if (!isStorageAvailable()) {
+			return;
+		}
+
+		// A body prefilled by the server (e.g. "compose?body=...") takes precedence over the stored draft
+		if ($textarea && $textarea.length && $textarea[0].defaultValue.trim() !== "") {
 			return;
 		}
 
@@ -174,6 +193,12 @@
 					$scheduledAt.val(draft.scheduled_at);
 					// Trigger change event for datepicker plugins
 					$scheduledAt.trigger("change");
+				}
+
+				// Restore a language that was picked by hand
+				if (draft.language && languageDetection) {
+					$languageSelect.val(draft.language);
+					languageDetection.setManual(true);
 				}
 			}, 100);
 		} catch (e) {
@@ -208,6 +233,7 @@
 		}
 
 		// Character counter - use input event to catch all changes (paste, cut, etc.)
+		$textarea.off("input.compose");
 		$textarea.on("input.compose", function () {
 			updateCharacterCounter($(this).val().length);
 		});
@@ -241,11 +267,13 @@
 
 		// Bind to both input and change events for robustness
 		$(locationInput)
+			.off("input.compose change.compose")
 			.on("input.compose change.compose", function () {
 				updateLocationButtonDisplay(locationButton, locationInput);
 			});
 
 		// Location button click handler
+		$(locationButton).off("click.compose");
 		$(locationButton).on("click.compose", function () {
 			handleLocationButtonClick();
 		});
@@ -364,10 +392,25 @@
 		}
 	}
 
-	// Initialize on DOM ready
-	$(function () {
-		init();
-	});
+	/**
+	 * Initialize the language selector and wire up automatic detection.
+	 */
+	function initLanguageSelector() {
+		$languageSelect = $("#jot-language");
+		languageDetection = initLanguageDetection($textarea, $languageSelect, "input");
+
+		// A language that was preselected by the server counts as picked by hand
+		if (languageDetection && $languageSelect.val() !== "un") {
+			languageDetection.setManual(true);
+		}
+
+		// Run detection once for text that's already there (e.g. a quoted reply)
+		if (languageDetection && !languageDetection.isManual()) {
+			languageDetection.detect();
+		}
+	}
+
+	window.onDocumentReady("body.mod-compose", init);
 
 	// Expose public API
 	window.updateLocationButtonDisplay = updateLocationButtonDisplay;

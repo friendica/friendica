@@ -46,6 +46,7 @@
 	<h3>{{$h_reports}}</h3>
 	{{if $reports}}
 		<form method="post">
+			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 		<table class="table table-condensed table-striped table-bordered">
 			<thead>
 				<tr>
@@ -74,13 +75,21 @@
 						<a href="contact/{{$report.cid}}" title="{{$report.nickname}}">{{if $report.nick}}{{$report.nick}}{{else}}{{$report.name}}{{/if}}</a><br>
 						<a href="{{$report.url}}" title="{{$report.nickname}}">{{if $report.addr}}{{$report.addr}}{{else}}{{$report.url}}{{/if}}</a>
 					</td>
+					<td class="reporter">
+						{{if $report.reporter_cid}}
+						<a href="contact/{{$report.reporter_cid}}">{{if $report.reporter_nick}}{{$report.reporter_nick}}{{else}}{{$report.reporter_name}}{{/if}}</a><br>
+						{{$report.reporter_addr}}
+						{{else}}
+						N/A
+						{{/if}}
+					</td>
 					<td class="comment">{{if $report.comment}}{{$report.comment}}{{else}}N/A{{/if}}</td>
 					<td class="category">{{if $report.category}}{{$report.category}}{{else}}N/A{{/if}}</td>
 					<td class="status">{{$report.status_label}}</td>
 				</tr>
 				{{if $report.posts}}
 				<tr>
-					<td colspan="7">
+					<td colspan="8">
 					<table class="table table-condensed table-striped table-bordered">
 					{{foreach $report.posts as $post}}
 						<tr>
@@ -108,7 +117,7 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+window.onDocumentReady('body', function() {
 	var selectAllCheckbox = document.getElementById('select-all-reports');
 	var reportCheckboxes = document.querySelectorAll('.report-checkbox');
 

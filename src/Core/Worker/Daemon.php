@@ -37,7 +37,7 @@ class Daemon
 			return $daemon_mode;
 		}
 
-		if (!function_exists('pcntl_fork')) {
+		if (!function_exists('posix_kill')) {
 			self::$mode = false;
 			return false;
 		}

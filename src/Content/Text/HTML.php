@@ -163,7 +163,7 @@ class HTML
 			$doc                     = new DOMDocument();
 			$doc->preserveWhiteSpace = false;
 
-			$message = mb_convert_encoding($message, 'HTML-ENTITIES', "UTF-8");
+			$message = self::toNumericEntities($message);
 
 			if (empty($message)) {
 				return '';
@@ -560,6 +560,24 @@ class HTML
 	}
 
 	/**
+	 * Encode every non ASCII character as a numeric HTML entity
+	 *
+	 * "DOMDocument::loadHTML()" assumes ISO-8859-1 for markup without a charset
+	 * declaration and would mangle UTF-8 input. Encoding the characters as entities
+	 * beforehand keeps them intact.
+	 *
+	 * This replaces mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), which is
+	 * deprecated since PHP 8.2 and raises an E_DEPRECATED on every call.
+	 *
+	 * @param string $html
+	 * @return string
+	 */
+	public static function toNumericEntities(string $html): string
+	{
+		return mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0x1FFFFF], 'UTF-8');
+	}
+
+	/**
 	 * @param string $html
 	 * @param int    $wraplength Ensures individual lines aren't longer than this many characters. Doesn't break words.
 	 * @param bool   $compact    True: Completely strips image tags; False: Keeps image URLs
@@ -573,9 +591,7 @@ class HTML
 		$doc                     = new DOMDocument();
 		$doc->preserveWhiteSpace = false;
 
-		// mb_convert_encoding($s, 'HTML-ENTITIES', 'UTF-8') is deprecated since PHP 8.2.
-		// mb_encode_numericentity() produces the same numeric-entity output without the warning.
-		$message = mb_encode_numericentity($message, [0x80, 0x10FFFF, 0, 0x1FFFFF], 'UTF-8');
+		$message = self::toNumericEntities($message);
 
 		if (empty($message)) {
 			DI::profiler()->stopRecording();
@@ -932,6 +948,14 @@ class HTML
 	 */
 	public static function purify(string $text, array $allowedIframeDomains = []): string
 	{
+		// Creating the purifier and loading its definitions is expensive, but it can be reused for any number of texts.
+		static $purifiers = [];
+
+		$key = implode('|', $allowedIframeDomains);
+		if (isset($purifiers[$key])) {
+			return $purifiers[$key]->purify($text);
+		}
+
 		// Allows cid: URL scheme
 		\HTMLPurifier_URISchemeRegistry::instance()->register('cid', new HTMLPurifier_URIScheme_cid());
 
@@ -979,6 +1003,8 @@ class HTML
 		//$config->set('Core.MaintainLineNumbers', true);
 
 		$HTMLPurifier = new \HTMLPurifier($config);
+
+		$purifiers[$key] = $HTMLPurifier;
 
 		$text = $HTMLPurifier->purify($text);
 
@@ -1087,7 +1113,7 @@ class HTML
 		$dom = new DOMDocument();
 		libxml_use_internal_errors(true);
 
-		$dom->loadHTML(mb_convert_encoding('<span>' . $html . '</span>', 'HTML-ENTITIES', "UTF-8"), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+		$dom->loadHTML(self::toNumericEntities('<span>' . $html . '</span>'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 		libxml_clear_errors();
 
 		$xpath = new DOMXPath($dom);

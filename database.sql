@@ -1,6 +1,6 @@
 -- ------------------------------------------
--- Friendica 2026.08-dev (Blutwurz)
--- DB_UPDATE_VERSION 1598
+-- Friendica
+-- DB_UPDATE_VERSION 1606
 -- ------------------------------------------
 
 
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`uri-id` int unsigned COMMENT 'Id of the item-uri table entry that contains the contact url',
 	`addr` varchar(255) NOT NULL DEFAULT '' COMMENT '',
 	`alias` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
-	`pubkey` text COMMENT 'RSA public key 4096 bit',
+	`pubkey` text COMMENT 'RSA public key 4096 bit, or, for Ed25519 only ActivityPub actors, the Multikey in multibase form',
 	`prvkey` text COMMENT 'RSA private key 4096 bit',
 	`batch` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
 	`notify` varbinary(383) COMMENT '',
@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`bd` date NOT NULL DEFAULT '0001-01-01' COMMENT '',
 	`reason` text COMMENT '',
 	`self` boolean NOT NULL DEFAULT '0' COMMENT '1 if the contact is the user him/her self',
-	`remote_self` boolean NOT NULL DEFAULT '0' COMMENT '',
+	`remote_self` tinyint NOT NULL DEFAULT 0 COMMENT '0 => No mirroring, 1-2 => Mirror as own post, 3 => Mirror as reshare',
 	`rel` tinyint unsigned NOT NULL DEFAULT 0 COMMENT 'The kind of the relation between the user and the contact',
 	`protocol` char(4) NOT NULL DEFAULT '' COMMENT 'Protocol of the contact',
 	`hub-verify` varbinary(383) NOT NULL DEFAULT '' COMMENT '',
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS `contact` (
 	`pending` boolean NOT NULL DEFAULT '1' COMMENT 'Contact request is pending',
 	`deleted` boolean NOT NULL DEFAULT '0' COMMENT 'Contact has been deleted',
 	`info` mediumtext COMMENT '',
-	`notify_new_posts` boolean NOT NULL DEFAULT '0' COMMENT '',
+	`notify_new_posts` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only',
 	`fetch_further_information` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '',
 	`ffi_keyword_denylist` text COMMENT '',
 	`photo` varbinary(383) DEFAULT '' COMMENT 'Link to the profile photo of the contact',
@@ -405,7 +405,7 @@ CREATE TABLE IF NOT EXISTS `apcontact` (
 	`header` varbinary(383) COMMENT 'Header picture',
 	`addr` varchar(255) COMMENT '',
 	`alias` varbinary(383) COMMENT '',
-	`pubkey` text COMMENT '',
+	`pubkey` text COMMENT 'RSA public key in PEM format or, for Ed25519 only actors, the Multikey in multibase form',
 	`subscribe` varbinary(383) COMMENT '',
 	`baseurl` varbinary(383) COMMENT 'baseurl of the ap contact',
 	`gsid` int unsigned COMMENT 'Global Server ID',
@@ -1270,7 +1270,7 @@ CREATE TABLE IF NOT EXISTS `post-category` (
 CREATE TABLE IF NOT EXISTS `post-counts` (
 	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the item uri',
 	`vid` smallint unsigned NOT NULL COMMENT 'Id of the verb table entry that contains the activity verbs',
-	`reaction` varchar(4) NOT NULL COMMENT 'Emoji Reaction',
+	`reaction` varbinary(64) NOT NULL COMMENT 'Emoji Reaction',
 	`parent-uri-id` int unsigned COMMENT 'Id of the item-uri table that contains the parent uri',
 	`count` int unsigned DEFAULT 0 COMMENT 'Number of activities',
 	 PRIMARY KEY(`uri-id`,`vid`,`reaction`),
@@ -1822,6 +1822,7 @@ CREATE TABLE IF NOT EXISTS `post-thread-user` (
 	 INDEX `uid_received` (`uid`,`received`),
 	 INDEX `uid_wall_received` (`uid`,`wall`,`received`),
 	 INDEX `uid_commented` (`uid`,`commented`),
+	 INDEX `uid_owner-id_commented` (`uid`,`owner-id`,`commented`),
 	 INDEX `uid_created` (`uid`,`created`),
 	 INDEX `uid_starred` (`uid`,`starred`),
 	 INDEX `uid_mention` (`uid`,`mention`),
@@ -1953,6 +1954,21 @@ CREATE TABLE IF NOT EXISTS `register` (
 	 INDEX `uid` (`uid`),
 	FOREIGN KEY (`uid`) REFERENCES `user` (`uid`) ON UPDATE RESTRICT ON DELETE CASCADE
 ) DEFAULT COLLATE utf8mb4_general_ci COMMENT='registrations requiring admin approval';
+
+--
+-- TABLE rendered-content
+--
+CREATE TABLE IF NOT EXISTS `rendered-content` (
+	`uri-id` int unsigned NOT NULL COMMENT 'Id of the item-uri table entry that contains the item or contact uri',
+	`mode` tinyint unsigned NOT NULL COMMENT 'Simple HTML mode of the rendering, see BBCode::EXTERNAL and BBCode::MASTODON_API',
+	`lang` varchar(10) NOT NULL DEFAULT '' COMMENT 'Language of the translated texts in the html, empty if the html doesn\'t contain translated texts',
+	`hash` varchar(32) NOT NULL DEFAULT '' COMMENT 'Hash of the rendered text and the BBCode version',
+	`html` mediumtext COMMENT 'Text converted to html',
+	`last-access` date NOT NULL DEFAULT '0001-01-01' COMMENT 'Day of the last access',
+	 PRIMARY KEY(`uri-id`,`mode`,`lang`),
+	 INDEX `last-access` (`last-access`),
+	FOREIGN KEY (`uri-id`) REFERENCES `item-uri` (`id`) ON UPDATE RESTRICT ON DELETE CASCADE
+) DEFAULT COLLATE utf8mb4_general_ci COMMENT='Rendered HTML for content that is requested via the API';
 
 --
 -- TABLE report
@@ -2112,7 +2128,7 @@ CREATE TABLE IF NOT EXISTS `user-contact` (
 	`pending` boolean COMMENT '',
 	`rel` tinyint unsigned COMMENT 'The kind of the relation between the user and the contact',
 	`info` mediumtext COMMENT '',
-	`notify_new_posts` boolean COMMENT '',
+	`notify_new_posts` tinyint unsigned COMMENT '0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only',
 	`remote_self` tinyint unsigned COMMENT '0 => No mirroring, 1-2 => Mirror as own post, 3 => Mirror as reshare',
 	`fetch_further_information` tinyint unsigned COMMENT '0 => None, 1 => Fetch information, 3 => Fetch keywords, 2 => Fetch both',
 	`ffi_keyword_denylist` text COMMENT '',
@@ -2890,7 +2906,8 @@ CREATE VIEW `post-thread-origin-view` AS SELECT
 			LEFT JOIN `item-uri` AS `quote-item-uri` ON `quote-item-uri`.`id` = `post-quote`.`quote-uri-id`
 			LEFT JOIN `post-delivery-data` ON `post-delivery-data`.`uri-id` = `post-origin`.`uri-id`
 			LEFT JOIN `post-question` ON `post-question`.`uri-id` = `post-origin`.`uri-id`
-			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`;
+			LEFT JOIN `permissionset` ON `permissionset`.`id` = `post-thread-user`.`psid`
+			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`;
 
 --
 -- VIEW post-user-view
@@ -3682,12 +3699,14 @@ CREATE VIEW `network-thread-view` AS SELECT
 	`post-user`.`protocol` AS `protocol`,
 	`post-thread-user`.`author-id` AS `author-id`,
 	`post-thread-user`.`contact-id` AS `contact-id`,
-	`ownercontact`.`contact-type` AS `contact-type`
+	`ownercontact`.`contact-type` AS `contact-type`,
+	`post-content`.`language` AS `language`
 	FROM `post-thread-user`
 			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
+			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-thread-user`.`uri-id`
 			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)
@@ -3713,12 +3732,14 @@ CREATE VIEW `network-thread-circle-view` AS SELECT
 	`post-user`.`protocol` AS `protocol`,
 	`post-thread-user`.`author-id` AS `author-id`,
 	`post-thread-user`.`contact-id` AS `contact-id`,
-	`ownercontact`.`contact-type` AS `contact-type`
+	`ownercontact`.`contact-type` AS `contact-type`,
+	`post-content`.`language` AS `language`
 	FROM `post-thread-user`
 			INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
 			STRAIGHT_JOIN `contact` ON `contact`.`id` = `post-thread-user`.`contact-id`
 			STRAIGHT_JOIN `contact` AS `authorcontact` ON `authorcontact`.`id` = `post-thread-user`.`author-id`
 			STRAIGHT_JOIN `contact` AS `ownercontact` ON `ownercontact`.`id` = `post-thread-user`.`owner-id`
+			LEFT JOIN `post-content` ON `post-content`.`uri-id` = `post-thread-user`.`uri-id`
 			WHERE `post-user`.`visible` AND NOT `post-user`.`deleted`
 			AND (NOT `contact`.`readonly` AND NOT `contact`.`blocked` AND NOT `contact`.`pending`)
 			AND (`post-thread-user`.`hidden` IS NULL OR NOT `post-thread-user`.`hidden`)

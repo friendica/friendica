@@ -10,12 +10,11 @@ namespace Friendica\Module\Security\TwoFactor;
 use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
-use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Module\Response;
+use Friendica\Security\TwoFactor\CodeVerifier;
 use Friendica\Util\Profiler;
-use PragmaRX\Google2FA\Google2FA;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -27,17 +26,17 @@ class Verify extends BaseModule
 {
 	protected $errors = [];
 
-	/** @var IManagePersonalConfigValues  */
-	protected $pConfig;
+	/** @var CodeVerifier */
+	protected $codeVerifier;
 	/** @var IHandleUserSessions */
 	protected $session;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManagePersonalConfigValues $pConfig, IHandleUserSessions $session, $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, CodeVerifier $codeVerifier, IHandleUserSessions $session, $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session = $session;
-		$this->pConfig = $pConfig;
+		$this->session      = $session;
+		$this->codeVerifier = $codeVerifier;
 	}
 
 	protected function post(array $request = [])
@@ -49,15 +48,15 @@ class Verify extends BaseModule
 		if (($request['action'] ?? '') === 'verify') {
 			self::checkFormSecurityTokenRedirectOnError('2fa', 'twofactor_verify');
 
+			$uid  = $this->session->getLocalUserId();
 			$code = $request['verify_code'] ?? '';
 
-			$valid = (new Google2FA())->verifyKey($this->pConfig->get($this->session->getLocalUserId(), '2fa', 'secret'), $code);
-
-			// The same code can't be used twice even if it's valid
-			if ($valid && $this->session->get('2fa') !== $code) {
+			if (is_string($code) && $this->codeVerifier->verifyTotp($uid, $code)) {
 				$this->session->set('2fa', $code);
 
 				$this->baseUrl->redirect('2fa/trust');
+			} elseif ($this->codeVerifier->isTotpLockedOut($uid)) {
+				$this->errors[] = $this->t('Too many failed attempts, please try again later.');
 			} else {
 				$this->errors[] = $this->t('Invalid code, please retry.');
 			}

@@ -650,8 +650,28 @@ class Post
 	 */
 	public static function getUnseenPosts(int $uid): array
 	{
-		$posts = DBA::selectToArray('post-user', ['uri-id'], ['unseen' => true, 'uid' => $uid], ['limit' => 100]);
+		$posts = DBA::selectToArray('post-user', ['uri-id'], self::getUnseenCondition($uid), ['limit' => 100]);
 		return array_column($posts, 'uri-id');
+	}
+
+	/**
+	 * Condition for unseen posts that can be set to seen when a timeline is displayed.
+	 * Group posts are excluded, they stay unseen until the group or the post itself is opened.
+	 *
+	 * @param int $uid User ID
+	 * @return array
+	 */
+	public static function getUnseenCondition(int $uid): array
+	{
+		$pcids = array_column(DBA::selectToArray('account-user-view', ['pid'], ['uid' => $uid, 'contact-type' => Contact::TYPE_COMMUNITY]), 'pid');
+		if (empty($pcids)) {
+			return ['uid' => $uid, 'unseen' => true];
+		}
+
+		return array_merge(
+			["`uid` = ? AND `unseen` AND NOT `parent-uri-id` IN (SELECT `uri-id` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . "))", $uid, $uid],
+			$pcids,
+		);
 	}
 
 	/**

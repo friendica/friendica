@@ -62,7 +62,17 @@ class ActivityPub
 				'@id'   => 'https://w3id.org/fep/044f#quoteAuthorization',
 				'@type' => '@id',
 			],
-			'gts'               => 'https://gotosocial.org/ns#',
+			'QuoteAuthorization' => 'https://w3id.org/fep/044f#QuoteAuthorization',
+			'QuoteRequest'       => 'https://w3id.org/fep/044f#QuoteRequest',
+			'gts'                => 'https://gotosocial.org/ns#',
+			'interactingObject'  => [
+				'@id'   => 'gts:interactingObject',
+				'@type' => '@id',
+			],
+			'interactionTarget' => [
+				'@id'   => 'gts:interactionTarget',
+				'@type' => '@id',
+			],
 			'interactionPolicy' => [
 				'@id'   => 'gts:interactionPolicy',
 				'@type' => '@id',
@@ -89,6 +99,8 @@ class ActivityPub
 			'quoteUrl'                  => 'as:quoteUrl',
 			'conversation'              => 'ostatus:conversation',
 			'directMessage'             => 'litepub:directMessage',
+			'EmojiReact'                => 'litepub:EmojiReact',
+			'emojiReactions'            => ['@id' => 'http://fedibird.com/ns#emojiReactions', '@type' => '@id'],
 			'discoverable'              => 'toot:discoverable',
 			'indexable'                 => 'toot:indexable',
 			'PropertyValue'             => 'schema:PropertyValue',
@@ -209,14 +221,23 @@ class ActivityPub
 	 * @param string  $url
 	 * @param integer $uid User ID
 	 * @param integer $max Maximum number of activities to fetch (0 = all)
+	 * @param boolean $latest Fetch the latest activities from the last page of outboxes that are sorted ascending (like NodeBB)
 	 * @return void
 	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
 	 */
-	public static function fetchOutbox(string $url, int $uid, int $max = 0)
+	public static function fetchOutbox(string $url, int $uid, int $max = 0, bool $latest = false)
 	{
 		$data = HTTPSignature::fetch($url, $uid);
 		if (empty($data)) {
 			return;
+		}
+
+		if ($latest && !empty($data['last']) && is_string($data['last'])) {
+			$data = HTTPSignature::fetch($data['last'], $uid);
+			if (empty($data)) {
+				return;
+			}
+			$data['orderedItems'] = array_reverse($data['orderedItems'] ?? []);
 		}
 
 		if (!empty($data['orderedItems'])) {
@@ -224,7 +245,7 @@ class ActivityPub
 		} elseif (!empty($data['first']['orderedItems'])) {
 			$items = $data['first']['orderedItems'];
 		} elseif (!empty($data['first'])) {
-			self::fetchOutbox($data['first'], $uid);
+			self::fetchOutbox($data['first'], $uid, $max);
 			return;
 		} else {
 			$items = [];

@@ -49,6 +49,10 @@ class Contacts extends BaseModule
 			throw new HTTPException\NotFoundException($this->t('Contact not found.'));
 		}
 
+		if (Model\Contact::isSelf($contact['id'], $this->userSession->getLocalUserId())) {
+			$this->baseUrl->redirect('profile/' . $contact['nick'] . '/contacts');
+		}
+
 		$localContactId = Model\Contact::getPublicIdByUserId($this->userSession->getLocalUserId());
 
 		$this->page['aside'] = Widget\VCard::getHTML($contact);
@@ -121,7 +125,7 @@ class Contacts extends BaseModule
 
 		$o = Module\Contact::getTabsHTML($contact, Module\Contact::TAB_CONTACTS);
 
-		$tabs = self::getContactFilterTabs('contact/' . $cid, $type, true);
+		$tabs = $this->getContactFilterTabs('contact/' . $cid, $type, true);
 
 		// Contact list is obtained from the visited contact, but the contact display is visitor dependent
 		$contacts = array_map(

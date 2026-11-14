@@ -36,6 +36,13 @@ cd path/to/friendica/addon
 git pull
 ```
 
+The addon repository lives at [git.friendi.ca](https://git.friendi.ca/friendica/friendica-addons), the copy on GitHub can lag behind.
+If your addon tree was cloned from GitHub, switch it once:
+```sh
+cd path/to/friendica/addon
+git remote set-url origin https://git.friendi.ca/friendica/friendica-addons.git
+```
+
 For both repositories:
 The default branch to use is the ``stable`` branch, which is the stable version of Friendica.
 It is updated about four times a year on a fixed schedule.

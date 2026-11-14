@@ -5,10 +5,17 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 {{* The button to open the jot - in This theme we move the button with js to the second nav bar *}}
-<a class="action-button btn btn-primary pull-right{{if !$always_open_compose}} modal-open{{/if}}" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
+{{if $always_open_compose}}
+<a class="action-button btn btn-primary pull-right" id="jotOpen" href="compose/{{$posttype}}{{if $content}}?body={{$content}}{{/if}}">
 	<i class="ri ri-lg ri-pencil-line"></i>
 	<span>{{$new_post}}</span>
 </a>
+{{else}}
+<button type="button" class="action-button btn btn-primary pull-right modal-open" id="jotOpen">
+	<i class="ri ri-lg ri-pencil-line"></i>
+	<span>{{$new_post}}</span>
+</button>
+{{/if}}
 
 <div id="jot-content">
 	<div id="jot-sections">
@@ -56,9 +63,9 @@
 			</ul>
 
 			{{* The Jot navigation menu for small displays (text input, permissions, preview, filebrowser) *}}
-			<div class="dropdown dropdown-head dropdown-mobile-jot jot-nav hidden-lg hidden-md hidden-sm" role="menubar" data-tabs="tabs" style="float: left;">
+			<div class="dropdown dropdown-head dropdown-mobile-jot jot-nav hidden-lg hidden-md hidden-sm" data-tabs="tabs" style="float: left;">
 				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true">{{$message}}&nbsp;<span class="caret"></span></button>
-				<ul class="dropdown-menu nav nav-pills" aria-label="submenu">
+				<ul class="dropdown-menu nav nav-pills" role="menu" aria-label="submenu">
 					{{* mark the first list entry as active because it is the first which is active after opening
 					the modal. Changing of the activity status is done by js in jot.tpl-header *}}
 					<li style="display: none;">
@@ -104,6 +111,10 @@
 					{{if $notes_cid}}
 					<input type="hidden" name="contact_allow[]" value="<{{$notes_cid}}>" />
 					{{/if}}
+					{{if $group_cid}}
+					<input type="hidden" name="contact_allow[]" value="<{{$group_cid}}>" />
+					<input type="hidden" name="group_post" value="1" />
+					{{/if}}
 					<div id="jot-title-wrap"><input name="title" id="jot-title" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdertitle}}" title="{{$placeholdertitle}}" value="{{$title}}" style="display:block;" dir="auto" /></div>
 					{{if $placeholdersummary}}
 					<div id="jot-summary-wrap"><input name="summary" id="jot-summary" class="jothidden jotforms form-control" type="text" placeholder="{{$placeholdersummary}}" title="{{$placeholdersummary}}" value="{{$summary}}" style="display:block;" dir="auto" /></div>
@@ -118,7 +129,7 @@
 					</div>
 
 					<ul id="profile-jot-submit-wrapper" class="jothidden nav nav-pills">
-						<li><button type="button" class="btn-link" id="profile-attach"  ondragenter="return linkDropper(event);" ondragover="return linkDropper(event);" ondrop="linkDrop(event);" onclick="jotGetLink();" title="{{$edattach}}"><i class="ri ri-attachment-2"></i></button></li>
+						<li><button type="button" class="btn-link" id="profile-attach"  ondragenter="return linkDropper(event);" ondragover="return linkDropper(event);" ondrop="linkDrop(event);" onclick="jotGetLink();" aria-label="{{$edattach}}" title="{{$edattach}}"><i class="ri ri-attachment-2" aria-hidden="true"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon emojis" style="cursor: pointer;" aria-label="{{$edemojis}}" title="{{$edemojis}}"><i class="ri ri-emotion-line"></i></button></li>
 
 						<li><button type="button" class="btn-link icon" style="cursor: pointer;" aria-label="{{$edurl}}" title="{{$edurl}}" onclick="insertFormattingToPost('url');"><i class="ri ri-link"></i></button></li>
@@ -126,9 +137,16 @@
 						<li><button type="button" class="hidden-xs btn-link icon italic" style="cursor: pointer;" aria-label="{{$editalic}}" title="{{$editalic}}" onclick="insertFormattingToPost('i');"><i class="ri ri-italic"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon bold" style="cursor: pointer;" aria-label="{{$edbold}}" title="{{$edbold}}" onclick="insertFormattingToPost('b');"><i class="ri ri-bold"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon quote" style="cursor: pointer;" aria-label="{{$edquote}}" title="{{$edquote}}" onclick="insertFormattingToPost('quote');"><i class="ri ri-double-quotes-l"></i></button></li>
-						<li><button type="button" class="btn-link" id="profile-location" onclick="jotGetLocation();" title="{{$setloc}}"><i class="ri ri-map-pin-line" aria-hidden="true"></i></button></li>
+						<li><button type="button" class="btn-link" id="profile-location" onclick="jotGetLocation();" aria-label="{{$setloc}}" title="{{$setloc}}"><i class="ri ri-map-pin-line" aria-hidden="true"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link icon underline" style="cursor: pointer;" aria-label="{{$contentwarn}}" title="{{$contentwarn}}" onclick="insertFormattingToPost('abstract');"><i class="ri ri-eye-line"></i></button></li>
 						<li><button type="button" class="hidden-xs btn-link" style="cursor: pointer;" aria-label="{{$edcode}}" title="{{$edcode}}" onclick="insertFormattingToPost('code');"><i class="ri ri-code-line"></i></button></li>
+						<li id="jot-language-wrapper" class="jothidden">
+							<select id="jot-language"{{if $is_edit}} data-no-detect="1"{{/if}} class="form-control jot-language" title="{{$language_label}}" aria-label="{{$language_label}}">
+								{{foreach $languages as $code => $label}}
+									<option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$label}}</option>
+								{{/foreach}}
+							</select>
+						</li>
 						<!-- TODO: waiting for a better placement
 						<li><button type="button" class="btn-link" id="profile-nolocation" onclick="jotClearLocation();" title="{{$noloc}}">{{$shortnoloc}}</button></li>
 						-->
@@ -173,7 +191,15 @@
 			</form>
 			<div id="dz-preview-jot" class="dropzone-preview"></div>
 
-			{{if $content}}<script type="text/javascript">initEditor();</script>{{/if}}
+			{{if $content}}
+			<script type="text/javascript">
+				window.onDocumentReady('#profile-jot-form', function () {
+					if (typeof initEditor === 'function') {
+						initEditor();
+					}
+				});
+			</script>
+			{{/if}}
 		</div>
 	</div>
 </div>

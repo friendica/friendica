@@ -19,6 +19,7 @@
 
 use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Core\Worker;
@@ -30,6 +31,7 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
 use Friendica\Model\Post;
+use Friendica\Model\Tag;
 use Friendica\Network\HTTPException;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Content\Post\Entity\PostMedia;
@@ -88,7 +90,7 @@ function item_drop(int $uid, string $dropitems): void
 
 function item_edit(int $uid, array $request, bool $preview, string $return_path): void
 {
-	$post = Post::selectFirst(Item::ITEM_FIELDLIST, ['id' => $request['post_id'], 'uid' => $uid]);
+	$post = Post::selectFirst(array_merge(Item::ITEM_FIELDLIST, ['sensitive']), ['id' => $request['post_id'], 'uid' => $uid]);
 	if (!DBA::isResult($post)) {
 		if ($return_path) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Unable to locate original post.'));
@@ -98,6 +100,9 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	}
 
 	$post['edit'] = $post;
+	$old_body     = $post['body'];
+	$old_language = $post['language'] ?? '';
+	$sensitive    = $post['sensitive'];
 	$post['file'] = Post\Category::getTextByURIId($post['uri-id'], $post['uid']);
 
 	Post\Media::deleteByURIId($post['uri-id'], [PostMedia::TYPE_AUDIO, PostMedia::TYPE_VIDEO, PostMedia::TYPE_IMAGE, PostMedia::TYPE_HTML, PostMedia::TYPE_HLS]);
@@ -106,7 +111,7 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 	$fields = [
 		'title'           => $post['title'],
 		'content-warning' => $post['content-warning'],
-		'sensitive'       => $post['sensitive'],
+		'sensitive'       => isset($request['sensitive']) ? $post['sensitive'] : $sensitive,
 		'body'            => $post['body'],
 		'attach'          => $post['attach'],
 		'file'            => $post['file'],
@@ -116,6 +121,15 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 		'changed'         => DateTimeFormat::utcNow(),
 	];
 
+	// The language is only changed when it had been chosen manually
+	if (($post['language'] ?? '') !== $old_language) {
+		$fields['language'] = $post['language'];
+	} elseif (($request['language'] ?? '') === L10n::UNDETERMINED_LANGUAGE) {
+		// "Auto" has been chosen: Detect the language of the edited text again
+		$content            = trim($post['title'] . ' ' . $post['content-warning'] . ' ' . $fields['body']);
+		$fields['language'] = json_encode(DI::contentItem()->getLanguageArray($content, 3, $post['uri-id'], $post['author-id']));
+	}
+
 	$fields['body'] = Item::setHashtags($fields['body']);
 
 	$quote_uri_id = Item::getQuoteUriId($fields['body'], $post['uid']);
@@ -123,6 +137,8 @@ function item_edit(int $uid, array $request, bool $preview, string $return_path)
 		$fields['quote-uri-id'] = $quote_uri_id;
 		$fields['body']         = BBCode::removeSharedData($post['body']);
 	}
+
+	Tag::updateFromBody($post['uri-id'], $old_body, $fields['body']);
 
 	Item::update($fields, ['id' => $post['id']]);
 	Item::updateDisplayCache($post['uri-id']);
@@ -239,6 +255,10 @@ function item_process(array $post, array $request, bool $preview, string $return
 	$post['location']        = trim($request['location'] ?? '');
 	$post['coord']           = trim($request['coord'] ?? '');
 
+	if (!empty($request['language']) && $request['language'] != L10n::UNDETERMINED_LANGUAGE && array_key_exists($request['language'], DI::l10n()->getLanguageCodes())) {
+		$post['language'] = json_encode([$request['language'] => 1]);
+	}
+
 	$post = DI::contentItem()->addCategories($post, $request['category'] ?? '');
 
 	// Add the attachment to the body.
@@ -246,7 +266,7 @@ function item_process(array $post, array $request, bool $preview, string $return
 		$post['body'] .= DI::contentItem()->storeAttachmentFromRequest($request);
 	}
 
-	$post = DI::contentItem()->finalizePost($post, $preview);
+	$post = DI::contentItem()->finalizePost($post, $preview, !empty($request['group_post']));
 
 	if (!strlen((string) $post['body'])) {
 		if ($preview) {
@@ -355,6 +375,11 @@ function item_post_return(string $baseurl, string $return_path, array $item = []
 
 	if (isset($item['guid'])) {
 		$json['guid'] = $item['guid'];
+	}
+
+	if ($item && ($item['gravity'] === Item::GRAVITY_COMMENT)) {
+		$json['comment-uri-id'] = $item['uri-id'];
+		$json['parent-uri-id']  = $item['thr-parent-id'];
 	}
 
 	DI::logger()->debug('post_json', ['json' => $json]);

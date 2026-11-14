@@ -47,7 +47,7 @@ class Compose extends BaseModule
 	protected function post(array $request = [])
 	{
 		if (!empty($request['body'])) {
-			$_REQUEST['return'] = 'network';
+			$_REQUEST['return'] = ($_GET['mode'] ?? '') === 'column' ? 'compose?mode=column&posted=1' : 'network';
 			require_once 'mod/item.php';
 			item_post();
 		} else {
@@ -61,8 +61,11 @@ class Compose extends BaseModule
 			return Login::form('compose');
 		}
 
-		if ($this->appHelper->getCurrentTheme() !== 'frio') {
-			throw new NotImplementedException($this->l10n->t('This feature is only available with the frio theme.'));
+		$current_theme = $this->appHelper->getCurrentTheme();
+		$theme_info    = Theme::getInfo($current_theme);
+
+		if (!in_array('compose_page', $theme_info['features'])) {
+			throw new NotImplementedException($this->l10n->t('This feature is not available with the current theme.'));
 		}
 
 		$posttype = $this->parameters['type'] ?? Item::PT_ARTICLE;
@@ -120,10 +123,12 @@ class Compose extends BaseModule
 		$body      = $request['body']      ?? '';
 		$location  = $request['location']  ?? $user['default-location'];
 		$wall      = $request['wall']      ?? $type == 'post';
+		$language  = $request['language']  ?? L10n::UNDETERMINED_LANGUAGE;
 
 		$jotplugins = $this->eventDispatcher->dispatch(new JotToolEvent(''))->getHtml();
 
 		// Output
+		$this->page->registerStylesheet(Theme::getPathForFile('css/compose.css'));
 		$this->page->registerFooterScript(Theme::getPathForFile('js/ajaxupload.js'));
 		$this->page->registerFooterScript(Theme::getPathForFile('js/linkPreview.js'));
 		$this->page->registerFooterScript(Theme::getPathForFile('js/compose.js'));
@@ -143,9 +148,13 @@ class Compose extends BaseModule
 		}
 
 		// Initialize Advanced Composer
-		$advancedComposer = $this->pConfig->get($this->session->getLocalUserId(), 'frio', 'enable_advancedcomposer', $this->config->get('frio', 'enable_advancedcomposer', false));
-		if ($advancedComposer) {
-			$html = $this->getAdvancedComposerHtml();
+		$advancedComposer = $this->pConfig->get($this->session->getLocalUserId(), $current_theme, 'enable_advancedcomposer', $this->config->get($current_theme, 'enable_advancedcomposer', false));
+		if (in_array('advanced_composer', $theme_info['features'])) {
+			if ($advancedComposer) {
+				$html = $this->getAdvancedComposerHtml();
+			} else {
+				$html = '';
+			}
 		} else {
 			$html = '';
 		}
@@ -154,37 +163,43 @@ class Compose extends BaseModule
 		return $html . Renderer::replaceMacros($tpl, [
 			'$enableAdvancedComposer' => $advancedComposer,
 			'$l10n'                   => [
-				'compose_title'        => $compose_title,
-				'default'              => '',
-				'summary'              => $this->l10n->t('Summary'),
-				'visibility_title'     => $this->l10n->t('Visibility'),
-				'mytitle'              => $this->l10n->t('This is you'),
-				'submit'               => $this->l10n->t('Post'),
-				'edbold'               => $this->l10n->t('Bold'),
-				'editalic'             => $this->l10n->t('Italic'),
-				'eduline'              => $this->l10n->t('Underline'),
-				'edquote'              => $this->l10n->t('Quote'),
-				'edemojis'             => $this->l10n->t('Add emojis'),
-				'contentwarn'          => $this->l10n->t('Content Warning'),
-				'edcode'               => $this->l10n->t('Code'),
-				'edimg'                => $this->l10n->t('Image'),
-				'edurl'                => $this->l10n->t('Link'),
-				'edattach'             => $this->l10n->t('Link or Media'),
-				'prompttext'           => $this->l10n->t('Please enter a image/video/audio/webpage URL:'),
-				'preview'              => $this->l10n->t('Preview'),
-				'location_set'         => $this->l10n->t('Set your location'),
-				'location_clear'       => $this->l10n->t('Clear the location'),
-				'location_unavailable' => $this->l10n->t('Location services are unavailable on your device'),
-				'location_disabled'    => $this->l10n->t('Location services are disabled. Please check the website\'s permissions on your device'),
-				'wait'                 => $this->l10n->t('Please wait'),
-				'btnAssistant'         => $this->l10n->t('Writing Assistant'),
-				'btnZen'               => $this->l10n->t('Distraction-Free'),
-				'btnEpZen'             => $this->l10n->t('Image Descriptions'),
-				'btnFocusPreview'      => $this->l10n->t('Focus Preview'),
-				'placeholdertitle'     => $this->l10n->t('Set title'),
-				'placeholdersummary'   => Feature::isEnabled($this->session->getLocalUserId(), Feature::SUMMARY) ? $this->l10n->t('Set summary, abstract or spoiler text') : '',
-				'placeholdercategory'  => Feature::isEnabled($this->session->getLocalUserId(), Feature::CATEGORIES) ? $this->l10n->t('Categories (comma-separated list)') : '',
-				'always_open_compose'  => $this->pConfig->get(
+				'compose_title'              => $compose_title,
+				'default'                    => '',
+				'summary'                    => $this->l10n->t('Summary'),
+				'visibility_title'           => $this->l10n->t('Visibility'),
+				'close'                      => $this->l10n->t('Close'),
+				'toggle_permissions'         => $this->l10n->t('Permissions'),
+				'toggle_permissions_tooltip' => $this->l10n->t('Visibility and post options'),
+				'mytitle'                    => $this->l10n->t('This is you'),
+				'submit'                     => $this->l10n->t('Post'),
+				'done'                       => $this->l10n->t('Done'),
+				'edbold'                     => $this->l10n->t('Bold'),
+				'editalic'                   => $this->l10n->t('Italic'),
+				'eduline'                    => $this->l10n->t('Underline'),
+				'edquote'                    => $this->l10n->t('Quote'),
+				'edemojis'                   => $this->l10n->t('Add emojis'),
+				'contentwarn'                => $this->l10n->t('Content Warning'),
+				'edcode'                     => $this->l10n->t('Code'),
+				'edimg'                      => $this->l10n->t('Image'),
+				'edurl'                      => $this->l10n->t('Web link'),
+				'edattach'                   => $this->l10n->t('Link or Media'),
+				'prompttext'                 => $this->l10n->t('Please enter a image/video/audio/webpage URL:'),
+				'preview'                    => $this->l10n->t('Preview'),
+				'close_preview'              => $this->l10n->t('Close preview'),
+				'location_set'               => $this->l10n->t('Set your location'),
+				'location_clear'             => $this->l10n->t('Clear the location'),
+				'location_unavailable'       => $this->l10n->t('Location services are unavailable on your device'),
+				'location_disabled'          => $this->l10n->t('Location services are disabled. Please check the website\'s permissions on your device'),
+				'language_label'             => $this->l10n->t('Language'),
+				'wait'                       => $this->l10n->t('Please wait'),
+				'btnAssistant'               => $this->l10n->t('Writing Assistant'),
+				'btnZen'                     => $this->l10n->t('Distraction-Free'),
+				'btnEpZen'                   => $this->l10n->t('Image Descriptions'),
+				'btnFocusPreview'            => $this->l10n->t('Focus Preview'),
+				'placeholdertitle'           => $this->l10n->t('Set title'),
+				'placeholdersummary'         => Feature::isEnabled($this->session->getLocalUserId(), Feature::SUMMARY) ? $this->l10n->t('Set summary, abstract or spoiler text') : '',
+				'placeholdercategory'        => Feature::isEnabled($this->session->getLocalUserId(), Feature::CATEGORIES) ? $this->l10n->t('Categories (comma-separated list)') : '',
+				'always_open_compose'        => $this->pConfig->get(
 					$this->session->getLocalUserId(),
 					'frio',
 					'always_open_compose',
@@ -214,6 +229,8 @@ class Compose extends BaseModule
 			'$category'   => $category,
 			'$body'       => $body,
 			'$location'   => $location,
+			'$language'   => $language,
+			'$languages'  => $this->l10n->getLanguageSelection(),
 
 			'$contact_allow' => implode(',', $contact_allow_list),
 			'$circle_allow'  => implode(',', $circle_allow_list),
@@ -313,7 +330,7 @@ class Compose extends BaseModule
 			'previewTimestamp'       => $this->l10n->t('Just now · Preview'),
 			'lblYou'                 => $this->l10n->t('You'),
 			'brandText'              => $this->l10n->t('Advanced Composer (deactivatable in settings)'),
-			'avatarFallback'         => $this->l10n->t('👤'),
+			'avatarFallback'         => '👤',
 			'helpToggleLabel'        => $this->l10n->t('How does the analysis work?'),
 			'helpPrivacyBadge'       => $this->l10n->t('No external services · All processing on your own instance'),
 			'helpPrivacyDetail'      => $this->l10n->t('Text analysis runs entirely in your browser - no data is sent anywhere for analysis. No third-party APIs, no cookies, no tracking. The optional post preview works exactly like Friendica\'s built-in preview button: your draft is sent to your own Friendica instance for rendering. The only server-side storage is your personal enable/disable preference in the standard Friendica settings.'),
@@ -332,13 +349,13 @@ class Compose extends BaseModule
 			'helpParagraphA11yTitle' => $this->l10n->t('Paragraph Check (Accessibility)'),
 			'helpParagraphA11yBody'  => $this->l10n->t('For posts longer than 300 characters, checks whether at least one paragraph break exists. Screen readers and cognitive-accessibility tools benefit greatly from structured text. Short posts are always rated neutral.'),
 			'btnClose'               => $this->l10n->t('Close'),
-			'btnCloseSymbol'         => $this->l10n->t('\u00d7'),
+			'btnCloseSymbol'         => '×',
 			'placeholder'            => $this->l10n->t('Image description'),
 		];
 
-		$advancedComposerL10n = array_map(fn ($v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'), $advancedComposerL10n);
-
-		$advancedComposerL10nJson = json_encode($advancedComposerL10n, JSON_UNESCAPED_UNICODE);
+		// The strings end up in textContent/title, so they must not be HTML escaped.
+		// JSON_HEX_* keeps them safe inside the <script> block instead.
+		$advancedComposerL10nJson = json_encode($advancedComposerL10n, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 		$tpl = Renderer::getMarkupTemplate('item/advancedcomposer.tpl');
 		return Renderer::replaceMacros($tpl, [

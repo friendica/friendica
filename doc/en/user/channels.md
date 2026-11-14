@@ -49,6 +49,34 @@ Each channel is defined by these values:
 * Full Text Search: This can be used to include or exclude content, based on the content and some additional keywords. It uses the "boolean mode" operators from MariaDB: https://mariadb.com/kb/en/full-text-index-overview/#in-boolean-mode
 * Images, Videos, Audio: When selected, you will see content with the selected media type. This can be combined. If none of these fields are checked, you will see any content, with or without attached media.
 
+## Timeline and Filter Channels
+
+If your server administrator activated the channel cache, the display settings offer two more selections in the "Channels" section: "Timeline channels" and "Filter channels".
+Timeline channels add posts from the selected channels to your default network timeline, on top of the posts from the people you follow.
+Filter channels do the opposite.
+Posts that match one of the selected channels are removed from your default network timeline instead.
+This is the way to keep specific content, for example imported hashtags or feeds, out of your main timeline while still being able to look at it in its own channel.
+
+Only your own channels can be used as a filter channel, the predefined channels like "For you" or "Discover" are not available here.
+Filtering only affects posts that are still within the time window of the channel.
+By default this is 24 hours, the administrator can change this value.
+The exact date is shown below the "Filter channels" selection.
+Older posts are no longer kept in the cache, so they won't be filtered and still appear in your default network timeline.
+
+Your own channels can only be used as a timeline channel when their source is the circle "Global Community" or "Followers".
+Every other source ("Latest Activity", "Latest Posts", "Latest Creation", "Following" or one of your own circles) only ever contains posts that are already part of your default timeline, so adding them wouldn't show you anything new.
+This means that a channel based on "Global Community" can be used both as a timeline channel and as a filter channel, while channels based on other sources can only be used as filter channels.
+
+The predefined channels are available as timeline channels as well, when the administrator activated the system channel cache.
+The channels "For you" and "Quiet sharers" are excluded.
+
+Selecting a channel as a timeline channel is independent of whether it is shown in the "Channels" widget or in the menu bar.
+Those are configured with the other timeline settings.
+
+The channel cache is the configuration option `channel_cache` in the `system` section of the `config/local.config.php` file, the system channel cache is `system_channel_cache`.
+Both are disabled by default and can't be activated from the admin panel.
+If these options are missing from your settings, ask your administrator to enable them.
+
 ## Additional keywords for the full text search
 
 Additionally to the search for content, there are keywords that can be used in the full text search.

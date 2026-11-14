@@ -70,8 +70,13 @@
 			toggleJotNav(this);
 		});
 
-		// Bookmarklet page needs a jot modal which appears automatically
-		if (window.location.pathname.indexOf("/bookmarklet") >= 0 && $("#jot-modal").length) {
+		// Bookmarklet and share intent pages need a jot modal which appears automatically.
+		// The exact path match doesn't work if Friendica is installed in a subdirectory.
+		if (
+			(window.location.pathname === "/bookmarklet" ||
+				window.location.pathname === "/share") &&
+			$("#jot-modal").length
+		) {
 			// jotShow is defined in jot-header.tpl
 			if (typeof window.jotShow === "function") {
 				window.jotShow();
@@ -96,6 +101,12 @@
 
 		// Generic delegated event to open an anchor URL in a modal
 		$body.on("click.frio", "a.add-to-modal", function (e) {
+			e.preventDefault();
+			addToModal(this.href);
+		});
+
+		// Page links inside a modal load the next page into the modal
+		$body.on("click.frio", "#modal-body .pagination a", function (e) {
 			e.preventDefault();
 			addToModal(this.href);
 		});

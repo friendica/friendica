@@ -19,8 +19,7 @@ use Friendica\Object\Image;
  */
 class Images
 {
-	// @deprecated PHP80100 add IMAGETYPE_AVIF once our minimal supported PHP version is PHP 8.1
-	public const IMAGETYPES = [IMAGETYPE_WEBP, IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF, IMAGETYPE_BMP];
+	public const IMAGETYPES = [IMAGETYPE_AVIF, IMAGETYPE_WEBP, IMAGETYPE_PNG, IMAGETYPE_JPEG, IMAGETYPE_GIF, IMAGETYPE_BMP];
 
 	/**
 	 * Get the Imagick format for the given image type
@@ -31,7 +30,7 @@ class Images
 	public static function getImagickFormatByImageType(int $imagetype): string
 	{
 		$formats = [
-			// @deprecated PHP80100 add "IMAGETYPE_AVIF => 'AVIF'" once our minimal supported PHP version is PHP 8.1
+			IMAGETYPE_AVIF => 'AVIF',
 			IMAGETYPE_WEBP => 'WEBP',
 			IMAGETYPE_PNG  => 'PNG',
 			IMAGETYPE_JPEG => 'JPEG',
@@ -44,6 +43,25 @@ class Images
 		}
 
 		return $formats[$imagetype];
+	}
+
+	/**
+	 * Get the best available image type for generated images, in order of preference.
+	 * Falls back down to JPEG if AVIF, WebP and PNG aren't supported by the installed GD library.
+	 *
+	 * @return integer
+	 */
+	public static function getPreferredImageType(): int
+	{
+		if (function_exists('imageavif')) {
+			return IMAGETYPE_AVIF;
+		} elseif (function_exists('imagewebp')) {
+			return IMAGETYPE_WEBP;
+		} elseif (function_exists('imagepng')) {
+			return IMAGETYPE_PNG;
+		}
+
+		return IMAGETYPE_JPEG;
 	}
 
 	/**
@@ -146,10 +164,9 @@ class Images
 	{
 		$types = [];
 
-		// @deprecated PHP80100 enable, once our lowest supported PHP version is PHP 8.1
-		//if (imagetypes() & IMG_AVIF) {
-		//	$types[] = image_type_to_mime_type(IMAGETYPE_AVIF);
-		//}
+		if (imagetypes() & IMG_AVIF) {
+			$types[] = image_type_to_mime_type(IMAGETYPE_AVIF);
+		}
 		if (imagetypes() & IMG_WEBP) {
 			$types[] = image_type_to_mime_type(IMAGETYPE_WEBP);
 		}
@@ -467,6 +484,28 @@ class Images
 		}
 
 		return ['width' => $dest_width, 'height' => $dest_height];
+	}
+
+	/**
+	 * Checks whether GD can decode and then process the image within the given memory budget.
+	 * Only the header is read: GD allocates 4 bytes per pixel for a truecolor bitmap,
+	 * so an image with huge declared dimensions is caught before it is decoded.
+	 * Rotating or scaling the decoded image allocates a second bitmap of up to the same size,
+	 * so the budget has to hold two of them.
+	 * Data without a readable header is left to the decoder.
+	 *
+	 * @param string $image_data      Image data
+	 * @param int    $available_bytes Free memory, i.e. the memory limit minus the current usage
+	 * @return bool
+	 */
+	public static function fitsIntoMemory(string $image_data, int $available_bytes): bool
+	{
+		$size = @getimagesizefromstring($image_data);
+		if (empty($size[0]) || empty($size[1])) {
+			return true;
+		}
+
+		return $size[0] * $size[1] * 4 * 2 <= $available_bytes;
 	}
 
 	/**

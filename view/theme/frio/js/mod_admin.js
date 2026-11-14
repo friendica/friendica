@@ -8,16 +8,16 @@
  */
 $(function () {
 	let $body = $("body");
-	$body.on("click", ".selectall", function () {
+	$body.off("click.mod-admin", ".selectall").on("click.mod-admin", ".selectall", function () {
 		selectall($(this).data("selectAll"));
 	});
-	$body.on("click", ".selectnone", function () {
+	$body.off("click.mod-admin", ".selectnone").on("click.mod-admin", ".selectnone", function () {
 		selectnone($(this).data("selectNone"));
 	});
 
 	// Toggle checkbox status to all or none for all checkboxes of a specific
 	// css class.
-	$body.on("change", "input[type=checkbox].selecttoggle", function () {
+	$body.off("change.mod-admin", "input[type=checkbox].selecttoggle").on("change.mod-admin", "input[type=checkbox].selecttoggle", function () {
 		$this = $(this);
 		if ($this.prop("checked")) {
 			selectall($this.data("selectClass"));

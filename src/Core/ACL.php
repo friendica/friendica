@@ -77,7 +77,7 @@ class ACL
 
 		return Contact::selectToArray(
 			['id', 'name', 'addr', 'micro', 'url', 'nick'],
-			DBA::mergeConditions($condition, ["`notify` != ''"]),
+			DBA::mergeConditions($condition, ["`notify` != '' AND `contact-type` != ?", Contact::TYPE_COMMUNITY]),
 		);
 	}
 

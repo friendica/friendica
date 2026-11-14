@@ -85,6 +85,11 @@
 				{{/foreach}}
 			</tbody>
 		</table>
+		{{if $data->isScanLimitReached()}}
+			<p class="alert alert-info">{{$l10n.Scan_limit_reached}}</p>
+		{{elseif $data->isTimeoutReached()}}
+			<p class="alert alert-info">{{$l10n.Timeout_reached}}</p>
+		{{/if}}
 	{{/if}}
 </div>
 
@@ -115,6 +120,8 @@
 							<th>{{$l10n.Function}}</th>
 							<th>{{$l10n.UID}}</th>
 							<th>{{$l10n.Process_ID}}</th>
+							<th>{{$l10n.Request_ID}}</th>
+							<th>{{$l10n.Worker_ID}}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -124,9 +131,14 @@
 							<td data-value="function" style="width:70%"></td>
 							<td data-value="uid"></td>
 							<td data-value="process_id"></td>
+							<td data-value="request-id" data-search></td>
+							<td data-value="worker_id" data-search></td>
 						</tr>
 					</tbody>
 				</table>
+
+				<h3 class="event-stack-header">{{$l10n.Call_stack}}</h3>
+				<pre class="event-stack"></pre>
 
 				<h3 class="event-data-header">{{$l10n.Data}}</h3>
 				<div class="event-source">

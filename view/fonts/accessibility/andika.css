@@ -1,0 +1,43 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2026 the Friendica project
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/* Andika 7.000, web fonts (woff2) as distributed by SIL in https://software.sil.org/downloads/r/andika/Andika-7.000.zip, unmodified. See andika/OFL.txt for the font license */
+@font-face {
+  font-family: "Andika";
+  src: url("andika/Andika-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Andika";
+  src: url("andika/Andika-Bold.woff2") format("woff2");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Andika";
+  src: url("andika/Andika-Italic.woff2") format("woff2");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Andika";
+  src: url("andika/Andika-BoldItalic.woff2") format("woff2");
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+html body,
+html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt, .glyphicon, :is(code, pre, kbd, samp, tt) *)) {
+  font-family: "Andika", sans-serif !important;
+}

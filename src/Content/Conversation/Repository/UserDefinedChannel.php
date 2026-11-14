@@ -215,13 +215,26 @@ class UserDefinedChannel extends BaseRepository
 			}
 		}
 
+		$disposableFullTextSearch = new DisposableFullTextSearch($this->db, $haystack);
+
+		$maxSearchLength = $this->config->get('channel', 'max_search_length');
+
 		$search    = '';
 		$condition = DBA::mergeConditions($usercondition, ["`full-text-search` != ? AND `circle` = ? AND `valid`", '', 0]);
 		foreach ($this->select($condition) as $channel) {
-			$search .= '(' . $channel->fullTextSearch . ') ';
+			$term = '(' . $channel->fullTextSearch . ') ';
+
+			if ($search !== '' && strlen($search) + strlen($term) > $maxSearchLength) {
+				if ($disposableFullTextSearch->match(Engagement::escapeKeywords($search))) {
+					return true;
+				}
+				$search = '';
+			}
+
+			$search .= $term;
 		}
 
-		return (new DisposableFullTextSearch($this->db, $haystack))->match(Engagement::escapeKeywords($search));
+		return $search !== '' && $disposableFullTextSearch->match(Engagement::escapeKeywords($search));
 	}
 
 	/**

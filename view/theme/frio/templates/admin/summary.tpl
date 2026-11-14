@@ -57,6 +57,10 @@
 					{{foreach $serversettings.mysql as $k => $p}}
 						<tr><td>{{$k}}</td><td>{{$p}}</td></tr>
 					{{/foreach}}
+					<tr class="info"><td colspan="2">cURL</td></tr>
+					{{foreach $serversettings.curl as $k => $p}}
+						<tr><td>{{$k}}</td><td>{{$p}}</td></tr>
+					{{/foreach}}
 				</tbody>
 				</table>
 			</div>

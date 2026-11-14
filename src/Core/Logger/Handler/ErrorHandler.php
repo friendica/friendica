@@ -39,7 +39,7 @@ class ErrorHandler
 	/** @var LogLevel::* */
 	private string $fatalLevel = LogLevel::ALERT;
 
-	private mixed $lastFatalTrace;
+	private ?array $lastFatalTrace = null;
 
 	/** @var int[] */
 	private static array $fatalErrors = [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR];
@@ -188,7 +188,6 @@ class ErrorHandler
 			E_USER_ERROR        => LogLevel::ERROR,
 			E_USER_WARNING      => LogLevel::WARNING,
 			E_USER_NOTICE       => LogLevel::NOTICE,
-			E_STRICT            => LogLevel::NOTICE,
 			E_RECOVERABLE_ERROR => LogLevel::ERROR,
 			E_DEPRECATED        => LogLevel::NOTICE,
 			E_USER_DEPRECATED   => LogLevel::WARNING,
@@ -313,7 +312,6 @@ class ErrorHandler
 			E_USER_ERROR        => 'E_USER_ERROR',
 			E_USER_WARNING      => 'E_USER_WARNING',
 			E_USER_NOTICE       => 'E_USER_NOTICE',
-			E_STRICT            => 'E_STRICT',
 			E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
 			E_DEPRECATED        => 'E_DEPRECATED',
 			E_USER_DEPRECATED   => 'E_USER_DEPRECATED',

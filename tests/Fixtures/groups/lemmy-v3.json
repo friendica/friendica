@@ -1,0 +1,174 @@
+{
+    "communities": [
+        {
+            "community": {
+                "id": 1993283,
+                "name": "allinone",
+                "title": "AIO",
+                "description": "We are on",
+                "removed": false,
+                "published": "2026-10-24T05:42:08.359345Z",
+                "deleted": false,
+                "nsfw": false,
+                "actor_id": "https://lemmy.world/c/allinone",
+                "local": true,
+                "hidden": false,
+                "posting_restricted_to_mods": false,
+                "instance_id": 1,
+                "visibility": "Public"
+            },
+            "subscribed": "NotSubscribed",
+            "blocked": false,
+            "counts": {
+                "community_id": 1993283,
+                "subscribers": 1,
+                "posts": 0,
+                "comments": 0,
+                "published": "2026-10-24T05:42:08.359345Z",
+                "users_active_day": 0,
+                "users_active_week": 0,
+                "users_active_month": 0,
+                "users_active_half_year": 0,
+                "subscribers_local": 1
+            },
+            "banned_from_community": false
+        },
+        {
+            "community": {
+                "id": 1992994,
+                "name": "genX_Safespace",
+                "title": "Gen X Safe Space ",
+                "description": "Please just kill us now. ",
+                "removed": false,
+                "published": "2026-10-23T22:14:18.892087Z",
+                "deleted": false,
+                "nsfw": false,
+                "actor_id": "https://lemmy.world/c/genX_Safespace",
+                "local": true,
+                "banner": "https://lemmy.world/pictrs/image/db750c04-f123-4cbf-98a5-dc771b6c9aee.png",
+                "hidden": false,
+                "posting_restricted_to_mods": false,
+                "instance_id": 1,
+                "visibility": "Public"
+            },
+            "subscribed": "NotSubscribed",
+            "blocked": false,
+            "counts": {
+                "community_id": 1992994,
+                "subscribers": 2,
+                "posts": 1,
+                "comments": 4,
+                "published": "2026-10-23T22:14:18.892087Z",
+                "users_active_day": 10,
+                "users_active_week": 4,
+                "users_active_month": 4,
+                "users_active_half_year": 4,
+                "subscribers_local": 1
+            },
+            "banned_from_community": false
+        },
+        {
+            "community": {
+                "id": 1992739,
+                "name": "Carhartt",
+                "title": "Carhartt clothing enthusiasts",
+                "description": "This community is to discuss the Carhartt clothing brand. For the time being this community can include the Carhartt work wear brand and the Carhartt WIP fashion brand.",
+                "removed": false,
+                "published": "2026-10-23T17:58:37.696064Z",
+                "deleted": false,
+                "nsfw": false,
+                "actor_id": "https://lemmy.world/c/Carhartt",
+                "local": true,
+                "icon": "https://lemmy.world/pictrs/image/015d081f-a8e2-4af4-9e1f-a041b580d772.png",
+                "hidden": false,
+                "posting_restricted_to_mods": false,
+                "instance_id": 1,
+                "visibility": "Public"
+            },
+            "subscribed": "NotSubscribed",
+            "blocked": false,
+            "counts": {
+                "community_id": 1992739,
+                "subscribers": 2,
+                "posts": 0,
+                "comments": 0,
+                "published": "2026-10-23T17:58:37.696064Z",
+                "users_active_day": 0,
+                "users_active_week": 0,
+                "users_active_month": 0,
+                "users_active_half_year": 0,
+                "subscribers_local": 1
+            },
+            "banned_from_community": false
+        },
+        {
+            "community": {
+                "id": 1991876,
+                "name": "remedialhq",
+                "title": "ReMediaLHQ",
+                "description": "Independent gaming news, original videos and commentary from ReMediaLHQ.\n\nSource-backed stories and explainers: https://remedialhq.com/\n\nOfficial ReMediaLHQ publication feed. Please keep discussion relevant and respectful.",
+                "removed": false,
+                "published": "2026-10-23T00:06:20.911061Z",
+                "deleted": false,
+                "nsfw": false,
+                "actor_id": "https://lemmy.world/c/remedialhq",
+                "local": true,
+                "hidden": false,
+                "posting_restricted_to_mods": true,
+                "instance_id": 1,
+                "visibility": "Public"
+            },
+            "subscribed": "NotSubscribed",
+            "blocked": false,
+            "counts": {
+                "community_id": 1991876,
+                "subscribers": 2,
+                "posts": 1,
+                "comments": 0,
+                "published": "2026-10-23T00:06:20.911061Z",
+                "users_active_day": 3,
+                "users_active_week": 3,
+                "users_active_month": 3,
+                "users_active_half_year": 3,
+                "subscribers_local": 1
+            },
+            "banned_from_community": false
+        },
+        {
+            "community": {
+                "id": 1991195,
+                "name": "eatandexplore",
+                "title": "Eat, Explore & Live Healthy 🌿✈️",
+                "description": "### Welcome to Eat, Explore & Live Healthy! 🌿✈️\n\nWelcome to `!eatandexplore@lemmy.world`! We are a vibrant, creator-friendly community dedicated to wholesome cooking, plant-based nutrition, outdoor adventures, and mindful travel. \n\nWhether you are looking for a quick 30-minute weeknight dinner, vegan comfort food, gluten-free baking, Air Fryer & Instant Pot meals, budget-friendly meal prep, or the best camping & vanlife recipes for your next road trip, you have found your home!\n\n---\n\n### 🔍 Topics & Post Tags (Optional)\nTo help organize our community and make searching easier, feel free to use these tags in your post titles:\n* **[RECIPE]** - Homemade recipes, cozy soups, one-pot meals, salads, or healthy desserts.\n* **[TRAVEL & OUTDOORS]** - Travel guides, road trip tips, hiking snacks, and campfire cooking.\n* **[HEALTHY LIVING]** - Wellness tips, whole-food nutrition, and sustainable lifestyle habits.\n* **[QUESTION / TIP]** - Ask for cooking advice, ingredient substitutions, or travel gear tips.\n* **[FOOD PHOTO]** - Show off what you cooked tonight or a great meal from your travels!\n\n---\n\n### 📜 Community Rules & Guidelines\nWhile participating here, you must abide by the [Lemmy.World Terms of Service](https://legal.lemmy.world/tos/). Failure to follow these rules will result in post removal and a ban:\n\n1. **Zero Tolerance for Hate Speech:** Posts or comments that are racist, sexist, homophobic, transphobic, ableist, or promote violence/harassment will result in an immediate permanent ban.\n2. **Be Civil & Respectful (No Food Shaming):** Disagreements happen, but personal insults, trolling, or bad-faith debates are not allowed. All healthy diets (vegan, vegetarian, plant-forward, omnivore healthy) are welcome here.\n3. **Creator-Friendly Zone (Self-Promotion Allowed):** Unlike other strict communities, **we support original creators!** You are encouraged to share links to your own food/travel blogs, recipe websites, or YouTube channels (including ASMR cooking and vlogs), as long as the content is real, helpful, and not malicious spam.\n4. **Authentic Content Only (No AI Slop / No Bots):** We want real food and real travel experiences. Low-effort AI-generated text, fake AI recipes, automated spam bots, crypto scams, or NSFW/gore content will be banned on sight.\n5. **Audio, Video & Accessibility:** If sharing videos, ensure the audio is clear and pleasant (cozy cooking sounds, voiceovers, and ASMR are highly appreciated; no loud/distorted troll audio). Adding *alt-text* to your food photos or a brief description in the comments is highly encouraged!\n\n---\n\n### 🌟 Featured Community Resources & Growth\n* **Official Recipe Blog:** [Healthy Living Enthusiast](https://healthylivingenthusiast.com/) – Discover cozy vegan soups, easy one-pot meals, and wholesome seasonal baking.\n* **Help Us Grow:** Love a recipe or post here? Feel free to **crosspost** it to other relevant Lemmy communities to help fellow foodies and travelers find us!\n\n*Let’s cook, share, and explore the world together!* 🥣🌍",
+                "removed": false,
+                "published": "2026-10-22T12:09:42.141939Z",
+                "updated": "2026-10-22T12:17:12.048886Z",
+                "deleted": false,
+                "nsfw": false,
+                "actor_id": "https://lemmy.world/c/eatandexplore",
+                "local": true,
+                "icon": "https://lemmy.world/pictrs/image/c7c0e690-9b8c-41d5-be4f-77d5da0f2596.png",
+                "banner": "https://lemmy.world/pictrs/image/1864ad4b-4b74-4479-b279-6fea6b142e4c.png",
+                "hidden": false,
+                "posting_restricted_to_mods": false,
+                "instance_id": 1,
+                "visibility": "Public"
+            },
+            "subscribed": "NotSubscribed",
+            "blocked": false,
+            "counts": {
+                "community_id": 1991195,
+                "subscribers": 3,
+                "posts": 5,
+                "comments": 2,
+                "published": "2026-10-22T12:09:42.141939Z",
+                "users_active_day": 3,
+                "users_active_week": 15,
+                "users_active_month": 15,
+                "users_active_half_year": 15,
+                "subscribers_local": 2
+            },
+            "banned_from_community": false
+        }
+    ]
+}

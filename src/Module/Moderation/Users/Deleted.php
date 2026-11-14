@@ -66,7 +66,7 @@ class Deleted extends BaseUsers
 			'$title' => $this->t('Moderation'),
 			'$page'  => $this->t('Users awaiting permanent deletion'),
 
-			'$th_deleted' => [$this->t('Name'), $this->t('Email'), $this->t('Register date'), $this->t('Last login'), $this->t('Last public item'), $this->t('Permanent deletion')],
+			'$th_deleted' => [$this->t('Name'), $this->t('Email'), $this->t('Register date'), $this->t('Last activity'), $this->t('Last public item'), $this->t('Permanent deletion')],
 
 			'$form_security_token' => self::getFormSecurityToken('moderation_users_deleted'),
 

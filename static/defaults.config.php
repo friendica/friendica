@@ -91,6 +91,11 @@ return [
 		// Days of inactivity after which an admin is considered inactive. "0" means that there will be no check for inactivity.
 		'admin_inactivity_limit' => 30,
 
+		// allowed_internal_hosts (String)
+		// Comma-separated list of internal hosts that server-side requests may reach. Wildcards are allowed.
+		// See block_private_addresses.
+		'allowed_internal_hosts' => '',
+
 		// allowed_link_protocols (Array)
 		// Allowed protocols in links URLs, add at your own risk. http(s) is always allowed.
 		'allowed_link_protocols' => ['ftp://', 'ftps://', 'mailto:', 'cid:', 'gopher://'],
@@ -102,6 +107,11 @@ return [
 		// ap_always_bcc (Boolean)
 		// Addresses non-mentioned ActivityPub receivers by BCC instead of CC. Increases privacy, decreases performance.
 		'ap_always_bcc' => false,
+
+		// api_profiler_limit (Float)
+		// If an API call lasts longer than this value in seconds, its profiling data is logged.
+		// A value of 0 logs every API call.
+		'api_profiler_limit' => 1,
 
 		// auth_cookie_lifetime (Integer)
 		// Number of days that should pass without any activity before a user who
@@ -139,6 +149,11 @@ return [
 		// Delivers AP messages in a bulk (experimental)
 		'bulk_delivery' => false,
 
+		// block_private_addresses (Boolean)
+		// Refuse server-side requests to non-public IP addresses, including redirects.
+		// The node's base URL and allowed_internal_hosts are exempt.
+		'block_private_addresses' => true,
+
 		// block_local_dir (Boolean)
 		// Deny public access to the local user directory.
 		'block_local_dir' => false,
@@ -161,10 +176,12 @@ return [
 
 		// cache_driver (database|memcache|memcached|redis|apcu)
 		// Whether to use Memcache, Memcached, Redis or APCu to store temporary cache.
+		// Falls back to the database if the driver isn't available, e.g. because of a missing PHP extension.
 		'cache_driver' => 'database',
 
 		// distributed_cache_driver (database|memcache|memcached|redis)
 		// Whether to use database, Memcache, Memcached or Redis as a distributed cache.
+		// Falls back to the database if the driver isn't available, e.g. because of a missing PHP extension.
 		'distributed_cache_driver' => 'database',
 
 		// fetch_parents (Boolean)
@@ -277,10 +294,6 @@ return [
 		// dlogip (String)
 		// restricts develop log writes to requests originating from this IP address.
 		'dlogip' => '',
-
-		// legacy_activities (Boolean)
-		// Display received activities (like, dislike, reshare) as detailed list
-		'legacy_activities' => true,
 
 		// expire-notify-priority (integer)
 		// Priority for the expiry notification
@@ -418,10 +431,6 @@ return [
 		// Pictures longer than this length will be resized to be this length (on the longest side, the other side will be scaled appropriately).
 		// If you don't want to set a maximum length, set to -1.
 		'max_image_length' => -1,
-
-		// max_likers (Integer)
-		// Maximum number of "people who like (or don't like) this" that we will list by name
-		'max_likers' => 75,
 
 		// max_processes_backend (Integer)
 		// Maximum number of concurrent database processes for background tasks.
@@ -697,9 +706,20 @@ return [
 	],
 	'performance' => [
 		// max_response_data_size (Integer)
-		// Maximum allowed outgoing HTTP request response data size in Bytes. Does not affect incoming requests to this node.
+		// Maximum size in bytes of a response that is buffered in memory while resolving URLs. Does not affect incoming requests to this node.
 		// Warning: Lowering this value can help with some PHP memory exhaustion issues, but can also partially break some federation features e.g. large posts may not be fetched or received from remote servers.
 		'max_response_data_size' => 1000000,
+
+		// max_download_size (Integer)
+		// Maximum size in bytes of a response body that is received for an outgoing HTTP request without own limit. 0 disables the limit.
+		// The body is counted while it is received, larger transfers are aborted. Requests with an own limit (e.g. server probing) keep it.
+		'max_download_size' => 100000000,
+	],
+	'channel' => [
+		// max_search_length (Integer)
+		// Maximum length in bytes of the combined full-text search query used for matching user-defined channels.
+		// Once the search terms of all channels exceed this length, the query gets split into several smaller ones.
+		'max_search_length' => 1000,
 	],
 	'proxy' => [
 		// forwarded_for_headers (String)

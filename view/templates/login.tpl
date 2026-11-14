@@ -12,6 +12,12 @@
 	{{/foreach}}
 {{/if}}
 
+{{if $register}}
+<div id="login-extra-links">
+	<a href="{{$register.url}}" id="register-link" class="button" title="{{$register.title}}">{{$register.desc}}</a>
+</div>
+{{/if}}
+
 <form id="login-form" action="{{$dest_url}}" role="form" method="post">
 <div id="login-group" role="group" aria-labelledby="login-head">
 	<input type="hidden" name="auth-params" value="login" />
@@ -24,6 +30,11 @@
 	<div id="login-lost-password-link">
 		<a href="lostpass" title="{{$lostpass}}" id="lost-password-link">{{$lostlink}}</a>
 	</div>
+	{{if $codelink}}
+	<div id="login-code-link">
+		<a href="{{$codepath}}" id="login-code-link-anchor">{{$codelink}}</a>
+	</div>
+	{{/if}}
 	</div>
 
 	{{if $openid}}
@@ -45,11 +56,8 @@
 </div>
 </form>
 
-{{if $register}}
-<div id="login-extra-links">
-	<h3 id="login-head" class="sr-only">{{$register.title}}</h3>
-	<a href="{{$register.url}}" title="{{$register.title}}" id="register-link">{{$register.desc}}</a>
-</div>
-{{/if}}
-
-<script type="text/javascript"> $(document).ready(function() { $("#id_{{$lname.0}}").focus();} );</script>
+<script type="text/javascript">
+	window.onDocumentReady('body', function () {
+		$("#id_{{$lname.0}}").focus();
+	});
+</script>

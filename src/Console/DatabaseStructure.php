@@ -82,7 +82,8 @@ HELP;
 			throw new \Asika\SimpleConsole\CommandArgsException('This command needs two arguments');
 		}
 
-		if (!$this->dba->isConnected()) {
+		// dumpsql only reads the definition files
+		if ($this->getArgument(0) !== 'dumpsql' && !$this->dba->isConnected()) {
 			throw new RuntimeException('Unable to connect to database');
 		}
 

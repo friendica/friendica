@@ -327,6 +327,8 @@ Die Datenmenge der geloggten Daten kann relativ schnell anwachsen, deshalb empfe
 **Die Größe der Logdateien kann schnell anwachsen**.
 Du solltest deshalb einen Dienst zur [log rotation](https://en.wikipedia.org/wiki/Log_rotation) einrichten.
 
+Wie du einen gefundenen Eintrag einordnest und welche Rechte die Logdatei braucht, steht unter [Die Logdatei lesen](help/admin/log-files).
+
 **Bekannte Probleme**: Der Dateiname `friendica.log` kann bei speziellen Server Konfigurationen zu Problemen führen (siehe [issue 2209](https://github.com/friendica/friendica/issues/2209)).
 
 Normalerweise werden Fehler- und Warnmeldungen von PHP unterdrückt.

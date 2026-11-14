@@ -49,6 +49,34 @@ Jeder Kanal wird durch diese Werte definiert:
 * Volltextsuche: Dies kann genutzt werden um Inhalte, basierend auf dem Inhalt und ein paar zusätzlichen Schlüsselwörtern, ein- oder auszuschließen. Es nutzt die "boolean mode"-Operatoren von MariaDB: https://mariadb.com/kb/en/full-text-index-overview/#in-boolean-mode
 * Bilder, Videos, Audio: Wenn ausgewählt, wirst du Inhalte mit dem gewählten Medientyp sehen. Diese Optionen können kombiniert werden. Wenn keines dieser Felder ausgewählt wurde, wirst du alle Inhalte, mit oder ohne angefügten Medien, sehen.
 
+## Timeline- und Filter-Kanäle
+
+Wenn dein Administrator den Kanal-Cache aktiviert hat, bieten die Anzeige-Einstellungen im Bereich "Kanäle" zwei weitere Auswahlfelder: "Timeline Kanäle" und "Filter Kanäle".
+Timeline Kanäle fügen Beiträge aus den ausgewählten Kanälen zusätzlich zu den Beiträgen der Leute, denen du folgst, in deine normale Network-Timeline ein.
+Filter Kanäle machen das Gegenteil.
+Beiträge, die zu einem der ausgewählten Kanäle passen, werden aus deiner normalen Network-Timeline entfernt.
+So kannst du bestimmte Inhalte, zum Beispiel importierte Hashtags oder Feeds, aus deiner Haupt-Timeline heraushalten und trotzdem in einem eigenen Kanal betrachten.
+
+Als Filter-Kanal kannst du nur deine eigenen Kanäle nutzen, die voreingestellten Kanäle wie "Für Dich" oder "Entdecken" stehen hier nicht zur Verfügung.
+Das Filtern betrifft nur Beiträge, die noch innerhalb des Zeitfensters des Kanals liegen.
+Standardmäßig sind das 24 Stunden, der Administrator kann diesen Wert ändern.
+Das genaue Datum steht unter dem Auswahlfeld "Filter Kanäle".
+Ältere Beiträge werden nicht mehr im Zwischenspeicher gehalten, daher nicht gefiltert und erscheinen weiterhin in deiner normalen Network-Timeline.
+
+Als Timeline-Kanal kannst du deine eigenen Kanäle nur nutzen, wenn ihre Datenquelle der Circle "Globale Gemeinschaft" oder "Folgende" ist.
+Jede andere Quelle ("Neu - Aktivität", "Neu - Empfangen", "Neu - Erstellung", "Gefolgte" oder einer deiner eigenen Circles) enthält ohnehin nur Beiträge, die bereits Teil deiner normalen Timeline sind, sie hinzuzufügen würde also nichts Neues zeigen.
+Ein Kanal auf Basis von "Globale Gemeinschaft" kann daher sowohl als Timeline-Kanal als auch als Filter-Kanal genutzt werden, Kanäle auf anderen Quellen nur als Filter-Kanal.
+
+Die voreingestellten Kanäle stehen ebenfalls als Timeline-Kanäle zur Verfügung, wenn der Administrator den System-Kanal-Cache aktiviert hat.
+Die Kanäle "Für Dich" und "Ruhige teilende" sind davon ausgenommen.
+
+Die Auswahl als Timeline-Kanal ist unabhängig davon, ob der Kanal im "Kanäle"-Widget oder in der Menüleiste erscheint.
+Das legst du mit den übrigen Timeline-Einstellungen fest.
+
+Der Kanal-Cache ist die Konfigurationsoption `channel_cache` im Abschnitt `system` der Datei `config/local.config.php`, der System-Kanal-Cache ist `system_channel_cache`.
+Beide sind standardmäßig deaktiviert und lassen sich nicht über das Admin-Panel aktivieren.
+Wenn dir diese Auswahlfelder fehlen, frag deinen Administrator, ob er sie aktivieren kann.
+
 ## Zusätzliche Schlüsselwörter für die Volltextsuche
 
 Zusätzlich zu der Suche nach Inhalten, gibt es Schlüsselwörter, die in der Volltextsuche genutzt werden können.

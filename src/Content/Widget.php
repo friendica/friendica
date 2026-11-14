@@ -98,6 +98,10 @@ class Widget
 		$networks = [Protocol::PHANTOM, Protocol::FACEBOOK, Protocol::APPNET, Protocol::TWITTER, Protocol::ZOT, Protocol::OSTATUS, Protocol::STATUSNET];
 		$addonHelper->loadAddons();
 
+		if (!$addonHelper->isAddonEnabled('bluesky')) {
+			$networks[] = Protocol::ATPROTO;
+		}
+
 		if (!$addonHelper->isAddonEnabled('discourse')) {
 			$networks[] = Protocol::DISCOURSE;
 		}
@@ -131,6 +135,10 @@ class Widget
 
 		$networks = [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::FEED];
 		$addonHelper->loadAddons();
+
+		if ($addonHelper->isAddonEnabled('bluesky')) {
+			$networks[] = Protocol::ATPROTO;
+		}
 
 		if ($addonHelper->isAddonEnabled('discourse')) {
 			$networks[] = Protocol::DISCOURSE;
@@ -177,10 +185,11 @@ class Widget
 	 * @param string $baseUrl The full page request URI
 	 * @param array  $options
 	 * @param string $selected The currently selected filter option value
+	 * @param string $editUrl Link to a page to edit the options, shown right of the title only when provided
 	 * @return string
 	 * @throws \Exception
 	 */
-	private static function filter(string $type, string $title, string $desc, string $all, string $baseUrl, array $options, ?string $selected = null): string
+	private static function filter(string $type, string $title, string $desc, string $all, string $baseUrl, array $options, ?string $selected = null, ?string $editUrl = null): string
 	{
 		$queryString = parse_url($baseUrl, PHP_URL_QUERY);
 		$queryArray  = [];
@@ -210,6 +219,8 @@ class Widget
 			'$all_label' => $all,
 			'$options'   => $options,
 			'$base'      => $baseUrl,
+			'$edit_url'  => $editUrl,
+			'$edit_text' => DI::l10n()->t('Edit'),
 		]);
 	}
 
@@ -339,12 +350,13 @@ class Widget
 
 		return self::filter(
 			'file',
-			DI::l10n()->t('Saved Folders'),
+			DI::l10n()->t('Folders'),
 			'',
 			DI::l10n()->t('Everything'),
 			$baseurl,
 			$terms,
 			$selected,
+			'folders',
 		);
 	}
 
@@ -577,40 +589,29 @@ class Widget
 	}
 
 	/**
-	 * Get a list of all channels
+	 * Get the list of all enabled channels in the order of the user
 	 *
-	 * @param string $base
-	 * @param string $channelname
 	 * @param integer $uid
-	 * @return string
+	 * @return array List of channels with the keys 'ref', 'name' and 'description'
 	 */
-	public static function channels(string $base, string $channelname, int $uid): string
+	public static function getChannelList(int $uid): array
 	{
 		$channels = [];
 
 		$enabled = DI::pConfig()->get($uid, 'system', 'enabled_timelines', []);
 
-		foreach (DI::NetworkFactory()->getTimelines('') as $channel) {
-			if (empty($enabled) || in_array($channel->code, $enabled)) {
-				$channels[] = ['ref' => $channel->code, 'name' => $channel->label];
-			}
-		}
+		$timelines = [
+			DI::NetworkFactory()->getTimelines(''),
+			DI::ChannelFactory()->getTimelines($uid),
+			DI::userDefinedChannel()->selectByUid($uid),
+			DI::CommunityFactory()->getTimelines(true),
+		];
 
-		foreach (DI::ChannelFactory()->getTimelines($uid) as $channel) {
-			if (empty($enabled) || in_array($channel->code, $enabled)) {
-				$channels[] = ['ref' => $channel->code, 'name' => $channel->label];
-			}
-		}
-
-		foreach (DI::userDefinedChannel()->selectByUid($uid) as $channel) {
-			if (empty($enabled) || in_array($channel->code, $enabled)) {
-				$channels[] = ['ref' => $channel->code, 'name' => $channel->label];
-			}
-		}
-
-		foreach (DI::CommunityFactory()->getTimelines(true) as $community) {
-			if (empty($enabled) || in_array($community->code, $enabled)) {
-				$channels[] = ['ref' => $community->code, 'name' => $community->label];
+		foreach ($timelines as $list) {
+			foreach ($list as $channel) {
+				if (empty($enabled) || in_array($channel->code, $enabled)) {
+					$channels[] = ['ref' => $channel->code, 'name' => $channel->label, 'description' => $channel->description];
+				}
 			}
 		}
 
@@ -626,6 +627,21 @@ class Widget
 			}
 			$channels = $tmp;
 		}
+
+		return $channels;
+	}
+
+	/**
+	 * Get a list of all channels
+	 *
+	 * @param string $base
+	 * @param string $channelname
+	 * @param integer $uid
+	 * @return string
+	 */
+	public static function channels(string $base, string $channelname, int $uid): string
+	{
+		$channels = self::getChannelList($uid);
 
 		return self::filter(
 			'channel',

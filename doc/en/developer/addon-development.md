@@ -8,6 +8,7 @@ Modules work by intercepting specific page requests (by URL path).
 
 Addon developers should check the following upgrade notes for breaking changes and deprecations:
 
+- [Upgrade from 2026.08 to 2026.11](help/developer/upgrade-2026.11)
 - [Upgrade from 2026.05 to 2026.08](help/developer/upgrade-2026.08)
 - [Upgrade from 2026.01 to 2026.05](help/developer/upgrade-2026.05)
 - [Upgrade from 2024.12-1 to 2026.01](help/developer/upgrade-2026.01)

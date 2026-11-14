@@ -5,13 +5,13 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <div id="acl-wrapper">
-	<div class="panel-group" id="visibility-accordion-{{$input_group_id}}" role="tablist" aria-multiselectable="true">
+	<div class="panel-group" id="visibility-accordion-{{$input_group_id}}">
 		<div class="panel panel-success">
 			<label class="panel-heading{{if $visibility != 'public'}} collapsed{{/if}}" id="visibility-public-heading-{{$input_group_id}}" aria-expanded="{{if $visibility == 'public'}}true{{else}}false{{/if}}">
 				<input type="radio" name="{{$input_names.visibility}}" id="visibility-public-{{$input_group_id}}" value="public" tabindex="14" {{if $visibility == 'public'}}checked{{/if}}>
 				<i class="ri ri-global-line"></i> {{$public_title}}
 			</label>
-			<fieldset id="visibility-public-panel-{{$input_group_id}}" class="panel-collapse collapse{{if $visibility == 'public'}} in{{/if}}" role="tabpanel" aria-labelledby="visibility-public-heading-{{$input_group_id}}" {{if $visibility != 'public'}}disabled{{/if}}>
+			<fieldset id="visibility-public-panel-{{$input_group_id}}" class="panel-collapse collapse{{if $visibility == 'public'}} in{{/if}}" aria-labelledby="visibility-public-heading-{{$input_group_id}}" {{if $visibility != 'public'}}disabled{{/if}}>
 				<div class="panel-body">
 					<p>{{$public_desc}}</p>
 	                {{if $for_federation}}
@@ -46,7 +46,7 @@
 				<input type="radio" name="{{$input_names.visibility}}" id="visibility-custom-{{$input_group_id}}" value="custom" tabindex="15" {{if $visibility == 'custom'}}checked{{/if}}>
 				<i class="ri ri-lock-line"></i> {{$custom_title}}
 			</label>
-			<fieldset id="visibility-custom-panel-{{$input_group_id}}" class="panel-collapse collapse{{if $visibility == 'custom'}} in{{/if}}" role="tabpanel" aria-labelledby="visibility-custom-heading-{{$input_group_id}}" {{if $visibility != 'custom'}}disabled{{/if}}>
+			<fieldset id="visibility-custom-panel-{{$input_group_id}}" class="panel-collapse collapse{{if $visibility == 'custom'}} in{{/if}}" aria-labelledby="visibility-custom-heading-{{$input_group_id}}" {{if $visibility != 'custom'}}disabled{{/if}}>
 				<input type="hidden" name="{{$input_names.circle_allow}}" value="{{$circle_allow}}"/>
 				<input type="hidden" name="{{$input_names.contact_allow}}" value="{{$contact_allow}}"/>
 				<input type="hidden" name="{{$input_names.circle_deny}}" value="{{$circle_deny}}"/>

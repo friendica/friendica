@@ -35,6 +35,7 @@
 		<div class="contact-entry-name" id="contact-entry-name-{{$contact.id}}">
 			<h4>
 				{{$contact.name}}
+				{{if !empty($contact.emoji)}}<span class="contact-entry-emoji">{{$contact.emoji}}</span>{{/if}}
 				{{if $contact.account_type == 4}}
 					{{$acct_icon = "ri-broadcast-line"}}
 				{{else if $contact.account_type == 3}}

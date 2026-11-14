@@ -36,7 +36,7 @@ steps:
       - git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
       - export COMPOSER_HOME=.composer
       - ./bin/composer.phar validate
-      - ./bin/composer.phar install --prefer-dist
+      - ./bin/composer.phar install --prefer-dist || { ./bin/composer.phar clear-cache && ./bin/composer.phar install --prefer-dist; }
 
   rebuild_cache:
     image: meltwater/drone-cache:dev
@@ -54,6 +54,11 @@ steps:
     image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
     commands:
       - bin/composer.phar run phpstan;
+
+  deptrac:
+    image: friendicaci/php${PHP_MAJOR_VERSION}:php${PHP_VERSION}
+    commands:
+      - bin/composer.phar run deptrac
 
   # Non-blocking: friendica-addons lives on git.friendi.ca and has no CI of its own,
   # so faulty addon code only surfaces here, after it was merged - turning this

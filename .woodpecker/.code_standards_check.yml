@@ -31,7 +31,7 @@ steps:
     commands:
       - mkdir addon # create empty addon folder to appease composer
       - export COMPOSER_HOME=.composer
-      - ./bin/composer.phar install --prefer-dist
+      - ./bin/composer.phar install --prefer-dist || { ./bin/composer.phar clear-cache && ./bin/composer.phar install --prefer-dist; }
 
   rebuild_cache:
     image: meltwater/drone-cache:dev

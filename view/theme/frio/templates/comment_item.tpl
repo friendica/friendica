@@ -69,6 +69,12 @@
 		</p>
 {{/if}}
 		<p class="comment-edit-submit-wrapper">
+			<select id="jot-language-{{$id}}" class="form-control jot-language" title="{{$language_label}}" aria-label="{{$language_label}}">
+				{{foreach $languages as $code => $name}}
+					<option value="{{$code}}"{{if $code == $language}} selected{{/if}}>{{$name}}</option>
+				{{/foreach}}
+			</select>
+			<span id="character-counter-{{$id}}" class="grey text-info"></span>
 {{if $preview}}
 			<button type="button" class="btn btn-default comment-edit-preview" onclick="preview_comment({{$id}});" id="comment-edit-preview-link-{{$id}}"><i class="ri ri-eye-line"></i> {{$preview}}</button>
 {{/if}}
@@ -91,4 +97,9 @@
 		$('[id=comment-fake-text-{{$id}}]').prop('focus', null).off('focus');
 		$('[id=comment-{{$id}}]').prop('click', null).off('click');
 	});
+
+	$('#comment-edit-text-{{$id}}').off('keyup.comment-counter').on('keyup.comment-counter', function () {
+		$('#character-counter-{{$id}}').text($(this).val().length);
+	});
+	initLanguageDetection($('#comment-edit-text-{{$id}}'), $('#jot-language-{{$id}}'), 'keyup');
 </script>

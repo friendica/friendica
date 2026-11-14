@@ -11,6 +11,7 @@ use FFMpeg\FFMpeg;
 use Friendica\Content\PageInfo;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Database\Database;
@@ -111,6 +112,11 @@ class Media
 
 		$media['url'] = Network::sanitizeUrl($media['url']);
 
+		if (!empty($media['player-url']) && !self::isEmbeddablePlayerUrl($media['player-url'])) {
+			DI::logger()->notice('Dropped unsafe player-url', ['uri-id' => $media['uri-id'], 'player-url' => $media['player-url']]);
+			unset($media['player-url']);
+		}
+
 		$media = self::unsetEmptyFields($media);
 		$media = DI::dbaDefinition()->truncateFieldsForTable('post-media', $media);
 
@@ -128,6 +134,12 @@ class Media
 		if (array_diff_assoc($media, $stored)) {
 			$result = DBA::insert('post-media', $media, Database::INSERT_UPDATE);
 			$id     = $media['id'] ?? DBA::lastInsertId();
+			if (empty($id)) {
+				// When the entry had already existed, the insert turned into an update
+				// and no insert id is provided. So we fetch the id via the unique key.
+				$existing = DBA::selectFirst('post-media', ['id'], ['uri-id' => $media['uri-id'], 'url' => $media['url']]);
+				$id       = $existing['id'] ?? null;
+			}
 			DI::logger()->info('Updated media', ['result' => $result, 'id' => $id, 'media' => $media]);
 		} else {
 			$id = null;
@@ -162,6 +174,42 @@ class Media
 		if (isset($media['publisher-image'])) {
 			Post\Link::getByLink($media['uri-id'], $media['publisher-image']);
 		}
+	}
+
+	/**
+	 * Checks whether a player URL is safe to render into an iframe "src".
+	 *
+	 * The player iframe (content/iframe.tpl) is sandboxed with
+	 * "allow-same-origin allow-scripts", so a same-origin src runs with this
+	 * instance's origin and could read the viewer's DOM and cookies. Only
+	 * absolute, cross-origin http(s) URLs (including protocol-relative
+	 * "//host/…" ones) are considered safe; relative paths, URLs pointing back
+	 * at the local host and non-HTTP schemes such as "javascript:"/"data:" are
+	 * rejected.
+	 *
+	 * @param string $url
+	 * @return bool
+	 */
+	private static function isEmbeddablePlayerUrl(string $url): bool
+	{
+		$url = trim($url);
+		if ($url === '') {
+			return false;
+		}
+
+		// Resolve protocol-relative URLs (//host/path) against https for the check
+		if (str_starts_with($url, '//')) {
+			$url = 'https:' . $url;
+		}
+
+		$scheme = strtolower(parse_url($url, PHP_URL_SCHEME));
+		$host   = parse_url($url, PHP_URL_HOST);
+
+		if (empty($host) || !in_array($scheme, ['http', 'https'], true)) {
+			return false;
+		}
+
+		return !DI::baseUrl()->isLocalUrl($url);
 	}
 
 	/**
@@ -853,6 +901,38 @@ class Media
 	}
 
 	/**
+	 * Resolve an HLS playlist URL to the address the browser finally ends up on
+	 *
+	 * Some sites hand out a permalink that only redirects
+	 * to a CDN. A browser following that redirect fails CORS on the intermediate
+	 * response, so hls.js has to be pointed at the resolved URL directly. The
+	 * redirect target may change over time, hence this runs at render time and is
+	 * only cached for a short while.
+	 *
+	 * @param string $url Playlist URL as stored with the media
+	 * @return string Resolved URL, or the input when it can't be resolved
+	 */
+	public static function resolvePlaylistUrl(string $url): string
+	{
+		$cacheKey = 'hls-playlist-url:' . $url;
+
+		$resolved = DI::cache()->get($cacheKey);
+		if (!is_null($resolved)) {
+			return $resolved;
+		}
+
+		$curlResult = DI::httpClient()->get($url, HttpClientAccept::HLS, [HttpClientOptions::REQUEST => HttpClientRequest::MEDIAVERIFIER]);
+
+		$resolved = ($curlResult->isSuccess() && $curlResult->isRedirectUrl() && $curlResult->getRedirectUrl() !== '')
+			? $curlResult->getRedirectUrl()
+			: $url;
+
+		DI::cache()->set($cacheKey, $resolved, Duration::QUARTER_HOUR);
+
+		return $resolved;
+	}
+
+	/**
 	 * Tests for path patterns that are used for picture links in Friendica
 	 *
 	 * @param string $page    Link to the image page
@@ -874,6 +954,29 @@ class Media
 	private static function isLinkToImagePage(string $page, string $preview): bool
 	{
 		return preg_match('#/photos/.*/image/#ism', $page) && preg_match('#/photo/.*-[012]\.#ism', $preview);
+	}
+
+	/**
+	 * Remove the images with the given URLs, including a surrounding link, from the body
+	 *
+	 * @param string[] $urls Image URLs (full size and preview)
+	 * @param string   $body
+	 * @return string
+	 */
+	public static function removeImagesByUrl(array $urls, string $body): string
+	{
+		foreach ($urls as $url) {
+			$url = preg_quote($url, '#');
+			$img = '(?:\[img=' . $url . '\].*?|\[img(?:=\d*x\d*)?\]' . $url . ')\[/img\]';
+
+			$body = preg_replace([
+				"#\[url=[^\]]*\]\s*$img\s*\[/url\]#ism",
+				"#\[url=$url\]\s*\[img[^\]]*\][^\[]*\[/img\]\s*\[/url\]#ism",
+				"#$img#ism",
+			], '', (string) $body);
+		}
+
+		return $body;
 	}
 
 	/**
@@ -1150,28 +1253,34 @@ class Media
 	 */
 	public static function insertFromAttachmentData(int $uriid, string $body)
 	{
-		$data = BBCode::getAttachmentData($body);
-		if (empty($data)) {
+		if (!preg_match_all("/\[attachment.*?\].*?\[\/attachment\]/ism", $body, $matches)) {
 			return;
 		}
 
-		DI::logger()->info('Adding attachment data', ['data' => $data]);
-		$attachment = [
-			'uri-id'         => $uriid,
-			'type'           => PostMedia::TYPE_HTML,
-			'url'            => $data['url'],
-			'preview'        => $data['preview']       ?? null,
-			'description'    => $data['description']   ?? null,
-			'name'           => $data['title']         ?? null,
-			'author-url'     => $data['author_url']    ?? null,
-			'author-name'    => $data['author_name']   ?? null,
-			'publisher-url'  => $data['provider_url']  ?? null,
-			'publisher-name' => $data['provider_name'] ?? null,
-		];
-		if (!empty($data['image'])) {
-			$attachment['preview'] = $data['image'];
+		foreach ($matches[0] as $match) {
+			$data = BBCode::getAttachmentData($match);
+			if (empty($data)) {
+				continue;
+			}
+
+			DI::logger()->info('Adding attachment data', ['data' => $data]);
+			$attachment = [
+				'uri-id'         => $uriid,
+				'type'           => PostMedia::TYPE_HTML,
+				'url'            => $data['url'],
+				'preview'        => $data['preview']       ?? null,
+				'description'    => $data['description']   ?? null,
+				'name'           => $data['title']         ?? null,
+				'author-url'     => $data['author_url']    ?? null,
+				'author-name'    => $data['author_name']   ?? null,
+				'publisher-url'  => $data['provider_url']  ?? null,
+				'publisher-name' => $data['provider_name'] ?? null,
+			];
+			if (!empty($data['image'])) {
+				$attachment['preview'] = $data['image'];
+			}
+			self::insert($attachment);
 		}
-		self::insert($attachment);
 	}
 
 	/**

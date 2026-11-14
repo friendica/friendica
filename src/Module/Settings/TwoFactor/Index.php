@@ -15,6 +15,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\FoundException;
+use Friendica\Security\TwoFactor\CodeVerifier;
 use Friendica\Security\TwoFactor\Model\AppSpecificPassword;
 use Friendica\Security\TwoFactor\Model\RecoveryCode;
 use Friendica\Model\User;
@@ -69,6 +70,7 @@ class Index extends BaseSettings
 						RecoveryCode::deleteForUser($this->session->getLocalUserId());
 						$this->pConfig->delete($this->session->getLocalUserId(), '2fa', 'secret');
 						$this->pConfig->delete($this->session->getLocalUserId(), '2fa', 'verified');
+						$this->pConfig->delete($this->session->getLocalUserId(), '2fa', CodeVerifier::LAST_TIMESTEP);
 						$this->session->remove('2fa');
 
 						$this->systemMessages->addInfo($this->t('Two-factor authentication successfully disabled.'));

@@ -195,6 +195,18 @@ class BaseURLTest extends TestCase
 		self::assertEquals($expect, $baseUrl->remove($origUrl));
 	}
 
+	public function testMalformedConfigUrlThrowsNonInvalidArgumentException(): void
+	{
+		$config = self::createConfiguredStub(IManageConfigValues::class, [
+			'get' => 'http://:',
+		]);
+
+		self::expectException(\UnexpectedValueException::class);
+		self::expectExceptionMessage('Invalid system.url "http://:"');
+
+		new BaseURL($config, self::createStub(LoggerInterface::class));
+	}
+
 	/**
 	 * Test that redirect to external domains fails
 	 */

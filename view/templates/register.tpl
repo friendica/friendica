@@ -52,13 +52,13 @@
 	{{if !$additional}}
 		<div id="register-email-wrapper">
 			<label for="register-email" id="label-register-email">{{$addrlabel}}</label>
-			<input type="text" maxlength="60" name="field1" id="register-email" value="{{$email}}" required>
+			<input type="email" autocomplete="email" maxlength="60" name="field1" id="register-email" value="{{$email}}" required>
 		</div>
 		<div id="register-email-end"></div>
 
 		<div id="register-repeat-wrapper">
 			<label for="register-repeat" id="label-register-repeat">{{$addrlabel2}}</label>
-			<input type="text" maxlength="60" name="repeat" id="register-repeat" value="" required>
+			<input type="email" autocomplete="email" maxlength="60" name="repeat" id="register-repeat" value="" required>
 		</div>
 		<div id="register-repeat-end"></div>
 	{{/if}}
@@ -75,6 +75,9 @@
 		<input type="text" maxlength="60" name="nickname" id="register-nickname" value="{{$nickname}}" required><div id="register-sitename">@{{$sitename}}</div>
 	</div>
 	<div id="register-nickname-end"></div>
+
+	{{include file="field_custom.tpl" field=$timezone}}
+	{{include file="field_select.tpl" field=$language}}
 
 	<input type="input" id=tarpit" name="email" style="display: none;" placeholder="Don't enter anything here"/>
 
@@ -111,7 +114,16 @@
 	{{if !$additional}}
 		<h3>{{$importh}}</h3>
 		<div id ="import-profile">
-			<a href="user/import">{{$importt}}</a>
+			<a href="user/import" class="button">{{$importt}}</a>
 		</div>
 	{{/if}}
+<script>
+	(function () {
+		var select = document.getElementById('timezone_select');
+		var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		if (select && timezone && Array.prototype.some.call(select.options, function (option) { return option.value === timezone; })) {
+			select.value = timezone;
+		}
+	})();
+</script>
 </form>

@@ -67,6 +67,7 @@ class Site extends BaseAdmin
 		$allowed_sites           = (!empty($_POST['allowed_sites'])           ? trim((string) $_POST['allowed_sites'])  : '');
 		$allowed_email           = (!empty($_POST['allowed_email'])           ? trim((string) $_POST['allowed_email'])  : '');
 		$disallowed_email        = (!empty($_POST['disallowed_email'])        ? trim((string) $_POST['disallowed_email'])  : '');
+		$forbidden_email         = (!empty($_POST['forbidden_email'])         ? strtolower(trim((string) $_POST['forbidden_email'])) : '');
 		$forbidden_nicknames     = (!empty($_POST['forbidden_nicknames'])     ? strtolower(trim((string) $_POST['forbidden_nicknames'])) : '');
 		$system_actor_name       = (!empty($_POST['system_actor_name'])       ? trim((string) $_POST['system_actor_name']) : '');
 		$block_public            = !empty($_POST['block_public']);
@@ -87,6 +88,7 @@ class Site extends BaseAdmin
 
 		$enable_multi_reg                = !empty($_POST['enable_multi_reg']);
 		$enable_openid                   = !empty($_POST['enable_openid']);
+		$enable_login_code               = !empty($_POST['enable_login_code']);
 		$enable_regfullname              = !empty($_POST['enable_regfullname']);
 		$register_notification           = !empty($_POST['register_notification']);
 		$community_page_style            = (!empty($_POST['community_page_style']) ? intval(trim((string) $_POST['community_page_style'])) : 0);
@@ -159,8 +161,6 @@ class Site extends BaseAdmin
 		$interaction_score_days  = (!empty($_POST['interaction_score_days'])  ? intval($_POST['interaction_score_days']) : 0);
 		$max_posts_per_author    = (!empty($_POST['max_posts_per_author'])    ? intval($_POST['max_posts_per_author']) : 0);
 		$sharer_interaction_days = (!empty($_POST['sharer_interaction_days']) ? intval($_POST['sharer_interaction_days']) : 0);
-
-		$active_panel = (!empty($_POST['active_panel'])      ? "#" . trim((string) $_POST['active_panel']) : '');
 
 		$transactionConfig = DI::config()->beginTransaction();
 
@@ -250,8 +250,11 @@ class Site extends BaseAdmin
 		$transactionConfig->set('system', 'allowed_sites', $allowed_sites);
 		$transactionConfig->set('system', 'allowed_email', $allowed_email);
 		$transactionConfig->set('system', 'disallowed_email', $disallowed_email);
+		$transactionConfig->set('system', 'forbidden_email', $forbidden_email);
 		$transactionConfig->set('system', 'forbidden_nicknames', $forbidden_nicknames);
-		$transactionConfig->set('system', 'system_actor_name', $system_actor_name);
+		if (!empty($system_actor_name) && !DBA::exists('contact', ['uid' => 0, 'self' => true])) {
+			$transactionConfig->set('system', 'actor_name', $system_actor_name);
+		}
 		$transactionConfig->set('system', 'block_public', $block_public);
 		$transactionConfig->set('system', 'publish_all', $force_publish);
 		$transactionConfig->set('system', 'newuser_private', $newuser_private);
@@ -269,6 +272,7 @@ class Site extends BaseAdmin
 
 		$transactionConfig->set('system', 'block_extended_register', !$enable_multi_reg);
 		$transactionConfig->set('system', 'no_openid', !$enable_openid);
+		$transactionConfig->set('system', 'enable_login_code', $enable_login_code);
 		$transactionConfig->set('system', 'no_regfullname', !$enable_regfullname);
 		$transactionConfig->set('system', 'register_notification', $register_notification);
 		$transactionConfig->set('system', 'community_page_style', $community_page_style);
@@ -344,7 +348,7 @@ class Site extends BaseAdmin
 
 		$transactionConfig->commit();
 
-		DI::baseUrl()->redirect('admin/site' . $active_panel);
+		DI::baseUrl()->redirect('admin/site');
 	}
 
 	protected function content(array $request = []): string
@@ -514,6 +518,7 @@ class Site extends BaseAdmin
 			'$allowed_sites'                   => ['allowed_sites', DI::l10n()->t('Allowed friend domains'), DI::config()->get('system', 'allowed_sites'), DI::l10n()->t('Comma separated list of domains which are allowed to establish friendships with this site. Wildcards are accepted. Empty to allow any domains')],
 			'$allowed_email'                   => ['allowed_email', DI::l10n()->t('Allowed email domains'), DI::config()->get('system', 'allowed_email'), DI::l10n()->t('Comma separated list of domains which are allowed in email addresses for registrations to this site. Wildcards are accepted. Empty to allow any domains')],
 			'$disallowed_email'                => ['disallowed_email', DI::l10n()->t('Disallowed email domains'), DI::config()->get('system', 'disallowed_email'), DI::l10n()->t('Comma separated list of domains which are rejected as email addresses for registrations to this site. Wildcards are accepted.')],
+			'$forbidden_email'                 => ['forbidden_email', DI::l10n()->t('Forbidden email addresses'), DI::config()->get('system', 'forbidden_email'), DI::l10n()->t('Comma separated list of email addresses that are rejected for registrations to this site. Wildcards are accepted, e.g. "user@example.com", "user+*@example.com" or "*porn*@*".')],
 			'$block_public'                    => ['block_public', DI::l10n()->t('Block public'), DI::config()->get('system', 'block_public'), DI::l10n()->t('Check to block public access to all otherwise public personal pages on this site unless you are currently logged in.')],
 			'$force_publish'                   => ['publish_all', DI::l10n()->t('Force publish'), DI::config()->get('system', 'publish_all'), DI::l10n()->t('Check to force all profiles on this site to be listed in the site directory.') . '<strong>' . DI::l10n()->t('Enabling this may violate privacy laws like the GDPR') . '</strong>'],
 			'$global_directory'                => ['directory', DI::l10n()->t('Global directory URL'), DI::config()->get('system', 'directory'), DI::l10n()->t('URL to the global directory. If this is not set, the global directory is completely unavailable to the application.')],
@@ -531,6 +536,7 @@ class Site extends BaseAdmin
 			'$min_poll_interval'               => ['min_poll_interval', DI::l10n()->t('Minimum poll interval'), DI::config()->get('system', 'min_poll_interval'), DI::l10n()->t('Minimal distance in minutes between two polls for mail and feed contacts. Reasonable values are between 1 and 59.')],
 			'$enable_multi_reg'                => ['enable_multi_reg', DI::l10n()->t('Enable multiple registrations'), !DI::config()->get('system', 'block_extended_register'), DI::l10n()->t('Enable users to register additional accounts for use as pages.')],
 			'$enable_openid'                   => ['enable_openid', DI::l10n()->t('Enable OpenID'), !DI::config()->get('system', 'no_openid'), DI::l10n()->t('Enable OpenID support for registration and logins.')],
+			'$enable_login_code'               => ['enable_login_code', DI::l10n()->t('Enable login with e-mail code'), DI::config()->get('system', 'enable_login_code'), DI::l10n()->t('Allow users to sign in with a one time code that is sent to their e-mail address instead of a password.')],
 			'$enable_regfullname'              => ['enable_regfullname', DI::l10n()->t('Enable full name check'), !DI::config()->get('system', 'no_regfullname'), DI::l10n()->t('Prevents users from registering with a display name with fewer than two parts separated by spaces.')],
 			'$register_notification'           => ['register_notification', DI::l10n()->t('Email administrators on new registration'), DI::config()->get('system', 'register_notification'), DI::l10n()->t('If enabled and the system is set to an open registration, an email for each new registration is sent to the administrators.')],
 			'$community_page_style'            => ['community_page_style', DI::l10n()->t('Community pages for visitors'), DI::config()->get('system', 'community_page_style'), DI::l10n()->t('Which community pages should be available for visitors. Local users always see both pages.'), $community_page_style_choices],

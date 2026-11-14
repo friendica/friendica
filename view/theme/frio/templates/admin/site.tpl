@@ -6,17 +6,6 @@
   *}}
 <script>
 	$(function(){
-		$(".collapse").on('show.bs.collapse', function(e) {
-			var id = $(e.target).attr('id');
-			$("input[name=active_panel]").val(id);
-		});
-		var url = document.location.toString();
-		if ( url.match('#') ) {
-			var element = '#'+url.split('#')[1];
-				$(element).addClass('in');
-			window.scroll(0, $(element).offset().top - 120);
-		}
-
 		$("#cnftheme").click(function(){
 			document.location.assign("{{$baseurl}}/admin/themes/" + $("#id_theme :selected").val());
 			return false;
@@ -27,20 +16,13 @@
 
 <div id="adminpage" class="adminpage generic-page-wrapper">
 	<h1>{{$title}} - {{$page}}</h1>
-	<div class="panel-group panel-group-settings" id="admin-settings" role="tablist" aria-multiselectable="true">
+	<div class="panel-group panel-group-settings" id="admin-settings">
 		<form action="{{$baseurl}}/admin/site" method="post">
 			<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
-			<input type="hidden" name="active_panel" value="">
 			{{* General Information *}}
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-settings-general">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-general-collapse" aria-expanded="false" aria-controls="admin-settings-general-collapse">
-							{{$general_info}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-general-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-general">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$general_info}}</h2></summary>
+				<div id="admin-settings-general">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$sitename}}
 						{{include file="field_input.tpl" field=$sender_email}}
@@ -59,21 +41,15 @@
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 
 			<!--
 			/*
 			 *    Registration
 			 */ -->
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-settings-registration">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-registration-collapse" aria-expanded="false" aria-controls="admin-settings-registration-collapse">
-							{{$registration}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-registration-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-registration">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$registration}}</h2></summary>
+				<div id="admin-settings-registration">
 					<div class="panel-body">
 						{{include file="field_textarea.tpl" field=$register_text}}
 						{{include file="field_select.tpl" field=$register_policy}}
@@ -81,17 +57,19 @@
 						{{include file="field_input.tpl" field=$daily_registrations}}
 						{{include file="field_checkbox.tpl" field=$enable_multi_reg}}
 						{{include file="field_checkbox.tpl" field=$enable_openid}}
+						{{include file="field_checkbox.tpl" field=$enable_login_code}}
 						{{include file="field_checkbox.tpl" field=$enable_regfullname}}
 						{{include file="field_checkbox.tpl" field=$register_notification}}
 						{{include file="field_textarea.tpl" field=$allowed_email}}
 						{{include file="field_textarea.tpl" field=$disallowed_email}}
+						{{include file="field_textarea.tpl" field=$forbidden_email}}
 						{{include file="field_textarea.tpl" field=$forbidden_nicknames}}
 					</div>
 					<div class="panel-footer">
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 
 
 
@@ -99,15 +77,9 @@
 				/*
 				 *    File upload
 				 */ -->
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-settings-upload">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-upload-collapse" aria-expanded="false" aria-controls="admin-settings-upload-collapse">
-							{{$upload}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-upload-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-upload">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$upload}}</h2></summary>
+				<div id="admin-settings-upload">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$maximagesize}}
 						{{include file="field_input.tpl" field=$maximagelength}}
@@ -118,22 +90,16 @@
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 
 
 			<!--
 			/*
 			 *    Corporate
 			 */ -->
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-settings-corporate">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-corporate-collapse" aria-expanded="false" aria-controls="admin-settings-corporate-collapse">
-							{{$corporate}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-corporate-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-corporate">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$corporate}}</h2></summary>
+				<div id="admin-settings-corporate">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$allowed_sites}}
 						{{include file="field_checkbox.tpl" field=$block_public}}
@@ -179,21 +145,15 @@
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 
 			<!--
 			/*
 			 *    Corporate
 			 */ -->
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-settings-advanced">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-advanced-collapse" aria-expanded="false" aria-controls="admin-settings-advanced-collapse">
-							{{$advanced}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-advanced-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-advanced">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$advanced}}</h2></summary>
+				<div id="admin-settings-advanced">
 					<div class="panel-body">
 						{{include file="field_checkbox.tpl" field=$verifyssl}}
 						{{include file="field_input.tpl" field=$proxy}}
@@ -209,21 +169,15 @@
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 
 			<!--
 			/*
 			 *    Contact Directory
 			 */ -->
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-settings-contacts">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-contacts-collapse" aria-expanded="false" aria-controls="admin-settings-contacts-collapse">
-							{{$portable_contacts}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-contacts-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-cocontactsrporate">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$portable_contacts}}</h2></summary>
+				<div id="admin-settings-contacts">
 					<div class="panel-body">
 						{{include file="field_select.tpl" field=$contact_discovery}}
 						{{include file="field_checkbox.tpl" field=$update_active_contacts}}
@@ -237,21 +191,15 @@
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 
 			<!--
 			/*
 			 *    Performance
 			 */ -->
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-settings-performance">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-performance-collapse" aria-expanded="false" aria-controls="admin-settings-performance-collapse">
-							{{$performance}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-performance-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-performance">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$performance}}</h2></summary>
+				<div id="admin-settings-performance">
 					<div class="panel-body">
 						{{include file="field_checkbox.tpl" field=$compute_circle_counts}}
 						{{include file="field_checkbox.tpl" field=$only_tag_search}}
@@ -276,21 +224,15 @@
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 
 			<!--
 			/*
 			 *    Worker
 			 */ -->
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-settings-worker">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-worker-collapse" aria-expanded="false" aria-controls="admin-settings-worker-collapse">
-							{{$worker_title}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-worker-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-worker">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$worker_title}}</h2></summary>
+				<div id="admin-settings-worker">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$maxloadavg}}
 						{{include file="field_input.tpl" field=$min_memory}}
@@ -306,21 +248,15 @@
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 
 			<!--
 			/*
 			 *    Relay
 			 */ -->
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-relay-corporate">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-relay-collapse" aria-expanded="false" aria-controls="admin-settings-relay-collapse">
-							{{$relay_title}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-relay-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-relay">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$relay_title}}</h2></summary>
+				<div id="admin-settings-relay">
 					<div class="panel-body">
 						{{if $relay_list}}
 							<p>{{$relay_list_title}}</p>
@@ -348,20 +284,14 @@
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 			<!--
 			/*
 			 *    Channel
 			 */ -->
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-channel">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-channel-collapse" aria-expanded="false" aria-controls="admin-settings-channel-collapse">
-							{{$channel_title}}
-						</button>
-					</h2>
-				</div>
-				<div id="admin-settings-channel-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-channel">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$channel_title}}</h2></summary>
+				<div id="admin-settings-channel-collapse">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$engagement_hours}}
 						{{include file="field_input.tpl" field=$engagement_post_limit}}
@@ -373,18 +303,12 @@
 						<input type="submit" name="page_site" class="btn btn-primary" value="{{$submit}}"/>
 					</div>
 				</div>
-			</div>
+			</details>
 		</form>
 
-		<div class="panel">
-			<div class="section-subtitle-wrapper panel-heading" role="tab" id="admin-settings-relocate">
-				<h2>
-					<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#admin-settings" href="#admin-settings-relocate-collapse" aria-expanded="false" aria-controls="admin-settings-relocate-collapse">
-						{{$relocate}}
-					</button>
-				</h2>
-			</div>
-			<div id="admin-settings-relocate-collapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="admin-settings-relocate">
+		<details class="panel">
+			<summary class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$relocate}}</h2></summary>
+			<div id="admin-settings-relocate">
 				<div class="panel-body">
 					<p>
 						{{$relocate_msg}}
@@ -392,6 +316,6 @@
 					<p><code>{{$relocate_cmd}}</code></p>
 				</div>
 			</div>
-		</div>
+		</details>
 	</div>
 </div>

@@ -419,7 +419,7 @@ class Profile
 		}
 
 		if (isset($p['about'])) {
-			$p['about'] = BBCode::convertForUriId($profile['uri-id'] ?? 0, $p['about']);
+			$p['about'] = DI::renderedContent()->convert($profile['uri-id'] ?? 0, $p['about'], BBCode::INTERNAL);
 		}
 
 		if (isset($p['address'])) {
@@ -517,7 +517,7 @@ class Profile
 	 */
 	public static function shouldDisplayEventList(int $uid, Mode $mode): bool
 	{
-		if (empty($uid) || $mode->isMobile()) {
+		if (empty($uid) || $mode->isMobile() || ($_GET['mode'] ?? '') === 'column') {
 			return false;
 		}
 

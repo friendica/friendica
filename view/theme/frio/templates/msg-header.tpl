@@ -8,7 +8,7 @@
 <script type="text/javascript">
 	$("#comment-edit-text-input").editor_autocomplete(baseurl + '/search/acl');
 
-	$(document).ready(function() {
+	window.onDocumentReady('body', function() {
 		$("#comment-edit-text-input").bbco_autocomplete('bbcode');
 		$('#mail-conversation').perfectScrollbar();
 		$('#message-preview').perfectScrollbar();

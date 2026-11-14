@@ -9,10 +9,12 @@ namespace Friendica\Module\Search;
 
 use Friendica\App;
 use Friendica\Content\Conversation\ConversationRenderer;
+use Friendica\Content\Feature;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\HTML;
 use Friendica\Content\Widget;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
@@ -35,7 +37,7 @@ class Index extends BaseSearch
 	/** @var string  */
 	private $remoteAddress;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Request $request, private readonly ConversationRenderer $conversationRenderer, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, App\Request $request, private readonly ConversationRenderer $conversationRenderer, private readonly SidebarMenu $sidebarMenu, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -88,7 +90,15 @@ class Index extends BaseSearch
 		}
 
 		if (DI::userSession()->getLocalUserId()) {
-			DI::page()['aside'] .= Widget\SavedSearches::getHTML(Search::getSearchPath($search), $search);
+			if ($this->sidebarMenu->isActive(DI::userSession()->getLocalUserId())) {
+				DI::page()['aside'] .= $this->sidebarMenu->getHTML(DI::userSession()->getLocalUserId(), Widget\SidebarMenu::SEARCHES);
+			} else {
+				DI::page()['aside'] .= Widget\SavedSearches::getHTML(Search::getSearchPath($search), $search);
+			}
+
+			if (($tag || str_starts_with($search, '#')) && Feature::isEnabled(DI::userSession()->getLocalUserId(), Feature::TRENDING_TAGS)) {
+				DI::page()['aside'] .= Widget\TrendingTags::getHTML();
+			}
 		}
 
 		Nav::setSelected('search');
@@ -207,7 +217,7 @@ class Index extends BaseSearch
 
 		$this->logger->info('Start Conversation.', ['q' => $search]);
 
-		$o .= $this->conversationRenderer->renderFlat($items, ConversationRenderer::MODE_SEARCH, false, DI::userSession()->getLocalUserId());
+		$o .= $this->conversationRenderer->renderFlat($items, ConversationRenderer::MODE_SEARCH, false, DI::userSession()->getLocalUserId(), $request);
 
 		if (DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'infinite_scroll', true)) {
 			$o .= HTML::scrollLoader($request);
@@ -217,6 +227,49 @@ class Index extends BaseSearch
 
 
 		return $o;
+	}
+
+	/**
+	 * URI-IDs of the posts that are newer than the ones shown on the search page, used by the automatic update
+	 *
+	 * @param array $request Request with the search ('q' or 'tag') and 'first_uriid' of the newest shown post
+	 * @return array List of URI-IDs, newest first
+	 */
+	protected function getNewUriIds(array $request, int $uid, int $limit): array
+	{
+		if (isset($request['tag'])) {
+			$tag    = true;
+			$search = trim(rawurldecode($request['tag']));
+		} else {
+			$tag    = false;
+			$search = isset($request['q']) ? trim(rawurldecode($request['q'])) : '';
+
+			if (str_starts_with($search, '#')) {
+				$tag    = true;
+				$search = substr($search, 1);
+			} elseif (str_starts_with($search, '@') || str_starts_with($search, '!')) {
+				return [];
+			} elseif (isset($request['search-option']) && in_array($request['search-option'], ['contacts', 'groups'])) {
+				return [];
+			} elseif (isset($request['search-option']) && $request['search-option'] == 'tags') {
+				$tag = true;
+			}
+		}
+
+		// The same as in content(): Neither tag nor fulltext search is done for URLs
+		if ($search === '' || (parse_url($search, PHP_URL_SCHEME) && parse_url($search, PHP_URL_HOST))) {
+			return [];
+		}
+
+		$tag = $tag || DI::config()->get('system', 'only_tag_search');
+
+		$first_uriid = isset($request['first_uriid']) ? intval($request['first_uriid']) : 0;
+
+		if ($tag) {
+			return Tag::getURIIdListByTag($search, $uid, 0, $limit, 0, $first_uriid);
+		}
+
+		return Post\Content::getURIIdListBySearch($search, $uid, 0, $limit, 0, $first_uriid);
 	}
 
 	/**

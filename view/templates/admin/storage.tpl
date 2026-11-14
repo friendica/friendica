@@ -6,7 +6,7 @@
   *}}
 <div id='adminpage'>
 	<h1>{{$title}} - {{$page}}</h1>
-
+	<div class="settings-section">
 		<h2>{{$label_current}}: <b>{{$storagebackend}}</b></h2>
 		{{$storagebackend_ro_txt nofilter}}
 
@@ -25,18 +25,18 @@
 		{{/if}}
 
 		{{if $storage.form}}
-		<input type="submit" name="submit_save" value="{{$save}}"/>
+		<input type="submit" class="settings-submit btn btn-default" name="submit_save" value="{{$save}}"/>
         {{if $is_writable}}
 				{{if $storage.active}}
-		<input type="submit" name="submit_save_set" value="{{$save_reload}}"/>
+		<input type="submit" class="settings-submit btn btn-default" name="submit_save_set" value="{{$save_reload}}"/>
 				{{else}}
-		<input type="submit" name="submit_save_set" value="{{$save_use}}"/>
+		<input type="submit" class="settings-submit btn btn-default" name="submit_save_set" value="{{$save_use}}"/>
 				{{/if}}
 		{{/if}}
 		{{elseif $is_writable}}
-		<br /><input type="submit" name="submit_save_set" {{if $storage.active}}disabled="disabled"{{/if}} value="{{$use}}"/>
+		<br /><input type="submit" class="settings-submit btn btn-default" name="submit_save_set" {{if $storage.active}}disabled="disabled"{{/if}} value="{{$use}}"/>
 		{{/if}}
 	</form>
 		{{/foreach}}
-
+	</div>
 </div>

@@ -28,12 +28,13 @@
 	<div class="wall-item-bottom">
 		<div class="wall-item-links">
 		</div>
+	{{if $tags}}
 		<div class="wall-item-tags tags">
-			{{foreach $tags as $tag}}
-				<span class='tag'>{{$tag nofilter}}</span>
-			{{/foreach}}
-
+		{{foreach $tags as $tag}}
+			<span class='tag'>{{$tag nofilter}}</span>
+		{{/foreach}}
 		</div>
+	{{/if}}
 	</div>
 	<div class="wall-item-bottom">
 		<div dir="auto">

@@ -107,6 +107,8 @@ class Login extends BaseModule
 	 */
 	public static function form(?string $return_path = null, bool $register = false): string
 	{
+		$return_path ??= DI::args()->getQueryString();
+
 		$noid = DI::config()->get('system', 'no_openid');
 
 		if ($noid) {
@@ -167,12 +169,15 @@ class Login extends BaseModule
 				'$openid'  => !$noid,
 				'$lopenid' => ['openid_url', $openid_title, $identity, '', $openid_readonly, $openid_placeholder],
 
-				'$hiddens' => ['return_path' => $return_path ?? DI::args()->getQueryString()],
+				'$hiddens' => ['return_path' => $return_path],
 
 				'$register' => $reg,
 
 				'$lostpass' => DI::l10n()->t('Forgot your password?'),
 				'$lostlink' => DI::l10n()->t('Password Reset'),
+
+				'$codelink' => DI::config()->get('system', 'enable_login_code') ? DI::l10n()->t('Sign in with an e-mail code') : '',
+				'$codepath' => 'login/code' . ($return_path !== '' ? '?' . http_build_query(['return_path' => $return_path]) : ''),
 
 				'$tostitle' => DI::l10n()->t('Website Terms of Service'),
 				'$toslink'  => DI::l10n()->t('terms of service'),

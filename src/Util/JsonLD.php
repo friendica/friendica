@@ -60,6 +60,9 @@ class JsonLD
 			case 'https://purl.archive.org/socialweb/webfinger':
 				$url = DI::basePath() . '/static/socialweb-webfinger.jsonld';
 				break;
+			case 'https://purl.archive.org/socialweb/mls':
+				$url = DI::basePath() . '/static/socialweb-mls.jsonld';
+				break;
 			case 'https://www.w3.org/ns/cid/v1':
 				$url = DI::basePath() . '/static/cid-v1.jsonld';
 				break;
@@ -249,7 +252,11 @@ class JsonLD
 		}
 
 		// Issue 14448: Peertube transmits an unexpected type and schema URL.
-		array_walk_recursive($json['@context'], function (&$value, $key): void {
+		$pixelfed = false;
+		array_walk_recursive($json['@context'], function (&$value, $key) use (&$pixelfed): void {
+			if (is_string($value) && str_contains($value, 'pixelfed.org/ns')) {
+				$pixelfed = true;
+			}
 			if ($key == '@type' && $value == '@json') {
 				DI::logger()->debug('"@json" converted to "@id"');
 				$value = '@id';
@@ -264,6 +271,11 @@ class JsonLD
 				$value = 'https://schema.org/docs/jsonldcontext.json#';
 			}
 		});
+
+		// Pixelfed transmits the country of a place without defining the term
+		if ($pixelfed && is_array($json['@context'])) {
+			$json['@context'][] = ['country' => 'http://schema.org#addressCountry'];
+		}
 
 		// Bookwyrm transmits "id" fields with "null", which isn't allowed.
 		array_walk_recursive($json, function (&$value, $key): void {

@@ -18,7 +18,9 @@ use Friendica\Core\Session\Type\Memory;
 use Friendica\Database\Database;
 use Friendica\Database\DBStructure;
 use Friendica\DI;
+use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
 use Friendica\Test\Util\Database\StaticDatabase;
+use Friendica\Test\Util\OfflineHttpClient;
 use Friendica\Test\Util\VFSTrait;
 
 trait FixtureTestTrait
@@ -50,6 +52,8 @@ trait FixtureTestTrait
 				'call'       => [['createConfigFileManager', [$this->root->url(), $this->root->url() . '/addon', $server,], Dice::CHAIN_CALL]]])
 			->addRule(Database::class, ['instanceOf' => $this->databaseClass, 'shared' => true])
 			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null])
+			// Fixture hosts like friendica.local don't exist, so never touch DNS or the network.
+			->addRule(ICanSendHttpRequests::class, ['instanceOf' => OfflineHttpClient::class, 'shared' => true, 'call' => null])
 			->addRule(Arguments::class, [
 				'instanceOf' => Arguments::class,
 				'call'       => [

@@ -128,6 +128,7 @@ final class BaseApiTest extends TestCase
 			self::createStub(LoggerInterface::class),
 			$baseUrl,
 			self::createStub(TwitterUser::class),
+			self::createStub(IManageConfigValues::class),
 		);
 
 		$module = new class (

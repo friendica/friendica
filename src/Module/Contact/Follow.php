@@ -15,6 +15,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
+use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
@@ -106,6 +107,10 @@ class Follow extends BaseModule
 			$submit = '';
 		}
 
+		if (empty(Contact::getByURL($url, false)) && empty(APContact::getByURL($url))) {
+			$this->followRemoteItem($url);
+		}
+
 		$contact = Contact::getByURL($url, true);
 
 		// Possibly it is a mail contact
@@ -157,12 +162,13 @@ class Follow extends BaseModule
 			'$submit'         => $submit,
 			'$cancel'         => $this->t('Cancel'),
 
-			'$action'   => $requestUrl,
-			'$name'     => $contact['name'],
-			'$url'      => Contact::getProfileLink($contact),
-			'$zrl'      => OpenWebAuth::getZrlUrl(Contact::getProfileLink($contact)),
-			'$myaddr'   => $myaddr,
-			'$keywords' => $contact['keywords'],
+			'$action'      => $requestUrl,
+			'$name'        => $contact['name'],
+			'$url'         => Contact::getProfileLink($contact),
+			'$contact_url' => $contact['url'],
+			'$zrl'         => OpenWebAuth::getZrlUrl(Contact::getProfileLink($contact)),
+			'$myaddr'      => $myaddr,
+			'$keywords'    => $contact['keywords'],
 
 			'$does_know_you' => ['knowyou', $this->t('%s knows you', $contact['name'])],
 			'$addnote_field' => ['dfrn-request-message', $this->t('Add a personal note:')],

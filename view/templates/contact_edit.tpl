@@ -76,7 +76,7 @@
 
 				<div id="contact-edit-end"></div>
 
-				{{include file="field_checkbox.tpl" field=$notify_new_posts}}
+				{{include file="field_select.tpl" field=$notify_new_posts}}
 
 			{{if $fetch_further_information}}
 				{{include file="field_select.tpl" field=$fetch_further_information}}

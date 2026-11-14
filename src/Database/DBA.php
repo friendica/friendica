@@ -34,6 +34,14 @@ class DBA
 	 */
 	public const NULL_DATETIME6 = '0001-01-01 00:00:00.000000';
 
+	/**
+	 * Highest possible datetime value
+	 *
+	 * @see https://mariadb.com/docs/server/reference/data-types/date-and-time-data-types/datetime
+	 * @see https://dev.mysql.com/doc/refman/8.0/en/datetime.html
+	 */
+	public const MAX_DATETIME = '9999-12-31 23:59:59';
+
 	public static function connect(): bool
 	{
 		return DI::dba()->connect();

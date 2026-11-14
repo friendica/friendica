@@ -10,6 +10,7 @@ namespace Friendica\Module\Debug;
 use Friendica\BaseModule;
 use Friendica\Core\Renderer;
 use Friendica\DI;
+use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
 use Friendica\Util\JsonLD;
 
@@ -23,6 +24,11 @@ class ActivityPubConversion extends BaseModule
 
 	protected function content(array $request = []): string
 	{
+		// Conversion fetches referenced actors and objects.
+		if (!DI::userSession()->getLocalUserId()) {
+			throw new HTTPException\ForbiddenException(DI::l10n()->t('Only logged in users are permitted to perform a conversion.'));
+		}
+
 		$results = [];
 
 		$visible_whitespace = function (string $s): string {

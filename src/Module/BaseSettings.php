@@ -110,6 +110,13 @@ class BaseSettings extends BaseModule
 		];
 
 		$tabs[] = [
+			'label'     => $this->t('External content'),
+			'url'       => 'settings/trustedhosts',
+			'selected'  => ($this instanceof Settings\TrustedHosts\Index) ? 'active' : '',
+			'accesskey' => '',
+		];
+
+		$tabs[] = [
 			'label'     => $this->t('Channels'),
 			'url'       => 'settings/channels',
 			'selected'  => ($this instanceof Settings\Channels) ? 'active' : '',
@@ -142,6 +149,13 @@ class BaseSettings extends BaseModule
 			'url'       => 'settings/oauth',
 			'selected'  => ($this instanceof Settings\OAuth) ? 'active' : '',
 			'accesskey' => 'b',
+		];
+
+		$tabs[] = [
+			'label'     => $this->t('Files'),
+			'url'       => 'settings/attachments',
+			'selected'  => ($this instanceof Settings\Attachments) ? 'active' : '',
+			'accesskey' => '',
 		];
 
 		$tabs[] = [

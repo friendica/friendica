@@ -13,6 +13,7 @@ use Friendica\App\Page;
 use Friendica\AppHelper;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Conversation\Collection\Timelines;
+use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Conversation\Entity\Channel;
 use Friendica\Content\Conversation\Entity\UserDefinedChannel;
 use Friendica\Content\Text\BBCode;
@@ -29,6 +30,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Event\DisplaySettingsPostEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Friendica\Model\Event;
 use Friendica\Model\Post\Engagement;
 use Friendica\Model\User;
 use Friendica\Module\BaseSettings;
@@ -96,36 +98,54 @@ class Display extends BaseSettings
 
 		$user = User::getById($uid);
 
-		$theme                   = trim($request['theme']);
-		$mobile_theme            = trim($request['mobile_theme'] ?? '');
-		$enable_smile            = (bool) $request['enable_smile'];
-		$enable_spa              = (bool) $request['enable_spa'];
-		$enable                  = (array) $request['enable'];
-		$bookmark                = (array) $request['bookmark'];
-		$channel_languages       = (array) $request['channel_languages'];
-		$timeline_channels       = isset($request['timeline_channels']) ? (array) $request['timeline_channels'] : null;
-		$filter_channels         = isset($request['filter_channels']) ? (array) $request['filter_channels'] : null;
-		$first_day_of_week       = (int) $request['first_day_of_week'];
-		$calendar_default_view   = trim($request['calendar_default_view']);
-		$infinite_scroll         = (bool) $request['infinite_scroll'];
-		$enable_smart_threading  = (bool) $request['enable_smart_threading'];
-		$enable_dislike          = (bool) $request['enable_dislike'];
-		$display_resharer        = (bool) $request['display_resharer'];
-		$stay_local              = (bool) $request['stay_local'];
-		$compact_timeline        = (bool) $request['compact_timeline'];
-		$hide_empty_descriptions = (bool) $request['hide_empty_descriptions'];
-		$hide_custom_emojis      = (bool) $request['hide_custom_emojis'];
-		$platform_icon_style     = (int) $request['platform_icon_style'];
-		$show_page_drop          = (bool) $request['show_page_drop'];
-		$display_eventlist       = (bool) $request['display_eventlist'];
-		$preview_mode            = (int) $request['preview_mode'];
-		$update_content          = (int) $request['update_content'];
-		$embed_remote_media      = (bool) $request['embed_remote_media'];
-		$embed_media             = (bool) $request['embed_media'];
-		$widget_timelineorder    = trim($request['widget_timelineorder']);
-		$menu_timelineorder      = trim($request['menu_timelineorder']);
-		$widget_timeline_reset   = (bool) $request['widget_timeline_reset'];
-		$menu_timeline_reset     = (bool) $request['menu_timeline_reset'];
+		$theme                    = trim($request['theme']);
+		$mobile_theme             = trim($request['mobile_theme'] ?? '');
+		$enable_smile             = (bool) $request['enable_smile'];
+		$enable_spa               = (bool) $request['enable_spa'];
+		$enable                   = (array) $request['enable'];
+		$bookmark                 = (array) $request['bookmark'];
+		$channel_languages        = (array) $request['channel_languages'];
+		$filter_timeline_language = (bool) $request['filter_timeline_language'];
+		$timeline_languages       = array_values(array_intersect((array) ($request['timeline_languages'] ?? []), array_keys($this->l10n->getLanguageCodes())));
+		$timeline_channels        = isset($request['timeline_channels']) ? (array) $request['timeline_channels'] : null;
+		$filter_channels          = isset($request['filter_channels']) ? (array) $request['filter_channels'] : null;
+		$first_day_of_week        = (int) $request['first_day_of_week'];
+		$calendar_default_view    = trim($request['calendar_default_view']);
+		$infinite_scroll          = (bool) $request['infinite_scroll'];
+		$enable_smart_threading   = (bool) $request['enable_smart_threading'];
+		$enable_dislike           = (bool) $request['enable_dislike'];
+		$display_resharer         = (bool) $request['display_resharer'];
+		$stay_local               = (bool) $request['stay_local'];
+		$compact_timeline         = ConversationRenderer::normalizeCommentsMode($request['compact_timeline']);
+		$click_to_display         = (bool) $request['click_to_display'];
+		$widgets_as_menu          = (bool) $request['widgets_as_menu'];
+		$hide_empty_descriptions  = (bool) $request['hide_empty_descriptions'];
+		$hide_custom_emojis       = (bool) $request['hide_custom_emojis'];
+		$platform_icon_style      = (int) $request['platform_icon_style'];
+		$show_page_drop           = (bool) $request['show_page_drop'];
+		$display_eventlist        = (bool) $request['display_eventlist'];
+		$preview_mode             = (int) $request['preview_mode'];
+		$update_content           = (int) $request['update_content'];
+		$embed_media              = (bool) $request['embed_media'];
+		$widget_timelineorder     = trim($request['widget_timelineorder']);
+		$menu_timelineorder       = trim($request['menu_timelineorder']);
+		$widget_timeline_reset    = (bool) $request['widget_timeline_reset'];
+		$menu_timeline_reset      = (bool) $request['menu_timeline_reset'];
+
+		$font = is_string($request['font'] ?? null) ? trim($request['font']) : '';
+		if (!in_array($font, Page::ACCESSIBILITY_FONTS, true)) {
+			$font = '';
+		}
+
+		$attachment_icons = is_string($request['attachment_icons'] ?? null) ? trim($request['attachment_icons']) : '';
+		if (!in_array($attachment_icons, Page::ACCESSIBILITY_ATTACHMENT_ICONS, true)) {
+			$attachment_icons = '';
+		}
+
+		$text_spacing = is_string($request['text_spacing'] ?? null) ? trim($request['text_spacing']) : '';
+		if (!in_array($text_spacing, Page::ACCESSIBILITY_TEXT_SPACINGS, true)) {
+			$text_spacing = '';
+		}
 
 		$enabled_timelines = [];
 		foreach ($enable as $code => $enabled) {
@@ -169,10 +189,11 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'display_resharer', $display_resharer);
 		$this->pConfig->set($uid, 'system', 'stay_local', $stay_local);
 		$this->pConfig->set($uid, 'system', 'compact_timeline', $compact_timeline);
+		$this->pConfig->set($uid, 'system', 'click_to_display', $click_to_display);
+		$this->pConfig->set($uid, 'system', 'widgets_as_menu', $widgets_as_menu);
 		$this->pConfig->set($uid, 'system', 'show_page_drop', $show_page_drop);
 		$this->pConfig->set($uid, 'system', 'display_eventlist', $display_eventlist);
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
-		$this->pConfig->set($uid, 'system', 'embed_remote_media', $embed_remote_media);
 		$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
 		if ($widget_timeline_reset) {
 			$this->pConfig->delete($uid, 'system', 'widget_timeline_order');
@@ -187,6 +208,10 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'network_timelines', $network_timelines);
 		$this->pConfig->set($uid, 'system', 'enabled_timelines', $enabled_timelines);
 		$this->pConfig->set($uid, 'channel', 'languages', $channel_languages);
+		$this->pConfig->set($uid, 'system', 'filter_timeline_language', $filter_timeline_language);
+		if ($filter_timeline_language) {
+			$this->pConfig->set($uid, 'system', 'timeline_languages', $timeline_languages);
+		}
 
 		if (!is_null($timeline_channels)) {
 			$this->pConfig->set($uid, 'channel', 'timeline_channels', $timeline_channels);
@@ -198,6 +223,13 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'accessibility', 'hide_empty_descriptions', $hide_empty_descriptions);
 		$this->pConfig->set($uid, 'accessibility', 'hide_custom_emojis', $hide_custom_emojis);
 		$this->pConfig->set($uid, 'accessibility', 'platform_icon_style', $platform_icon_style);
+		foreach (['font' => $font, 'text_spacing' => $text_spacing, 'attachment_icons' => $attachment_icons] as $key => $value) {
+			if ($value === '') {
+				$this->pConfig->delete($uid, 'accessibility', $key);
+			} else {
+				$this->pConfig->set($uid, 'accessibility', $key, $value);
+			}
+		}
 
 		$this->pConfig->set($uid, 'calendar', 'first_day_of_week', $first_day_of_week);
 		$this->pConfig->set($uid, 'calendar', 'default_view', $calendar_default_view);
@@ -274,7 +306,12 @@ class Display extends BaseSettings
 		$itemspage_mobile_network = intval($this->pConfig->get($uid, 'system', 'itemspage_mobile_network'));
 		$itemspage_mobile_network = (($itemspage_mobile_network > 0 && $itemspage_mobile_network < 101) ? $itemspage_mobile_network : $this->config->get('system', 'itemspage_network_mobile'));
 
-		$update_content         = $this->pConfig->get($uid, 'system', 'update_content') ?? false;
+		$update_content  = (int) $this->pConfig->get($uid, 'system', 'update_content');
+		$update_contents = [
+			0 => $this->t('Don\'t update'),
+			1 => $this->t('Update at the top of the page'),
+			2 => $this->t('Always update'),
+		];
 		$enable_smile           = !$this->pConfig->get($uid, 'system', 'no_smilies', false);
 		$enable_spa             = $this->pConfig->get($uid, 'system', 'enable_spa', false);
 		$infinite_scroll        = $this->pConfig->get($uid, 'system', 'infinite_scroll', true);
@@ -282,11 +319,17 @@ class Display extends BaseSettings
 		$enable_dislike         = !$this->pConfig->get($uid, 'system', 'hide_dislike', false);
 		$display_resharer       = $this->pConfig->get($uid, 'system', 'display_resharer', false);
 		$stay_local             = $this->pConfig->get($uid, 'system', 'stay_local', true);
-		$compact_timeline       = $this->pConfig->get($uid, 'system', 'compact_timeline', false);
-		$show_page_drop         = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
-		$display_eventlist      = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
-		$embed_remote_media     = $this->pConfig->get($uid, 'system', 'embed_remote_media', false);
-		$embed_media            = $this->pConfig->get($uid, 'system', 'embed_media', false);
+		$compact_timeline       = ConversationRenderer::normalizeCommentsMode($this->pConfig->get($uid, 'system', 'compact_timeline', ConversationRenderer::COMMENTS_MODE_ALL));
+		$comments_modes         = [
+			ConversationRenderer::COMMENTS_MODE_ALL     => $this->t('Show all comments'),
+			ConversationRenderer::COMMENTS_MODE_COMPACT => $this->t('Compact conversation view: only comments from the thread author and yourself that form coherent conversation threads'),
+			ConversationRenderer::COMMENTS_MODE_HIDDEN  => $this->t('Hide comments in feeds'),
+		];
+		$click_to_display  = $this->pConfig->get($uid, 'system', 'click_to_display', false);
+		$widgets_as_menu   = $this->pConfig->get($uid, 'system', 'widgets_as_menu', false);
+		$show_page_drop    = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
+		$display_eventlist = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
+		$embed_media       = $this->pConfig->get($uid, 'system', 'embed_media', false);
 
 		$hide_empty_descriptions = $this->pConfig->get($uid, 'accessibility', 'hide_empty_descriptions', false);
 		$hide_custom_emojis      = $this->pConfig->get($uid, 'accessibility', 'hide_custom_emojis', false);
@@ -299,6 +342,33 @@ class Display extends BaseSettings
 			ContactSelector::SVG_WHITE       => $this->t('White'),
 		];
 
+		$font_names = [
+			'opendyslexic'          => 'OpenDyslexic',
+			'atkinson-hyperlegible' => 'Atkinson Hyperlegible',
+			'lexend'                => 'Lexend',
+			'luciole'               => 'Luciole',
+			'andika'                => 'Andika',
+		];
+
+		$font  = $this->pConfig->get($uid, 'accessibility', 'font', '');
+		$fonts = ['' => $this->t('Theme default')];
+		foreach (Page::ACCESSIBILITY_FONTS as $font_key) {
+			$fonts[$font_key] = $font_names[$font_key];
+		}
+
+		$text_spacing  = $this->pConfig->get($uid, 'accessibility', 'text_spacing', '');
+		$text_spacings = [
+			''          => $this->t('Theme default'),
+			'increased' => $this->t('Increased'),
+			'large'     => $this->t('Large'),
+		];
+		$attachment_icons      = $this->pConfig->get($uid, 'accessibility', 'attachment_icons', '');
+		$attachment_icon_modes = [
+			''           => $this->t('Color'),
+			'monochrome' => $this->t('Monochrome'),
+			'none'       => $this->t('Disabled'),
+		];
+
 		$preview_mode  = $this->pConfig->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_AUTO);
 		$preview_modes = [
 			BBCode::PREVIEW_NONE     => $this->t('No preview'),
@@ -308,12 +378,14 @@ class Display extends BaseSettings
 			BBCode::PREVIEW_AUTO     => $this->t('Automatic image size'),
 		];
 
-		$bookmarked_timelines = $this->pConfig->get($uid, 'system', 'network_timelines', $this->getAvailableTimelines($uid, true)->column('code'));
-		$enabled_timelines    = $this->pConfig->get($uid, 'system', 'enabled_timelines', $this->getAvailableTimelines($uid, false)->column('code'));
-		$channel_languages    = User::getWantedLanguages($uid);
-		$languages            = $this->l10n->getLanguageCodes(true, true);
-		$timeline_channels    = $this->pConfig->get($uid, 'channel', 'timeline_channels') ?? [];
-		$filter_channels      = $this->pConfig->get($uid, 'channel', 'filter_channels')   ?? [];
+		$bookmarked_timelines     = $this->pConfig->get($uid, 'system', 'network_timelines', $this->getAvailableTimelines($uid, true)->column('code'));
+		$enabled_timelines        = $this->pConfig->get($uid, 'system', 'enabled_timelines', $this->getAvailableTimelines($uid, false)->column('code'));
+		$channel_languages        = User::getWantedLanguages($uid);
+		$languages                = $this->l10n->getLanguageCodes(true, true);
+		$filter_timeline_language = $this->pConfig->get($uid, 'system', 'filter_timeline_language', false);
+		$timeline_languages       = $this->pConfig->get($uid, 'system', 'timeline_languages') ?? [User::getLanguageCode($uid)];
+		$timeline_channels        = $this->pConfig->get($uid, 'channel', 'timeline_channels') ?? [];
+		$filter_channels          = $this->pConfig->get($uid, 'channel', 'filter_channels')   ?? [];
 
 		$channels = [];
 		if ($this->config->get('system', 'system_channel_cache')) {
@@ -421,12 +493,7 @@ class Display extends BaseSettings
 		];
 
 		$calendar_default_view = $this->pConfig->get($uid, 'calendar', 'default_view', 'month');
-		$calendarViews         = [
-			'month'      => $this->t('month'),
-			'agendaWeek' => $this->t('week'),
-			'agendaDay'  => $this->t('day'),
-			'listMonth'  => $this->t('list'),
-		];
+		$calendarViews         = Event::getCalendarViews();
 
 		$theme_config = '';
 		if ($themeconfigfile = Theme::getConfigFile($theme_selected)) {
@@ -465,23 +532,29 @@ class Display extends BaseSettings
 
 			'$itemspage_network'        => ['itemspage_network', $this->t('Number of items to display per page:'), $itemspage_network, $this->t('Maximum of 100 items')],
 			'$itemspage_mobile_network' => ['itemspage_mobile_network', $this->t('Number of items to display per page when viewed from mobile device:'), $itemspage_mobile_network, $this->t('Maximum of 100 items')],
-			'$update_content'           => ['update_content', $this->t('Regularly update the page content'), $update_content, $this->t('When enabled, new content on network, community and channels are added on top.')],
+			'$update_content'           => ['update_content', $this->t('Regularly update the timeline'), $update_content, $this->t('Controls whether new content on network, community and channels is added on top of the timeline. The display page is never updated automatically.'), $update_contents, false],
 			'$enable_smile'             => ['enable_smile', $this->t('Display emojis'), $enable_smile, $this->t('When enabled, emoticons are replaced with matching emojis.')],
-			'$enable_spa'               => ['enable_spa', $this->t('Enable SPA mode'), $enable_spa, $this->t('Warning - Experimental feature: This may lead to errors or unexpected behaviour. When enabled, supported page requests can use the single page application response.')],
+			'$enable_spa'               => ['enable_spa', $this->t('Enable SPA mode'), $enable_spa, $this->t('Warning - Experimental feature: This may lead to errors or unexpected behaviour. When enabled, supported pages are loaded by replacing only the main content instead of reloading the whole browser page, which makes navigation faster.')],
 			'$infinite_scroll'          => ['infinite_scroll', $this->t('Infinite scroll'), $infinite_scroll, $this->t('Automatic fetch new items when reaching the page end.')],
 			'$enable_smart_threading'   => ['enable_smart_threading', $this->t('Enable Smart Threading'), $enable_smart_threading, $this->t('Enable the automatic suppression of extraneous thread indentation.')],
 			'$enable_dislike'           => ['enable_dislike', $this->t('Display the Dislike feature'), $enable_dislike, $this->t('Display the Dislike button and dislike reactions on posts and comments.')],
 			'$display_resharer'         => ['display_resharer', $this->t('Display the resharer'), $display_resharer, $this->t('Display the first resharer as icon and text on a reshared item.')],
 			'$stay_local'               => ['stay_local', $this->t('Stay local'), $stay_local, $this->t("Don't go to a remote system when following a contact link.")],
-			'$compact_timeline'         => ['compact_timeline', $this->t('Compact conversation view'), $compact_timeline, $this->t('Show only comments from the thread author and yourself that form coherent conversation threads. Hides replies to filtered-out comments.')],
+			'$compact_timeline'         => ['compact_timeline', $this->t('Comments in timelines'), $compact_timeline, $this->t('Controls which comments are shown below posts on all pages that list posts, like timelines, profiles and contact pages. "Compact conversation view" hides replies to filtered-out comments, "Hide comments in feeds" shows no comments at all. Single post pages always show the full conversation.'), $comments_modes, false],
+			'$click_to_display'         => ['click_to_display', $this->t('Open the post when clicking it'), $click_to_display, $this->t('Clicking the text of a post opens its own page. This applies to feeds with compact or hidden comments and to lists that never show comments, like search results and contact posts.')],
+			'$widgets_as_menu'          => ['widgets_as_menu', $this->t('Show circles, channels, tags and folders as a menu'), $widgets_as_menu, $this->t('Instead of expandable widgets in the sidebar, these entries are shown as a menu at the top of the sidebar. Each entry opens an overview page.')],
 			'$show_page_drop'           => ['show_page_drop', $this->t('Show the post deletion checkbox'), $show_page_drop, $this->t("Display the checkbox for the post deletion on the network page.")],
 			'$display_eventlist'        => ['display_eventlist', $this->t('Display the event list'), $display_eventlist, $this->t("Display the birthday reminder and event list on the network page.")],
 			'$preview_mode'             => ['preview_mode', $this->t('Link preview mode'), $preview_mode, $this->t('Appearance of the link preview that is added to each post with a link.'), $preview_modes, false],
 			'$hide_empty_descriptions'  => ['hide_empty_descriptions', $this->t('Hide pictures with empty alternative text'), $hide_empty_descriptions, $this->t("Don't display pictures that are missing the alternative text.")],
 			'$hide_custom_emojis'       => ['hide_custom_emojis', $this->t('Hide custom emojis'), $hide_custom_emojis, $this->t("Don't display custom emojis.")],
 			'$platform_icon_style'      => ['platform_icon_style', $this->t('Platform icons style'), $platform_icon_style, $this->t('Style of the platform icons'), $platform_icon_styles, false],
-			'$embed_remote_media'       => ['embed_remote_media', $this->t('Embed remote media'), $embed_remote_media, $this->t('When enabled, remote media will be embedded in the post, like for example YouTube videos.')],
+			'$font'                     => ['font', $this->t('Font'), $font, $this->t('Replace the font of the theme with a font that is easier to read. OpenDyslexic is designed for people with dyslexia, Atkinson Hyperlegible and Luciole for people with low vision, Lexend for a smoother reading flow, Andika for beginning readers.'), $fonts, false],
+			'$text_spacing'             => ['text_spacing', $this->t('Text spacing'), $text_spacing, $this->t('Increase the spacing between letters, words and lines to make texts easier to read. "Large" corresponds to the text spacing values of WCAG 2.1 success criterion 1.4.12.'), $text_spacings, false],
+			'$attachment_icons'         => ['attachment_icons', $this->t('Attachment icons style'), $attachment_icons, $this->t('Style of the file attachment icons'), $attachment_icon_modes, false],
 			'$embed_media'              => ['embed_media', $this->t('Embed supported media'), $embed_media, $this->t('When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos.')],
+			'$filter_timeline_language' => ['filter_timeline_language', $this->t('Filter timeline by language'), $filter_timeline_language, $this->t('When enabled, only posts in the selected languages are shown in the network timeline.')],
+			'$timeline_languages'       => ['timeline_languages[]', $this->t('Timeline languages:'), $timeline_languages, $this->t('Select all the languages you want to see in your timelines. "Undetermined" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language).'), $languages, 'multiple'],
 
 			'$timeline_label'       => $this->t('Label'),
 			'$timeline_descriptiom' => $this->t('Description'),
@@ -497,7 +570,7 @@ class Display extends BaseSettings
 			'$has_filter_channels'   => !empty($filter),
 
 			'$first_day_of_week'     => ['first_day_of_week', $this->t('Beginning of week:'), $first_day_of_week, '', $weekdays, false],
-			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, '', $calendarViews, false],
+			'$calendar_default_view' => ['calendar_default_view', $this->t('Default calendar view:'), $calendar_default_view, $this->t('This setting is also updated whenever you switch the view in your calendar.'), $calendarViews, false],
 		]);
 	}
 

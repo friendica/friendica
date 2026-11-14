@@ -7,6 +7,7 @@
 
 namespace Friendica\Test\src\Core\Cache;
 
+use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\Cache\Type\DatabaseCache;
 use Friendica\Test\CacheTestCase;
 use Friendica\Test\DatabaseTestTrait;
@@ -41,5 +42,15 @@ class DatabaseCacheTest extends CacheTestCase
 		$this->tearDownDb();
 
 		parent::tearDown();
+	}
+
+	public function testInfiniteTtlIsStoredAndSurvivesClearingOutdated(): void
+	{
+		self::assertTrue($this->instance->set('infinite', 'value', Duration::INFINITE));
+		self::assertSame('value', $this->instance->get('infinite'));
+		self::assertContains('infinite', $this->instance->getAllKeys());
+
+		self::assertTrue($this->instance->clear());
+		self::assertSame('value', $this->instance->get('infinite'));
 	}
 }

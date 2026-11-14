@@ -117,7 +117,7 @@ class UserNotification
 	{
 		$fields = ['id', 'uri-id', 'parent-uri-id', 'uid', 'body', 'parent', 'gravity', 'vid', 'gravity',
 			'contact-id', 'author-id', 'author-gsid', 'owner-id', 'owner-gsid', 'causer-id', 'causer-gsid',
-			'private', 'thr-parent', 'thr-parent-id', 'parent-uri-id', 'parent-uri', 'verb'];
+			'private', 'thr-parent', 'thr-parent-id', 'parent-uri-id', 'parent-uri', 'verb', 'quote-uri-id'];
 		$item = Post::selectFirst($fields, ['uri-id' => $uri_id, 'uid' => $uid, 'origin' => false]);
 		if (!DBA::isResult($item)) {
 			return;
@@ -174,6 +174,10 @@ class UserNotification
 			}
 			if (Contact\User::isBlocked($author_id, $uid) || Contact\User::isIgnored($author_id, $uid) || Contact\User::isCollapsed($author_id, $uid)) {
 				DI::logger()->debug('Author is blocked/ignored/collapsed by user', ['uid' => $uid, 'author' => $author_id, 'uri-id' => $item['uri-id']]);
+				return;
+			}
+			if (Contact\User::isIsBlocked($author_id, $uid)) {
+				DI::logger()->debug('Author blocked the user', ['uid' => $uid, 'author' => $author_id, 'uri-id' => $item['uri-id']]);
 				return;
 			}
 		}
@@ -264,7 +268,7 @@ class UserNotification
 			}
 		}
 
-		if (($item['verb'] != Activity::ANNOUNCE) && self::checkCommentedThread($item, $contacts)) {
+		if (($item['verb'] != Activity::ANNOUNCE) && self::checkCommentedThread($item, $contacts, $uid)) {
 			$notification_type = $notification_type | self::TYPE_THREAD_COMMENT;
 			if (!$notified) {
 				self::insertNotificationByItem(self::TYPE_THREAD_COMMENT, $uid, $item);
@@ -272,7 +276,7 @@ class UserNotification
 			}
 		}
 
-		if (($item['verb'] != Activity::ANNOUNCE) && self::checkCommentedParticipation($item, $contacts)) {
+		if (($item['verb'] != Activity::ANNOUNCE) && self::checkCommentedParticipation($item, $contacts, $uid)) {
 			$notification_type = $notification_type | self::TYPE_COMMENT_PARTICIPATION;
 			if (!$notified) {
 				self::insertNotificationByItem(self::TYPE_COMMENT_PARTICIPATION, $uid, $item);
@@ -288,7 +292,7 @@ class UserNotification
 			}
 		}
 
-		if (($item['verb'] != Activity::ANNOUNCE) && self::checkFollowParticipation($item, $contacts)) {
+		if (($item['verb'] != Activity::ANNOUNCE) && self::checkFollowParticipation($item, $contacts, $uid)) {
 			$notification_type = $notification_type | self::TYPE_FOLLOW;
 			if (!$notified) {
 				self::insertNotificationByItem(self::TYPE_FOLLOW, $uid, $item);
@@ -296,7 +300,7 @@ class UserNotification
 			}
 		}
 
-		if (($item['verb'] != Activity::ANNOUNCE) && self::checkActivityParticipation($item, $contacts)) {
+		if (($item['verb'] != Activity::ANNOUNCE) && self::checkActivityParticipation($item, $contacts, $uid)) {
 			$notification_type = $notification_type | self::TYPE_ACTIVITY_PARTICIPATION;
 			if (!$notified) {
 				self::insertNotificationByItem(self::TYPE_ACTIVITY_PARTICIPATION, $uid, $item);
@@ -426,6 +430,12 @@ class UserNotification
 			return false;
 		}
 
+		// Don't notify twice about the same post, e.g. when a community has posted and announced it
+		$target = ($item['gravity'] === Item::GRAVITY_ACTIVITY) ? $item['thr-parent-id'] : $item['uri-id'];
+		if (DI::notification()->existsForUser($uid, ['type' => self::TYPE_SHARED, 'target-uri-id' => $target])) {
+			return false;
+		}
+
 		// Don't notify about reshares by communities of our own posts or each time someone comments
 		if (($item['verb'] == Activity::ANNOUNCE) && DBA::exists('contact', ['id' => $item['contact-id'], 'contact-type' => Contact::TYPE_COMMUNITY])) {
 			$post = Post::selectFirst(['origin', 'gravity'], ['uri-id' => $item['thr-parent-id'], 'uid' => $uid]);
@@ -436,12 +446,18 @@ class UserNotification
 
 		// Only check on posts by the user itself
 		$cdata = Contact::getPublicAndUserContactID($item['contact-id'], $item['uid']);
-		if (empty($cdata['user']) || ($item['author-id'] != $cdata['public'])) {
+		if (empty($cdata['user']) || !in_array($cdata['public'], [$item['author-id'], $item['owner-id']])) {
 			return false;
 		}
 
 		// Check if the contact posted or shared something directly
-		if (DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => true])) {
+		// Diaspora reshares arrive as a post with an empty body that quotes the original post
+		$is_reshare = ($item['verb'] == Activity::ANNOUNCE) || (empty($item['body']) && !empty($item['quote-uri-id']));
+
+		$notify_new_posts   = [Contact::NOTIFY_NEW_POSTS_ALL];
+		$notify_new_posts[] = $is_reshare ? Contact::NOTIFY_NEW_POSTS_SHARES : Contact::NOTIFY_NEW_POSTS_POSTS;
+
+		if (DBA::exists('contact', ['id' => $item['contact-id'], 'notify_new_posts' => $notify_new_posts])) {
 			return true;
 		}
 
@@ -497,12 +513,14 @@ class UserNotification
 	 *
 	 * @param array $item
 	 * @param array $contacts Array of contact IDs
+	 * @param int   $uid User ID
 	 * @return bool The user had created this thread
 	 * @throws Exception
 	 */
-	private static function checkCommentedThread(array $item, array $contacts): bool
+	private static function checkCommentedThread(array $item, array $contacts, int $uid): bool
 	{
-		$condition = ['parent' => $item['parent'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => Item::GRAVITY_PARENT];
+		$condition = ['parent-uri-id' => $item['parent-uri-id'], 'uid' => $uid, 'author-id' => $contacts, 'deleted' => false, 'gravity' => Item::GRAVITY_PARENT];
+		$condition = DBA::mergeConditions($condition, ["`uri-id` != ?", $item['uri-id']]);
 		return Post::exists($condition);
 	}
 
@@ -539,12 +557,14 @@ class UserNotification
 	 *
 	 * @param array $item
 	 * @param array $contacts Array of contact IDs
+	 * @param int   $uid User ID
 	 * @return bool The user had commented in the thread
 	 * @throws Exception
 	 */
-	private static function checkCommentedParticipation(array $item, array $contacts): bool
+	private static function checkCommentedParticipation(array $item, array $contacts, int $uid): bool
 	{
-		$condition = ['parent' => $item['parent'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => Item::GRAVITY_COMMENT];
+		$condition = ['parent-uri-id' => $item['parent-uri-id'], 'uid' => $uid, 'author-id' => $contacts, 'deleted' => false, 'gravity' => Item::GRAVITY_COMMENT];
+		$condition = DBA::mergeConditions($condition, ["`uri-id` != ?", $item['uri-id']]);
 		return Post::exists($condition);
 	}
 
@@ -553,12 +573,13 @@ class UserNotification
 	 *
 	 * @param array $item
 	 * @param array $contacts Array of contact IDs
+	 * @param int   $uid User ID
 	 * @return bool The user follows the thread
 	 * @throws Exception
 	 */
-	private static function checkFollowParticipation(array $item, array $contacts): bool
+	private static function checkFollowParticipation(array $item, array $contacts, int $uid): bool
 	{
-		$condition = ['parent' => $item['parent'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => Activity::FOLLOW];
+		$condition = ['parent-uri-id' => $item['parent-uri-id'], 'uid' => $uid, 'author-id' => $contacts, 'deleted' => false, 'gravity' => Item::GRAVITY_ACTIVITY, 'verb' => Activity::FOLLOW];
 		return Post::exists($condition);
 	}
 
@@ -567,12 +588,14 @@ class UserNotification
 	 *
 	 * @param array $item
 	 * @param array $contacts Array of contact IDs
+	 * @param int   $uid User ID
 	 * @return bool The user had interacted in the thread
 	 * @throws Exception
 	 */
-	private static function checkActivityParticipation(array $item, array $contacts): bool
+	private static function checkActivityParticipation(array $item, array $contacts, int $uid): bool
 	{
-		$condition = ['parent' => $item['parent'], 'author-id' => $contacts, 'deleted' => false, 'gravity' => Item::GRAVITY_ACTIVITY];
+		$condition = ['parent-uri-id' => $item['parent-uri-id'], 'uid' => $uid, 'author-id' => $contacts, 'deleted' => false, 'gravity' => Item::GRAVITY_ACTIVITY];
+		$condition = DBA::mergeConditions($condition, ["NOT `verb` IN (?, ?, ?) AND `uri-id` != ?", Activity::FOLLOW, Activity::VIEW, Activity::READ, $item['uri-id']]);
 		return Post::exists($condition);
 	}
 

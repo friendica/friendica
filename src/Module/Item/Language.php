@@ -17,16 +17,18 @@ use Friendica\Model\Post;
 use Friendica\Module\Api\ApiResponse;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Profiler;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Return the language of a given item uri-id
+ * Return the language of a given item uri-id, or, without an id, detect the
+ * language of a text that is still being composed.
  */
 class Language extends BaseModule
 {
-	public function __construct(private readonly ContentItem $item, private readonly IHandleUserSessions $session, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	public function __construct(private readonly ContentItem $item, private readonly IHandleUserSessions $session, EventDispatcherInterface $eventDispatcher, L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
 	{
-		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters, $eventDispatcher);
 	}
 
 	protected function rawContent(array $request = [])
@@ -36,7 +38,9 @@ class Language extends BaseModule
 		}
 
 		if (empty($this->parameters['id'])) {
-			throw new HTTPException\BadRequestException();
+			$languages = $this->item->getLanguageArray((string) ($request['body'] ?? ''), 1);
+			$lang      = array_key_first($languages);
+			$this->earlyJsonExit(['lang' => $lang]);
 		}
 
 		$item = Post::selectFirstForUser($this->session->getLocalUserId(), ['language'], ['uid' => [0, $this->session->getLocalUserId()], 'uri-id' => $this->parameters['id']]);

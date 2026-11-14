@@ -54,6 +54,9 @@ class User
 	 *
 	 * @{
 	 */
+	/** Personal config and session key of the random value that a password change renews */
+	public const PASSWORD_GENERATION = 'password_generation';
+
 	public const PAGE_FLAGS_NORMAL    = 0;
 	public const PAGE_FLAGS_SOAPBOX   = 1;
 	public const PAGE_FLAGS_COMMUNITY = 2;
@@ -161,7 +164,9 @@ class User
 			}
 		}
 
-		$system['name']         = App::PLATFORM . " '" . App::CODENAME . "' " . App::VERSION . '-' . DB_UPDATE_VERSION;
+		self::repairSystemContact($system);
+
+		$system['name']         = App::PLATFORM . " '" . App::CODENAME . "' " . App::version() . '-' . DB_UPDATE_VERSION;
 		$system['uprvkey']      = $system['prvkey'];
 		$system['upubkey']      = $system['pubkey'];
 		$system['nickname']     = $system['nick'];
@@ -211,6 +216,59 @@ class User
 	}
 
 	/**
+	 * Fetch the contact fields of the system account that depend on the host name
+	 *
+	 * @param array $system System contact (needs at least the nick)
+	 * @return array Fields, empty when the host name can't be detected
+	 */
+	private static function getSystemContactHostFields(array $system): array
+	{
+		$host = DI::baseUrl()->getHost();
+		if (empty($host) || empty($system['nick'])) {
+			DI::logger()->notice('Host name or actor name is missing, host dependent fields of the system contact are not filled.', ['host' => $host, 'nick' => $system['nick'] ?? '']);
+			return [];
+		}
+
+		$url    = DI::baseUrl() . '/friendica';
+		$avatar = Contact::getDefaultAvatar($system, Proxy::SIZE_SMALL);
+
+		return [
+			'addr'    => $system['nick'] . '@' . $host,
+			'url'     => $url,
+			'nurl'    => Strings::normaliseLink($url),
+			'uri-id'  => ItemURI::getIdByURI($url),
+			'baseurl' => (string) DI::baseUrl(),
+			'avatar'  => $avatar,
+			'photo'   => $avatar,
+			'thumb'   => Contact::getDefaultAvatar($system, Proxy::SIZE_THUMB),
+			'micro'   => Contact::getDefaultAvatar($system, Proxy::SIZE_MICRO),
+			'gsid'    => GServer::getRealID((string) DI::baseUrl()),
+		];
+	}
+
+	/**
+	 * Correct missing or wrong data of the system contact
+	 *
+	 * @param array $system System contact; it is updated by reference
+	 */
+	private static function repairSystemContact(array &$system)
+	{
+		$repair = array_diff_assoc(self::getSystemContactHostFields($system), $system);
+		if (empty($repair)) {
+			return;
+		}
+
+		DI::logger()->notice('Repair the system contact', ['id' => $system['id'], 'old' => array_intersect_key($system, $repair), 'new' => $repair]);
+		Contact::update($repair, ['id' => $system['id']]);
+
+		if (isset($repair['uri-id'])) {
+			DBA::update('account-user', ['uri-id' => $repair['uri-id']], ['uid' => 0, 'uri-id' => $system['uri-id']]);
+		}
+
+		$system = array_merge($system, $repair);
+	}
+
+	/**
 	 * Create the system account
 	 *
 	 * @return int
@@ -235,9 +293,7 @@ class User
 			'self'         => true,
 			'network'      => Protocol::ACTIVITYPUB,
 			'name'         => 'System Account',
-			'addr'         => $system_actor_name . '@' . DI::baseUrl()->getHost(),
 			'nick'         => $system_actor_name,
-			'url'          => DI::baseUrl() . '/friendica',
 			'pubkey'       => $keys['pubkey'],
 			'prvkey'       => $keys['prvkey'],
 			'blocked'      => 0,
@@ -247,14 +303,11 @@ class User
 			'uri-date'     => DateTimeFormat::utcNow(),
 			'avatar-date'  => DateTimeFormat::utcNow(),
 			'closeness'    => 0,
-			'baseurl'      => DI::baseUrl(),
 		];
 
-		$system['avatar'] = $system['photo'] = Contact::getDefaultAvatar($system, Proxy::SIZE_SMALL);
-		$system['thumb']  = Contact::getDefaultAvatar($system, Proxy::SIZE_THUMB);
-		$system['micro']  = Contact::getDefaultAvatar($system, Proxy::SIZE_MICRO);
-		$system['nurl']   = Strings::normaliseLink($system['url']);
-		$system['gsid']   = GServer::getRealID($system['baseurl']);
+		// The fields that depend on the host name are only filled when the host name is known.
+		// Otherwise they are added by "repairSystemContact" as soon as possible.
+		$system = array_merge($system, self::getSystemContactHostFields($system));
 
 		DI::logger()->info('System account to be created', ['account' => $system]);
 		return Contact::insert($system);
@@ -271,7 +324,7 @@ class User
 		$systemuser        = DBA::selectFirst('user', ['nickname'], ['uid' => 0]);
 		$system_actor_name = DI::config()->get('system', 'actor_name');
 
-		if (isset($systemuser['nickname'])) {
+		if (!empty($systemuser['nickname'])) {
 			if ($system_actor_name != $systemuser['nickname']) {
 				DI::logger()->notice('Set the actor name to the system user name', ['name' => $systemuser['nickname'], 'systemactor' => $system_actor_name]);
 				DI::config()->set('system', 'actor_name', $systemuser['nickname']);
@@ -281,7 +334,7 @@ class User
 			return $systemuser['nickname'];
 		}
 
-		if (isset($self['nick'])) {
+		if (!empty($self['nick'])) {
 			if ($system_actor_name != $self['nick']) {
 				DI::logger()->notice('Set the actor name to the system contact name', ['name' => $self['nick'], 'systemactor' => $system_actor_name]);
 				DI::config()->set('system', 'actor_name', $self['nick']);
@@ -291,7 +344,7 @@ class User
 			return $self['nick'];
 		}
 
-		if (isset($system_actor_name)) {
+		if (!empty($system_actor_name)) {
 			DI::logger()->notice('Use the stored system actor name', ['systemactor' => $system_actor_name]);
 			return $system_actor_name;
 		}
@@ -674,7 +727,7 @@ class User
 			if (!in_array($channel['uid'], $uids)) {
 				continue;
 			}
-			$values = unserialize($channel['v']);
+			$values = unserialize($channel['v'], ['allowed_classes' => false]);
 			if (!empty($values) && is_array($values)) {
 				foreach ($values as $language) {
 					$language             = DI::l10n()->toISO6391($language);
@@ -1000,7 +1053,60 @@ class User
 			throw new Exception(DI::l10n()->t("The password can't contain white spaces nor accentuated letters"));
 		}
 
-		return self::updatePasswordHashed($uid, self::hashPassword($password));
+		if (!self::updatePasswordHashed($uid, self::hashPassword($password))) {
+			return false;
+		}
+
+		// Sessions with another generation are logged out, only the current session stays valid
+		$generation = Strings::getRandomHex(16);
+		DI::pConfig()->set($uid, 'system', self::PASSWORD_GENERATION, $generation);
+		if (DI::userSession()->getLocalUserId() === $uid) {
+			DI::userSession()->set(self::PASSWORD_GENERATION, $generation);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns the account a password reset can be requested for
+	 *
+	 * @param string $login Email address or nickname
+	 * @return array{uid: int, username: string, nickname: string, email: string, language: string}|null
+	 */
+	public static function getForPasswordReset(string $login): ?array
+	{
+		$condition = ['(`email` = ? OR `nickname` = ?) AND `verified` AND NOT `blocked` AND NOT `account_removed` AND NOT `account_expired`', $login, $login];
+		$user      = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'language'], $condition);
+
+		return DBA::isResult($user) ? $user : null;
+	}
+
+	/**
+	 * Returns the account a password reset token belongs to
+	 *
+	 * @return array{uid: int, username: string, nickname: string, email: string, pwdreset_time: string, language: string}|null
+	 */
+	public static function getByPasswordResetToken(string $tokenHash): ?array
+	{
+		$user = DBA::selectFirst('user', ['uid', 'username', 'nickname', 'email', 'pwdreset_time', 'language'], ['pwdreset' => $tokenHash]);
+
+		return DBA::isResult($user) ? $user : null;
+	}
+
+	/**
+	 * Removes the password reset token of an account
+	 */
+	public static function clearPasswordResetToken(int $uid): bool
+	{
+		return DBA::update('user', ['pwdreset' => null, 'pwdreset_time' => null], ['uid' => $uid]);
+	}
+
+	/**
+	 * Stores the hash of a new password reset token
+	 */
+	public static function setPasswordResetToken(int $uid, string $tokenHash): bool
+	{
+		return DBA::update('user', ['pwdreset' => $tokenHash, 'pwdreset_time' => DateTimeFormat::utcNow()], ['uid' => $uid]);
 	}
 
 	/**
@@ -1205,7 +1311,8 @@ class User
 		$confirm    = !empty($data['confirm'])    ? trim((string) $data['confirm'])    : '';
 		$blocked    = !empty($data['blocked']);
 		$verified   = !empty($data['verified']);
-		$language   = !empty($data['language'])   ? trim((string) $data['language'])   : 'en';
+		$language   = !empty($data['language'])   ? L10n::toDirectoryName((string) $data['language']) : 'en';
+		$timezone   = !empty($data['timezone'])   ? trim((string) $data['timezone'])   : DI::config()->get('system', 'default_timezone', 'UTC');
 
 		$netpublish = $publish = !empty($data['profile_publish_reg']);
 
@@ -1288,8 +1395,8 @@ class User
 			}
 		}
 
-		if (!Network::isEmailDomainAllowed($email)) {
-			throw new Exception(DI::l10n()->t('Your email domain is not among those allowed on this site.'));
+		if (!Network::isEmailDomainAllowed($email) || !Network::isEmailAddressAllowed($email)) {
+			throw new Exception(DI::l10n()->t('This email address cannot be used for a registration on this site.'));
 		}
 
 		if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !Network::isEmailDomainValid($email)) {
@@ -1348,7 +1455,7 @@ class User
 			'verified'         => $verified,
 			'blocked'          => $blocked,
 			'language'         => $language,
-			'timezone'         => 'UTC',
+			'timezone'         => $timezone,
 			'register_date'    => DateTimeFormat::utcNow(),
 			'default-location' => '',
 		]);
@@ -2055,7 +2162,7 @@ class User
 	 */
 	public static function getAdminEmailList(): array
 	{
-		$adminEmails = strtolower(str_replace(' ', '', DI::config()->get('config', 'admin_email')));
+		$adminEmails = strtolower(str_replace(' ', '', DI::config()->get('config', 'admin_email') ?? ''));
 		if (!$adminEmails) {
 			return [];
 		}

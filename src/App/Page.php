@@ -13,6 +13,7 @@ use DOMXPath;
 use Friendica\App;
 use Friendica\AppHelper;
 use Friendica\Content\Nav;
+use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
@@ -44,6 +45,18 @@ use Psr\Http\Message\ResponseInterface;
  */
 class Page implements ArrayAccess
 {
+	/**
+	 * @var string[] Fonts a user can select in the accessibility settings, each backed by view/fonts/accessibility/<name>.css
+	 */
+	public const ACCESSIBILITY_FONTS = ['opendyslexic', 'atkinson-hyperlegible', 'lexend', 'luciole', 'andika'];
+
+	/**
+	 * @var string[] Text spacings a user can select in the accessibility settings, each backed by view/accessibility/text-spacing-<name>.css
+	 */
+	public const ACCESSIBILITY_TEXT_SPACINGS = ['increased', 'large'];
+
+	public const ACCESSIBILITY_ATTACHMENT_ICONS = ['monochrome', 'none'];
+
 	/**
 	 * @var array Contains all stylesheets, which should get loaded during page
 	 */
@@ -158,7 +171,7 @@ class Page implements ArrayAccess
 	 */
 	public function registerStylesheet(string $path, string $media = 'screen')
 	{
-		$path = Network::appendQueryParam($path, ['v' => App::VERSION]);
+		$path = Network::appendQueryParam($path, ['v' => App::version()]);
 
 		if (mb_strpos($path, $this->basePath . DIRECTORY_SEPARATOR) === 0) {
 			$path = mb_substr($path, mb_strlen($this->basePath . DIRECTORY_SEPARATOR));
@@ -257,13 +270,29 @@ class Page implements ArrayAccess
 			],
 
 			'$local_user'     => $localUID,
-			'$generator'      => 'Friendica' . ' ' . App::VERSION,
+			'$generator'      => 'Friendica' . ' ' . App::version(),
 			'$update_content' => (int) $pConfig->get($localUID, 'system', 'update_content'),
-			'$shortcut_icon'  => $shortcut_icon,
-			'$touch_icon'     => $touch_icon,
-			'$block_public'   => intval($config->get('system', 'block_public')),
-			'$stylesheets'    => $this->stylesheets,
-			'$loading'        => [
+			'$spa_mode'       => ($_GET['mode'] ?? '') === 'column' ? 0 : (int) $pConfig->get($localUID, 'system', 'enable_spa'),
+			'$spa_router_ts'  => $this->getSpaModuleTimestamp(),
+			'$emoji_l10n'     => json_encode([
+				'search'        => $l10n->t('Search'),
+				'skintone'      => $l10n->t('Skin tone'),
+				'Frequent'      => $l10n->t('Frequently used'),
+				'Smileys'       => $l10n->t('Smileys & Emotion'),
+				'People'        => $l10n->t('People & Body'),
+				'Nature'        => $l10n->t('Animals & Nature'),
+				'Food-dring'    => $l10n->t('Food & Drink'),
+				'Activity'      => $l10n->t('Activities'),
+				'Travel-places' => $l10n->t('Travel & Places'),
+				'Objects'       => $l10n->t('Objects'),
+				'Symbols'       => $l10n->t('Symbols'),
+				'Flags'         => $l10n->t('Flags'),
+			], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT),
+			'$shortcut_icon' => $shortcut_icon,
+			'$touch_icon'    => $touch_icon,
+			'$block_public'  => intval($config->get('system', 'block_public')),
+			'$stylesheets'   => $this->stylesheets,
+			'$loading'       => [
 				'fetching'            => $l10n->t('Fetching...'),
 				'receiving'           => $l10n->t('Receiving data...'),
 				'processing'          => $l10n->t('Processing...'),
@@ -274,7 +303,6 @@ class Page implements ArrayAccess
 			'$spaErrors' => [
 				'timeout'         => $l10n->t('Timeout'),
 				'timeout_message' => $l10n->t('The request took too long. Please try again.'),
-				'close'           => $l10n->t('Close'),
 				'delay_title'     => $l10n->t('Please wait'),
 			],
 
@@ -283,8 +311,20 @@ class Page implements ArrayAccess
 
 		]) . $this->page['htmlhead'];
 
+		$font = $pConfig->get($localUID, 'accessibility', 'font');
+		if (in_array($font, self::ACCESSIBILITY_FONTS, true)) {
+			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/fonts/accessibility/' . $font . '.css?v=' . App::version() . '" type="text/css" media="all" />' . "\n";
+		}
+		$text_spacing = $pConfig->get($localUID, 'accessibility', 'text_spacing');
+		if (in_array($text_spacing, self::ACCESSIBILITY_TEXT_SPACINGS, true)) {
+			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/accessibility/text-spacing-' . $text_spacing . '.css?v=' . App::version() . '" type="text/css" media="all" />' . "\n";
+		}
 		if ($pConfig->get($localUID, 'accessibility', 'hide_empty_descriptions')) {
 			$this->page['htmlhead'] .= "<style>a[data-alt='']{display:none;} a:has(.empty-description){display:none;} .empty-description {display: none;}</style>\n";
+		}
+		$attachment_icons = $pConfig->get($localUID, 'accessibility', 'attachment_icons');
+		if (in_array($attachment_icons, self::ACCESSIBILITY_ATTACHMENT_ICONS, true)) {
+			$this->page['htmlhead'] .= '<link rel="stylesheet" href="view/accessibility/attachment-icons-' . $attachment_icons . '.css?v=' . App::version() . '" type="text/css" media="all" />' . "\n";
 		}
 		if ($pConfig->get($localUID, 'accessibility', 'hide_custom_emojis')) {
 			$this->page['htmlhead'] .= "<style>span.emoji.mastodon img {display: none;}</style>\n";
@@ -400,11 +440,23 @@ class Page implements ArrayAccess
 	 */
 	public function registerFooterScript($path)
 	{
-		$path = Network::appendQueryParam($path, ['v' => App::VERSION]);
+		$path = Network::appendQueryParam($path, ['v' => App::version()]);
 
 		$url = str_replace($this->basePath . DIRECTORY_SEPARATOR, '', $path);
 
 		$this->footerScripts[] = trim($url, '/');
+	}
+
+	/**
+	 * Get the directory modification timestamp combined with the application version.
+	 * This ensures that changes to any SPA module file (which affects directory timestamp)
+	 * or version changes trigger a reload.
+	 *
+	 * @return string
+	 */
+	private function getSpaModuleTimestamp(): string
+	{
+		return (filemtime($this->basePath . '/view/js/spa') ?: 0) . '-' . App::version();
 	}
 
 	/**
@@ -496,10 +548,12 @@ class Page implements ArrayAccess
 			$target = new DOMDocument();
 			$target->loadXML("<root></root>");
 
-			$content = mb_convert_encoding($this->page["content"], 'HTML-ENTITIES', "UTF-8");
+			$content = HTML::toNumericEntities($this->page["content"]);
 
-			/// @TODO one day, kill those error-suppressing @ stuff, or PHP should ban it
-			@$doc->loadHTML($content);
+			if ($content !== '') {
+				/// @TODO one day, kill those error-suppressing @ stuff, or PHP should ban it
+				@$doc->loadHTML($content);
+			}
 
 			$xpath = new DOMXPath($doc);
 
@@ -526,7 +580,7 @@ class Page implements ArrayAccess
 		$page['section'] = htmlspecialchars($args->get(0) ?? 'generic');
 		$page['module']  = htmlspecialchars($args->getModuleName());
 
-		header("X-Friendica-Version: " . App::VERSION);
+		header("X-Friendica-Version: " . App::version());
 		header("Content-type: text/html; charset=utf-8");
 
 		if ($config->get('system', 'hsts') && ($baseURL->getScheme() === 'https')) {

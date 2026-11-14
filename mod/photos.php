@@ -322,6 +322,7 @@ function photos_content()
 	// photos/name/image/xxxxx
 	// photos/name/image/xxxxx/edit
 	// photos/name/image/xxxxx/drop
+	// photos/name/image/xxxxx/usage
 
 	$user = User::getByNickname(DI::args()->getArgv()[1] ?? '');
 	if (!DBA::isResult($user)) {
@@ -367,6 +368,7 @@ function photos_content()
 	$contact_id     = 0;
 	$edit           = '';
 	$drop           = '';
+	$download       = '';
 
 	$owner_uid = $user['uid'];
 
@@ -582,6 +584,10 @@ function photos_content()
 			$drop = [DI::l10n()->t('Delete album'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album) . '/drop'];
 		}
 
+		if ($is_owner && class_exists('ZipArchive')) {
+			$download = [DI::l10n()->t('Download album'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album) . '/download'];
+		}
+
 		if ($order_field === 'created') {
 			$order = [DI::l10n()->t('Show Newest First'), 'photos/' . $user['nickname'] . '/album/' . bin2hex($album), 'oldest'];
 		} else {
@@ -625,6 +631,7 @@ function photos_content()
 			'$order'    => $order,
 			'$edit'     => $edit,
 			'$drop'     => $drop,
+			'$download' => $download,
 			'$paginate' => $pager->renderFull($total),
 		]);
 
@@ -748,12 +755,15 @@ function photos_content()
 
 		if ($can_post && ($ph[0]['uid'] == $owner_uid)) {
 			$tools = [];
-			if ($cmd === 'edit') {
+			if (in_array($cmd, ['edit', 'usage'])) {
 				$tools['view'] = ['photos/' . $user['nickname'] . '/image/' . $datum, DI::l10n()->t('View photo')];
 			} else {
 				$tools['edit']    = ['photos/' . $user['nickname'] . '/image/' . $datum . '/edit', DI::l10n()->t('Edit photo')];
 				$tools['delete']  = ['photos/' . $user['nickname'] . '/image/' . $datum . '/drop', DI::l10n()->t('Delete photo')];
 				$tools['profile'] = ['settings/profile/photo/crop/' . $ph[0]['resource-id'], DI::l10n()->t('Use as profile picture')];
+				if ($is_owner) {
+					$tools['usage'] = ['photos/' . $user['nickname'] . '/image/' . $datum . '/usage', DI::l10n()->t('Used in posts')];
+				}
 			}
 
 			if (
@@ -768,6 +778,8 @@ function photos_content()
 			'href'     => 'photo/' . $hires['resource-id'] . '-' . $hires['scale'] . Images::getExtensionByMimeType($hires['type']),
 			'title'    => DI::l10n()->t('View Full Size'),
 			'src'      => 'photo/' . $lores['resource-id'] . '-' . $lores['scale'] . Images::getExtensionByMimeType($lores['type']) . '?_u=' . DateTimeFormat::utcNow('ymdhis'),
+			'lheight'  => $lores['height'],
+			'lwidth'   => $lores['width'],
 			'height'   => $hires['height'],
 			'width'    => $hires['width'],
 			'album'    => $hires['album'],
@@ -814,6 +826,11 @@ function photos_content()
 			]);
 		}
 
+		$usage = null;
+		if ($cmd === 'usage' && $is_owner) {
+			$usage = DI::mediaUsageRenderer()->renderForPhoto($ph[0]['resource-id'], $owner_uid);
+		}
+
 		$photo_tpl = Renderer::getMarkupTemplate('photo_view.tpl');
 		$o .= Renderer::replaceMacros($photo_tpl, [
 			'$id'                          => $ph[0]['id'],
@@ -824,9 +841,11 @@ function photos_content()
 			'$nextlink'                    => $nextlink,
 			'$desc'                        => $ph[0]['desc'],
 			'$edit'                        => $edit,
+			'$usage'                       => $usage,
 			'$edit_text'                   => DI::l10n()->t('Edit'),
 			'$delete_text'                 => DI::l10n()->t('Delete'),
 			'$use_as_profile_picture_text' => DI::l10n()->t('Use as profile picture'),
+			'$usage_text'                  => DI::l10n()->t('Used in posts'),
 			'$back_text'                   => DI::l10n()->t('Back to viewing'),
 		]);
 

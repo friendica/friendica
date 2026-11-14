@@ -37,7 +37,8 @@ final readonly class UriGenerator
 	{
 		// Our regular guid routine is using this kind of prefix as well
 		// We have to avoid that different routines could accidentally create the same value
-		$parsed = parse_url($uri);
+		// "parse_url()" returns false for malformed URIs
+		$parsed = parse_url($uri) ?: [];
 
 		// Remove the scheme to make sure that "https" and "http" doesn't make a difference
 		unset($parsed['scheme']);

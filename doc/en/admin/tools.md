@@ -77,3 +77,30 @@ The following will compress */var/log/friendica* (assuming this is the location 
 	rotate 2
 }
 ```
+
+If you also log slow page executions, slow queries or queries with a bad index (see the `page_execution_logfile`, `db_log` and `db_log_index` config values), you can rotate all of them together by listing all the paths on the first line.
+As explained in [Reading the log file](help/admin/log-files#file+permissions), the log files need to be writable by both the web server and whichever user runs your workers and daemons.
+The `create` directive lets *logrotate* re-apply the right owner, group and permissions after every rotation, instead of you having to fix them by hand:
+
+```
+/var/log/friendica.log /var/log/friendica-page.log /var/log/friendica-db.log /var/log/friendica-db-index.log {
+	compress
+	daily
+	rotate 2
+	missingok
+	delaycompress
+	create 660 friendica www-data
+	prerotate
+		su friendica -c "/var/www/example.com/htdocs/bin/console.php daemon stop"
+		su friendica -c "/var/www/example.com/htdocs/bin/console.php jetstream stop"
+	endscript
+	postrotate
+		su friendica -c "/var/www/example.com/htdocs/bin/console.php daemon start"
+		su friendica -c "/var/www/example.com/htdocs/bin/console.php jetstream start"
+	endscript
+}
+```
+
+The `prerotate`/`postrotate` hooks stop and restart the daemon and Jetstream processes around the rotation.
+Both keep a log file handle open for as long as they run, so without this they would keep writing into the old, now-renamed file instead of the fresh one.
+Worker processes started via cron do not need this, since each one opens the log file anew.

@@ -78,7 +78,11 @@ class PublicTimeline extends BaseApi
 		}
 
 		if ($request['remote']) {
-			$condition = DBA::mergeConditions($condition, ["NOT `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `origin` AND `post-user`.`uri-id` = `post-timeline-view`.`uri-id`)"]);
+			if ($request['exclude_replies']) {
+				$condition = DBA::mergeConditions($condition, ["NOT `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `origin` AND `post-user`.`uri-id` = `post-timeline-thread-view`.`uri-id`)"]);
+			} else {
+				$condition = DBA::mergeConditions($condition, ["NOT `uri-id` IN (SELECT `uri-id` FROM `post-user` WHERE `origin` AND `post-user`.`uri-id` = `post-timeline-view`.`uri-id`)"]);
+			}
 		}
 
 		if ($request['only_media']) {

@@ -111,7 +111,7 @@ class Feature
 			'composition' => [
 				$l10n->t('Post Composition Features'),
 				[self::EXPLICIT_MENTIONS, $l10n->t('Explicit Mentions'), $l10n->t('Add explicit mentions to comment box for manual control over who gets mentioned in replies.'), false, $config->get('feature_lock', Feature::EXPLICIT_MENTIONS, false)],
-				[self::ADD_ABSTRACT,      $l10n->t('Add an abstract from ActivityPub content warnings'), $l10n->t('Add an abstract when commenting on ActivityPub posts with a content warning. Abstracts are displayed as content warning on systems like Mastodon or Pleroma.'), false, $config->get('feature_lock', self::ADD_ABSTRACT, false)],
+				[self::ADD_ABSTRACT,      $l10n->t('Add an abstract from ActivityPub content warnings'), $l10n->t('Add an abstract when commenting on a sensitive ActivityPub post that has a content warning. Abstracts are displayed as content warning on systems like Mastodon or Pleroma.'), false, $config->get('feature_lock', self::ADD_ABSTRACT, false)],
 			],
 
 			// Item tools
@@ -131,8 +131,8 @@ class Feature
 				[self::NETWORKS, $l10n->t('Protocols'), $l10n->t('Display posts with the selected protocols.'), true, $config->get('feature_lock', self::NETWORKS, false)],
 				[self::ACCOUNTS, $l10n->t('Account Types'), $l10n->t('Display posts done by accounts with the selected account type.'), true, $config->get('feature_lock', self::ACCOUNTS, false)],
 				[self::CHANNELS, $l10n->t('Channels'), $l10n->t('Display posts in the system channels and user defined channels.'), true, $config->get('feature_lock', self::CHANNELS, false)],
-				[self::SEARCHES, $l10n->t('Saved Searches'), $l10n->t('Display posts that contain subscribed hashtags.'), true, $config->get('feature_lock', self::SEARCHES, false)],
-				[self::FOLDERS, $l10n->t('Saved Folders'), $l10n->t('Display a list of folders in which posts are stored.'), true, $config->get('feature_lock', self::FOLDERS, false)],
+				[self::SEARCHES, $l10n->t('Tags'), $l10n->t('Display posts that contain subscribed hashtags.'), true, $config->get('feature_lock', self::SEARCHES, false)],
+				[self::FOLDERS, $l10n->t('Folders'), $l10n->t('Display a list of folders in which posts are stored.'), true, $config->get('feature_lock', self::FOLDERS, false)],
 				[self::NOSHARER, $l10n->t('Own Contacts'), $l10n->t('Include or exclude posts from subscribed accounts. This widget is not visible on all channels.'), true, $config->get('feature_lock', self::NOSHARER, false)],
 				[self::TRENDING_TAGS,  $l10n->t('Trending Tags'), $l10n->t('Display a list of the most popular tags in recent public posts.'), false, $config->get('feature_lock', self::TRENDING_TAGS, false)],
 			],

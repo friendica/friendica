@@ -9,6 +9,7 @@ namespace Friendica\Module\Settings;
 
 use Exception;
 use Friendica\Core\ACL;
+use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Core\Worker;
@@ -24,6 +25,7 @@ use Friendica\Module\BaseSettings;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\Activity;
 use Friendica\Protocol\Delivery;
+use Friendica\Util\Network;
 use Friendica\Util\Temporal;
 
 class Account extends BaseSettings
@@ -94,6 +96,11 @@ class Account extends BaseSettings
 				if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 					$err .= DI::l10n()->t('Invalid email.');
 				}
+				//  ensure new email is not on the list of forbidden addresses
+				if (!Network::isEmailAddressAllowed($email)) {
+					$err .= DI::l10n()->t('Cannot change to that email.');
+					$email = $user['email'];
+				}
 				//  ensure new email is not the admin mail
 				if (in_array(strtolower((string) $email), User::getAdminEmailList())) {
 					$err .= DI::l10n()->t('Cannot change to that email.');
@@ -116,7 +123,7 @@ class Account extends BaseSettings
 				'timezone'         => $timezone,
 				'default-location' => trim($request['default_location'] ?? ''),
 				'allow_location'   => !empty($request['allow_location']),
-				'language'         => trim($request['language'] ?? ''),
+				'language'         => L10n::toDirectoryName($request['language'] ?? ''),
 			];
 
 			if (!empty($request['delete_openid'])) {
@@ -350,7 +357,7 @@ class Account extends BaseSettings
 		$email            = $user['email'];
 		$nickname         = DI::userSession()->getLocalUserNickname();
 		$timezone         = $user['timezone'];
-		$language         = $user['language'];
+		$language         = L10n::toDirectoryName($user['language']);
 		$notify           = $user['notify-flags'];
 		$default_location = $user['default-location'];
 		$openid           = $user['openid'];
@@ -576,7 +583,7 @@ class Account extends BaseSettings
 			'$notify_comment_participation'  => ['notify_comment_participation', DI::l10n()->t('Someone commented in a thread where you commented'), is_null($notify_type) || $notify_type & UserNotification::TYPE_COMMENT_PARTICIPATION, ''],
 			'$notify_activity_participation' => ['notify_activity_participation', DI::l10n()->t('Someone commented in a thread where you interacted'), is_null($notify_type) || $notify_type & UserNotification::TYPE_ACTIVITY_PARTICIPATION, ''],
 
-			'$desktop_notifications' => ['desktop_notifications', DI::l10n()->t('Activate desktop notifications'), false, DI::l10n()->t('Show desktop popup on new notifications')],
+			'$desktop_notifications' => ['desktop_notifications', DI::l10n()->t('Activate desktop notifications'), false, DI::l10n()->t('Show a popup on new notifications while this browser window is open. Your browser will ask you to allow this once, and the setting only applies to the browser and device you enable it on.')],
 
 			'$email_textonly' => [
 				'email_textonly',

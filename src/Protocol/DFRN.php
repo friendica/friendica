@@ -353,7 +353,7 @@ class DFRN
 		XML::addElement($doc, $root, 'id', DI::baseUrl() . '/profile/' . $owner['nick']);
 		XML::addElement($doc, $root, 'title', $owner['name']);
 
-		$attributes = ['uri' => 'https://friendi.ca', 'version' => App::VERSION . '-' . DB_UPDATE_VERSION];
+		$attributes = ['uri' => 'https://friendi.ca', 'version' => App::version() . '-' . DB_UPDATE_VERSION];
 		XML::addElement($doc, $root, 'generator', App::PLATFORM, $attributes);
 
 		$attributes = ['rel' => 'license', 'href' => 'http://creativecommons.org/licenses/by/3.0/'];
@@ -1926,7 +1926,8 @@ class DFRN
 
 		// Check if the message is wanted
 		if (!self::isSolicitedMessage($item, $importer)) {
-			DBA::delete('item-uri', ['uri' => $item['uri']]);
+			// The item-uri can be in use by a parallel insert, ExpirePosts removes it once it is unused.
+			DI::logger()->notice('Unsolicited message dropped', ['uri-id' => $item['uri-id'], 'uri' => $item['uri']]);
 			return;
 		}
 

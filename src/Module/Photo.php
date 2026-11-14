@@ -158,7 +158,7 @@ class Photo extends BaseApi
 		}
 
 		if (empty($imgdata) && !empty($photo['blurhash'])) {
-			$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
+			$image = new Image('', image_type_to_mime_type(Images::getPreferredImageType()));
 			$image->getFromBlurHash($photo['blurhash'], $photo['width'], $photo['height']);
 			$imgdata  = $image->asString();
 			$mimetype = $image->getType();
@@ -281,7 +281,7 @@ class Photo extends BaseApi
 				}
 
 				if (empty($url) && isset($media['blurhash']) && isset($media['width']) && isset($media['height'])) {
-					$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
+					$image = new Image('', image_type_to_mime_type(Images::getPreferredImageType()));
 					$image->getFromBlurHash($media['blurhash'], $media['width'], $media['height']);
 					return MPhoto::createPhotoForImageData($image->asString());
 				}
@@ -408,7 +408,7 @@ class Photo extends BaseApi
 				}
 
 				if (empty($mimetext) && !empty($contact['blurhash'])) {
-					$image = new Image('', image_type_to_mime_type(IMAGETYPE_WEBP));
+					$image = new Image('', image_type_to_mime_type(Images::getPreferredImageType()));
 					$image->getFromBlurHash($contact['blurhash'], $customsize, $customsize);
 					return MPhoto::createPhotoForImageData($image->asString());
 				} elseif (empty($mimetext)) {

@@ -71,7 +71,7 @@ class Get extends \Friendica\BaseModule
 				'nofinish' => $event['nofinish'],
 				'desc'     => Strings::escapeHtml($event['desc']),
 				'location' => Strings::escapeHtml($event['location']),
-				'item'     => $item,
+				'item'     => array_map(Strings::escapeHtml(...), $item),
 			];
 		}, $events);
 	}

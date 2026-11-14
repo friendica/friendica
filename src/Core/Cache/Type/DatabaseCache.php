@@ -11,6 +11,7 @@ use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Cache\Enum;
 use Friendica\Core\Cache\Exception\CachePersistenceException;
 use Friendica\Database\Database;
+use Friendica\Database\DBA;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -36,7 +37,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 			if (empty($prefix)) {
 				$where = ['`expires` >= ?', DateTimeFormat::utcNow()];
 			} else {
-				$where = ['`expires` >= ? AND `k` LIKE CONCAT(?, \'%\')', DateTimeFormat::utcNow(), $prefix];
+				$where = ['`expires` >= ? AND `k` LIKE ?', DateTimeFormat::utcNow(), $prefix . '%'];
 			}
 
 			$stmt = $this->dba->select('cache', ['k'], $where);
@@ -65,12 +66,12 @@ class DatabaseCache extends AbstractCache implements ICanCache
 	{
 		try {
 			$cache = $this->dba->selectFirst('cache', ['v'], [
-				'`k` = ? AND (`expires` >= ? OR `expires` = -1)', $key, DateTimeFormat::utcNow(),
+				'`k` = ? AND `expires` >= ?', $key, DateTimeFormat::utcNow(),
 			]);
 
 			if ($this->dba->isResult($cache)) {
 				$cached = $cache['v'];
-				$value  = @unserialize($cached);
+				$value  = @unserialize($cached, ['allowed_classes' => [\stdClass::class]]);
 
 				// Only return a value if the serialized value is valid.
 				// We also check if the db entry is a serialized
@@ -101,7 +102,7 @@ class DatabaseCache extends AbstractCache implements ICanCache
 			} else {
 				$fields = [
 					'v'       => serialize($value),
-					'expires' => -1,
+					'expires' => DBA::MAX_DATETIME,
 					'updated' => DateTimeFormat::utcNow(),
 				];
 			}

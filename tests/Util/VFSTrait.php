@@ -64,11 +64,26 @@ trait VFSTrait
 				$targetFileName = array_pop($tmpArray);
 			}
 			vfsStream::newFile($targetFileName)
-				->at($this->root->getChild(($static ? 'static' : 'config')))
+				->at($this->getVfsDirectory($static ? 'static' : 'config'))
 				->setContent(file_get_contents($file));
 		} else {
 			throw new \Exception(sprintf('Unexpected missing config \'%s\'', $file));
 		}
+	}
+
+	/**
+	 * Returns a directory of the Virtual File System
+	 *
+	 * @param string $path The path of the directory, relative to the root
+	 */
+	protected function getVfsDirectory(string $path): vfsStreamDirectory
+	{
+		$dir = $this->root->getChild($path);
+		if (!$dir instanceof vfsStreamDirectory) {
+			throw new \Exception(sprintf('Unexpected missing directory \'%s\'', $path));
+		}
+
+		return $dir;
 	}
 
 	/**

@@ -240,6 +240,12 @@ class Processor
 			if (!Post::exists(['uri' => $item['thr-parent'], 'uid' => [0, $uid]])) {
 				$this->logger->warning('Thread parent does not exist', ['uid' => $uid, 'thr-parent' => $item['thr-parent']]);
 			}
+
+			// The bluesky addon imports reposts as well, so the same repost can already exist under a different URI.
+			if (Post::exists(['uid' => $uid, 'thr-parent' => $item['thr-parent'], 'verb' => Activity::ANNOUNCE, 'contact-id' => $item['contact-id']])) {
+				$this->logger->notice('Repost of the author for this post already exists', ['uri' => $item['uri'], 'thr-parent' => $item['thr-parent'], 'uid' => $uid]);
+				continue;
+			}
 			$id = Item::insert($item);
 
 			if ($id) {

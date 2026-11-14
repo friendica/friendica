@@ -26,7 +26,7 @@ contact table
 | uri-id                    | Id of the item-uri table entry that contains the contact url                                                   | int unsigned       | YES  |     | NULL                |                |
 | addr                      |                                                                                                                | varchar(255)       | NO   |     |                     |                |
 | alias                     |                                                                                                                | varbinary(383)     | NO   |     |                     |                |
-| pubkey                    | RSA public key 4096 bit                                                                                        | text               | YES  |     | NULL                |                |
+| pubkey                    | RSA public key 4096 bit, or, for Ed25519 only ActivityPub actors, the Multikey in multibase form               | text               | YES  |     | NULL                |                |
 | prvkey                    | RSA private key 4096 bit                                                                                       | text               | YES  |     | NULL                |                |
 | batch                     |                                                                                                                | varbinary(383)     | NO   |     |                     |                |
 | notify                    |                                                                                                                | varbinary(383)     | YES  |     | NULL                |                |
@@ -54,7 +54,7 @@ contact table
 | bd                        |                                                                                                                | date               | NO   |     | 0001-01-01          |                |
 | reason                    |                                                                                                                | text               | YES  |     | NULL                |                |
 | self                      | 1 if the contact is the user him/her self                                                                      | boolean            | NO   |     | 0                   |                |
-| remote_self               |                                                                                                                | boolean            | NO   |     | 0                   |                |
+| remote_self               | 0 => No mirroring, 1-2 => Mirror as own post, 3 => Mirror as reshare                                           | tinyint            | NO   |     | 0                   |                |
 | rel                       | The kind of the relation between the user and the contact                                                      | tinyint unsigned   | NO   |     | 0                   |                |
 | protocol                  | Protocol of the contact                                                                                        | char(4)            | NO   |     |                     |                |
 | hub-verify                |                                                                                                                | varbinary(383)     | NO   |     |                     |                |
@@ -65,7 +65,7 @@ contact table
 | pending                   | Contact request is pending                                                                                     | boolean            | NO   |     | 1                   |                |
 | deleted                   | Contact has been deleted                                                                                       | boolean            | NO   |     | 0                   |                |
 | info                      |                                                                                                                | mediumtext         | YES  |     | NULL                |                |
-| notify_new_posts          |                                                                                                                | boolean            | NO   |     | 0                   |                |
+| notify_new_posts          | 0 => None, 1 => Posts and reshares, 2 => Posts only, 3 => Reshares only                                        | tinyint unsigned   | NO   |     | 0                   |                |
 | fetch_further_information |                                                                                                                | tinyint unsigned   | NO   |     | 0                   |                |
 | ffi_keyword_denylist      |                                                                                                                | text               | YES  |     | NULL                |                |
 | photo                     | Link to the profile photo of the contact                                                                       | varbinary(383)     | YES  |     |                     |                |

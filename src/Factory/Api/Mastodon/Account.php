@@ -11,6 +11,7 @@ use Friendica\App\BaseURL;
 use Friendica\BaseFactory;
 use Friendica\Collection\Api\Mastodon\Fields;
 use Friendica\Content\Text\BBCode;
+use Friendica\Content\Text\RenderedContent;
 use Friendica\Content\Widget;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Database\DBA;
@@ -23,7 +24,7 @@ use Psr\Log\LoggerInterface;
 
 class Account extends BaseFactory
 {
-	public function __construct(private readonly IManagePersonalConfigValues $pConfig, LoggerInterface $logger, private readonly BaseURL $baseUrl, private readonly ProfileFieldRepository $profileFieldRepo, private readonly Field $mstdnFieldFactory)
+	public function __construct(private readonly IManagePersonalConfigValues $pConfig, LoggerInterface $logger, private readonly BaseURL $baseUrl, private readonly ProfileFieldRepository $profileFieldRepo, private readonly Field $mstdnFieldFactory, private readonly RenderedContent $renderedContent)
 	{
 		parent::__construct($logger);
 	}
@@ -98,7 +99,7 @@ class Account extends BaseFactory
 			}
 		}
 
-		return new \Friendica\Object\Api\Mastodon\Account($this->baseUrl, $account, $fields, $source);
+		return new \Friendica\Object\Api\Mastodon\Account($this->baseUrl, $account, $fields, $source, $this->renderedContent->convert($account['uri-id'], $account['about'], BBCode::EXTERNAL));
 	}
 
 	private function getContactRelationCountForUid(int $uid, array $rel): int

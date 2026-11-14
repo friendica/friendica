@@ -11,11 +11,11 @@
 <div id="prvmail-wrapper">
 <form id="prvmail-form" action="message" method="post">
 
-{{$parent nofilter}}
+{{if $replyto}}<input type="hidden" name="replyto" value="{{$replyto}}" />{{/if}}
 
 <div id="prvmail-to-label">
 {{$to}}<br/>
-{{$select nofilter}}<br/>
+{{if $recipient}}{{$recipient.name}}<input type="hidden" name="recipient" value="{{$recipient.id}}" />{{else}}{{$select nofilter}}{{/if}}<br/>
 <small>{{$to_desc}}</small>
 </div>
 

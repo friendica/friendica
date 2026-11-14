@@ -40,7 +40,7 @@ class NodeInfo120 extends BaseModule
 			'version'  => '2.0',
 			'software' => [
 				'name'    => 'friendica',
-				'version' => App::VERSION . '-' . DB_UPDATE_VERSION,
+				'version' => App::version() . '-' . DB_UPDATE_VERSION,
 			],
 			'protocols'         => ['dfrn', 'activitypub'],
 			'services'          => Nodeinfo::getServices(),

@@ -31,12 +31,14 @@ Usage
     bin/console serverblock [-h|--help|-?] [-v]
     bin/console serverblock add <pattern> <reason> [-h|--help|-?] [-v]
     bin/console serverblock remove <pattern> [-h|--help|-?] [-v]
+    bin/console serverblock clear [-h|--help|-?] [-v]
     bin/console serverblock export <filename>
     bin/console serverblock import <filename>
 
 Description
     With this tool, you can list the current blocked server domain patterns
     or you can add / remove a blocked server domain pattern from the list.
+    The clear command removes the whole block list at once.
     Using the export and import options you can share your server blocklist
     with other node admins by CSV files.
 
@@ -66,6 +68,7 @@ HELP;
 		return match ($this->getArgument(0)) {
 			'add'    => $this->addBlockedServer(),
 			'remove' => $this->removeBlockedServer(),
+			'clear'  => $this->clearBlockedServers(),
 			'export' => $this->exportBlockedServers(),
 			'import' => $this->importBlockedServers(),
 			default  => throw new CommandArgsException('Unknown command.'),
@@ -185,6 +188,23 @@ HELP;
 			}
 		} else {
 			$this->out(sprintf("Couldn't remove '%s' from blocked domain patterns", $pattern));
+			return 1;
+		}
+	}
+
+	/**
+	 * Removes the whole list of blocked domain patterns
+	 *
+	 * @return int The return code (0 = success, 1 = failed)
+	 */
+	private function clearBlockedServers(): int
+	{
+		if ($this->blocklist->clear()) {
+			$this->out('The block list was cleared');
+			Worker::add(Worker::PRIORITY_LOW, 'UpdateBlockedServers');
+			return 0;
+		} else {
+			$this->out("Couldn't clear the block list");
 			return 1;
 		}
 	}

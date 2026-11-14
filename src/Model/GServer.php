@@ -1697,6 +1697,8 @@ class GServer
 			return 'blacksky';
 		} elseif ($host === 'northsky.social') {
 			return 'northsky';
+		} elseif ($host === 'pds.wsocial.network') {
+			return 'wsocial';
 		}
 		return 'atprotocol';
 	}
@@ -1958,6 +1960,11 @@ class GServer
 			return $serverdata;
 		}
 		$serverdata['network'] = $contact['network'];
+
+		// The AT Protocol probing can fail sporadically, in this case the provider is derived from the url.
+		if (($contact['network'] === Protocol::ATPROTO) && empty($serverdata['platform'])) {
+			$serverdata['platform'] = self::getAtProtoProvider($url);
+		}
 
 		if (in_array($serverdata['detection-method'], self::DETECT_UNSPECIFIC)) {
 			$serverdata['detection-method'] = self::DETECT_CONTACTS;

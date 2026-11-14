@@ -53,10 +53,11 @@ class ViewDefinitionSqlWriter
 	 *
 	 * @param string $viewName      The view name
 	 * @param array  $viewStructure The structure information of the view
+	 * @param bool   $replace       Whether to replace an existing view in place
 	 *
 	 * @return string The SQL definition
 	 */
-	public static function createView(string $viewName, array $viewStructure): string
+	public static function createView(string $viewName, array $viewStructure, bool $replace = false): string
 	{
 		$sql_rows = [];
 		foreach ($viewStructure['fields'] as $fieldname => $origin) {
@@ -66,7 +67,7 @@ class ViewDefinitionSqlWriter
 				$sql_rows[] = "`" . static::escape($origin[0]) . "`.`" . static::escape($origin[1]) . "` AS `" . static::escape($fieldname) . "`";
 			}
 		}
-		return sprintf("CREATE VIEW `%s` AS SELECT\n\t", static::escape($viewName))
+		return sprintf("CREATE %sVIEW `%s` AS SELECT\n\t", $replace ? 'OR REPLACE ' : '', static::escape($viewName))
 			   . implode(",\n\t", $sql_rows) . "\n\t" . $viewStructure['query'] . ";\n\n";
 	}
 

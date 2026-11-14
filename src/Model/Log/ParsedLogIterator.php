@@ -21,14 +21,35 @@ class ParsedLogIterator implements \Iterator
 	/** @var ParsedLogLine|null current iterator value*/
 	private $value = null;
 
-	/** @var int max number of lines to read */
+	/** @var int max number of lines to return */
 	private $limit = 0;
+
+	/** @var int max number of lines to read */
+	private $scanLimit = 0;
+
+	/** @var int number of lines returned so far */
+	private $count = 0;
+
+	/** @var bool true if reading stopped because of the scan limit */
+	private $scanLimitReached = false;
+
+	/** @var int max number of seconds to read */
+	private $timeout = 0;
+
+	/** @var float time when reading started */
+	private $start = 0;
+
+	/** @var bool true if reading stopped because of the timeout */
+	private $timeoutReached = false;
 
 	/** @var array filters per column */
 	private $filters = [];
 
 	/** @var string search term */
 	private $search = '';
+
+	/** @var string request id whose lines are skipped */
+	private $excludedRequestId = '';
 
 	public function __construct(private readonly ReversedFileReader $reader) {}
 
@@ -43,12 +64,32 @@ class ParsedLogIterator implements \Iterator
 	}
 
 	/**
-	 * @param int $limit		Max num of lines to read
+	 * @param int $limit		Max num of lines to return
 	 * @return $this
 	 */
 	public function withLimit(int $limit): ParsedLogIterator
 	{
 		$this->limit = $limit;
+		return $this;
+	}
+
+	/**
+	 * @param int $scanLimit	Max num of lines to read
+	 * @return $this
+	 */
+	public function withScanLimit(int $scanLimit): ParsedLogIterator
+	{
+		$this->scanLimit = $scanLimit;
+		return $this;
+	}
+
+	/**
+	 * @param int $timeout		Max num of seconds to read
+	 * @return $this
+	 */
+	public function withTimeout(int $timeout): ParsedLogIterator
+	{
+		$this->timeout = $timeout;
 		return $this;
 	}
 
@@ -70,6 +111,35 @@ class ParsedLogIterator implements \Iterator
 	{
 		$this->search = $search;
 		return $this;
+	}
+
+	/**
+	 * Used to skip the lines of the request that displays the log,
+	 * since they contain the search term in the requested URL.
+	 *
+	 * @param string $requestId	request id whose lines are skipped
+	 * @return $this
+	 */
+	public function withExcludedRequestId(string $requestId): ParsedLogIterator
+	{
+		$this->excludedRequestId = $requestId;
+		return $this;
+	}
+
+	/**
+	 * @return bool true if reading stopped because of the scan limit
+	 */
+	public function isScanLimitReached(): bool
+	{
+		return $this->scanLimitReached;
+	}
+
+	/**
+	 * @return bool true if reading stopped because of the timeout
+	 */
+	public function isTimeoutReached(): bool
+	{
+		return $this->timeoutReached;
 	}
 
 	/**
@@ -97,34 +167,70 @@ class ParsedLogIterator implements \Iterator
 	}
 
 	/**
-	 * Check if parsed log line match search.
-	 * Always match if no search query is set.
+	 * Quick check on the raw log line to avoid parsing lines that can't match the filters
 	 *
-	 * @param ParsedLogLine $parsedlogline
+	 * @param string $logline
 	 * @return bool
 	 */
-	private function search(ParsedLogLine $parsedlogline): bool
+	private function prefilter(string $logline): bool
 	{
-		if ($this->search != '') {
-			return str_contains($parsedlogline->logline, $this->search);
+		if (!empty($this->filters['level']) && !str_contains($logline, ' [' . strtoupper((string) $this->filters['level']) . ']: ')) {
+			return false;
+		}
+
+		if (!empty($this->filters['context']) && !str_contains($logline, ' ' . $this->filters['context'] . ' [')) {
+			return false;
 		}
 		return true;
 	}
 
 	/**
-	 * Read a line from reader and parse.
-	 * Returns null if limit is reached or the reader is invalid.
+	 * Check if the raw log line match search.
+	 * Always match if no search query is set.
+	 *
+	 * @param string $logline
+	 * @return bool
+	 */
+	private function search(string $logline): bool
+	{
+		// The lines of the current request contain the search term in the requested URL
+		if ($this->excludedRequestId !== '' && str_contains($logline, '"request-id":"' . $this->excludedRequestId . '"')) {
+			return false;
+		}
+
+		if ($this->search != '') {
+			return str_contains($logline, $this->search);
+		}
+		return true;
+	}
+
+	/**
+	 * Read the next line from reader which matches the search and parse it.
+	 * Returns null if scan limit is reached or the reader is invalid.
 	 *
 	 * @return ?ParsedLogLine
 	 */
 	private function read()
 	{
-		$this->reader->next();
-		if ($this->limit > 0 && $this->reader->key() > $this->limit || !$this->reader->valid()) {
-			return null;
-		}
+		do {
+			$this->reader->next();
+			if (!$this->reader->valid()) {
+				return null;
+			}
 
-		$line = $this->reader->current();
+			if ($this->scanLimit > 0 && $this->reader->key() > $this->scanLimit) {
+				$this->scanLimitReached = true;
+				return null;
+			}
+
+			if ($this->timeout > 0 && microtime(true) - $this->start > $this->timeout) {
+				$this->timeoutReached = true;
+				return null;
+			}
+
+			$line = $this->reader->current();
+		} while (!$this->prefilter($line) || !$this->search($line));
+
 		return new ParsedLogLine($this->reader->key(), $line);
 	}
 
@@ -138,12 +244,21 @@ class ParsedLogIterator implements \Iterator
 	 */
 	public function next(): void
 	{
+		if ($this->limit > 0 && $this->count >= $this->limit) {
+			$this->value = null;
+			return;
+		}
+
 		$parsed = $this->read();
 
-		while (is_null($parsed) == false && !($this->filter($parsed) && $this->search($parsed))) {
+		while (is_null($parsed) == false && !$this->filter($parsed)) {
 			$parsed = $this->read();
 		}
 		$this->value = $parsed;
+
+		if (!is_null($parsed)) {
+			$this->count++;
+		}
 	}
 
 
@@ -155,7 +270,11 @@ class ParsedLogIterator implements \Iterator
 	 */
 	public function rewind(): void
 	{
-		$this->value = null;
+		$this->value            = null;
+		$this->count            = 0;
+		$this->scanLimitReached = false;
+		$this->timeoutReached   = false;
+		$this->start            = microtime(true);
 		$this->reader->rewind();
 		$this->next();
 	}

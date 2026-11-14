@@ -154,10 +154,10 @@ class System
 			return;
 		}
 
-		$cmdline = $this->config->get('config', 'php_path', 'php') . ' ' . escapeshellarg($command);
+		$cmdline = escapeshellarg((string) $this->config->get('config', 'php_path', 'php')) . ' ' . escapeshellarg($command);
 
 		foreach ($args as $argumment) {
-			$cmdline .= ' ' . $argumment;
+			$cmdline .= ' ' . escapeshellarg((string) $argumment);
 		}
 
 		foreach ($options as $key => $value) {
@@ -165,9 +165,9 @@ class System
 				continue;
 			}
 
-			$cmdline .= ' --' . $key;
+			$cmdline .= ' --' . escapeshellarg((string) $key);
 			if (!is_null($value) && !is_bool($value)) {
-				$cmdline .= ' ' . $value;
+				$cmdline .= ' ' . escapeshellarg((string) $value);
 			}
 		}
 

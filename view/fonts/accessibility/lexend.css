@@ -1,0 +1,19 @@
+/*
+ * SPDX-FileCopyrightText: 2010-2026 the Friendica project
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+/* Lexend, see lexend/OFL.txt for the font license. The font has no italic styles. */
+@font-face {
+  font-family: "Lexend";
+  src: url("lexend/Lexend-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+html body,
+html body :where(:not([class^="ri-"], [class*=" ri-"], code, pre, kbd, samp, tt, .glyphicon, :is(code, pre, kbd, samp, tt) *)) {
+  font-family: "Lexend", sans-serif !important;
+}

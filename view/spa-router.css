@@ -3,41 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-/* SPA Router Modals - Shared Styles */
-.spa-modal-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.7);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: 9999;
-	cursor: pointer;
-}
-
-.spa-modal-content {
-	background-color: white;
-	padding: 30px;
-	border-radius: 8px;
-	max-width: 500px;
-	width: 90%;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-	text-align: center;
-	cursor: auto;
-}
-
-.spa-modal-content h2 {
-	margin-top: 0;
-}
-
-.spa-modal-close-btn {
-	margin-top: 15px;
-}
-
-/* Timeout Modal - Specific Styles */
-#spa-timeout-modal h2 {
+/* Timeout Modal - rendered as an Unpoly overlay, see spa-ui-helpers.js */
+.spa-timeout-modal h2 {
 	color: #d9534f;
 }

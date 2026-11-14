@@ -76,8 +76,15 @@ class UpdateGServer
 	 */
 	public static function add($run_parameters, string $serverUrl, bool $onlyNodeInfo = false): int
 	{
+		try {
+			$uri = new Uri($serverUrl);
+		} catch (\Throwable) {
+			DI::logger()->warning('Invalid URL', ['url' => $serverUrl]);
+			return 0;
+		}
+
 		// Dropping the worker task if the server domain is blocked
-		if (Network::isUriBlocked(new Uri($serverUrl))) {
+		if (Network::isUriBlocked($uri)) {
 			GServer::setBlockedByUrl($serverUrl);
 			return 0;
 		}

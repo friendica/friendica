@@ -9,17 +9,10 @@
 	<form action="settings/display" id="settings-form" method="post" autocomplete="off">
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 
-		<div class="panel-group panel-group-settings" id="settings" role="tablist" aria-multiselectable="true">
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="theme-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#theme-settings-content" aria-expanded="true" aria-controls="theme-settings-content">
-							{{$themes_title}}
-						</button>
-					</h2>
-				</div>
-
-				<div id="theme-settings-content" class="panel-collapse collapse" role="tabpanel" aria-labelledby="theme-settings">
+		<div class="panel-group panel-group-settings" id="settings">
+			<details class="panel">
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle" id="theme-settings-title"><h2>{{$themes_title}}</h2></summary>
+				<div id="theme-settings-content">
 					<div class="panel-body">
 						{{include file="field_themeselect.tpl" field=$theme}}
 
@@ -41,53 +34,63 @@
 						<button type="submit" name="{{$theme.2}}-settings-submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="content-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#content-settings-content" aria-expanded="false" aria-controls="content-settings-content">
-							{{$d_cset}}
-						</button>
-					</h2>
-				</div>
-				<div id="content-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="content-settings">
+			<details class="panel"{{if !$theme && !$mobile_theme && !$theme_config}} open{{/if}}>
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="content-settings-title"><h2>{{$d_cset}}</h2></summary>
+				<div id="content-settings-content">
 					<div class="panel-body">
 						{{include file="field_input.tpl" field=$itemspage_network}}
 						{{include file="field_input.tpl" field=$itemspage_mobile_network}}
 						{{include file="field_checkbox.tpl" field=$enable_smile}}
 						{{include file="field_checkbox.tpl" field=$enable_spa}}
-						{{include file="field_checkbox.tpl" field=$update_content}}
+						{{include file="field_select.tpl" field=$update_content}}
 						{{include file="field_checkbox.tpl" field=$infinite_scroll}}
 						{{include file="field_checkbox.tpl" field=$enable_smart_threading}}
 						{{include file="field_checkbox.tpl" field=$enable_dislike}}
 						{{include file="field_checkbox.tpl" field=$display_resharer}}
 						{{include file="field_checkbox.tpl" field=$stay_local}}
-						{{include file="field_checkbox.tpl" field=$compact_timeline}}
+						{{include file="field_select.tpl" field=$compact_timeline}}
+						{{include file="field_checkbox.tpl" field=$click_to_display}}
+						{{include file="field_checkbox.tpl" field=$widgets_as_menu}}
 						{{include file="field_checkbox.tpl" field=$show_page_drop}}
 						{{include file="field_checkbox.tpl" field=$display_eventlist}}
 						{{include file="field_select.tpl" field=$preview_mode}}
 						{{include file="field_checkbox.tpl" field=$hide_empty_descriptions}}
 						{{include file="field_checkbox.tpl" field=$hide_custom_emojis}}
 						{{include file="field_select.tpl" field=$platform_icon_style}}
-						{{include file="field_checkbox.tpl" field=$embed_remote_media}}
+						{{include file="field_select.tpl" field=$font}}
+						{{include file="field_select.tpl" field=$text_spacing}}
+						{{include file="field_select.tpl" field=$attachment_icons}}
 						{{include file="field_checkbox.tpl" field=$embed_media}}
+						{{include file="field_checkbox.tpl" field=$filter_timeline_language}}
+						<div id="timeline-languages-wrapper">
+							{{include file="field_select.tpl" field=$timeline_languages}}
+						</div>
 					</div>
 					<div class="panel-footer">
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="timeline-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#timeline-settings-content" aria-expanded="false" aria-controls="timeline-settings-content">
-							{{$timeline_title}}
-						</button>
-					</h2>
-				</div>
-				<div id="timeline-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="timeline-settings">
+			<script type="text/javascript">
+				(function () {
+					let $filterTimelineLanguage = $("#id_filter_timeline_language");
+					let $timelineLanguages      = $("#timeline-languages-wrapper select");
+
+					function toggleTimelineLanguages() {
+						$timelineLanguages.prop('disabled', !$filterTimelineLanguage.is(':checked'));
+					}
+
+					toggleTimelineLanguages();
+					$filterTimelineLanguage.on('change', toggleTimelineLanguages);
+				})();
+			</script>
+
+			<details class="panel"{{if !$theme && !$mobile_theme && !$theme_config}} open{{/if}}>
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="timeline-settings-title"><h2>{{$timeline_title}}</h2></summary>
+				<div id="timeline-settings-content">
 						<p tabindex="0">{{$timeline_explanation}} {{$sortable}}</p>
 						<h3 tabindex="0">{{$timeline_enable}}</h3>
 					<div class="panel-body timelines-widget sortable">
@@ -105,23 +108,18 @@
 					<div class="panel-body timelines-menu sortable">
 						{{foreach $timelines as $t}}
 							{{include file="field_checkbox.tpl" field=$t.bookmark}}
-						{{/foreach}}						
+						{{/foreach}}
+					</div>
 					<div class="panel-footer">
 						{{include file="field_checkbox.tpl" field=$reset_menu}}
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="channel-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#channel-settings-content" aria-expanded="false" aria-controls="channel-settings-content">
-							{{$channel_title}}
-						</button>
-					</h2>
-				</div>
-				<div id="channel-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="channel-settings">
+			<details class="panel"{{if !$theme && !$mobile_theme && !$theme_config}} open{{/if}}>
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="channel-settings-title"><h2>{{$channel_title}}</h2></summary>
+				<div id="channel-settings-content">
 					<div class="panel-body">
 						{{include file="field_select.tpl" field=$channel_languages}}
 					</div>
@@ -139,17 +137,11 @@
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 
-			<div class="panel">
-				<div class="section-subtitle-wrapper panel-heading" role="tab" id="calendar-settings-title">
-					<h2>
-						<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#settings" href="#calendar-settings-content" aria-expanded="false" aria-controls="calendar-settings-content">
-							{{$calendar_title}}
-						</button>
-					</h2>
-				</div>
-				<div id="calendar-settings-content" class="panel-collapse collapse{{if !$theme && !$mobile_theme && !$theme_config}} in{{/if}}" role="tabpanel" aria-labelledby="calendar-settings">
+			<details class="panel"{{if !$theme && !$mobile_theme && !$theme_config}} open{{/if}}>
+				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="calendar-settings-title"><h2>{{$calendar_title}}</h2></summary>
+				<div id="calendar-settings-content">
 					<div class="panel-body">
 						{{include file="field_select.tpl" field=$first_day_of_week}}
 						{{include file="field_select.tpl" field=$calendar_default_view}}
@@ -158,7 +150,7 @@
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
 					</div>
 				</div>
-			</div>
+			</details>
 		</div>
 	</form>
 </div>

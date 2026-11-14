@@ -37,7 +37,7 @@ class Emailer
 		private readonly BaseURL $baseUrl,
 		private readonly LoggerInterface $logger,
 		private readonly L10n $l10n,
-		private readonly ?EventDispatcherInterface $eventDispatcher = null,
+		private readonly EventDispatcherInterface $eventDispatcher,
 	) {
 		$this->siteEmailAddress = $this->config->get('config', 'sender_email');
 		if (empty($this->siteEmailAddress)) {
@@ -116,12 +116,10 @@ class Emailer
 	 */
 	public function send(IEmail $email): bool
 	{
-		if ($this->eventDispatcher) {
-			$emailData = $this->eventDispatcher->dispatch(
-				new EmailerSendPrepareEvent($email),
-			);
-			$email = $emailData->getEmail();
-		}
+		$emailData = $this->eventDispatcher->dispatch(
+			new EmailerSendPrepareEvent($email),
+		);
+		$email = $emailData->getEmail();
 
 		if (! ($email instanceof IEmail)) {
 			return true;
@@ -191,14 +189,12 @@ class Emailer
 		}
 
 		// send the message
-		if ($this->eventDispatcher) {
-			$event = $this->eventDispatcher->dispatch(
-				new EmailerSendEvent($email->getToAddress(), $messageSubject, $multipartMessageBody, $messageHeader, $sendmail_params),
-			);
+		$event = $this->eventDispatcher->dispatch(
+			new EmailerSendEvent($email->getToAddress(), $messageSubject, $multipartMessageBody, $messageHeader, $sendmail_params),
+		);
 
-			if ($event->isSent()) {
-				return true;
-			}
+		if ($event->isSent()) {
+			return true;
 		}
 
 		$res = $this->mail(

@@ -11,6 +11,7 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\System;
 use Friendica\Util\Strings;
 use Friendica\Network\HTTPException;
+use GuzzleHttp\Psr7\Exception\MalformedUriException;
 use GuzzleHttp\Psr7\ServerRequest;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\UriInterface;
@@ -31,7 +32,12 @@ class BaseURL extends Uri implements UriInterface
 								->withPath($this->determineURLPath($server));
 		}
 
-		parent::__construct($url);
+		// MalformedUriException is an InvalidArgumentException, which Dice swallows while resolving constructor parameters.
+		try {
+			parent::__construct($url);
+		} catch (MalformedUriException $exception) {
+			throw new \UnexpectedValueException(sprintf('Invalid system.url "%s"', $url), 0, $exception);
+		}
 	}
 
 	/**

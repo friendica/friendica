@@ -6,8 +6,8 @@
   *}}
 
 <script>
-$(document).ready(function() {
-	$("#contacts-search").contact_autocomplete(baseurl + '/search/acl', 'a', true);
+window.onDocumentReady('body', function() {
+	$("#contacts-search").name_autocomplete(baseurl + '/search/acl', 'a', true);
 });
 </script>
 

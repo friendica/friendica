@@ -9,6 +9,8 @@ namespace Friendica\Test\src\Model;
 
 use Dice\Dice;
 use Friendica\Database\Database;
+use Friendica\Core\Config\Capability\IManageConfigValues;
+use Friendica\Core\L10n;
 use Friendica\DI;
 use Friendica\Model\User;
 use Friendica\Test\MockedTestCase;
@@ -170,5 +172,35 @@ class UserTest extends MockedTestCase
 			$this->child,
 			$this->manage,
 		], $record);
+	}
+
+	public function testCreateRejectsForbiddenEmail(): void
+	{
+		$settings = [
+			'forbidden_email' => 'victim+*@example.org',
+			'no_regfullname'  => true,
+		];
+
+		$config = \Mockery::mock(IManageConfigValues::class);
+		$config->shouldReceive('get')->andReturnUsing(
+			fn (string $cat, string $key, $default = null) => $settings[$key] ?? $default,
+		);
+
+		$l10n = \Mockery::mock(L10n::class);
+		$l10n->shouldReceive('t')->andReturnUsing(fn (string $s): string => $s);
+
+		$dice = \Mockery::mock(Dice::class);
+		$dice->shouldReceive('create')->with(IManageConfigValues::class)->andReturn($config);
+		$dice->shouldReceive('create')->with(L10n::class)->andReturn($l10n);
+		DI::init($dice, true);
+
+		$this->expectException(\Exception::class);
+		$this->expectExceptionMessage('This email address cannot be used for a registration on this site.');
+
+		User::create([
+			'username' => 'Max Muster',
+			'nickname' => 'maxmuster',
+			'email'    => 'victim+x@example.org',
+		]);
 	}
 }

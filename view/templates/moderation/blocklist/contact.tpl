@@ -21,7 +21,7 @@
 	<h3>{{$h_newblock}}</h3>
 	<p>
 		<a href="{{$baseurl}}/moderation/blocklist/contact/import" class="btn btn-primary">{{$import_csv}}</a>
-		<a href="{{$baseurl}}/moderation/blocklist/contact/export" class="btn btn-default">{{$export_csv}}</a>
+		<a href="{{$baseurl}}/moderation/blocklist/contact/export" class="btn btn-default" download>{{$export_csv}}</a>
 	</p>
 	<form action="{{$baseurl}}/moderation/blocklist/contact" method="get" class="form-inline" style="margin-bottom: 1em;">
 		<div class="form-group">

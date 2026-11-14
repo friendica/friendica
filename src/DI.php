@@ -148,11 +148,6 @@ abstract class DI
 		return self::$dice->create(Content\Item::class);
 	}
 
-	public static function activityFormatter(): Content\Conversation\ActivityFormatter
-	{
-		return self::$dice->create(Content\Conversation\ActivityFormatter::class);
-	}
-
 	public static function postTemplateBuilder(): Content\Conversation\PostTemplateBuilder
 	{
 		return self::$dice->create(Content\Conversation\PostTemplateBuilder::class);
@@ -161,6 +156,11 @@ abstract class DI
 	public static function conversationDataProvider(): Content\Conversation\ConversationDataProvider
 	{
 		return self::$dice->create(Content\Conversation\ConversationDataProvider::class);
+	}
+
+	public static function postInteractions(): Content\Conversation\PostInteractions
+	{
+		return self::$dice->create(Content\Conversation\PostInteractions::class);
 	}
 
 	public static function conversationRenderer(): Content\Conversation\ConversationRenderer
@@ -507,6 +507,11 @@ abstract class DI
 		return self::$dice->create(Contact\LocalRelationship\Repository\LocalRelationship::class);
 	}
 
+	public static function postPermissions(): Security\PostPermissions
+	{
+		return self::$dice->create(Security\PostPermissions::class);
+	}
+
 	public static function permissionSet(): Security\PermissionSet\Repository\PermissionSet
 	{
 		return self::$dice->create(Security\PermissionSet\Repository\PermissionSet::class);
@@ -575,6 +580,16 @@ abstract class DI
 	// "Post" namespace instances
 	//
 
+	public static function postLinkResolver(): Post\LinkResolver
+	{
+		return self::$dice->create(Post\LinkResolver::class);
+	}
+
+	public static function postFetcher(): Protocol\PostFetcher
+	{
+		return self::$dice->create(Protocol\PostFetcher::class);
+	}
+
 	public static function postUriGenerator(): Post\UriGenerator
 	{
 		return self::$dice->create(Post\UriGenerator::class);
@@ -601,6 +616,11 @@ abstract class DI
 	public static function auth(): Security\Authentication
 	{
 		return self::$dice->create(Security\Authentication::class);
+	}
+
+	public static function formSecurityToken(): Security\FormSecurityToken
+	{
+		return self::$dice->create(Security\FormSecurityToken::class);
 	}
 
 	//
@@ -644,6 +664,11 @@ abstract class DI
 		return self::$dice->create(Util\Emailer::class);
 	}
 
+	public static function renderedContent(): Content\Text\RenderedContent
+	{
+		return self::$dice->create(Content\Text\RenderedContent::class);
+	}
+
 	public static function postMediaRepository(): Content\Post\Repository\PostMedia
 	{
 		return self::$dice->create(Content\Post\Repository\PostMedia::class);
@@ -652,6 +677,12 @@ abstract class DI
 	public static function postMediaFactory(): Content\Post\Factory\PostMedia
 	{
 		return self::$dice->create(Content\Post\Factory\PostMedia::class);
+	}
+
+	// @todo Only for the procedural mod/photos.php; remove once photos is migrated to a module with constructor injection.
+	public static function mediaUsageRenderer(): Content\Post\MediaUsageRenderer
+	{
+		return self::$dice->create(Content\Post\MediaUsageRenderer::class);
 	}
 
 	public static function passwordExposedChecker(): Util\IPasswordExposedChecker

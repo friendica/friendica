@@ -23,6 +23,14 @@ class AbstractSession implements IHandleSessions
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function regenerateId(): IHandleSessions
+	{
+		return $this;
+	}
+
+	/**
 	 * {@inheritDoc}}
 	 */
 	public function exists(string $name): bool

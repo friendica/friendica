@@ -23,6 +23,7 @@ use Friendica\Content\Conversation\Factory\Community as CommunityFactory;
 use Friendica\Content\Conversation\Factory\Network as NetworkFactory;
 use Friendica\Content\GroupManager;
 use Friendica\Content\PagesManager;
+use Friendica\Content\Widget\SidebarMenu;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -57,6 +58,7 @@ class Network extends NetworkModule
 		private readonly GroupManager $groupManager,
 		private readonly PagesManager $pagesManager,
 		Page $page,
+		SidebarMenu $sidebarMenu,
 		IHandleUserSessions $session,
 		Database $database,
 		IManagePersonalConfigValues $pConfig,
@@ -88,6 +90,7 @@ class Network extends NetworkModule
 			$groupManager,
 			$pagesManager,
 			$page,
+			$sidebarMenu,
 			$session,
 			$database,
 			$pConfig,
@@ -125,7 +128,7 @@ class Network extends NetworkModule
 			$this->earlyHttpExit('');
 		}
 
-		$lockkey = 'network-ping-' . $this->session->getLocalUserId();
+		$lockkey = 'network-ping-' . $this->session->getLocalUserId() . '-' . md5(json_encode([$this->selectedTab, $this->parameters]));
 		if (!$this->lock->acquire($lockkey, 0)) {
 			$this->logger->debug('Ping-1-lock', ['uid' => $this->session->getLocalUserId()]);
 			$this->earlyHttpExit('');

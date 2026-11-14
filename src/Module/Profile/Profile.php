@@ -18,11 +18,13 @@ use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
+use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Event\ModProfileContentEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile as ProfileModel;
@@ -35,6 +37,7 @@ use Friendica\Network\HTTPException;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Profile\ProfileField\Repository\ProfileField;
 use Friendica\Protocol\ActivityPub;
+use Friendica\Util\HTTPSignature;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use Friendica\Util\Temporal;
@@ -48,6 +51,7 @@ class Profile extends BaseProfile
 		private readonly ProfileField $profileField,
 		private Page $page,
 		private readonly IManageConfigValues $config,
+		private readonly IManagePersonalConfigValues $pconfig,
 		private readonly IHandleUserSessions $session,
 		private readonly AppHelper $appHelper,
 		private readonly Database $database,
@@ -70,6 +74,19 @@ class Profile extends BaseProfile
 		if (ActivityPub::isRequest()) {
 			$user = $this->database->selectFirst('user', ['uid'], ['nickname' => $this->parameters['nickname'] ?? '', 'verified' => true, 'blocked' => false, 'account_removed' => false, 'account_expired' => false]);
 			if ($user) {
+				// @see https://github.com/friendica/friendica/issues/15873
+				// The tag relay at tags.pub takes a 200 answer to its profile request as
+				// permission to redistribute this user's public posts. When the tag relay
+				// is disabled for the node or the user opted out of relaying, check the
+				// signature and deny the request so the relay stops re-sharing.
+				if (!$this->config->get('system', 'relay_auto_subscribe_tags') || $this->pconfig->get($user['uid'], 'system', 'prevent-relay', false)) {
+					$signer = HTTPSignature::getSigner('', $_SERVER);
+					if (is_string($signer) && parse_url($signer, PHP_URL_HOST) === 'tags.pub') {
+						$this->logger->debug('Denying tag relay profile request', ['uid' => $user['uid'], 'signer' => $signer]);
+						$this->earlyJsonError(403, ['error' => 'Forbidden']);
+					}
+				}
+
 				try {
 					$data = ActivityPub\Transmitter::getProfile($user['uid'], ActivityPub::isAcceptedRequester($user['uid']));
 					header('Access-Control-Allow-Origin: *');
@@ -180,7 +197,7 @@ class Profile extends BaseProfile
 		}
 
 		if ($profile['about']) {
-			$basic_fields += self::buildField('about', $this->t('Description:'), BBCode::convertForUriId($profile['uri-id'], $profile['about']));
+			$basic_fields += self::buildField('about', $this->t('Description:'), DI::renderedContent()->convert($profile['uri-id'], $profile['about'], BBCode::INTERNAL));
 		}
 
 		if ($profile['xmpp']) {
@@ -255,7 +272,7 @@ class Profile extends BaseProfile
 		$publicCircles     = DBA::selectToArray('group', ['id', 'name'], ['uid' => $profile['uid'], 'deleted' => false, 'public' => true], ['order' => ['name']]);
 		foreach ($publicCircles as $publicCircle) {
 			$publicCircleLinks[] = sprintf(
-				'<a href="%s/profile/%s/circles/%d/download">%s</a>',
+				'<a href="%s/profile/%s/circles/%d/download" download>%s</a>',
 				$this->baseUrl,
 				urlencode((string) $profile['nickname']),
 				(int) $publicCircle['id'],

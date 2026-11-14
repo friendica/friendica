@@ -113,6 +113,8 @@ class Cron
 
 			Worker::add(Worker::PRIORITY_LOW, 'ExpireSearchIndex');
 
+			Worker::add(Worker::PRIORITY_LOW, 'ExpireRenderedContent');
+
 			Worker::add(Worker::PRIORITY_LOW, 'Expire');
 
 			Worker::add(Worker::PRIORITY_LOW, 'RemoveUnusedTags');

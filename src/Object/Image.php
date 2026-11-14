@@ -14,6 +14,7 @@ use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\System;
 use Friendica\DI;
 use Friendica\Util\Images;
+use Friendica\Util\Strings;
 use Imagick;
 use ImagickDraw;
 use ImagickPixel;
@@ -55,10 +56,10 @@ class Image implements \Stringable
 
 		if (Images::isSupportedMimeType($type)) {
 			$this->originType = $this->outputType = Images::getImageTypeByMimeType($type);
-		} elseif (($type == '') || str_starts_with($type, 'image/') || substr($type, 0, 12) == ' application/') {
+		} elseif (($type == '') || str_starts_with($type, 'image/') || str_starts_with($type, 'application/')) {
 			$this->originType = IMAGETYPE_UNKNOWN;
-			$this->outputType = IMAGETYPE_WEBP;
-			DI::logger()->debug('Unhandled image mime type, use WebP instead', ['type' => $type, 'filename' => $this->filename, 'size' => strlen($data)]);
+			$this->outputType = Images::getPreferredImageType();
+			DI::logger()->debug('Unhandled image mime type, use fallback instead', ['type' => $type, 'outputType' => $this->outputType, 'filename' => $this->filename, 'size' => strlen($data)]);
 		} else {
 			DI::logger()->debug('Unhandled mime type', ['type' => $type, 'filename' => $this->filename, 'size' => strlen($data)]);
 			$this->valid = false;
@@ -217,6 +218,12 @@ class Image implements \Stringable
 
 		if (($this->originType == IMAGETYPE_WEBP) && $this->isAnimatedWebP(substr($data, 0, 90))) {
 			DI::logger()->notice('Animated WebP images are unsupported by GDlib. Please install Imagick.', ['file' => $this->filename]);
+			return false;
+		}
+
+		$memory_limit = Strings::getBytesFromShorthand((string) ini_get('memory_limit'));
+		if ($memory_limit > 0 && !Images::fitsIntoMemory($data, $memory_limit - memory_get_usage())) {
+			DI::logger()->notice('Image is too large to be decoded within the memory limit', ['memory_limit' => $memory_limit, 'file' => $this->filename]);
 			return false;
 		}
 
@@ -741,6 +748,10 @@ class Image implements \Stringable
 
 			case IMAGETYPE_WEBP:
 				@imagewebp($this->image, $stream, DI::config()->get('system', 'jpeg_quality'));
+				break;
+
+			case IMAGETYPE_AVIF:
+				@imageavif($this->image, $stream, DI::config()->get('system', 'jpeg_quality'));
 				break;
 
 			case IMAGETYPE_BMP:

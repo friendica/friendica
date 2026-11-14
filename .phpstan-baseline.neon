@@ -8,6 +8,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method getPermissionsSQLByUserId\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Security\\PostPermissions\:\:getSQL\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Content/Widget/TagCloud.php
+
+		-
+			message: '''
 				#^Call to deprecated method loadINIConfigFile\(\) of class Friendica\\Core\\Config\\Util\\ConfigFileManager\:
 				2018\.12 since version 2018\.12$#
 			'''
@@ -37,10 +46,100 @@ parameters:
 			path: src/Factory/Api/Mastodon/Emoji.php
 
 		-
+			message: '''
+				#^Call to deprecated method getPermissionsSQLByUserId\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Security\\PostPermissions\:\:getSQL\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: src/Model/Event.php
+
+		-
+			message: '''
+				#^Call to deprecated method fetchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Protocol\\PostFetcher\:\:fetchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Model/Post/Media.php
+
+		-
+			message: '''
+				#^Call to deprecated method fetchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Protocol\\PostFetcher\:\:fetchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: src/Module/Api/Mastodon/Search.php
+
+		-
+			message: '''
+				#^Call to deprecated method fetchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Protocol\\PostFetcher\:\:fetchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: src/Module/Api/Twitter/Search/Tweets.php
+
+		-
 			message: '#^PHPDoc type Friendica\\Module\\Api\\ApiResponse of property Friendica\\Module\\BaseApi\:\:\$response is not the same as PHPDoc type Friendica\\Module\\Response of overridden property Friendica\\BaseModule\:\:\$response\.$#'
 			identifier: property.phpDocType
 			count: 1
 			path: src/Module/BaseApi.php
+
+		-
+			message: '''
+				#^Call to deprecated method fetchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Protocol\\PostFetcher\:\:fetchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: src/Module/Contact/Follow.php
+
+		-
+			message: '''
+				#^Call to deprecated method getPermissionsSQLByUserId\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Security\\PostPermissions\:\:getSQL\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Module/Item/Display.php
+
+		-
+			message: '''
+				#^Call to deprecated method getPermissionsConditionArrayByUserId\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Security\\PostPermissions\:\:getConditionArray\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Module/Profile/Conversations.php
+
+		-
+			message: '''
+				#^Call to deprecated method fetchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Protocol\\PostFetcher\:\:fetchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 2
+			path: src/Module/Search/Index.php
+
+		-
+			message: '''
+				#^Call to deprecated method searchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Post\\LinkResolver\:\:searchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Module/Search/Index.php
+
+		-
+			message: '''
+				#^Call to deprecated method getPermissionsSQLByUserId\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Security\\PostPermissions\:\:getSQL\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Module/Update/Profile.php
 
 		-
 			message: '''
@@ -50,6 +149,69 @@ parameters:
 			identifier: method.deprecated
 			count: 1
 			path: src/Network/HTTPClient/Client/HttpClient.php
+
+		-
+			message: '''
+				#^Call to deprecated method fetchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Protocol\\PostFetcher\:\:fetchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Protocol/ActivityPub/ClientToServer.php
+
+		-
+			message: '''
+				#^Call to deprecated method fetchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Protocol\\PostFetcher\:\:fetchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Protocol/ActivityPub/Processor.php
+
+		-
+			message: '''
+				#^Call to deprecated method getQuoteUriId\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Protocol\\PostFetcher\:\:getQuoteUriId\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Protocol/ActivityPub/Processor.php
+
+		-
+			message: '''
+				#^Call to deprecated method searchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Post\\LinkResolver\:\:searchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 3
+			path: src/Protocol/ActivityPub/Processor.php
+
+		-
+			message: '''
+				#^Call to deprecated method getURIByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Post\\LinkResolver\:\:getURIByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 3
+			path: src/Protocol/ActivityPub/Receiver.php
+
+		-
+			message: '''
+				#^Call to deprecated method searchByLink\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Post\\LinkResolver\:\:searchByLink\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Protocol/ActivityPub/Receiver.php
+
+		-
+			message: '''
+				#^Call to deprecated method getQuoteUriId\(\) of class Friendica\\Model\\Item\:
+				2026\.11 \- Use \\Friendica\\Protocol\\PostFetcher\:\:getQuoteUriId\(\) instead$#
+			'''
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/Protocol/DFRN.php
 
 		-
 			message: '#^Parameter \#1 \$permissions of method Friendica\\Util\\ACLFormatter\:\:toString\(\) expects array\|string, int given\.$#'

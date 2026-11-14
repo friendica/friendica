@@ -25,6 +25,7 @@ use Friendica\Model\User;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
 use Friendica\Util\Proxy;
+use Friendica\Util\Temporal;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 
@@ -131,12 +132,9 @@ class Register extends BaseModule
 		} else {
 			$publish_tpl     = Renderer::getMarkupTemplate('profile/publish.tpl');
 			$profile_publish = Renderer::replaceMacros($publish_tpl, [
-				'$instance'     => 'reg',
-				'$pubdesc'      => DI::l10n()->t('Include your profile in member directory?'),
-				'$yes_selected' => '',
-				'$no_selected'  => ' checked="checked"',
-				'$str_yes'      => DI::l10n()->t('Yes'),
-				'$str_no'       => DI::l10n()->t('No'),
+				'$instance' => 'reg',
+				'$pubdesc'  => DI::l10n()->t('Include your profile in member directory?'),
+				'$checked'  => '',
 			]);
 		}
 
@@ -194,6 +192,9 @@ class Register extends BaseModule
 
 		$ask_password = !DBA::count('contact');
 
+		$timezone = ['timezone_select', DI::l10n()->t('Your Timezone:'), Temporal::getTimezoneSelect(DI::appHelper()->getTimeZone()), ''];
+		$language = ['language', DI::l10n()->t('Your Language:'), L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language')), DI::l10n()->t('Set the language we use to show you friendica interface and to send you emails'), DI::l10n()->getAvailableLanguages()];
+
 		// Retrieve system messages to display on the registration page
 		$notices = DI::sysmsg()->flushNotices();
 
@@ -245,6 +246,8 @@ class Register extends BaseModule
 			'$additional'            => !empty(DI::userSession()->getLocalUserId()),
 			'$parent_password'       => ['parent_password', DI::l10n()->t('Parent Password:'), '', DI::l10n()->t('Please enter the password of the parent account to legitimize your request.')],
 			'$acct_type'             => $acct_type,
+			'$timezone'              => $timezone,
+			'$language'              => $language,
 
 		]);
 
@@ -362,9 +365,30 @@ class Register extends BaseModule
 			DI::baseUrl()->redirect('register?' . http_build_query($regdata));
 		}
 
+		if (!$additional_account && self::getPolicy() === self::APPROVE) {
+			if (!User::getAdminEmailList()) {
+				$this->logger->critical('Registration policy is set to APPROVE but no admin email address has been set in config.admin_email');
+				DI::sysmsg()->addNotice(DI::l10n()->t('Your registration can not be processed.'));
+				DI::baseUrl()->redirect();
+			}
+
+			// Check if the note to the admin is actually filled out
+			if (empty($_POST['permonlybox'])) {
+				DI::sysmsg()->addNotice(DI::l10n()->t('You have to leave a request note for the admin.')
+					. DI::l10n()->t('Your registration can not be processed.'));
+
+				DI::baseUrl()->redirect('register');
+			}
+		}
+
 		$post['blocked']  = $blocked;
 		$post['verified'] = $verified;
-		$post['language'] = L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language'));
+		if (empty($post['language']) || !array_key_exists($post['language'], DI::l10n()->getAvailableLanguages())) {
+			$post['language'] = L10n::detectLanguage($_SERVER, $_GET, DI::config()->get('system', 'language'));
+		}
+		if (!in_array($post['timezone'] ?? '', \DateTimeZone::listIdentifiers(), true)) {
+			unset($post['timezone']);
+		}
 
 		try {
 			$result = Model\User::create($post);
@@ -474,20 +498,6 @@ class Register extends BaseModule
 				DI::baseUrl()->redirect();
 			}
 		} elseif (self::getPolicy() === self::APPROVE) {
-			if (!User::getAdminEmailList()) {
-				$this->logger->critical('Registration policy is set to APPROVE but no admin email address has been set in config.admin_email');
-				DI::sysmsg()->addNotice(DI::l10n()->t('Your registration can not be processed.'));
-				DI::baseUrl()->redirect();
-			}
-
-			// Check if the note to the admin is actually filled out
-			if (empty($_POST['permonlybox'])) {
-				DI::sysmsg()->addNotice(DI::l10n()->t('You have to leave a request note for the admin.')
-					. DI::l10n()->t('Your registration can not be processed.'));
-
-				$this->baseUrl->redirect('register');
-			}
-
 			try {
 				Model\Register::createForApproval($user['uid'], DI::config()->get('system', 'language'), $_POST['permonlybox']);
 			} catch (\Throwable) {

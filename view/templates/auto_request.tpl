@@ -37,7 +37,7 @@
 {{else}}
 		<input type="text" name="dfrn_url" id="dfrn-url" value="{{$myaddr}}">
 {{/if}}
-		<input type="hidden" name="url" id="url" value="{{$url}}">
+		<input type="hidden" name="url" id="url" value="{{$contact_url}}">
 		<div id="dfrn-request-url-end"></div>
 	</div>
 

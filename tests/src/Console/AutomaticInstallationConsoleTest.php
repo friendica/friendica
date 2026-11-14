@@ -45,7 +45,11 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 			'logs'    => [],
 			'config2' => [],
 		];
-		$this->root  = vfsStream::setup('friendica', 0777, $structure);
+		$this->root = vfsStream::setup('friendica', 0777, $structure);
+		$staticDir  = $this->root->getChild('static');
+		$configDir  = $this->root->getChild('config');
+		self::assertInstanceOf(vfsStreamDirectory::class, $staticDir);
+		self::assertInstanceOf(vfsStreamDirectory::class, $configDir);
 		$projectRoot = dirname(__DIR__, 3);
 		$staticFiles = [
 			'static' . DIRECTORY_SEPARATOR . 'dbstructure.config.php',
@@ -59,22 +63,19 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 				$parts          = explode(DIRECTORY_SEPARATOR, $source);
 				$targetFileName = end($parts);
 				vfsStream::newFile($targetFileName)
-					->at($this->root->getChild('static'))
+					->at($staticDir)
 					->setContent(file_get_contents($file));
 			}
 		}
 		$modFile = $projectRoot . DIRECTORY_SEPARATOR . 'mods' . DIRECTORY_SEPARATOR . 'local.config.ci.php';
 		if (file_exists($modFile)) {
 			vfsStream::newFile('local.config.php')
-				->at($this->root->getChild('config'))
+				->at($configDir)
 				->setContent(file_get_contents($modFile));
 		}
 
 		if ($this->root->hasChild('config' . DIRECTORY_SEPARATOR . 'local.config.php')) {
-			$configDir = $this->root->getChild('config');
-			if ($configDir instanceof vfsStreamDirectory) {
-				$configDir->removeChild('local.config.php');
-			}
+			$configDir->removeChild('local.config.php');
 		}
 
 		$l10nMock = $this->createMock(L10n::class);

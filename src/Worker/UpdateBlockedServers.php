@@ -25,7 +25,15 @@ class UpdateBlockedServers
 		$changed   = 0;
 		$unchanged = 0;
 		while ($gserver = DBA::fetch($gservers)) {
-			$blocked = Network::isUriBlocked(new Uri($gserver['url']));
+			try {
+				$uri = new Uri($gserver['url']);
+			} catch (\Throwable) {
+				// A single stored URL that cannot be parsed must not abort the update for all following servers
+				DI::logger()->warning('Invalid URL', ['url' => $gserver['url']]);
+				continue;
+			}
+
+			$blocked = Network::isUriBlocked($uri);
 			if (!is_null($gserver['blocked']) && ($blocked == $gserver['blocked'])) {
 				$unchanged++;
 				continue;

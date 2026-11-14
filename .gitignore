@@ -90,6 +90,7 @@ venv/
 .php_cs.cache
 .php-cs-fixer.cache
 .phpmd.result-cache.php
+.deptrac.cache
 
 #ignore avatar picture cache path
 /avatar

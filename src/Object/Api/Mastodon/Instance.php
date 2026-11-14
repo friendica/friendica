@@ -38,16 +38,20 @@ class Instance extends BaseDataTransferObject
 	protected bool $registrations;
 	protected bool $approval_required;
 	protected bool $invites_enabled;
+	/** Pleroma extension, clients use it to detect the support of emoji reactions */
+	protected array $pleroma;
+	/** Fedibird extension, used by clients of Fedibird and kmyblue */
+	protected array $fedibird_capabilities;
 
 	public function __construct(IManageConfigValues $config, BaseURL $baseUrl, Database $database, protected Configuration $configuration, protected ?Account $contact_account, protected array $rules)
 	{
 		$register_policy = Register::getPolicy();
 
 		$this->uri               = $baseUrl->getHost();
-		$this->title             = $config->get('config', 'sitename');
-		$this->short_description = $this->description = $config->get('config', 'info');
-		$this->email             = $config->get('config', 'sender_email');
-		$this->version           = '2.8.0 (compatible; Friendica ' . App::VERSION . ')';
+		$this->title             = $config->get('config', 'sitename')                  ?? '';
+		$this->short_description = $this->description = $config->get('config', 'info') ?? '';
+		$this->email             = $config->get('config', 'sender_email')              ?? '';
+		$this->version           = '2.8.0 (compatible; Friendica ' . App::version() . ')';
 		$this->urls              = ['streaming_api' => '']; // Not supported
 		$this->stats             = new Stats($config, $database);
 		$this->thumbnail         = $baseUrl . (new Header($config))->getMastodonBannerPath();
@@ -56,5 +60,9 @@ class Instance extends BaseDataTransferObject
 		$this->registrations     = ($register_policy !== Register::CLOSED);
 		$this->approval_required = ($register_policy === Register::APPROVE);
 		$this->invites_enabled   = false;
+
+		// Signal the support of emoji reactions
+		$this->pleroma               = ['metadata' => ['features' => ['pleroma_emoji_reactions']]];
+		$this->fedibird_capabilities = ['emoji_reaction'];
 	}
 }
