@@ -286,6 +286,21 @@ class GServer
 	}
 
 	/**
+	 * Checks whether a server has not answered for longer than the given number of days.
+	 * A limit of 0 disables the check.
+	 */
+	public static function isAbandoned(string $created, string $last_contact, int $days, string $now): bool
+	{
+		if ($days <= 0) {
+			return false;
+		}
+
+		$contact_time = max(strtotime($created) ?: 0, strtotime($last_contact) ?: 0);
+
+		return $contact_time < strtotime($now . ' -' . $days . ' day');
+	}
+
+	/**
 	 * Calculate the next update day
 	 *
 	 * @param bool $success

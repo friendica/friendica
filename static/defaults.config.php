@@ -316,6 +316,11 @@ return [
 		// This can alternatively be set on a per-account basis in the pconfig table.
 		'circle_edit_image_limit' => 400,
 
+		// gserver_abandoned_days (Integer)
+		// Servers that failed and haven't answered for this many days are no longer polled by the cron, unless they have contacts with local data.
+		// They are still checked when they are referenced again. 0 disables this.
+		'gserver_abandoned_days' => 365,
+
 		// gserver_update_limit (Integer)
 		// How many servers should be checked at a time?
 		'gserver_update_limit' => 100,
