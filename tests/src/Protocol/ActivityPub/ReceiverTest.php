@@ -1,0 +1,88 @@
+<?php
+
+// Copyright (C) 2010-2026, the Friendica project
+// SPDX-FileCopyrightText: 2010-2026 the Friendica project
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+declare(strict_types=1);
+
+namespace Friendica\Test\src\Protocol\ActivityPub;
+
+use Friendica\Database\DBA;
+use Friendica\Protocol\ActivityPub\Receiver;
+use Friendica\Test\FixtureTestCase;
+use Friendica\Util\DateTimeFormat;
+use PHPUnit\Framework\Attributes\DataProvider;
+
+class ReceiverTest extends FixtureTestCase
+{
+	private const OBJECT_ID = 'https://video.example/videos/1';
+
+	/**
+	 * Builds a compacted object with a single "as:url" entry.
+	 *
+	 * @param array|string $url
+	 */
+	private static function compactedObject(string $type, $url): array
+	{
+		return ['@id' => self::OBJECT_ID, '@type' => $type, 'as:url' => $url];
+	}
+
+	private static function htmlLink(string $href): array
+	{
+		return [['@type' => 'as:Link', 'as:href' => ['@id' => $href], 'as:mediaType' => 'text/html']];
+	}
+
+	/**
+	 * Seeds the parse_url cache, so the audio/video branch doesn't fetch the URL.
+	 */
+	private function seedSiteinfoCache(string $url): void
+	{
+		DBA::insert('parsed_url', [
+			'url_hash' => hash('sha256', $url),
+			'oembed'   => false,
+			'url'      => $url,
+			'content'  => serialize(['url' => $url, 'type' => 'link']),
+			'created'  => DateTimeFormat::utcNow(),
+			'expires'  => DateTimeFormat::utc('now + 1 day'),
+		]);
+	}
+
+	public static function dataInvalidAlternateUrl(): array
+	{
+		return [
+			'video-link-javascript' => [self::compactedObject('as:Video', self::htmlLink('javascript:alert(document.domain)'))],
+			'audio-link-javascript' => [self::compactedObject('as:Audio', self::htmlLink('javascript:alert(document.domain)'))],
+			'video-link-data'       => [self::compactedObject('as:Video', self::htmlLink('data:text/html,<script>alert(1)</script>'))],
+			'video-plain-url'       => [self::compactedObject('as:Video', ['@id' => 'javascript:alert(document.domain)'])],
+			'note-plain-url'        => [self::compactedObject('as:Note', ['@id' => 'javascript:alert(document.domain)'])],
+		];
+	}
+
+	#[DataProvider('dataInvalidAlternateUrl')]
+	public function testInvalidAlternateUrlIsDropped(array $object): void
+	{
+		$objectData = Receiver::getObjectDataFromActivity($object);
+
+		self::assertNull($objectData['alternate-url']);
+	}
+
+	public static function dataValidAlternateUrl(): array
+	{
+		return [
+			'video-link' => ['as:Video', 'https://video.example/w/abc'],
+			'audio-link' => ['as:Audio', 'https://audio.example/track/abc'],
+		];
+	}
+
+	#[DataProvider('dataValidAlternateUrl')]
+	public function testValidAlternateUrlIsKept(string $type, string $href): void
+	{
+		$this->seedSiteinfoCache($href);
+
+		$objectData = Receiver::getObjectDataFromActivity(self::compactedObject($type, self::htmlLink($href)));
+
+		self::assertSame($href, $objectData['alternate-url']);
+	}
+}
