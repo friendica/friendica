@@ -249,6 +249,10 @@ class Network extends Timeline
 			}
 		}
 
+		$this->page['aside'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('network_sidebar_configure.tpl'), [
+			'$description' => $this->l10n->t('Configure these sections'),
+		]);
+
 		if (!$this->raw) {
 			$o .= $this->getTabsHTML();
 
