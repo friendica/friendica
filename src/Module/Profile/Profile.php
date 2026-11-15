@@ -173,16 +173,6 @@ class Profile extends BaseProfile
 
 		$basic_fields = [];
 
-		$basic_fields += self::buildField('fullname', $this->t('Display name:'), $this->cleanInput($profile['uri-id'], $profile['name']));
-
-		if (Feature::isEnabled($profile['uid'], Feature::MEMBER_SINCE)) {
-			$basic_fields += self::buildField(
-				'membersince',
-				$this->t('Joined:'),
-				$this->l10n->mediumDate($profile['register_date']),
-			);
-		}
-
 		if (!empty($profile['dob']) && $profile['dob'] > DBA::NULL_DATE) {
 			$short_bd_format = $this->t('d MMMM');
 			$dob             = intval($profile['dob'])
@@ -194,36 +184,6 @@ class Profile extends BaseProfile
 			if ($age = Temporal::getAgeByTimezone($profile['dob'], $profile['timezone'])) {
 				$basic_fields += self::buildField('age', $this->t('Age: '), $this->tt('%d year old', '%d years old', $age));
 			}
-		}
-
-		if ($profile['about']) {
-			$basic_fields += self::buildField('about', $this->t('Description:'), DI::renderedContent()->convert($profile['uri-id'], $profile['about'], BBCode::INTERNAL));
-		}
-
-		if ($profile['xmpp']) {
-			$basic_fields += self::buildField('xmpp', $this->t('XMPP:'), $this->cleanInput($profile['uri-id'], $profile['xmpp']));
-		}
-
-		if ($profile['matrix']) {
-			$basic_fields += self::buildField('matrix', $this->t('Matrix:'), $this->cleanInput($profile['uri-id'], $profile['matrix']));
-		}
-
-		if ($profile['homepage']) {
-			$basic_fields += self::buildField(
-				'homepage',
-				$this->t('Homepage:'),
-				$this->tryRelMe($profile['homepage']) ?: $this->cleanInput($profile['uri-id'], $profile['homepage']),
-			);
-		}
-
-		if (
-			$profile['address']
-			|| $profile['locality']
-			|| $profile['postal-code']
-			|| $profile['region']
-			|| $profile['country-name']
-		) {
-			$basic_fields += self::buildField('location', $this->t('Location:'), $this->cleanInput($profile['uri-id'], ProfileModel::formatLocation($profile)));
 		}
 
 		if ($profile['pub_keywords']) {

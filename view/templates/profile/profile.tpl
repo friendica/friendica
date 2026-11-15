@@ -24,18 +24,6 @@
 		</ul>
 	</div>
 {{/if}}
-	<dl id="{{$basic_fields.fullname.id}}" class="row {{$basic_fields.fullname.class|default:'aprofile'}}">
-		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.fullname.label}}</dt>
-		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.fullname.value}}</dd>
-	</dl>
-
-{{if $basic_fields.membersince}}
-	<dl id="aprofile-membersince" class="row {{$basic_fields.membersince.class|default:'aprofile'}}">
-		<hr class="profile-separator">
-		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.membersince.label}}</dt>
-		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.membersince.value}}</dd>
-	</dl>
-{{/if}}
 
 {{if $basic_fields.birthday}}
 	<dl id="aprofile-birthday" class="row {{$basic_fields.birthday.class|default:'aprofile'}}">
@@ -50,38 +38,6 @@
 		<hr class="profile-separator">
 		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.age.label}}</dt>
 		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.age.value}}</dd>
-	</dl>
-{{/if}}
-
-{{if $basic_fields.location}}
-	<dl id="aprofile-location" class="row {{$basic_fields.location.class|default:'aprofile'}}">
-		<hr class="profile-separator">
-		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.location.label}}</dt>
-		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.location.value}}</dd>
-	</dl>
-{{/if}}
-
-{{if $basic_fields.homepage}}
-	<dl id="aprofile-homepage" class="row {{$basic_fields.homepage.class|default:'aprofile'}}">
-		<hr class="profile-separator">
-		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.homepage.label}}</dt>
-		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.homepage.value nofilter}}{{if $profile.homepage_verified}} <span title="{{$homepage_verified}}">✔</span>{{/if}}</dd>
-	</dl>
-{{/if}}
-
-{{if $basic_fields.xmpp}}
-	<dl id="aprofile-xmpp" class="row {{$basic_fields.xmpp.class|default:'aprofile'}}">
-		<hr class="profile-separator">
-		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.xmpp.label}}</dt>
-		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry"><a href="xmpp:{{$basic_fields.xmpp.value nofilter}}">{{$basic_fields.xmpp.value nofilter}}</a></dd>
-	</dl>
-{{/if}}
-
-{{if $basic_fields.matrix}}
-	<dl id="aprofile-matrix" class="row {{$basic_fields.matrix.class|default:'aprofile'}}">
-		<hr class="profile-separator">
-		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.matrix.label}}</dt>
-		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry"><a href="https://matrix.to/#/{{$basic_fields.matrix.value nofilter}}">{{$basic_fields.matrix.value nofilter}}</a></dd>
 	</dl>
 {{/if}}
 
