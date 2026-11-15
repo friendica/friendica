@@ -89,30 +89,6 @@
 									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 text-muted">{{$profileurllabel}}</div><a target="blank" href="{{$profileurl}}">{{$profileurl}}</a>
 								</div>
 
-								{{if $location}}
-								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-									<hr class="profile-separator">
-									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 text-muted">{{$location_label}}</div>
-									<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">{{$location nofilter}}</div>
-								</div>
-								{{/if}}
-
-								{{if $xmpp}}
-								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-									<hr class="profile-separator">
-									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 text-muted">{{$xmpp_label}}</div>
-									<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">{{$xmpp}}</div>
-								</div>
-								{{/if}}
-
-								{{if $matrix}}
-								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-									<hr class="profile-separator">
-									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 text-muted">{{$matrix_label}}</div>
-									<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">{{$matrix}}</div>
-								</div>
-								{{/if}}
-
 								{{if $keywords}}
 								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 									<hr class="profile-separator">
@@ -121,13 +97,6 @@
 								</div>
 								{{/if}}
 
-								{{if $about}}
-								<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-									<hr class="profile-separator">
-									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 text-muted">{{$about_label}}</div>
-									<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">{{$about nofilter}}</div>
-								</div>
-								{{/if}}
 							</div>
 						</div>
 						<div class="clear"></div>
