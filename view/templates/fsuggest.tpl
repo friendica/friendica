@@ -7,6 +7,7 @@
 <div class="generic-page-wrapper">
 	<h2>{{$fsuggest_title}}</h2>
 	<form id="fsuggest-form" action="fsuggest/{{$contact_id}}" method="post">
+		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 		{{include file="field_select.tpl" field=$fsuggest_select}}
 		<div id="fsuggest-submit-wrapper">
 			<button class="btn btn-primary" id="fsuggest-submit" type="submit" name="submit" value="{{$submit}}">{{$submit}}</button>

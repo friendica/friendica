@@ -53,6 +53,8 @@ class FriendSuggest extends BaseModule
 	{
 		$cid = intval($this->parameters['contact']);
 
+		self::checkFormSecurityTokenRedirectOnError('fsuggest/' . $cid, 'fsuggest');
+
 		// We do query the "uid" as well to ensure that it is our contact
 		if (!$this->dba->exists('contact', ['id' => $cid, 'uid' => DI::userSession()->getLocalUserId()])) {
 			throw new NotFoundException($this->t('Contact not found.'));
@@ -135,7 +137,8 @@ class FriendSuggest extends BaseModule
 				'',
 				$formattedContacts,
 			],
-			'$submit' => $this->t('Submit'),
+			'$submit'              => $this->t('Submit'),
+			'$form_security_token' => self::getFormSecurityToken('fsuggest'),
 		]);
 	}
 }
