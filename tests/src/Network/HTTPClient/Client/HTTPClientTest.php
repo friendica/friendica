@@ -319,8 +319,57 @@ class HTTPClientTest extends MockedTestCase
 		DI::config()->set('system', 'block_private_addresses', true);
 		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
 
-		// URLResolver appends a slash to single-segment paths
-		self::assertSame($url . '/final/', DI::httpClient()->finalUrl($url . '/redirect'));
+		self::assertSame($url . '/final', DI::httpClient()->finalUrl($url . '/redirect'));
+	}
+
+	public static function finalUrlLinkProvider(): array
+	{
+		return [
+			'og:url wins over canonical' => ['/og', '/final-og'],
+			'canonical'                  => ['/canonical', '/final-canonical'],
+		];
+	}
+
+	/** Ensures finalUrl() follows og:url and canonical links. */
+	#[DataProvider('finalUrlLinkProvider')]
+	public function testFinalUrlFollowsPageLinks(string $path, string $expected): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		self::assertSame($url . $expected, DI::httpClient()->finalUrl($url . $path));
+	}
+
+	/** Ensures finalUrl() doesn't follow an og:url into the private network. */
+	public function testFinalUrlDoesNotFollowPageLinkToPrivateTarget(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		$marker = sys_get_temp_dir() . '/friendica-sink-hit-' . parse_url($url, PHP_URL_PORT);
+		@unlink($marker);
+
+		self::assertSame($url . '/og-loopback', DI::httpClient()->finalUrl($url . '/og-loopback'));
+		self::assertFileDoesNotExist($marker, 'the og:url into the private network was followed');
+	}
+
+	/** Ensures every hop of finalUrl() connects to the checked addresses. */
+	public function testFinalUrlHopsArePinned(): void
+	{
+		$this->httpRequestHandler->setHandler(new MockHandler([
+			new Response(302, ['Location' => 'https://friendi.ca/']),
+			new Response(200, ['Content-Type' => 'text/plain']),
+		]));
+		$client = DI::httpClient();
+		$pins   = $this->recordPins();
+
+		self::assertSame('https://friendi.ca/', $client->finalUrl('https://mastodon.social'));
+
+		self::assertCount(2, $pins);
+		self::assertMatchesRegularExpression('/^mastodon\\.social:443:/', $pins[0][0]);
+		self::assertMatchesRegularExpression('/^friendi\\.ca:443:/', $pins[1][0]);
 	}
 
 	/** Ensures finalUrl() checks every redirect target, not only the first URL. */

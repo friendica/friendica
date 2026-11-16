@@ -52,6 +52,19 @@ switch (parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH)) {
 		header('Location: http://localhost:' . $_SERVER['SERVER_PORT'] . '/hit', true, 302);
 		break;
 
+	case '/og':
+		echo '<html><head><meta property="og:url" content="/final-og"><link rel="canonical" href="/final-canonical"></head></html>';
+		break;
+
+	case '/canonical':
+		echo '<html><head><link rel="canonical" href="/final-canonical"></head></html>';
+		break;
+
+	case '/og-loopback':
+		// og:url into the private network under another loopback name
+		echo '<html><head><meta property="og:url" content="http://localhost:' . $_SERVER['SERVER_PORT'] . '/hit"></head></html>';
+		break;
+
 	case '/hit':
 		touch(sys_get_temp_dir() . '/friendica-sink-hit-' . $_SERVER['SERVER_PORT']);
 		echo 'hit';

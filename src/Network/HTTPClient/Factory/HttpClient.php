@@ -10,17 +10,14 @@ namespace Friendica\Network\HTTPClient\Factory;
 use Friendica\App;
 use Friendica\BaseFactory;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\System;
 use Friendica\Network\HTTPClient\Client;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
-use Friendica\Util\Strings;
 use GuzzleHttp;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
-use mattwright\URLResolver;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
@@ -106,16 +103,13 @@ class HttpClient extends BaseFactory
 			'handler'               => $handlerStack,
 		]);
 
-		$resolver = new URLResolver();
-		// One hop per call: HttpClient::finalUrl() follows the hops itself and checks every target.
-		$resolver->setMaxRedirects(1);
-		$resolver->setRequestTimeout(10);
-		// if the file is too large then exit
-		$resolver->setMaxResponseDataSize($this->config->get('performance', 'max_response_data_size', 1000000));
-		// Designate a temporary file that will store cookies during the session.
-		// Some websites test the browser for cookie support, so this enhances results.
-		$resolver->setCookieJar(System::getTempPath() . '/resolver-cookie-' . Strings::getRandomName(10));
-
-		return new Client\HttpClient($logger, $this->profiler, $guzzle, $resolver, $this->baseUrl, (int) $this->config->get('performance', 'max_download_size', 0));
+		return new Client\HttpClient(
+			$logger,
+			$this->profiler,
+			$guzzle,
+			$this->baseUrl,
+			(int) $this->config->get('performance', 'max_download_size', 0),
+			(int) $this->config->get('performance', 'max_response_data_size', 1000000),
+		);
 	}
 }

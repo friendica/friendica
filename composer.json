@@ -46,7 +46,6 @@
 		"level-2/dice": "^4",
 		"lightopenid/lightopenid": "dev-master",
 		"matriphe/iso-639": "^1.2",
-		"mattwright/urlresolver": "^2.0",
 		"michelf/php-markdown": "^1.7",
 		"minishlink/web-push": "^10",
 		"mobiledetect/mobiledetectlib": "^4.11",
