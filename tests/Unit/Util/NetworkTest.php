@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Friendica\Test\Unit\Util;
 
 use Friendica\Util\Network;
+use GuzzleHttp\Psr7\Uri;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -134,5 +135,22 @@ class NetworkTest extends TestCase
 	public function testIsAllowedInternalHost(bool $expected, string $host, string $allowedList): void
 	{
 		self::assertSame($expected, Network::isAllowedInternalHost($host, $allowedList));
+	}
+
+	public static function dataCurlResolveEntry(): array
+	{
+		return [
+			'https default port' => ['example.com:443:192.0.2.1', 'https://example.com/path', ['192.0.2.1']],
+			'http default port'  => ['example.com:80:192.0.2.1', 'http://example.com/', ['192.0.2.1']],
+			'explicit port'      => ['example.com:8443:192.0.2.1', 'https://example.com:8443/', ['192.0.2.1']],
+			'ipv6 in brackets'   => ['example.com:443:[2001:db8::1]', 'https://example.com/', ['2001:db8::1']],
+			'several addresses'  => ['example.com:443:192.0.2.1,[2001:db8::1]', 'https://example.com/', ['192.0.2.1', '2001:db8::1']],
+		];
+	}
+
+	#[DataProvider('dataCurlResolveEntry')]
+	public function testGetCurlResolveEntry(string $expected, string $url, array $addresses): void
+	{
+		self::assertSame($expected, Network::getCurlResolveEntry(new Uri($url), $addresses));
 	}
 }

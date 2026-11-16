@@ -67,12 +67,17 @@ class HttpClient extends BaseFactory
 		) use ($logger): void {
 			$logger->info('Curl redirect.', ['url' => $request->getUri(), 'to' => $uri, 'method' => $request->getMethod()]);
 
-			// Apply the outbound restrictions to every redirect target.
-			if (Network::isUriBlocked($uri) || !Network::isValidHttpUrl((string) $uri) || Network::isPrivateTarget($uri)) {
+			// Apply the outbound restrictions to every redirect target, AddressPinningMiddleware checks the address.
+			if (Network::isUriBlocked($uri) || !Network::isValidHttpUrl((string) $uri)) {
 				$logger->notice('Redirect target is not allowed.', ['url' => $request->getUri(), 'to' => $uri]);
 				throw new TransferException('Redirect to a disallowed target: ' . $uri);
 			}
 		};
+
+		$handlerStack ??= HandlerStack::create();
+		// Pushed last, so it runs below the redirect middleware and checks every hop
+		$handlerStack->remove('address_pinning');
+		$handlerStack->push(new Client\AddressPinningMiddleware($logger), 'address_pinning');
 
 		$guzzle = new GuzzleHttp\Client([
 			RequestOptions::ALLOW_REDIRECTS => [
@@ -98,7 +103,7 @@ class HttpClient extends BaseFactory
 			RequestOptions::VERSION => (curl_version()['features'] & CURL_VERSION_HTTP2) ? 2.0 : 1.1,
 			RequestOptions::PROXY   => $proxy,
 			RequestOptions::HEADERS => [],
-			'handler'               => $handlerStack ?? HandlerStack::create(),
+			'handler'               => $handlerStack,
 		]);
 
 		$resolver = new URLResolver();

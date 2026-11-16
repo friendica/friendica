@@ -94,11 +94,7 @@ class HttpClient implements ICanSendHttpRequests
 			return CurlResult::createErrorCurl($this->logger, $url);
 		}
 
-		if (Network::isPrivateTarget(new Uri($url))) {
-			$this->logger->notice('Target is not on the public internet.', ['url' => $url]);
-			$this->profiler->stopRecording();
-			return CurlResult::createErrorCurl($this->logger, $url);
-		}
+		// AddressPinningMiddleware checks the target address of the request and every redirect
 
 		$conf = [];
 
