@@ -22,6 +22,7 @@ use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use mattwright\URLResolver;
+use mattwright\URLResolverResult;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -31,6 +32,9 @@ use Psr\Log\LoggerInterface;
  */
 class HttpClient implements ICanSendHttpRequests
 {
+	/** Upper bound for redirects and og:url/canonical hops in finalUrl() */
+	private const MAX_RESOLVER_HOPS = 10;
+
 	public function __construct(private readonly LoggerInterface $logger, private readonly Profiler $profiler, private readonly Client $client, private readonly URLResolver $resolver, private readonly App\BaseURL $baseUrl, private readonly int $maxBodySize = 0) {}
 
 	/**
@@ -356,13 +360,65 @@ class HttpClient implements ICanSendHttpRequests
 		$url = trim($url, "'");
 
 		$this->resolver->setUserAgent($this->getUserAgent(HttpClientRequest::URLRESOLVER));
-		$urlResult = $this->resolver->resolveURL($url);
 
-		if ($urlResult->didErrorOccur()) {
-			throw new TransferException($urlResult->getErrorMessageString(), $urlResult->getHTTPStatusCode() ?? 0);
+		// The resolver fetches one hop per call, so every redirect target passes the outbound restrictions first.
+		$results = [];
+		$visits  = [];
+		$viaOg   = $viaCanonical = false;
+		for ($hop = 0; $hop < self::MAX_RESOLVER_HOPS; $hop++) {
+			$urlResult = $this->resolver->resolveURL($url);
+
+			if ($urlResult->didErrorOccur()) {
+				throw new TransferException($urlResult->getErrorMessageString(), $urlResult->getHTTPStatusCode() ?? 0);
+			}
+
+			$urlResult->isOpenGraphURL($urlResult->isOpenGraphURL() || $viaOg);
+			$urlResult->isCanonicalURL($urlResult->isCanonicalURL() || $viaCanonical);
+			$results[]    = $urlResult;
+			$visits[$url] = ($visits[$url] ?? 0) + 1;
+
+			$next = $urlResult->getRedirectTarget();
+			if ($next === null || ($visits[$next] ?? 0) > 1 || (isset($visits[$next]) && !$urlResult->hasRedirectHTTPStatus())) {
+				break;
+			}
+
+			if (Network::isUriBlocked(new Uri($next)) || !Network::isValidHttpUrl($next) || Network::isPrivateTarget(new Uri($next))) {
+				$this->logger->notice('Redirect target is not allowed.', ['url' => $url, 'to' => $next]);
+				break;
+			}
+
+			$viaOg        = $urlResult->redirectTargetIsOpenGraphURL();
+			$viaCanonical = $urlResult->redirectTargetIsCanonicalURL();
+			$url          = $next;
 		}
 
-		return $urlResult->getUrl();
+		return $this->selectResolvedUrl($results);
+	}
+
+	/**
+	 * Picks the resolved URL with the same preference as URLResolver: og:url, canonical, success, failure, redirect.
+	 *
+	 * @param URLResolverResult[] $results Results in the order they were fetched
+	 */
+	private function selectResolvedUrl(array $results): string
+	{
+		$found = [];
+		foreach (array_reverse($results) as $result) {
+			if ($result->hasSuccessHTTPStatus()) {
+				$type = $result->isOpenGraphURL() ? 'og' : ($result->isCanonicalURL() ? 'canonical' : 'ok');
+			} else {
+				$type = $result->hasRedirectHTTPStatus() ? 'redirect' : 'fail';
+			}
+			$found[$type] ??= $result;
+		}
+
+		foreach (['og', 'canonical', 'ok', 'fail', 'redirect'] as $type) {
+			if (isset($found[$type])) {
+				return $found[$type]->getURL();
+			}
+		}
+
+		return $results[0]->getURL();
 	}
 
 	/**
