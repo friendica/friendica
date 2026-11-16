@@ -28,39 +28,40 @@ Thread related data per user
 | contact-id      | contact.id                                                                                              | int unsigned       | NO   |     | 0                   |       |
 | unseen          | post has not been seen                                                                                  | boolean            | NO   |     | 1                   |       |
 | hidden          | Marker to hide the post from the user                                                                   | boolean            | NO   |     | 0                   |       |
+| deleted         | item has been marked for deletion                                                                       | boolean            | NO   |     | 0                   |       |
 | origin          | item originated at this site                                                                            | boolean            | NO   |     | 0                   |       |
 | psid            | ID of the permission set of this post                                                                   | int unsigned       | YES  |     | NULL                |       |
 | post-user-id    | Id of the post-user table                                                                               | int unsigned       | YES  |     | NULL                |       |
 
 ## Indexes
 
-| Name                   | Fields                   |
-| ---------------------- | ------------------------ |
-| PRIMARY                | uid, uri-id              |
-| uri-id                 | uri-id                   |
-| context-id             | context-id               |
-| conversation-id        | conversation-id          |
-| owner-id               | owner-id                 |
-| author-id              | author-id                |
-| causer-id              | causer-id                |
-| uid                    | uid                      |
-| contact-id             | contact-id               |
-| psid                   | psid                     |
-| post-user-id           | post-user-id             |
-| commented              | commented                |
-| received               | received                 |
-| author-id_created      | author-id, created       |
-| owner-id_created       | owner-id, created        |
-| uid_received           | uid, received            |
-| uid_wall_received      | uid, wall, received      |
-| uid_commented          | uid, commented           |
-| uid_owner-id_commented | uid, owner-id, commented |
-| uid_created            | uid, created             |
-| uid_starred            | uid, starred             |
-| uid_mention            | uid, mention             |
-| contact-id_commented   | contact-id, commented    |
-| contact-id_received    | contact-id, received     |
-| contact-id_created     | contact-id, created      |
+| Name                   | Fields                                               |
+| ---------------------- | ---------------------------------------------------- |
+| PRIMARY                | uid, uri-id                                          |
+| uri-id                 | uri-id                                               |
+| context-id             | context-id                                           |
+| conversation-id        | conversation-id                                      |
+| owner-id               | owner-id                                             |
+| author-id              | author-id                                            |
+| causer-id              | causer-id                                            |
+| uid                    | uid                                                  |
+| contact-id             | contact-id                                           |
+| psid                   | psid                                                 |
+| post-user-id           | post-user-id                                         |
+| commented              | commented                                            |
+| received               | received                                             |
+| author-id_created      | author-id, created                                   |
+| owner-id_created       | owner-id, created                                    |
+| uid_received           | uid, received                                        |
+| uid_wall_received      | uid, wall, received                                  |
+| uid_commented          | uid, commented                                       |
+| uid_owner-id_commented | uid, owner-id, commented, uri-id, deleted, author-id |
+| uid_created            | uid, created                                         |
+| uid_starred            | uid, starred                                         |
+| uid_mention            | uid, mention                                         |
+| contact-id_commented   | contact-id, commented                                |
+| contact-id_received    | contact-id, received                                 |
+| contact-id_created     | contact-id, created                                  |
 
 ## Foreign keys
 

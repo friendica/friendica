@@ -8,11 +8,9 @@
 namespace Friendica\Test\Functional\Content;
 
 use Friendica\Content\GroupManager;
-use Friendica\Core\Protocol;
-use Friendica\Database\DBA;
+use Friendica\Database\Database;
 use Friendica\DI;
 use Friendica\Test\FixtureTestCase;
-use Friendica\Util\Strings;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class GroupManagerTest extends FixtureTestCase
@@ -30,17 +28,6 @@ class GroupManagerTest extends FixtureTestCase
 			'addr' => 'localgroup@' . DI::baseUrl()->getHost(),
 		];
 
-		// Contact::isLocal() takes the base url from the public contact
-		DBA::insert('contact', [
-			'uid'     => 0,
-			'name'    => 'localgroup',
-			'nick'    => 'localgroup',
-			'url'     => $contact['url'],
-			'nurl'    => Strings::normaliseLink($contact['url']),
-			'baseurl' => (string) DI::baseUrl(),
-			'network' => Protocol::DFRN,
-		]);
-
 		self::assertSame('group/localgroup', $this->getGroupManager()->getLink($contact));
 	}
 
@@ -53,6 +40,164 @@ class GroupManagerTest extends FixtureTestCase
 		];
 
 		self::assertSame('group/remotegroup%40example.org', $this->getGroupManager()->getLink($contact));
+	}
+
+	public function testGetLinkForRemoteGroupOnHostStartingWithLocalHost(): void
+	{
+		$host    = DI::baseUrl()->getHost();
+		$contact = [
+			'id'   => 123,
+			'url'  => 'https://' . $host . '.example/c/remotegroup',
+			'addr' => 'remotegroup@' . $host . '.example',
+		];
+
+		self::assertSame('group/' . rawurlencode('remotegroup@' . $host . '.example'), $this->getGroupManager()->getLink($contact));
+	}
+
+	private const UID     = 42;
+	private const GROUP   = 9000;
+	private const AUTHOR  = 9001;
+	private const BLOCKED = 9002;
+
+	private function insertContact(Database $dba, int $id): void
+	{
+		$dba->insert('item-uri', ['uri' => 'https://remote.example/contact/' . $id, 'guid' => 'contact-' . $id]);
+		$dba->insert('contact', [
+			'id'      => $id,
+			'uid'     => 0,
+			'uri-id'  => $dba->lastInsertId(),
+			'url'     => 'https://remote.example/contact/' . $id,
+			'nurl'    => 'https://remote.example/contact/' . $id,
+			'name'    => 'Contact ' . $id,
+			'nick'    => 'contact' . $id,
+			'network' => 'apub',
+		]);
+	}
+
+	/**
+	 * Inserts a thread of the group (public for $uid = 0, otherwise private for that user) and returns its uri-id
+	 */
+	private function insertThread(Database $dba, int $number, int $author, bool $deleted, bool $unseen, int $uid = 0): int
+	{
+		$dba->insert('item-uri', ['uri' => 'https://remote.example/post/' . $number, 'guid' => 'post-' . $number]);
+		$uriId = $dba->lastInsertId();
+
+		$this->insertThreadCopy($dba, $uriId, $number, $author, $deleted, $unseen, $uid);
+
+		return $uriId;
+	}
+
+	/**
+	 * Inserts the copy of an existing thread for the given user
+	 */
+	private function insertThreadCopy(Database $dba, int $uriId, int $number, int $author, bool $deleted, bool $unseen, int $uid): void
+	{
+		$commented = '2026-01-0' . $number . ' 12:00:00';
+
+		$dba->insert('post-user', [
+			'uri-id'        => $uriId,
+			'parent-uri-id' => $uriId,
+			'thr-parent-id' => $uriId,
+			'uid'           => $uid,
+			'gravity'       => 0,
+			'owner-id'      => self::GROUP,
+			'author-id'     => $author,
+			'visible'       => true,
+			'deleted'       => $deleted,
+			'unseen'        => $unseen,
+			'created'       => $commented,
+		]);
+
+		$dba->insert('post-thread-user', [
+			'uri-id'       => $uriId,
+			'owner-id'     => self::GROUP,
+			'author-id'    => $author,
+			'uid'          => $uid,
+			'post-user-id' => $dba->lastInsertId(),
+			'deleted'      => $deleted,
+			'commented'    => $commented,
+		]);
+	}
+
+	private function prepareGroup(Database $dba): void
+	{
+		$this->insertContact($dba, self::GROUP);
+		$this->insertContact($dba, self::AUTHOR);
+		$this->insertContact($dba, self::BLOCKED);
+		$dba->insert('user-contact', ['uid' => self::UID, 'cid' => self::BLOCKED, 'blocked' => true]);
+	}
+
+	public function testGetThreadIdsSkipsDeletedAndBlockedThreads(): void
+	{
+		$dba = DI::dba();
+		$this->prepareGroup($dba);
+
+		$visible = $this->insertThread($dba, 1, self::AUTHOR, false, false);
+		$this->insertThread($dba, 2, self::AUTHOR, true, false);
+		$this->insertThread($dba, 3, self::BLOCKED, false, false);
+
+		self::assertSame([$visible], $this->getGroupManager()->getThreadIds(self::UID, self::GROUP, 0, 10));
+	}
+
+	public function testGetThreadIdsPagesOverHiddenThreads(): void
+	{
+		$dba = DI::dba();
+		$this->prepareGroup($dba);
+
+		$first = $this->insertThread($dba, 1, self::AUTHOR, false, false);
+		$this->insertThread($dba, 2, self::BLOCKED, false, false);
+		$third = $this->insertThread($dba, 3, self::AUTHOR, false, false);
+
+		// Newest first, the blocked thread in between doesn't take a slot
+		self::assertSame([$third], $this->getGroupManager()->getThreadIds(self::UID, self::GROUP, 0, 1));
+		self::assertSame([$first], $this->getGroupManager()->getThreadIds(self::UID, self::GROUP, 1, 1));
+	}
+
+	public function testGetGroupStatsCountsUnreadThreads(): void
+	{
+		$dba = DI::dba();
+		$this->prepareGroup($dba);
+
+		$this->insertThread($dba, 1, self::AUTHOR, false, true, self::UID);
+		$this->insertThread($dba, 2, self::AUTHOR, false, false, self::UID);
+		$this->insertThread($dba, 3, self::AUTHOR, true, true, self::UID);
+
+		$stats = $this->getGroupManager()->getGroupStats(self::UID, [self::GROUP]);
+
+		// Only the first thread is unread, the third one is deleted
+		self::assertSame(1, $stats[self::GROUP]['unread']);
+	}
+
+	public function testGetGroupStatsSkipsDeletedAndBlockedThreads(): void
+	{
+		$dba = DI::dba();
+		$this->prepareGroup($dba);
+
+		$this->insertThread($dba, 1, self::AUTHOR, false, false);
+		$this->insertThread($dba, 2, self::AUTHOR, true, false);
+		$this->insertThread($dba, 3, self::BLOCKED, false, false);
+		$this->insertThread($dba, 4, self::AUTHOR, false, false, self::UID);
+
+		$stats = $this->getGroupManager()->getGroupStats(self::UID, [self::GROUP]);
+
+		// One public and one private thread remain
+		self::assertSame(2, $stats[self::GROUP]['threads']);
+		self::assertSame('2026-01-04 12:00:00', $stats[self::GROUP]['commented']);
+	}
+
+	public function testGetGroupStatsCountsThreadInBothCopiesOnce(): void
+	{
+		$dba = DI::dba();
+		$this->prepareGroup($dba);
+
+		$uriId = $this->insertThread($dba, 1, self::AUTHOR, false, false);
+		$this->insertThreadCopy($dba, $uriId, 2, self::AUTHOR, false, false, self::UID);
+
+		$stats = $this->getGroupManager()->getGroupStats(self::UID, [self::GROUP]);
+
+		// The latest activity is taken from the newer copy
+		self::assertSame(1, $stats[self::GROUP]['threads']);
+		self::assertSame('2026-01-02 12:00:00', $stats[self::GROUP]['commented']);
 	}
 
 	public function testGetLinkWithoutAddress(): void

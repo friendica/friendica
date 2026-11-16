@@ -40,6 +40,7 @@
 			<li id="nav-groups-link" class="nav-menu {{$sel.groups}}">
 				<a class="{{$nav.groups.2}} desktop-view" href="{{$nav.groups.0}}" title="{{$nav.groups.3}}">{{$nav.groups.1}}</a>
 				<a class="{{$nav.groups.2}} mobile-view" href="{{$nav.groups.0}}" title="{{$nav.groups.3}}" aria-label="{{$nav.groups.3}}"><i class="icon s22 icon-commenting" aria-hidden="true"></i></a>
+				<span id="groups-update" class="nav-notification"></span>
 			</li>
 		{{/if}}
 		{{if $nav.calendar}}

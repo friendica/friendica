@@ -44,7 +44,7 @@ use Friendica\Database\DBA;
 
 // This file is required several times during the test in DbaDefinition which justifies this condition
 if (!defined('DB_UPDATE_VERSION')) {
-	define('DB_UPDATE_VERSION', 1606);
+	define('DB_UPDATE_VERSION', 1607);
 }
 
 return [
@@ -1774,6 +1774,7 @@ return [
 			"contact-id"      => ["type" => "int unsigned", "not null" => "1", "default" => "0", "foreign" => ["contact" => "id"], "comment" => "contact.id"],
 			"unseen"          => ["type" => "boolean", "not null" => "1", "default" => "1", "comment" => "post has not been seen"],
 			"hidden"          => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "Marker to hide the post from the user"],
+			"deleted"         => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "item has been marked for deletion"],
 			"origin"          => ["type" => "boolean", "not null" => "1", "default" => "0", "comment" => "item originated at this site"],
 			"psid"            => ["type" => "int unsigned", "foreign" => ["permissionset" => "id", "on delete" => "restrict"], "comment" => "ID of the permission set of this post"],
 			"post-user-id"    => ["type" => "int unsigned", "foreign" => ["post-user" => "id"], "comment" => "Id of the post-user table"],
@@ -1797,7 +1798,7 @@ return [
 			"uid_received"           => ["uid", "received"],
 			"uid_wall_received"      => ["uid", "wall", "received"],
 			"uid_commented"          => ["uid", "commented"],
-			"uid_owner-id_commented" => ["uid", "owner-id", "commented"],
+			"uid_owner-id_commented" => ["uid", "owner-id", "commented", "uri-id", "deleted", "author-id"],
 			"uid_created"            => ["uid", "created"],
 			"uid_starred"            => ["uid", "starred"],
 			"uid_mention"            => ["uid", "mention"],

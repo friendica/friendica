@@ -122,7 +122,11 @@ class BaseURL extends Uri implements UriInterface
 
 	public function isLocalUrl(string $url): bool
 	{
-		return str_starts_with(Strings::normaliseLink($url), Strings::normaliseLink((string) $this));
+		$url  = Strings::normaliseLink($url);
+		$base = Strings::normaliseLink((string) $this);
+
+		// The base url has to end at a path boundary, so that "example.org.foo" isn't seen as "example.org"
+		return $url === $base || str_starts_with($url, rtrim($base, '/') . '/');
 	}
 
 	public function isLocalUri(UriInterface $uri): bool

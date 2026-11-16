@@ -409,8 +409,8 @@ window.onDocumentReady('body', function() {
 			document.title = originalTitle;
 		}
 
-		['home', 'intro', 'mail', 'events', 'birthdays', 'notification'].forEach(function(type) {
-			var number = data[type];
+		['home', 'intro', 'mail', 'events', 'birthdays', 'notification', 'groups'].forEach(function(type) {
+			var number = (type === 'groups') ? data['groups-unread'] : data[type];
 			updateCounter(type, number);
 		});
 
