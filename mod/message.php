@@ -403,8 +403,8 @@ function get_messages(int $uid, int $start, int $limit): array
 
 function render_messages(array $msg, string $t): string
 {
-	$tpl   = Renderer::getMarkupTemplate($t);
-	$rslt  = '';
+	$tpl  = Renderer::getMarkupTemplate($t);
+	$rslt = '';
 
 	$myprofile = DI::baseUrl() . '/profile/' . DI::userSession()->getLocalUserNickname();
 
