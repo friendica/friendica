@@ -7,7 +7,6 @@
 
 namespace Friendica\Content\Widget;
 
-use Friendica\BaseModule;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\Database\DBA;
@@ -49,7 +48,6 @@ class SavedSearches
 			'$searchbox'  => '',
 			'$saved'      => $saved,
 			'$return_url' => bin2hex($return_url),
-			'$token'      => BaseModule::getFormSecurityToken('search_saved'),
 		]);
 	}
 }

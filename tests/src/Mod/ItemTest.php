@@ -593,6 +593,26 @@ class ItemTest extends ApiTestCase
 		}
 	}
 
+	public function testItemActionRequiresFormSecurityToken(): void
+	{
+		unset($_REQUEST['form_security_token']);
+		$this->setArgs('item/block/1');
+
+		$this->expectException(HTTPException\ForbiddenException::class);
+
+		item_action();
+	}
+
+	public function testItemActionRejectsInvalidFormSecurityToken(): void
+	{
+		$_REQUEST['form_security_token'] = 'invalid';
+		$this->setArgs('item/block/1');
+
+		$this->expectException(HTTPException\ForbiddenException::class);
+
+		item_action();
+	}
+
 	public function testItemActionRequiresAtLeastTwoArguments(): void
 	{
 		$this->setActionToken();
@@ -666,7 +686,7 @@ class ItemTest extends ApiTestCase
 	 *
 	 * Needs manual/browser verification instead.
 	 */
-	public function testItemContentAjaxBranchesAreNotAutomaticallyTestable(): void
+	public function testItemActionAjaxBranchesAreNotAutomaticallyTestable(): void
 	{
 		self::markTestIncomplete(
 			'item_action() ajax branches (drop/block/ignore/collapse with DI::mode()->isAjax()) '

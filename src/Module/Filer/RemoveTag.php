@@ -51,8 +51,12 @@ class RemoveTag extends BaseModule
 		$term = '';
 		$code = $this->removeTag($request, $type, $term);
 
-		if (empty($this->server['HTTP_X_REQUESTED_WITH']) && $type === Post\Category::FILE) {
-			$this->baseUrl->redirect('filed?file=' . rawurlencode((string) $term));
+		if (empty($this->server['HTTP_X_REQUESTED_WITH'])) {
+			if ($type === Post\Category::FILE) {
+				$this->baseUrl->redirect('filed?file=' . rawurlencode((string) $term));
+			}
+
+			$this->baseUrl->redirect('network');
 		}
 
 		$this->earlyHttpError($code);

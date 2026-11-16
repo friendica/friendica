@@ -14,7 +14,7 @@
 		<div class="mail-conv-date">{{$mail.date}}</div>
 		<div class="mail-conv-subject">{{$mail.subject}}</div>
 		<div class="mail-conv-body">{{$mail.body nofilter}}</div>
-	<div class="mail-conv-delete-wrapper" id="mail-conv-delete-wrapper-{{$mail.id}}"><a href="message/drop/{{$mail.id}}" class="icon drophide delete-icon mail-list-delete-icon post-action" data-token="{{$mail.token}}" onclick="return confirmDelete();" title="{{$mail.delete}}" id="mail-conv-delete-icon-{{$mail.id}}" class="mail-conv-delete-icon" onmouseover="imgbright(this);" onmouseout="imgdull(this);"></a></div><div class="mail-conv-delete-end"></div>
+	<div class="mail-conv-delete-wrapper" id="mail-conv-delete-wrapper-{{$mail.id}}"><a href="message/drop/{{$mail.id}}" class="icon drophide delete-icon mail-list-delete-icon post-action" onclick="return confirmDelete();" title="{{$mail.delete}}" id="mail-conv-delete-icon-{{$mail.id}}" class="mail-conv-delete-icon" onmouseover="imgbright(this);" onmouseout="imgdull(this);"></a></div><div class="mail-conv-delete-end"></div>
 	<div class="mail-conv-outside-wrapper-end"></div>
 </div>
 </div>

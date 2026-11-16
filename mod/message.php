@@ -59,7 +59,7 @@ function message_post(): void
 	}
 
 	if ((DI::args()->getArgc() == 3) && (DI::args()->getArgv()[1] === 'drop' || DI::args()->getArgv()[1] === 'dropconv')) {
-		BaseModule::checkFormSecurityTokenRedirectOnError('message', 'message_drop');
+		BaseModule::checkFormSecurityTokenRedirectOnError('message', 'action');
 
 		if (!intval(DI::args()->getArgv()[2])) {
 			return;
@@ -285,7 +285,6 @@ function message_content()
 		$mails   = [];
 		$seen    = 0;
 		$unknown = false;
-		$token   = BaseModule::getFormSecurityToken('message_drop');
 
 		foreach ($messages as $message) {
 			if ($message['unknown']) {
@@ -318,7 +317,6 @@ function message_content()
 				'subject'    => $subject_e,
 				'body'       => $body_e,
 				'delete'     => DI::l10n()->t('Delete message'),
-				'token'      => $token,
 				'to_name'    => $to_name_e,
 				'date'       => DateTimeFormat::local($message['created'], DI::l10n()->t('D, d M Y - g:i A')),
 				'ago'        => Temporal::getRelativeDate($message['created']),
@@ -407,7 +405,6 @@ function render_messages(array $msg, string $t): string
 {
 	$tpl   = Renderer::getMarkupTemplate($t);
 	$rslt  = '';
-	$token = BaseModule::getFormSecurityToken('message_drop');
 
 	$myprofile = DI::baseUrl() . '/profile/' . DI::userSession()->getLocalUserNickname();
 
@@ -440,7 +437,6 @@ function render_messages(array $msg, string $t): string
 			'$from_photo' => $from_photo,
 			'$subject'    => $rr['title'],
 			'$delete'     => DI::l10n()->t('Delete conversation'),
-			'$token'      => $token,
 			'$body'       => $body_e,
 			'$to_name'    => $to_name_e,
 			'$date'       => DateTimeFormat::local($rr['mailcreated'], DI::l10n()->t('D, d M Y - g:i A')),

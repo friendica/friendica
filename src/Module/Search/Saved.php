@@ -41,7 +41,7 @@ class Saved extends BaseModule
 			$return_url = Search::getSearchPath($search);
 		}
 
-		self::checkFormSecurityTokenRedirectOnError($return_url, 'search_saved');
+		self::checkFormSecurityTokenRedirectOnError($return_url, 'action');
 
 		if (DI::userSession()->getLocalUserId() && $search) {
 			switch ($action) {
