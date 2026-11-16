@@ -17,6 +17,11 @@ return \Rector\Config\RectorConfig::configure()
 		__DIR__ . '/view/php',
 		__DIR__ . '/view/theme',
 	])
+	// Rector switches to an in-memory cache on CI, keep the file cache so CI can persist it.
+	->withCache(
+		cacheDirectory: sys_get_temp_dir() . '/rector_cached_files',
+		cacheClass: \Rector\Caching\ValueObject\Storage\FileCacheStorage::class,
+	)
 	->withIndent("\t", 4)
 	->withPhpVersion(80200)
 	->withTypeCoverageLevel(6)

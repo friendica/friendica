@@ -169,8 +169,6 @@ $a->strings['User not found'] = 'Bruger ikke fundet';
 $a->strings['Enter new password: '] = 'Indtast nyt brugernavn:';
 $a->strings['Password update failed. Please try again.'] = 'Opdatering af adgangskode fejlede. Prøv igen.';
 $a->strings['Password changed.'] = 'Adgangskode ændret.';
-$a->strings['Enter user name: '] = 'Indtast profilnavn:';
-$a->strings['Enter user email address: '] = 'Indtast brugerens email-adresse:';
 $a->strings['Enter a language (optional): '] = 'Vælg et sprog (valgfrit)';
 $a->strings['Enter URL of an image to use as avatar (optional): '] = 'Indtast URL til et billede til brug som profilbillede (valgfrit):';
 $a->strings['User is not pending.'] = 'Bruger er ikke afventende.';
@@ -254,52 +252,10 @@ $a->strings['<button type="button" %2$s>%1$d person</button> reshared this'] = [
 	0 => '<button type="button" %2$s>%1$d personer</button> videredelte dette',
 	1 => '<button type="button" %2$s>%1$d personer</button> videredelte dette',
 ];
-$a->strings['Visible to <strong>everybody</strong>'] = 'Kan ses af <strong>alle</strong>';
-$a->strings['Please enter a image/video/audio/webpage URL:'] = 'Indtast venligst en URL til et billede/video/lyd/hjemmeside:';
-$a->strings['Tag term:'] = 'Tag-emne:';
-$a->strings['Save to Folder'] = 'Gem til mappe';
-$a->strings['Where are you right now?'] = 'Hvor er du lige nu?';
-$a->strings['Delete item(s)?'] = 'Slet element(er)?';
-$a->strings['Post published.'] = 'Opslag publiceret.';
-$a->strings['Go to post'] = 'Gå til opslag';
-$a->strings['Created at'] = 'Oprettet';
-$a->strings['New Post'] = 'Nyt opslag';
-$a->strings['Post'] = 'Slå op';
-$a->strings['Loading...'] = 'Indlæser...';
-$a->strings['upload photo'] = 'upload billede';
-$a->strings['Attach file'] = 'Vedhæft fil';
-$a->strings['attach file'] = 'vedhæft fil';
-$a->strings['Bold'] = 'Fed';
-$a->strings['Italic'] = 'Kursiv';
-$a->strings['Underline'] = 'Understreget';
-$a->strings['Quote'] = 'Citér';
-$a->strings['Add emojis'] = 'Tilføj emojier';
-$a->strings['Content Warning'] = 'Indholdsadvarsel';
-$a->strings['Code'] = 'Kode';
-$a->strings['Image'] = 'Billede';
-$a->strings['Link'] = 'Link';
-$a->strings['Link or Media'] = 'Link eller medie';
-$a->strings['Set your location'] = 'Indstil din placering';
-$a->strings['set location'] = 'indstil placering';
-$a->strings['Clear browser location'] = 'Nulstil browserplacering';
-$a->strings['clear location'] = 'ryd placering';
-$a->strings['Set title'] = 'Vælg titel';
-$a->strings['Set summary, abstract or spoiler text'] = 'Sæt opslag eller "spoiler"-tekst';
-$a->strings['Categories (comma-separated list)'] = 'Kategorier (komma-separeret liste)';
-$a->strings['Sensitive post'] = 'Følsomt opslag';
-$a->strings['Scheduled at'] = 'Planlagt til';
-$a->strings['Permission settings'] = 'Tilladelsesindstillinger';
-$a->strings['Public post'] = 'Offentligt opslag';
-$a->strings['Preview'] = 'Forhåndsvisning';
-$a->strings['Message'] = 'Besked';
-$a->strings['Add file'] = 'Tilføj fil';
-$a->strings['Open Compose page'] = 'Åben skrivesiden';
-$a->strings['remove'] = 'fjern';
-$a->strings['Delete Selected Items'] = 'Slet valgte elementer';
 $a->strings['You had been addressed (%s).'] = 'Du er blevet nævnt (%s).';
 $a->strings['You are following %s.'] = 'Du følger %s.';
-$a->strings['You subscribed to %s.'] = 'Du følger %s.';
 $a->strings['You subscribed to one or more tags in this post.'] = 'Du følger nu et eller flere tags i dette opslag.';
+$a->strings['You subscribed to %s.'] = 'Du følger %s.';
 $a->strings['%s reshared this.'] = '%s videredelte dette.';
 $a->strings['Reshared'] = 'Videredelt';
 $a->strings['Reshared by %s <%s>'] = 'Videredelt af %s <%s>';
@@ -317,13 +273,8 @@ $a->strings['Distributed'] = 'Distribueret';
 $a->strings['Pushed to us'] = 'Skubbet til os';
 $a->strings['Channel "%s": %s'] = 'Kanal "%s": %s';
 $a->strings['Channel "%s"'] = 'Kanal "%s"';
-$a->strings['Select'] = 'Vælg';
-$a->strings['Pinned item'] = 'Fastgjort element';
-$a->strings['View %s\'s profile @ %s'] = 'Se %ss profil @ %s';
-$a->strings['Categories:'] = 'Kategorier:';
-$a->strings['Filed under:'] = 'Gemt i:';
-$a->strings['%s from %s'] = '%s fra %s';
-$a->strings['View in context'] = 'Se i kontekst';
+$a->strings['Delete Selected Items'] = 'Slet valgte elementer';
+$a->strings['remove'] = 'fjern';
 $a->strings['For you'] = 'Til dig';
 $a->strings['Posts from contacts you interact with and who interact with you'] = 'Opslag fra kontakter, du interagerer med, og som interagerer med dig';
 $a->strings['Discover'] = 'Gå på opdagelse';
@@ -356,6 +307,132 @@ $a->strings['Personal'] = 'Personlige';
 $a->strings['Posts that mention or involve you'] = 'Opslag der nævner eller involverer dig';
 $a->strings['Bookmarked'] = 'Bogmærket';
 $a->strings['Favourite Posts'] = 'Favoritopslag';
+$a->strings['Unknown parent'] = 'Ukendt forælder';
+$a->strings['This entry was edited'] = 'Dette indlæg er blevet redigeret';
+$a->strings['Pinned to your wall'] = 'Fastgjort på din væg';
+$a->strings['Comment this item on your system'] = 'Kommenterede dette element på din instans';
+$a->strings['Remote comment'] = 'Eksternt indhold';
+$a->strings['Categories:'] = 'Kategorier:';
+$a->strings['Filed under:'] = 'Gemt i:';
+$a->strings['View %s\'s profile @ %s'] = 'Se %ss profil @ %s';
+$a->strings['to'] = 'til';
+$a->strings['via'] = 'via';
+$a->strings['Wall-to-Wall'] = 'væg-til-væg';
+$a->strings['via Wall-To-Wall:'] = 'via væg-til-væg:';
+$a->strings['%s from %s'] = '%s fra %s';
+$a->strings['Raw content'] = 'Rå indhold';
+$a->strings['Load more comments'] = 'Indlæs flere kommentarer';
+$a->strings['%d comment'] = [
+	0 => '%d kommentar',
+	1 => '%d kommentarer',
+];
+$a->strings['Comment'] = 'Kommentar';
+$a->strings['Like'] = 'Synes om';
+$a->strings['Dislike'] = 'Synes ikke om';
+$a->strings['Reshare'] = 'Del';
+$a->strings['Reply to %s'] = 'Svar på %s';
+$a->strings['More'] = 'Mere';
+$a->strings['Loading ...'] = 'Indlæser ...';
+$a->strings['Delivery to remote servers is pending'] = 'Levering til øvrige instanser afventer';
+$a->strings['Delivery to remote servers is underway'] = 'Leveringer til øvrige instanser er undervejs';
+$a->strings['Delivery to remote servers is mostly done'] = 'Levering til øvrige instanser er næsten færdig';
+$a->strings['Delivery to remote servers is done'] = 'Levering til øvrige instanser er færdig';
+$a->strings['in reply to %s'] = 'som svar til %s';
+$a->strings['Parent is probably private or not federated.'] = 'Forælder er sandsynligvis privat eller ikke-fødereret';
+$a->strings['Show comments'] = 'Vis kommentarer';
+$a->strings['Close comments'] = 'Luk kommentarer';
+$a->strings['Show more comments'] = 'Vis yderligere kommentarer';
+$a->strings['Show fewer comments'] = 'Vis færre kommentarer';
+$a->strings['Detected languages'] = 'Genkendte sprog';
+$a->strings['Share via ...'] = 'Del via ...';
+$a->strings['Share via external services'] = 'Del via eksterne tjenester';
+$a->strings['Turn off related notifications'] = 'Slå relaterede notifikationer fra';
+$a->strings['Turn on related notifications'] = 'Slå relaterede notifikationer til';
+$a->strings['Notifications turned off for this post'] = 'Notifikationer er slået fra på dette opslag';
+$a->strings['Edit event'] = 'Rediger begivenhed';
+$a->strings['Edit post'] = 'Rediger opslag';
+$a->strings['Bookmark'] = 'Bogmærk';
+$a->strings['Remove bookmark'] = 'Fjern bogmærke';
+$a->strings['Starred'] = 'Favoritter';
+$a->strings['Add tag to post'] = 'Tilføj "tag" til opslaget';
+$a->strings['Save to folder'] = 'Gem til mappe';
+$a->strings['Select'] = 'Vælg';
+$a->strings['Delete globally'] = 'Slet globalt';
+$a->strings['Remove locally'] = 'Slet lokalt';
+$a->strings['Block %s'] = 'Blokér %s';
+$a->strings['Ignore %s'] = 'Ignorér %s';
+$a->strings['Collapse %s'] = 'Sammenfold %s';
+$a->strings['Report this post'] = 'Anmeld dette opslag';
+$a->strings['Ignore %s server'] = 'Ignorér %s instans';
+$a->strings['I will attend'] = 'Jeg deltager';
+$a->strings['I will not attend'] = 'Jeg deltager ikke';
+$a->strings['I might attend'] = 'Jeg deltager måske';
+$a->strings['Going'] = 'Deltager';
+$a->strings['Can\'t Go'] = 'Deltager ikke';
+$a->strings['Maybe'] = 'Måske';
+$a->strings['%s (Received %s)'] = '%s (Modtog %s)';
+$a->strings['I like this (toggle)'] = 'Jeg synes om dette (slå til/fra)';
+$a->strings['I don\'t like this (toggle)'] = 'Jeg synes ikke om dette (slå til/fra)';
+$a->strings['Quote share this'] = 'Del med citat';
+$a->strings['Quote Share'] = 'Del med citat';
+$a->strings['Reshare this'] = 'Del dette';
+$a->strings['Cancel your Reshare'] = 'Fortryd din Videredeling';
+$a->strings['Unshare'] = 'Fjern videredeling';
+$a->strings['Private Message'] = 'Besked';
+$a->strings['Public Message'] = 'Offentlig besked';
+$a->strings['Unlisted Message'] = 'Skjult besked';
+$a->strings['Reshared by: %s'] = 'Videredelt af: %s';
+$a->strings['Viewed by: %s'] = 'Set af: %s';
+$a->strings['Read by: %s'] = 'Læst af: %s';
+$a->strings['Liked by: %s'] = 'Synes om: %s';
+$a->strings['Disliked by: %s'] = 'Syntes ikke om: %s';
+$a->strings['Attended by: %s'] = 'Deltagere: %s';
+$a->strings['Maybe attended by: %s'] = 'Deltager muligvis: %s';
+$a->strings['Not attended by: %s'] = 'Deltager ikke: %s';
+$a->strings['Commented by: %s'] = 'Kommenteret af: %s';
+$a->strings['Reacted with %s by: %s'] = 'Reagerede med %saf : %s';
+$a->strings['Quote shared by: %s'] = 'Delt med citat af: %s';
+$a->strings['This is you'] = 'Dette er dig';
+$a->strings['Post comment'] = 'Opslå kommentar';
+$a->strings['Loading...'] = 'Indlæser...';
+$a->strings['Bold'] = 'Fed';
+$a->strings['Italic'] = 'Kursiv';
+$a->strings['Underline'] = 'Understreget';
+$a->strings['Content Warning'] = 'Indholdsadvarsel';
+$a->strings['Quote'] = 'Citér';
+$a->strings['Add emojis'] = 'Tilføj emojier';
+$a->strings['Code'] = 'Kode';
+$a->strings['Image'] = 'Billede';
+$a->strings['Link'] = 'Link';
+$a->strings['Link or Media'] = 'Link eller medie';
+$a->strings['Please enter a image/video/audio/webpage URL:'] = 'Indtast venligst en URL til et billede/video/lyd/hjemmeside:';
+$a->strings['Preview'] = 'Forhåndsvisning';
+$a->strings['Visible to <strong>everybody</strong>'] = 'Kan ses af <strong>alle</strong>';
+$a->strings['Please enter a video URL:'] = 'Indtast venligst en video-URL:';
+$a->strings['Please enter an audio URL:'] = 'Indtast venligst en lyd-URL:';
+$a->strings['Tag term:'] = 'Tag-emne:';
+$a->strings['Save to Folder'] = 'Gem til mappe';
+$a->strings['Where are you right now?'] = 'Hvor er du lige nu?';
+$a->strings['Delete item(s)?'] = 'Slet element(er)?';
+$a->strings['Post published.'] = 'Opslag publiceret.';
+$a->strings['Go to post'] = 'Gå til opslag';
+$a->strings['Created at'] = 'Oprettet';
+$a->strings['Post to group'] = 'Slå op i gruppe';
+$a->strings['New Post'] = 'Nyt opslag';
+$a->strings['Post'] = 'Slå op';
+$a->strings['Attach file'] = 'Vedhæft fil';
+$a->strings['Set your location'] = 'Indstil din placering';
+$a->strings['Clear browser location'] = 'Nulstil browserplacering';
+$a->strings['Video'] = 'Video';
+$a->strings['Set title'] = 'Vælg titel';
+$a->strings['Set summary, abstract or spoiler text'] = 'Sæt opslag eller "spoiler"-tekst';
+$a->strings['Categories (comma-separated list)'] = 'Kategorier (komma-separeret liste)';
+$a->strings['Sensitive post'] = 'Følsomt opslag';
+$a->strings['Scheduled at'] = 'Planlagt til';
+$a->strings['Permission settings'] = 'Tilladelsesindstillinger';
+$a->strings['Message'] = 'Besked';
+$a->strings['Add file'] = 'Tilføj fil';
+$a->strings['Open Compose page'] = 'Åben skrivesiden';
 $a->strings['General Features'] = 'Generelle funktioner';
 $a->strings['Display the community in the navigation'] = 'Vis Fællesskabet i menuen';
 $a->strings['If enabled, the community can be accessed via the navigation menu. Independent from this setting, the community timelines can always be accessed via the channels.'] = 'Hvis slået til, kan communitiet tilgås via navigationsmenuen. Uafhængigt af denne indstilling. kan communitiets tidslinje altid tilgås via kanalerne.';
@@ -374,6 +451,7 @@ $a->strings['Circles'] = 'Kredse';
 $a->strings['Display posts that have been created by accounts of the selected circle.'] = 'Vis opslag oprettet af konti fra den valgte kreds.';
 $a->strings['Groups'] = 'Grupper';
 $a->strings['Display posts that have been distributed by the selected group.'] = 'Vis opslag som er blevet delt i den valgte gruppe.';
+$a->strings['Pages'] = 'Sider';
 $a->strings['Archives'] = 'Arkiver';
 $a->strings['Display an archive where posts can be selected by month and year.'] = 'Vis et arkiv hvor opslag kan vælges efter måned og år.';
 $a->strings['Protocols'] = 'Protokoller';
@@ -412,14 +490,10 @@ $a->strings['Fetch more replies'] = 'Hent flere kommentar.';
 $a->strings['View Status'] = 'Se status';
 $a->strings['View Profile'] = 'Se profil';
 $a->strings['View Photos'] = 'Se billeder';
-$a->strings['Network Posts'] = 'Opslag fra netværket';
-$a->strings['View Contact'] = 'Se kontakt';
+$a->strings['Settings'] = 'Indstillinger';
 $a->strings['Collapse'] = 'Fold sammen';
 $a->strings['Ignore user'] = 'Ignorér bruger';
 $a->strings['Block user'] = 'Blokér bruger';
-$a->strings['Ignore %s server'] = 'Ignorér %s instans';
-$a->strings['Detected languages'] = 'Genkendte sprog';
-$a->strings['Raw content'] = 'Rå indhold';
 $a->strings['Connect/Follow'] = 'Forbind/Følg';
 $a->strings['Unable to fetch user.'] = 'Kunne ikke hente bruger.';
 $a->strings['Undetermined'] = 'Uafklaret';
@@ -429,6 +503,7 @@ $a->strings['Detected languages in this post:
 %s'] = 'Genkendte sprog i dette opslag:
 %s';
 $a->strings['Nothing new here'] = 'Intet nyt her';
+$a->strings['My Profile'] = 'Min profil';
 $a->strings['Home'] = 'Hjem';
 $a->strings['Skip to main content'] = 'Spring frem til hovedindholdet';
 $a->strings['Clear notifications'] = 'Ryd notifikationer';
@@ -436,17 +511,14 @@ $a->strings['Search: @name, !group, #tags, content'] = 'Søg: @navn, !gruppe, #t
 $a->strings['Sign out'] = 'Log ud';
 $a->strings['End this session'] = 'Afslut denne session';
 $a->strings['Sign in'] = 'Log ind';
-$a->strings['Profile'] = 'Profil';
-$a->strings['Your profile page'] = 'Din profilside';
-$a->strings['Conversations'] = 'Samtaler';
-$a->strings['Conversations you started'] = 'Samtaler du har startet';
 $a->strings['Photos'] = 'Billeder';
-$a->strings['Your photos'] = 'Dine billeder';
-$a->strings['Calendar'] = 'Kalender';
-$a->strings['Your calendar'] = 'Din kalender';
+$a->strings['My photos'] = 'Mine billeder';
+$a->strings['Files'] = 'Filer';
+$a->strings['My uploaded files'] = 'Mine uploadede filer';
 $a->strings['Personal notes'] = 'Personlige noter';
-$a->strings['Your personal notes'] = 'Dine personlige noter';
-$a->strings['Home Page'] = 'Startside';
+$a->strings['Only you can see these'] = 'Kun du kan se disse';
+$a->strings['Profile'] = 'Profil';
+$a->strings['My profile'] = 'Min profil';
 $a->strings['Register'] = 'Registrér';
 $a->strings['Create an account'] = 'Opret en konto';
 $a->strings['Help'] = 'Hjælp';
@@ -459,16 +531,13 @@ $a->strings['Full Text'] = 'Fuld tekst';
 $a->strings['Tags'] = 'Tags';
 $a->strings['Contacts'] = 'Kontakter';
 $a->strings['Community'] = 'Fællesskab';
-$a->strings['Conversations on this and other servers'] = 'Samtaler på denne og andre instanser';
+$a->strings['Calendar'] = 'Kalender';
 $a->strings['Directory'] = 'Adressebog';
 $a->strings['People directory'] = 'Personadressebog';
 $a->strings['Information'] = 'Information';
 $a->strings['Information about this friendica instance'] = 'Information om denne friendica instans';
 $a->strings['Terms of Service'] = 'Servicevilkår';
 $a->strings['Terms of Service of this Friendica instance'] = 'Vilkår for denne Friendica instans';
-$a->strings['Network'] = 'Netværk';
-$a->strings['Conversations from your friends'] = 'Samtaler fra dine venner';
-$a->strings['Your posts and conversations'] = 'Dine opslag og samtaler';
 $a->strings['Introductions'] = 'Introduktioner';
 $a->strings['Friend Requests'] = 'Venneanmodninger';
 $a->strings['Notifications'] = 'Notifikationer';
@@ -478,9 +547,9 @@ $a->strings['Mark all system notifications as seen'] = 'Markér alle systemnotif
 $a->strings['Private mail'] = 'Privat mail';
 $a->strings['Inbox'] = 'Indbox';
 $a->strings['Outbox'] = 'Udgående';
-$a->strings['Accounts'] = 'Konti';
 $a->strings['Manage other accounts, including groups and pages'] = 'Håndter øvrige konti, inklusiv grupper og sider';
-$a->strings['Settings'] = 'Indstillinger';
+$a->strings['Switch Accounts'] = 'Skift konto';
+$a->strings['Add Account'] = 'Tilføj konto';
 $a->strings['Account settings'] = 'Kontoindstillinger';
 $a->strings['Manage/edit friends and contacts'] = 'Rediger venner og kontakter';
 $a->strings['Admin'] = 'Admin';
@@ -493,6 +562,7 @@ $a->strings['first'] = 'første';
 $a->strings['prev'] = 'forrige';
 $a->strings['next'] = 'næste';
 $a->strings['last'] = 'sidste';
+$a->strings['Back'] = 'Tilbage';
 $a->strings['<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> %3$s'] = '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> %3$s';
 $a->strings['Link to source'] = 'Link til kilde';
 $a->strings['Click to open/close'] = 'Klik for at åbne/lukke';
@@ -548,6 +618,8 @@ $a->strings['%d Contact'] = [
 	1 => '%d Kontakter',
 ];
 $a->strings['View Contacts'] = 'Se kontakter';
+$a->strings['Administrator'] = 'Administrator';
+$a->strings['Moderator'] = 'Moderator';
 $a->strings['Remove term'] = 'Fjern term';
 $a->strings['(%d hour)'] = [
 	0 => '(%d time)',
@@ -556,7 +628,6 @@ $a->strings['(%d hour)'] = [
 $a->strings['More Trending Tags'] = 'Flere populære tags';
 $a->strings['Show More'] = 'Vis flere';
 $a->strings['Show Less'] = 'Vis færre';
-$a->strings['Post to group'] = 'Slå op i gruppe';
 $a->strings['Mention'] = 'Omtal';
 $a->strings['XMPP:'] = 'XMPP:';
 $a->strings['Matrix:'] = 'Matrix:';
@@ -564,7 +635,7 @@ $a->strings['Location:'] = 'Placering:';
 $a->strings['Network:'] = 'Netværk:';
 $a->strings['Follow'] = 'Følg';
 $a->strings['Unfollow'] = 'Følg ikke';
-$a->strings['View group'] = 'Vis gruppe';
+$a->strings['Group posts'] = 'Gruppeopslag';
 $a->strings['Yourself'] = 'Mig selv';
 $a->strings['Mutuals'] = 'Venner';
 $a->strings['Post to Email'] = 'Send som e-mail';
@@ -635,7 +706,6 @@ $a->strings['Blocked domain'] = 'Blokeret domæne';
 $a->strings['Connect URL missing.'] = 'Forbindelses-URL mangler.';
 $a->strings['The contact could not be added. Please check the relevant network credentials in your Settings -> Social Networks page.'] = 'Kontakten kunne ikke blive tilføjet. Tjek venligst de instillinger du har sat for det sociale netværk kontakten tilhører under Indstillinger -> Sociale netværk';
 $a->strings['This seems to be a relay account. They can\'t be followed by users.'] = 'Dette virker til at være en relækonto. Denne kontotype kan man ikke følge.';
-$a->strings['The profile address specified does not provide adequate information.'] = 'Den angivne profiladresse giver ikke tilstrækkelig information.';
 $a->strings['An author or name was not found.'] = 'En forfatter eller et navn blev ikke fundet.';
 $a->strings['No browser URL could be matched to this address.'] = 'Ingen browser-URL kunne matches med denne adresse.';
 $a->strings['Use mailto: in front of address to force email check.'] = 'Sæt mailto: foran adressen for at gennemtvinge et e-mail-tjek.';
@@ -734,7 +804,6 @@ $a->strings['This website has been verified to belong to the same person.'] = 'D
 $a->strings['[today]'] = '[i dag]';
 $a->strings['Birthday Reminders'] = 'Fødselsdagspåmindelser';
 $a->strings['Birthdays this week:'] = 'Fødselsdage denne uge:';
-$a->strings['[No description]'] = '[Ingen beskrivelse]';
 $a->strings['Event Reminders'] = 'Begivenhedspåmindelser';
 $a->strings['Upcoming events the next 7 days:'] = 'Kommende begivenheder de næste 7 dage:';
 $a->strings['Hometown:'] = 'Hjemby:';
@@ -798,56 +867,6 @@ $a->strings['
 			the administrator of %2$s has set up an account for you.'] = '
 		Kære %1$s,
 			administratoren for %2$s har sat en konto op for dig.';
-$a->strings['
-		The login details are as follows:
-
-		Site Location:	%1$s
-		Login Name:		%2$s
-		Password:		%3$s
-
-		You may change your password from your account "Settings" page after logging
-		in.
-
-		Please take a few moments to review the other account settings on that page.
-
-		You may also wish to add some basic information to your default profile
-		(on the "Profiles" page) so that other people can easily find you.
-
-		We recommend adding a profile photo, adding some profile "keywords"
-		(very useful in making new friends) - and perhaps what country you live in;
-		if you do not wish to be more specific than that.
-
-		We fully respect your right to privacy, and none of these items are necessary.
-		If you are new and do not know anybody here, they may help
-		you to make some new and interesting friends.
-
-		If you ever want to delete your account, you can do so at %1$s/settings/removeme
-
-		Thank you and welcome to %4$s.'] = '
-Dine logininformationer er som følger:
-
-URL: %1$s
-Brugernavn: %2$s
-Kodeord: %3$s
-
-Du kan ændre dit kodeord fra din kontos "Indstillinger", efter du er logget ind.
-
-Brug venligst et øjeblik på gennemgå om de øvrige indstillinger, på den side, er passende.
-
-Det er muligt du kunne være interesseret i at tilføje basal information til din standardprofil
-(på "Profil"-siden), så andre let kan finde dig.
-
-Vi anbefaler at tilføje et profilbillede, at tilføje nogle profil-nøgleord (disse er
-meget brugbare ift. at finde nye bekendskaber) - og muligvis hvilket land, du bor dig i,
-hvis du ikke ønsker at specificere nærmere, hvor du bor.
-
-Vi respekterer fuldt ud din ret til privatliv, og intet af det omtalte er påkrævet.
-Hvis du ikke kender andre her, kan ovenstående hjælpe dig med at finde nye og
-interessante venner.
-
-Hvis du på noget tidspunkt ønsker at slette din konto, kan du gøre det på %1$s/settings/removeme
-
-Tak og velkommen til %4$s.';
 $a->strings['Registration details for %s'] = 'Registreringsdetaljer for %s';
 $a->strings['Registration at %s'] = 'Registrering på %s';
 $a->strings['
@@ -857,56 +876,6 @@ $a->strings['
 				Kære %1$s,
 				Tak fordi du registrerede dig på %2$s. Din konto er blevet oprettet.
 			';
-$a->strings['
-			The login details are as follows:
-
-			Site Location:	%3$s
-			Login Name:		%1$s
-			Password:		%5$s
-
-			You may change your password from your account "Settings" page after logging
-			in.
-
-			Please take a few moments to review the other account settings on that page.
-
-			You may also wish to add some basic information to your default profile
-			(on the "Profiles" page) so that other people can easily find you.
-
-			We recommend adding a profile photo, adding some profile "keywords" (very useful
-			in making new friends) - and perhaps what country you live in; if you do not wish
-			to be more specific than that.
-
-			We fully respect your right to privacy, and none of these items are necessary.
-			If you are new and do not know anybody here, they may help
-			you to make some new and interesting friends.
-
-			If you ever want to delete your account, you can do so at %3$s/settings/removeme
-
-			Thank you and welcome to %2$s.'] = '
-Dine logininformationer er som følger:
-
-URL: %3$s
-Brugernavn: %1$s
-Kodeord: %5$s
-
-Du kan ændre dit kodeord fra din kontos "Indstillinger", efter du er logget ind.
-
-Brug venligst et øjeblik på gennemgå om de øvrige indstillinger, på den side, er passende.
-
-Det er muligt du kunne være interesseret i at tilføje basal information til din standardprofil
-(på "Profil"-siden), så andre let kan finde dig.
-
-Vi anbefaler at tilføje et profilbillede, at tilføje nogle profil-nøgleord (disse er
-meget brugbare ift. at finde nye bekendskaber) - og muligvis hvilket land, du bor dig i,
-hvis du ikke ønsker at specificere nærmere, hvor du bor.
-
-Vi respekterer fuldt ud din ret til privatliv, og intet af det omtalte er påkrævet.
-Hvis du ikke kender andre her, kan ovenstående hjælpe dig med at finde nye og
-interessante venner.
-
-Hvis du på noget tidspunkt ønsker at slette din konto, kan du gøre det på %3$s/settings/removeme
-
-Tak og velkommen til %2$s.';
 $a->strings['User with delegates can\'t be removed, please remove delegate users first'] = 'Bruger med delegerede brugere kan ikke blive fjernet, fjern venligst delegerede brugere først';
 $a->strings['Addon not found.'] = 'Tilføjelse ikke fundet.';
 $a->strings['Addon %s disabled.'] = 'Tilføjelse %s slået fra.';
@@ -1002,6 +971,17 @@ $a->strings['Job Parameters'] = 'Job-parametre';
 $a->strings['Created'] = 'Oprettet';
 $a->strings['Next Try'] = 'Næste forsøg';
 $a->strings['Priority'] = 'Prioritet';
+$a->strings['Please select a valid user.'] = 'Vælg venligst en gyldig bruger.';
+$a->strings['The selected user cannot be assigned moderation rights.'] = 'Den valgte bruger kan ikke tildeles moderatorrettigheder.';
+$a->strings['Roles'] = 'Roller';
+$a->strings['User'] = 'Bruger';
+$a->strings['Actions'] = 'Handlinger';
+$a->strings['No administrators found.'] = 'Ingen administratorer fundet.';
+$a->strings['Administrator + Moderator'] = 'Administrator + moderator';
+$a->strings['Remove moderation rights'] = 'Fjern moderatorrettigheder';
+$a->strings['Assign moderation rights'] = 'Tildel moderatorrettigheder';
+$a->strings['Grant moderation rights'] = 'Tildel moderatorrettigheder';
+$a->strings['All active users already have moderation rights.'] = 'Alle aktive brugere har allerede moderatorrettigheder.';
 $a->strings['%s is no valid input for maximum media size'] = '%s er ikke en gyldig maksimal mediestørrelse';
 $a->strings['%s is no valid input for maximum image size'] = '%ser ikke en gyldig maksimal billedestørrelse';
 $a->strings['No special theme for mobile devices'] = 'Intet særligt tema til mobile enheder';
@@ -1171,7 +1151,6 @@ $a->strings['Save & Use storage backend'] = 'Gem & brug lager-backend';
 $a->strings['Use storage backend'] = 'Brug lager-backend';
 $a->strings['Save & Reload'] = 'Gem & geindlæs';
 $a->strings['This backend doesn\'t have custom settings'] = 'Denne backend har ikke nogen brugerdefinerede indstillinger';
-$a->strings['Database (legacy)'] = 'Database (gammel tilgang)';
 $a->strings['There is a new version of Friendica available for download. Your current version is %1$s, upstream version is %2$s'] = 'Der er en ny version af Friendica tilgængelig til download. Din nuværende version er %1$s, den nyeste version er %2$s';
 $a->strings['Message queues'] = 'Meddelelseskøer';
 $a->strings['Server Settings'] = 'Serverindstillinger';
@@ -1195,6 +1174,8 @@ $a->strings['Privacy Statement Preview'] = 'Forhåndsvisning af fortrolighedserk
 $a->strings['The Terms of Service'] = 'Servicevilkår';
 $a->strings['The rules'] = 'Reglerne';
 $a->strings['Enter your system rules here. Each line represents one rule.'] = 'Indsæt din instans\' regler her. Én regel per linje.';
+$a->strings['No id specified.'] = 'Intet ID specificeret.';
+$a->strings['Attachment not available.'] = 'Vedhæftning ikke tilgængelig.';
 $a->strings['Only starting posts can be bookmarked'] = 'Kun oprindelige opslag kan bogmærkes';
 $a->strings['Only starting posts can be unbookmarked'] = 'Bogmærker kan kun fjernes fra oprindelige opslag';
 $a->strings['Posts from %s can\'t be unshared'] = 'Delinger af opslag fra %s kan ikke fjernes';
@@ -1238,13 +1219,12 @@ $a->strings['Server Blocklist'] = 'Server-blokeringsliste';
 $a->strings['Delete Item'] = 'Slet element';
 $a->strings['Item Source'] = 'Element kilde';
 $a->strings['Profile Details'] = 'Profildetaljer';
-$a->strings['Conversations started'] = 'Samtaler startet';
-$a->strings['Media'] = 'Media';
-$a->strings['Only You Can See This'] = 'Det er kun dig der kan se dette';
-$a->strings['Scheduled Posts'] = 'Planlagte Opslag';
+$a->strings['All posts'] = 'Alle opslag';
+$a->strings['Media posts'] = 'Medieopslag';
+$a->strings['Posts containing media'] = 'Opslag der indeholder medier';
+$a->strings['Scheduled posts'] = 'Planlagte opslag';
 $a->strings['Posts that are scheduled for publishing'] = 'Opslag som er planlagt til offentliggørelse';
 $a->strings['Tips for New Members'] = 'Tips for nye medlemmer';
-$a->strings['More'] = 'Mere';
 $a->strings['People Search - %s'] = 'Profilsøgning - %s';
 $a->strings['Group Search - %s'] = 'Gruppesøgning - %s';
 $a->strings['No results.'] = 'Ingen resultater.';
@@ -1267,7 +1247,6 @@ $a->strings['Event can not end before it has started.'] = 'Begivenhed kan ikke s
 $a->strings['Event title and start time are required.'] = 'Titel og starttidspunkt er påkrævet.';
 $a->strings['Create event'] = 'Opret begivenhed';
 $a->strings['Formatting is not supported for this field'] = 'Formattering er ikke understøttet for dette felt';
-$a->strings['Edit event'] = 'Rediger begivenhed';
 $a->strings['New event'] = 'Ny begivenhed';
 $a->strings['Ends'] = 'Slutter';
 $a->strings['Back to the calendar'] = 'Tilbage til kalenderen';
@@ -1292,7 +1271,6 @@ $a->strings['New Event'] = 'Ny begivenhed';
 $a->strings['list'] = 'list';
 $a->strings['Could not create circle.'] = 'Kunne ikke skabe kreds.';
 $a->strings['Circle not found.'] = 'Kreds ikke fundet.';
-$a->strings['Circle name was not changed.'] = 'Kredsnavn blev ikke ændret.';
 $a->strings['Unknown circle.'] = 'Ukendt kreds.';
 $a->strings['Contact not found.'] = 'Kontakt ikke fundet.';
 $a->strings['Invalid contact.'] = 'Ugyldig kontakt.';
@@ -1341,10 +1319,8 @@ $a->strings['Ignore'] = 'Ignorér';
 $a->strings['Unignore'] = 'Ignorer ikke længere';
 $a->strings['Uncollapse'] = 'Fold ud';
 $a->strings['Batch Actions'] = 'Handlinger på valgte';
-$a->strings['Conversations started by this contact'] = 'Samtaler startet af denne kontakt';
 $a->strings['Posts and Comments'] = 'Opslag og Kommentarer';
 $a->strings['Individual Posts and Replies'] = 'Individuelle Opslag og Svar';
-$a->strings['Posts containing media objects'] = 'Opslag med medieindhold';
 $a->strings['View all known contacts'] = 'Vis alle kendte kontakter';
 $a->strings['Advanced Contact Settings'] = 'Avancerede Kontaktindstillinger';
 $a->strings['Friend'] = 'Ven';
@@ -1352,13 +1328,12 @@ $a->strings['Follows you'] = 'Følger dig';
 $a->strings['You follow'] = 'Du følger';
 $a->strings['Pending outgoing contact request'] = 'Afventende sendte kontaktanmodninger';
 $a->strings['Pending incoming contact request'] = 'Afventende modtagede kontaktanmodninger';
-$a->strings['This is you'] = 'Dette er dig';
 $a->strings['Visit %s\'s profile [%s]'] = 'Besøg %ss profil [%s]';
 $a->strings['Contact update failed.'] = 'Kontaktopdatering fejlede.';
 $a->strings['Return to contact editor'] = 'Gå tilbage til kontakteditor';
 $a->strings['Submit'] = 'Send';
 $a->strings['Name'] = 'Navn';
-$a->strings['Account Nickname'] = 'Profilnavn';
+$a->strings['Account username'] = 'Kontos brugernavn';
 $a->strings['Account URL'] = 'Konto-URL';
 $a->strings['New photo from this URL'] = 'Nyt billede fra denne URL';
 $a->strings['No known contacts.'] = 'Ingen kendte kontakter.';
@@ -1444,8 +1419,7 @@ $a->strings['Manage remote servers'] = 'Håndtér øvrige instanser';
 $a->strings['Hide this contact from others'] = 'Skjul denne kontakt for andre';
 $a->strings['Replies/likes to your public posts <strong>may</strong> still be visible'] = 'Kommentarer og likes på dine offentlige opslag <strong>vil</strong> stadig være synlige';
 $a->strings['Notification for new posts'] = 'Notifikation for nye opslag';
-$a->strings['Send a notification of every new post of this contact'] = 'Send en notifikation for hvert opslag fra denne kontakt.';
-$a->strings['Actions'] = 'Handlinger';
+$a->strings['Send a notification of every new post of this contact'] = 'Send en notifikation for hvert nyt opslag fra denne kontakt';
 $a->strings['Status'] = 'Status';
 $a->strings['Mirror postings from this contact'] = 'Spejl opslag fra denne kontakt';
 $a->strings['Channel Settings'] = 'Kanalindstillinger';
@@ -1586,6 +1560,10 @@ $a->strings['Clear the location'] = 'Ryd placeringen';
 $a->strings['Location services are unavailable on your device'] = 'Placeringstjenester er ikke tilgængelige på din enhed';
 $a->strings['Location services are disabled. Please check the website\'s permissions on your device'] = 'Lokationstjenester er slået fra. Tjek venligst hjemmesidens tilladelser på din enhed';
 $a->strings['If you want to always use this editor for posting, you can configure the New Post button to always open it in your <a href="/settings/display">Theme settings</a>.'] = 'Hvis du ønsker altid at benytte denne editor til at lave opslag, kan du konfigurere Nyt opslag tilaltid at åbne den i dine <a href="/settings/display">temaindstillinger</a>.';
+$a->strings['Publish'] = 'Publicér';
+$a->strings['You'] = 'Mig';
+$a->strings['How does the analysis work?'] = 'Hvordan virker analysen?';
+$a->strings['Image description'] = 'Billedebeskrivelse';
 $a->strings['Post by %s'] = 'Opslag af %s';
 $a->strings['The feed for this item is unavailable.'] = 'Feedet for dette element er ikke tilgængelig.';
 $a->strings['Unable to follow this item.'] = 'Kunne ikke følge dette element.';
@@ -1596,7 +1574,7 @@ $a->strings['Request could not be verified. (You may have previously submitted i
 $a->strings['Request has expired, please make a new one.'] = 'Anmodning er udløbet, opret venligst en ny.';
 $a->strings['Forgot your Password?'] = 'Glemt din adgangskode?';
 $a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Indtast din e-mailadresse og indsend for at nulstille din adgangskode. Tjek derefter din e-mailkonto for instruktioner.';
-$a->strings['Nickname or email'] = 'Profilnavn eller e-mail';
+$a->strings['Username or email'] = 'Brugernavn eller e-mail-adresse';
 $a->strings['Reset my password'] = 'Nulstil mit kodeord';
 $a->strings['Password Reset'] = 'Nulstil adgangskode';
 $a->strings['Your password has been reset as requested.'] = 'Din adgangskode er blevet nulstillet som anmodet.';
@@ -1609,15 +1587,14 @@ $a->strings['Your password has been changed at %s'] = 'Din adgangskode er blevet
 $a->strings['System down for maintenance'] = 'System nede for vedligeholdelse';
 $a->strings['This Friendica node is currently in maintenance mode, either automatically because it is self-updating or manually by the node administrator. This condition should be temporary, please come back in a few minutes.'] = 'Denne Friendica-instans er i øjeblikket i vedligeholdelsestilstand, enten automatisk fordi den er selvopdaterende, eller manuelt af instans-administratoren. Denne tilstand bør være midlertidig, kom venligst tilbage igen om nogle få minutter.';
 $a->strings['A Decentralized Social Network'] = 'Et decentraliseret socialt netværk';
-$a->strings['Files'] = 'Filer';
-$a->strings['Upload'] = 'Upload';
-$a->strings['Switch between photo and attachment mode'] = 'Skift mellem foto- og filtilstand';
-$a->strings['Album navigation'] = 'Albumnavigation';
-$a->strings['Browser content'] = 'Browserindhold';
 $a->strings['Sorry, maybe your upload is bigger than the PHP configuration allows'] = 'Undskyld, måske dit upload er større end PHP-konfigurationen tillader';
 $a->strings['Or - did you try to upload an empty file?'] = 'Eller - prøvede du at uploade en tom fil?';
 $a->strings['File exceeds size limit of %s'] = 'Fil overskrider størrelsesgrænse på %s';
 $a->strings['File upload failed.'] = 'Filupload fejlede.';
+$a->strings['Upload'] = 'Upload';
+$a->strings['Switch between photo and attachment mode'] = 'Skift mellem foto- og filtilstand';
+$a->strings['Album navigation'] = 'Albumnavigation';
+$a->strings['Browser content'] = 'Browserindhold';
 $a->strings['Unable to process image.'] = 'Kunne ikke behandle billede.';
 $a->strings['Image upload failed.'] = 'Billedeupload fejlede.';
 $a->strings['List of all users'] = 'Liste over alle brugere';
@@ -1766,7 +1743,6 @@ $a->strings['3. Pick posts'] = '3. Vælg opslag';
 $a->strings['List of reports'] = 'Liste af anmeldelser';
 $a->strings['This page display reports created by our or remote users.'] = 'Denne side viser anmeldelser oprettet af vores brugere eller eksterne brugere';
 $a->strings['No report exists at this node.'] = 'Der eksisterer ingen anmeldelser på denne instans';
-$a->strings['Comment'] = 'Kommentar';
 $a->strings['Category'] = 'Kategori';
 $a->strings['Select all'] = 'Vælg alle';
 $a->strings['Close selected reports'] = 'Luk de valgte rapporter';
@@ -1789,7 +1765,7 @@ $a->strings['%s user deleted'] = [
 	1 => '%s brugere slettet',
 ];
 $a->strings['Register date'] = 'Registreringsdato';
-$a->strings['Last login'] = 'Sidste login';
+$a->strings['Last activity'] = 'Seneste aktivitet';
 $a->strings['Last public item'] = 'Sidste offentlige element';
 $a->strings['Active Accounts'] = 'Aktive konti';
 $a->strings['User blocked'] = 'Bruger blokeret';
@@ -1858,12 +1834,16 @@ $a->strings['The Photo with id %s is not available.'] = 'Billedet med ID %s er i
 $a->strings['Invalid external resource with url %s.'] = 'Ugyldig ekstern ressource med url %s.';
 $a->strings['Invalid photo with id %s.'] = 'Ugyldigt billede med ID %s.';
 $a->strings['Post not found.'] = 'Opslag ikke fundet.';
-$a->strings['Edit post'] = 'Rediger opslag';
+$a->strings['upload photo'] = 'upload billede';
+$a->strings['attach file'] = 'vedhæft fil';
 $a->strings['web link'] = 'web-link';
 $a->strings['Insert video link'] = 'Indsæt video link';
 $a->strings['video link'] = 'video link';
 $a->strings['Insert audio link'] = 'Indsæt lydlink';
 $a->strings['audio link'] = 'lydlink';
+$a->strings['set location'] = 'indstil placering';
+$a->strings['clear location'] = 'ryd placering';
+$a->strings['Public post'] = 'Offentligt opslag';
 $a->strings['Remove Item Tag'] = 'Fjern Elementets Tag';
 $a->strings['Select a tag to remove: '] = 'Vælg et tag at fjerne:';
 $a->strings['Wrong type "%s", expected one of: %s'] = 'Ugyldig type "%s", forventede en af: %s';
@@ -1878,6 +1858,7 @@ $a->strings['Attributed To:'] = 'Tilskrevet:';
 $a->strings['Collection (%s)'] = 'Samling (%s)';
 $a->strings['Followers (%s)'] = 'Følgere (%s)';
 $a->strings['%d more'] = '%d mere';
+$a->strings['Profile not found.'] = 'Profil ikke fundet.';
 $a->strings['No contacts.'] = 'Ingen kontakter.';
 $a->strings['%s\'s posts'] = '%s\'s opslag';
 $a->strings['%s\'s comments'] = '%s\'s kommentarer';
@@ -1889,7 +1870,6 @@ $a->strings['Image file is missing'] = 'Billedefil mangler';
 $a->strings['Server can\'t accept new file upload at this time, please contact your administrator'] = 'Serveren kan ikke modtage nye filuploads lige nu, kontakt venligst din administrator';
 $a->strings['Image file is empty.'] = 'Billedefil er tom.';
 $a->strings['View Album'] = 'Se album';
-$a->strings['Profile not found.'] = 'Profil ikke fundet.';
 $a->strings['You\'re currently viewing your profile as <b>%s</b> <a href="%s" class="btn btn-sm pull-right">Cancel</a>'] = 'Du ser i øjeblikket din profil som <b>%s</b> <a href="%s" class="btn btn-sm pull-right">Anuller</a>';
 $a->strings['Display name:'] = 'Vist navn:';
 $a->strings['Birthday:'] = 'Fødselsdag';
@@ -1911,8 +1891,7 @@ $a->strings['If you are not yet a member of the free social web, <a href="%s">fo
 $a->strings['Your Webfinger address or profile URL:'] = 'Din Webfinger-adresse eller profil-URL:';
 $a->strings['Restricted profile'] = 'Begrænset profil';
 $a->strings['This profile has been restricted which prevents access to their public content from anonymous visitors.'] = 'Denne profil er blevet begrænset, som forhindrer adgang til deres offentlige indhold fra anonyme besøgende.';
-$a->strings['Private Message'] = 'Besked';
-$a->strings['via'] = 'via';
+$a->strings['Scheduled Posts'] = 'Planlagte Opslag';
 $a->strings['Scheduled'] = 'Planlagt';
 $a->strings['Content'] = 'Indhold';
 $a->strings['Remove post'] = 'Fjern opslag';
@@ -1937,7 +1916,6 @@ $a->strings['Create Page'] = 'Opret side';
 $a->strings['Personal Soap-Box (auto-approve Follow requests)'] = 'Personlig sæbekasse (godkender automatisk følge-anmodninger)';
 $a->strings['Personal Love-All (auto-approve Friend requests)'] = 'Personlig elsk alle (godkender automatisk venne-anmodninger)';
 $a->strings['Account type:'] = 'Kontotype:';
-$a->strings['You can change the account type later. (<a href="'] = 'Du kan ændre kontotypen senere. (<a href="';
 $a->strings['Note for the admin'] = 'Note til administratoren';
 $a->strings['Leave a message for the admin, why you want to join this node'] = 'Skriv en besked til administratoren om hvorfor du gerne vil blive medlem af denne instans';
 $a->strings['Membership on this site is by invitation only.'] = 'Medlemsskab på denne side foregår udelukkende via invitationer.';
@@ -1948,8 +1926,8 @@ $a->strings['Please repeat your e-mail address:'] = 'Gentag venligst din email-a
 $a->strings['New Password:'] = 'Ny adgangskode:';
 $a->strings['Leave empty for an auto generated password.'] = 'Efterlad tom for at få en autogenereret adgangskode.';
 $a->strings['Confirm:'] = 'Bekræft:';
-$a->strings['Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".'] = 'Vælg et profilnavn. Det skal begynde med et teksttegn. Din profiladresse på denne side vil være "<strong>profilnavn@%s</strong>".';
-$a->strings['Choose a nickname: '] = 'Vælg et profilnavn:';
+$a->strings['Usernames must begin with a text character. Your handle on this site will then be "<strong>username@%s</strong>".'] = 'Brugernavne skal starte med et bogstav. Dit navn ("handle") på denne side vil så være  "<strong>brugernavn@%s</strong>".';
+$a->strings['Choose a username: '] = 'Vælg et brugernavn:';
 $a->strings['Import'] = 'Importér';
 $a->strings['Import your profile to this friendica instance'] = 'Importér din profil til denne friendica instans';
 $a->strings['Note: This node explicitly contains adult content'] = 'OBS: Denne instans indeholder voksent indhold';
@@ -1959,14 +1937,14 @@ $a->strings['Password doesn\'t match.'] = 'Adgangskoder er ikke ens.';
 $a->strings['Please enter your password.'] = 'Indtast venligst din adgangskode.';
 $a->strings['You have entered too much information.'] = 'Du har indtastet for meget information.';
 $a->strings['Please enter the identical mail address in the second field.'] = 'Indtast venligst den identiske mail-adresse i det andet feldt.';
-$a->strings['Nickname cannot start with a digit.'] = 'Profilnavne kan ikke starte med et tal.';
-$a->strings['Nickname can only contain US-ASCII characters.'] = 'Profilnavne kan kun indeholde bogstaver og tal';
+$a->strings['Username cannot start with a digit.'] = 'Brugernavn kan ikke starte med et tal.';
+$a->strings['Usernames can only contain US-ASCII characters.'] = 'Brugernavne kan kun indeholde store og små bogstaver og tal.';
+$a->strings['Your registration can not be processed.'] = 'Din registrering kan ikke behandles.';
+$a->strings['You have to leave a request note for the admin.'] = 'Du skal skrive en anmodningsbesked til administratoren.';
 $a->strings['The additional account was created.'] = 'Den yderligere konto blev oprettet.';
 $a->strings['Registration successful. Please check your email for further instructions.'] = 'Registrering lykkedes. Tjek venligst din email for yderligere instruktioner.';
 $a->strings['Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.'] = 'Kunne ikke sende e-mail-besked. Her er dine kontodetaljer:<br> login: %s<br> adgangskode: %s<br><br>Du kan ændre din adgangskode efter login.';
 $a->strings['Registration successful.'] = 'Registrering lykkedes.';
-$a->strings['Your registration can not be processed.'] = 'Din registrering kan ikke behandles.';
-$a->strings['You have to leave a request note for the admin.'] = 'Du skal skrive en anmodningsbesked til administratoren.';
 $a->strings['An internal error occured.'] = 'En intern fejl er opstået.';
 $a->strings['Your registration is pending approval by the site owner.'] = 'Din registrering afventer godkendelse af sideejeren.';
 $a->strings['You must be logged in to use this module.'] = 'Du skal være logget ind for at bruge dette modul.';
@@ -2111,7 +2089,6 @@ $a->strings['Someone commented in your thread'] = 'Nogen kommenterede i din trå
 $a->strings['Someone commented in a thread where you commented'] = 'Nogen kommenterede, i en tråd, hvor du kommenterede';
 $a->strings['Someone commented in a thread where you interacted'] = 'Nogen kommenterede, i en tråd, som du har interageret med';
 $a->strings['Activate desktop notifications'] = 'Aktivér browsernotifikationer';
-$a->strings['Show desktop popup on new notifications'] = 'Vis popup i browser når der er nye notifikationer';
 $a->strings['Text-only notification emails'] = 'Kun-tekst notifikationsemails';
 $a->strings['Send text only notification emails, without the html part'] = 'Send kun-tekst notifikationsemails, uden html-delen';
 $a->strings['Show detailled notifications'] = 'Vis detaljerede notifikationer';
@@ -2125,9 +2102,13 @@ $a->strings['If you have moved this profile from another server, and some of you
 $a->strings['Resend relocate message to contacts'] = 'Gensend relokaliseringsbesked til kontakter';
 $a->strings['Addon Settings'] = 'Tilføjelsesindstillinger';
 $a->strings['None of the addons installed on this server have any settings.'] = 'Ingen af tilføjelserne installeret på denne server har nogen indstillinger.';
+$a->strings['File is empty.'] = 'Fil er tom.';
+$a->strings['Filename'] = 'Filnavn';
+$a->strings['Size'] = 'Størrelse';
+$a->strings['Uploaded'] = 'Uploadet';
+$a->strings['You have no uploaded files.'] = 'Du har ingen uploadede filer.';
 $a->strings['This page can be used to define the channels that will automatically be reshared by your account.'] = 'Denne side bruges til at definere kanaler, der autoomatisk vil blive videredelt fra din konto';
 $a->strings['This page can be used to define your own channels.'] = 'Denne side bruges til at define dine egne kanaler.';
-$a->strings['Publish'] = 'Publicér';
 $a->strings['When selected, the channel results are reshared. This only works for public ActivityPub posts from the public timeline or the user defined circles.'] = 'Når valgt, vil kanalresultater blive gendelt. Dette virker kun for offentlige ActivityPub opslag fra den offentlige tidslinje eller de bruger definerede kredse.';
 $a->strings['Label'] = 'Etiket';
 $a->strings['Access Key'] = 'Adgangsnøgle';
@@ -2212,6 +2193,9 @@ $a->strings['Potential Delegates'] = 'Potentielle Delegerede';
 $a->strings['No entries.'] = 'Ingen poste.';
 $a->strings['The theme you chose isn\'t available.'] = 'Det tema du valgte er ikke tilgængeligt';
 $a->strings['%s - (Unsupported)'] = '%s - (Ikke understøttet)';
+$a->strings['Don\'t update'] = 'Opdatér ikke';
+$a->strings['Update at the top of the page'] = 'Opdatér i toppen af siden';
+$a->strings['Always update'] = 'Opdatér altid';
 $a->strings['Color/Black'] = 'Farve/Sort';
 $a->strings['Black'] = 'Sort';
 $a->strings['Color/White'] = 'Farve/Hvid';
@@ -2234,8 +2218,7 @@ $a->strings['Mobile theme'] = 'Tema til mobile enheder';
 $a->strings['Number of items to display per page:'] = 'Antal Opslag per side:';
 $a->strings['Maximum of 100 items'] = 'Maximum 100 elementer';
 $a->strings['Number of items to display per page when viewed from mobile device:'] = 'Antal Opslag per side fra mobile enheder:';
-$a->strings['Regularly update the page content'] = 'Opdatér løbende sideindholdet';
-$a->strings['When enabled, new content on network, community and channels are added on top.'] = 'Når dette slås til, vil nyt indhold fra netværket, fællesskabet og kredse komme ind fra toppen.';
+$a->strings['Regularly update the timeline'] = 'Opdatér løbende tidslinjen';
 $a->strings['Display emojis'] = 'Vis emojis';
 $a->strings['When enabled, emoticons are replaced with matching emojis.'] = 'Når dette aktiveres vil tekstemojis blive erstattet af matchende billedeemojis.';
 $a->strings['Infinite scroll'] = 'Uendelig scroll';
@@ -2248,9 +2231,9 @@ $a->strings['Display the resharer'] = 'Vis hvem der har videredelt';
 $a->strings['Display the first resharer as icon and text on a reshared item.'] = 'Vis den første deler som ikon og tekst på et delt element.';
 $a->strings['Stay local'] = 'Forbliv lokal';
 $a->strings['Don\'t go to a remote system when following a contact link.'] = 'Forbind ikke til eksterne instanser når du følger et kontaktlink';
+$a->strings['Compact conversation view'] = 'Kompakt samtalevisning';
 $a->strings['Show the post deletion checkbox'] = 'Vis afkrydsningsfeltet for at slette opslag';
 $a->strings['Display the checkbox for the post deletion on the network page.'] = 'Vis afkrydsningsfelter til at slette opslag på netværkssiden';
-$a->strings['DIsplay the event list'] = 'Vis listen over begivenheder';
 $a->strings['Display the birthday reminder and event list on the network page.'] = 'Vis fødselsdags-påmindelse og begivenhedslisten på netværkssiden.';
 $a->strings['Link preview mode'] = 'Link forhåndsvisnings-tilstand';
 $a->strings['Appearance of the link preview that is added to each post with a link.'] = 'Udseendet på link-forhåndsvisningen som tilføjes til alle opslag med links.';
@@ -2276,6 +2259,7 @@ $a->strings['Beginning of week:'] = 'Start på uge:';
 $a->strings['Default calendar view:'] = 'Standard kalendervisning:';
 $a->strings['Additional Features'] = 'Yderligere funktioner';
 $a->strings['Connected Apps'] = 'Forbundne apps';
+$a->strings['Home Page'] = 'Startside';
 $a->strings['Remove authorization'] = 'Fjern autorisation';
 $a->strings['You have no connected apps.'] = 'Du har ingen forbundne apps.';
 $a->strings['Display Name is required.'] = 'Vist navn er påkrævet.';
@@ -2423,7 +2407,6 @@ $a->strings['Unfortunately, the requested conversation isn\'t available to you.'
 $a->strings['Possible reasons include:'] = 'Mulige årsager inkluderer:';
 $a->strings['Go back'] = 'Gå tilbage';
 $a->strings['Stack trace:'] = 'Stack trace:';
-$a->strings['At the time of registration, and for providing communications between the user account and their contacts, the user has to provide a display name (pen name), an username (nickname) and a working email address. The names will be accessible on the profile page of the account by any visitor of the page, even if other profile details are not displayed. The email address will only be used to send the user notifications about interactions, but wont be visibly displayed. The listing of an account in the node\'s user directory or the global user directory is optional and can be controlled in the user settings, it is not necessary for communication.'] = 'På registreringstidspunktet, og for at muliggøre kommunikation ml. brugeren og deres kontakter, skal brugeren sætte et "vist navn", et brugernavn og en fungerende e-mail-adresse. Navnene vil være synlige på profilsiden på kontoen af enhver besøgende på siden, selv hvis øvrige profilinfo ikke vises. E-mail-adressen vil kun blive brugt til at sende brugeren notifikationer omkring interaktioner, og vil ikke blive vist. Om brugeren listes i instansens/serverens brugerliste, og den globale brugerliste er valgfrit, og kan ændres i brugerindstillingerne. Det er ikke påkrævet for at kommunikere med andre.';
 $a->strings['Privacy Statement'] = 'Privatlivsbeskyttelse';
 $a->strings['Rules'] = 'Regler';
 $a->strings['The requested item doesn\'t exist or has been deleted.'] = 'Det efterspurgte element findes ikke eller er blevet slettet.';
@@ -2556,11 +2539,6 @@ $a->strings['Please visit %s  if you wish to make any changes to this relationsh
 $a->strings['registration request'] = 'registreringsanmodning';
 $a->strings['You\'ve received a registration request from \'%1$s\' at %2$s'] = 'Du har modtaget en registreringsanmodning fra \'%1$s\' på %2$s';
 $a->strings['You\'ve received a [url=%1$s]registration request[/url] from %2$s.'] = 'Du har modtaget [url=%1$s]en registreringsanmodning[/url] fra %2$s.';
-$a->strings['Display Name:	%s
-Site Location:	%s
-Login Name:	%s (%s)'] = 'Vist Navn:	%s
-Side-placering:	%s
-Loginnavn:	%s (%s)';
 $a->strings['Please visit %s to approve or reject the request.'] = 'Besøg venligst %s for at godkende eller afvise anmodningen.';
 $a->strings['new registration'] = 'ny registrering';
 $a->strings['You\'ve received a new registration from \'%1$s\' at %2$s'] = 'Du har modtaget en ny registrering fra \'%1$s\' på %2$s';
@@ -2574,73 +2552,6 @@ $a->strings['This message was sent to you by %s, a member of the Friendica socia
 $a->strings['You may visit them online at %s'] = 'Du kan besøge dem online på %s';
 $a->strings['Please contact the sender by replying to this post if you do not wish to receive these messages.'] = 'Hvis du ikke ønsker at modtage disse beskeder, så kontakt venligst afsenderen ved at svare på dette opslag.';
 $a->strings['%s posted an update.'] = '%s lagde en opdatering op.';
-$a->strings['Public Message'] = 'Offentlig besked';
-$a->strings['Unlisted Message'] = 'Skjult besked';
-$a->strings['This entry was edited'] = 'Dette indlæg er blevet redigeret';
-$a->strings['Pinned to your wall'] = 'Fastgjort på din væg';
-$a->strings['Delete globally'] = 'Slet globalt';
-$a->strings['Remove locally'] = 'Slet lokalt';
-$a->strings['Block %s'] = 'Blokér %s';
-$a->strings['Ignore %s'] = 'Ignorér %s';
-$a->strings['Collapse %s'] = 'Sammenfold %s';
-$a->strings['Report this post'] = 'Anmeld dette opslag';
-$a->strings['Save to folder'] = 'Gem til mappe';
-$a->strings['I will attend'] = 'Jeg deltager';
-$a->strings['I will not attend'] = 'Jeg deltager ikke';
-$a->strings['I might attend'] = 'Jeg deltager måske';
-$a->strings['Turn off related notifications'] = 'Slå relaterede notifikationer fra';
-$a->strings['Turn on related notifications'] = 'Slå relaterede notifikationer til';
-$a->strings['Notifications turned off for this post'] = 'Notifikationer er slået fra på dette opslag';
-$a->strings['Bookmark'] = 'Bogmærk';
-$a->strings['Remove bookmark'] = 'Fjern bogmærke';
-$a->strings['Starred'] = 'Favoritter';
-$a->strings['Pin to your wall'] = 'Fastgør på din profil';
-$a->strings['Unpin from your wall'] = 'Fjern fastgørelse på din profil';
-$a->strings['Add tag to post'] = 'Tilføj "tag" til opslaget';
-$a->strings['I like this (toggle)'] = 'Jeg synes om dette (slå til/fra)';
-$a->strings['Like'] = 'Synes om';
-$a->strings['I don\'t like this (toggle)'] = 'Jeg synes ikke om dette (slå til/fra)';
-$a->strings['Dislike'] = 'Synes ikke om';
-$a->strings['Quote share this'] = 'Del med citat';
-$a->strings['Quote Share'] = 'Del med citat';
-$a->strings['Reshare this'] = 'Del dette';
-$a->strings['Reshare'] = 'Del';
-$a->strings['Cancel your Reshare'] = 'Fortryd din Videredeling';
-$a->strings['Unshare'] = 'Fjern videredeling';
-$a->strings['%s (Received %s)'] = '%s (Modtog %s)';
-$a->strings['Comment this item on your system'] = 'Kommenterede dette element på din instans';
-$a->strings['Remote comment'] = 'Eksternt indhold';
-$a->strings['Share via ...'] = 'Del via ...';
-$a->strings['Share via external services'] = 'Del via eksterne tjenester';
-$a->strings['Unknown parent'] = 'Ukendt forælder';
-$a->strings['in reply to %s'] = 'som svar til %s';
-$a->strings['Parent is probably private or not federated.'] = 'Forælder er sandsynligvis privat eller ikke-fødereret';
-$a->strings['to'] = 'til';
-$a->strings['Wall-to-Wall'] = 'væg-til-væg';
-$a->strings['via Wall-To-Wall:'] = 'via væg-til-væg:';
-$a->strings['Reply to %s'] = 'Svar på %s';
-$a->strings['Delivery to remote servers is pending'] = 'Levering til øvrige instanser afventer';
-$a->strings['Delivery to remote servers is underway'] = 'Leveringer til øvrige instanser er undervejs';
-$a->strings['Delivery to remote servers is mostly done'] = 'Levering til øvrige instanser er næsten færdig';
-$a->strings['Delivery to remote servers is done'] = 'Levering til øvrige instanser er færdig';
-$a->strings['%d comment'] = [
-	0 => '%d kommentar',
-	1 => '%d kommentarer',
-];
-$a->strings['Show more'] = 'Vis flere';
-$a->strings['Show fewer'] = 'Vis færre';
-$a->strings['Reshared by: %s'] = 'Videredelt af: %s';
-$a->strings['Viewed by: %s'] = 'Set af: %s';
-$a->strings['Read by: %s'] = 'Læst af: %s';
-$a->strings['Liked by: %s'] = 'Synes om: %s';
-$a->strings['Disliked by: %s'] = 'Syntes ikke om: %s';
-$a->strings['Attended by: %s'] = 'Deltagere: %s';
-$a->strings['Maybe attended by: %s'] = 'Deltager muligvis: %s';
-$a->strings['Not attended by: %s'] = 'Deltager ikke: %s';
-$a->strings['Commented by: %s'] = 'Kommenteret af: %s';
-$a->strings['Reacted with %s by: %s'] = 'Reagerede med %saf : %s';
-$a->strings['Quote shared by: %s'] = 'Delt med citat af: %s';
-$a->strings['Post comment'] = 'Opslå kommentar';
 $a->strings['Chat'] = 'Chat';
 $a->strings['(no subject)'] = '(intet emne)';
 $a->strings['The folder %s must be writable by webserver.'] = 'Mappen %s skal være skrivbar for webserveren.';
@@ -2701,7 +2612,9 @@ $a->strings['Dark'] = 'Mørk';
 $a->strings['Custom'] = 'Brugerdefineret';
 $a->strings['Guest'] = 'Gæst';
 $a->strings['Visitor'] = 'Besøgende';
-$a->strings['Your postings with media'] = 'Dine opslag med medier';
+$a->strings['Your calendar'] = 'Din kalender';
+$a->strings['Back home'] = 'Tilbage hjem';
+$a->strings['Back to my instance'] = 'Tilbage til min instans';
 $a->strings['Comma separated list of helper groups'] = 'Komma-separeret liste af hjælpegrupper';
 $a->strings['don\'t show'] = 'vis ikke';
 $a->strings['show'] = 'vis';
