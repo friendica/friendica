@@ -38,7 +38,8 @@ use Friendica\Content\Post\Entity\PostMedia;
 
 function item_post(): void
 {
-	if (DI::args()->has(1)) {
+	// Module\Item\Compose also calls this function, so only item/<action>/… requests are actions.
+	if (DI::args()->get(0) === 'item' && DI::args()->has(1)) {
 		item_action();
 		return;
 	}
