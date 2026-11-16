@@ -65,6 +65,34 @@ switch (parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH)) {
 		echo '<html><head><meta property="og:url" content="http://localhost:' . $_SERVER['SERVER_PORT'] . '/hit"></head></html>';
 		break;
 
+	case '/og-big':
+		// og:url in the head of a page above max_response_data_size
+		echo '<html><head><meta property="og:url" content="/final-og"></head><body>';
+		flush();
+		for ($i = 0; $i < 3; $i++) {
+			echo str_repeat('x', 1000000);
+			flush();
+		}
+		break;
+
+	case '/redirect-image':
+		header('Location: /image', true, 302);
+		break;
+
+	case '/image':
+		header('Content-Type: image/png');
+		echo str_repeat("\x89", 1000);
+		break;
+
+	case '/redirect-missing':
+		header('Location: /missing', true, 302);
+		break;
+
+	case '/missing':
+		http_response_code(404);
+		echo '<html><head><meta property="og:url" content="/final-og"></head></html>';
+		break;
+
 	case '/hit':
 		touch(sys_get_temp_dir() . '/friendica-sink-hit-' . $_SERVER['SERVER_PORT']);
 		echo 'hit';

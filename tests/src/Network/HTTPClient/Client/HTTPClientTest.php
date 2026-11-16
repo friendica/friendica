@@ -276,13 +276,14 @@ class HTTPClientTest extends MockedTestCase
 	/** Allowed internal hosts are not restricted, so curl resolves them itself. */
 	public function testAllowedInternalHostIsNotPinned(): void
 	{
-		DI::config()->set('system', 'allowed_internal_hosts', 'localhost');
+		// request() checks the host via DNS first, which ignores /etc/hosts, so a public host keeps this independent from the resolver
+		DI::config()->set('system', 'allowed_internal_hosts', 'mastodon.social');
 
 		$this->httpRequestHandler->setHandler(new MockHandler([new Response(200)]));
 		$client = DI::httpClient();
 		$pins   = $this->recordPins();
 
-		self::assertTrue($client->get('http://localhost:9999/')->isSuccess());
+		self::assertTrue($client->get('https://mastodon.social/')->isSuccess());
 		self::assertSame([[]], $pins->getArrayCopy());
 	}
 
@@ -353,6 +354,28 @@ class HTTPClientTest extends MockedTestCase
 
 		self::assertSame($url . '/og-loopback', DI::httpClient()->finalUrl($url . '/og-loopback'));
 		self::assertFileDoesNotExist($marker, 'the og:url into the private network was followed');
+	}
+
+	public static function finalUrlCutOffBodyProvider(): array
+	{
+		return [
+			'og:url from the start of an oversized page'      => ['/og-big', '/final-og'],
+			'non-HTML body is not read'                       => ['/redirect-image', '/image'],
+			'error page is the final URL, its og:url ignored' => ['/redirect-missing', '/missing'],
+		];
+	}
+
+	/** Ensures finalUrl() keeps status and headers of a hop whose body was cut off or not read. */
+	#[DataProvider('finalUrlCutOffBodyProvider')]
+	public function testFinalUrlHandlesCutOffBody(string $path, string $expected): void
+	{
+		DI::config()->set('performance', 'max_response_data_size', 100000);
+
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		self::assertSame($url . $expected, DI::httpClient()->finalUrl($url . $path));
 	}
 
 	/** Ensures every hop of finalUrl() connects to the checked addresses. */

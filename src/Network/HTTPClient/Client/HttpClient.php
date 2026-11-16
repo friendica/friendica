@@ -42,7 +42,7 @@ class HttpClient implements ICanSendHttpRequests
 	/** Status codes that finalUrl() follows */
 	private const REDIRECT_STATUS = [301, 302, 303, 307, 308];
 
-	public function __construct(private readonly LoggerInterface $logger, private readonly Profiler $profiler, private readonly Client $client, private readonly App\BaseURL $baseUrl, private readonly int $maxBodySize = 0, private readonly int $maxResolverBodySize = 1000000) {}
+	public function __construct(private readonly LoggerInterface $logger, private readonly Profiler $profiler, private readonly Client $client, private readonly App\BaseURL $baseUrl, private readonly int $maxBodySize, private readonly int $maxResolverBodySize) {}
 
 	/**
 	 * {@inheritDoc}
