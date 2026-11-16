@@ -159,6 +159,27 @@ class ItemTest extends ApiTestCase
 		self::assertSame('Edited via item_post() dispatch', $post['body']);
 	}
 
+	public function testItemPostFromComposeDispatchesToInsert(): void
+	{
+		$this->setArgs('compose/post');
+
+		$header = $this->mockRedirectHeader();
+		$header->expects(self::once())->with(self::stringStartsWith('Location: https://friendica.local/network'));
+
+		$_REQUEST = ['body' => 'Posted via compose', 'return' => 'network'];
+
+		try {
+			item_post();
+			self::fail('Expected a redirect (FoundException)');
+		} catch (HTTPException\FoundException) {
+			// expected
+		} finally {
+			$_REQUEST = [];
+		}
+
+		self::assertTrue(DBA::isResult(Post::selectFirst(['id'], ['uid' => 42, 'body' => 'Posted via compose'])));
+	}
+
 	public function testItemPostDropitemsDelegationIsNotAutomaticallyTestable(): void
 	{
 		self::markTestIncomplete(
