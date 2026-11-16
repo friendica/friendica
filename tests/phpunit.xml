@@ -36,17 +36,15 @@
 	</testsuites>
 	<source restrictNotices="true" restrictWarnings="true" ignoreIndirectDeprecations="true" >
 		<include>
-			<directory>../</directory>
+			<directory>../bin/</directory>
+			<directory>../mod/</directory>
+			<directory>../src/</directory>
+			<directory>../static/</directory>
+			<file>../index.php</file>
+			<file>../update.php</file>
 		</include>
 		<exclude>
-			<directory suffix=".php">../config/</directory>
-			<directory suffix=".php">../doc/</directory>
-			<directory suffix=".php">../images/</directory>
-			<directory suffix=".php">../library/</directory>
-			<directory suffix=".php">../spec/</directory>
-			<directory suffix=".php">../tests/</directory>
-			<directory suffix=".php">../view/</directory>
-			<directory suffix=".php">../vendor/</directory>
+			<directory>../bin/dev/</directory>
 		</exclude>
 	</source>
 </phpunit>

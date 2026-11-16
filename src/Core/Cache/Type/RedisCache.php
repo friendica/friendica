@@ -165,6 +165,10 @@ class RedisCache extends AbstractCache implements ICanCacheInMemory
 		$cacheKey = $this->getCacheKey($key);
 		$cached   = serialize($value);
 
+		if ($ttl > 0) {
+			return (bool) $this->redis->set($cacheKey, $cached, ['nx', 'ex' => $ttl]);
+		}
+
 		return $this->redis->setnx($cacheKey, $cached);
 	}
 

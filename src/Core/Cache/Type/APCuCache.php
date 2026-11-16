@@ -131,7 +131,7 @@ class APCuCache extends AbstractCache implements ICanCacheInMemory
 		$cacheKey = $this->getCacheKey($key);
 		$cached   = serialize($value);
 
-		return apcu_add($cacheKey, $cached);
+		return apcu_add($cacheKey, $cached, $ttl);
 	}
 
 	public static function isAvailable(): bool
