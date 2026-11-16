@@ -9,6 +9,7 @@ namespace Friendica\Model;
 
 use Exception;
 use Friendica\Contact\Avatar;
+use Friendica\Contact\Enum\ContactRelation;
 use Friendica\Contact\Header;
 use Friendica\Contact\Introduction\Exception\IntroductionNotFoundException;
 use Friendica\Content\Conversation\ConversationRenderer;
@@ -94,11 +95,11 @@ class Contact
 	 * Relationship types
 	 * @{
 	 */
-	public const NOTHING  = 0; // There is no relationship between the contact and the user
-	public const FOLLOWER = 1; // The contact is following this user (the contact is the subscriber)
-	public const SHARING  = 2; // The contact shares their content with this user (the user is the subscriber)
-	public const FRIEND   = 3; // There is a mutual relationship between the contact and the user
-	public const SELF     = 4; // This is the user theirself
+	public const NOTHING  = ContactRelation::Nothing->value;
+	public const FOLLOWER = ContactRelation::Follower->value;
+	public const SHARING  = ContactRelation::Sharing->value;
+	public const FRIEND   = ContactRelation::Friend->value;
+	public const SELF     = ContactRelation::Self->value;
 
 	// Notify New Posts options, not a binary flag
 	public const NOTIFY_NEW_POSTS_NONE   = 0;

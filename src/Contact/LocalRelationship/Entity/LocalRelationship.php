@@ -7,6 +7,7 @@
 
 namespace Friendica\Contact\LocalRelationship\Entity;
 
+use Friendica\Contact\Enum\ContactRelation;
 use Friendica\Core\Protocol;
 use Friendica\Model\Contact;
 
@@ -100,21 +101,26 @@ class LocalRelationship extends \Friendica\BaseEntity
 
 	public function addFollow()
 	{
-		$this->rel = in_array($this->rel, [Contact::FOLLOWER, Contact::FRIEND]) ? Contact::FRIEND : Contact::SHARING;
+		$this->rel = $this->relation()->withSharing()->value;
 	}
 
 	public function removeFollow()
 	{
-		$this->rel = in_array($this->rel, [Contact::FOLLOWER, Contact::FRIEND]) ? Contact::FOLLOWER : Contact::NOTHING;
+		$this->rel = $this->relation()->withoutSharing()->value;
 	}
 
 	public function addFollower()
 	{
-		$this->rel = in_array($this->rel, [Contact::SHARING, Contact::FRIEND]) ? Contact::FRIEND : Contact::FOLLOWER;
+		$this->rel = $this->relation()->withFollower()->value;
 	}
 
 	public function removeFollower()
 	{
-		$this->rel = in_array($this->rel, [Contact::SHARING, Contact::FRIEND]) ? Contact::SHARING : Contact::NOTHING;
+		$this->rel = $this->relation()->withoutFollower()->value;
+	}
+
+	private function relation(): ContactRelation
+	{
+		return ContactRelation::tryFrom($this->rel) ?? ContactRelation::Nothing;
 	}
 }
