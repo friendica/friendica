@@ -11,5 +11,5 @@
 	<span class="mail-date">{{$date}}</span>
 	<span class="mail-count">{{$count}}</span>
 	
-	<a href="message/dropconv/{{$id}}" onclick="return confirmDelete();"  title="{{$delete}}" class="mail-delete"><i class="icon-trash icon-large"></i></a>
+	<a href="message/dropconv/{{$id}}" onclick="return confirmDelete();"  title="{{$delete}}" class="mail-delete post-action" data-token="{{$token}}"><i class="icon-trash icon-large"></i></a>
 </div>

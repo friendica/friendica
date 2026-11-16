@@ -10,6 +10,7 @@ namespace Friendica\Content\Text;
 use DOMDocument;
 use DOMXPath;
 use Friendica\Protocol\HTTP\MediaType;
+use Friendica\BaseModule;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\DI;
@@ -889,6 +890,7 @@ class HTML
 			'$search_hint'  => DI::l10n()->t('@name, !group, #tags, content'),
 			'$mode'         => $mode,
 			'$return_url'   => bin2hex(Search::getSearchPath($s)),
+			'$token'        => BaseModule::getFormSecurityToken('search_saved'),
 		];
 
 		if (!$aside) {

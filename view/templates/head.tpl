@@ -76,6 +76,7 @@ window.onload = function(){
 	const updateContent = {{$update_content}};
 	const localUser = {{if $local_user}}{{$local_user}}{{else}}false{{/if}};
 	var spaEnabled = {{$spa_mode}};
+	var actionToken = "{{$action_token}}";
 </script>
 <script type="text/javascript" src="view/js/loading-indicator.js?v={{$VERSION}}"></script>
 <script type="text/javascript" src="view/js/main.js?v={{$VERSION}}"></script>

@@ -58,6 +58,20 @@ class Notification extends BaseModule
 			throw new HTTPException\UnauthorizedException($this->l10n->t('Permission denied.'));
 		}
 
+		if ($this->args->get(1) === 'mark' && $this->args->get(2) === 'all') {
+			self::checkFormSecurityTokenForbiddenOnError('action');
+
+			try {
+				$this->notificationRepo->setAllSeenForUser(DI::userSession()->getLocalUserId());
+				$success = $this->notifyRepo->setAllSeenForUser(DI::userSession()->getLocalUserId());
+			} catch (\Exception $e) {
+				$this->logger->warning('set all seen failed.', ['exception' => $e]);
+				$success = false;
+			}
+
+			$this->earlyJsonExit(['result' => (($success) ? 'success' : 'fail')]);
+		}
+
 		$request_id = $this->parameters['id'] ?? false;
 
 		if ($request_id) {
@@ -87,18 +101,6 @@ class Notification extends BaseModule
 	{
 		if (!DI::userSession()->getLocalUserId()) {
 			throw new HTTPException\UnauthorizedException($this->l10n->t('Permission denied.'));
-		}
-
-		if ($this->args->get(1) === 'mark' && $this->args->get(2) === 'all') {
-			try {
-				$this->notificationRepo->setAllSeenForUser(DI::userSession()->getLocalUserId());
-				$success = $this->notifyRepo->setAllSeenForUser(DI::userSession()->getLocalUserId());
-			} catch (\Exception $e) {
-				$this->logger->warning('set all seen failed.', ['exception' => $e]);
-				$success = false;
-			}
-
-			$this->earlyJsonExit(['result' => (($success) ? 'success' : 'fail')]);
 		}
 	}
 

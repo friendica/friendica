@@ -40,34 +40,6 @@ class Delegation extends BaseSettings
 
 		BaseModule::checkFormSecurityTokenRedirectOnError('settings/delegation', 'delegate');
 
-		$parent_uid      = $request['parent_user']     ?? null;
-		$parent_password = $request['parent_password'] ?? '';
-
-		if ($parent_uid) {
-			try {
-				// An integer value will trigger the direct user query on uid in User::getAuthenticationInfo
-				$parent_uid = (int) $parent_uid;
-				User::getIdFromPasswordAuthentication($parent_uid, $parent_password);
-				$this->systemMessages->addInfo($this->t('Delegation successfully granted.'));
-			} catch (\Exception) {
-				$this->systemMessages->addNotice($this->t('Parent user not found, unavailable or password doesn\'t match.'));
-				return;
-			}
-		} else {
-			$this->systemMessages->addInfo($this->t('Delegation successfully revoked.'));
-		}
-
-		$this->db->update('user', ['parent-uid' => $parent_uid], ['uid' => $this->session->getLocalUserId()]);
-	}
-
-	protected function content(array $request = []): string
-	{
-		parent::content();
-
-		if (!$this->session->isAuthenticated()) {
-			throw new HTTPException\ForbiddenException($this->t('Permission denied.'));
-		}
-
 		$action  = $this->parameters['action']  ?? '';
 		$user_id = $this->parameters['user_id'] ?? 0;
 
@@ -101,6 +73,34 @@ class Delegation extends BaseSettings
 
 			$this->db->delete('manage', ['uid' => $user_id, 'mid' => $this->session->getLocalUserId()]);
 			$this->baseUrl->redirect('settings/delegation');
+		}
+
+		$parent_uid      = $request['parent_user']     ?? null;
+		$parent_password = $request['parent_password'] ?? '';
+
+		if ($parent_uid) {
+			try {
+				// An integer value will trigger the direct user query on uid in User::getAuthenticationInfo
+				$parent_uid = (int) $parent_uid;
+				User::getIdFromPasswordAuthentication($parent_uid, $parent_password);
+				$this->systemMessages->addInfo($this->t('Delegation successfully granted.'));
+			} catch (\Exception) {
+				$this->systemMessages->addNotice($this->t('Parent user not found, unavailable or password doesn\'t match.'));
+				return;
+			}
+		} else {
+			$this->systemMessages->addInfo($this->t('Delegation successfully revoked.'));
+		}
+
+		$this->db->update('user', ['parent-uid' => $parent_uid], ['uid' => $this->session->getLocalUserId()]);
+	}
+
+	protected function content(array $request = []): string
+	{
+		parent::content();
+
+		if (!$this->session->isAuthenticated()) {
+			throw new HTTPException\ForbiddenException($this->t('Permission denied.'));
 		}
 
 		// find everybody that currently has delegated management to this account/page

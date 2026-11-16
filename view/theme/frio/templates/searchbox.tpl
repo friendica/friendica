@@ -24,7 +24,7 @@ Some parts of this template will be moved by js to other places (see theme.js) -
 					<div class="col-md-8">
 						{{* The button to save searches *}}
 						{{if $s}}
-						<a href="search/saved/add?term={{$q}}&amp;return_url={{$return_url}}" class="btn btn-primary btn-small pull-right">{{$action_text}}</a>
+						<a href="search/saved/add?term={{$q}}&amp;return_url={{$return_url}}" class="btn btn-primary btn-small pull-right post-action" data-token="{{$token}}">{{$action_text}}</a>
 						{{/if}}
 
 						{{* The select popup menu to select what kind of results the user would like to search for *}}
@@ -52,7 +52,7 @@ Some parts of this template will be moved by js to other places (see theme.js) -
 	</div>
 
 {{if $s}}
-	<a href="search/saved/add?term={{$q}}&amp;return_url={{$return_url}}" class="action-button btn btn-primary pull-right" id="search-save">
+	<a href="search/saved/add?term={{$q}}&amp;return_url={{$return_url}}" class="action-button btn btn-primary pull-right post-action" data-token="{{$token}}" id="search-save">
 		<i class="ri ri-lg ri-save-line" aria-hidden="true"></i>
 		<span>{{$action_text}}</span>
 	</a>

@@ -233,7 +233,7 @@ function dropItem(url, elementId) {
 		var $el = $(document.getElementById(elementId));
 
 		$el.fadeTo('fast', 0.33, function () {
-			$.get(url).then(function() {
+			$.post(url, {form_security_token: getActionToken()}).then(function() {
 				$el.remove();
 			}).fail(function() {
 				// @todo Show related error message
@@ -260,7 +260,7 @@ function blockAuthor(url, elementId) {
 		var $el = $(document.getElementById(elementId));
 
 		$el.fadeTo("fast", 0.33, function () {
-			$.get(url)
+			$.post(url, {form_security_token: getActionToken()})
 				.then(function () {
 					$el.remove();
 				})
@@ -290,7 +290,7 @@ function ignoreAuthor(url, elementId) {
 		var $el = $(document.getElementById(elementId));
 
 		$el.fadeTo("fast", 0.33, function () {
-			$.get(url)
+			$.post(url, {form_security_token: getActionToken()})
 				.then(function () {
 					$el.remove();
 				})
@@ -319,7 +319,7 @@ function collapseAuthor(url, elementId) {
 		var $el = $(document.getElementById(elementId));
 
 		$el.fadeTo("fast", 0.33, function () {
-			$.get(url)
+			$.post(url, {form_security_token: getActionToken()})
 				.then(function () {
 					//$el.remove();
 				})
