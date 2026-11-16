@@ -58,6 +58,9 @@ deptrac:
                 value: src/Util/.*
               - type: classLike
                 value: ^Friendica\\(AppHelper|AppLegacy|Base(Collection|DataTransferObject|Entity|Factory|Repository))$
+              # shared vocabulary: constants only, every tier names verbs and object types
+              - type: classLike
+                value: ^Friendica\\Protocol\\(Activity|Activity\\ObjectType|ActivityNamespace)$
 
         # --- Tier 1: Domain ---------------------------------------------------
         # The core nouns everything else points at. Uses Base only.
@@ -131,8 +134,13 @@ deptrac:
                 value: src/Module/.*
               - type: directory
                 value: src/Object/.*
-              - type: directory
-                value: src/Protocol/.*
+              - type: bool
+                must:
+                    - type: directory
+                      value: src/Protocol/.*
+                must_not:
+                    - type: layer
+                      value: Base
               - type: directory
                 value: src/Worker/.*
               - type: classLike
