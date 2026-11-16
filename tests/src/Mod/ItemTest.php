@@ -10,6 +10,7 @@ namespace Friendica\Test\src\Mod;
 use Dice\Dice;
 use Friendica\App\Arguments;
 use Friendica\App\Router;
+use Friendica\BaseModule;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -58,6 +59,11 @@ class ItemTest extends ApiTestCase
 	private function isVisibleForUser(int $id): bool
 	{
 		return DBA::isResult(Post::selectFirstForUser(42, ['id'], ['id' => $id]));
+	}
+
+	private function setActionToken(): void
+	{
+		$_REQUEST['form_security_token'] = BaseModule::getFormSecurityToken('action');
 	}
 
 	private function setArgs(string $pagename): void
@@ -575,75 +581,100 @@ class ItemTest extends ApiTestCase
 		}
 	}
 
-	public function testItemContentRequiresAuthentication(): void
+	public function testItemActionRequiresAuthentication(): void
 	{
 		DI::session()->set('authenticated', false);
 		try {
 			$this->expectException(HTTPException\UnauthorizedException::class);
 
-			item_content();
+			item_action();
 		} finally {
 			DI::session()->set('authenticated', true);
 		}
 	}
 
-	public function testItemContentRequiresAtLeastTwoArguments(): void
+	public function testItemActionRequiresFormSecurityToken(): void
 	{
+		unset($_REQUEST['form_security_token']);
+		$this->setArgs('item/block/1');
+
+		$this->expectException(HTTPException\ForbiddenException::class);
+
+		item_action();
+	}
+
+	public function testItemActionRejectsInvalidFormSecurityToken(): void
+	{
+		$_REQUEST['form_security_token'] = 'invalid';
+		$this->setArgs('item/block/1');
+
+		$this->expectException(HTTPException\ForbiddenException::class);
+
+		item_action();
+	}
+
+	public function testItemActionRequiresAtLeastTwoArguments(): void
+	{
+		$this->setActionToken();
 		$this->setArgs('item');
 
 		$this->expectException(HTTPException\BadRequestException::class);
 
-		item_content();
+		item_action();
 	}
 
-	public function testItemContentBlockUnknownItemThrowsNotFound(): void
+	public function testItemActionBlockUnknownItemThrowsNotFound(): void
 	{
+		$this->setActionToken();
 		$this->setArgs('item/block/999999');
 
 		$this->expectException(HTTPException\NotFoundException::class);
 
-		item_content();
+		item_action();
 	}
 
-	public function testItemContentBlockNonAjaxRedirectsAfterAction(): void
+	public function testItemActionBlockNonAjaxRedirectsAfterAction(): void
 	{
+		$this->setActionToken();
 		$this->setArgs('item/block/1');
 
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
 		try {
-			item_content();
+			item_action();
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
 		}
 	}
 
-	public function testItemContentIgnoreNonAjaxRedirectsAfterAction(): void
+	public function testItemActionIgnoreNonAjaxRedirectsAfterAction(): void
 	{
+		$this->setActionToken();
 		$this->setArgs('item/ignore/1');
 
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
 		try {
-			item_content();
+			item_action();
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
 		}
 	}
 
-	public function testItemContentCollapseNonAjaxRedirectsAfterAction(): void
+	public function testItemActionCollapseNonAjaxRedirectsAfterAction(): void
 	{
+		$this->setActionToken();
 		$this->setArgs('item/collapse/1');
 
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
 		try {
-			item_content();
+			item_action();
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
@@ -651,14 +682,14 @@ class ItemTest extends ApiTestCase
 	}
 
 	/**
-	 * Known gap: the "drop" ajax branch of item_content() calls System::jsonExit(), which cannot be intercepted by PHPUnit.
+	 * Known gap: the "drop" ajax branch of item_action() calls System::jsonExit(), which cannot be intercepted by PHPUnit.
 	 *
 	 * Needs manual/browser verification instead.
 	 */
-	public function testItemContentAjaxBranchesAreNotAutomaticallyTestable(): void
+	public function testItemActionAjaxBranchesAreNotAutomaticallyTestable(): void
 	{
 		self::markTestIncomplete(
-			'item_content() ajax branches (drop/block/ignore/collapse with DI::mode()->isAjax()) '
+			'item_action() ajax branches (drop/block/ignore/collapse with DI::mode()->isAjax()) '
 			. 'call System::jsonExit(), a raw exit() call that cannot be intercepted by PHPUnit. '
 			. 'Verify manually: ajax drop/block/ignore/collapse return a JSON array [item id, owner id].',
 		);
