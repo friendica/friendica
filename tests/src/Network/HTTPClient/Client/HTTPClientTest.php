@@ -222,6 +222,49 @@ class HTTPClientTest extends MockedTestCase
 		self::assertTrue(DI::httpClient()->get('http://127.0.0.1:9999/')->isSuccess());
 	}
 
+	/** Ensures finalUrl() still resolves redirects to allowed targets. */
+	public function testFinalUrlFollowsAllowedRedirect(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		// URLResolver appends a slash to single-segment paths
+		self::assertSame($url . '/final/', DI::httpClient()->finalUrl($url . '/redirect'));
+	}
+
+	/** Ensures finalUrl() checks every redirect target, not only the first URL. */
+	public function testFinalUrlDoesNotFollowRedirectToPrivateTarget(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		$marker = sys_get_temp_dir() . '/friendica-sink-hit-' . parse_url($url, PHP_URL_PORT);
+		@unlink($marker);
+
+		$final = DI::httpClient()->finalUrl($url . '/redirect-loopback');
+
+		self::assertFileDoesNotExist($marker, 'the redirect into the private network was followed');
+		self::assertSame($url . '/redirect-loopback', $final);
+	}
+
+	/** Ensures finalUrl() returns a redirect target on the no_redirect_list without fetching it. */
+	public function testFinalUrlStopsAtNoRedirectTarget(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', false);
+		DI::config()->set('system', 'no_redirect_list', ['localhost']);
+
+		$marker = sys_get_temp_dir() . '/friendica-sink-hit-' . parse_url($url, PHP_URL_PORT);
+		@unlink($marker);
+
+		$final = DI::httpClient()->finalUrl($url . '/redirect-loopback');
+
+		self::assertFileDoesNotExist($marker, 'the redirect target on the no_redirect_list was fetched');
+		self::assertSame('http://localhost:' . parse_url($url, PHP_URL_PORT) . '/hit', $final);
+	}
+
 	/**
 	 * Starts the built-in PHP web server with SinkTestRouter.php and sends requests through curl
 	 *

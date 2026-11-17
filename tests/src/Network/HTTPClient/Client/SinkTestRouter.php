@@ -47,6 +47,16 @@ switch (parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH)) {
 		echo str_repeat('f', 600000);
 		break;
 
+	case '/redirect-loopback':
+		// Same server under another loopback name, which is not in allowed_internal_hosts
+		header('Location: http://localhost:' . $_SERVER['SERVER_PORT'] . '/hit', true, 302);
+		break;
+
+	case '/hit':
+		touch(sys_get_temp_dir() . '/friendica-sink-hit-' . $_SERVER['SERVER_PORT']);
+		echo 'hit';
+		break;
+
 	default:
 		echo 'final';
 }
