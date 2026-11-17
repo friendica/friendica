@@ -129,7 +129,9 @@ class FormattedNavNotification extends BaseFactory
 			}
 		}
 
-		if (self::$contacts[$intro->cid]['pending']) {
+		if ($intro->sid) {
+			$msg = $this->l10n->t('{0} sent you a friend suggestion');
+		} elseif (self::$contacts[$intro->cid]['pending']) {
 			$msg = $this->l10n->t('{0} wants to follow you');
 		} else {
 			$msg = $this->l10n->t('{0} has started following you');

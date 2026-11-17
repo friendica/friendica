@@ -144,7 +144,7 @@ class Delegation extends BaseModule
 
 			$notifications = $this->notify->countForUser(
 				$identity['uid'],
-				["`msg` != '' AND NOT (`type` IN (?, ?)) AND NOT `seen`", Notification\Type::INTRO, Notification\Type::MAIL],
+				["`msg` != '' AND NOT (`type` IN (?, ?, ?)) AND NOT `seen`", Notification\Type::INTRO, Notification\Type::SUGGEST, Notification\Type::MAIL],
 				['distinct' => true, 'expression' => 'parent'],
 			);
 

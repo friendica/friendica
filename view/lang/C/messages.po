@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2026.08-rc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-16 09:24+0000\n"
+"POT-Creation-Date: 2026-11-16 19:02-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,40 +18,40 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 
-#: mod/item.php:101 mod/item.php:104 mod/item.php:176 mod/item.php:179
+#: mod/item.php:102 mod/item.php:105 mod/item.php:177 mod/item.php:180
 msgid "Unable to locate original post."
 msgstr ""
 
-#: mod/item.php:144
+#: mod/item.php:145
 msgid "Post updated."
 msgstr ""
 
-#: mod/item.php:209 mod/item.php:213
+#: mod/item.php:210 mod/item.php:214
 msgid "Item wasn't stored."
 msgstr ""
 
-#: mod/item.php:223
+#: mod/item.php:224
 msgid "Item couldn't be fetched."
 msgstr ""
 
-#: mod/item.php:267 mod/item.php:271
+#: mod/item.php:268 mod/item.php:272
 msgid "Empty post discarded."
 msgstr ""
 
-#: mod/item.php:484 src/Module/Admin/Themes/Details.php:31
+#: mod/item.php:485 src/Module/Admin/Themes/Details.php:31
 #: src/Module/Admin/Themes/Index.php:51 src/Module/Debug/ItemBody.php:34
 #: src/Module/Debug/ItemBody.php:42 src/Module/Item/Feed.php:65
 msgid "Item not found."
 msgstr ""
 
-#: mod/item.php:508 mod/message.php:57 mod/message.php:141 mod/photos.php:117
+#: mod/item.php:509 mod/message.php:57 mod/message.php:141 mod/photos.php:117
 #: mod/photos.php:418 src/Model/Event.php:512 src/Module/Attach.php:40
 #: src/Module/BaseApi.php:96 src/Module/BaseNotifications.php:83
 #: src/Module/BaseSettings.php:38 src/Module/Calendar/Event/API.php:75
 #: src/Module/Calendar/Event/Form.php:73 src/Module/Calendar/Export.php:79
 #: src/Module/Calendar/Show.php:71 src/Module/Circle.php:27
 #: src/Module/Circle.php:76 src/Module/Contact/Advanced.php:46
-#: src/Module/Contact/Follow.php:78 src/Module/Contact/Follow.php:150
+#: src/Module/Contact/Follow.php:83 src/Module/Contact/Follow.php:155
 #: src/Module/Contact/MatchInterests.php:73
 #: src/Module/Contact/Suggestions.php:32 src/Module/Contact/Unfollow.php:47
 #: src/Module/Contact/Unfollow.php:61 src/Module/Contact/Unfollow.php:93
@@ -130,7 +130,7 @@ msgstr ""
 msgid "Send Private Message"
 msgstr ""
 
-#: mod/message.php:183 mod/message.php:341
+#: mod/message.php:183 mod/message.php:339
 #: src/Module/Privacy/PermissionTooltip.php:135
 msgid "To:"
 msgstr ""
@@ -147,18 +147,18 @@ msgstr ""
 msgid "Your message"
 msgstr ""
 
-#: mod/message.php:193 mod/message.php:350 mod/photos.php:76 mod/photos.php:624
+#: mod/message.php:193 mod/message.php:348 mod/photos.php:76 mod/photos.php:624
 #: src/Content/Conversation/StatusEditor.php:150 src/Module/Post/Edit.php:142
 #: src/Module/Profile/Photos.php:336 src/Module/Profile/Photos.php:356
 #: src/Module/Profile/Photos.php:359
 msgid "Upload photo"
 msgstr ""
 
-#: mod/message.php:194 mod/message.php:351 src/Module/Post/Edit.php:146
+#: mod/message.php:194 mod/message.php:349 src/Module/Post/Edit.php:146
 msgid "Insert web link"
 msgstr ""
 
-#: mod/message.php:195 mod/message.php:353 src/App/Page.php:281
+#: mod/message.php:195 mod/message.php:351 src/App/Page.php:281
 #: src/Content/Conversation/PostTemplateBuilder.php:398
 #: src/Content/Conversation/StatusEditor.php:182
 #: src/Module/Item/Compose.php:181 src/Module/Media/BaseBrowser.php:91
@@ -166,7 +166,7 @@ msgstr ""
 msgid "Please wait"
 msgstr ""
 
-#: mod/message.php:196 mod/message.php:352
+#: mod/message.php:196 mod/message.php:350
 msgid "Send Message"
 msgstr ""
 
@@ -178,50 +178,50 @@ msgstr ""
 msgid "Message not available."
 msgstr ""
 
-#: mod/message.php:320
+#: mod/message.php:319
 msgid "Delete message"
 msgstr ""
 
-#: mod/message.php:323 mod/message.php:446
+#: mod/message.php:321 mod/message.php:442
 msgid "D, d M Y - g:i A"
 msgstr ""
 
-#: mod/message.php:335 mod/message.php:442
+#: mod/message.php:333 mod/message.php:439
 msgid "Delete conversation"
 msgstr ""
 
-#: mod/message.php:337
+#: mod/message.php:335
 msgid "No secure communications available. You <strong>may</strong> be able to respond from the sender's profile page."
 msgstr ""
 
-#: mod/message.php:340
+#: mod/message.php:338
 msgid "Send Reply"
 msgstr ""
 
-#: mod/message.php:342
+#: mod/message.php:340
 msgid "Subject:"
 msgstr ""
 
-#: mod/message.php:345 src/Module/Invite.php:156
+#: mod/message.php:343 src/Module/Invite.php:156
 msgid "Your message:"
 msgstr ""
 
-#: mod/message.php:416
+#: mod/message.php:413
 #, php-format
 msgid "Unknown sender - %s"
 msgstr ""
 
-#: mod/message.php:418
+#: mod/message.php:415
 #, php-format
 msgid "You and %s"
 msgstr ""
 
-#: mod/message.php:420
+#: mod/message.php:417
 #, php-format
 msgid "%s and You"
 msgstr ""
 
-#: mod/message.php:449
+#: mod/message.php:445
 #, php-format
 msgid "%d message"
 msgid_plural "%d messages"
@@ -329,7 +329,7 @@ msgstr ""
 msgid "Delete Album"
 msgstr ""
 
-#: mod/photos.php:556 mod/photos.php:655 src/Module/Contact/Follow.php:163
+#: mod/photos.php:556 mod/photos.php:655 src/Module/Contact/Follow.php:168
 #: src/Module/Contact/Revoke.php:92 src/Module/Contact/Unfollow.php:107
 #: src/Module/Media/BaseBrowser.php:86 src/Module/Post/Edit.php:180
 #: src/Module/Post/Tag/Remove.php:103 src/Module/Profile/RemoteFollow.php:110
@@ -1965,7 +1965,7 @@ msgid "Display posts that have been created by accounts of the selected circle."
 msgstr ""
 
 #: src/Content/Feature.php:129 src/Content/GroupManager.php:95
-#: src/Content/Nav.php:245 src/Content/Text/HTML.php:904
+#: src/Content/Nav.php:245 src/Content/Text/HTML.php:902
 #: src/Content/Widget.php:572 src/Model/User.php:1524
 msgid "Groups"
 msgstr ""
@@ -2017,7 +2017,7 @@ msgstr ""
 msgid "Display posts in the system channels and user defined channels."
 msgstr ""
 
-#: src/Content/Feature.php:135 src/Content/Widget/SavedSearches.php:47
+#: src/Content/Feature.php:135 src/Content/Widget/SavedSearches.php:46
 msgid "Saved Searches"
 msgstr ""
 
@@ -2173,7 +2173,7 @@ msgstr ""
 
 #: src/Content/Item.php:448 src/Content/Widget.php:71
 #: src/Model/Contact.php:1299 src/Model/Contact.php:1311
-#: src/Module/Contact/Follow.php:157 view/theme/vier/theme.php:182
+#: src/Module/Contact/Follow.php:162 view/theme/vier/theme.php:182
 msgid "Connect/Follow"
 msgstr ""
 
@@ -2311,7 +2311,7 @@ msgstr ""
 msgid "Addon applications, utilities, games"
 msgstr ""
 
-#: src/Content/Nav.php:236 src/Content/Text/HTML.php:888
+#: src/Content/Nav.php:236 src/Content/Text/HTML.php:887
 #: src/Module/Moderation/Blocklist/Contact.php:112
 #: src/Module/Moderation/Blocklist/Server/Index.php:103
 #: src/Module/Search/Index.php:99
@@ -2322,17 +2322,17 @@ msgstr ""
 msgid "Search site content"
 msgstr ""
 
-#: src/Content/Nav.php:239 src/Content/Text/HTML.php:898
+#: src/Content/Nav.php:239 src/Content/Text/HTML.php:896
 msgid "Full Text"
 msgstr ""
 
-#: src/Content/Nav.php:240 src/Content/Text/HTML.php:899
+#: src/Content/Nav.php:240 src/Content/Text/HTML.php:897
 #: src/Content/Widget/TagCloud.php:54
 msgid "Tags"
 msgstr ""
 
 #: src/Content/Nav.php:241 src/Content/Nav.php:301
-#: src/Content/Text/HTML.php:900 src/Module/BaseProfile.php:112
+#: src/Content/Text/HTML.php:898 src/Module/BaseProfile.php:112
 #: src/Module/BaseProfile.php:115 src/Module/Contact.php:191
 #: src/Module/Contact.php:409 src/Module/Contact.php:519
 #: view/theme/frio/theme.php:232
@@ -2516,7 +2516,7 @@ msgstr ""
 msgid "Link to source"
 msgstr ""
 
-#: src/Content/Text/BBCode.php:1737 src/Content/Text/HTML.php:928
+#: src/Content/Text/BBCode.php:1737 src/Content/Text/HTML.php:926
 msgid "Click to open/close"
 msgstr ""
 
@@ -2536,19 +2536,19 @@ msgstr ""
 msgid "Invalid link protocol"
 msgstr ""
 
-#: src/Content/Text/HTML.php:805
+#: src/Content/Text/HTML.php:804
 msgid "Loading more entries..."
 msgstr ""
 
-#: src/Content/Text/HTML.php:806
+#: src/Content/Text/HTML.php:805
 msgid "The end"
 msgstr ""
 
-#: src/Content/Text/HTML.php:882
+#: src/Content/Text/HTML.php:881
 msgid "Save search"
 msgstr ""
 
-#: src/Content/Text/HTML.php:890
+#: src/Content/Text/HTML.php:889
 msgid "@name, !group, #tags, content"
 msgstr ""
 
@@ -2719,7 +2719,7 @@ msgstr ""
 msgid "Moderator"
 msgstr ""
 
-#: src/Content/Widget/SavedSearches.php:34
+#: src/Content/Widget/SavedSearches.php:33
 msgid "Remove term"
 msgstr ""
 
@@ -6424,8 +6424,8 @@ msgstr ""
 #: src/Module/Contact/Posts.php:57 src/Module/Contact/Profile.php:148
 #: src/Module/Contact/Profile.php:153 src/Module/Contact/Profile.php:172
 #: src/Module/Contact/Redir.php:68 src/Module/Contact/Redir.php:122
-#: src/Module/FriendSuggest.php:60 src/Module/FriendSuggest.php:98
-#: src/Module/FriendSuggest.php:104
+#: src/Module/FriendSuggest.php:61 src/Module/FriendSuggest.php:100
+#: src/Module/FriendSuggest.php:106
 msgid "Contact not found."
 msgstr ""
 
@@ -6678,7 +6678,7 @@ msgstr ""
 #: src/Module/Debug/ActivityPubConversion.php:134
 #: src/Module/Debug/Babel.php:280 src/Module/Debug/Localtime.php:50
 #: src/Module/Debug/Probe.php:40 src/Module/Debug/WebFinger.php:37
-#: src/Module/FriendSuggest.php:140 src/Module/Install.php:216
+#: src/Module/FriendSuggest.php:142 src/Module/Install.php:216
 #: src/Module/Install.php:256 src/Module/Install.php:293
 #: src/Module/Invite.php:163 src/Module/Moderation/Item/Source.php:70
 #: src/Module/Moderation/Report/Create.php:197
@@ -6771,7 +6771,7 @@ msgid_plural "Contacts (%s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Module/Contact/Follow.php:57 src/Module/Contact/Redir.php:36
+#: src/Module/Contact/Follow.php:62 src/Module/Contact/Redir.php:36
 #: src/Module/Contact/Redir.php:197 src/Module/Conversation/Community.php:156
 #: src/Module/Debug/ItemBody.php:30 src/Module/Diaspora/Receive.php:45
 #: src/Module/Item/Comment.php:44 src/Module/Item/Comments.php:45
@@ -6784,32 +6784,32 @@ msgstr[1] ""
 msgid "Access denied."
 msgstr ""
 
-#: src/Module/Contact/Follow.php:96 src/Module/Contact/Unfollow.php:106
+#: src/Module/Contact/Follow.php:101 src/Module/Contact/Unfollow.php:106
 #: src/Module/Profile/RemoteFollow.php:109
 msgid "Submit Request"
 msgstr ""
 
-#: src/Module/Contact/Follow.php:106
+#: src/Module/Contact/Follow.php:111
 msgid "You already added this contact."
 msgstr ""
 
-#: src/Module/Contact/Follow.php:125
+#: src/Module/Contact/Follow.php:130
 msgid "The network type couldn't be detected. Contact can't be added."
 msgstr ""
 
-#: src/Module/Contact/Follow.php:133
+#: src/Module/Contact/Follow.php:138
 msgid "Diaspora support isn't enabled. Contact can't be added."
 msgstr ""
 
-#: src/Module/Contact/Follow.php:158 src/Module/Profile/RemoteFollow.php:108
+#: src/Module/Contact/Follow.php:163 src/Module/Profile/RemoteFollow.php:108
 msgid "Please answer the following:"
 msgstr ""
 
-#: src/Module/Contact/Follow.php:159 src/Module/Contact/Unfollow.php:104
+#: src/Module/Contact/Follow.php:164 src/Module/Contact/Unfollow.php:104
 msgid "Your Identity Address:"
 msgstr ""
 
-#: src/Module/Contact/Follow.php:160 src/Module/Contact/Profile.php:422
+#: src/Module/Contact/Follow.php:165 src/Module/Contact/Profile.php:422
 #: src/Module/Contact/Unfollow.php:110
 #: src/Module/Moderation/Blocklist/Contact.php:128
 #: src/Module/Moderation/Reports.php:263
@@ -6818,26 +6818,26 @@ msgstr ""
 msgid "Profile URL"
 msgstr ""
 
-#: src/Module/Contact/Follow.php:161 src/Module/Contact/Profile.php:434
+#: src/Module/Contact/Follow.php:166 src/Module/Contact/Profile.php:434
 #: src/Module/Notifications/Introductions.php:191
 #: src/Module/Profile/Profile.php:238
 msgid "Tags:"
 msgstr ""
 
-#: src/Module/Contact/Follow.php:173
+#: src/Module/Contact/Follow.php:178
 #, php-format
 msgid "%s knows you"
 msgstr ""
 
-#: src/Module/Contact/Follow.php:174
+#: src/Module/Contact/Follow.php:179
 msgid "Add a personal note:"
 msgstr ""
 
-#: src/Module/Contact/Follow.php:184 src/Module/Contact/Unfollow.php:119
+#: src/Module/Contact/Follow.php:189 src/Module/Contact/Unfollow.php:119
 msgid "Posts and Replies"
 msgstr ""
 
-#: src/Module/Contact/Follow.php:213
+#: src/Module/Contact/Follow.php:219
 msgid "The contact could not be added."
 msgstr ""
 
@@ -7364,11 +7364,11 @@ msgstr ""
 msgid "Accounts listed: %s"
 msgstr ""
 
-#: src/Module/Filer/RemoveTag.php:91
+#: src/Module/Filer/RemoveTag.php:95
 msgid "Item was not deleted"
 msgstr ""
 
-#: src/Module/Filer/RemoveTag.php:101
+#: src/Module/Filer/RemoveTag.php:105
 msgid "Item was not removed"
 msgstr ""
 
@@ -7380,19 +7380,19 @@ msgstr ""
 msgid "- select -"
 msgstr ""
 
-#: src/Module/FriendSuggest.php:71
+#: src/Module/FriendSuggest.php:72
 msgid "Suggested contact not found."
 msgstr ""
 
-#: src/Module/FriendSuggest.php:89
+#: src/Module/FriendSuggest.php:91
 msgid "Friend suggestion sent."
 msgstr ""
 
-#: src/Module/FriendSuggest.php:132
+#: src/Module/FriendSuggest.php:134
 msgid "Suggest Friends"
 msgstr ""
 
-#: src/Module/FriendSuggest.php:135
+#: src/Module/FriendSuggest.php:137
 #, php-format
 msgid "Suggest a friend for %s"
 msgstr ""
@@ -12270,10 +12270,14 @@ msgid "Our <strong>help</strong> pages may be consulted for detail on other prog
 msgstr ""
 
 #: src/Navigation/Notifications/Factory/FormattedNavNotification.php:133
-msgid "{0} wants to follow you"
+msgid "{0} sent you a friend suggestion"
 msgstr ""
 
 #: src/Navigation/Notifications/Factory/FormattedNavNotification.php:135
+msgid "{0} wants to follow you"
+msgstr ""
+
+#: src/Navigation/Notifications/Factory/FormattedNavNotification.php:137
 msgid "{0} has started following you"
 msgstr ""
 

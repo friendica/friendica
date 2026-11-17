@@ -85,6 +85,8 @@
 				{{if $note}}<div>{{$note}}</div>{{/if}}
 				<input type="hidden" name="url" value="{{$url}}">
 				<input type="hidden" name="dfrn-url" value="{{$dfrn_url}}">
+				{{* Lets the follow page remove the suggestion after it was approved *}}
+				<input type="hidden" name="intro_id" value="{{$intro_id}}">
 				{{/if}}
 				<div class="pull-right">
 					<button class="btn btn-primary intro-submit-approve" type="submit" name="submit" value="{{$approve}}">{{$approve}}</button>
