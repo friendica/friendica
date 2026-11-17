@@ -23,7 +23,7 @@ use Friendica\Test\FixtureTestCase;
  * - thread 1: parent 1/7 with the comments 2/8, 4/10 and 5/11
  * - thread 3: parent 3/9
  * - thread 6: parent 6/12
- * - thread 7: public copies only, its post-thread-user row points at item 12, so it is left out here
+ * - thread 7: public copy 13 with the comment 14, no user item
  */
 class ItemDeletionTest extends FixtureTestCase
 {
@@ -141,6 +141,20 @@ class ItemDeletionTest extends FixtureTestCase
 			['nodeinfo_total_posts' => -1, 'nodeinfo_total_comments' => -3, 'nodeinfo_local_posts' => -1, 'nodeinfo_local_comments' => -3],
 			$this->getNodeinfoChanges(),
 		);
+	}
+
+	public function testThreadLeavesOtherThreadsAlone(): void
+	{
+		self::assertTrue(Item::markForDeletionById(6));
+
+		self::assertSame([6, 12], $this->getDeletedIds());
+	}
+
+	public function testPublicThreadTakesItsCommentsAlong(): void
+	{
+		self::assertTrue(Item::markForDeletionById(13));
+
+		self::assertSame([13, 14], $this->getDeletedIds());
 	}
 
 	public function testOwnPostTakesTheCopiesOfOtherUsersAlong(): void
