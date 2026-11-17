@@ -385,7 +385,9 @@ class Item
 		}
 
 		// If item is a link to an event, delete the event.
+		// The posts are unlinked first, the foreign key would delete them before the Notifier can announce the deletion.
 		if (intval($item['event-id'])) {
+			Post::update(['event-id' => null], ['event-id' => $item['event-id']]);
 			Event::delete($item['event-id']);
 		}
 
