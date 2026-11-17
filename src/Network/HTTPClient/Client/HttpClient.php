@@ -387,6 +387,12 @@ class HttpClient implements ICanSendHttpRequests
 				break;
 			}
 
+			// Same as for the initial URL: a domain on the no_redirect_list is returned as is, without fetching it.
+			if (Network::isRedirectBlocked($next)) {
+				$this->logger->info('Redirect target should not be redirected.', ['url' => $url, 'to' => $next]);
+				return $next;
+			}
+
 			$viaOg        = $urlResult->redirectTargetIsOpenGraphURL();
 			$viaCanonical = $urlResult->redirectTargetIsCanonicalURL();
 			$url          = $next;

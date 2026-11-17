@@ -249,6 +249,22 @@ class HTTPClientTest extends MockedTestCase
 		self::assertSame($url . '/redirect-loopback', $final);
 	}
 
+	/** Ensures finalUrl() returns a redirect target on the no_redirect_list without fetching it. */
+	public function testFinalUrlStopsAtNoRedirectTarget(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', false);
+		DI::config()->set('system', 'no_redirect_list', ['localhost']);
+
+		$marker = sys_get_temp_dir() . '/friendica-sink-hit-' . parse_url($url, PHP_URL_PORT);
+		@unlink($marker);
+
+		$final = DI::httpClient()->finalUrl($url . '/redirect-loopback');
+
+		self::assertFileDoesNotExist($marker, 'the redirect target on the no_redirect_list was fetched');
+		self::assertSame('http://localhost:' . parse_url($url, PHP_URL_PORT) . '/hit', $final);
+	}
+
 	/**
 	 * Starts the built-in PHP web server with SinkTestRouter.php and sends requests through curl
 	 *
