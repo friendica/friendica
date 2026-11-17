@@ -9,6 +9,7 @@ namespace Friendica\Module\Api\Friendica\Events;
 
 use Friendica\Database\DBA;
 use Friendica\Model\Event;
+use Friendica\Model\Item;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException;
 
@@ -40,8 +41,9 @@ class Delete extends BaseApi
 			throw new HTTPException\BadRequestException('id not available');
 		}
 
-		// delete event
+		// Deleting the post also deletes the event and announces the deletion, events without a post are deleted directly
 		$eventid = $request['id'];
+		Item::markForDeletion(['uid' => $uid, 'event-id' => $eventid]);
 		Event::delete($eventid);
 
 		$success = ['id' => $eventid, 'status' => 'deleted'];

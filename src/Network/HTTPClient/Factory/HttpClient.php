@@ -102,7 +102,8 @@ class HttpClient extends BaseFactory
 		]);
 
 		$resolver = new URLResolver();
-		$resolver->setMaxRedirects(10);
+		// One hop per call: HttpClient::finalUrl() follows the hops itself and checks every target.
+		$resolver->setMaxRedirects(1);
 		$resolver->setRequestTimeout(10);
 		// if the file is too large then exit
 		$resolver->setMaxResponseDataSize($this->config->get('performance', 'max_response_data_size', 1000000));

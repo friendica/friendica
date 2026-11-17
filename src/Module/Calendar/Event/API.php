@@ -78,19 +78,16 @@ class API extends BaseModule
 
 	protected function post(array $request = [])
 	{
-		$this->createEvent($request);
-	}
-
-	protected function rawContent(array $request = [])
-	{
 		if (empty($this->parameters['action']) || !in_array($this->parameters['action'], self::ALLOWED_ACTIONS)) {
 			throw new BadRequestException($this->t('Invalid Request'));
 		}
 
-		// CREATE is done per POSt, so nothing to do left
 		if ($this->parameters['action'] === static::ACTION_CREATE) {
+			$this->createEvent($request);
 			return;
 		}
+
+		self::checkFormSecurityTokenRedirectOnError('calendar', 'action');
 
 		if (empty($this->parameters['id'])) {
 			throw new BadRequestException($this->t('Event id is missing.'));

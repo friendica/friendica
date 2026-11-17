@@ -38,7 +38,7 @@
 					{{if $item.actions}}
 						<div class="overview-actions">
 							{{foreach $item.actions as $action}}
-								<a href="{{$action.href}}" class="overview-action{{if $action.confirm}} overview-action-confirm{{/if}}" title="{{$action.label}}">
+								<a href="{{$action.href}}" class="overview-action{{if $action.confirm}} overview-action-confirm{{/if}}{{if $action.post}} post-action{{/if}}" title="{{$action.label}}">
 									<i class="ri {{$action.icon}}" aria-hidden="true"></i>
 									<span class="sr-only">{{$action.label}}</span>
 								</a>

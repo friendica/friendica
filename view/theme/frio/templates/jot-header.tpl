@@ -243,7 +243,7 @@
 			// Prevents arbitrary Ajax requests
 			if ($href.substr(0, 7) === 'filerm/') {
 				$(t).parent().fadeOut(500)
-				$.post($href)
+				$.post($href, {form_security_token: getActionToken()})
 				.done(function() {
 					liking = 1;
 					force_update = true;
@@ -408,7 +408,7 @@
 					commentBusy = true;
 					formModified = true;
 					$('body').css('cursor', 'wait');
-					$.get('filer/' + id + '?term=' + term)
+					$.post('filer/' + id, {term: term, form_security_token: getActionToken()})
 						.done(function () {
 							$('#modal-body').empty();
 							$('#modal').modal('hide');

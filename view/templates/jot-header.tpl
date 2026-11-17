@@ -220,7 +220,7 @@ function enableOnUser(){
 					commentBusy = true;
 					formModified = true;
 					$('body').css('cursor', 'wait');
-					$.get('filer/' + id + '?term=' + reply)
+					$.post('filer/' + id, {term: reply, form_security_token: getActionToken()})
 						.done(function () {
 							$.colorbox.close();
 							resetFormModifiedFlag();

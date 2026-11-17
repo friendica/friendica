@@ -2,6 +2,7 @@ deptrac:
   skip_violations:
     Friendica\App\Page:
       - Friendica\App
+      - Friendica\BaseModule
       - Friendica\Content\Nav
       - Friendica\Content\Text\HTML
       - Friendica\DI

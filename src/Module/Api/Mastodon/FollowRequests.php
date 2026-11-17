@@ -90,6 +90,10 @@ class FollowRequests extends BaseApi
 		foreach ($introductions as $key => $introduction) {
 			try {
 				self::setBoundaries($introduction->id);
+				// Suggestions are shown with the introductions, but they aren't follow requests
+				if ($introduction->sid) {
+					continue;
+				}
 				$return[] = DI::mstdnAccount()->createFromContactId($introduction->cid, $introduction->uid);
 			} catch (
 				HTTPException\InternalServerErrorException|HTTPException\NotFoundException|\ImagickException
