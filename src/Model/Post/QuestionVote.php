@@ -8,10 +8,10 @@
 namespace Friendica\Model\Post;
 
 use BadMethodCallException;
+use Friendica\Core\L10n;
 use Friendica\Core\Worker;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Network\HTTPException;
@@ -25,11 +25,12 @@ class QuestionVote
 	 * @param integer $uri_id  Id of the item-uri table entry of the question
 	 * @param integer $uid     Id of the voting user
 	 * @param array   $choices Ids of the selected question options
+	 * @param L10n    $l10n    Translates the error messages
 	 * @throws HTTPException\NotFoundException            if the question isn't visible to the user
 	 * @throws HTTPException\UnprocessableEntityException if the votes aren't valid
 	 * @throws \Exception
 	 */
-	public static function vote(int $uri_id, int $uid, array $choices): void
+	public static function vote(int $uri_id, int $uid, array $choices, L10n $l10n): void
 	{
 		$question  = Post::selectFirstForUser($uid, ['question-id', 'question-multiple', 'question-end-time'], ['uri-id' => $uri_id, 'uid' => [0, $uid]]);
 		$author_id = Contact::getPublicIdByUserId($uid);
@@ -38,20 +39,20 @@ class QuestionVote
 		}
 
 		if (!empty($question['question-end-time']) && ($question['question-end-time'] > DBA::NULL_DATETIME) && ($question['question-end-time'] < DateTimeFormat::utcNow())) {
-			throw new HTTPException\UnprocessableEntityException(DI::l10n()->t('The poll has already ended.'));
+			throw new HTTPException\UnprocessableEntityException($l10n->t('The poll has already ended.'));
 		}
 
 		$choices = array_values(array_unique(array_map(intval(...), $choices)));
 		if (empty($choices) || (!$question['question-multiple'] && count($choices) > 1)) {
-			throw new HTTPException\UnprocessableEntityException(DI::l10n()->t('Invalid number of choices.'));
+			throw new HTTPException\UnprocessableEntityException($l10n->t('Invalid number of choices.'));
 		}
 
 		if (array_diff($choices, array_column(QuestionOption::getByURIId($uri_id), 'id'))) {
-			throw new HTTPException\UnprocessableEntityException(DI::l10n()->t('Invalid choice.'));
+			throw new HTTPException\UnprocessableEntityException($l10n->t('Invalid choice.'));
 		}
 
 		if (self::hasVoted($uri_id, $author_id)) {
-			throw new HTTPException\UnprocessableEntityException(DI::l10n()->t('You have already voted on this poll.'));
+			throw new HTTPException\UnprocessableEntityException($l10n->t('You have already voted on this poll.'));
 		}
 
 		$added = [];
@@ -60,7 +61,7 @@ class QuestionVote
 				foreach ($added as $id) {
 					self::delete($uri_id, $id, $author_id);
 				}
-				throw new HTTPException\UnprocessableEntityException(DI::l10n()->t('You have already voted on this poll.'));
+				throw new HTTPException\UnprocessableEntityException($l10n->t('You have already voted on this poll.'));
 			}
 			$added[] = $choice;
 		}

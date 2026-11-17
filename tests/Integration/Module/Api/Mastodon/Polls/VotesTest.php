@@ -41,7 +41,7 @@ final class VotesTest extends ApiTestCase
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/v1/polls/' . ($id ?: $this->questionId) . '/votes'))
 			->withParsedBody(['choices' => $choices]);
 
-		$module = new Votes(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['id' => $id ?: $this->questionId]);
+		$module = new Votes(DI::mstdnPoll(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['id' => $id ?: $this->questionId]);
 
 		try {
 			return $module->handleRequest($request);

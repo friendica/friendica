@@ -8,6 +8,7 @@
 namespace Friendica\Test\src\Model\Post;
 
 use Friendica\Database\DBA;
+use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Post\Question;
 use Friendica\Model\Post\QuestionOption;
@@ -138,7 +139,7 @@ class QuestionVoteTest extends FixtureTestCase
 		$this->createQuestion();
 		$queued = $this->queuedDeliveries();
 
-		QuestionVote::vote(self::URI_ID, self::UID, ['1']);
+		QuestionVote::vote(self::URI_ID, self::UID, ['1'], DI::l10n());
 
 		self::assertSame([1], QuestionVote::getChoices(self::URI_ID, Contact::getPublicIdByUserId(self::UID)));
 		self::assertSame($queued + 1, $this->queuedDeliveries());
@@ -148,7 +149,7 @@ class QuestionVoteTest extends FixtureTestCase
 	{
 		$this->createQuestion(true);
 
-		QuestionVote::vote(self::URI_ID, self::UID, [2, 0]);
+		QuestionVote::vote(self::URI_ID, self::UID, [2, 0], DI::l10n());
 
 		self::assertSame([0, 2], QuestionVote::getChoices(self::URI_ID, Contact::getPublicIdByUserId(self::UID)));
 	}
@@ -158,7 +159,7 @@ class QuestionVoteTest extends FixtureTestCase
 		$this->createQuestion();
 
 		$this->expectException(HTTPException\UnprocessableEntityException::class);
-		QuestionVote::vote(self::URI_ID, self::UID, [0, 1]);
+		QuestionVote::vote(self::URI_ID, self::UID, [0, 1], DI::l10n());
 	}
 
 	public function testVoteRejectsEmptyChoices(): void
@@ -166,7 +167,7 @@ class QuestionVoteTest extends FixtureTestCase
 		$this->createQuestion();
 
 		$this->expectException(HTTPException\UnprocessableEntityException::class);
-		QuestionVote::vote(self::URI_ID, self::UID, []);
+		QuestionVote::vote(self::URI_ID, self::UID, [], DI::l10n());
 	}
 
 	public function testVoteRejectsUnknownOptions(): void
@@ -174,7 +175,7 @@ class QuestionVoteTest extends FixtureTestCase
 		$this->createQuestion();
 
 		$this->expectException(HTTPException\UnprocessableEntityException::class);
-		QuestionVote::vote(self::URI_ID, self::UID, [7]);
+		QuestionVote::vote(self::URI_ID, self::UID, [7], DI::l10n());
 	}
 
 	public function testVoteRejectsEndedQuestions(): void
@@ -182,16 +183,16 @@ class QuestionVoteTest extends FixtureTestCase
 		$this->createQuestion(false, DateTimeFormat::utc('now - 1 hour'));
 
 		$this->expectException(HTTPException\UnprocessableEntityException::class);
-		QuestionVote::vote(self::URI_ID, self::UID, [0]);
+		QuestionVote::vote(self::URI_ID, self::UID, [0], DI::l10n());
 	}
 
 	public function testVoteRejectsASecondVote(): void
 	{
 		$this->createQuestion(true);
-		QuestionVote::vote(self::URI_ID, self::UID, [0]);
+		QuestionVote::vote(self::URI_ID, self::UID, [0], DI::l10n());
 
 		try {
-			QuestionVote::vote(self::URI_ID, self::UID, [1]);
+			QuestionVote::vote(self::URI_ID, self::UID, [1], DI::l10n());
 			self::fail('The second vote has been accepted');
 		} catch (HTTPException\UnprocessableEntityException) {
 			self::assertSame([0], QuestionVote::getChoices(self::URI_ID, Contact::getPublicIdByUserId(self::UID)));
@@ -201,6 +202,6 @@ class QuestionVoteTest extends FixtureTestCase
 	public function testVoteRejectsPostsWithoutQuestion(): void
 	{
 		$this->expectException(HTTPException\NotFoundException::class);
-		QuestionVote::vote(self::URI_ID, self::UID, [0]);
+		QuestionVote::vote(self::URI_ID, self::UID, [0], DI::l10n());
 	}
 }

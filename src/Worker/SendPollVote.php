@@ -8,7 +8,6 @@
 namespace Friendica\Worker;
 
 use Friendica\Core\Worker;
-use Friendica\DI;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Protocol\ActivityPub\Transmitter;
@@ -42,8 +41,8 @@ class SendPollVote
 			return;
 		}
 
+		// Worker::defer() logs when the retries are exhausted
 		if (!Worker::defer()) {
-			DI::logger()->notice('Vote could not be delivered and is removed', ['uid' => $uid, 'uri-id' => $uri_id, 'choice' => $choice]);
 			Post\QuestionVote::delete($uri_id, $choice, $author_id);
 		}
 	}

@@ -512,6 +512,8 @@ deptrac:
       - Friendica\DI
     Friendica\Module\Api\Mastodon\Polls:
       - Friendica\DI
+    Friendica\Module\Api\Mastodon\Polls\Votes:
+      - Friendica\DI
     Friendica\Module\Api\Mastodon\Preferences:
       - Friendica\DI
     Friendica\Module\Api\Mastodon\Proofs:
