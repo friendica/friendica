@@ -876,10 +876,6 @@ Here is a complete list of all hook callbacks with file locations (as of 24-Sep-
 
     Hook::callAll('authenticate', $addon_auth);
 
-### src/Security/ExAuth.php
-
-    Hook::callAll('authenticate', $addon_auth);
-
 ### src/Content/ContactBlock.php
 
     Hook::callAll('contact_block_end', $text);

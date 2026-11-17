@@ -52,7 +52,9 @@ final class EJabberdAuthDaemon extends Console
 
 	private int $debugMode = 0;
 
+	/** @var resource */
 	private $input;
+	/** @var resource */
 	private $output;
 
 	public function __construct(
@@ -92,6 +94,9 @@ HELP;
 
 	protected function doExecute(): int
 	{
+		// STDOUT carries the binary protocol, so PHP notices must never be printed there.
+		ini_set('display_errors', 'stderr');
+
 		$this->debugMode = (int) $this->config->get('jabber', 'debug');
 
 		openlog('auth_ejabberd', LOG_PID, LOG_USER);
@@ -179,10 +184,11 @@ HELP;
 	 */
 	private function handle(string $payload): bool
 	{
-		$this->writeLog(LOG_DEBUG, 'received data: ' . $payload);
-
 		// Limit to 4 parts so a ':' inside the password is not silently truncated.
 		$command = explode(':', $payload, 4);
+
+		// Never log the password part of an auth command.
+		$this->writeLog(LOG_DEBUG, 'received data: ' . implode(':', array_slice($command, 0, 3)));
 
 		try {
 			switch ($command[0]) {
