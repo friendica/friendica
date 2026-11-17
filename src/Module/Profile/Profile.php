@@ -24,7 +24,6 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\DI;
 use Friendica\Event\HtmlFilterEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile as ProfileModel;
@@ -172,6 +171,8 @@ class Profile extends BaseProfile
 		$o = self::getTabsHTML('profile', $is_owner, $profile['nickname'], $profile['hide-friends']);
 
 		$basic_fields = [];
+
+		$basic_fields += self::buildField('fullname', $this->t('Display name:'), $this->cleanInput($profile['uri-id'], $profile['name']));
 
 		if (!empty($profile['dob']) && $profile['dob'] > DBA::NULL_DATE) {
 			$short_bd_format = $this->t('d MMMM');

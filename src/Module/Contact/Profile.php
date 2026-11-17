@@ -15,8 +15,6 @@ use Friendica\Contact\LocalRelationship\Entity\LocalRelationship as LocalRelatio
 use Friendica\Contact\LocalRelationship\Repository\LocalRelationship as LocalRelationshipRepository;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Nav;
-use Friendica\Content\Text\BBCode;
-use Friendica\Content\Text\RenderedContent;
 use Friendica\Content\Widget;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -62,7 +60,6 @@ class Profile extends BaseModule
 		Response $response,
 		private Page $page,
 		private readonly IManageConfigValues $config,
-		private readonly RenderedContent $renderedContent,
 		array $server,
 		array $parameters = [],
 	) {

@@ -25,6 +25,12 @@
 	</div>
 {{/if}}
 
+	{{* Note: membersince addon points to the below CSS ID, so if it's removed it should be removed from that addon as well. *}}
+	<dl id="{{$basic_fields.fullname.id}}" class="row {{$basic_fields.fullname.class|default:'aprofile'}}">
+		<dt class="col-lg-4 col-md-4 col-sm-4 col-xs-12 profile-label-name text-muted">{{$basic_fields.fullname.label}}</dt>
+		<dd class="col-lg-8 col-md-8 col-sm-8 col-xs-12 profile-entry">{{$basic_fields.fullname.value}}</dd>
+	</dl>
+
 {{if $basic_fields.birthday}}
 	<dl id="aprofile-birthday" class="row {{$basic_fields.birthday.class|default:'aprofile'}}">
 		<hr class="profile-separator">
