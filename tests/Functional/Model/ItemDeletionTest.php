@@ -215,7 +215,7 @@ class ItemDeletionTest extends FixtureTestCase
 
 	public function testDeleteForUserRemovesOwnItem(): void
 	{
-		Item::deleteForUser(['id' => 3], self::UID);
+		DI::postDeletion()->deleteForUser(['id' => 3], self::UID);
 
 		self::assertSame([3, 9], $this->getDeletedIds());
 		self::assertTrue($this->isHiddenForUser(3));
@@ -223,7 +223,7 @@ class ItemDeletionTest extends FixtureTestCase
 
 	public function testDeleteForUserOnlyHidesPublicCopy(): void
 	{
-		Item::deleteForUser(['id' => 13], self::UID);
+		DI::postDeletion()->deleteForUser(['id' => 13], self::UID);
 
 		self::assertSame([], $this->getDeletedIds());
 		self::assertTrue($this->isHiddenForUser(7));
@@ -231,8 +231,8 @@ class ItemDeletionTest extends FixtureTestCase
 
 	public function testDeleteForUserIgnoresOtherUsers(): void
 	{
-		Item::deleteForUser(['id' => 3], self::OTHER_UID);
-		Item::deleteForUser(['id' => 3], 0);
+		DI::postDeletion()->deleteForUser(['id' => 3], self::OTHER_UID);
+		DI::postDeletion()->deleteForUser(['id' => 3], 0);
 
 		self::assertSame([], $this->getDeletedIds());
 		self::assertFalse($this->isHiddenForUser(3));

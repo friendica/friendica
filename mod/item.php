@@ -89,7 +89,7 @@ function item_drop(int $uid, string $dropitems): void
 {
 	$arr_drop = explode(',', $dropitems);
 	foreach ($arr_drop as $item) {
-		Item::deleteForUser(['id' => $item], $uid);
+		DI::postDeletion()->deleteForUser(['id' => $item], $uid);
 	}
 
 	System::jsonExit(['success' => 1]);
@@ -424,7 +424,7 @@ function item_action(): void
 	switch ($args->get(1)) {
 		case 'drop':
 			if (DI::mode()->isAjax()) {
-				Item::deleteForUser(['id' => $args->get(2)], DI::userSession()->getLocalUserId());
+				DI::postDeletion()->deleteForUser(['id' => $args->get(2)], DI::userSession()->getLocalUserId());
 				// ajax return: [<item id>, 0 (no perm) | <owner id>]
 				System::jsonExit([intval($args->get(2)), DI::userSession()->getLocalUserId()]);
 			} else {
@@ -516,7 +516,7 @@ function drop_item(int $id, string $return = ''): string
 
 	if ((DI::userSession()->getLocalUserId() == $item['uid']) || $contact_id) {
 		// delete the item
-		Item::deleteForUser(['id' => $item['id']], DI::userSession()->getLocalUserId());
+		DI::postDeletion()->deleteForUser(['id' => $item['id']], DI::userSession()->getLocalUserId());
 
 		item_redirect_after_action($item, $return);
 		//NOTREACHED
