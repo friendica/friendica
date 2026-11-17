@@ -26,6 +26,7 @@ use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Network\HTTPException\UnauthorizedException;
+use Friendica\Post\Deletion;
 use Friendica\Protocol\Delivery;
 use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;
@@ -62,7 +63,7 @@ class API extends BaseModule
 	/** @var string */
 	protected $timezone;
 
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, ACLFormatter $aclFormatter, AppHelper $appHelper, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, ACLFormatter $aclFormatter, AppHelper $appHelper, private readonly Deletion $deletion, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -111,7 +112,7 @@ class API extends BaseModule
 
 				// Delete only real events (no birthdays)
 				if (!empty($event) && $event['type'] == 'event') {
-					Item::deleteForUser(['id' => $event['itemid']], $this->session->getLocalUserId());
+					$this->deletion->deleteForUser(['id' => $event['itemid']], $this->session->getLocalUserId());
 				}
 
 				if (Post::exists(['id' => $event['itemid']])) {

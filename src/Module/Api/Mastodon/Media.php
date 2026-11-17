@@ -7,6 +7,11 @@
 
 namespace Friendica\Module\Api\Mastodon;
 
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\AppHelper;
+use Friendica\Content\Post\Entity\PostMedia;
+use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Model\Attach;
@@ -14,16 +19,24 @@ use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\Photo;
 use Friendica\Model\Post;
+use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Post\Deletion;
+use Friendica\Util\Profiler;
 use Friendica\Util\Strings;
-use Friendica\Content\Post\Entity\PostMedia;
+use Psr\Log\LoggerInterface;
 
 /**
  * @see https://docs.joinmastodon.org/methods/statuses/media/
  */
 class Media extends BaseApi
 {
+	public function __construct(private readonly Deletion $deletion, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	{
+		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	}
+
 	protected function post(array $request = [])
 	{
 		$this->checkAllowedScope(self::SCOPE_WRITE);
@@ -116,7 +129,7 @@ class Media extends BaseApi
 		Photo::delete(['uid' => $uid, 'resource-id' => $photo['resource-id']]);
 		// This is only needed for images that had been stored in older versions.
 		// @todo Possibly add an update job that deletes the related items and then remove the line here.
-		Item::deleteForUser(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true], $uid);
+		$this->deletion->deleteForUser(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true], $uid);
 		Photo::clearAlbumCache($uid);
 
 		$this->earlyJsonExit(new \stdClass());

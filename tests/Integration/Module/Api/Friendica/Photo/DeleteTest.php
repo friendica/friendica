@@ -120,6 +120,7 @@ final class DeleteTest extends ApiTestCase
 	private function createModule(array $parameters = []): Delete
 	{
 		return new Delete(
+			DI::postDeletion(),
 			DI::mstdnError(),
 			DI::appHelper(),
 			DI::l10n(),

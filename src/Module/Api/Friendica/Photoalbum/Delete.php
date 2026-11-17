@@ -7,18 +7,31 @@
 
 namespace Friendica\Module\Api\Friendica\Photoalbum;
 
+use Friendica\App\Arguments;
+use Friendica\App\BaseURL;
+use Friendica\AppHelper;
+use Friendica\Core\L10n;
 use Friendica\Database\DBA;
 use Friendica\Model\Item;
 use Friendica\Model\Photo;
+use Friendica\Module\Api\ApiResponse;
 use Friendica\Module\BaseApi;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Network\HTTPException\InternalServerErrorException;
+use Friendica\Post\Deletion;
+use Friendica\Util\Profiler;
+use Psr\Log\LoggerInterface;
 
 /**
  * API endpoint: /api/friendica/photoalbum/delete
  */
 class Delete extends BaseApi
 {
+	public function __construct(private readonly Deletion $deletion, \Friendica\Factory\Api\Mastodon\Error $errorFactory, AppHelper $appHelper, L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, ApiResponse $response, array $server, array $parameters = [])
+	{
+		parent::__construct($errorFactory, $appHelper, $l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
+	}
+
 	protected function post(array $request = [])
 	{
 		$this->checkAllowedScope(self::SCOPE_WRITE);
@@ -44,7 +57,7 @@ class Delete extends BaseApi
 		// function for setting the items to "deleted = 1" which ensures that comments, likes etc. are not shown anymore
 		// to the user and the contacts of the users (drop_items() performs the federation of the deletion to other networks
 		$condition = ['uid' => $uid, 'resource-id' => $resourceIds, 'post-type' => Item::PT_IMAGE, 'origin' => true];
-		Item::deleteForUser($condition, $uid);
+		$this->deletion->deleteForUser($condition, $uid);
 
 		// now let's delete all photos from the album
 		$result = Photo::delete(['uid' => $uid, 'album' => $request['album']]);

@@ -133,7 +133,7 @@ class MediaDeletionTest extends ApiTestCase
 
 	private function deleteMedia(string $id): ResponseInterface
 	{
-		$module = new Media(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['id' => $id]);
+		$module = new Media(DI::postDeletion(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['id' => $id]);
 		try {
 			return $module->handleRequest(new ServerRequest(Router::DELETE, DI::baseUrl() . '/api/v1/media/' . $id));
 		} catch (EarlyExitException $exception) {

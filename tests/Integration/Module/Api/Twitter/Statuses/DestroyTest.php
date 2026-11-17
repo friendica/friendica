@@ -77,6 +77,6 @@ final class DestroyTest extends ApiTestCase
 
 	private function createModule(): Destroy
 	{
-		return new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+		return new Destroy(DI::postDeletion(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
 	}
 }
