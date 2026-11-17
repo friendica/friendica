@@ -126,5 +126,5 @@ XMPP application password for the cache lifetime.
 
 ## Deprecated: bin/auth_ejabberd.php
 
-`bin/auth_ejabberd.php` is deprecated since 2026.08 and will be removed. Replace it with
+`bin/auth_ejabberd.php` is deprecated since 2026.11 and will be removed. Replace it with
 `bin/console.php auth_ejabberd` in your `extauth_program` setting.

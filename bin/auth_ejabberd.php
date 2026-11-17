@@ -38,7 +38,7 @@
  * 	  " " (space) is replaced with "%20"
  * 	  "@" is replaced with "(a)"
  *
- * @deprecated 2026.08 use `bin/console.php auth_ejabberd` instead
+ * @deprecated 2026.11 use `bin/console.php auth_ejabberd` instead
  */
 
 if (php_sapi_name() !== 'cli') {
@@ -50,7 +50,7 @@ chdir(dirname(__DIR__));
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-fwrite(STDOUT, '`bin/auth_ejabberd.php` is deprecated since 2026.08 and will be removed in 5 months, please use `bin/console.php auth_ejabberd` instead.' . \PHP_EOL);
+fwrite(STDERR, '`bin/auth_ejabberd.php` is deprecated since 2026.11 and will be removed in 5 months, please use `bin/console.php auth_ejabberd` instead.' . \PHP_EOL);
 
 $argv = $_SERVER['argv'] ?? [];
 array_splice($argv, 1, 0, "auth_ejabberd");
