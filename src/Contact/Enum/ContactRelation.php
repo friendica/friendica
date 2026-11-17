@@ -25,32 +25,50 @@ enum ContactRelation: int
 	/** This is the user themself */
 	case Self = 4;
 
+	/**
+	 * Whether the contact follows the user.
+	 */
 	public function isFollower(): bool
 	{
 		return $this === self::Follower || $this === self::Friend;
 	}
 
+	/**
+	 * Whether the user follows the contact.
+	 */
 	public function isSharing(): bool
 	{
 		return $this === self::Sharing || $this === self::Friend;
 	}
 
-	public function withFollower(): self
+	/**
+	 * The relation after the contact started following the user.
+	 */
+	public function addFollower(): self
 	{
 		return $this->isSharing() ? self::Friend : self::Follower;
 	}
 
-	public function withoutFollower(): self
+	/**
+	 * The relation after the contact stopped following the user.
+	 */
+	public function removeFollower(): self
 	{
 		return $this->isSharing() ? self::Sharing : self::Nothing;
 	}
 
-	public function withSharing(): self
+	/**
+	 * The relation after the user started following the contact.
+	 */
+	public function addSharer(): self
 	{
 		return $this->isFollower() ? self::Friend : self::Sharing;
 	}
 
-	public function withoutSharing(): self
+	/**
+	 * The relation after the user stopped following the contact.
+	 */
+	public function removeSharer(): self
 	{
 		return $this->isFollower() ? self::Follower : self::Nothing;
 	}

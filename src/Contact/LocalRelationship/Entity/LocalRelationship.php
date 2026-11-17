@@ -101,22 +101,22 @@ class LocalRelationship extends \Friendica\BaseEntity
 
 	public function addFollow()
 	{
-		$this->rel = $this->relation()->withSharing()->value;
+		$this->rel = $this->relation()->addSharer()->value;
 	}
 
 	public function removeFollow()
 	{
-		$this->rel = $this->relation()->withoutSharing()->value;
+		$this->rel = $this->relation()->removeSharer()->value;
 	}
 
 	public function addFollower()
 	{
-		$this->rel = $this->relation()->withFollower()->value;
+		$this->rel = $this->relation()->addFollower()->value;
 	}
 
 	public function removeFollower()
 	{
-		$this->rel = $this->relation()->withoutFollower()->value;
+		$this->rel = $this->relation()->removeFollower()->value;
 	}
 
 	private function relation(): ContactRelation

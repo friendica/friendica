@@ -38,9 +38,9 @@ class ContactRelationTest extends TestCase
 
 	public function testChangingOneDirectionKeepsTheOther(): void
 	{
-		self::assertSame(ContactRelation::Friend, ContactRelation::Sharing->withFollower());
-		self::assertSame(ContactRelation::Sharing, ContactRelation::Friend->withoutFollower());
-		self::assertSame(ContactRelation::Friend, ContactRelation::Follower->withSharing());
-		self::assertSame(ContactRelation::Follower, ContactRelation::Friend->withoutSharing());
+		self::assertSame(ContactRelation::Friend, ContactRelation::Sharing->addFollower());
+		self::assertSame(ContactRelation::Sharing, ContactRelation::Friend->removeFollower());
+		self::assertSame(ContactRelation::Friend, ContactRelation::Follower->addSharer());
+		self::assertSame(ContactRelation::Follower, ContactRelation::Friend->removeSharer());
 	}
 }
