@@ -30,6 +30,9 @@ use IntlDateFormatter;
  */
 class Event
 {
+	/** Token type of the calendar/api/delete, ignore and unignore links */
+	public const ACTION_TOKEN_TYPE = 'calendar_event_action';
+
 	public static function getHTML(array $event, bool $simple = false, int $uriid = 0): string
 	{
 		if (empty($event)) {
@@ -668,7 +671,7 @@ class Event
 		if (DI::userSession()->getLocalUserId() && DI::userSession()->getLocalUserId() == $event['uid'] && $event['type'] == 'event') {
 			$edit = !$event['cid'] ? ['calendar/event/edit/' . $event['id'], DI::l10n()->t('Edit'), '', ''] : null;
 			$copy = !$event['cid'] ? ['calendar/event/copy/' . $event['id'], DI::l10n()->t('Duplicate'), '', ''] : null;
-			$drop = ['calendar/api/delete/' . $event['id'], DI::l10n()->t('Delete'), '', ''];
+			$drop = ['calendar/api/delete/' . $event['id'] . '?t=' . DI::formSecurityToken()->create(self::ACTION_TOKEN_TYPE), DI::l10n()->t('Delete'), '', ''];
 		}
 
 		$title = strip_tags(BBCode::convertForUriId($event['uri-id'], $event['summary']));

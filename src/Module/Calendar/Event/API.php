@@ -25,8 +25,10 @@ use Friendica\Model\User;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
 use Friendica\Network\HTTPException\BadRequestException;
+use Friendica\Network\HTTPException\ForbiddenException;
 use Friendica\Network\HTTPException\UnauthorizedException;
 use Friendica\Protocol\Delivery;
+use Friendica\Security\FormSecurityToken;
 use Friendica\Util\ACLFormatter;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Profiler;
@@ -62,7 +64,7 @@ class API extends BaseModule
 	/** @var string */
 	protected $timezone;
 
-	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, ACLFormatter $aclFormatter, AppHelper $appHelper, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, BaseURL $baseUrl, Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, ACLFormatter $aclFormatter, AppHelper $appHelper, private readonly FormSecurityToken $formSecurityToken, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -94,6 +96,11 @@ class API extends BaseModule
 
 		if (empty($this->parameters['id'])) {
 			throw new BadRequestException($this->t('Event id is missing.'));
+		}
+
+		// The actions are GET links, so the session cookie alone doesn't protect them against cross-site requests
+		if (!$this->formSecurityToken->isRequestValid($request, $this->server, Event::ACTION_TOKEN_TYPE, 't')) {
+			throw new ForbiddenException($this->formSecurityToken->getErrorMessage());
 		}
 
 		$returnPath = $request['return_path'] ?? 'calendar';

@@ -572,21 +572,21 @@ as the value of $top_child_total (this is done at the end of this file)
 							{{* Available: On posts made by others *}}
 							{{if $item.collapse}}
 								<li role="menuitem">
-									<a class="btn-link navicon collapse" href="javascript:collapseAuthor('item/collapse/{{$item.id}}', 'item-{{$item.guid}}');" title="{{$item.collapse.label}}"><i class="ri ri-subtract-line" aria-hidden="true"></i>&ensp;{{$item.collapse.label}}</a>
+									<a class="btn-link navicon collapse" href="javascript:collapseAuthor('item/collapse/{{$item.id}}?t={{$item.collapse.token}}', 'item-{{$item.guid}}');" title="{{$item.collapse.label}}"><i class="ri ri-subtract-line" aria-hidden="true"></i>&ensp;{{$item.collapse.label}}</a>
 								</li>
 							{{/if}}
 
 							{{* Available: On posts made by others *}}
 							{{if $item.ignore_author}}
 								<li role="menuitem">
-									<a class="btn-link navicon ignore" href="javascript:ignoreAuthor('item/ignore/{{$item.id}}', 'item-{{$item.guid}}');" title="{{$item.ignore_author.label}}"><i class="ri ri-eye-off-line" aria-hidden="true"></i>&ensp;{{$item.ignore_author.label}}</a>
+									<a class="btn-link navicon ignore" href="javascript:ignoreAuthor('item/ignore/{{$item.id}}?t={{$item.ignore_author.token}}', 'item-{{$item.guid}}');" title="{{$item.ignore_author.label}}"><i class="ri ri-eye-off-line" aria-hidden="true"></i>&ensp;{{$item.ignore_author.label}}</a>
 								</li>
 							{{/if}}
 
 							{{* Available: On posts made by others *}}
 							{{if $item.block}}
 								<li role="menuitem">
-									<a class="btn-link navicon block" href="javascript:blockAuthor('item/block/{{$item.id}}', 'item-{{$item.guid}}');" title="{{$item.block.label}}"><i class="ri ri-forbid-2-line" aria-hidden="true"></i>&ensp;{{$item.block.label}}</a>
+									<a class="btn-link navicon block" href="javascript:blockAuthor('item/block/{{$item.id}}?t={{$item.block.token}}', 'item-{{$item.guid}}');" title="{{$item.block.label}}"><i class="ri ri-forbid-2-line" aria-hidden="true"></i>&ensp;{{$item.block.label}}</a>
 								</li>
 							{{/if}}
 
@@ -623,7 +623,7 @@ as the value of $top_child_total (this is done at the end of this file)
 							{{* Available: If you're an admin, on all posts and comments on your instance *}}
 							{{if $item.drop && $item.drop.dropping}}
 								<li role="menuitem">
-                                	<a class="btn-link navicon delete" href="javascript:dropItem('item/drop/{{$item.id}}', 'item-{{$item.guid}}');" title="{{$item.drop.label}}"><i class="ri ri-delete-bin-line" aria-hidden="true"></i>&ensp;{{$item.drop.label}}</a>
+                                	<a class="btn-link navicon delete" href="javascript:dropItem('item/drop/{{$item.id}}?t={{$item.drop.token}}', 'item-{{$item.guid}}');" title="{{$item.drop.label}}"><i class="ri ri-delete-bin-line" aria-hidden="true"></i>&ensp;{{$item.drop.label}}</a>
 								</li>
 							{{/if}}
 						</ul>

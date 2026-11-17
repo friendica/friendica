@@ -25,6 +25,7 @@ use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Model\User;
 use Friendica\Protocol\Activity;
+use Friendica\Security\FormSecurityToken;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Util\Strings;
 use GuzzleHttp\Psr7\Uri;
@@ -40,6 +41,11 @@ final class PostTemplateBuilder
 	/** Number of columns in the action button grid; the reactions below must fit into it */
 	private const MAX_DISPLAYED_REACTIONS = 6;
 
+	/** Token type of the item/drop, item/block, item/ignore and item/collapse links */
+	public const ACTION_TOKEN_TYPE = 'item_action';
+
+	private ?string $actionToken = null;
+
 	public function __construct(
 		private readonly L10n $l10n,
 		private readonly IManageConfigValues $config,
@@ -50,6 +56,7 @@ final class PostTemplateBuilder
 		private readonly \Friendica\Core\Addon\AddonHelper $addonHelper,
 		private readonly LoggerInterface $logger,
 		private readonly Item $item,
+		private readonly FormSecurityToken $formSecurityToken,
 		private int $uid = 0,
 		private ?string $remote_comment = null,
 	) {}
@@ -643,6 +650,7 @@ final class PostTemplateBuilder
 				'pagedrop' => !empty($item['pagedrop']),
 				'select'   => $this->l10n->t('Select'),
 				'label'    => $origin ? $this->l10n->t('Delete globally') : $this->l10n->t('Remove locally'),
+				'token'    => $this->getActionToken(),
 			];
 		}
 
@@ -651,16 +659,19 @@ final class PostTemplateBuilder
 				'blocking'  => true,
 				'label'     => $this->l10n->t('Block %s', $item['author-name'] ?? ''),
 				'author_id' => $item['author-id'] ?? 0,
+				'token'     => $this->getActionToken(),
 			];
 			$ignore = [
 				'ignoring'  => true,
 				'label'     => $this->l10n->t('Ignore %s', $item['author-name'] ?? ''),
 				'author_id' => $item['author-id'] ?? 0,
+				'token'     => $this->getActionToken(),
 			];
 			$collapse = [
 				'collapsing' => true,
 				'label'      => $this->l10n->t('Collapse %s', $item['author-name'] ?? ''),
 				'author_id'  => $item['author-id'] ?? 0,
+				'token'      => $this->getActionToken(),
 			];
 			$report = [
 				'label' => $this->l10n->t('Report this post'),
@@ -680,6 +691,14 @@ final class PostTemplateBuilder
 		}
 
 		return ['drop' => $drop, 'block' => $block, 'ignore' => $ignore, 'collapse' => $collapse, 'report' => $report, 'ignoreServer' => $ignoreServer, 'dropping' => $dropping];
+	}
+
+	/**
+	 * Returns the token for the item action links, created once per request.
+	 */
+	private function getActionToken(): string
+	{
+		return $this->actionToken ??= $this->formSecurityToken->create(self::ACTION_TOKEN_TYPE);
 	}
 
 	/**

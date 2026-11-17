@@ -18,6 +18,7 @@
  */
 
 use Friendica\Content\Conversation\ConversationRenderer;
+use Friendica\Content\Conversation\PostTemplateBuilder;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
 use Friendica\Core\Protocol;
@@ -32,6 +33,7 @@ use Friendica\Model\ItemURI;
 use Friendica\Model\Post;
 use Friendica\Model\Tag;
 use Friendica\Network\HTTPException;
+use Friendica\Security\LegacyFormSecurityToken;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Content\Post\Entity\PostMedia;
 
@@ -400,6 +402,11 @@ function item_content()
 
 	if (!$args->has(2)) {
 		throw new HTTPException\BadRequestException();
+	}
+
+	// The actions are GET links, so the session cookie alone doesn't protect them against cross-site requests
+	if (in_array($args->get(1), ['drop', 'block', 'ignore', 'collapse'])) {
+		LegacyFormSecurityToken::checkForbiddenOnError(PostTemplateBuilder::ACTION_TOKEN_TYPE, 't');
 	}
 
 	$o = '';

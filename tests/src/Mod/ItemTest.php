@@ -10,6 +10,8 @@ namespace Friendica\Test\src\Mod;
 use Dice\Dice;
 use Friendica\App\Arguments;
 use Friendica\App\Router;
+use Friendica\BaseModule;
+use Friendica\Content\Conversation\PostTemplateBuilder;
 use Friendica\Core\Protocol;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -43,6 +45,13 @@ class ItemTest extends ApiTestCase
 		DBA::update('apcontact', ['updated' => DateTimeFormat::utcNow()], ['url' => 'https://friendica.local/profile/selfcontact']);
 	}
 
+	protected function tearDown(): void
+	{
+		$_REQUEST = [];
+
+		parent::tearDown();
+	}
+
 	private function mockRedirectHeader()
 	{
 		return $this->getFunctionMock('Friendica\Core', 'header');
@@ -60,8 +69,13 @@ class ItemTest extends ApiTestCase
 		return DBA::isResult(Post::selectFirstForUser(42, ['id'], ['id' => $id]));
 	}
 
-	private function setArgs(string $pagename): void
+	/**
+	 * Sets the arguments of the request, item_content() actions get a valid token unless another one is given.
+	 */
+	private function setArgs(string $pagename, ?string $token = null): void
 	{
+		$_REQUEST = ['t' => $token ?? BaseModule::getFormSecurityToken(PostTemplateBuilder::ACTION_TOKEN_TYPE)];
+
 		$server                   = $_SERVER;
 		$server['REQUEST_METHOD'] = Router::GET;
 
@@ -732,6 +746,46 @@ class ItemTest extends ApiTestCase
 		$this->expectException(HTTPException\BadRequestException::class);
 
 		item_content();
+	}
+
+	public function testItemContentDropWithoutTokenIsForbidden(): void
+	{
+		$this->setArgs('item/drop/1', '');
+
+		try {
+			item_content();
+			self::fail('Expected a ForbiddenException');
+		} catch (HTTPException\ForbiddenException) {
+			// expected
+		}
+
+		self::assertTrue($this->isVisibleForUser(1));
+	}
+
+	public function testItemContentBlockWithTokenOfOtherFormIsForbidden(): void
+	{
+		$this->setArgs('item/block/1', BaseModule::getFormSecurityToken('other_form'));
+
+		$this->expectException(HTTPException\ForbiddenException::class);
+
+		item_content();
+	}
+
+	public function testItemContentDropNonAjaxDeletesAndRedirects(): void
+	{
+		$this->setArgs('item/drop/1');
+
+		$header = $this->mockRedirectHeader();
+		$header->expects(self::once())->with('Location: https://friendica.local/network');
+
+		try {
+			item_content();
+			self::fail('Expected a redirect (FoundException)');
+		} catch (HTTPException\FoundException) {
+			// expected
+		}
+
+		self::assertFalse($this->isVisibleForUser(1));
 	}
 
 	public function testItemContentBlockUnknownItemThrowsNotFound(): void
