@@ -22,6 +22,7 @@ const vendorGlobals = {
 
 // Page variables injected by PHP or by inline <script> blocks in the templates.
 const injectedGlobals = {
+	actionToken: "writable", // view/templates/head.tpl, updated by NavUpdate() in view/js/main.js
 	acl: "writable",
 	aActErr: "readonly",
 	aErrType: "readonly",
@@ -48,6 +49,7 @@ const friendicaGlobals = {
 	commentBusy: "writable",
 	commentClose: "readonly",
 	commentCloseUI: "readonly",
+	getActionToken: "readonly", // view/js/main.js
 	hideLoading: "readonly",
 	htmlToText: "readonly",
 	initInfiniteScroll: "readonly", // view/js/main.js

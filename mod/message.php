@@ -8,6 +8,7 @@
  *
  */
 
+use Friendica\BaseModule;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
@@ -55,6 +56,44 @@ function message_post(): void
 	if (!DI::userSession()->getLocalUserId()) {
 		DI::sysmsg()->addNotice(DI::l10n()->t('Permission denied.'));
 		return;
+	}
+
+	if ((DI::args()->getArgc() == 3) && (DI::args()->getArgv()[1] === 'drop' || DI::args()->getArgv()[1] === 'dropconv')) {
+		BaseModule::checkFormSecurityTokenRedirectOnError('message', 'action');
+
+		if (!intval(DI::args()->getArgv()[2])) {
+			return;
+		}
+
+		$cmd = DI::args()->getArgv()[1];
+		if ($cmd === 'drop') {
+			$message = DBA::selectFirst('mail', ['convid'], ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()]);
+			if (!DBA::isResult($message)) {
+				DI::sysmsg()->addNotice(DI::l10n()->t('Conversation not found.'));
+				DI::baseUrl()->redirect('message');
+			}
+
+			if (!DBA::delete('mail', ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()])) {
+				DI::sysmsg()->addNotice(DI::l10n()->t('Message was not deleted.'));
+			}
+
+			$conversation = DBA::selectFirst('mail', ['id'], ['convid' => $message['convid'], 'uid' => DI::userSession()->getLocalUserId()]);
+			if (!DBA::isResult($conversation)) {
+				DI::baseUrl()->redirect('message');
+			}
+
+			DI::baseUrl()->redirect('message/' . $conversation['id']);
+		} else {
+			$parentmail = DBA::selectFirst('mail', ['parent-uri'], ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()]);
+			if (DBA::isResult($parentmail)) {
+				$parent = $parentmail['parent-uri'];
+
+				if (!DBA::delete('mail', ['parent-uri' => $parent, 'uid' => DI::userSession()->getLocalUserId()])) {
+					DI::sysmsg()->addNotice(DI::l10n()->t('Conversation was not removed.'));
+				}
+			}
+			DI::baseUrl()->redirect('message');
+		}
 	}
 
 	$sender_id = DI::userSession()->getLocalUserId();
@@ -124,42 +163,6 @@ function message_content()
 		'$messages' => DI::l10n()->t('Messages'),
 		'$button'   => $button,
 	]);
-
-	if ((DI::args()->getArgc() == 3) && (DI::args()->getArgv()[1] === 'drop' || DI::args()->getArgv()[1] === 'dropconv')) {
-		if (!intval(DI::args()->getArgv()[2])) {
-			return;
-		}
-
-		$cmd = DI::args()->getArgv()[1];
-		if ($cmd === 'drop') {
-			$message = DBA::selectFirst('mail', ['convid'], ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()]);
-			if (!DBA::isResult($message)) {
-				DI::sysmsg()->addNotice(DI::l10n()->t('Conversation not found.'));
-				DI::baseUrl()->redirect('message');
-			}
-
-			if (!DBA::delete('mail', ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()])) {
-				DI::sysmsg()->addNotice(DI::l10n()->t('Message was not deleted.'));
-			}
-
-			$conversation = DBA::selectFirst('mail', ['id'], ['convid' => $message['convid'], 'uid' => DI::userSession()->getLocalUserId()]);
-			if (!DBA::isResult($conversation)) {
-				DI::baseUrl()->redirect('message');
-			}
-
-			DI::baseUrl()->redirect('message/' . $conversation['id']);
-		} else {
-			$parentmail = DBA::selectFirst('mail', ['parent-uri'], ['id' => DI::args()->getArgv()[2], 'uid' => DI::userSession()->getLocalUserId()]);
-			if (DBA::isResult($parentmail)) {
-				$parent = $parentmail['parent-uri'];
-
-				if (!DBA::delete('mail', ['parent-uri' => $parent, 'uid' => DI::userSession()->getLocalUserId()])) {
-					DI::sysmsg()->addNotice(DI::l10n()->t('Conversation was not removed.'));
-				}
-			}
-			DI::baseUrl()->redirect('message');
-		}
-	}
 
 	if ((DI::args()->getArgc() > 1) && (DI::args()->getArgv()[1] === 'new')) {
 		$o .= $header;

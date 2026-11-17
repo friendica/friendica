@@ -15,8 +15,8 @@
 		<h4>{{$f}}</h4>
 
 		<ul>
-			<li><a href="{{$baseurl}}/admin/dbsync/mark/{{$f}}">{{$mark}}</a></li>
-			<li><a href="{{$baseurl}}/admin/dbsync/update/{{$f}}">{{$apply}}</a></li>
+			<li><a href="{{$baseurl}}/admin/dbsync/mark/{{$f}}" class="post-action" data-token="{{$token}}">{{$mark}}</a></li>
+			<li><a href="{{$baseurl}}/admin/dbsync/update/{{$f}}" class="post-action" data-token="{{$token}}">{{$apply}}</a></li>
 		</ul>
 
 		<hr />

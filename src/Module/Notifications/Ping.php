@@ -243,6 +243,9 @@ class Ping extends BaseModule
 
 		$data['notifications'] = $navNotifications;
 
+		// The token expires, so pages that stay open are provided with a fresh one
+		$data['token'] = self::getFormSecurityToken('action');
+
 		$data['sysmsgs'] = [
 			'notice' => array_map(Strings::escapeHtml(...), $this->systemMessages->flushNotices()),
 			'info'   => array_map(Strings::escapeHtml(...), $this->systemMessages->flushInfos()),

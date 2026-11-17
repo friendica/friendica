@@ -41,26 +41,25 @@ class RemoveTag extends BaseModule
 
 	protected function post(array $request = []): never
 	{
-		$type = 0;
-		$term = '';
-		$this->earlyHttpError($this->removeTag($request, $type, $term));
-	}
-
-	protected function content(array $request = []): string
-	{
 		if (!$this->userSession->getLocalUserId()) {
 			throw new HTTPException\ForbiddenException();
 		}
 
+		self::checkFormSecurityTokenForbiddenOnError('action');
+
 		$type = 0;
 		$term = '';
-		$this->removeTag($request, $type, $term);
+		$code = $this->removeTag($request, $type, $term);
 
-		if ($type == Post\Category::FILE) {
-			$this->baseUrl->redirect('filed?file=' . rawurlencode((string) $term));
+		if (empty($this->server['HTTP_X_REQUESTED_WITH'])) {
+			if ($type === Post\Category::FILE) {
+				$this->baseUrl->redirect('filed?file=' . rawurlencode((string) $term));
+			}
+
+			$this->baseUrl->redirect('network');
 		}
 
-		return '';
+		$this->earlyHttpError($code);
 	}
 
 	/**

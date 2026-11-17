@@ -30,16 +30,18 @@ class Saved extends BaseModule
 		$this->dba = $dba;
 	}
 
-	protected function rawContent(array $request = [])
+	protected function post(array $request = [])
 	{
 		$action = $this->args->get(2, 'none');
-		$search = trim(rawurldecode($_GET['term'] ?? ''));
+		$search = trim(rawurldecode($request['term'] ?? ''));
 
-		if (!empty($_GET['return_url']) && Strings::isHex($_GET['return_url'])) {
-			$return_url = hex2bin((string) $_GET['return_url']);
+		if (!empty($request['return_url']) && Strings::isHex($request['return_url'])) {
+			$return_url = hex2bin((string) $request['return_url']);
 		} else {
 			$return_url = Search::getSearchPath($search);
 		}
+
+		self::checkFormSecurityTokenRedirectOnError($return_url, 'action');
 
 		if (DI::userSession()->getLocalUserId() && $search) {
 			switch ($action) {

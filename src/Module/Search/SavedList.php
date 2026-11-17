@@ -75,6 +75,7 @@ class SavedList extends BaseModule
 					'label'   => $this->t('Remove term'),
 					'icon'    => 'ri-delete-bin-line',
 					'confirm' => true,
+					'post'    => true,
 				]],
 			];
 		}
@@ -84,9 +85,12 @@ class SavedList extends BaseModule
 			'$intro' => '',
 			'$links' => [],
 			'$add'   => [
-				'action'      => 'search/saved/add',
-				'method'      => 'get',
-				'hidden'      => [['name' => 'return_url', 'value' => $returnUrl]],
+				'action' => 'search/saved/add',
+				'method' => 'post',
+				'hidden' => [
+					['name' => 'return_url', 'value' => $returnUrl],
+					['name' => 'form_security_token', 'value' => self::getFormSecurityToken('action')],
+				],
 				'name'        => 'term',
 				'placeholder' => $this->t('Search term'),
 				'submit'      => $this->t('Save search'),

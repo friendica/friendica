@@ -7,6 +7,7 @@
 
 namespace Friendica\Module\Admin;
 
+use Friendica\App\Router;
 use Friendica\Core\Renderer;
 use Friendica\Core\Update;
 use Friendica\Database\DBA;
@@ -22,6 +23,14 @@ class DBSync extends BaseAdmin
 
 		$action = $this->parameters['action'] ?? '';
 		$update = $this->parameters['update'] ?? 0;
+
+		if ($action !== '') {
+			if (DI::args()->getMethod() !== Router::POST) {
+				DI::baseUrl()->redirect('admin/dbsync');
+			}
+
+			self::checkFormSecurityTokenRedirectOnError('admin/dbsync', 'admin_dbsync');
+		}
 
 		switch ($action) {
 			case 'mark':
@@ -88,6 +97,7 @@ class DBSync extends BaseAdmin
 					$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/dbsync/structure_check.tpl'), [
 						'$banner' => DI::l10n()->t('No failed updates.'),
 						'$check'  => DI::l10n()->t('Check database structure'),
+						'$token'  => self::getFormSecurityToken('admin_dbsync'),
 					]);
 				} else {
 					$o = Renderer::replaceMacros(Renderer::getMarkupTemplate('admin/dbsync/failed_updates.tpl'), [
@@ -96,6 +106,7 @@ class DBSync extends BaseAdmin
 						'$mark'   => DI::l10n()->t("Mark success \x28if update was manually applied\x29"),
 						'$apply'  => DI::l10n()->t('Attempt to execute this update step automatically'),
 						'$failed' => $failed,
+						'$token'  => self::getFormSecurityToken('admin_dbsync'),
 					]);
 				}
 

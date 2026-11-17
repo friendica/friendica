@@ -193,6 +193,36 @@ document.addEventListener("click", function (event) {
 	}
 });
 
+/**
+ * Sends action links as POST request, a declined confirmation cancels them
+ */
+document.addEventListener("click", function (event) {
+	const action = event.target.closest("a.post-action");
+	if (!action || event.defaultPrevented) {
+		return;
+	}
+
+	event.preventDefault();
+
+	// Never send the token to another origin
+	if (action.origin !== window.location.origin) {
+		return;
+	}
+
+	const form = document.createElement("form");
+	form.method = "post";
+	form.action = action.href;
+
+	const token = document.createElement("input");
+	token.type = "hidden";
+	token.name = "form_security_token";
+	token.value = action.dataset.token || getActionToken();
+	form.appendChild(token);
+
+	document.body.appendChild(form);
+	form.submit();
+});
+
 function openClose(theID) {
 	var el = document.getElementById(theID);
 	if (el) {
@@ -857,6 +887,13 @@ function isColumnMode() {
 	return document.body.classList.contains('column-view');
 }
 
+/**
+ * Returns the security token for action requests
+ */
+function getActionToken() {
+	return actionToken;
+}
+
 function NavUpdate() {
 	if (!stopped && !doNotDisturb) {
 		if (force_update) {
@@ -867,6 +904,10 @@ function NavUpdate() {
 		pingRequest
 			.done(function(data) {
 				if (data.result) {
+					if (data.result.token) {
+						actionToken = data.result.token;
+					}
+
 					if (force_update) {
 						showProcessing();
 					}
@@ -2284,7 +2325,7 @@ function checkboxhighlight(box) {
 
 function notificationMarkAll() {
 	showFetching();
-	$.get('notification/mark/all')
+	$.post('notification/mark/all', {form_security_token: getActionToken()})
 		.done(function(data) {
 			showProcessing();
 			if (timer) {

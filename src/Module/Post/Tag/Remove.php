@@ -45,6 +45,13 @@ class Remove extends \Friendica\BaseModule
 			$this->baseUrl->redirect($request['return'] ?? '');
 		}
 
+		self::checkFormSecurityTokenRedirectOnError($request['return'] ?? '', 'action');
+
+		if (isset($this->parameters['tag_name'])) {
+			$this->removeTagsFromItem($this->parameters['item_id'], [trim(hex2bin($this->parameters['tag_name']))]);
+			$this->baseUrl->redirect($request['return'] ?? '');
+		}
+
 		$requestTags = array_key_exists('tag', $request) ? (array) $request['tag'] : [];
 		$tags        = [];
 		foreach ($requestTags as $tag => $checked) {
@@ -62,11 +69,6 @@ class Remove extends \Friendica\BaseModule
 		$returnUrl = $request['return'] ?? '';
 
 		if (!$this->session->getLocalUserId()) {
-			$this->baseUrl->redirect($returnUrl);
-		}
-
-		if (isset($this->parameters['tag_name'])) {
-			$this->removeTagsFromItem($this->parameters['item_id'], [trim(hex2bin($this->parameters['tag_name']))]);
 			$this->baseUrl->redirect($returnUrl);
 		}
 
@@ -101,9 +103,10 @@ class Remove extends \Friendica\BaseModule
 				'cancel' => $this->t('Cancel'),
 			],
 
-			'$item_id'        => $item_id,
-			'$return'         => urlencode($returnUrl),
-			'$tag_checkboxes' => $tag_checkboxes,
+			'$form_security_token' => self::getFormSecurityToken('action'),
+			'$item_id'             => $item_id,
+			'$return'              => urlencode($returnUrl),
+			'$tag_checkboxes'      => $tag_checkboxes,
 		]);
 	}
 

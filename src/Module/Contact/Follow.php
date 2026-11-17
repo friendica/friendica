@@ -9,6 +9,8 @@ namespace Friendica\Module\Contact;
 
 use Friendica\App;
 use Friendica\BaseModule;
+use Friendica\Contact\Introduction\Exception\IntroductionNotFoundException;
+use Friendica\Contact\Introduction\Repository\Introduction as IntroductionRepository;
 use Friendica\Content\Widget\VCard;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -40,15 +42,18 @@ class Follow extends BaseModule
 	protected $config;
 	/** @var App\Page */
 	protected $page;
+	/** @var IntroductionRepository */
+	protected $introductionRepo;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, IManageConfigValues $config, App\Page $page, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IHandleUserSessions $session, SystemMessages $sysMessages, IManageConfigValues $config, App\Page $page, IntroductionRepository $introductionRepo, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
-		$this->session     = $session;
-		$this->sysMessages = $sysMessages;
-		$this->config      = $config;
-		$this->page        = $page;
+		$this->session          = $session;
+		$this->sysMessages      = $sysMessages;
+		$this->config           = $config;
+		$this->page             = $page;
+		$this->introductionRepo = $introductionRepo;
 	}
 
 	protected function post(array $request = [])
@@ -67,7 +72,7 @@ class Follow extends BaseModule
 			$this->baseUrl->redirect('contact');
 		}
 
-		$this->process($url);
+		$this->process($url, (int) ($request['intro_id'] ?? 0));
 	}
 
 	protected function content(array $request = []): string
@@ -191,7 +196,7 @@ class Follow extends BaseModule
 		return $output;
 	}
 
-	protected function process(string $url)
+	protected function process(string $url, int $introId = 0)
 	{
 		$returnPath = 'contact/follow?binurl=' . bin2hex($url);
 
@@ -207,6 +212,7 @@ class Follow extends BaseModule
 
 			$this->baseUrl->redirect($returnPath);
 		} elseif (!empty($result['cid'])) {
+			$this->removeSuggestion($introId);
 			$this->baseUrl->redirect('contact/' . Contact::getPublicContactId($result['cid'], $this->session->getLocalUserId()));
 		}
 
@@ -236,6 +242,25 @@ class Follow extends BaseModule
 			}
 		} catch (\InvalidArgumentException) {
 			return;
+		}
+	}
+
+	/**
+	 * Removes an accepted friend suggestion, so it doesn't stay in the introductions
+	 */
+	private function removeSuggestion(int $introId): void
+	{
+		if (!$introId) {
+			return;
+		}
+
+		try {
+			$intro = $this->introductionRepo->selectOneById($introId, $this->session->getLocalUserId());
+			if ($intro->sid) {
+				$this->introductionRepo->delete($intro);
+			}
+		} catch (IntroductionNotFoundException $e) {
+			$this->logger->info('Suggestion not removed', ['intro' => $introId, 'error' => $e->getMessage()]);
 		}
 	}
 
