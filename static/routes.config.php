@@ -298,7 +298,7 @@ return [
 			'/pleroma/statuses/{id:\d+}/reactions'                   => [Module\Api\Mastodon\Statuses\Reactions::class,           [R::GET         ]],
 			'/pleroma/statuses/{id:\d+}/reactions/{emoji}'           => [Module\Api\Mastodon\Statuses\Reactions::class,           [R::GET, R::PUT, R::DELETE]],
 			'/polls/{id:\d+}'                                        => [Module\Api\Mastodon\Polls::class,                        [R::GET         ]],
-			'/polls/{id:\d+}/votes'                                  => [Module\Api\Mastodon\Unimplemented::class,                [        R::POST]], // not supported
+			'/polls/{id:\d+}/votes'                                  => [Module\Api\Mastodon\Polls\Votes::class,                  [        R::POST]],
 			'/preferences'                                           => [Module\Api\Mastodon\Preferences::class,                  [R::GET         ]],
 			'/profile'                                               => [Module\Api\Mastodon\Unimplemented::class,                [R::GET, R::PATCH]], // not supported
 			'/profile/avatar'                                        => [Module\Api\Mastodon\Unimplemented::class,                [R::DELETE      ]], // not supported
@@ -563,6 +563,7 @@ return [
 		'/pin'             => [Module\Item\Pin::class,         [        R::POST]],
 		'/searchtext'      => [Module\Item\Searchtext::class,  [R::GET]],
 		'/star'            => [Module\Item\Star::class,        [        R::POST]],
+		'/vote'            => [Module\Item\Vote::class,        [        R::POST]],
 	],
 
 	'/localtime'             => [Module\Debug\Localtime::class, [R::GET, R::POST]],

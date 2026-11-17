@@ -76,7 +76,12 @@ class Instance extends BaseApi
 		return new InstanceV2Entity\Configuration(
 			$statuses_config,
 			new InstanceV2Entity\MediaAttachmentsConfig(Images::supportedMimeTypes(), $image_size_limit, $image_matrix_limit, $media_size_limit),
-			new InstanceV2Entity\Polls(),
+			new InstanceV2Entity\Polls(
+				(int) $this->config->get('poll', 'max_options'),
+				(int) $this->config->get('poll', 'max_characters_per_option'),
+				(int) $this->config->get('poll', 'min_expiration'),
+				(int) $this->config->get('poll', 'max_expiration'),
+			),
 			new InstanceV2Entity\Accounts(),
 		);
 	}

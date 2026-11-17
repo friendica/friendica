@@ -1395,6 +1395,41 @@ function doIgnoreThread(ident) {
 		});
 }
 
+/**
+ * Submits the checked options of a poll in a single request
+ */
+function doPollVote(ident, votedMessage, failedMessage) {
+	ident = ident.toString();
+	var $button = $('#poll-form-' + ident + ' .poll-vote-button');
+	if ($button.prop('disabled')) {
+		return;
+	}
+
+	var choices = [];
+	$('input[name="poll-option-' + ident + '"]:checked').each(function() {
+		choices.push($(this).val());
+	});
+	if (choices.length === 0) {
+		return;
+	}
+
+	$button.prop('disabled', true);
+	showPosting();
+
+	$.post('item/' + ident + '/vote', {choices: choices})
+		.done(function() {
+			$('#poll-form-' + ident).addClass('hidden');
+			$.jGrowl(votedMessage, {sticky: false, theme: 'info', life: 5000});
+		})
+		.fail(function() {
+			$button.prop('disabled', false);
+			$.jGrowl(failedMessage, {sticky: false, theme: 'info', life: 5000});
+		})
+		.always(function() {
+			hideLoading();
+		});
+}
+
 function getPosition(e) {
 	var cursor = {x:0, y:0};
 
