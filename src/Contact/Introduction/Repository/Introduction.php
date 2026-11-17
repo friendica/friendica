@@ -108,7 +108,8 @@ class Introduction extends BaseRepository
 	public function selectForContact(int $cid): IntroductionEntity
 	{
 		try {
-			return $this->selectOne(['contact-id' => $cid]);
+			// Suggestions are stored with the contact who made them, so they are left out here
+			return $this->selectOne(['contact-id' => $cid, 'suggest-cid' => null]);
 		} catch (NotFoundException $exception) {
 			throw new IntroductionNotFoundException(sprintf('There is no Introduction for the contact %d', $cid), $exception);
 		}

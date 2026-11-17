@@ -97,6 +97,11 @@ class Introduction
 	 */
 	public static function discard(Entity\Introduction $introduction): void
 	{
+		// Suggestions are only deleted. A reject would go to the person who made the suggestion
+		if ($introduction->sid) {
+			return;
+		}
+
 		$contact = Contact::selectFirst([], ['id' => $introduction->cid, 'uid' => $introduction->uid]);
 		if (!empty($contact)) {
 			if (!empty($contact['protocol'])) {

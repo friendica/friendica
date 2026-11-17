@@ -1390,12 +1390,12 @@ class DFRN
 		$suggest['title']   = '';
 		$suggest['body']    = $note;
 
+		// The suggested contact has to go into "suggest-cid", or it is shown as a normal introduction
 		DI::intro()->save(DI::introFactory()->createNew(
 			$suggest['uid'],
 			$suggest['cid'],
 			$suggest['body'],
-			null,
-			(bool) $cid,
+			$cid,
 		));
 
 		DI::notify()->createFromArray([
