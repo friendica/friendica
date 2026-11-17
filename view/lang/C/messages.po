@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 10:33+0000\n"
+"POT-Creation-Date: 2026-11-17 20:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -467,7 +467,7 @@ msgstr ""
 msgid "Back to viewing"
 msgstr ""
 
-#: src/App.php:486
+#: src/App.php:446
 msgid "Apologies but the website is unavailable at the moment."
 msgstr ""
 
@@ -1871,7 +1871,7 @@ msgid "Created at"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:145
-#: src/Content/Widget/VCard.php:100 src/Model/Contact.php:1301
+#: src/Content/Widget/VCard.php:100 src/Model/Contact.php:1302
 #: src/Model/Profile.php:443
 msgid "Post to group"
 msgstr ""
@@ -1933,7 +1933,7 @@ msgid "Permission settings"
 msgstr ""
 
 #: src/Content/Conversation/StatusEditor.php:213 src/Content/Item.php:432
-#: src/Content/Widget/VCard.php:134 src/Model/Contact.php:1343
+#: src/Content/Widget/VCard.php:134 src/Model/Contact.php:1344
 #: src/Model/Profile.php:485 src/Module/Admin/Logs/View.php:109
 #: src/Module/Post/Edit.php:200
 msgid "Message"
@@ -2017,7 +2017,7 @@ msgstr ""
 msgid "Display posts that have been created by accounts of the selected circle."
 msgstr ""
 
-#: src/Content/Feature.php:129 src/Content/GroupManager.php:116
+#: src/Content/Feature.php:129 src/Content/GroupManager.php:115
 #: src/Content/Nav.php:249 src/Content/Nav.php:282
 #: src/Content/Text/HTML.php:902 src/Content/Widget.php:576
 #: src/Model/User.php:1525 src/Module/Groups.php:103
@@ -2140,25 +2140,25 @@ msgstr ""
 msgid "Allows anonymous visitors to consult your calendar and your public events. Contact birthday events are private to you."
 msgstr ""
 
-#: src/Content/GroupManager.php:118
+#: src/Content/GroupManager.php:117
 msgid "External link to group"
 msgstr ""
 
-#: src/Content/GroupManager.php:122 src/Content/PagesManager.php:101
+#: src/Content/GroupManager.php:121 src/Content/PagesManager.php:101
 #: src/Content/Widget.php:551
 msgid "show less"
 msgstr ""
 
-#: src/Content/GroupManager.php:123 src/Content/PagesManager.php:102
+#: src/Content/GroupManager.php:122 src/Content/PagesManager.php:102
 #: src/Content/Widget.php:446 src/Content/Widget.php:552
 msgid "show more"
 msgstr ""
 
-#: src/Content/GroupManager.php:124
+#: src/Content/GroupManager.php:123
 msgid "Create new group"
 msgstr ""
 
-#: src/Content/GroupManager.php:126
+#: src/Content/GroupManager.php:125
 msgid "Find groups to join"
 msgstr ""
 
@@ -2189,28 +2189,28 @@ msgstr ""
 msgid "Fetch more replies"
 msgstr ""
 
-#: src/Content/Item.php:427 src/Model/Contact.php:1338
+#: src/Content/Item.php:427 src/Model/Contact.php:1339
 msgid "View Status"
 msgstr ""
 
-#: src/Content/Item.php:428 src/Content/Item.php:451 src/Model/Contact.php:1273
-#: src/Model/Contact.php:1329 src/Model/Contact.php:1339
+#: src/Content/Item.php:428 src/Content/Item.php:451 src/Model/Contact.php:1274
+#: src/Model/Contact.php:1330 src/Model/Contact.php:1340
 #: src/Module/Directory.php:143 src/Module/Settings/Profile/Index.php:271
 msgid "View Profile"
 msgstr ""
 
-#: src/Content/Item.php:429 src/Model/Contact.php:1340
+#: src/Content/Item.php:429 src/Model/Contact.php:1341
 msgid "View Photos"
 msgstr ""
 
-#: src/Content/Item.php:430 src/Model/Contact.php:1307
+#: src/Content/Item.php:430 src/Model/Contact.php:1308
 #: src/Model/Profile.php:450 src/Module/BaseProfile.php:49
 #: src/Module/Contact.php:502
 msgid "Posts"
 msgstr ""
 
-#: src/Content/Item.php:431 src/Content/Nav.php:306 src/Model/Contact.php:1331
-#: src/Model/Contact.php:1342 src/Module/Admin/Addons/Details.php:140
+#: src/Content/Item.php:431 src/Content/Nav.php:306 src/Model/Contact.php:1332
+#: src/Model/Contact.php:1343 src/Module/Admin/Addons/Details.php:140
 #: src/Module/Admin/Themes/Details.php:85 src/Module/BaseAdmin.php:89
 #: src/Module/BaseSettings.php:191 src/Module/Welcome.php:39
 #: view/theme/frio/theme.php:232
@@ -2231,7 +2231,7 @@ msgid "Block user"
 msgstr ""
 
 #: src/Content/Item.php:448 src/Content/Widget.php:71
-#: src/Model/Contact.php:1332 src/Model/Contact.php:1344
+#: src/Model/Contact.php:1333 src/Model/Contact.php:1345
 #: src/Module/Contact/Follow.php:157 view/theme/vier/theme.php:182
 msgid "Connect/Follow"
 msgstr ""
@@ -2240,7 +2240,7 @@ msgstr ""
 msgid "Unable to fetch user."
 msgstr ""
 
-#: src/Content/Item.php:1455 src/Core/L10n.php:603
+#: src/Content/Item.php:1455 src/Core/L10n.php:620
 msgid "Undetermined"
 msgstr ""
 
@@ -2654,7 +2654,7 @@ msgid "Always"
 msgstr ""
 
 #: src/Content/SpaBackButton.php:34 src/Module/Group.php:194
-#: src/Module/Groups/Discover.php:114
+#: src/Module/Groups/Discover.php:123
 msgid "Back"
 msgstr ""
 
@@ -2740,7 +2740,7 @@ msgid "Examples: Robert Morgenstein, Fishing"
 msgstr ""
 
 #: src/Content/Widget.php:73 src/Module/Contact.php:450
-#: src/Module/Directory.php:81 src/Module/Groups/Discover.php:125
+#: src/Module/Directory.php:81 src/Module/Groups/Discover.php:127
 #: view/theme/vier/theme.php:184
 msgid "Find"
 msgstr ""
@@ -2820,7 +2820,7 @@ msgstr ""
 msgid "Organisations"
 msgstr ""
 
-#: src/Content/Widget.php:575 src/Model/Contact.php:2007
+#: src/Content/Widget.php:575 src/Model/Contact.php:2008
 msgid "News"
 msgstr ""
 
@@ -2901,7 +2901,7 @@ msgstr ""
 msgid "Show Less"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:105 src/Model/Contact.php:1305
+#: src/Content/Widget/VCard.php:105 src/Model/Contact.php:1306
 #: src/Model/Profile.php:448 src/Module/Moderation/Item/Source.php:76
 msgid "Mention"
 msgstr ""
@@ -2934,13 +2934,13 @@ msgstr ""
 msgid "Follow"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:132 src/Model/Contact.php:1333
-#: src/Model/Contact.php:1345 src/Model/Profile.php:481
+#: src/Content/Widget/VCard.php:132 src/Model/Contact.php:1334
+#: src/Model/Contact.php:1346 src/Model/Profile.php:481
 #: src/Module/Contact/Profile.php:509
 msgid "Unfollow"
 msgstr ""
 
-#: src/Content/Widget/VCard.php:139 src/Model/Contact.php:1303
+#: src/Content/Widget/VCard.php:139 src/Model/Contact.php:1304
 #: src/Model/Profile.php:445
 msgid "Group posts"
 msgstr ""
@@ -3308,11 +3308,11 @@ msgstr ""
 msgid "Could not connect to database."
 msgstr ""
 
-#: src/Core/L10n.php:128
+#: src/Core/L10n.php:145
 msgid "Auto"
 msgstr ""
 
-#: src/Core/L10n.php:613
+#: src/Core/L10n.php:630
 #, php-format
 msgid "%s (%s)"
 msgstr ""
@@ -3513,83 +3513,83 @@ msgstr ""
 msgid "Edit circles"
 msgstr ""
 
-#: src/Model/Contact.php:1352 src/Module/Moderation/Users/Pending.php:87
+#: src/Model/Contact.php:1353 src/Module/Moderation/Users/Pending.php:87
 #: src/Module/Notifications/Introductions.php:128
 msgid "Approve"
 msgstr ""
 
-#: src/Model/Contact.php:1691 src/Model/Contact.php:1809
-#: src/Model/Contact.php:1961 src/Module/Contact/Profile.php:376
+#: src/Model/Contact.php:1692 src/Model/Contact.php:1810
+#: src/Model/Contact.php:1962 src/Module/Contact/Profile.php:376
 #, php-format
 msgid "%s has blocked you"
 msgstr ""
 
-#: src/Model/Contact.php:2006
+#: src/Model/Contact.php:2007
 msgid "Organisation"
 msgstr ""
 
-#: src/Model/Contact.php:2008 src/Module/Groups/Discover.php:121
+#: src/Model/Contact.php:2009 src/Module/Groups/Discover.php:130
 msgid "Group"
 msgstr ""
 
-#: src/Model/Contact.php:2009 src/Module/Moderation/BaseUsers.php:146
+#: src/Model/Contact.php:2010 src/Module/Moderation/BaseUsers.php:146
 msgid "Relay"
 msgstr ""
 
-#: src/Model/Contact.php:3350
+#: src/Model/Contact.php:3351
 msgid "Disallowed profile URL."
 msgstr ""
 
-#: src/Model/Contact.php:3355 src/Module/Friendica.php:91
+#: src/Model/Contact.php:3356 src/Module/Friendica.php:91
 msgid "Blocked domain"
 msgstr ""
 
-#: src/Model/Contact.php:3360
+#: src/Model/Contact.php:3361
 msgid "Connect URL missing."
 msgstr ""
 
-#: src/Model/Contact.php:3373
+#: src/Model/Contact.php:3374
 msgid "The contact could not be added. Please check the relevant network credentials in your Settings -> Social Networks page."
 msgstr ""
 
-#: src/Model/Contact.php:3391
+#: src/Model/Contact.php:3392
 #, php-format
 msgid "Expected network %s does not match actual network %s"
 msgstr ""
 
-#: src/Model/Contact.php:3408
+#: src/Model/Contact.php:3409
 msgid "This seems to be a relay account. They can't be followed by users."
 msgstr ""
 
-#: src/Model/Contact.php:3415
+#: src/Model/Contact.php:3416
 msgid "The handle specified does not provide adequate information."
 msgstr ""
 
-#: src/Model/Contact.php:3417
+#: src/Model/Contact.php:3418
 msgid "No compatible communication protocols or feeds were discovered."
 msgstr ""
 
-#: src/Model/Contact.php:3420
+#: src/Model/Contact.php:3421
 msgid "An author or name was not found."
 msgstr ""
 
-#: src/Model/Contact.php:3423
+#: src/Model/Contact.php:3424
 msgid "No browser URL could be matched to this address."
 msgstr ""
 
-#: src/Model/Contact.php:3426
+#: src/Model/Contact.php:3427
 msgid "Unable to match @-style Identity Address with a known protocol or email contact."
 msgstr ""
 
-#: src/Model/Contact.php:3427
+#: src/Model/Contact.php:3428
 msgid "Use mailto: in front of address to force email check."
 msgstr ""
 
-#: src/Model/Contact.php:3433
+#: src/Model/Contact.php:3434
 msgid "Limited profile. This person will be unable to receive direct/personal notifications from you."
 msgstr ""
 
-#: src/Model/Contact.php:3492
+#: src/Model/Contact.php:3493
 msgid "Unable to retrieve contact information."
 msgstr ""
 
@@ -6114,7 +6114,7 @@ msgstr ""
 msgid "Enter your system rules here. Each line represents one rule."
 msgstr ""
 
-#: src/Module/Api/ApiResponse.php:289
+#: src/Module/Api/ApiResponse.php:299
 #, php-format
 msgid "API endpoint %s %s is not implemented but might be in the future."
 msgstr ""
@@ -6673,8 +6673,8 @@ msgstr ""
 #: src/Module/Contact/Conversations.php:62 src/Module/Contact/Media.php:45
 #: src/Module/Contact/Profile.php:157 src/Module/Contact/Profile.php:162
 #: src/Module/Contact/Profile.php:181 src/Module/Contact/Redir.php:68
-#: src/Module/Contact/Redir.php:122 src/Module/FriendSuggest.php:58
-#: src/Module/FriendSuggest.php:96 src/Module/FriendSuggest.php:102
+#: src/Module/Contact/Redir.php:122 src/Module/FriendSuggest.php:60
+#: src/Module/FriendSuggest.php:98 src/Module/FriendSuggest.php:104
 #: src/Module/Group.php:256 src/Module/Group.php:261
 msgid "Contact not found."
 msgstr ""
@@ -6920,7 +6920,7 @@ msgstr ""
 #: src/Module/Debug/ActivityPubConversion.php:134
 #: src/Module/Debug/Babel.php:280 src/Module/Debug/Localtime.php:50
 #: src/Module/Debug/Probe.php:40 src/Module/Debug/WebFinger.php:37
-#: src/Module/FriendSuggest.php:138 src/Module/Install.php:216
+#: src/Module/FriendSuggest.php:140 src/Module/Install.php:216
 #: src/Module/Install.php:256 src/Module/Install.php:293
 #: src/Module/Invite.php:163 src/Module/Moderation/Item/Source.php:70
 #: src/Module/Moderation/Report/Create.php:197
@@ -7723,19 +7723,19 @@ msgstr ""
 msgid "Rename"
 msgstr ""
 
-#: src/Module/FriendSuggest.php:69
+#: src/Module/FriendSuggest.php:71
 msgid "Suggested contact not found."
 msgstr ""
 
-#: src/Module/FriendSuggest.php:87
+#: src/Module/FriendSuggest.php:89
 msgid "Friend suggestion sent."
 msgstr ""
 
-#: src/Module/FriendSuggest.php:130
+#: src/Module/FriendSuggest.php:132
 msgid "Suggest Friends"
 msgstr ""
 
-#: src/Module/FriendSuggest.php:133
+#: src/Module/FriendSuggest.php:135
 #, php-format
 msgid "Suggest a friend for %s"
 msgstr ""
@@ -7793,7 +7793,7 @@ msgstr ""
 msgid "The latest posts of the group will be fetched shortly."
 msgstr ""
 
-#: src/Module/Group.php:197 src/Module/Groups/Discover.php:123
+#: src/Module/Group.php:197 src/Module/Groups/Discover.php:132
 msgid "Join"
 msgstr ""
 
@@ -7821,7 +7821,7 @@ msgstr ""
 msgid "No posts yet"
 msgstr ""
 
-#: src/Module/Groups.php:107 src/Module/Groups/Discover.php:116
+#: src/Module/Groups.php:107 src/Module/Groups/Discover.php:118
 msgid "Discover groups"
 msgstr ""
 
@@ -7841,28 +7841,28 @@ msgstr ""
 msgid "Server not found."
 msgstr ""
 
-#: src/Module/Groups/Discover.php:113
+#: src/Module/Groups/Discover.php:115
 #, php-format
 msgid "Discover groups on %s"
 msgstr ""
 
-#: src/Module/Groups/Discover.php:126
+#: src/Module/Groups/Discover.php:128
 msgid "Search in name and description"
 msgstr ""
 
-#: src/Module/Groups/Discover.php:129
+#: src/Module/Groups/Discover.php:131
 msgid "Latest activity"
 msgstr ""
 
-#: src/Module/Groups/Discover.php:131
+#: src/Module/Groups/Discover.php:133
 msgid "Membership requires approval"
 msgstr ""
 
-#: src/Module/Groups/Discover.php:132
+#: src/Module/Groups/Discover.php:134
 msgid "No groups found."
 msgstr ""
 
-#: src/Module/Groups/Discover.php:132
+#: src/Module/Groups/Discover.php:134
 msgid "No further groups are known."
 msgstr ""
 
@@ -9837,11 +9837,11 @@ msgstr ""
 msgid "Show unread"
 msgstr ""
 
-#: src/Module/Notifications/Ping.php:194
+#: src/Module/Notifications/Ping.php:197
 msgid "{0} requested registration"
 msgstr ""
 
-#: src/Module/Notifications/Ping.php:203
+#: src/Module/Notifications/Ping.php:206
 #, php-format
 msgid "{0} and %d others requested registration"
 msgstr ""
