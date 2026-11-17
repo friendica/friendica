@@ -37,6 +37,9 @@ deptrac:
                 value: src/App/.*
               - type: directory
                 value: src/Capabilities/.*
+              # shared vocabulary of the contact noun, used by Model\Contact and the contact features
+              - type: directory
+                value: src/Contact/Enum/.*
               - type: bool
                 must:
                     - type: directory
@@ -84,8 +87,13 @@ deptrac:
                 value: src/Content/Conversation/(Collection|Entity|Factory|Repository)/.*
         - name: Feature/Contact
           collectors:
-              - type: directory
-                value: src/Contact/.*
+              - type: bool
+                must:
+                    - type: directory
+                      value: src/Contact/.*
+                must_not:
+                    - type: layer
+                      value: Base
         - name: Feature/Moderation
           collectors:
               - type: directory
