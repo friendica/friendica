@@ -9,6 +9,7 @@ namespace Friendica\Test\src\Model;
 
 use Friendica\DI;
 use Friendica\Model\Contact;
+use Friendica\Model\Contact\User;
 use Friendica\Test\ApiTestCase;
 use Friendica\Test\FixtureTestCase;
 
@@ -25,6 +26,8 @@ class ContactThreadsTest extends FixtureTestCase
 	protected function setUp(): void
 	{
 		parent::setUp();
+
+		User::resetIsBlockedCache();
 
 		DI::dba()->update('post-thread-user', ['created' => '2026-10-01 10:00:00'], ['uri-id' => 1, 'uid' => 0]);
 		DI::dba()->update('post-thread-user', ['created' => '2026-10-02 10:00:00'], ['uri-id' => 3, 'uid' => 0]);
@@ -56,6 +59,7 @@ class ContactThreadsTest extends FixtureTestCase
 	public function testNothingIsCountedWhenTheContactHasBlockedTheUser(): void
 	{
 		DI::dba()->insert('user-contact', ['cid' => self::AUTHOR, 'uid' => self::UID, 'is-blocked' => true]);
+		User::resetIsBlockedCache();
 
 		self::assertSame(0, Contact::countNewThreadsFromId(self::AUTHOR, self::UID, '2026-09-01 00:00:00'));
 	}

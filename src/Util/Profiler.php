@@ -89,14 +89,19 @@ class Profiler implements ContainerInterface
 
 		$timestamp = array_pop($this->timestamps);
 
-		$duration = floatval(microtime(true) - $timestamp['stamp'] - $timestamp['credit']);
+		$end      = microtime(true);
+		$duration = floatval($end - $timestamp['stamp'] - $timestamp['credit']);
 		$value    = $timestamp['value'];
 
-		foreach ($this->timestamps as $key => $stamp) {
-			$this->timestamps[$key]['credit'] += $duration;
-		}
-
 		$callstack = $callstack ?: System::callstack(4, $value == 'rendering' ? 0 : 1);
+
+		// Creating the callstack is the profiler's own overhead. It must not be attributed to the enclosing recordings.
+		$overhead = microtime(true) - $end;
+		$this->performance['profiler'] += $overhead;
+		$credit = $duration + $overhead;
+		foreach ($this->timestamps as $key => $stamp) {
+			$this->timestamps[$key]['credit'] += $credit;
+		}
 
 		if (!isset($this->performance[$value])) {
 			$this->performance[$value] = 0;
@@ -129,7 +134,10 @@ class Profiler implements ContainerInterface
 			return;
 		}
 
+		$start     = microtime(true);
 		$callstack = $callstack ?: System::callstack(4, 1);
+
+		$this->performance['profiler'] += microtime(true) - $start;
 
 		$duration = floatval(microtime(true) - $timestamp);
 
@@ -178,6 +186,7 @@ class Profiler implements ContainerInterface
 		$this->performance['file']           = 0;
 		$this->performance['rendering']      = 0;
 		$this->performance['session']        = 0;
+		$this->performance['profiler']       = 0;
 		$this->performance['marktime']       = microtime(true);
 		$this->performance['classcreate']    = 0;
 		$this->performance['classinit']      = 0;
