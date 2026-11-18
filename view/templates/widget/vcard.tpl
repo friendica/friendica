@@ -7,6 +7,7 @@
 <div class="vcard h-card">
 	<div class="fn p-name" dir="auto">{{$contact.name}}</div>
 	{{if $contact.addr}}<div class="p-addr">{{$contact.addr}}</div>{{/if}}
+
 	{{if $is_admin}}<div class="badge badge-admin"><i class="ri ri-medal-2-fill" aria-hidden="true"></i> {{$admin_title}}</div>{{/if}}
 	{{if $is_mod}}<div class="badge badge-mod"><i class="ri ri-shield-user-line" aria-hidden="true"></i> {{$moderator_title}}</div>{{/if}}
 
