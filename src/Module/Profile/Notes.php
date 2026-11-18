@@ -22,9 +22,11 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
+use Friendica\Model\Profile as ProfileModel;
 use Friendica\Database\DBA;
 use Friendica\Module\BaseProfile;
 use Friendica\Network\HTTPException\ForbiddenException;
+use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -114,6 +116,11 @@ class Notes extends BaseProfile
 		}
 
 		$pager = new Pager($this->l10n, $this->args->getQueryString(), $itemsPerPage);
+
+		$profile = ProfileModel::load($this->appHelper, $this->userSession->getLocalUserNickname());
+		if (!$profile) {
+			throw new NotFoundException($this->t('Profile not found.'));
+		}
 
 		$params = [
 			'order' => ['created' => true],
