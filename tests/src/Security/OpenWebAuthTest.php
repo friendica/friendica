@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Friendica\Test\src\Security;
 
+use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Security\OpenWebAuth;
 use Friendica\Test\DiceHttpMockHandlerTrait;
@@ -55,11 +56,25 @@ class OpenWebAuthTest extends MockedTestCase
 		self::assertSame([], $this->requests);
 	}
 
+	public function testUnknownSignerIsProbedInTheBackgroundOnce(): void
+	{
+		OpenWebAuth::addVisitorCookieForHandle(self::UNKNOWN_SIGNER, false);
+		OpenWebAuth::addVisitorCookieForHandle(self::UNKNOWN_SIGNER, false);
+
+		self::assertSame(1, $this->countAddContactTasks(self::UNKNOWN_SIGNER));
+	}
+
 	public function testKnownSignerIsAuthenticated(): void
 	{
 		$visitor = OpenWebAuth::addVisitorCookieForHandle('https://domain.tld/profile/remotecontact', false);
 
 		self::assertSame('https://domain.tld/profile/remotecontact', $visitor['url']);
 		self::assertSame([], $this->requests);
+		self::assertSame(0, $this->countAddContactTasks('https://domain.tld/profile/remotecontact'));
+	}
+
+	private function countAddContactTasks(string $url): int
+	{
+		return DBA::count('workerqueue', ['command' => 'AddContact', 'parameter' => json_encode([0, $url, '']), 'done' => false]);
 	}
 }
