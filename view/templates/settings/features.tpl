@@ -12,7 +12,7 @@
 	{{foreach $features as $key => $f}}
 	<details class="settings-section">
 		<summary id="{{$key}}-settings-title" class="settings-heading"><h2>{{$f.0}}</h2></summary>
-		<div class="settings-content-block {{if $key == $network_mode}}network sortable{{/if}}">
+		<div id="{{$key}}-settings-content" class="settings-content-block {{if $key == $network_mode}}network sortable{{/if}}">
 			{{if $key == $network_mode}}
 			<input type="hidden" id="feature_widgetorder" name="feature_widgetorder" value=""/>
 			<p tabindex="0">{{$sortable}}</p>

@@ -6,8 +6,8 @@
   *}}
 
 <div class="network-sidebar-configure">
-	<a href="/settings/features#network-settings-title" data-toggle="tooltip" title="{{$description}}">
+	<a href="/settings/features#network-settings-content" data-toggle="tooltip" title="{{$description}}">
 		<i class="ri ri-settings-line ri-xl" aria-hidden="true"></i>
-		<span class="sr-only">{{$description}}</span>
+		<span class="sr-only">{{$sr_description}}</span>
 	</a>
 </div>

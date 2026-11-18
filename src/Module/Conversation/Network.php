@@ -250,7 +250,8 @@ class Network extends Timeline
 		}
 
 		$this->page['aside'] .= Renderer::replaceMacros(Renderer::getMarkupTemplate('network_sidebar_configure.tpl'), [
-			'$description' => $this->l10n->t('Configure these sections'),
+			'$description'    => $this->l10n->t('Configure these sections'),
+			'$sr_description' => $this->l10n->t('Configure network widgets'),
 		]);
 
 		if (!$this->raw) {

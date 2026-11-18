@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 19:25+0100\n"
+"POT-Creation-Date: 2026-11-18 15:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1443,7 +1443,7 @@ msgstr ""
 #: src/Module/BaseProfile.php:138 src/Module/Contact.php:409
 #: src/Module/Contact.php:531 src/Module/Conversation/Channel.php:102
 #: src/Module/Conversation/Community.php:91
-#: src/Module/Conversation/Network.php:404
+#: src/Module/Conversation/Network.php:409
 #: src/Module/Moderation/BaseUsers.php:127
 msgid "More"
 msgstr ""
@@ -2077,7 +2077,7 @@ msgstr ""
 #: src/Content/Feature.php:135 src/Content/Nav.php:244
 #: src/Content/Text/HTML.php:897 src/Content/Widget/SavedSearches.php:46
 #: src/Content/Widget/SidebarMenu.php:86 src/Content/Widget/TagCloud.php:54
-#: src/Module/Search/SavedList.php:83
+#: src/Module/Search/SavedList.php:84
 msgid "Tags"
 msgstr ""
 
@@ -2698,7 +2698,7 @@ msgstr ""
 msgid "The end"
 msgstr ""
 
-#: src/Content/Text/HTML.php:881 src/Module/Search/SavedList.php:92
+#: src/Content/Text/HTML.php:881 src/Module/Search/SavedList.php:96
 msgid "Save search"
 msgstr ""
 
@@ -7461,21 +7461,29 @@ msgstr ""
 msgid "Not available."
 msgstr ""
 
-#: src/Module/Conversation/Network.php:296
+#: src/Module/Conversation/Network.php:253
+msgid "Configure these sections"
+msgstr ""
+
+#: src/Module/Conversation/Network.php:254
+msgid "Configure network widgets"
+msgstr ""
+
+#: src/Module/Conversation/Network.php:301
 msgid "No such circle"
 msgstr ""
 
-#: src/Module/Conversation/Network.php:300
+#: src/Module/Conversation/Network.php:305
 #, php-format
 msgid "Circle: %s"
 msgstr ""
 
-#: src/Module/Conversation/Network.php:320
+#: src/Module/Conversation/Network.php:325
 #, php-format
 msgid "Error %d (%s) while fetching the timeline."
 msgstr ""
 
-#: src/Module/Conversation/Network.php:416
+#: src/Module/Conversation/Network.php:421
 msgid "Network feed not available."
 msgstr ""
 
@@ -7612,7 +7620,7 @@ msgstr ""
 msgid "Personal notifications"
 msgstr ""
 
-#: src/Module/Deck.php:89 src/Module/Search/SavedList.php:91
+#: src/Module/Deck.php:89 src/Module/Search/SavedList.php:95
 msgid "Search term"
 msgstr ""
 
@@ -10469,11 +10477,11 @@ msgstr ""
 msgid "Search term was not removed."
 msgstr ""
 
-#: src/Module/Search/SavedList.php:94
+#: src/Module/Search/SavedList.php:98
 msgid "Filter searches"
 msgstr ""
 
-#: src/Module/Search/SavedList.php:96
+#: src/Module/Search/SavedList.php:100
 msgid "You have no saved searches."
 msgstr ""
 
