@@ -440,6 +440,11 @@ td.federation-data {
   vertical-align: middle;
 }
 
+.network-sidebar-configure {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
 /* help widget */
 aside .help-aside-wrapper ul {
   padding-left: 1em;
