@@ -68,7 +68,8 @@ class Objects extends BaseModule
 
 				$validated = in_array(Contact::getIdForURL($requester, $item['uid']), $receivers);
 				if (!$validated) {
-					$validated = in_array(Contact::getIdForURL($requester), $receivers);
+					// An unknown signer can't be a receiver, probing it would only call back the remote system.
+					$validated = in_array(Contact::getIdForURL($requester, 0, false), $receivers);
 				}
 			}
 		}
