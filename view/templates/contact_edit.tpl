@@ -22,15 +22,13 @@
 						<button class="btn" id="contact-edit-actions-button">{{$contact_action_button}}</button>
 
 						<ul role="menu" aria-haspopup="true" id="contact-actions-menu" class="menu-popup">
-							{{if $contact_actions.follow}}<li role="menuitem"><a href="{{$contact_actions.follow.url}}" title="{{$contact_actions.follow.title}}">{{$contact_actions.follow.label}}</a></li>{{/if}}
-							{{if $contact_actions.unfollow}}<li role="menuitem"><a href="{{$contact_actions.unfollow.url}}" title="{{$contact_actions.unfollow.title}}">{{$contact_actions.unfollow.label}}</a></li>{{/if}}
 							{{if $lblsuggest}}<li role="menuitem"><a href="{{$contact_actions.suggest.url}}" title="{{$contact_actions.suggest.title}}">{{$contact_actions.suggest.label}}</a></li>{{/if}}
 							{{if $poll_enabled}}<li role="menuitem"><a href="{{$contact_actions.update.url}}" title="{{$contact_actions.update.title}}">{{$contact_actions.update.label}}</a></li>{{/if}}
 							{{if $contact_actions.updateprofile}}<li role="menuitem"><a href="{{$contact_actions.updateprofile.url}}" title="{{$contact_actions.updateprofile.title}}">{{$contact_actions.updateprofile.label}}</a></li>{{/if}}
 							{{if $contact_actions.fetchoutbox}}<li role="menuitem"><a href="{{$contact_actions.fetchoutbox.url}}" title="{{$contact_actions.fetchoutbox.title}}">{{$contact_actions.fetchoutbox.label}}</a></li>{{/if}}
 							<li class="divider"></li>
-							<li role="menuitem"><a href="#" title="{{$contact_actions.block.title}}" onclick="window.location.href='{{$contact_actions.block.url}}'; return false;">{{$contact_actions.block.label}}</a></li>
 							<li role="menuitem"><a href="#" title="{{$contact_actions.ignore.title}}" onclick="window.location.href='{{$contact_actions.ignore.url}}'; return false;">{{$contact_actions.ignore.label}}</a></li>
+							<li role="menuitem"><a href="#" title="{{$contact_actions.block.title}}" onclick="window.location.href='{{$contact_actions.block.url}}'; return false;">{{$contact_actions.block.label}}</a></li>
 							{{if $contact_actions.revoke_follow.url}}<li role="menuitem"><a href="{{$contact_actions.revoke_follow.url}}" title="{{$contact_actions.revoke_follow.title}}">{{$contact_actions.revoke_follow.label}}</a></li>{{/if}}
 						</ul>
 					</div>
@@ -91,13 +89,6 @@
 
 				{{include file="field_textarea.tpl" field=$cinfo}}
 
-			{{if $reason}}
-				<div id="contact-info-wrapper">
-					<h4>{{$lbl_info2}}</h4>
-					<p>{{$reason}}</p>
-				</div>
-				<div id="contact-info-end"></div>
-			{{/if}}
 			{{if $channel_settings_label}}
 				<h4>{{$channel_settings_label}}</h4>
 				{{include file="field_checkbox.tpl" field=$channel_only}}
@@ -107,6 +98,14 @@
 				{{include file="field_radio.tpl" field=$frequency_reduced}}
 				{{include file="field_radio.tpl" field=$frequency_never}}
 				<p>{{$frequency_description}}</p>
+			{{/if}}
+
+			{{if $reason}}
+				<div id="contact-info-wrapper">
+					<h4>{{$lbl_info2}}</h4>
+					<p>{{$reason}}</p>
+				</div>
+				<div id="contact-info-end"></div>
 			{{/if}}
 
 			</div>

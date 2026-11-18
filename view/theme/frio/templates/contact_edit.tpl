@@ -25,8 +25,6 @@
 						</button>
 
 						<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="contact-edit-actions-button" aria-haspopup="true" id="contact-actions-menu">
-							{{if $contact_actions.follow}}<li><a role="menuitem" href="{{$contact_actions.follow.url}}" title="{{$contact_actions.follow.title}}">{{$contact_actions.follow.label}}</a></li>{{/if}}
-							{{if $contact_actions.unfollow}}<li><a role="menuitem" href="{{$contact_actions.unfollow.url}}" title="{{$contact_actions.unfollow.title}}">{{$contact_actions.unfollow.label}}</a></li>{{/if}}
 							{{if $lblsuggest}}<li><a role="menuitem" href="{{$contact_actions.suggest.url}}" title="{{$contact_actions.suggest.title}}">{{$contact_actions.suggest.label}}</a></li>{{/if}}
 							{{if $poll_enabled}}<li><a role="menuitem" href="{{$contact_actions.update.url}}" title="{{$contact_actions.update.title}}">{{$contact_actions.update.label}}</a></li>{{/if}}
 							{{if $contact_actions.updateprofile}}<li><a role="menuitem" href="{{$contact_actions.updateprofile.url}}" title="{{$contact_actions.updateprofile.title}}">{{$contact_actions.updateprofile.label}}</a></li>{{/if}}
@@ -34,9 +32,9 @@
 							{{if $lblsuggest || $poll_enabled || $contact_actions.updateprofile}}
 							<li class="divider"></li>
 							{{/if}}
-							<li><a role="menuitem" href="{{$contact_actions.block.url}}" title="{{$contact_actions.block.title}}">{{$contact_actions.block.label}}</a></li>
-							<li><a role="menuitem" href="{{$contact_actions.ignore.url}}" title="{{$contact_actions.ignore.title}}">{{$contact_actions.ignore.label}}</a></li>
 							<li><a role="menuitem" href="{{$contact_actions.collapse.url}}" title="{{$contact_actions.collapse.title}}">{{$contact_actions.collapse.label}}</a></li>
+							<li><a role="menuitem" href="{{$contact_actions.ignore.url}}" title="{{$contact_actions.ignore.title}}">{{$contact_actions.ignore.label}}</a></li>
+							<li><a role="menuitem" href="{{$contact_actions.block.url}}" title="{{$contact_actions.block.title}}">{{$contact_actions.block.label}}</a></li>
 							{{if $contact_actions.revoke_follow.url}}<li><button role="menuitem" type="button" class="btn-link" title="{{$contact_actions.revoke_follow.title}}" onclick="addToModal('{{$contact_actions.revoke_follow.url}}');">{{$contact_actions.revoke_follow.label}}</button></li>{{/if}}
 						</ul>
 					</li>
@@ -169,33 +167,6 @@
 					</div>
 					{{/if}}
 
-					{{if $lbl_info1}}
-					<div class="panel">
-						<div class="section-subtitle-wrapper panel-heading" id="contact-edit-info">
-							<h4>
-								<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#contact-edit-tools" href="#contact-edit-info-collapse" aria-expanded="false" aria-controls="contact-edit-info-collapse">
-									{{$lbl_info1}}
-								</button>
-							</h4>
-						</div>
-						<div id="contact-edit-info-collapse" class="panel-body panel-collapse collapse" aria-labelledby="contact-edit-info">
-							<div class="section-content-tools-wrapper">
-
-								{{include file="field_textarea.tpl" field=$cinfo}}
-
-								<div class="pull-right settings-submit-wrapper">
-									<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
-								</div>
-								<div class="clear"></div>
-								{{if $reason}}
-								<h4>{{$lbl_info2}}</h4>
-								<p>{{$reason}}</p>
-								<div class="clear"></div>
-								{{/if}}
-							</div>
-						</div>
-					</div>
-					{{/if}}
 					{{if $channel_settings_label}}
 						<div class="panel">
 							<div class="section-subtitle-wrapper panel-heading" id="contact-edit-channel">
@@ -222,6 +193,34 @@
 								</div>
 							</div>
 						</div>
+					{{/if}}
+
+					{{if $lbl_info1}}
+					<div class="panel">
+						<div class="section-subtitle-wrapper panel-heading" id="contact-edit-info">
+							<h4>
+								<button class="btn-link accordion-toggle collapsed" data-toggle="collapse" data-parent="#contact-edit-tools" href="#contact-edit-info-collapse" aria-expanded="false" aria-controls="contact-edit-info-collapse">
+									{{$lbl_info1}}
+								</button>
+							</h4>
+						</div>
+						<div id="contact-edit-info-collapse" class="panel-body panel-collapse collapse" aria-labelledby="contact-edit-info">
+							<div class="section-content-tools-wrapper">
+
+								{{include file="field_textarea.tpl" field=$cinfo}}
+
+								<div class="pull-right settings-submit-wrapper">
+									<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>
+								</div>
+								<div class="clear"></div>
+								{{if $reason}}
+								<h4>{{$lbl_info2}}</h4>
+								<p>{{$reason}}</p>
+								<div class="clear"></div>
+								{{/if}}
+							</div>
+						</div>
+					</div>
 					{{/if}}
 				</div>
 
