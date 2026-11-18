@@ -651,6 +651,7 @@ class Widget
 			$base,
 			$channels,
 			$channelname,
+			'settings/display#timeline-settings-content',
 		);
 	}
 }
