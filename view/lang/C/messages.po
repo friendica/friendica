@@ -60,7 +60,7 @@ msgstr ""
 #: src/Module/Folders.php:53 src/Module/Folders/Remove.php:51
 #: src/Module/Folders/Rename.php:57 src/Module/Folders/Rename.php:82
 #: src/Module/FollowConfirm.php:24 src/Module/FriendSuggest.php:44
-#: src/Module/Group.php:75 src/Module/Groups.php:50
+#: src/Module/Group.php:75 src/Module/Groups.php:51 src/Module/Groups.php:68
 #: src/Module/Groups/Discover.php:56 src/Module/Invite.php:28
 #: src/Module/Invite.php:117 src/Module/Notifications/Notification.php:59
 #: src/Module/Notifications/Notification.php:104
@@ -1153,7 +1153,7 @@ msgstr ""
 msgid "Posts from contacts you interact with and who interact with you"
 msgstr ""
 
-#: src/Content/Conversation/Factory/Channel.php:30 src/Module/Groups.php:108
+#: src/Content/Conversation/Factory/Channel.php:30
 msgid "Discover"
 msgstr ""
 
@@ -2022,7 +2022,7 @@ msgstr ""
 #: src/Content/Feature.php:129 src/Content/GroupManager.php:115
 #: src/Content/Nav.php:249 src/Content/Nav.php:282
 #: src/Content/Text/HTML.php:902 src/Content/Widget.php:576
-#: src/Model/User.php:1525 src/Module/Groups.php:103
+#: src/Model/User.php:1525 src/Module/Groups.php:127
 msgid "Groups"
 msgstr ""
 
@@ -2345,7 +2345,7 @@ msgstr ""
 msgid "My profile"
 msgstr ""
 
-#: src/Content/Nav.php:226 src/Module/Group.php:199
+#: src/Content/Nav.php:226 src/Module/Group.php:200
 #: src/Module/Security/Login.php:126
 msgid "Register"
 msgstr ""
@@ -2655,8 +2655,9 @@ msgstr ""
 msgid "Always"
 msgstr ""
 
-#: src/Content/SpaBackButton.php:34 src/Module/Group.php:194
-#: src/Module/Groups/Discover.php:123
+#: src/Content/SpaBackButton.php:34 src/Module/Group.php:195
+#: src/Module/Groups.php:135 src/Module/Groups/Discover.php:123
+#: src/Module/Item/Display.php:181
 msgid "Back"
 msgstr ""
 
@@ -6386,7 +6387,7 @@ msgstr ""
 msgid "Posts quoting other posts"
 msgstr ""
 
-#: src/Module/BaseProfile.php:188 src/Module/Group.php:212
+#: src/Module/BaseProfile.php:188 src/Module/Group.php:213
 msgid "Comments"
 msgstr ""
 
@@ -6670,7 +6671,7 @@ msgstr ""
 #: src/Module/Contact/Profile.php:178 src/Module/Contact/Redir.php:68
 #: src/Module/Contact/Redir.php:122 src/Module/FriendSuggest.php:61
 #: src/Module/FriendSuggest.php:100 src/Module/FriendSuggest.php:106
-#: src/Module/Group.php:256 src/Module/Group.php:261
+#: src/Module/Group.php:257 src/Module/Group.php:262
 msgid "Contact not found."
 msgstr ""
 
@@ -6735,7 +6736,7 @@ msgstr ""
 msgid "Edit Circle Name"
 msgstr ""
 
-#: src/Module/Circle.php:314 src/Module/Group.php:201
+#: src/Module/Circle.php:314 src/Module/Group.php:202 src/Module/Groups.php:136
 msgid "Mark all as read"
 msgstr ""
 
@@ -7796,52 +7797,48 @@ msgstr ""
 msgid "The latest posts of the group will be fetched shortly."
 msgstr ""
 
-#: src/Module/Group.php:197 src/Module/Groups/Discover.php:132
+#: src/Module/Group.php:198 src/Module/Groups/Discover.php:132
 msgid "Join"
 msgstr ""
 
-#: src/Module/Group.php:209 src/Module/Groups.php:104
+#: src/Module/Group.php:210 src/Module/Groups.php:131
 msgid "Threads"
 msgstr ""
 
-#: src/Module/Group.php:213 src/Module/Groups.php:105
+#: src/Module/Group.php:214 src/Module/Groups.php:132
 msgid "Unread"
 msgstr ""
 
-#: src/Module/Group.php:214
+#: src/Module/Group.php:215
 msgid "Unseen"
 msgstr ""
 
-#: src/Module/Group.php:215
+#: src/Module/Group.php:216
 msgid "No comments yet"
 msgstr ""
 
-#: src/Module/Group.php:216
+#: src/Module/Group.php:217
 msgid "There are no threads in this group."
 msgstr ""
 
-#: src/Module/Groups.php:106
+#: src/Module/Groups.php:76 src/Module/Groups/Discover.php:66
+msgid "Server not found."
+msgstr ""
+
+#: src/Module/Groups.php:133
 msgid "No posts yet"
 msgstr ""
 
-#: src/Module/Groups.php:107 src/Module/Groups/Discover.php:118
+#: src/Module/Groups.php:134 src/Module/Groups/Discover.php:118
 msgid "Discover groups"
 msgstr ""
 
-#: src/Module/Groups.php:109
-msgid "Discover more groups on this server"
-msgstr ""
-
-#: src/Module/Groups.php:110
+#: src/Module/Groups.php:138
 msgid "You are not subscribed to any groups."
 msgstr ""
 
-#: src/Module/Groups.php:111
+#: src/Module/Groups.php:139
 msgid "Filter groups"
-msgstr ""
-
-#: src/Module/Groups/Discover.php:66
-msgid "Server not found."
 msgstr ""
 
 #: src/Module/Groups/Discover.php:115
@@ -8422,7 +8419,7 @@ msgstr ""
 msgid "Image description"
 msgstr ""
 
-#: src/Module/Item/Display.php:180
+#: src/Module/Item/Display.php:188
 #, php-format
 msgid "Post by %s"
 msgstr ""

@@ -165,19 +165,31 @@ class Display extends BaseModule
 		$this->displaySidebar($item);
 		$this->displayHead($item['uri-id'], $item['parent-uri-id']);
 
+		// Posts that are opened from a list of groups are shown in the layout of the groups, without the profile of the author
+		$fromGroup = $this->session->getLocalUserId() ? trim((string) ($request['from'] ?? '')) : '';
+		if ($fromGroup !== '') {
+			$this->page['aside'] = '';
+		}
+
 		$output = '';
 
 		// add the uri-id to the update_display parameter
 		if ($this->session->getLocalUserId()) {
 			$output .= "<script> var netargs = '?uri_id=" . $item['uri-id'] . "&highlight=" . $highlightUriId . "'; </script>";
 
-			$output .= $this->spaBackButton->render();
+			$output .= $fromGroup !== ''
+				? Renderer::replaceMacros(Renderer::getMarkupTemplate('group/display_back.tpl'), ['$back_link' => 'group/' . rawurlencode($fromGroup), '$back' => $this->l10n->t('Back')])
+				: $this->spaBackButton->render();
 		}
 
 		$output .= $this->getDisplayData($item, false, false, $highlightUriId);
 
 		$author              = Contact::getByURLForUser($item['author-link'], $this->session->getLocalUserId());
 		$this->page['title'] = $this->l10n->t("Post by %s", $author['name']);
+
+		if ($fromGroup !== '') {
+			$output = '<div class="generic-page-wrapper group-display-wrapper">' . $output . '</div>';
+		}
 
 		return $output;
 	}

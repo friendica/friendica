@@ -171,6 +171,7 @@ class Group extends BaseModule
 
 			$thread = [
 				'guid'     => $parent['guid'],
+				'display'  => $this->groupManager->getPostLink($parent['guid'], $contact),
 				'thumb'    => Contact::getAvatarUrlForId($parent['author-id'], Proxy::SIZE_THUMB, $parent['author-updated']),
 				'author'   => $parent['author-name'],
 				'link'     => Contact::magicLink($parent['author-link']),
@@ -183,7 +184,7 @@ class Group extends BaseModule
 			];
 
 			if (!empty($latest[$uriId])) {
-				$thread['latest'] = $this->groupManager->getPostSummary($latest[$uriId]);
+				$thread['latest'] = $this->groupManager->getPostSummary($latest[$uriId], $contact);
 			}
 
 			$threads[] = $thread;

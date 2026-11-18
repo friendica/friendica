@@ -199,12 +199,19 @@ class GroupManager
 	 */
 	public function countUnreadThreads(int $uid): int
 	{
-		$pcids = array_column($this->getList($uid, false, true, true), 'pid');
-		if (empty($pcids)) {
-			return 0;
+		// The navigation bar asks for this number on every ping, but the query is expensive for users with busy groups
+		$key   = 'GroupManager::countUnreadThreads:' . $uid;
+		$count = $this->cache->get($key);
+		if (is_int($count)) {
+			return $count;
 		}
 
-		return array_sum($this->countUnreadThreadsPerGroup($uid, $pcids));
+		$pcids = array_column($this->getList($uid, false, true, true), 'pid');
+		$count = empty($pcids) ? 0 : array_sum($this->countUnreadThreadsPerGroup($uid, $pcids));
+
+		$this->cache->set($key, $count, Duration::MINUTE);
+
+		return $count;
 	}
 
 	/**
@@ -221,9 +228,10 @@ class GroupManager
 		$counts  = [];
 		$authors = $this->getIgnoredAuthors($uid);
 
+		// The join order is forced: The optimizer otherwise starts with all threads of the groups instead of the few unseen posts
 		$unread = $this->database->p(
 			"SELECT `post-thread-user`.`owner-id`, COUNT(DISTINCT `post-user`.`parent-uri-id`) AS `unread` FROM `post-user`
-				INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+				STRAIGHT_JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
 				WHERE `post-user`.`uid` = ? AND `post-user`.`unseen` AND NOT `post-user`.`hidden` AND NOT `post-user`.`deleted`
 				AND `post-user`.`gravity` IN (?, ?) AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
 				AND NOT `post-thread-user`.`deleted`" . $this->excludeAuthors($authors) . "
@@ -252,6 +260,40 @@ class GroupManager
 	public function markSeen(int $uid, int $pcid): void
 	{
 		Item::update(['unseen' => false], ["`uid` = ? AND `unseen` AND `parent-uri-id` IN (SELECT `uri-id` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` = ?)", $uid, $uid, $pcid]);
+		$this->cache->delete('GroupManager::countUnreadThreads:' . $uid);
+	}
+
+	/**
+	 * Marks all posts in the threads of all groups of the user as seen
+	 *
+	 * @param int    $uid  User id
+	 * @param string $host Limits the groups to the ones on this server, if it isn't empty
+	 * @throws \Exception
+	 */
+	public function markAllSeen(int $uid, string $host = ''): void
+	{
+		foreach ($this->getListByHost($uid, $host) as $contact) {
+			$this->markSeen($uid, (int) $contact['pid']);
+		}
+	}
+
+	/**
+	 * Fetches the groups of the user, optionally only the ones on a single server
+	 *
+	 * @param int    $uid  User id
+	 * @param string $host Host name of the server, all groups if it is empty
+	 *
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function getListByHost(int $uid, string $host = ''): array
+	{
+		$contacts = $this->getList($uid, true, true, true);
+		if ($host === '') {
+			return $contacts;
+		}
+
+		return array_values(array_filter($contacts, fn (array $contact): bool => strcasecmp(parse_url((string) $contact['url'], PHP_URL_HOST) ?: '', $host) === 0));
 	}
 
 	/**
@@ -361,14 +403,15 @@ class GroupManager
 	/**
 	 * Prepares a post from getLatestPosts() for the display
 	 *
-	 * @param array $post Post with guid, title, body, author and unseen fields
+	 * @param array $post  Post with guid, title, body, author and unseen fields
+	 * @param array $group Group contact with id, url and addr fields
 	 *
 	 * @return array
 	 */
-	public function getPostSummary(array $post): array
+	public function getPostSummary(array $post, array $group): array
 	{
 		return [
-			'link'        => 'display/' . $post['guid'],
+			'link'        => $this->getPostLink($post['guid'], $group),
 			'author'      => $post['author-name'],
 			'author_link' => Contact::magicLink($post['author-link']),
 			'thumb'       => Contact::getAvatarUrlForId($post['author-id'], Proxy::SIZE_MICRO, $post['author-updated']),
@@ -387,12 +430,37 @@ class GroupManager
 	 */
 	public function getLink(array $contact): string
 	{
+		return 'group/' . rawurlencode($this->getGroupId($contact));
+	}
+
+	/**
+	 * Fetches the identifier of a group that is used in the addresses of its pages
+	 *
+	 * @param array $contact Contact with id, url and addr fields
+	 *
+	 * @return string
+	 */
+	public function getGroupId(array $contact): string
+	{
 		$id = (string) $contact['addr'] ?: (string) $contact['id'];
 		if ($this->baseUrl->isLocalUrl($contact['url'])) {
 			$id = strstr($id, '@', true) ?: $id;
 		}
 
-		return 'group/' . rawurlencode($id);
+		return $id;
+	}
+
+	/**
+	 * Creates the link to a post that is shown in the context of a group
+	 *
+	 * @param string $guid  Guid of the post
+	 * @param array  $group Group contact with id, url and addr fields
+	 *
+	 * @return string
+	 */
+	public function getPostLink(string $guid, array $group): string
+	{
+		return 'display/' . $guid . '?from=' . rawurlencode($this->getGroupId($group));
 	}
 
 	/**

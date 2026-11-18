@@ -534,8 +534,9 @@ return [
 		'/rename' => [Module\Folders\Rename::class, [R::GET, R::POST]],
 	],
 	'/group/{id}'                   => [Module\Group::class,            [R::GET, R::POST]],
-	'/groups'                       => [Module\Groups::class,           [R::GET]],
+	'/groups'                       => [Module\Groups::class,           [R::GET, R::POST]],
 	'/groups/discover[/{gsid:\d+}]' => [Module\Groups\Discover::class, [R::GET]],
+	'/groups/{host}'                => [Module\Groups::class,           [R::GET, R::POST]],
 
 	'/hashtag'                    => [Module\Hashtag::class,           [R::GET]],
 	'/help[/{doc:.+}]'            => [Module\Help::class,              [R::GET]],
