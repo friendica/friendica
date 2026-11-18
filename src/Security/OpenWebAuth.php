@@ -156,16 +156,17 @@ class OpenWebAuth
 	/**
 	 * Set the visitor cookies (see remote_user()) for the given handle
 	 *
-	 * @param string $handle Visitor handle
+	 * @param string    $handle Visitor handle
+	 * @param bool|null $update true = always probe, false = never probe, null = probe when the contact is unknown or incomplete
 	 *
 	 * @return array Visitor contact array
 	 */
-	public static function addVisitorCookieForHandle(string $handle): array
+	public static function addVisitorCookieForHandle(string $handle, ?bool $update = null): array
 	{
 		$appHelper = DI::appHelper();
 
 		// Try to find the public contact entry of the visitor.
-		$cid = Contact::getIdForURL($handle);
+		$cid = Contact::getIdForURL($handle, 0, $update);
 		if (!$cid) {
 			DI::logger()->info('Handle not found', ['handle' => $handle]);
 			return [];
@@ -205,7 +206,8 @@ class OpenWebAuth
 		if (empty($requester)) {
 			return [];
 		}
-		return self::addVisitorCookieForHandle($requester);
+		// Probing the signer calls back the remote system, which can wait on this request.
+		return self::addVisitorCookieForHandle($requester, false);
 	}
 
 	/**
