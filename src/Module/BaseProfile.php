@@ -12,7 +12,7 @@ use Friendica\Content\Feature;
 use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ProfileTabsEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 
@@ -125,17 +125,15 @@ class BaseProfile extends BaseModule
 			];
 		}
 
-		$hook_data = ['is_owner' => $is_owner, 'nickname' => $nickname, 'tab' => $current, 'tabs' => $tabs];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_TABS, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new ProfileTabsEvent($is_owner, $nickname, $current, $tabs),
+		);
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
 
-		$o = Renderer::replaceMacros($tpl, ['$tabs' => $hook_data['tabs'], '$more' => DI::l10n()->t('More')]);
+		$o = Renderer::replaceMacros($tpl, ['$tabs' => $event->getTabsArray(), '$more' => DI::l10n()->t('More')]);
 
 		if (in_array($current, self::POSTS_TABS)) {
 			$pcid     = $is_owner ? DI::userSession()->getPublicContactId() : Contact::getPublicIdByUserId($owner['uid'] ?? 0);

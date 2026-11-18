@@ -18,7 +18,8 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\Theme;
 use Friendica\Core\Worker;
 use Friendica\Database\DBA;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ProfileSettingsFormEvent;
+use Friendica\Event\ProfileSettingsPostEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile;
 use Friendica\Module\Response;
@@ -74,8 +75,8 @@ class Index extends BaseSettings
 		self::checkFormSecurityTokenRedirectOnError('/settings/profile', 'settings_profile');
 
 		$request = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SETTINGS_POST, $request),
-		)->getArray();
+			new ProfileSettingsPostEvent($request),
+		)->getRequestArray();
 
 		$dob = $this->cleanInput($request['dob'] ?? '');
 
@@ -310,18 +311,11 @@ class Index extends BaseSettings
 			'$custom_fields' => $custom_fields,
 		]);
 
-		$hook_data = [
-			'profile' => $owner,
-			'entry'   => $o,
-		];
+		$event = $this->eventDispatcher->dispatch(
+			new ProfileSettingsFormEvent($owner, $o),
+		);
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SETTINGS_FORM, $hook_data),
-		)->getArray();
-
-		$o = $hook_data['entry'] ?? $o;
-
-		return $o;
+		return $event->getEntry();
 	}
 
 	private function getProfileFieldsFromInput(int $uid, array $profileFieldInputs, array $profileFieldOrder): ProfileField\Collection\ProfileFields

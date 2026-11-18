@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Friendica\Test\Functional\Protocol;
 
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\FetchItemByLinkEvent;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
 use Friendica\Post\LinkResolver;
 use Friendica\Protocol\PostFetcher;
@@ -50,18 +50,16 @@ class PostFetcherTest extends FixtureTestCase
 	public static function hookItemIdProvider(): array
 	{
 		return [
-			'int'            => [7, 7],
-			'numeric string' => ['7', 7],
-			'garbage'        => ['abc', 0],
+			'int' => [7, 7],
 		];
 	}
 
 	#[DataProvider('hookItemIdProvider')]
-	public function testFetchByLinkUsesAddonResultWithoutNetwork(mixed $hookItemId, int $expected): void
+	public function testFetchByLinkUsesAddonResultWithoutNetwork(int $hookItemId, int $expected): void
 	{
 		$dispatcher = $this->createStub(EventDispatcherInterface::class);
-		$dispatcher->method('dispatch')->willReturnCallback(function (ArrayFilterEvent $event) use ($hookItemId): ArrayFilterEvent {
-			$event->setArray(['item_id' => $hookItemId] + $event->getArray());
+		$dispatcher->method('dispatch')->willReturnCallback(function (FetchItemByLinkEvent $event) use ($hookItemId): FetchItemByLinkEvent {
+			$event->setItemId($hookItemId);
 			return $event;
 		});
 

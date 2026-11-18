@@ -9,7 +9,13 @@ namespace Friendica\Core;
 
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\BlockContactEvent;
+use Friendica\Event\ProtocolSupportsFollowEvent;
+use Friendica\Event\ProtocolSupportsProbeEvent;
+use Friendica\Event\ProtocolSupportsRevokeFollowEvent;
+use Friendica\Event\RevokeFollowContactEvent;
+use Friendica\Event\UnblockContactEvent;
+use Friendica\Event\UnfollowContactEvent;
 use Friendica\Model\User;
 use Friendica\Network\HTTPException;
 use Friendica\Protocol\ActivityPub;
@@ -73,18 +79,13 @@ class Protocol
 			return true;
 		}
 
-		$hook_data = [
-			'protocol' => $protocol,
-			'result'   => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new ProtocolSupportsFollowEvent((string) $protocol),
+		);
 
-		return $hook_data['result'] === true;
+		return $event->getResult() === true;
 	}
 
 	/**
@@ -100,18 +101,13 @@ class Protocol
 			return true;
 		}
 
-		$hook_data = [
-			'protocol' => $protocol,
-			'result'   => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new ProtocolSupportsRevokeFollowEvent((string) $protocol),
+		);
 
-		return $hook_data['result'] === true;
+		return $event->getResult() === true;
 	}
 
 	/**
@@ -177,20 +173,13 @@ class Protocol
 			return ActivityPub\Transmitter::sendContactUndo($contact['url'], $contact['id'], $owner);
 		}
 
-		// Catch-all hook for connector addons
-		$hook_data = [
-			'contact' => $contact,
-			'uid'     => $owner['uid'],
-			'result'  => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::UNFOLLOW_CONTACT, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new UnfollowContactEvent($contact, $owner['uid']),
+		);
 
-		return $hook_data['result'];
+		return $event->getResult();
 	}
 
 	/**
@@ -217,20 +206,13 @@ class Protocol
 			return ActivityPub\Transmitter::sendContactReject($contact['url'], $contact['hub-verify'], $owner);
 		}
 
-		// Catch-all hook for connector addons
-		$hook_data = [
-			'contact' => $contact,
-			'uid'     => $owner['uid'],
-			'result'  => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new RevokeFollowContactEvent($contact, $owner['uid']),
+		);
 
-		return $hook_data['result'];
+		return $event->getResult();
 	}
 
 	/**
@@ -260,20 +242,13 @@ class Protocol
 			return ActivityPub\Transmitter::sendActivity('Block', $contact['url'], $uid, $activity_id);
 		}
 
-		// Catch-all hook for connector addons
-		$hook_data = [
-			'contact' => $contact,
-			'uid'     => $uid,
-			'result'  => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::BLOCK_CONTACT, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new BlockContactEvent($contact, $uid),
+		);
 
-		return $hook_data['result'];
+		return $event->getResult();
 	}
 
 	/**
@@ -304,20 +279,13 @@ class Protocol
 			return ActivityPub\Transmitter::sendContactUnblock($contact['url'], $contact['id'], $owner);
 		}
 
-		// Catch-all hook for connector addons
-		$hook_data = [
-			'contact' => $contact,
-			'uid'     => $uid,
-			'result'  => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::UNBLOCK_CONTACT, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new UnblockContactEvent($contact, $uid),
+		);
 
-		return $hook_data['result'];
+		return $event->getResult();
 	}
 
 	/**
@@ -338,17 +306,12 @@ class Protocol
 			return true;
 		}
 
-		$hook_data = [
-			'protocol' => $protocol,
-			'result'   => null,
-		];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, $hook_data),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new ProtocolSupportsProbeEvent((string) $protocol),
+		);
 
-		return $hook_data['result'] === true;
+		return (bool) $event->getResult();
 	}
 }

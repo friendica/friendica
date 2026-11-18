@@ -15,7 +15,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ModerationUsersTabsEvent;
 use Friendica\Model\Register;
 use Friendica\Model\User;
 use Friendica\Module\BaseModeration;
@@ -111,16 +111,11 @@ abstract class BaseUsers extends BaseModeration
 			],
 		];
 
-		$hook_data = [
-			'tabs'        => $tabs,
-			'selectedTab' => $selectedTab,
-		];
+		$event = $this->eventDispatcher->dispatch(
+			new ModerationUsersTabsEvent($tabs, $selectedTab),
+		);
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::MODERATION_USERS_TABS, $hook_data),
-		)->getArray();
-
-		$tabs = $hook_data['tabs'] ?? $tabs;
+		$tabs = $event->getTabsArray();
 
 		$tpl = Renderer::getMarkupTemplate('common_tabs.tpl');
 

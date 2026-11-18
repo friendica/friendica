@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Event;
+namespace Friendica\Core\Event;
 
 /**
  * Interface for named events.

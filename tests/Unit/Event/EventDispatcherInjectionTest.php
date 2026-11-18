@@ -35,7 +35,7 @@ class EventDispatcherInjectionTest extends TestCase
 	public function testDiceDoesNotAutowireNullableParameters(): void
 	{
 		$dice = (new Dice())->addRules([
-			EventDispatcherInterface::class => ['instanceOf' => \Friendica\Event\EventDispatcher::class],
+			EventDispatcherInterface::class => ['instanceOf' => \Friendica\Core\Event\EventDispatcher::class],
 		]);
 
 		$nullable = $dice->create(ClassWithNullableDispatcher::class);

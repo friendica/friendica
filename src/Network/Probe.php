@@ -12,9 +12,9 @@ use DOMXPath;
 use Exception;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Protocol;
-use Friendica\Event\ArrayFilterEvent;
 use Friendica\Database\DBA;
 use Friendica\DI;
+use Friendica\Event\ProbeDetectEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\GServer;
 use Friendica\Model\Profile;
@@ -522,19 +522,12 @@ class Probe
 	 */
 	private static function detect(string $uri, string $network, int $uid, array $ap_profile): array
 	{
-		$hookData = [
-			'uri'     => $uri,
-			'network' => $network,
-			'uid'     => $uid,
-			'result'  => null,
-		];
+		$event = DI::eventDispatcher()->dispatch(
+			new ProbeDetectEvent($uri, $network, $uid),
+		);
 
-		$hookData = DI::eventDispatcher()->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PROBE_DETECT, $hookData),
-		)->getArray();
-
-		if (isset($hookData['result'])) {
-			return is_array($hookData['result']) ? $hookData['result'] : [];
+		if ($event->getResult() !== null) {
+			return is_array($event->getResult()) ? $event->getResult() : [];
 		}
 
 		$parts = parse_url($uri);

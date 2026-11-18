@@ -311,7 +311,7 @@ class StorageManagerTest extends DatabaseTestCase
 			->addRule(IHandleSessions::class, ['instanceOf' => Memory::class, 'shared' => true, 'call' => null]);
 		DI::init($dice);
 
-		/** @var \Friendica\Event\EventDispatcher */
+		/** @var \Friendica\Core\Event\EventDispatcher */
 		$eventDispatcher = DI::eventDispatcher();
 
 		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {

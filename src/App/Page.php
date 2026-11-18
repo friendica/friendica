@@ -23,7 +23,10 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Core\Theme;
 use Friendica\DI;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\FooterEvent;
+use Friendica\Event\HeadEvent;
+use Friendica\Event\PageContentTopEvent;
+use Friendica\Event\PageEndEvent;
 use Friendica\Network\HTTPException;
 use Friendica\Util\Images;
 use Friendica\Util\Network;
@@ -230,9 +233,7 @@ class Page implements ArrayAccess
 			$touch_icon = 'images/friendica-192.png';
 		}
 
-		$this->page['htmlhead'] = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::HEAD, $this->page['htmlhead']),
-		)->getHtml();
+		$this->page['htmlhead'] = $this->eventDispatcher->dispatch(new HeadEvent($this->page['htmlhead']))->getHtml();
 
 		$tpl = Renderer::getMarkupTemplate('head.tpl');
 		/* put the head template at the beginning of page['htmlhead']
@@ -396,9 +397,7 @@ class Page implements ArrayAccess
 			]);
 		}
 
-		$this->page['footer'] = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::FOOTER, $this->page['footer']),
-		)->getHtml();
+		$this->page['footer'] = $this->eventDispatcher->dispatch(new FooterEvent($this->page['footer']))->getHtml();
 
 		$tpl                  = Renderer::getMarkupTemplate('footer.tpl');
 		$this->page['footer'] = Renderer::replaceMacros($tpl, [
@@ -424,7 +423,7 @@ class Page implements ArrayAccess
 		// initialise content region
 		if ($mode->isNormal()) {
 			$this->page['content'] = $this->eventDispatcher->dispatch(
-				new HtmlFilterEvent(HtmlFilterEvent::PAGE_CONTENT_TOP, $this->page['content']),
+				new PageContentTopEvent($this->page['content']),
 			)->getHtml();
 		}
 
@@ -535,9 +534,7 @@ class Page implements ArrayAccess
 		$profiler->set(microtime(true) - $timestamp, 'aftermath');
 
 		if (!$mode->isAjax()) {
-			$this->page['content'] = $this->eventDispatcher->dispatch(
-				new HtmlFilterEvent(HtmlFilterEvent::PAGE_END, $this->page['content']),
-			)->getHtml();
+			$this->page['content'] = $this->eventDispatcher->dispatch(new PageEndEvent($this->page['content']))->getHtml();
 		}
 
 		// Add the navigation (menu) template

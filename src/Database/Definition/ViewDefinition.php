@@ -9,7 +9,7 @@ namespace Friendica\Database\Definition;
 
 use Exception;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\DbViewDefinitionEvent;
 
 /**
  * Stores the whole View definitions
@@ -71,8 +71,8 @@ class ViewDefinition
 			$eventDispatcher = DI::eventDispatcher();
 
 			$definition = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::DB_VIEW_DEFINITION, $definition),
-			)->getArray();
+				new DbViewDefinitionEvent($definition),
+			)->getDefinitionArray();
 		}
 
 		$this->definition = $definition;

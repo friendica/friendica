@@ -11,15 +11,16 @@ use Friendica\App\BaseURL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
-use Friendica\Event\ArrayFilterEvent;
-use Friendica\Event\EventDispatcher;
+use Friendica\Core\Event\EventDispatcher;
+use Friendica\Event\EmailerSendEvent;
+use Friendica\Event\EmailerSendPrepareEvent;
 use Friendica\Object\EMail\IEmail;
 use Friendica\Test\Util\EmailerSpy;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 /**
- * Emailer has to dispatch EMAILER_SEND_PREPARE and EMAILER_SEND on every send().
+ * Emailer has to dispatch EmailerSendPrepareEvent and EmailerSendEvent on every send().
  *
  * SMTP addons like phpmailer hook into those two events through the HookEventBridge.
  * If they aren't dispatched, delivery silently falls back to PHP mail() and nothing
@@ -51,16 +52,16 @@ class EmailerTest extends TestCase
 		$dispatched = [];
 
 		$this->eventDispatcher->addListener(
-			ArrayFilterEvent::EMAILER_SEND_PREPARE,
-			function (ArrayFilterEvent $event) use (&$dispatched): void {
-				$dispatched[] = $event->getArray();
+			EmailerSendPrepareEvent::NAME,
+			function (EmailerSendPrepareEvent $event) use (&$dispatched): void {
+				$dispatched[] = $event->getEmail();
 			},
 		);
 
 		$this->createEmailer()->send($this->createEmail());
 
 		self::assertCount(1, $dispatched);
-		self::assertInstanceOf(IEmail::class, $dispatched[0]['email']);
+		self::assertInstanceOf(IEmail::class, $dispatched[0]);
 	}
 
 	public function testSendDispatchesTheSendEvent(): void
@@ -68,18 +69,18 @@ class EmailerTest extends TestCase
 		$dispatched = [];
 
 		$this->eventDispatcher->addListener(
-			ArrayFilterEvent::EMAILER_SEND,
-			function (ArrayFilterEvent $event) use (&$dispatched): void {
-				$dispatched[] = $event->getArray();
+			EmailerSendEvent::NAME,
+			function (EmailerSendEvent $event) use (&$dispatched): void {
+				$dispatched[] = $event;
 			},
 		);
 
 		$this->createEmailer()->send($this->createEmail());
 
 		self::assertCount(1, $dispatched);
-		self::assertSame('recipient@friendica.local', $dispatched[0]['to']);
-		self::assertSame('Test Subject', $dispatched[0]['subject']);
-		self::assertFalse($dispatched[0]['sent']);
+		self::assertSame('recipient@friendica.local', $dispatched[0]->getToAddress());
+		self::assertSame('Test Subject', $dispatched[0]->getSubject());
+		self::assertFalse($dispatched[0]->isSent());
 	}
 
 	/**
@@ -88,11 +89,9 @@ class EmailerTest extends TestCase
 	public function testListenerMarkingTheMailAsSentSkipsTheMailFallback(): void
 	{
 		$this->eventDispatcher->addListener(
-			ArrayFilterEvent::EMAILER_SEND,
-			function (ArrayFilterEvent $event): void {
-				$data         = $event->getArray();
-				$data['sent'] = true;
-				$event->setArray($data);
+			EmailerSendEvent::NAME,
+			function (EmailerSendEvent $event): void {
+				$event->setSent(true);
 			},
 		);
 
@@ -106,9 +105,9 @@ class EmailerTest extends TestCase
 	public function testPrepareListenerCanCancelTheMail(): void
 	{
 		$this->eventDispatcher->addListener(
-			ArrayFilterEvent::EMAILER_SEND_PREPARE,
-			function (ArrayFilterEvent $event): void {
-				$event->setArray(['email' => null]);
+			EmailerSendPrepareEvent::NAME,
+			function (EmailerSendPrepareEvent $event): void {
+				$event->setEmail(null);
 			},
 		);
 

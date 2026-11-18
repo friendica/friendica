@@ -16,7 +16,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\PermissionTooltipContentEvent;
 use Friendica\Model;
 use Friendica\Module\Response;
 use Friendica\Network\HTTPException;
@@ -92,15 +92,11 @@ class PermissionTooltip extends BaseModule
 			throw new HttpException\NotFoundException($this->t('Model not found'));
 		}
 
-		$hook_data = [
-			'model' => $model,
-		];
+		$event = $this->eventDispatcher->dispatch(
+			new PermissionTooltipContentEvent($model),
+		);
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, $hook_data),
-		)->getArray();
-
-		$model = $hook_data['model'] ?? $model;
+		$model = $event->getModelArray();
 
 		$aclReceivers       = new Entity\AclReceivers();
 		$addressedReceivers = new Entity\AddressedReceivers();

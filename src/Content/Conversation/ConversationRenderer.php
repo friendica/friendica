@@ -13,7 +13,7 @@ use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ConversationStartEvent;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Util\Profiler;
 use ImagickException;
@@ -101,13 +101,9 @@ final readonly class ConversationRenderer
 			$_SESSION['return_path'] = $this->args->getQueryString();
 		}
 
-		$cb = ['items' => $items, 'mode' => $mode, 'update' => $update, 'preview' => false];
-
-		$cb = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::CONVERSATION_START, $cb),
-		)->getArray();
-
-		$items = $cb['items'];
+		$items = $this->eventDispatcher->dispatch(
+			new ConversationStartEvent($items, $mode, $update, false),
+		)->getItemsArray();
 
 		$timelineHtml = $this->renderTimelineByItems($items, $viewerUid, $mode, $order, $update);
 		$html         = $live_update_div . $timelineHtml;
@@ -412,13 +408,9 @@ final readonly class ConversationRenderer
 
 		$_SESSION['return_path'] = $this->args->getQueryString();
 
-		$cb = ['items' => $items, 'mode' => $mode, 'update' => false, 'preview' => $preview];
-
-		$cb = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::CONVERSATION_START, $cb),
-		)->getArray();
-
-		$items = $cb['items'];
+		$items = $this->eventDispatcher->dispatch(
+			new ConversationStartEvent($items, $mode, false, $preview),
+		)->getItemsArray();
 
 		$roots = $this->dataProvider->getFlatTemplateData($items, $viewerUid, $preview);
 		$html  = $live_update_div . $this->renderThreadedTemplate($roots, $mode, false, false, !$preview && $this->isClickToDisplayEnabled($viewerUid, true));

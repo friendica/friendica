@@ -8,7 +8,7 @@
 namespace Friendica\Render;
 
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\TemplateVarsEvent;
 use Friendica\Network\HTTPException\ServiceUnavailableException;
 use Friendica\Util\Strings;
 
@@ -68,15 +68,10 @@ final class FriendicaSmartyEngine extends TemplateEngine
 			$template = self::STRING_PREFIX . $template;
 		}
 
-		// "middleware": inject variables into templates
-		$arr = [
-			'template' => basename($this->smarty->filename ?? ''),
-			'vars'     => $vars,
-		];
-		$arr = DI::eventDispatcher()->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::TEMPLATE_VARS, $arr),
-		)->getArray();
-		$vars = $arr['vars'];
+		$event = DI::eventDispatcher()->dispatch(
+			new TemplateVarsEvent(basename($this->smarty->filename ?? ''), $vars),
+		);
+		$vars = $event->getVars();
 
 		$this->smarty->clearAllAssign();
 

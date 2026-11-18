@@ -11,7 +11,7 @@ use Friendica\App\BaseURL;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
-use Friendica\Event\EventDispatcher;
+use Friendica\Core\Event\EventDispatcher;
 use Friendica\Test\MockedTestCase;
 use Friendica\Test\Util\EmailerSpy;
 use Friendica\Test\Util\SampleMailBuilder;

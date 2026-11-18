@@ -20,7 +20,8 @@ use Friendica\Core\Storage\Capability\ICanWriteToStorage;
 use Friendica\Database\Database;
 use Friendica\Core\Storage\Type;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\StorageConfigEvent;
+use Friendica\Event\StorageInstanceEvent;
 use Friendica\Network\HTTPException\InternalServerErrorException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -137,23 +138,18 @@ class StorageManager
 			case Type\Database::getName():
 				return false;
 			default:
-				$data = [
-					'name'           => $name,
-					'storage_config' => null,
-				];
-
 				try {
-					$data = $this->eventDispatcher->dispatch(
-						new ArrayFilterEvent(ArrayFilterEvent::STORAGE_CONFIG, $data),
-					)->getArray();
+					$storageConfig = $this->eventDispatcher->dispatch(
+						new StorageConfigEvent($name),
+					)->getConfig();
 
-					if (!($data['storage_config'] ?? null) instanceof ICanConfigureStorage) {
+					if (!$storageConfig instanceof ICanConfigureStorage) {
 						throw new InvalidClassStorageException(sprintf('Configuration for backend %s was not found', $name));
 					}
 
-					return $data['storage_config'];
+					return $storageConfig;
 				} catch (InternalServerErrorException $exception) {
-					throw new StorageException(sprintf('Failed calling hook::storage_config for backend %s', $name), $exception->getCode(), $exception);
+					throw new StorageException(sprintf('Failed calling event StorageConfigEvent for backend %s', $name), $exception->getCode(), $exception);
 				}
 		}
 	}
@@ -196,23 +192,18 @@ class StorageManager
 					$this->backendInstances[$name] = new Type\ExternalResource($this->logger);
 					break;
 				default:
-					$data = [
-						'name'    => $name,
-						'storage' => null,
-					];
-
 					try {
-						$data = $this->eventDispatcher->dispatch(
-							new ArrayFilterEvent(ArrayFilterEvent::STORAGE_INSTANCE, $data),
-						)->getArray();
+						$storage = $this->eventDispatcher->dispatch(
+							new StorageInstanceEvent($name),
+						)->getStorage();
 
-						if (!($data['storage'] ?? null) instanceof ICanReadFromStorage) {
+						if (!$storage instanceof ICanReadFromStorage) {
 							throw new InvalidClassStorageException(sprintf('Backend %s was not found', $name));
 						}
 
-						$this->backendInstances[$data['name'] ?? $name] = $data['storage'];
+						$this->backendInstances[$name] = $storage;
 					} catch (InternalServerErrorException $exception) {
-						throw new StorageException(sprintf('Failed calling hook::storage_instance for backend %s', $name), $exception->getCode(), $exception);
+						throw new StorageException(sprintf('Failed calling event StorageInstanceEvent for backend %s', $name), $exception->getCode(), $exception);
 					}
 					break;
 			}
@@ -271,7 +262,7 @@ class StorageManager
 	/**
 	 * Register a storage backend class
 	 *
-	 * You have to register the hook "storage_instance" as well to make this class work!
+	 * You have to provide the backend instance via the `\Friendica\Event\StorageInstanceEvent` as well to make this class work!
 	 *
 	 * @param string $class Backend class name
 	 *

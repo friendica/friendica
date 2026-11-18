@@ -11,7 +11,7 @@ use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core\Cache\Capability\ICanCache;
 use Friendica\Core\L10n;
-use Friendica\Event\Event;
+use Friendica\Event\LoggingOutEvent;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Core\System;
 use Friendica\Model\User\Cookie;
@@ -70,7 +70,7 @@ class Logout extends BaseModule
 			$this->cache->delete('zrlInit:' . $visitor_home);
 		}
 
-		$this->eventDispatcher->dispatch(new Event(Event::LOGGING_OUT));
+		$this->eventDispatcher->dispatch(new LoggingOutEvent());
 
 		// If this is a trusted browser, redirect to the 2fa signout page
 		if ($this->cookie->get('2fa_cookie_hash')) {

@@ -13,7 +13,7 @@ use Friendica\Protocol\HTTP\MediaType;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\HtmlToBbcodeEndEvent;
 use Friendica\Model\Contact;
 use Friendica\Util\Strings;
 use Friendica\Util\XML;
@@ -317,13 +317,11 @@ class HTML
 			$message = preg_replace('=\r *\r=i', "\n", $message);
 			$message = str_replace("\r", "\n", $message);
 
-			$message_data = ['html2bbcode' => $message];
-
 			$message_data = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::HTML_TO_BBCODE_END, $message_data),
-			)->getArray();
+				new HtmlToBbcodeEndEvent($message),
+			)->getHtml2bbcode();
 
-			$message = $message_data['html2bbcode'] ?? $message;
+			$message = $message_data;
 
 			$message = strip_tags((string) $message);
 

@@ -66,6 +66,8 @@ deptrac:
       - Friendica\Model\User
     Friendica\Core\Hook:
       - Friendica\DI
+    Friendica\Core\Hooks\HookEventBridge:
+      - Friendica\Object\EMail\IEmail
     Friendica\Core\Installer:
       - Friendica\DI
     Friendica\Core\Protocol:
@@ -139,6 +141,8 @@ deptrac:
       - Friendica\Protocol\ActivityPub\Receiver
     Friendica\Database\View:
       - Friendica\DI
+    Friendica\Event\EmailerSendPrepareEvent:
+      - Friendica\Object\EMail\IEmail
     Friendica\Event\LegacyEventDispatcher:
       - Friendica\DI
     Friendica\Event\ModuleContentEvent:

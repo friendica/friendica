@@ -17,7 +17,7 @@ use Friendica\Core\Search;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\AclLookupEndEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Post;
 use Friendica\Module\Response;
@@ -291,26 +291,15 @@ class Acl extends BaseModule
 			$resultTotal += count($unknown_contacts);
 		}
 
-		$hook_data = [
-			'tot'      => $resultTotal,
-			'start'    => $start,
-			'count'    => $count,
-			'circles'  => $resultCircles,
-			'contacts' => $resultContacts,
-			'items'    => $resultItems,
-			'type'     => $type,
-			'search'   => $search,
-		];
-
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ACL_LOOKUP_END, $hook_data),
-		)->getArray();
+		$event = $this->eventDispatcher->dispatch(
+			new AclLookupEndEvent($resultTotal, $start, $count, $resultCircles, $resultContacts, $resultItems, $type, $search),
+		);
 
 		$o = [
-			'tot'   => $hook_data['tot'],
-			'start' => $hook_data['start'],
-			'count' => $hook_data['count'],
-			'items' => $hook_data['items'],
+			'tot'   => $event->getTotal(),
+			'start' => $event->getStart(),
+			'count' => $event->getCount(),
+			'items' => $event->getItems(),
 		];
 
 		$this->logger->info('ACL {action} - {subaction} - done', ['module' => 'acl', 'action' => 'content', 'subaction' => 'search', 'search' => $search, 'type' => $type, 'conversation' => $conv_id]);

@@ -22,7 +22,7 @@ use Friendica\Core\Renderer;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Core\Theme;
 use Friendica\Database\DBA;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\JotToolEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\User;
@@ -125,9 +125,7 @@ class Compose extends BaseModule
 		$wall      = $request['wall']      ?? $type == 'post';
 		$language  = $request['language']  ?? L10n::UNDETERMINED_LANGUAGE;
 
-		$jotplugins = $this->eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::JOT_TOOL, ''),
-		)->getHtml();
+		$jotplugins = $this->eventDispatcher->dispatch(new JotToolEvent(''))->getHtml();
 
 		// Output
 		$this->page->registerStylesheet(Theme::getPathForFile('css/compose.css'));

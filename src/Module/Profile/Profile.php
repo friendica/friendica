@@ -25,7 +25,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\ModProfileContentEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Profile as ProfileModel;
 use Friendica\Model\Tag;
@@ -312,9 +312,7 @@ class Profile extends BaseProfile
 			],
 		]);
 
-		$o = $this->eventDispatcher->dispatch(
-			new HTmlFilterEvent(HtmlFilterEvent::MOD_PROFILE_CONTENT, $o),
-		)->getHtml();
+		$o = $this->eventDispatcher->dispatch(new ModProfileContentEvent($o))->getHtml();
 
 		return $o;
 	}

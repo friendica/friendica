@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Friendica\Test\Unit\Event;
 
 use Friendica\Event\ModulePostRecipientEvent;
-use Friendica\Event\NamedEvent;
+use Friendica\Core\Event\NamedEvent;
 use Friendica\Module\Smilies;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,7 @@ class ModulePostRecipientEventTest extends TestCase
 {
 	public function testImplementationOfInstances(): void
 	{
-		$event = new ModulePostRecipientEvent('test', 'moduleName', Smilies::class, 'html');
+		$event = new ModulePostRecipientEvent('moduleName', Smilies::class, 'html');
 
 		$this->assertInstanceOf(NamedEvent::class, $event); // @phpstan-ignore method.alreadyNarrowedType
 	}
@@ -26,7 +26,7 @@ class ModulePostRecipientEventTest extends TestCase
 	public static function getPublicConstants(): array
 	{
 		return [
-			[ModulePostRecipientEvent::MODULE_POST_RECIPIENT, 'friendica.module_post_recipient'],
+			[ModulePostRecipientEvent::NAME, 'friendica.module_post_recipient'],
 		];
 	}
 
@@ -38,35 +38,35 @@ class ModulePostRecipientEventTest extends TestCase
 
 	public function testGetNameReturnsName(): void
 	{
-		$event = new ModulePostRecipientEvent('test', 'moduleName', Smilies::class, 'html');
+		$event = new ModulePostRecipientEvent('moduleName', Smilies::class, 'html');
 
-		$this->assertSame('test', $event->getName());
+		$this->assertSame('friendica.module_post_recipient', $event->getName());
 	}
 
 	public function testGetModuleNameReturnsModuleName(): void
 	{
-		$event = new ModulePostRecipientEvent('test', 'moduleName', Smilies::class, 'html');
+		$event = new ModulePostRecipientEvent('moduleName', Smilies::class, 'html');
 
 		$this->assertSame('moduleName', $event->getModuleName());
 	}
 
 	public function testGetModuleClassReturnsModuleClass(): void
 	{
-		$event = new ModulePostRecipientEvent('test', 'moduleName', Smilies::class, 'html');
+		$event = new ModulePostRecipientEvent('moduleName', Smilies::class, 'html');
 
 		$this->assertSame(Smilies::class, $event->getModuleClass());
 	}
 
 	public function testGetHtmlReturnsCorrectString(): void
 	{
-		$event = new ModulePostRecipientEvent('test', 'moduleName', Smilies::class, 'myHtml');
+		$event = new ModulePostRecipientEvent('moduleName', Smilies::class, 'myHtml');
 
 		$this->assertSame('myHtml', $event->getHtml());
 	}
 
 	public function testSetHtmlUpdatesHtml(): void
 	{
-		$event = new ModulePostRecipientEvent('test', 'moduleName', Smilies::class, 'oldHtml');
+		$event = new ModulePostRecipientEvent('moduleName', Smilies::class, 'oldHtml');
 
 		$event->setHtml('newHtml');
 

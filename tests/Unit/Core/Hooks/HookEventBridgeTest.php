@@ -12,15 +12,126 @@ namespace Friendica\Test\Unit\Core\Hooks;
 use FastRoute\RouteCollector;
 use Friendica\Core\Config\Util\ConfigFileManager;
 use Friendica\Core\Hooks\HookEventBridge;
+use Friendica\Core\Storage\Capability\ICanConfigureStorage;
+use Friendica\Core\Storage\Capability\ICanReadFromStorage;
+use Friendica\Core\Worker;
+use Friendica\Event\AccountAuthenticateEvent;
+use Friendica\Event\AccountRegisterEvent;
+use Friendica\Event\AccountRegisterFormEvent;
+use Friendica\Event\AccountRegisterPostEvent;
+use Friendica\Event\AccountRemoveEvent;
+use Friendica\Event\AclLookupEndEvent;
+use Friendica\Event\AddonSettingsPostEvent;
+use Friendica\Event\AddWorkerTaskEvent;
+use Friendica\Event\AppMenuEvent;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\AvatarLookupEvent;
+use Friendica\Event\BbcodeToHtmlStartEvent;
+use Friendica\Event\BbcodeToMarkdownEndEvent;
+use Friendica\Event\BlockContactEvent;
+use Friendica\Event\CacheItemEvent;
+use Friendica\Event\CheckItemNotificationEvent;
+use Friendica\Event\ConnectorSettingsPostEvent;
+use Friendica\Event\ContactBlockEndEvent;
+use Friendica\Event\ContactPhotoMenuEvent;
+use Friendica\Event\ConversationStartEvent;
+use Friendica\Event\DbStructureDefinitionEvent;
+use Friendica\Event\DbViewDefinitionEvent;
+use Friendica\Event\DetectLanguagesEvent;
+use Friendica\Event\DirectoryItemEvent;
+use Friendica\Event\DisplayItemEvent;
+use Friendica\Event\DisplaySettingsPostEvent;
+use Friendica\Event\EmailGetMessageEvent;
+use Friendica\Event\EmailGetMessageEndEvent;
+use Friendica\Event\EmailerSendEvent;
+use Friendica\Event\EmailerSendPrepareEvent;
+use Friendica\Event\EnotifyEvent;
+use Friendica\Event\EnotifyMailEvent;
+use Friendica\Event\EnotifyStoreEvent;
+use Friendica\Event\EditContactFormEvent;
+use Friendica\Event\EditContactPostEvent;
+use Friendica\Event\EventCreatedEvent;
+use Friendica\Event\EventUpdatedEvent;
+use Friendica\Event\FetchItemByLinkEvent;
+use Friendica\Event\FeatureEnabledEvent;
+use Friendica\Event\FeatureGetEvent;
+use Friendica\Event\FollowContactEvent;
+use Friendica\Event\FooterEvent;
+use Friendica\Event\GenerateMapEvent;
+use Friendica\Event\GenerateNamedMapEvent;
+use Friendica\Event\GetSiteInfoEvent;
+use Friendica\Object\EMail\IEmail;
+use Friendica\Event\GlobalDirUpdateEvent;
+use Friendica\Event\HeadEvent;
+use Friendica\Event\HtmlToBbcodeEndEvent;
+use Friendica\Event\InsertPostLocalEvent;
+use Friendica\Event\ItemPhotoMenuEvent;
+use Friendica\Event\ItemTaggedEvent;
+use Friendica\Event\LoggedInEvent;
+use Friendica\Event\LoginFormEvent;
+use Friendica\Event\MagicAuthSuccessEvent;
+use Friendica\Event\MapGetCoordinatesEvent;
+use Friendica\Event\ModAboutContentEvent;
+use Friendica\Event\ModerationUsersTabsEvent;
+use Friendica\Event\ModHomeContentEvent;
+use Friendica\Event\ModProfileContentEvent;
+use Friendica\Event\NavInfoEvent;
+use Friendica\Event\NetworkToNameEvent;
+use Friendica\Event\NetworkContentStartEvent;
+use Friendica\Event\NetworkContentTabsEvent;
 use Friendica\Event\CollectRoutesEvent;
 use Friendica\Event\ConfigLoadedEvent;
-use Friendica\Event\Event;
+use Friendica\Event\HomeInitEvent;
 use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\InitEvent;
+use Friendica\Event\LoggingOutEvent;
 use Friendica\Event\ModuleContentEvent;
 use Friendica\Event\ModuleInitEvent;
 use Friendica\Event\ModulePostEvent;
+use Friendica\Event\NotifierEndEvent;
+use Friendica\Event\OcrDetectionEvent;
+use Friendica\Event\OtherEncapsulateEvent;
+use Friendica\Event\OtherUnencapsulateEvent;
+use Friendica\Event\PageHeaderEvent;
+use Friendica\Event\PageContentTopEvent;
+use Friendica\Event\PageEndEvent;
+use Friendica\Event\PageInfoEvent;
+use Friendica\Event\ParseLinkEvent;
+use Friendica\Event\PermissionTooltipContentEvent;
+use Friendica\Event\RenderLocationEvent;
+use Friendica\Event\SmileyListEvent;
+use Friendica\Event\StorageConfigEvent;
+use Friendica\Event\StorageInstanceEvent;
+use Friendica\Event\TemplateVarsEvent;
+use Friendica\Event\InsertPostLocalEndEvent;
+use Friendica\Event\InsertPostLocalStartEvent;
+use Friendica\Event\InsertPostRemoteEvent;
+use Friendica\Event\InsertPostRemoteEndEvent;
+use Friendica\Event\JotNetworksEvent;
+use Friendica\Event\JotToolEvent;
+use Friendica\Event\PreparePostEndEvent;
+use Friendica\Event\PreparePostEvent;
+use Friendica\Event\PreparePostFilterContentEvent;
+use Friendica\Event\PreparePostStartEvent;
+use Friendica\Event\PhotoUploadEndEvent;
+use Friendica\Event\PhotoUploadFormEvent;
+use Friendica\Event\ProfileSettingsFormEvent;
+use Friendica\Event\ProfileSettingsPostEvent;
+use Friendica\Event\ProfileSidebarEvent;
+use Friendica\Event\ProfileSidebarStartEvent;
+use Friendica\Event\ProfileTabsEvent;
+use Friendica\Event\ProtocolSupportsFollowEvent;
+use Friendica\Event\ProtocolSupportsProbeEvent;
+use Friendica\Event\ProtocolSupportsRevokeFollowEvent;
+use Friendica\Event\PhotoUploadEvent;
+use Friendica\Event\PhotoUploadStartEvent;
+use Friendica\Event\ProbeDetectEvent;
 use Friendica\Event\ModulePostRecipientEvent;
+use Friendica\Event\ZrlInitEvent;
+use Friendica\Event\UnblockContactEvent;
+use Friendica\Event\UnfollowContactEvent;
+use Friendica\Event\UserExportOptionsEvent;
+use Friendica\Event\RevokeFollowContactEvent;
 use PHPUnit\Framework\TestCase;
 
 class HookEventBridgeTest extends TestCase
@@ -37,120 +148,120 @@ class HookEventBridgeTest extends TestCase
 	public function testGetStaticSubscribedEventsReturnsStaticMethods(): void
 	{
 		$expected = [
-			Event::INIT                                       => 'onNamedEvent',
-			Event::HOME_INIT                                  => 'onNamedEvent',
-			Event::LOGGING_OUT                                => 'onNamedEvent',
-			ConfigLoadedEvent::CONFIG_LOADED                  => 'onConfigLoadedEvent',
-			CollectRoutesEvent::COLLECT_ROUTES                => 'onCollectRoutesEvent',
-			ArrayFilterEvent::ACCOUNT_AUTHENTICATE            => 'onArrayFilterEvent',
-			ArrayFilterEvent::ACCOUNT_REGISTER                => 'onAccountRegisterEvent',
-			ArrayFilterEvent::ACCOUNT_REGISTER_FORM           => 'onArrayFilterEvent',
-			ArrayFilterEvent::ACCOUNT_REGISTER_POST           => 'onArrayFilterEvent',
-			ArrayFilterEvent::ACCOUNT_REMOVE                  => 'onAccountRemoveEvent',
-			ArrayFilterEvent::ACL_LOOKUP_END                  => 'onArrayFilterEvent',
-			ArrayFilterEvent::ADD_WORKER_TASK                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::ADDON_SETTINGS_POST             => 'onArrayFilterEvent',
-			ArrayFilterEvent::APP_MENU                        => 'onArrayFilterEvent',
-			ArrayFilterEvent::AVATAR_LOOKUP                   => 'onArrayFilterEvent',
-			ArrayFilterEvent::BBCODE_TO_HTML_START            => 'onBbcodeToHtmlEvent',
-			ArrayFilterEvent::BBCODE_TO_MARKDOWN_END          => 'onBbcodeToMarkdownEvent',
-			ArrayFilterEvent::BLOCK_CONTACT                   => 'onArrayFilterEvent',
-			ArrayFilterEvent::CACHE_ITEM                      => 'onArrayFilterEvent',
-			ArrayFilterEvent::CHECK_ITEM_NOTIFICATION         => 'onArrayFilterEvent',
-			ArrayFilterEvent::CONNECTOR_SETTINGS_POST         => 'onArrayFilterEvent',
-			ArrayFilterEvent::CONTACT_PHOTO_MENU              => 'onArrayFilterEvent',
-			ArrayFilterEvent::CONVERSATION_START              => 'onArrayFilterEvent',
-			ArrayFilterEvent::DB_STRUCTURE_DEFINITION         => 'onArrayFilterEvent',
-			ArrayFilterEvent::DB_VIEW_DEFINITION              => 'onArrayFilterEvent',
-			ArrayFilterEvent::DETECT_LANGUAGES                => 'onArrayFilterEvent',
-			ArrayFilterEvent::DIRECTORY_ITEM                  => 'onArrayFilterEvent',
-			ArrayFilterEvent::DISPLAY_ITEM                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::DISPLAY_SETTINGS_POST           => 'onArrayFilterEvent',
-			ArrayFilterEvent::EDIT_CONTACT_FORM               => 'onArrayFilterEvent',
-			ArrayFilterEvent::EDIT_CONTACT_POST               => 'onArrayFilterEvent',
-			ArrayFilterEvent::EMAIL_GET_MESSAGE               => 'onArrayFilterEvent',
-			ArrayFilterEvent::EMAIL_GET_MESSAGE_END           => 'onArrayFilterEvent',
-			ArrayFilterEvent::EMAILER_SEND                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::EMAILER_SEND_PREPARE            => 'onEmailerSendPrepareEvent',
-			ArrayFilterEvent::ENOTIFY                         => 'onArrayFilterEvent',
-			ArrayFilterEvent::ENOTIFY_MAIL                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::ENOTIFY_STORE                   => 'onArrayFilterEvent',
-			ArrayFilterEvent::EVENT_CREATED                   => 'onEventCreatedEvent',
-			ArrayFilterEvent::EVENT_UPDATED                   => 'onEventUpdatedEvent',
-			ArrayFilterEvent::FEATURE_ENABLED                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::FEATURE_GET                     => 'onArrayFilterEvent',
-			ArrayFilterEvent::FETCH_ITEM_BY_LINK              => 'onArrayFilterEvent',
-			ArrayFilterEvent::FOLLOW_CONTACT                  => 'onArrayFilterEvent',
-			ArrayFilterEvent::GENERATE_MAP                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::GENERATE_NAMED_MAP              => 'onArrayFilterEvent',
-			ArrayFilterEvent::GET_SITE_INFO                   => 'onArrayFilterEvent',
-			ArrayFilterEvent::GLOBAL_DIR_UPDATE               => 'onArrayFilterEvent',
-			ArrayFilterEvent::HTML_TO_BBCODE_END              => 'onHtmlToBbcodeEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL               => 'onInsertPostLocalEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL_END           => 'onInsertPostLocalEndEvent',
-			ArrayFilterEvent::INSERT_POST_LOCAL_START         => 'onArrayFilterEvent',
-			ArrayFilterEvent::INSERT_POST_REMOTE              => 'onArrayFilterEvent',
-			ArrayFilterEvent::INSERT_POST_REMOTE_END          => 'onArrayFilterEvent',
-			ArrayFilterEvent::ITEM_PHOTO_MENU                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::ITEM_TAGGED                     => 'onArrayFilterEvent',
-			ArrayFilterEvent::JOT_NETWORKS                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::LOGGED_IN                       => 'onArrayFilterEvent',
-			ArrayFilterEvent::LOGIN_FORM                      => 'onLoginFormEvent',
-			ArrayFilterEvent::MAGIC_AUTH_SUCCESS              => 'onArrayFilterEvent',
-			ArrayFilterEvent::MAP_GET_COORDINATES             => 'onArrayFilterEvent',
-			ArrayFilterEvent::MODERATION_USERS_TABS           => 'onArrayFilterEvent',
-			ArrayFilterEvent::NAV_INFO                        => 'onArrayFilterEvent',
-			ArrayFilterEvent::NETWORK_CONTENT_START           => 'onArrayFilterEvent',
-			ArrayFilterEvent::NETWORK_CONTENT_TABS            => 'onArrayFilterEvent',
-			ArrayFilterEvent::NETWORK_TO_NAME                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::NOTIFIER_END                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::OCR_DETECTION                   => 'onArrayFilterEvent',
-			ArrayFilterEvent::OTHER_ENCAPSULATE               => 'onArrayFilterEvent',
-			ArrayFilterEvent::OTHER_UNENCAPSULATE             => 'onArrayFilterEvent',
-			ArrayFilterEvent::PAGE_INFO                       => 'onArrayFilterEvent',
-			ArrayFilterEvent::PARSE_LINK                      => 'onArrayFilterEvent',
-			ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT      => 'onPermissionTooltipContentEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD_END                => 'onPhotoUploadEndEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD_FORM               => 'onArrayFilterEvent',
-			ArrayFilterEvent::PHOTO_UPLOAD_START              => 'onPhotoUploadStartEvent',
-			ArrayFilterEvent::PREPARE_POST                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::PREPARE_POST_END                => 'onArrayFilterEvent',
-			ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT     => 'onArrayFilterEvent',
-			ArrayFilterEvent::PREPARE_POST_START              => 'onPreparePostStartEvent',
-			ArrayFilterEvent::PROBE_DETECT                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SETTINGS_FORM           => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SETTINGS_POST           => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SIDEBAR                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY           => 'onProfileSidebarEntryEvent',
-			ArrayFilterEvent::PROFILE_TABS                    => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW        => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE         => 'onArrayFilterEvent',
-			ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW => 'onArrayFilterEvent',
-			ArrayFilterEvent::RENDER_LOCATION                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::REVOKE_FOLLOW_CONTACT           => 'onArrayFilterEvent',
-			ArrayFilterEvent::SMILEY_LIST                     => 'onArrayFilterEvent',
-			ArrayFilterEvent::STORAGE_CONFIG                  => 'onArrayFilterEvent',
-			ArrayFilterEvent::STORAGE_INSTANCE                => 'onArrayFilterEvent',
-			ArrayFilterEvent::TEMPLATE_VARS                   => 'onArrayFilterEvent',
-			ArrayFilterEvent::UNBLOCK_CONTACT                 => 'onArrayFilterEvent',
-			ArrayFilterEvent::UNFOLLOW_CONTACT                => 'onArrayFilterEvent',
-			ArrayFilterEvent::USER_EXPORT_OPTIONS             => 'onArrayFilterEvent',
-			ArrayFilterEvent::ZRL_INIT                        => 'onArrayFilterEvent',
-			HtmlFilterEvent::CONTACT_BLOCK_END                => 'onHtmlFilterEvent',
-			HtmlFilterEvent::FOOTER                           => 'onHtmlFilterEvent',
-			HtmlFilterEvent::HEAD                             => 'onHtmlFilterEvent',
-			HtmlFilterEvent::JOT_TOOL                         => 'onHtmlFilterEvent',
-			HtmlFilterEvent::MOD_ABOUT_CONTENT                => 'onHtmlFilterEvent',
-			HtmlFilterEvent::MOD_HOME_CONTENT                 => 'onHtmlFilterEvent',
-			HtmlFilterEvent::MOD_PROFILE_CONTENT              => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_CONTENT_TOP                 => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_END                         => 'onHtmlFilterEvent',
-			HtmlFilterEvent::PAGE_HEADER                      => 'onHtmlFilterEvent',
-			ModuleContentEvent::MODULE_CONTENT                => 'onModuleContentEvent',
-			ModuleInitEvent::MODULE_INIT                      => 'onModuleInitEvent',
-			ModulePostEvent::MODULE_POST                      => 'onModulePostEvent',
-			ModulePostRecipientEvent::MODULE_POST_RECIPIENT   => 'onModulePostRecipientEvent',
+			InitEvent::NAME                         => 'onNamedEvent',
+			HomeInitEvent::NAME                     => 'onNamedEvent',
+			LoggingOutEvent::NAME                   => 'onNamedEvent',
+			ConfigLoadedEvent::NAME                 => 'onConfigLoadedEvent',
+			CollectRoutesEvent::NAME                => 'onCollectRoutesEvent',
+			AccountAuthenticateEvent::NAME          => 'onAccountAuthenticateEvent',
+			AccountRegisterEvent::NAME              => 'onAccountRegisterEvent',
+			AccountRegisterFormEvent::NAME          => 'onAccountRegisterFormEvent',
+			AccountRegisterPostEvent::NAME          => 'onAccountRegisterPostEvent',
+			AccountRemoveEvent::NAME                => 'onAccountRemoveEvent',
+			AclLookupEndEvent::NAME                 => 'onAclLookupEndEvent',
+			AddWorkerTaskEvent::NAME                => 'onAddWorkerTaskEvent',
+			AddonSettingsPostEvent::NAME            => 'onAddonSettingsPostEvent',
+			AppMenuEvent::NAME                      => 'onAppMenuEvent',
+			AvatarLookupEvent::NAME                 => 'onAvatarLookupEvent',
+			BbcodeToHtmlStartEvent::NAME            => 'onBbcodeToHtmlEvent',
+			BbcodeToMarkdownEndEvent::NAME          => 'onBbcodeToMarkdownEndEvent',
+			BlockContactEvent::NAME                 => 'onBlockContactEvent',
+			CacheItemEvent::NAME                    => 'onCacheItemEvent',
+			CheckItemNotificationEvent::NAME        => 'onCheckItemNotificationEvent',
+			ConnectorSettingsPostEvent::NAME        => 'onConnectorSettingsPostEvent',
+			ContactPhotoMenuEvent::NAME             => 'onContactPhotoMenuEvent',
+			ConversationStartEvent::NAME            => 'onConversationStartEvent',
+			DbStructureDefinitionEvent::NAME        => 'onDbStructureDefinitionEvent',
+			DbViewDefinitionEvent::NAME             => 'onDbViewDefinitionEvent',
+			DetectLanguagesEvent::NAME              => 'onDetectLanguagesEvent',
+			DirectoryItemEvent::NAME                => 'onDirectoryItemEvent',
+			DisplayItemEvent::NAME                  => 'onDisplayItemEvent',
+			DisplaySettingsPostEvent::NAME          => 'onDisplaySettingsPostEvent',
+			EditContactFormEvent::NAME              => 'onEditContactFormEvent',
+			EditContactPostEvent::NAME              => 'onEditContactPostEvent',
+			EmailGetMessageEvent::NAME              => 'onEmailGetMessageEvent',
+			EmailGetMessageEndEvent::NAME           => 'onEmailGetMessageEndEvent',
+			EmailerSendEvent::NAME                  => 'onEmailerSendEvent',
+			EmailerSendPrepareEvent::NAME           => 'onEmailerSendPrepareEvent',
+			EnotifyEvent::NAME                      => 'onEnotifyEvent',
+			EnotifyMailEvent::NAME                  => 'onEnotifyMailEvent',
+			EnotifyStoreEvent::NAME                 => 'onEnotifyStoreEvent',
+			EventCreatedEvent::NAME                 => 'onEventCreatedEvent',
+			EventUpdatedEvent::NAME                 => 'onEventUpdatedEvent',
+			FeatureEnabledEvent::NAME               => 'onFeatureEnabledEvent',
+			FeatureGetEvent::NAME                   => 'onFeatureGetEvent',
+			FetchItemByLinkEvent::NAME              => 'onFetchItemByLinkEvent',
+			FollowContactEvent::NAME                => 'onFollowContactEvent',
+			GenerateMapEvent::NAME                  => 'onGenerateMapEvent',
+			GenerateNamedMapEvent::NAME             => 'onGenerateNamedMapEvent',
+			GetSiteInfoEvent::NAME                  => 'onGetSiteInfoEvent',
+			GlobalDirUpdateEvent::NAME              => 'onGlobalDirUpdateEvent',
+			HtmlToBbcodeEndEvent::NAME              => 'onHtmlToBbcodeEvent',
+			InsertPostLocalEvent::NAME              => 'onInsertPostLocalEvent',
+			InsertPostLocalEndEvent::NAME           => 'onInsertPostLocalEndEvent',
+			InsertPostRemoteEvent::NAME             => 'onInsertPostRemoteEvent',
+			InsertPostRemoteEndEvent::NAME          => 'onInsertPostRemoteEndEvent',
+			InsertPostLocalStartEvent::NAME         => 'onInsertPostLocalStartEvent',
+			ItemPhotoMenuEvent::NAME                => 'onItemPhotoMenuEvent',
+			ItemTaggedEvent::NAME                   => 'onItemTaggedEvent',
+			JotNetworksEvent::NAME                  => 'onJotNetworksEvent',
+			LoggedInEvent::NAME                     => 'onLoggedInEvent',
+			LoginFormEvent::NAME                    => 'onLoginFormEvent',
+			MagicAuthSuccessEvent::NAME             => 'onMagicAuthSuccessEvent',
+			MapGetCoordinatesEvent::NAME            => 'onMapGetCoordinatesEvent',
+			ModerationUsersTabsEvent::NAME          => 'onModerationUsersTabsEvent',
+			NavInfoEvent::NAME                      => 'onNavInfoEvent',
+			NetworkContentStartEvent::NAME          => 'onNetworkContentStartEvent',
+			NetworkContentTabsEvent::NAME           => 'onNetworkContentTabsEvent',
+			NetworkToNameEvent::NAME                => 'onNetworkToNameEvent',
+			NotifierEndEvent::NAME                  => 'onNotifierEndEvent',
+			OcrDetectionEvent::NAME                 => 'onOcrDetectionEvent',
+			OtherEncapsulateEvent::NAME             => 'onOtherEncapsulateEvent',
+			OtherUnencapsulateEvent::NAME           => 'onOtherUnencapsulateEvent',
+			PageInfoEvent::NAME                     => 'onPageInfoEvent',
+			ParseLinkEvent::NAME                    => 'onParseLinkEvent',
+			PermissionTooltipContentEvent::NAME     => 'onPermissionTooltipContentEvent',
+			PhotoUploadEvent::NAME                  => 'onPhotoUploadEvent',
+			PhotoUploadEndEvent::NAME               => 'onPhotoUploadEndEvent',
+			PhotoUploadFormEvent::NAME              => 'onPhotoUploadFormEvent',
+			PhotoUploadStartEvent::NAME             => 'onPhotoUploadStartEvent',
+			PreparePostEvent::NAME                  => 'onPreparePostEvent',
+			PreparePostEndEvent::NAME               => 'onPreparePostEndEvent',
+			PreparePostFilterContentEvent::NAME     => 'onPreparePostFilterContentEvent',
+			PreparePostStartEvent::NAME             => 'onPreparePostStartEvent',
+			ProbeDetectEvent::NAME                  => 'onProbeDetectEvent',
+			ProfileSettingsFormEvent::NAME          => 'onProfileSettingsFormEvent',
+			ProfileSettingsPostEvent::NAME          => 'onProfileSettingsPostEvent',
+			ProfileSidebarEvent::NAME               => 'onProfileSidebarEvent',
+			ProfileSidebarStartEvent::NAME          => 'onProfileSidebarStartEvent',
+			ProfileTabsEvent::NAME                  => 'onProfileTabsEvent',
+			ProtocolSupportsFollowEvent::NAME       => 'onProtocolSupportsFollowEvent',
+			ProtocolSupportsProbeEvent::NAME        => 'onProtocolSupportsProbeEvent',
+			ProtocolSupportsRevokeFollowEvent::NAME => 'onProtocolSupportsRevokeFollowEvent',
+			RenderLocationEvent::NAME               => 'onRenderLocationEvent',
+			RevokeFollowContactEvent::NAME          => 'onRevokeFollowContactEvent',
+			SmileyListEvent::NAME                   => 'onSmileyListEvent',
+			StorageConfigEvent::NAME                => 'onStorageConfigEvent',
+			StorageInstanceEvent::NAME              => 'onStorageInstanceEvent',
+			TemplateVarsEvent::NAME                 => 'onTemplateVarsEvent',
+			UnblockContactEvent::NAME               => 'onUnblockContactEvent',
+			UnfollowContactEvent::NAME              => 'onUnfollowContactEvent',
+			UserExportOptionsEvent::NAME            => 'onUserExportOptionsEvent',
+			ZrlInitEvent::NAME                      => 'onZrlInitEvent',
+			ContactBlockEndEvent::NAME              => 'onContactBlockEndEvent',
+			FooterEvent::NAME                       => 'onFooterEvent',
+			HeadEvent::NAME                         => 'onHeadEvent',
+			JotToolEvent::NAME                      => 'onJotToolEvent',
+			ModAboutContentEvent::NAME              => 'onModAboutContentEvent',
+			ModHomeContentEvent::NAME               => 'onModHomeContentEvent',
+			ModProfileContentEvent::NAME            => 'onModProfileContentEvent',
+			PageContentTopEvent::NAME               => 'onPageContentTopEvent',
+			PageEndEvent::NAME                      => 'onPageEndEvent',
+			PageHeaderEvent::NAME                   => 'onPageHeaderEvent',
+			ModuleContentEvent::NAME                => 'onModuleContentEvent',
+			ModuleInitEvent::NAME                   => 'onModuleInitEvent',
+			ModulePostEvent::NAME                   => 'onModulePostEvent',
+			ModulePostRecipientEvent::NAME          => 'onModulePostRecipientEvent',
 		];
 
 		$this->assertSame(
@@ -174,16 +285,20 @@ class HookEventBridgeTest extends TestCase
 	public static function getNamedEventData(): array
 	{
 		return [
-			['test', 'test'],
-			[Event::INIT, 'init_1'],
-			[Event::HOME_INIT, 'home_init'],
+			[InitEvent::NAME, 'init_1'],
+			[HomeInitEvent::NAME, 'home_init'],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getNamedEventData')]
 	public function testOnNamedEventCallsHook($name, $expected): void
 	{
-		$event = new Event($name);
+		$event = new class ($name) extends \Friendica\Core\Event\AbstractEvent {
+			public function __construct(string $name)
+			{
+				parent::__construct($name);
+			}
+		};
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -200,17 +315,16 @@ class HookEventBridgeTest extends TestCase
 	public static function getConfigLoadedEventData(): array
 	{
 		return [
-			['test', 'test'],
-			[ConfigLoadedEvent::CONFIG_LOADED, 'load_config'],
+			['load_config'],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getConfigLoadedEventData')]
-	public function testOnConfigLoadedEventCallsHookWithCorrectValue($name, $expected): void
+	public function testOnConfigLoadedEventCallsHookWithCorrectValue(string $expected): void
 	{
 		$config = $this->createStub(ConfigFileManager::class);
 
-		$event = new ConfigLoadedEvent($name, $config);
+		$event = new ConfigLoadedEvent($config);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -224,20 +338,513 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onConfigLoadedEvent($event);
 	}
 
+	public function testOnEditContactFormEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EditContactFormEvent(['name' => 'original'], '<p>original</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('contact_edit', $name);
+			$this->assertSame([
+				'contact' => ['name' => 'original'],
+				'output'  => '<p>original</p>',
+			], $data);
+
+			return [
+				'contact' => ['name' => 'original'],
+				'output'  => '<p>modified</p>',
+			];
+		});
+
+		HookEventBridge::onEditContactFormEvent($event);
+
+		$this->assertSame('<p>modified</p>', $event->getOutput());
+	}
+
+	public function testOnEditContactFormEventCallsSetterOnlyForValidOutput(): void
+	{
+		$event = new EditContactFormEvent(['name' => 'original'], '<p>original</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			return [
+				'contact' => ['name' => 'original'],
+				'output'  => null,
+			];
+		});
+
+		HookEventBridge::onEditContactFormEvent($event);
+
+		$this->assertSame('<p>original</p>', $event->getOutput());
+	}
+
+	public function testOnEditContactPostEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EditContactPostEvent(['hidden' => true]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('contact_edit_post', $name);
+			$this->assertSame(['hidden' => true], $data);
+
+			return ['hidden' => false];
+		});
+
+		HookEventBridge::onEditContactPostEvent($event);
+
+		$this->assertSame(
+			['hidden' => false],
+			$event->getRequestArray(),
+		);
+	}
+
+	public function testOnFollowContactEventCallsHookWithCorrectValue(): void
+	{
+		$event = new FollowContactEvent('https://example.com/profile', 42, []);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('follow', $name);
+			$this->assertSame([
+				'url'     => 'https://example.com/profile',
+				'uid'     => 42,
+				'contact' => [],
+			], $data);
+
+			return [
+				'url'     => 'https://example.com/profile',
+				'uid'     => 42,
+				'contact' => ['name' => 'contact'],
+			];
+		});
+
+		HookEventBridge::onFollowContactEvent($event);
+
+		$this->assertFalse($event->isAborted());
+		$this->assertSame(['name' => 'contact'], $event->getContactArray());
+	}
+
+	public function testOnFollowContactEventSetsAbortedOnEmptyHookData(): void
+	{
+		$event = new FollowContactEvent('https://example.com/profile', 42, []);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('follow', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onFollowContactEvent($event);
+
+		$this->assertTrue($event->isAborted());
+		$this->assertSame([], $event->getContactArray());
+	}
+
+	public function testOnGetSiteInfoEventCallsHookWithCorrectValue(): void
+	{
+		$event = new GetSiteInfoEvent([
+			'url'  => 'https://example.org',
+			'type' => 'link',
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('getsiteinfo', $name);
+			$this->assertSame([
+				'url'  => 'https://example.org',
+				'type' => 'link',
+			], $data);
+
+			return [
+				'url'   => 'https://example.org',
+				'type'  => 'photo',
+				'title' => 'Example',
+			];
+		});
+
+		HookEventBridge::onGetSiteInfoEvent($event);
+
+		$this->assertSame([
+			'url'   => 'https://example.org',
+			'type'  => 'photo',
+			'title' => 'Example',
+		], $event->getSiteInfoArray());
+	}
+
+	public function testOnGlobalDirUpdateEventCallsHookWithCorrectValue(): void
+	{
+		$event = new GlobalDirUpdateEvent('https://example.org/profile');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('globaldir_update', $name);
+			$this->assertSame([
+				'url' => 'https://example.org/profile',
+			], $data);
+
+			return [
+				'url' => '',
+			];
+		});
+
+		HookEventBridge::onGlobalDirUpdateEvent($event);
+
+		$this->assertSame('', $event->getUrl());
+	}
+
+	public function testOnUserExportOptionsEventCallsHookWithCorrectValue(): void
+	{
+		$event = new UserExportOptionsEvent([
+			['settings/userexport/account', 'Export account', 'Export your account info and contacts.'],
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('uexport_options', $name);
+			$this->assertSame([
+				['settings/userexport/account', 'Export account', 'Export your account info and contacts.'],
+			], $data);
+
+			return [
+				['settings/userexport/backup', 'Export all', 'Export your account info, contacts and all your items.'],
+			];
+		});
+
+		HookEventBridge::onUserExportOptionsEvent($event);
+
+		$this->assertSame([
+			['settings/userexport/backup', 'Export all', 'Export your account info, contacts and all your items.'],
+		], $event->getOptionsArray());
+	}
+
+	public function testOnAppMenuEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AppMenuEvent([]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('app_menu', $name);
+			$this->assertSame(['app_menu' => []], $data);
+
+			$data['app_menu'][] = '<div class="app-title"><a href="irc">IRC Chatroom</a></div>';
+
+			return $data;
+		});
+
+		HookEventBridge::onAppMenuEvent($event);
+
+		$this->assertSame(['<div class="app-title"><a href="irc">IRC Chatroom</a></div>'], $event->getAppMenuArray());
+	}
+
+	public function testOnAvatarLookupEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AvatarLookupEvent(300, 'contact@example.com');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('avatar_lookup', $name);
+			$this->assertSame([
+				'size'    => 300,
+				'email'   => 'contact@example.com',
+				'url'     => '',
+				'success' => false,
+			], $data);
+
+			return [
+				'size'    => 300,
+				'email'   => 'contact@example.com',
+				'url'     => 'https://example.com/avatar',
+				'success' => true,
+			];
+		});
+
+		HookEventBridge::onAvatarLookupEvent($event);
+
+		$this->assertSame('https://example.com/avatar', $event->getUrl());
+		$this->assertTrue($event->isSuccess());
+	}
+
+	public function testOnProbeDetectEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProbeDetectEvent('https://example.com/profile', 'activitypub', 42);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('probe_detect', $name);
+			$this->assertSame([
+				'uri'     => 'https://example.com/profile',
+				'network' => 'activitypub',
+				'uid'     => 42,
+				'result'  => null,
+			], $data);
+
+			return [
+				'uri'     => 'https://example.com/profile',
+				'network' => 'activitypub',
+				'uid'     => 42,
+				'result'  => ['name' => 'contact'],
+			];
+		});
+
+		HookEventBridge::onProbeDetectEvent($event);
+
+		$this->assertSame(['name' => 'contact'], $event->getResult());
+	}
+
+	public function testOnProtocolSupportsFollowEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProtocolSupportsFollowEvent('activitypub');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('support_follow', $name);
+			$this->assertSame([
+				'protocol' => 'activitypub',
+				'result'   => null,
+			], $data);
+
+			return [
+				'protocol' => 'activitypub',
+				'result'   => true,
+			];
+		});
+
+		HookEventBridge::onProtocolSupportsFollowEvent($event);
+
+		$this->assertTrue($event->getResult());
+	}
+
+	public function testOnProtocolSupportsProbeEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProtocolSupportsProbeEvent('activitypub');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('support_probe', $name);
+			$this->assertSame([
+				'protocol' => 'activitypub',
+				'result'   => null,
+			], $data);
+
+			return [
+				'protocol' => 'activitypub',
+				'result'   => true,
+			];
+		});
+
+		HookEventBridge::onProtocolSupportsProbeEvent($event);
+
+		$this->assertTrue($event->getResult());
+	}
+
+	public function testOnProtocolSupportsRevokeFollowEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProtocolSupportsRevokeFollowEvent('activitypub');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('support_revoke_follow', $name);
+			$this->assertSame([
+				'protocol' => 'activitypub',
+				'result'   => null,
+			], $data);
+
+			return [
+				'protocol' => 'activitypub',
+				'result'   => true,
+			];
+		});
+
+		HookEventBridge::onProtocolSupportsRevokeFollowEvent($event);
+
+		$this->assertTrue($event->getResult());
+	}
+
+	public function testOnDbStructureDefinitionEventCallsHookWithCorrectValue(): void
+	{
+		$event = new DbStructureDefinitionEvent([
+			'user' => [
+				'fields' => [
+					'uid' => ['type' => 'int unsigned', 'primary' => '1'],
+				],
+			],
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('dbstructure_definition', $name);
+			$this->assertSame([
+				'user' => [
+					'fields' => [
+						'uid' => ['type' => 'int unsigned', 'primary' => '1'],
+					],
+				],
+			], $data);
+
+			return [
+				'rules' => [
+					'fields' => [
+						'id' => ['type' => 'int unsigned', 'primary' => '1'],
+					],
+				],
+			];
+		});
+
+		HookEventBridge::onDbStructureDefinitionEvent($event);
+
+		$this->assertSame([
+			'rules' => [
+				'fields' => [
+					'id' => ['type' => 'int unsigned', 'primary' => '1'],
+				],
+			],
+		], $event->getDefinitionArray());
+	}
+
+	public function testOnDbViewDefinitionEventCallsHookWithCorrectValue(): void
+	{
+		$event = new DbViewDefinitionEvent([
+			'user-view' => [
+				'fields' => [
+					'uid' => ['type' => 'int unsigned'],
+				],
+			],
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('dbview_definition', $name);
+			$this->assertSame([
+				'user-view' => [
+					'fields' => [
+						'uid' => ['type' => 'int unsigned'],
+					],
+				],
+			], $data);
+
+			return [
+				'post-view' => [
+					'fields' => [
+						'id' => ['type' => 'int unsigned'],
+					],
+				],
+			];
+		});
+
+		HookEventBridge::onDbViewDefinitionEvent($event);
+
+		$this->assertSame([
+			'post-view' => [
+				'fields' => [
+					'id' => ['type' => 'int unsigned'],
+				],
+			],
+		], $event->getDefinitionArray());
+	}
+
+	public function testOnDetectLanguagesEventCallsHookWithCorrectValue(): void
+	{
+		$event = new DetectLanguagesEvent('This is some text', ['en' => 0.8], 42, 99);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('detect_languages', $name);
+			$this->assertSame([
+				'text'      => 'This is some text',
+				'detected'  => ['en' => 0.8],
+				'uri-id'    => 42,
+				'author-id' => 99,
+			], $data);
+
+			return [
+				'text'      => 'This is some text',
+				'detected'  => ['de' => 0.9],
+				'uri-id'    => 42,
+				'author-id' => 99,
+			];
+		});
+
+		HookEventBridge::onDetectLanguagesEvent($event);
+
+		$this->assertSame(['de' => 0.9], $event->getDetected());
+	}
+
+	public function testOnFeatureEnabledEventCallsHookWithCorrectValue(): void
+	{
+		$event = new FeatureEnabledEvent(42, 'expanding_events', false);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('isEnabled', $name);
+			$this->assertSame([
+				'uid'     => 42,
+				'feature' => 'expanding_events',
+				'enabled' => false,
+			], $data);
+
+			return [
+				'uid'     => 42,
+				'feature' => 'expanding_events',
+				'enabled' => true,
+			];
+		});
+
+		HookEventBridge::onFeatureEnabledEvent($event);
+
+		$this->assertTrue($event->isEnabled());
+	}
+
+	public function testOnFeatureGetEventCallsHookWithCorrectValue(): void
+	{
+		$features = ['general' => ['General Settings', [['expanding', 'Expanding Events', 'Provide the ability to expand posts', true, false]]]];
+		$event    = new FeatureGetEvent($features);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('get', $name);
+			$this->assertSame(['general' => ['General Settings', [['expanding', 'Expanding Events', 'Provide the ability to expand posts', true, false]]]], $data);
+
+			return ['network' => ['Network Widgets', [['circles', 'Circles', 'Display posts of the selected circle', true, false]]]];
+		});
+
+		HookEventBridge::onFeatureGetEvent($event);
+
+		$this->assertSame(['network' => ['Network Widgets', [['circles', 'Circles', 'Display posts of the selected circle', true, false]]]], $event->getFeatures());
+	}
+
 	public static function getCollectRoutesEventData(): array
 	{
 		return [
-			['test', 'test'],
-			[CollectRoutesEvent::COLLECT_ROUTES, 'route_collection'],
+			['route_collection'],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getCollectRoutesEventData')]
-	public function testOnCollectRoutesEventCallsHookWithCorrectValue($name, $expected): void
+	public function testOnCollectRoutesEventCallsHookWithCorrectValue(string $expected): void
 	{
 		$routeCollector = $this->createStub(RouteCollector::class);
 
-		$event = new CollectRoutesEvent($name, $routeCollector);
+		$event = new CollectRoutesEvent($routeCollector);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -253,7 +860,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnPermissionTooltipContentEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::PERMISSION_TOOLTIP_CONTENT, ['model' => ['uid' => -1]]);
+		$event = new PermissionTooltipContentEvent(['uid' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -266,15 +873,12 @@ class HookEventBridgeTest extends TestCase
 
 		HookEventBridge::onPermissionTooltipContentEvent($event);
 
-		$this->assertSame(
-			['model' => ['uid' => 123]],
-			$event->getArray(),
-		);
+		$this->assertSame(['uid' => 123], $event->getModelArray());
 	}
 
 	public function testOnInsertPostLocalEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL, ['item' => ['id' => -1]]);
+		$event = new InsertPostLocalEvent(['id' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -288,14 +892,35 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onInsertPostLocalEvent($event);
 
 		$this->assertSame(
-			['item' => ['id' => 123]],
-			$event->getArray(),
+			['id' => 123],
+			$event->getItemArray(),
+		);
+	}
+
+	public function testOnInsertPostLocalStartEventCallsHookWithCorrectValue(): void
+	{
+		$event = new InsertPostLocalStartEvent(['uid' => 1]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('post_local_start', $name);
+			$this->assertSame(['uid' => 1], $data);
+
+			return ['uid' => 2];
+		});
+
+		HookEventBridge::onInsertPostLocalStartEvent($event);
+
+		$this->assertSame(
+			['uid' => 2],
+			$event->getRequestArray(),
 		);
 	}
 
 	public function testOnInsertPostLocalEndEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::INSERT_POST_LOCAL_END, ['item' => ['id' => -1]]);
+		$event = new InsertPostLocalEndEvent(['id' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -309,14 +934,14 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onInsertPostLocalEndEvent($event);
 
 		$this->assertSame(
-			['item' => ['id' => 123]],
-			$event->getArray(),
+			['id' => 123],
+			$event->getItemArray(),
 		);
 	}
 
 	public function testOnPreparePostStartEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::PREPARE_POST_START, ['item' => ['id' => -1]]);
+		$event = new PreparePostStartEvent(['id' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -330,14 +955,14 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onPreparePostStartEvent($event);
 
 		$this->assertSame(
-			['item' => ['id' => 123]],
-			$event->getArray(),
+			['id' => 123],
+			$event->getItemArray(),
 		);
 	}
 
 	public function testOnPhotoUploadStartEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_START, ['request' => ['album' => -1]]);
+		$event = new PhotoUploadStartEvent(['album' => -1]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -351,20 +976,359 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onPhotoUploadStartEvent($event);
 
 		$this->assertSame(
-			['request' => ['album' => 123]],
-			$event->getArray(),
+			['album' => 123],
+			$event->getRequestArray(),
 		);
+	}
+
+	public function testOnPhotoUploadFormEventCallsHookWithCorrectValue(): void
+	{
+		$event = new PhotoUploadFormEvent(['post_url' => '/photos', 'addon_text' => '', 'default_upload' => true]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('photo_upload_form', $name);
+			$this->assertSame(['post_url' => '/photos', 'addon_text' => '', 'default_upload' => true], $data);
+
+			return ['post_url' => '/photos', 'addon_text' => 'text', 'default_upload' => false];
+		});
+
+		HookEventBridge::onPhotoUploadFormEvent($event);
+
+		$this->assertSame(
+			['post_url' => '/photos', 'addon_text' => 'text', 'default_upload' => false],
+			$event->getFormArray(),
+		);
+	}
+
+	public function testOnOcrDetectionEventCallsHookWithCorrectValue(): void
+	{
+		$event = new OcrDetectionEvent('binary data');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('ocr-detection', $name);
+			$this->assertSame(['img_str' => 'binary data', 'description' => null], $data);
+
+			return ['img_str' => 'binary data', 'description' => 'A photo of a cat'];
+		});
+
+		HookEventBridge::onOcrDetectionEvent($event);
+
+		$this->assertSame('A photo of a cat', $event->getDescription());
+	}
+
+	public function testOnNetworkToNameEventCallsHookWithCorrectValue(): void
+	{
+		$event = new NetworkToNameEvent(['dfrn' => 'DFRN']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('network_to_name', $name);
+			$this->assertSame(['dfrn' => 'DFRN'], $data);
+
+			return ['dfrn' => 'DFRN', 'feed' => 'RSS/Atom'];
+		});
+
+		HookEventBridge::onNetworkToNameEvent($event);
+
+		$this->assertSame(['dfrn' => 'DFRN', 'feed' => 'RSS/Atom'], $event->getNetworks());
+	}
+
+	public function testOnNetworkContentStartEventCallsHookWithCorrectValue(): void
+	{
+		$event = new NetworkContentStartEvent('q=/network');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): void {
+			$this->assertSame('network_content_init', $name);
+			$this->assertSame(['query' => 'q=/network'], $data);
+		});
+
+		HookEventBridge::onNetworkContentStartEvent($event);
+	}
+
+	public function testOnNetworkContentTabsEventCallsHookWithCorrectValue(): void
+	{
+		$event = new NetworkContentTabsEvent([['code' => 'all', 'name' => 'All']]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('network_tabs', $name);
+			$this->assertSame(['tabs' => [['code' => 'all', 'name' => 'All']]], $data);
+
+			return ['tabs' => [['code' => 'all', 'name' => 'All'], ['code' => 'feed', 'name' => 'RSS']]];
+		});
+
+		HookEventBridge::onNetworkContentTabsEvent($event);
+
+		$this->assertSame(
+			[['code' => 'all', 'name' => 'All'], ['code' => 'feed', 'name' => 'RSS']],
+			$event->getTabs(),
+		);
+	}
+
+	public function testOnParseLinkEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ParseLinkEvent('https://friendica.example', 'json');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('parse_link', $name);
+			$this->assertSame([
+				'url'    => 'https://friendica.example',
+				'format' => 'json',
+				'text'   => null,
+			], $data);
+
+			return [
+				'url'    => 'https://friendica.example',
+				'format' => 'json',
+				'text'   => 'Some text',
+			];
+		});
+
+		HookEventBridge::onParseLinkEvent($event);
+
+		$this->assertSame('Some text', $event->getText());
+	}
+
+	public function testOnRenderLocationEventCallsHookWithCorrectValue(): void
+	{
+		$event = new RenderLocationEvent('Berlin', '52.52,13.405');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('render_location', $name);
+			$this->assertSame([
+				'location' => 'Berlin',
+				'coord'    => '52.52,13.405',
+				'html'     => '',
+			], $data);
+
+			return [
+				'location' => 'Berlin',
+				'coord'    => '52.52,13.405',
+				'html'     => '<span>Berlin</span>',
+			];
+		});
+
+		HookEventBridge::onRenderLocationEvent($event);
+
+		$this->assertSame('<span>Berlin</span>', $event->getHtml());
+	}
+
+	public function testOnPageInfoEventCallsHookWithCorrectValue(): void
+	{
+		$event = new PageInfoEvent(['url' => 'https://example.com', 'type' => 'link']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('page_info_data', $name);
+			$this->assertSame(['url' => 'https://example.com', 'type' => 'link'], $data);
+
+			return ['url' => 'https://example.com', 'type' => 'photo'];
+		});
+
+		HookEventBridge::onPageInfoEvent($event);
+
+		$this->assertSame(['url' => 'https://example.com', 'type' => 'photo'], $event->getDataArray());
+	}
+
+	public function testOnSmileyListEventCallsHookWithCorrectValue(): void
+	{
+		$event = new SmileyListEvent(['&lt;3'], ['<img src="heart.gif" />']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('smilie', $name);
+			$this->assertSame([
+				'texts' => ['&lt;3'],
+				'icons' => ['<img src="heart.gif" />'],
+			], $data);
+
+			return [
+				'texts' => ['&lt;3', ':-)'],
+				'icons' => ['<img src="heart.gif" />', '<img src="smile.gif" />'],
+			];
+		});
+
+		HookEventBridge::onSmileyListEvent($event);
+
+		$this->assertSame(['&lt;3', ':-)'], $event->getTexts());
+		$this->assertSame(['<img src="heart.gif" />', '<img src="smile.gif" />'], $event->getIcons());
+	}
+
+	public function testOnStorageConfigEventCallsHookWithCorrectValue(): void
+	{
+		$event     = new StorageConfigEvent('s3_storage');
+		$getConfig = $this->createStub(ICanConfigureStorage::class);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data) use ($getConfig): array {
+			$this->assertSame('storage_config', $name);
+			$this->assertSame([
+				'name'           => 's3_storage',
+				'storage_config' => null,
+			], $data);
+
+			return [
+				'name'           => 's3_storage',
+				'storage_config' => $getConfig,
+			];
+		});
+
+		HookEventBridge::onStorageConfigEvent($event);
+
+		$this->assertSame($getConfig, $event->getConfig());
+	}
+
+	public function testOnStorageConfigEventKeepsConfigNullOnEmptyHookData(): void
+	{
+		$event = new StorageConfigEvent('s3_storage');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			return [];
+		});
+
+		HookEventBridge::onStorageConfigEvent($event);
+
+		$this->assertNull($event->getConfig());
+	}
+
+	public function testOnStorageInstanceEventCallsHookWithCorrectValue(): void
+	{
+		$event   = new StorageInstanceEvent('s3_storage');
+		$storage = $this->createStub(ICanReadFromStorage::class);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data) use ($storage): array {
+			$this->assertSame('storage_instance', $name);
+			$this->assertSame([
+				'name'    => 's3_storage',
+				'storage' => null,
+			], $data);
+
+			return [
+				'name'    => 's3_storage',
+				'storage' => $storage,
+			];
+		});
+
+		HookEventBridge::onStorageInstanceEvent($event);
+
+		$this->assertSame($storage, $event->getStorage());
+	}
+
+	public function testOnStorageInstanceEventKeepsStorageNullOnEmptyHookData(): void
+	{
+		$event = new StorageInstanceEvent('s3_storage');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			return [];
+		});
+
+		HookEventBridge::onStorageInstanceEvent($event);
+
+		$this->assertNull($event->getStorage());
+	}
+
+	public function testOnTemplateVarsEventCallsHookWithCorrectValue(): void
+	{
+		$event = new TemplateVarsEvent('test.tpl', ['foo' => 'bar']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('template_vars', $name);
+			$this->assertSame([
+				'template' => 'test.tpl',
+				'vars'     => ['foo' => 'bar'],
+			], $data);
+
+			return [
+				'template' => 'test.tpl',
+				'vars'     => ['foo' => 'baz'],
+			];
+		});
+
+		HookEventBridge::onTemplateVarsEvent($event);
+
+		$this->assertSame(['foo' => 'baz'], $event->getVars());
+	}
+
+	public function testOnContactPhotoMenuEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ContactPhotoMenuEvent(
+			['id' => 1, 'name' => 'Alice'],
+			['profile' => ['View Profile', 'https://example.com', true]],
+		);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('contact_photo_menu', $name);
+			$this->assertSame([
+				'contact' => ['id' => 1, 'name' => 'Alice'],
+				'menu'    => ['profile' => ['View Profile', 'https://example.com', true]],
+			], $data);
+
+			return [
+				'contact' => ['id' => 1, 'name' => 'Alice'],
+				'menu'    => ['profile' => ['View Profile', 'https://example.com', true], 'pm' => ['Message', 'https://example.com/pm', false]],
+			];
+		});
+
+		HookEventBridge::onContactPhotoMenuEvent($event);
+
+		$this->assertSame(
+			['profile' => ['View Profile', 'https://example.com', true], 'pm' => ['Message', 'https://example.com/pm', false]],
+			$event->getMenu(),
+		);
+	}
+
+	public function testOnJotNetworksEventCallsHookWithCorrectValue(): void
+	{
+		$event = new JotNetworksEvent([['type' => 'checkbox']]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('jot_networks', $name);
+			$this->assertSame([['type' => 'checkbox']], $data);
+
+			return [['type' => 'checkbox'], ['type' => 'text']];
+		});
+
+		HookEventBridge::onJotNetworksEvent($event);
+
+		$this->assertSame([['type' => 'checkbox'], ['type' => 'text']], $event->getJotnetsFields());
 	}
 
 	public function testOnPhotoUploadEndEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::PHOTO_UPLOAD_END, ['id' => -1]);
+		$event = new PhotoUploadEndEvent('abc123');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
-		$reflectionProperty->setValue(null, function (string $name, int $data): int {
+		$reflectionProperty->setValue(null, function (string $name, string $data): int {
 			$this->assertSame('photo_post_end', $name);
-			$this->assertSame(-1, $data);
+			$this->assertSame('abc123', $data);
 
 			return 123;
 		});
@@ -372,9 +1336,9 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onPhotoUploadEndEvent($event);
 	}
 
-	public function testOnProfileSidebarEntryEventCallsHookWithCorrectValue(): void
+	public function testOnProfileSidebarStartEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::PROFILE_SIDEBAR_ENTRY, ['profile' => ['uid' => 0, 'name' => 'original']]);
+		$event = new ProfileSidebarStartEvent(['uid' => 0, 'name' => 'original']);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -385,17 +1349,144 @@ class HookEventBridgeTest extends TestCase
 			return ['uid' => 0, 'name' => 'changed'];
 		});
 
-		HookEventBridge::onProfileSidebarEntryEvent($event);
+		HookEventBridge::onProfileSidebarStartEvent($event);
 
 		$this->assertSame(
-			['profile' => ['uid' => 0, 'name' => 'changed']],
-			$event->getArray(),
+			['uid' => 0, 'name' => 'changed'],
+			$event->getProfileArray(),
+		);
+	}
+
+	public function testOnProfileSidebarEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProfileSidebarEvent(['uid' => 0, 'name' => 'original'], '<p>entry</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('profile_sidebar', $name);
+			$this->assertSame([
+				'profile' => ['uid' => 0, 'name' => 'original'],
+				'entry'   => '<p>entry</p>',
+			], $data);
+
+			return [
+				'profile' => ['uid' => 0, 'name' => 'changed'],
+				'entry'   => '<p>modified</p>',
+			];
+		});
+
+		HookEventBridge::onProfileSidebarEvent($event);
+
+		$this->assertSame(
+			['uid' => 0, 'name' => 'original'],
+			$event->getProfileArray(),
+		);
+		$this->assertSame('<p>modified</p>', $event->getEntry());
+	}
+
+	public function testOnProfileTabsEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProfileTabsEvent(
+			true,
+			'testnick',
+			'status',
+			[['label' => 'Posts', 'url' => '/profile/testnick/conversations', 'sel' => 'active', 'title' => 'All posts', 'id' => 'status-tab', 'accesskey' => 'm']],
+		);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('profile_tabs', $name);
+			$this->assertSame([
+				'is_owner' => true,
+				'nickname' => 'testnick',
+				'tab'      => 'status',
+				'tabs'     => [['label' => 'Posts', 'url' => '/profile/testnick/conversations', 'sel' => 'active', 'title' => 'All posts', 'id' => 'status-tab', 'accesskey' => 'm']],
+			], $data);
+
+			return [
+				'is_owner' => true,
+				'nickname' => 'testnick',
+				'tab'      => 'status',
+				'tabs'     => [['label' => 'Other', 'url' => '/profile/testnick/other', 'sel' => '', 'title' => 'Other', 'id' => 'other-tab', 'accesskey' => 'o']],
+			];
+		});
+
+		HookEventBridge::onProfileTabsEvent($event);
+
+		$this->assertSame(
+			[['label' => 'Other', 'url' => '/profile/testnick/other', 'sel' => '', 'title' => 'Other', 'id' => 'other-tab', 'accesskey' => 'o']],
+			$event->getTabsArray(),
+		);
+	}
+
+	public function testOnProfileSettingsFormEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProfileSettingsFormEvent(['name' => 'original'], '<p>original</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('profile_edit', $name);
+			$this->assertSame([
+				'profile' => ['name' => 'original'],
+				'entry'   => '<p>original</p>',
+			], $data);
+
+			return [
+				'profile' => ['name' => 'original'],
+				'entry'   => '<p>modified</p>',
+			];
+		});
+
+		HookEventBridge::onProfileSettingsFormEvent($event);
+
+		$this->assertSame('<p>modified</p>', $event->getEntry());
+	}
+
+	public function testOnProfileSettingsFormEventCallsSetterOnlyForValidEntry(): void
+	{
+		$event = new ProfileSettingsFormEvent(['name' => 'original'], '<p>original</p>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			return [
+				'profile' => ['name' => 'original'],
+				'entry'   => null,
+			];
+		});
+
+		HookEventBridge::onProfileSettingsFormEvent($event);
+
+		$this->assertSame('<p>original</p>', $event->getEntry());
+	}
+
+	public function testOnProfileSettingsPostEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ProfileSettingsPostEvent(['name' => 'original']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('profile_post', $name);
+			$this->assertSame(['name' => 'original'], $data);
+
+			return ['name' => 'modified'];
+		});
+
+		HookEventBridge::onProfileSettingsPostEvent($event);
+
+		$this->assertSame(
+			['name' => 'modified'],
+			$event->getRequestArray(),
 		);
 	}
 
 	public function testOnBbcodeToHtmlEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_HTML_START, ['bbcode2html' => '[b]original[/b]']);
+		$event = new BbcodeToHtmlStartEvent('[b]original[/b]');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -409,14 +1500,14 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onBbcodeToHtmlEvent($event);
 
 		$this->assertSame(
-			['bbcode2html' => '<b>changed</b>'],
-			$event->getArray(),
+			'<b>changed</b>',
+			$event->getBbcode2html(),
 		);
 	}
 
 	public function testOnHtmlToBbcodeEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::HTML_TO_BBCODE_END, ['html2bbcode' => '<b>original</b>']);
+		$event = new HtmlToBbcodeEndEvent('<b>original</b>');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -430,14 +1521,14 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onHtmlToBbcodeEvent($event);
 
 		$this->assertSame(
-			['html2bbcode' => '[b]changed[/b]'],
-			$event->getArray(),
+			'[b]changed[/b]',
+			$event->getHtml2bbcode(),
 		);
 	}
 
 	public function testOnBbcodeToMarkdownEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::BBCODE_TO_MARKDOWN_END, ['bbcode2markdown' => '[b]original[/b]']);
+		$event = new BbcodeToMarkdownEndEvent('[b]original[/b]');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -448,17 +1539,17 @@ class HookEventBridgeTest extends TestCase
 			return '**changed**';
 		});
 
-		HookEventBridge::onBbcodeToMarkdownEvent($event);
+		HookEventBridge::onBbcodeToMarkdownEndEvent($event);
 
 		$this->assertSame(
-			['bbcode2markdown' => '**changed**'],
-			$event->getArray(),
+			'**changed**',
+			$event->getBbcode2markdown(),
 		);
 	}
 
 	public function testOnEventCreatedEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_CREATED, ['event' => ['id' => 123]]);
+		$event = new EventCreatedEvent(['id' => 123]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -474,7 +1565,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnAccountRegisterEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REGISTER, ['uid' => 123]);
+		$event = new AccountRegisterEvent(123);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -490,7 +1581,7 @@ class HookEventBridgeTest extends TestCase
 
 	public function testOnAccountRemoveEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::ACCOUNT_REMOVE, ['user' => ['uid' => 123]]);
+		$event = new AccountRemoveEvent(['uid' => 123]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -504,9 +1595,884 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onAccountRemoveEvent($event);
 	}
 
+	public function testOnAclLookupEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AclLookupEndEvent(
+			5,
+			0,
+			10,
+			[['type' => 'circle', 'name' => 'Friends', 'id' => 1]],
+			[['type' => 'contact', 'name' => 'John', 'id' => 2]],
+			[['type' => 'contact', 'name' => 'Jane', 'id' => 3]],
+			'contact',
+			'john',
+		);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('acl_lookup_end', $name);
+			$this->assertSame([
+				'tot'      => 5,
+				'start'    => 0,
+				'count'    => 10,
+				'circles'  => [['type' => 'circle', 'name' => 'Friends', 'id' => 1]],
+				'contacts' => [['type' => 'contact', 'name' => 'John', 'id' => 2]],
+				'items'    => [['type' => 'contact', 'name' => 'Jane', 'id' => 3]],
+				'type'     => 'contact',
+				'search'   => 'john',
+			], $data);
+
+			return [
+				'tot'      => 6,
+				'start'    => 1,
+				'count'    => 20,
+				'circles'  => [['type' => 'circle', 'name' => 'Friends', 'id' => 1]],
+				'contacts' => [['type' => 'contact', 'name' => 'John', 'id' => 2]],
+				'items'    => [['type' => 'contact', 'name' => 'Joe', 'id' => 4]],
+				'type'     => 'contact',
+				'search'   => 'john',
+			];
+		});
+
+		HookEventBridge::onAclLookupEndEvent($event);
+
+		$this->assertSame(6, $event->getTotal());
+		$this->assertSame(1, $event->getStart());
+		$this->assertSame(20, $event->getCount());
+		$this->assertSame([['type' => 'contact', 'name' => 'Joe', 'id' => 4]], $event->getItems());
+	}
+
+	public function testOnAddWorkerTaskEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AddWorkerTaskEvent([Worker::PRIORITY_MEDIUM, 'Notifier', 123], true);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('proc_run', $name);
+			$this->assertSame([
+				'args'    => [Worker::PRIORITY_MEDIUM, 'Notifier', 123],
+				'run_cmd' => true,
+			], $data);
+
+			$data['run_cmd'] = false;
+
+			return $data;
+		});
+
+		HookEventBridge::onAddWorkerTaskEvent($event);
+
+		$this->assertFalse($event->isRunCmd());
+	}
+
+	public function testOnAddonSettingsPostEventCallsHookWithCorrectValue(): void
+	{
+		$event = new AddonSettingsPostEvent([
+			'irc-submit' => 'foo',
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('addon_settings_post', $name);
+			$this->assertSame([
+				'irc-submit' => 'foo',
+			], $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onAddonSettingsPostEvent($event);
+	}
+
+	public function testOnConnectorSettingsPostEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ConnectorSettingsPostEvent([
+			'diaspora-submit' => 'foo',
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('connector_settings_post', $name);
+			$this->assertSame([
+				'diaspora-submit' => 'foo',
+			], $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onConnectorSettingsPostEvent($event);
+	}
+
+	public function testOnDisplaySettingsPostEventCallsHookWithCorrectValue(): void
+	{
+		$event = new DisplaySettingsPostEvent([
+			'theme' => 'frio',
+		]);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('display_settings_post', $name);
+			$this->assertSame([
+				'theme' => 'frio',
+			], $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onDisplaySettingsPostEvent($event);
+	}
+
+	public function testOnEmailerSendEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EmailerSendEvent('recipient@example.com', 'Subject', 'Body', 'Header', '-f sender@example.com');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('emailer_send', $name);
+			$this->assertSame([
+				'to'         => 'recipient@example.com',
+				'subject'    => 'Subject',
+				'body'       => 'Body',
+				'headers'    => 'Header',
+				'parameters' => '-f sender@example.com',
+				'sent'       => false,
+			], $data);
+
+			$data['sent'] = true;
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailerSendEvent($event);
+
+		$this->assertTrue($event->isSent());
+	}
+
+	public function testOnEmailerSendEventCallsHookWithNullParameters(): void
+	{
+		$event = new EmailerSendEvent('recipient@example.com', 'Subject', 'Body', 'Header', null);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertNull($data['parameters']);
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailerSendEvent($event);
+
+		$this->assertFalse($event->isSent());
+	}
+
+	public function testOnEmailerSendPrepareEventCallsHookWithCorrectValue(): void
+	{
+		$email = \Mockery::mock(IEmail::class);
+		$event = new EmailerSendPrepareEvent($email);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, IEmail $data) use ($email): IEmail {
+			$this->assertSame('emailer_send_prepare', $name);
+			$this->assertSame($email, $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailerSendPrepareEvent($event);
+
+		$this->assertSame($email, $event->getEmail());
+	}
+
+	public function testOnEmailerSendPrepareEventCallsHookWithNullValue(): void
+	{
+		$event = new EmailerSendPrepareEvent();
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, ?IEmail $data): ?IEmail {
+			$this->assertSame('emailer_send_prepare', $name);
+			$this->assertNull($data);
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailerSendPrepareEvent($event);
+
+		$this->assertNull($event->getEmail());
+	}
+
+	public function testOnEmailerSendPrepareEventCallsHookWithWrongValue(): void
+	{
+		$event = new EmailerSendPrepareEvent();
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, ?IEmail $data) {
+			$this->assertSame('emailer_send_prepare', $name);
+			$this->assertNull($data);
+
+			return 'wrong type';
+		});
+
+		HookEventBridge::onEmailerSendPrepareEvent($event);
+
+		$this->assertNull($event->getEmail());
+	}
+
+	public function testOnEmailGetMessageEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EmailGetMessageEvent('Text', 'Html', ['body' => 'Body']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('email_getmessage', $name);
+			$this->assertSame([
+				'text' => 'Text',
+				'html' => 'Html',
+				'item' => ['body' => 'Body'],
+			], $data);
+
+			$data['text'] = 'New Text';
+			$data['html'] = 'New Html';
+			$data['item'] = ['body' => 'New Body'];
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailGetMessageEvent($event);
+
+		$this->assertSame('New Text', $event->getText());
+		$this->assertSame('New Html', $event->getHtml());
+		$this->assertSame(['body' => 'New Body'], $event->getItemArray());
+	}
+
+	public function testOnEmailGetMessageEventCallsHookWithMissingValues(): void
+	{
+		$event = new EmailGetMessageEvent('Text', 'Html', ['body' => 'Body']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('email_getmessage', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onEmailGetMessageEvent($event);
+
+		$this->assertSame('Text', $event->getText());
+		$this->assertSame('Html', $event->getHtml());
+		$this->assertSame(['body' => 'Body'], $event->getItemArray());
+	}
+
+	public function testOnEmailGetMessageEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new EmailGetMessageEndEvent(['body' => 'Body']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('email_getmessage_end', $name);
+			$this->assertSame(['body' => 'Body'], $data);
+
+			$data['body'] = 'New Body';
+
+			return $data;
+		});
+
+		HookEventBridge::onEmailGetMessageEndEvent($event);
+
+		$this->assertSame(['body' => 'New Body'], $event->getItemArray());
+	}
+
+	public function testOnEmailGetMessageEndEventCallsHookWithMissingValue(): void
+	{
+		$event = new EmailGetMessageEndEvent(['body' => 'Body']);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data) {
+			$this->assertSame('email_getmessage_end', $name);
+
+			return 'wrong type';
+		});
+
+		HookEventBridge::onEmailGetMessageEndEvent($event);
+
+		$this->assertSame(['body' => 'Body'], $event->getItemArray());
+	}
+
+	public function testOnGenerateMapEventCallsHookWithCorrectValue(): void
+	{
+		$event = new GenerateMapEvent('52.1832', '11.6316', 0);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('generate_map', $name);
+			$this->assertSame([
+				'lat'  => '52.1832',
+				'lon'  => '11.6316',
+				'mode' => 0,
+				'html' => '',
+			], $data);
+
+			$data['html'] = '<iframe>';
+
+			return $data;
+		});
+
+		HookEventBridge::onGenerateMapEvent($event);
+
+		$this->assertSame('<iframe>', $event->getHtml());
+	}
+
+	public function testOnGenerateMapEventCallsHookWithMissingValues(): void
+	{
+		$event = new GenerateMapEvent('52.1832', '11.6316', 0);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('generate_map', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onGenerateMapEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnGenerateNamedMapEventCallsHookWithCorrectValue(): void
+	{
+		$event = new GenerateNamedMapEvent('Berlin', 0);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('generate_named_map', $name);
+			$this->assertSame([
+				'location' => 'Berlin',
+				'mode'     => 0,
+				'html'     => '',
+			], $data);
+
+			$data['html'] = '<iframe>';
+
+			return $data;
+		});
+
+		HookEventBridge::onGenerateNamedMapEvent($event);
+
+		$this->assertSame('<iframe>', $event->getHtml());
+	}
+
+	public function testOnGenerateNamedMapEventCallsHookWithMissingValues(): void
+	{
+		$event = new GenerateNamedMapEvent('Berlin', 0);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('generate_named_map', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onGenerateNamedMapEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnMapGetCoordinatesEventCallsHookWithCorrectValue(): void
+	{
+		$event = new MapGetCoordinatesEvent('Berlin');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('Map::getCoordinates', $name);
+			$this->assertSame([
+				'location' => 'Berlin',
+				'lat'      => false,
+				'lon'      => false,
+			], $data);
+
+			$data['lat'] = '52.5200';
+			$data['lon'] = '13.4050';
+
+			return $data;
+		});
+
+		HookEventBridge::onMapGetCoordinatesEvent($event);
+
+		$this->assertSame('52.5200', $event->getLatitude());
+		$this->assertSame('13.4050', $event->getLongitude());
+	}
+
+	public function testOnMapGetCoordinatesEventCallsHookWithMissingValues(): void
+	{
+		$event = new MapGetCoordinatesEvent('Berlin');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('Map::getCoordinates', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onMapGetCoordinatesEvent($event);
+
+		$this->assertNull($event->getLatitude());
+		$this->assertNull($event->getLongitude());
+	}
+
+	public function testOnOtherEncapsulateEventCallsHookWithCorrectValue(): void
+	{
+		$event = new OtherEncapsulateEvent('data', 'pubkey', 'aes256cbc');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('other_encapsulate', $name);
+			$this->assertSame([
+				'data'   => 'data',
+				'pubkey' => 'pubkey',
+				'alg'    => 'aes256cbc',
+				'result' => 'data',
+			], $data);
+
+			$data['result'] = 'encrypted';
+
+			return $data;
+		});
+
+		HookEventBridge::onOtherEncapsulateEvent($event);
+
+		$this->assertSame('encrypted', $event->getResult());
+	}
+
+	public function testOnOtherEncapsulateEventCallsHookWithMissingValues(): void
+	{
+		$event = new OtherEncapsulateEvent('data', 'pubkey', 'aes256cbc');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('other_encapsulate', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onOtherEncapsulateEvent($event);
+
+		$this->assertSame('data', $event->getResult());
+	}
+
+	public function testOnOtherUnencapsulateEventCallsHookWithCorrectValue(): void
+	{
+		$event = new OtherUnencapsulateEvent(['data' => 'encrypted'], 'prvkey', 'aes256cbc');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('other_unencapsulate', $name);
+			$this->assertSame([
+				'data'   => ['data' => 'encrypted'],
+				'prvkey' => 'prvkey',
+				'alg'    => 'aes256cbc',
+				'result' => ['data' => 'encrypted'],
+			], $data);
+
+			$data['result'] = ['data' => 'decrypted'];
+
+			return $data;
+		});
+
+		HookEventBridge::onOtherUnencapsulateEvent($event);
+
+		$this->assertSame(['data' => 'decrypted'], $event->getResultArray());
+	}
+
+	public function testOnOtherUnencapsulateEventCallsHookWithMissingValues(): void
+	{
+		$event = new OtherUnencapsulateEvent(['data' => 'encrypted'], 'prvkey', 'aes256cbc');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('other_unencapsulate', $name);
+
+			return [];
+		});
+
+		HookEventBridge::onOtherUnencapsulateEvent($event);
+
+		$this->assertSame(['data' => 'encrypted'], $event->getResultArray());
+	}
+
+	public function testOnHeadEventCallsHookWithCorrectValue(): void
+	{
+		$event = new HeadEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('head', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onHeadEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnHeadEventCallsHookWithMissingValues(): void
+	{
+		$event = new HeadEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('head', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onHeadEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnFooterEventCallsHookWithCorrectValue(): void
+	{
+		$event = new FooterEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('footer', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onFooterEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnFooterEventCallsHookWithMissingValues(): void
+	{
+		$event = new FooterEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('footer', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onFooterEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnPageHeaderEventCallsHookWithCorrectValue(): void
+	{
+		$event = new PageHeaderEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('page_header', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onPageHeaderEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnPageHeaderEventCallsHookWithMissingValues(): void
+	{
+		$event = new PageHeaderEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('page_header', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onPageHeaderEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnPageContentTopEventCallsHookWithCorrectValue(): void
+	{
+		$event = new PageContentTopEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('page_content_top', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onPageContentTopEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnPageContentTopEventCallsHookWithMissingValues(): void
+	{
+		$event = new PageContentTopEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('page_content_top', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onPageContentTopEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnPageEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new PageEndEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('page_end', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onPageEndEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnPageEndEventCallsHookWithMissingValues(): void
+	{
+		$event = new PageEndEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('page_end', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onPageEndEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnModHomeContentEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ModHomeContentEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('home_content', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onModHomeContentEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnModHomeContentEventCallsHookWithMissingValues(): void
+	{
+		$event = new ModHomeContentEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('home_content', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onModHomeContentEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnModAboutContentEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ModAboutContentEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('about_hook', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onModAboutContentEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnModAboutContentEventCallsHookWithMissingValues(): void
+	{
+		$event = new ModAboutContentEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('about_hook', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onModAboutContentEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnModProfileContentEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ModProfileContentEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('profile_advanced', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onModProfileContentEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnModProfileContentEventCallsHookWithMissingValues(): void
+	{
+		$event = new ModProfileContentEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('profile_advanced', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onModProfileContentEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnJotToolEventCallsHookWithCorrectValue(): void
+	{
+		$event = new JotToolEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('jot_tool', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onJotToolEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnJotToolEventCallsHookWithMissingValues(): void
+	{
+		$event = new JotToolEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('jot_tool', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onJotToolEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
+	public function testOnContactBlockEndEventCallsHookWithCorrectValue(): void
+	{
+		$event = new ContactBlockEndEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('contact_block_end', $name);
+			$this->assertSame('<html>', $html);
+
+			return '<changed>';
+		});
+
+		HookEventBridge::onContactBlockEndEvent($event);
+
+		$this->assertSame('<changed>', $event->getHtml());
+	}
+
+	public function testOnContactBlockEndEventCallsHookWithMissingValues(): void
+	{
+		$event = new ContactBlockEndEvent('<html>');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, string $html): string {
+			$this->assertSame('contact_block_end', $name);
+
+			return '';
+		});
+
+		HookEventBridge::onContactBlockEndEvent($event);
+
+		$this->assertSame('', $event->getHtml());
+	}
+
 	public function testOnEventUpdatedEventCallsHookWithCorrectValue(): void
 	{
-		$event = new ArrayFilterEvent(ArrayFilterEvent::EVENT_UPDATED, ['event' => ['id' => 123]]);
+		$event = new EventUpdatedEvent(['id' => 123]);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -520,72 +2486,174 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onEventUpdatedEvent($event);
 	}
 
+	public function testOnMagicAuthSuccessEventCallsHookWithCorrectValue(): void
+	{
+		$visitor = ['id' => 42, 'name' => 'TestVisitor'];
+		$event   = new MagicAuthSuccessEvent($visitor, 'test=query');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('magic_auth_success', $name);
+			$this->assertSame(['id' => 42, 'name' => 'TestVisitor'], $data['visitor']);
+			$this->assertSame('test=query', $data['url']);
+
+			$data['visitor']['id'] = 99;
+
+			return $data;
+		});
+
+		HookEventBridge::onMagicAuthSuccessEvent($event);
+
+		$this->assertSame(99, $event->getVisitorArray()['id']);
+	}
+
+	public function testOnModerationUsersTabsEventCallsHookWithCorrectValue(): void
+	{
+		$tabs = [
+			[
+				'label'     => 'Users',
+				'url'       => 'moderation/users',
+				'sel'       => 'active',
+				'title'     => 'List of users',
+				'id'        => 'admin-users',
+				'accesskey' => 'u',
+			],
+		];
+		$event = new ModerationUsersTabsEvent($tabs, 'users');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('moderation_users_tabs', $name);
+			$this->assertSame([
+				[
+					'label'     => 'Users',
+					'url'       => 'moderation/users',
+					'sel'       => 'active',
+					'title'     => 'List of users',
+					'id'        => 'admin-users',
+					'accesskey' => 'u',
+				],
+			], $data['tabs']);
+			$this->assertSame('users', $data['selectedTab']);
+
+			$data['tabs'][] = [
+				'label'     => 'Behaviour',
+				'url'       => 'ratioed',
+				'sel'       => '',
+				'title'     => 'Statistics about users behaviour',
+				'id'        => 'admin-users-ratioed',
+				'accesskey' => 'r',
+			];
+
+			return $data;
+		});
+
+		HookEventBridge::onModerationUsersTabsEvent($event);
+
+		$this->assertCount(2, $event->getTabsArray());
+		$this->assertSame('Behaviour', $event->getTabsArray()[1]['label']);
+	}
+
+	public function testOnNavInfoEventCallsHookWithCorrectValue(): void
+	{
+		$event = new NavInfoEvent(
+			'<span id="logo-text"><a href="https://friendi.ca">Friendica</a></span>',
+			['login' => ['login', 'Sign in', 'selected', 'Sign in']],
+			'@friendica@friendi.ca',
+			null,
+		);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('nav_info', $name);
+			$this->assertSame([
+				'banner'       => '<span id="logo-text"><a href="https://friendi.ca">Friendica</a></span>',
+				'nav'          => ['login' => ['login', 'Sign in', 'selected', 'Sign in']],
+				'sitelocation' => '@friendica@friendi.ca',
+				'userinfo'     => null,
+			], $data);
+
+			return [
+				'banner'       => '<a href="https://friendi.ca">Friendica</a>',
+				'nav'          => ['logout' => ['logout', 'Sign out', '', 'End this session']],
+				'sitelocation' => '@friendica@friendi.ca',
+				'userinfo'     => ['icon' => 'images/user.png', 'name' => 'John', 'link' => 'profile/john'],
+			];
+		});
+
+		HookEventBridge::onNavInfoEvent($event);
+
+		$this->assertSame('<a href="https://friendi.ca">Friendica</a>', $event->getBanner());
+		$this->assertSame(['logout' => ['logout', 'Sign out', '', 'End this session']], $event->getNavArray());
+		$this->assertSame('@friendica@friendi.ca', $event->getSitelocation());
+		$this->assertSame(['icon' => 'images/user.png', 'name' => 'John', 'link' => 'profile/john'], $event->getUserinfoArray());
+	}
+
+	public function testOnNavInfoEventKeepsUserinfoNullOnEmptyHookData(): void
+	{
+		$event = new NavInfoEvent('<h1>Banner</h1>', ['network' => null], '@friendica@friendi.ca', null);
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			return [];
+		});
+
+		HookEventBridge::onNavInfoEvent($event);
+
+		$this->assertNull($event->getUserinfoArray());
+	}
+
 	public static function getArrayFilterEventData(): array
 	{
 		return [
 			['test', 'test'],
-			[ArrayFilterEvent::APP_MENU, 'app_menu'],
-			[ArrayFilterEvent::NAV_INFO, 'nav_info'],
-			[ArrayFilterEvent::FEATURE_ENABLED, 'isEnabled'],
-			[ArrayFilterEvent::FEATURE_GET, 'get'],
-			[ArrayFilterEvent::INSERT_POST_LOCAL_START, 'post_local_start'],
-			[ArrayFilterEvent::INSERT_POST_REMOTE, 'post_remote'],
-			[ArrayFilterEvent::INSERT_POST_REMOTE_END, 'post_remote_end'],
-			[ArrayFilterEvent::PREPARE_POST_FILTER_CONTENT, 'prepare_body_content_filter'],
-			[ArrayFilterEvent::PREPARE_POST, 'prepare_body'],
-			[ArrayFilterEvent::PREPARE_POST_END, 'prepare_body_final'],
-			[ArrayFilterEvent::PHOTO_UPLOAD_FORM, 'photo_upload_form'],
-			[ArrayFilterEvent::PHOTO_UPLOAD, 'photo_post_file'],
-			[ArrayFilterEvent::NETWORK_TO_NAME, 'network_to_name'],
-			[ArrayFilterEvent::NETWORK_CONTENT_START, 'network_content_init'],
-			[ArrayFilterEvent::NETWORK_CONTENT_TABS, 'network_tabs'],
-			[ArrayFilterEvent::PARSE_LINK, 'parse_link'],
-			[ArrayFilterEvent::CONVERSATION_START, 'conversation_start'],
-			[ArrayFilterEvent::FETCH_ITEM_BY_LINK, 'item_by_link'],
-			[ArrayFilterEvent::ITEM_TAGGED, 'tagged'],
-			[ArrayFilterEvent::DISPLAY_ITEM, 'display_item'],
-			[ArrayFilterEvent::CACHE_ITEM, 'put_item_in_cache'],
-			[ArrayFilterEvent::CHECK_ITEM_NOTIFICATION, 'check_item_notification'],
-			[ArrayFilterEvent::ENOTIFY, 'enotify'],
-			[ArrayFilterEvent::ENOTIFY_STORE, 'enotify_store'],
-			[ArrayFilterEvent::ENOTIFY_MAIL, 'enotify_mail'],
-			[ArrayFilterEvent::DETECT_LANGUAGES, 'detect_languages'],
-			[ArrayFilterEvent::RENDER_LOCATION, 'render_location'],
-			[ArrayFilterEvent::ITEM_PHOTO_MENU, 'item_photo_menu'],
-			[ArrayFilterEvent::DIRECTORY_ITEM, 'directory_item'],
-			[ArrayFilterEvent::CONTACT_PHOTO_MENU, 'contact_photo_menu'],
-			[ArrayFilterEvent::PROFILE_SIDEBAR, 'profile_sidebar'],
-			[ArrayFilterEvent::PROFILE_TABS, 'profile_tabs'],
-			[ArrayFilterEvent::PROFILE_SETTINGS_FORM, 'profile_edit'],
-			[ArrayFilterEvent::PROFILE_SETTINGS_POST, 'profile_post'],
-			[ArrayFilterEvent::MODERATION_USERS_TABS, 'moderation_users_tabs'],
-			[ArrayFilterEvent::ACL_LOOKUP_END, 'acl_lookup_end'],
-			[ArrayFilterEvent::PAGE_INFO, 'page_info_data'],
-			[ArrayFilterEvent::SMILEY_LIST, 'smilie'],
-			[ArrayFilterEvent::JOT_NETWORKS, 'jot_networks'],
-			[ArrayFilterEvent::PROTOCOL_SUPPORTS_FOLLOW, 'support_follow'],
-			[ArrayFilterEvent::PROTOCOL_SUPPORTS_REVOKE_FOLLOW, 'support_revoke_follow'],
-			[ArrayFilterEvent::PROTOCOL_SUPPORTS_PROBE, 'support_probe'],
-			[ArrayFilterEvent::FOLLOW_CONTACT, 'follow'],
-			[ArrayFilterEvent::UNFOLLOW_CONTACT, 'unfollow'],
-			[ArrayFilterEvent::REVOKE_FOLLOW_CONTACT, 'revoke_follow'],
-			[ArrayFilterEvent::BLOCK_CONTACT, 'block'],
-			[ArrayFilterEvent::UNBLOCK_CONTACT, 'unblock'],
-			[ArrayFilterEvent::EDIT_CONTACT_FORM, 'contact_edit'],
-			[ArrayFilterEvent::EDIT_CONTACT_POST, 'contact_edit_post'],
-			[ArrayFilterEvent::AVATAR_LOOKUP, 'avatar_lookup'],
-			[ArrayFilterEvent::ACCOUNT_AUTHENTICATE, 'authenticate'],
-			[ArrayFilterEvent::ACCOUNT_REGISTER_FORM, 'register_form'],
-			[ArrayFilterEvent::ACCOUNT_REGISTER_POST, 'register_post'],
-			[ArrayFilterEvent::ACCOUNT_REGISTER, 'register_account'],
-			[ArrayFilterEvent::ACCOUNT_REMOVE, 'remove_user'],
-			[ArrayFilterEvent::EVENT_CREATED, 'event_created'],
-			[ArrayFilterEvent::EVENT_UPDATED, 'event_updated'],
-			[ArrayFilterEvent::ADD_WORKER_TASK, 'proc_run'],
-			[ArrayFilterEvent::STORAGE_CONFIG, 'storage_config'],
-			[ArrayFilterEvent::STORAGE_INSTANCE, 'storage_instance'],
-			[ArrayFilterEvent::DB_STRUCTURE_DEFINITION, 'dbstructure_definition'],
-			[ArrayFilterEvent::DB_VIEW_DEFINITION, 'dbview_definition'],
+			[AppMenuEvent::NAME, 'app_menu'],
+			[NavInfoEvent::NAME, 'nav_info'],
+			[PhotoUploadEvent::NAME, 'photo_post_file'],
+			[NetworkToNameEvent::NAME, 'network_to_name'],
+			[NetworkContentStartEvent::NAME, 'network_content_init'],
+			[NetworkContentTabsEvent::NAME, 'network_tabs'],
+			[ParseLinkEvent::NAME, 'parse_link'],
+			[EnotifyEvent::NAME, 'enotify'],
+			[EnotifyMailEvent::NAME, 'enotify_mail'],
+			[EnotifyStoreEvent::NAME, 'enotify_store'],
+			[RenderLocationEvent::NAME, 'render_location'],
+			[ContactPhotoMenuEvent::NAME, 'contact_photo_menu'],
+			[ProfileSettingsFormEvent::NAME, 'profile_edit'],
+			[ProfileSettingsPostEvent::NAME, 'profile_post'],
+			[ModerationUsersTabsEvent::NAME, 'moderation_users_tabs'],
+			[AclLookupEndEvent::NAME, 'acl_lookup_end'],
+			[PageInfoEvent::NAME, 'page_info_data'],
+			[SmileyListEvent::NAME, 'smilie'],
+			[JotNetworksEvent::NAME, 'jot_networks'],
+			[FollowContactEvent::NAME, 'follow'],
+			[GetSiteInfoEvent::NAME, 'getsiteinfo'],
+			[GlobalDirUpdateEvent::NAME, 'globaldir_update'],
+			[UnfollowContactEvent::NAME, 'unfollow'],
+			[UserExportOptionsEvent::NAME, 'uexport_options'],
+			[RevokeFollowContactEvent::NAME, 'revoke_follow'],
+			[BlockContactEvent::NAME, 'block'],
+			[UnblockContactEvent::NAME, 'unblock'],
+			[EditContactFormEvent::NAME, 'contact_edit'],
+			[EditContactPostEvent::NAME, 'contact_edit_post'],
+			[AccountAuthenticateEvent::NAME, 'authenticate'],
+			[AccountRegisterFormEvent::NAME, 'register_form'],
+			[AccountRegisterPostEvent::NAME, 'register_post'],
+			[AccountRegisterEvent::NAME, 'register_account'],
+			[EventCreatedEvent::NAME, 'event_created'],
+			[EventUpdatedEvent::NAME, 'event_updated'],
+			[AddWorkerTaskEvent::NAME, 'proc_run'],
+			[AddonSettingsPostEvent::NAME, 'addon_settings_post'],
+			[ConnectorSettingsPostEvent::NAME, 'connector_settings_post'],
+			[DisplaySettingsPostEvent::NAME, 'display_settings_post'],
+			[StorageConfigEvent::NAME, 'storage_config'],
+			[StorageInstanceEvent::NAME, 'storage_instance'],
+			[DbStructureDefinitionEvent::NAME, 'dbstructure_definition'],
+			[DbViewDefinitionEvent::NAME, 'dbview_definition'],
 		];
 	}
 
@@ -610,16 +2678,11 @@ class HookEventBridgeTest extends TestCase
 	{
 		return [
 			['test', 'test'],
-			[HtmlFilterEvent::HEAD, 'head'],
-			[HtmlFilterEvent::FOOTER, 'footer'],
-			[HtmlFilterEvent::PAGE_HEADER, 'page_header'],
-			[HtmlFilterEvent::PAGE_CONTENT_TOP, 'page_content_top'],
-			[HtmlFilterEvent::PAGE_END, 'page_end'],
-			[HtmlFilterEvent::MOD_HOME_CONTENT, 'home_content'],
-			[HtmlFilterEvent::MOD_ABOUT_CONTENT, 'about_hook'],
-			[HtmlFilterEvent::MOD_PROFILE_CONTENT, 'profile_advanced'],
-			[HtmlFilterEvent::JOT_TOOL, 'jot_tool'],
-			[HtmlFilterEvent::CONTACT_BLOCK_END, 'contact_block_end'],
+			[ModHomeContentEvent::NAME, 'home_content'],
+			[ModAboutContentEvent::NAME, 'about_hook'],
+			[ModProfileContentEvent::NAME, 'profile_advanced'],
+			[JotToolEvent::NAME, 'jot_tool'],
+			[ContactBlockEndEvent::NAME, 'contact_block_end'],
 		];
 	}
 
@@ -643,15 +2706,15 @@ class HookEventBridgeTest extends TestCase
 	public static function getModuleInitEventData(): array
 	{
 		return [
-			'Home'         => ['friendica.module_init', 'home_mod_init', 'home', \Friendica\Module\Home::class],
-			'LegacyModule' => ['friendica.module_init', 'photos_mod_init', 'photos', \Friendica\LegacyModule::class],
+			'Home'         => ['home_mod_init', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['photos_mod_init', 'photos', \Friendica\LegacyModule::class],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getModuleInitEventData')]
-	public function testOnModuleInitEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	public function testOnModuleInitEventCallsHookWithCorrectValue($expected, $moduleName, $moduleClass): void
 	{
-		$event = new ModuleInitEvent($name, $moduleName, $moduleClass);
+		$event = new ModuleInitEvent($moduleName, $moduleClass);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -668,15 +2731,15 @@ class HookEventBridgeTest extends TestCase
 	public static function getModulePostEventData(): array
 	{
 		return [
-			'Home'         => ['friendica.module_post', 'home_mod_post', 'home', \Friendica\Module\Home::class],
-			'LegacyModule' => ['friendica.module_post', 'photos_mod_post', 'photos', \Friendica\LegacyModule::class],
+			'Home'         => ['home_mod_post', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['photos_mod_post', 'photos', \Friendica\LegacyModule::class],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getModulePostEventData')]
-	public function testOnModulePostEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	public function testOnModulePostEventCallsHookWithCorrectValue($expected, $moduleName, $moduleClass): void
 	{
-		$event = new ModulePostEvent($name, $moduleName, $moduleClass, ['original']);
+		$event = new ModulePostEvent($moduleName, $moduleClass, ['original']);
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -693,15 +2756,15 @@ class HookEventBridgeTest extends TestCase
 	public static function getModuleContentEventData(): array
 	{
 		return [
-			'Home'         => ['friendica.module_content', 'Friendica\Module\Home_mod_content', 'home', \Friendica\Module\Home::class],
-			'LegacyModule' => ['friendica.module_content', 'Friendica\LegacyModule_mod_content', 'photos', \Friendica\LegacyModule::class],
+			'Home'         => ['Friendica\Module\Home_mod_content', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['Friendica\LegacyModule_mod_content', 'photos', \Friendica\LegacyModule::class],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getModuleContentEventData')]
-	public function testOnModuleContentEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	public function testOnModuleContentEventCallsHookWithCorrectValue($expected, $moduleName, $moduleClass): void
 	{
-		$event = new ModuleContentEvent($name, $moduleName, $moduleClass, 'original');
+		$event = new ModuleContentEvent($moduleName, $moduleClass, 'original');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 
@@ -722,15 +2785,15 @@ class HookEventBridgeTest extends TestCase
 	public static function getModulePostRecipientEventData(): array
 	{
 		return [
-			'Home'         => ['friendica.module_post_recipient', 'home_post_recipient', 'home', \Friendica\Module\Home::class],
-			'LegacyModule' => ['friendica.module_post_recipient', 'photos_post_recipient', 'photos', \Friendica\LegacyModule::class],
+			'Home'         => ['home_post_recipient', 'home', \Friendica\Module\Home::class],
+			'LegacyModule' => ['photos_post_recipient', 'photos', \Friendica\LegacyModule::class],
 		];
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('getModulePostRecipientEventData')]
-	public function testOnModulePostRecipientEventCallsHookWithCorrectValue($name, $expected, $moduleName, $moduleClass): void
+	public function testOnModulePostRecipientEventCallsHookWithCorrectValue($expected, $moduleName, $moduleClass): void
 	{
-		$event = new ModulePostRecipientEvent($name, $moduleName, $moduleClass, 'original');
+		$event = new ModulePostRecipientEvent($moduleName, $moduleClass, 'original');
 
 		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
 

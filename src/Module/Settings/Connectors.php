@@ -11,15 +11,15 @@ use Friendica\App;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\Hook;
 use Friendica\Core\L10n;
-use Friendica\Event\ArrayFilterEvent;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
+use Friendica\Event\ConnectorSettingsPostEvent;
 use Friendica\Model\Item;
 use Friendica\Model\User;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Friendica\Module\BaseSettings;
 use Friendica\Module\Response;
 use Friendica\Navigation\SystemMessages;
@@ -114,7 +114,7 @@ class Connectors extends BaseSettings
 			}
 		}
 
-		$this->eventDispatcher->dispatch(new ArrayFilterEvent(ArrayFilterEvent::CONNECTOR_SETTINGS_POST, $request));
+		$this->eventDispatcher->dispatch(new ConnectorSettingsPostEvent($request));
 		$this->baseUrl->redirect($this->args->getQueryString());
 	}
 
