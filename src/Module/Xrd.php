@@ -56,7 +56,8 @@ class Xrd extends BaseModule
 			throw new BadRequestException();
 		}
 
-		if (!empty($host) && $host !== DI::baseUrl()->getHost()) {
+		// The address of local users contains the port, when the base url has got a non-default port
+		if (!empty($host) && !in_array($host, [$this->baseUrl->getHost(), $this->baseUrl->getAuthority()], true)) {
 			DI::logger()->notice('Invalid host name for xrd query', ['host' => $host, 'uri' => $uri]);
 			throw new NotFoundException('Invalid host name for xrd query: ' . $host);
 		}
