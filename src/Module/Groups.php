@@ -20,6 +20,7 @@ use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Network\HTTPException\ForbiddenException;
+use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -43,6 +44,23 @@ class Groups extends BaseModule
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 	}
 
+	protected function post(array $request = [])
+	{
+		$uid = $this->session->getLocalUserId();
+		if (!$uid) {
+			throw new ForbiddenException($this->t('Permission denied.'));
+		}
+
+		$host   = (string) ($this->parameters['host'] ?? '');
+		$return = 'groups' . ($host !== '' ? '/' . rawurlencode($host) : '');
+
+		self::checkFormSecurityTokenRedirectOnError($return, 'groups');
+
+		$this->groupManager->markAllSeen($uid, $host);
+
+		$this->baseUrl->redirect($return);
+	}
+
 	protected function content(array $request = []): string
 	{
 		$uid = $this->session->getLocalUserId();
@@ -52,7 +70,13 @@ class Groups extends BaseModule
 
 		Nav::setSelected('groups');
 
-		$contacts = $this->groupManager->getList($uid, true, true, true);
+		$filterHost = (string) ($this->parameters['host'] ?? '');
+		$contacts   = $this->groupManager->getListByHost($uid, $filterHost);
+		if ($filterHost !== '' && empty($contacts)) {
+			throw new NotFoundException($this->t('Server not found.'));
+		}
+
+		$backLink = 'groups' . ($filterHost !== '' ? '/' . rawurlencode($filterHost) : '');
 
 		$stats   = $this->groupManager->getGroupStats($uid, array_column($contacts, 'pid'));
 		$threads = $this->groupManager->getLatestThreads($uid, $stats);
@@ -81,7 +105,7 @@ class Groups extends BaseModule
 			$uriId = $threads[$pid] ?? 0;
 			if (!empty($latest[$uriId])) {
 				$group['received'] = $latest[$uriId]['received'];
-				$group['latest']   = $this->groupManager->getPostSummary($latest[$uriId]);
+				$group['latest']   = $this->groupManager->getPostSummary($latest[$uriId], $backLink);
 			}
 
 			if (!isset($groups[$host])) {
@@ -98,18 +122,24 @@ class Groups extends BaseModule
 		}
 		usort($groups, fn ($a, $b): int => strcmp((string) $b['groups'][0]['received'], (string) $a['groups'][0]['received']));
 
+		$single = $filterHost !== '' ? reset($groups) : [];
+
 		$tpl = Renderer::getMarkupTemplate('groups.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$title'           => $this->t('Groups'),
-			'$threads'         => $this->t('Threads'),
-			'$unread'          => $this->t('Unread'),
-			'$no_posts'        => $this->t('No posts yet'),
-			'$discover'        => $this->t('Discover groups'),
-			'$discover_short'  => $this->t('Discover'),
-			'$discover_server' => $this->t('Discover more groups on this server'),
-			'$no_groups'       => $this->t('You are not subscribed to any groups.'),
-			'$filter'          => $this->t('Filter groups'),
-			'$groups'          => $groups,
+			'$title'         => $single ? $single['name'] : $this->t('Groups'),
+			'$single'        => $single,
+			'$discover_link' => $single && $single['gsid'] ? 'groups/discover/' . $single['gsid'] : 'groups/discover',
+			'$action'        => $backLink,
+			'$threads'       => $this->t('Threads'),
+			'$unread'        => $this->t('Unread'),
+			'$no_posts'      => $this->t('No posts yet'),
+			'$discover'      => $this->t('Discover groups'),
+			'$back'          => $this->t('Back'),
+			'$mark_seen'     => $this->t('Mark all as read'),
+			'$form_token'    => self::getFormSecurityToken('groups'),
+			'$no_groups'     => $this->t('You are not subscribed to any groups.'),
+			'$filter'        => $this->t('Filter groups'),
+			'$groups'        => $groups,
 		]);
 	}
 }

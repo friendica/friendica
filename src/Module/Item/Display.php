@@ -12,6 +12,7 @@ use Friendica\AppHelper;
 use Friendica\BaseModule;
 use Friendica\Content\Conversation\StatusEditor;
 use Friendica\Content\Conversation\ConversationRenderer;
+use Friendica\Content\GroupManager;
 use Friendica\Content\Item as ContentItem;
 use Friendica\Content\SpaBackButton;
 use Friendica\Content\Text\BBCode;
@@ -64,8 +65,10 @@ class Display extends BaseModule
 	protected $notify;
 	/** @var SpaBackButton */
 	protected $spaBackButton;
+	/** @var GroupManager */
+	protected $groupManager;
 
-	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, IHandleUserSessions $session, AppHelper $appHelper, App\Page $page, ContentItem $contentItem, StatusEditor $statusEditor, ConversationRenderer $htmlRenderer, Notification $notification, Notify $notify, SpaBackButton $spaBackButton, array $server, array $parameters = [])
+	public function __construct(L10n $l10n, App\BaseURL $baseUrl, App\Arguments $args, LoggerInterface $logger, Profiler $profiler, Response $response, IManageConfigValues $config, IManagePersonalConfigValues $pConfig, IHandleUserSessions $session, AppHelper $appHelper, App\Page $page, ContentItem $contentItem, StatusEditor $statusEditor, ConversationRenderer $htmlRenderer, Notification $notification, Notify $notify, SpaBackButton $spaBackButton, GroupManager $groupManager, array $server, array $parameters = [])
 	{
 		parent::__construct($l10n, $baseUrl, $args, $logger, $profiler, $response, $server, $parameters);
 
@@ -80,6 +83,7 @@ class Display extends BaseModule
 		$this->notification  = $notification;
 		$this->notify        = $notify;
 		$this->spaBackButton = $spaBackButton;
+		$this->groupManager  = $groupManager;
 	}
 
 	protected function content(array $request = []): string
@@ -165,19 +169,47 @@ class Display extends BaseModule
 		$this->displaySidebar($item);
 		$this->displayHead($item['uri-id'], $item['parent-uri-id']);
 
+		// Posts that are opened from a list of groups are shown in the layout of the groups, without the profile of the author
+		$fromGroup = $this->session->getLocalUserId() ? trim((string) ($request['from'] ?? '')) : '';
+		// Only follow links that lead back into the groups feature, the parameter must not become an open redirect
+		if ($fromGroup !== '' && !preg_match('~^(group/[^/?#]+|groups(/[^/?#]+)?)$~', $fromGroup)) {
+			$fromGroup = '';
+		}
+		if ($fromGroup !== '') {
+			$this->page['aside'] = '';
+		}
+
 		$output = '';
 
 		// add the uri-id to the update_display parameter
 		if ($this->session->getLocalUserId()) {
 			$output .= "<script> var netargs = '?uri_id=" . $item['uri-id'] . "&highlight=" . $highlightUriId . "'; </script>";
 
-			$output .= $this->spaBackButton->render();
+			$output .= $fromGroup !== ''
+				? Renderer::replaceMacros(Renderer::getMarkupTemplate('group/display_back.tpl'), ['$back_link' => $fromGroup, '$back' => $this->l10n->t('Back')])
+				: $this->spaBackButton->render();
 		}
 
 		$output .= $this->getDisplayData($item, false, false, $highlightUriId);
 
+		if ($this->session->getLocalUserId() && $item['owner-contact-type'] == Contact::TYPE_COMMUNITY) {
+			$this->groupManager->invalidateUnreadCache($this->session->getLocalUserId());
+		}
+
 		$author              = Contact::getByURLForUser($item['author-link'], $this->session->getLocalUserId());
 		$this->page['title'] = $this->l10n->t("Post by %s", $author['name']);
+
+		if ($fromGroup !== '') {
+			$header = [];
+			if (str_starts_with($fromGroup, 'group/') && $item['owner-contact-type'] == Contact::TYPE_COMMUNITY) {
+				$group = Contact::getAccountById($item['owner-id']);
+				if (!empty($group)) {
+					$header = $this->groupManager->getHeader($group, $this->session->getLocalUserId());
+				}
+			}
+
+			$output = Renderer::replaceMacros(Renderer::getMarkupTemplate('group/display_wrapper.tpl'), ['$header' => $header, '$content' => $output]);
+		}
 
 		return $output;
 	}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-18 18:38+0100\n"
+"POT-Creation-Date: 2026-11-19 11:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,7 +60,7 @@ msgstr ""
 #: src/Module/Folders.php:53 src/Module/Folders/Remove.php:51
 #: src/Module/Folders/Rename.php:57 src/Module/Folders/Rename.php:82
 #: src/Module/FollowConfirm.php:24 src/Module/FriendSuggest.php:44
-#: src/Module/Group.php:75 src/Module/Groups.php:50
+#: src/Module/Group.php:73 src/Module/Groups.php:51 src/Module/Groups.php:68
 #: src/Module/Groups/Discover.php:56 src/Module/Invite.php:28
 #: src/Module/Invite.php:117 src/Module/Notifications/Notification.php:59
 #: src/Module/Notifications/Notification.php:104
@@ -1153,7 +1153,7 @@ msgstr ""
 msgid "Posts from contacts you interact with and who interact with you"
 msgstr ""
 
-#: src/Content/Conversation/Factory/Channel.php:30 src/Module/Groups.php:108
+#: src/Content/Conversation/Factory/Channel.php:30
 msgid "Discover"
 msgstr ""
 
@@ -2019,10 +2019,10 @@ msgstr ""
 msgid "Display posts that have been created by accounts of the selected circle."
 msgstr ""
 
-#: src/Content/Feature.php:129 src/Content/GroupManager.php:115
+#: src/Content/Feature.php:129 src/Content/GroupManager.php:117
 #: src/Content/Nav.php:249 src/Content/Nav.php:282
 #: src/Content/Text/HTML.php:902 src/Content/Widget.php:576
-#: src/Model/User.php:1525 src/Module/Groups.php:103
+#: src/Model/User.php:1525 src/Module/Groups.php:129
 msgid "Groups"
 msgstr ""
 
@@ -2142,26 +2142,35 @@ msgstr ""
 msgid "Allows anonymous visitors to consult your calendar and your public events. Contact birthday events are private to you."
 msgstr ""
 
-#: src/Content/GroupManager.php:117
+#: src/Content/GroupManager.php:119
 msgid "External link to group"
 msgstr ""
 
-#: src/Content/GroupManager.php:121 src/Content/PagesManager.php:101
+#: src/Content/GroupManager.php:123 src/Content/PagesManager.php:101
 #: src/Content/Widget.php:551
 msgid "show less"
 msgstr ""
 
-#: src/Content/GroupManager.php:122 src/Content/PagesManager.php:102
+#: src/Content/GroupManager.php:124 src/Content/PagesManager.php:102
 #: src/Content/Widget.php:446 src/Content/Widget.php:552
 msgid "show more"
 msgstr ""
 
-#: src/Content/GroupManager.php:123
+#: src/Content/GroupManager.php:125
 msgid "Create new group"
 msgstr ""
 
-#: src/Content/GroupManager.php:125
+#: src/Content/GroupManager.php:127
 msgid "Find groups to join"
+msgstr ""
+
+#: src/Content/GroupManager.php:458 src/Module/Groups.php:133
+msgid "Threads"
+msgstr ""
+
+#: src/Content/GroupManager.php:460 src/Module/Group.php:207
+#: src/Module/Groups.php:134
+msgid "Unread"
 msgstr ""
 
 #: src/Content/Item.php:328 src/Model/Item.php:2905
@@ -2336,7 +2345,7 @@ msgstr ""
 
 #: src/Content/Nav.php:221 src/Module/BaseProfile.php:41
 #: src/Module/BaseSettings.php:86 src/Module/Contact.php:494
-#: src/Module/Contact/Profile.php:448 src/Module/Profile/Profile.php:253
+#: src/Module/Contact/Profile.php:448 src/Module/Profile/Profile.php:255
 #: src/Module/Welcome.php:44 view/theme/frio/theme.php:217
 msgid "Profile"
 msgstr ""
@@ -2345,7 +2354,7 @@ msgstr ""
 msgid "My profile"
 msgstr ""
 
-#: src/Content/Nav.php:226 src/Module/Group.php:199
+#: src/Content/Nav.php:226 src/Module/Group.php:200
 #: src/Module/Security/Login.php:126
 msgid "Register"
 msgstr ""
@@ -2656,7 +2665,8 @@ msgid "Always"
 msgstr ""
 
 #: src/Content/SpaBackButton.php:34 src/Module/Group.php:194
-#: src/Module/Groups/Discover.php:123
+#: src/Module/Groups.php:137 src/Module/Groups/Discover.php:123
+#: src/Module/Item/Display.php:189
 msgid "Back"
 msgstr ""
 
@@ -2942,7 +2952,7 @@ msgstr ""
 msgid "Group posts"
 msgstr ""
 
-#: src/Core/ACL.php:152 src/Module/Profile/Profile.php:254
+#: src/Core/ACL.php:152 src/Module/Profile/Profile.php:256
 msgid "Yourself"
 msgstr ""
 
@@ -3932,7 +3942,7 @@ msgstr ""
 msgid "Atom feed"
 msgstr ""
 
-#: src/Model/Profile.php:492 src/Module/Profile/Profile.php:267
+#: src/Model/Profile.php:492 src/Module/Profile/Profile.php:269
 msgid "This website has been verified to belong to the same person."
 msgstr ""
 
@@ -4912,7 +4922,7 @@ msgid "Policies"
 msgstr ""
 
 #: src/Module/Admin/Site.php:471 src/Module/Calendar/Event/Form.php:265
-#: src/Module/Contact.php:521 src/Module/Profile/Profile.php:261
+#: src/Module/Contact.php:521 src/Module/Profile/Profile.php:263
 msgid "Advanced"
 msgstr ""
 
@@ -6386,7 +6396,7 @@ msgstr ""
 msgid "Posts quoting other posts"
 msgstr ""
 
-#: src/Module/BaseProfile.php:188 src/Module/Group.php:212
+#: src/Module/BaseProfile.php:188 src/Module/Group.php:206
 msgid "Comments"
 msgstr ""
 
@@ -6607,7 +6617,7 @@ msgstr ""
 msgid "Share this event"
 msgstr ""
 
-#: src/Module/Calendar/Event/Form.php:264 src/Module/Profile/Profile.php:260
+#: src/Module/Calendar/Event/Form.php:264 src/Module/Profile/Profile.php:262
 msgid "Basic"
 msgstr ""
 
@@ -6670,7 +6680,7 @@ msgstr ""
 #: src/Module/Contact/Profile.php:178 src/Module/Contact/Redir.php:68
 #: src/Module/Contact/Redir.php:122 src/Module/FriendSuggest.php:61
 #: src/Module/FriendSuggest.php:100 src/Module/FriendSuggest.php:106
-#: src/Module/Group.php:256 src/Module/Group.php:261
+#: src/Module/Group.php:250 src/Module/Group.php:255
 msgid "Contact not found."
 msgstr ""
 
@@ -6735,7 +6745,7 @@ msgstr ""
 msgid "Edit Circle Name"
 msgstr ""
 
-#: src/Module/Circle.php:314 src/Module/Group.php:201
+#: src/Module/Circle.php:314 src/Module/Group.php:202 src/Module/Groups.php:138
 msgid "Mark all as read"
 msgstr ""
 
@@ -7012,7 +7022,7 @@ msgstr[1] ""
 #: src/Module/Contact/Redir.php:197 src/Module/Conversation/Community.php:156
 #: src/Module/Debug/ItemBody.php:30 src/Module/Diaspora/Receive.php:45
 #: src/Module/Item/Comment.php:44 src/Module/Item/Comments.php:45
-#: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:92
+#: src/Module/Item/Complete.php:25 src/Module/Item/Display.php:96
 #: src/Module/Item/Feed.php:44 src/Module/Item/Follow.php:25
 #: src/Module/Item/Ignore.php:26 src/Module/Item/Interactions.php:60
 #: src/Module/Item/Language.php:37 src/Module/Item/Node.php:44
@@ -7058,7 +7068,7 @@ msgstr ""
 
 #: src/Module/Contact/Follow.php:166 src/Module/Contact/Profile.php:443
 #: src/Module/Notifications/Introductions.php:191
-#: src/Module/Profile/Profile.php:198
+#: src/Module/Profile/Profile.php:200
 msgid "Tags:"
 msgstr ""
 
@@ -7374,7 +7384,7 @@ msgstr ""
 msgid "Refetch contact data"
 msgstr ""
 
-#: src/Module/Contact/Profile.php:529 src/Module/Group.php:200
+#: src/Module/Contact/Profile.php:529 src/Module/Group.php:201
 msgid "Fetch latest posts"
 msgstr ""
 
@@ -7792,56 +7802,44 @@ msgstr ""
 msgid "Suggestions, praise, etc. - please email \"info\" at \"friendi - dot - ca"
 msgstr ""
 
-#: src/Module/Group.php:87
+#: src/Module/Group.php:85
 msgid "The latest posts of the group will be fetched shortly."
 msgstr ""
 
-#: src/Module/Group.php:197 src/Module/Groups/Discover.php:132
+#: src/Module/Group.php:198 src/Module/Groups/Discover.php:132
 msgid "Join"
 msgstr ""
 
-#: src/Module/Group.php:209 src/Module/Groups.php:104
-msgid "Threads"
-msgstr ""
-
-#: src/Module/Group.php:213 src/Module/Groups.php:105
-msgid "Unread"
-msgstr ""
-
-#: src/Module/Group.php:214
+#: src/Module/Group.php:208
 msgid "Unseen"
 msgstr ""
 
-#: src/Module/Group.php:215
+#: src/Module/Group.php:209
 msgid "No comments yet"
 msgstr ""
 
-#: src/Module/Group.php:216
+#: src/Module/Group.php:210
 msgid "There are no threads in this group."
 msgstr ""
 
-#: src/Module/Groups.php:106
+#: src/Module/Groups.php:76 src/Module/Groups/Discover.php:66
+msgid "Server not found."
+msgstr ""
+
+#: src/Module/Groups.php:135
 msgid "No posts yet"
 msgstr ""
 
-#: src/Module/Groups.php:107 src/Module/Groups/Discover.php:118
+#: src/Module/Groups.php:136 src/Module/Groups/Discover.php:118
 msgid "Discover groups"
 msgstr ""
 
-#: src/Module/Groups.php:109
-msgid "Discover more groups on this server"
-msgstr ""
-
-#: src/Module/Groups.php:110
+#: src/Module/Groups.php:140
 msgid "You are not subscribed to any groups."
 msgstr ""
 
-#: src/Module/Groups.php:111
+#: src/Module/Groups.php:141
 msgid "Filter groups"
-msgstr ""
-
-#: src/Module/Groups/Discover.php:66
-msgid "Server not found."
 msgstr ""
 
 #: src/Module/Groups/Discover.php:115
@@ -8422,7 +8420,7 @@ msgstr ""
 msgid "Image description"
 msgstr ""
 
-#: src/Module/Item/Display.php:180
+#: src/Module/Item/Display.php:200
 #, php-format
 msgid "Post by %s"
 msgstr ""
@@ -10034,8 +10032,8 @@ msgstr ""
 msgid "%d more"
 msgstr ""
 
-#: src/Module/Profile/CircleExport.php:49 src/Module/Profile/Profile.php:113
-#: src/Module/Profile/Profile.php:148 src/Module/Profile/Restricted.php:33
+#: src/Module/Profile/CircleExport.php:49 src/Module/Profile/Profile.php:115
+#: src/Module/Profile/Profile.php:150 src/Module/Profile/Restricted.php:33
 msgid "Profile not found."
 msgstr ""
 
@@ -10043,19 +10041,19 @@ msgstr ""
 msgid "Public circle not found."
 msgstr ""
 
-#: src/Module/Profile/Conversations.php:68 src/Module/Profile/Profile.php:333
+#: src/Module/Profile/Conversations.php:68 src/Module/Profile/Profile.php:335
 #: src/Protocol/Feed.php:1108
 #, php-format
 msgid "%s's posts"
 msgstr ""
 
-#: src/Module/Profile/Conversations.php:69 src/Module/Profile/Profile.php:334
+#: src/Module/Profile/Conversations.php:69 src/Module/Profile/Profile.php:336
 #: src/Protocol/Feed.php:1111
 #, php-format
 msgid "%s's comments"
 msgstr ""
 
-#: src/Module/Profile/Conversations.php:70 src/Module/Profile/Profile.php:335
+#: src/Module/Profile/Conversations.php:70 src/Module/Profile/Profile.php:337
 #: src/Protocol/Feed.php:1104
 #, php-format
 msgid "%s's timeline"
@@ -10092,30 +10090,30 @@ msgstr ""
 msgid "View Album"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:139
+#: src/Module/Profile/Profile.php:141
 #, php-format
 msgid "You're currently viewing your profile as <b>%s</b> <a href=\"%s\" class=\"btn btn-sm pull-right\">Cancel</a>"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:173 src/Module/Settings/Account.php:534
+#: src/Module/Profile/Profile.php:175 src/Module/Settings/Account.php:534
 #: src/Module/Settings/Profile/Index.php:296
 msgid "Display name:"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:176
+#: src/Module/Profile/Profile.php:178
 msgid "d MMMM"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:181 src/Util/Temporal.php:155
+#: src/Module/Profile/Profile.php:183 src/Util/Temporal.php:155
 msgid "Birthday:"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:184 src/Module/Settings/Profile/Index.php:304
+#: src/Module/Profile/Profile.php:186 src/Module/Settings/Profile/Index.php:304
 #: src/Util/Temporal.php:157
 msgid "Age: "
 msgstr ""
 
-#: src/Module/Profile/Profile.php:184 src/Module/Settings/Profile/Index.php:304
+#: src/Module/Profile/Profile.php:186 src/Module/Settings/Profile/Index.php:304
 #: src/Util/Temporal.php:157
 #, php-format
 msgid "%d year old"
@@ -10123,23 +10121,23 @@ msgid_plural "%d years old"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Module/Profile/Profile.php:225
+#: src/Module/Profile/Profile.php:227
 msgid "Groups:"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:245
+#: src/Module/Profile/Profile.php:247
 msgid "Public circles (CSV):"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:258
+#: src/Module/Profile/Profile.php:260
 msgid "View profile as:"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:259
+#: src/Module/Profile/Profile.php:261
 msgid "View as selected profile"
 msgstr ""
 
-#: src/Module/Profile/Profile.php:270
+#: src/Module/Profile/Profile.php:272
 msgid "View as"
 msgstr ""
 

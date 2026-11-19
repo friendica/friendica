@@ -11,6 +11,7 @@ use Friendica\App\BaseURL;
 use Friendica\Content\Contact\Repository\ContactByType;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
+use Friendica\Content\Text\RenderedContent;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Cache\Capability\ICanCache;
@@ -49,6 +50,7 @@ class GroupManager
 		private readonly IHandleUserSessions $session,
 		private readonly Database $database,
 		private readonly ICanCache $cache,
+		private readonly RenderedContent $renderedContent,
 	) {}
 
 	/**
@@ -199,12 +201,19 @@ class GroupManager
 	 */
 	public function countUnreadThreads(int $uid): int
 	{
-		$pcids = array_column($this->getList($uid, false, true, true), 'pid');
-		if (empty($pcids)) {
-			return 0;
+		// The navigation bar asks for this number on every ping, but the query is expensive for users with busy groups
+		$key   = 'GroupManager::countUnreadThreads:' . $uid;
+		$count = $this->cache->get($key);
+		if (is_int($count)) {
+			return $count;
 		}
 
-		return array_sum($this->countUnreadThreadsPerGroup($uid, $pcids));
+		$pcids = array_column($this->getList($uid, false, true, true), 'pid');
+		$count = empty($pcids) ? 0 : array_sum($this->countUnreadThreadsPerGroup($uid, $pcids));
+
+		$this->cache->set($key, $count, Duration::MINUTE);
+
+		return $count;
 	}
 
 	/**
@@ -221,9 +230,10 @@ class GroupManager
 		$counts  = [];
 		$authors = $this->getIgnoredAuthors($uid);
 
+		// The join order is forced: The optimizer otherwise starts with all threads of the groups instead of the few unseen posts
 		$unread = $this->database->p(
 			"SELECT `post-thread-user`.`owner-id`, COUNT(DISTINCT `post-user`.`parent-uri-id`) AS `unread` FROM `post-user`
-				INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+				STRAIGHT_JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
 				WHERE `post-user`.`uid` = ? AND `post-user`.`unseen` AND NOT `post-user`.`hidden` AND NOT `post-user`.`deleted`
 				AND `post-user`.`gravity` IN (?, ?) AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
 				AND NOT `post-thread-user`.`deleted`" . $this->excludeAuthors($authors) . "
@@ -252,6 +262,54 @@ class GroupManager
 	public function markSeen(int $uid, int $pcid): void
 	{
 		Item::update(['unseen' => false], ["`uid` = ? AND `unseen` AND `parent-uri-id` IN (SELECT `uri-id` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` = ?)", $uid, $uid, $pcid]);
+		$this->invalidateUnreadCache($uid);
+	}
+
+	/**
+	 * Marks all posts in the threads of all groups of the user as seen
+	 *
+	 * @param int    $uid  User id
+	 * @param string $host Limits the groups to the ones on this server, if it isn't empty
+	 * @throws \Exception
+	 */
+	public function markAllSeen(int $uid, string $host = ''): void
+	{
+		$pcids = array_column($this->getListByHost($uid, $host), 'pid');
+		if (empty($pcids)) {
+			return;
+		}
+
+		Item::update(['unseen' => false], array_merge(["`uid` = ? AND `unseen` AND `parent-uri-id` IN (SELECT `uri-id` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . '))', $uid, $uid], $pcids));
+		$this->invalidateUnreadCache($uid);
+	}
+
+	/**
+	 * Invalidates the cache of countUnreadThreads() for the user
+	 *
+	 * @param int $uid User id
+	 */
+	public function invalidateUnreadCache(int $uid): void
+	{
+		$this->cache->delete('GroupManager::countUnreadThreads:' . $uid);
+	}
+
+	/**
+	 * Fetches the groups of the user, optionally only the ones on a single server
+	 *
+	 * @param int    $uid  User id
+	 * @param string $host Host name of the server, all groups if it is empty
+	 *
+	 * @return array{url: string, addr: string, alias: string, name: string, id: int, pid: int, micro: ?string, thumb: ?string, network: string, about: string, gsid: ?int}[]
+	 * @throws \Exception
+	 */
+	public function getListByHost(int $uid, string $host = ''): array
+	{
+		$contacts = $this->getList($uid, true, true, true);
+		if ($host === '') {
+			return $contacts;
+		}
+
+		return array_values(array_filter($contacts, fn (array $contact): bool => strcasecmp(parse_url((string) $contact['url'], PHP_URL_HOST) ?: '', $host) === 0));
 	}
 
 	/**
@@ -361,20 +419,46 @@ class GroupManager
 	/**
 	 * Prepares a post from getLatestPosts() for the display
 	 *
-	 * @param array $post Post with guid, title, body, author and unseen fields
+	 * @param array  $post     Post with guid, title, body, author and unseen fields
+	 * @param string $backLink Relative link of the page the post is shown on, so that the display page can link back to it without relying on the browser history
 	 *
 	 * @return array
 	 */
-	public function getPostSummary(array $post): array
+	public function getPostSummary(array $post, string $backLink): array
 	{
 		return [
-			'link'        => 'display/' . $post['guid'],
+			'link'        => $this->getPostLink($post['guid'], $backLink),
 			'author'      => $post['author-name'],
 			'author_link' => Contact::magicLink($post['author-link']),
 			'thumb'       => Contact::getAvatarUrlForId($post['author-id'], Proxy::SIZE_MICRO, $post['author-updated']),
 			'received'    => $this->l10n->relativeDateTime($post['received']),
 			'excerpt'     => Plaintext::shorten($post['title'] ?: BBCode::toPlaintext($post['body'], false), 100),
 			'unseen'      => $post['unseen'],
+		];
+	}
+
+	/**
+	 * Prepares the header of a group (name, avatar, statistics and description) for the display
+	 *
+	 * @param array $contact Public contact of the group
+	 * @param int   $uid     User id
+	 *
+	 * @return array
+	 */
+	public function getHeader(array $contact, int $uid): array
+	{
+		$stats = $this->getGroupStats($uid, [$contact['id']])[$contact['id']] ?? ['threads' => 0, 'unread' => 0];
+
+		return [
+			'title'         => $contact['name'],
+			'profile'       => Contact::magicLinkByContact($contact),
+			'thumb'         => Contact::getThumb($contact),
+			'about'         => $this->renderedContent->convert($contact['uri-id'], $contact['about'], BBCode::EXTERNAL),
+			'readonly'      => !Contact::isSharing($contact['id'], $uid, true),
+			'threads_label' => $this->l10n->t('Threads'),
+			'threads_count' => $stats['threads'],
+			'unread_label'  => $this->l10n->t('Unread'),
+			'unread_count'  => $stats['unread'],
 		];
 	}
 
@@ -387,12 +471,37 @@ class GroupManager
 	 */
 	public function getLink(array $contact): string
 	{
+		return 'group/' . rawurlencode($this->getGroupId($contact));
+	}
+
+	/**
+	 * Fetches the identifier of a group that is used in the addresses of its pages
+	 *
+	 * @param array $contact Contact with id, url and addr fields
+	 *
+	 * @return string
+	 */
+	public function getGroupId(array $contact): string
+	{
 		$id = (string) $contact['addr'] ?: (string) $contact['id'];
 		if ($this->baseUrl->isLocalUrl($contact['url'])) {
 			$id = strstr($id, '@', true) ?: $id;
 		}
 
-		return 'group/' . rawurlencode($id);
+		return $id;
+	}
+
+	/**
+	 * Creates the link to a post that is shown in the context of a group, with a back link to the page it is shown on
+	 *
+	 * @param string $guid     Guid of the post
+	 * @param string $backLink Relative link of the page the post is shown on, so that the display page can link back to it without relying on the browser history
+	 *
+	 * @return string
+	 */
+	public function getPostLink(string $guid, string $backLink): string
+	{
+		return 'display/' . $guid . '?from=' . rawurlencode($backLink);
 	}
 
 	/**

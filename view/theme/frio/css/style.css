@@ -3103,6 +3103,17 @@ body.mod-login .navbar #nav-login {
 		float: none;
 		margin: 0 auto;
 	}
+
+	/* Posts that are opened from a list of groups */
+	body:has(.group-display-toolbar) main aside {
+		display: none;
+	}
+	body:has(.group-display-toolbar) #content {
+		width: 100%;
+		max-width: 1350px;
+		float: none;
+		margin: 0 auto;
+	}
 }
 
 .mod-lostpass #login-name-wrapper{

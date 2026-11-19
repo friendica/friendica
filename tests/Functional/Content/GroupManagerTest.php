@@ -8,9 +8,13 @@
 namespace Friendica\Test\Functional\Content;
 
 use Friendica\Content\GroupManager;
+use Friendica\Core\Protocol;
 use Friendica\Database\Database;
 use Friendica\DI;
+use Friendica\Model\Contact;
+use Friendica\Model\ItemURI;
 use Friendica\Test\FixtureTestCase;
+use Friendica\Util\Strings;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class GroupManagerTest extends FixtureTestCase
@@ -265,5 +269,82 @@ class GroupManagerTest extends FixtureTestCase
 		self::assertSame($expected, $description['name']);
 		self::assertSame('example.org', $description['host']);
 		self::assertSame(trim(html_entity_decode(strip_tags($info))), $description['info']);
+	}
+
+	/**
+	 * Creates the public and the user's own copy of a group contact on the given host
+	 *
+	 * @return array{id: int, pid: int} User contact id and public contact id of the group
+	 */
+	private function createGroupOnHost(Database $dba, string $nick, string $host): array
+	{
+		$url   = 'https://' . $host . '/c/' . $nick;
+		$uriId = ItemURI::insert(['uri' => $url, 'guid' => $nick]);
+
+		// The platform of the group is taken from its server, groups without a known server are not listed
+		$serverUrl = 'https://' . $host;
+		$dba->insert('gserver', ['url' => $serverUrl, 'nurl' => Strings::normaliseLink($serverUrl), 'platform' => 'lemmy', 'network' => Protocol::ACTIVITYPUB]);
+		$gsid = $dba->lastInsertId();
+
+		$fields = [
+			'gsid'             => $gsid,
+			'uri-id'           => $uriId,
+			'name'             => $nick,
+			'nick'             => $nick,
+			'url'              => $url,
+			'nurl'             => Strings::normaliseLink($url),
+			'addr'             => $nick . '@' . $host,
+			'network'          => Protocol::ACTIVITYPUB,
+			'contact-type'     => Contact::TYPE_COMMUNITY,
+			'manually-approve' => false,
+			'blocked'          => false,
+		];
+
+		$dba->insert('contact', array_merge($fields, ['uid' => 0, 'rel' => Contact::NOTHING, 'pending' => false]));
+		$pcid = $dba->lastInsertId();
+
+		$dba->insert('contact', array_merge($fields, ['uid' => self::UID, 'rel' => Contact::SHARING, 'pending' => false]));
+		$id = $dba->lastInsertId();
+
+		return ['id' => $id, 'pid' => $pcid];
+	}
+
+	public function testGetListByHostFiltersByHost(): void
+	{
+		$dba = DI::dba();
+
+		$this->createGroupOnHost($dba, 'alpha', 'alpha.example');
+		$beta = $this->createGroupOnHost($dba, 'beta', 'beta.example');
+
+		$contacts = $this->getGroupManager()->getListByHost(self::UID, 'beta.example');
+
+		self::assertCount(1, $contacts);
+		self::assertSame($beta['pid'], $contacts[0]['pid']);
+	}
+
+	public function testGetListByHostIsCaseInsensitive(): void
+	{
+		$dba  = DI::dba();
+		$beta = $this->createGroupOnHost($dba, 'beta', 'beta.example');
+
+		$contacts = $this->getGroupManager()->getListByHost(self::UID, 'BETA.EXAMPLE');
+
+		self::assertCount(1, $contacts);
+		self::assertSame($beta['pid'], $contacts[0]['pid']);
+	}
+
+	public function testGetListByHostWithoutHostReturnsAllGroups(): void
+	{
+		$dba = DI::dba();
+
+		$this->createGroupOnHost($dba, 'alpha', 'alpha.example');
+		$this->createGroupOnHost($dba, 'beta', 'beta.example');
+
+		self::assertCount(2, $this->getGroupManager()->getListByHost(self::UID, ''));
+	}
+
+	public function testGetPostLink(): void
+	{
+		self::assertSame('display/abc123?from=group%2Fremotegroup', $this->getGroupManager()->getPostLink('abc123', 'group/remotegroup'));
 	}
 }

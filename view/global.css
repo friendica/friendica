@@ -1269,6 +1269,16 @@ summary.wall-item-summary {
 	border-radius: 4px;
 }
 
+.generic-page-wrapper.group-display-wrapper {
+	min-height: 0;
+}
+
+.group-toolbar-start {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
 #group-discover .group-overview-avatar {
 	width: 64px;
 }
