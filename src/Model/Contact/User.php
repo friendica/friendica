@@ -26,6 +26,10 @@ class User
 	public const FREQUENCY_NEVER   = 1;
 	public const FREQUENCY_ALWAYS  = 2;
 	public const FREQUENCY_REDUCED = 3;
+
+	/** @var array<string, bool> Per-request cache of isIsBlocked(), keyed by "cid:uid" */
+	private static array $isBlockedCache = [];
+
 	/**
 	 * Insert a user-contact for a given contact array
 	 *
@@ -401,6 +405,8 @@ class User
 		}
 
 		DBA::update('user-contact', ['is-blocked' => $blocked], ['cid' => $pcid, 'uid' => $uid], true);
+		// The cache may hold entries under the user contact id as well as the public contact id
+		self::$isBlockedCache = [];
 	}
 
 	/**
@@ -413,12 +419,26 @@ class User
 	 */
 	public static function isIsBlocked(int $cid, int $uid): bool
 	{
+		$key = $cid . ':' . $uid;
+		if (isset(self::$isBlockedCache[$key])) {
+			return self::$isBlockedCache[$key];
+		}
+
 		$pcid = Contact::getPublicContactId($cid, $uid);
 		if (!$pcid) {
-			return false;
+			return self::$isBlockedCache[$key] = false;
 		}
 
 		$public_contact = DBA::selectFirst('user-contact', ['is-blocked'], ['cid' => $pcid, 'uid' => $uid]);
-		return $public_contact['is-blocked'] ?? false;
+
+		return self::$isBlockedCache[$key] = (bool) ($public_contact['is-blocked'] ?? false);
+	}
+
+	/**
+	 * Empties the per-request cache of isIsBlocked(), e.g. after the table was changed directly
+	 */
+	public static function resetIsBlockedCache(): void
+	{
+		self::$isBlockedCache = [];
 	}
 }

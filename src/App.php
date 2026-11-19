@@ -38,6 +38,7 @@ use Friendica\Database\Definition\DbaDefinition;
 use Friendica\Database\Definition\ViewDefinition;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\Event;
+use Friendica\Model\Contact\User as ContactUser;
 use Friendica\Module\Maintenance;
 use Friendica\Module\Response;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
@@ -356,6 +357,8 @@ class App
 		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
 			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
 		}
+
+		$eventDispatcher->addListener(Event::WORKER_JOB_START, ContactUser::resetIsBlockedCache(...));
 	}
 
 	private function registerTemplateEngine(): void

@@ -14,6 +14,7 @@ use Friendica\Core\Worker\Entity\Process;
 use Friendica\Database\DBA;
 use Friendica\DI;
 use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\Event;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -555,6 +556,7 @@ class Worker
 		// We use the callstack here to analyze the performance of executed worker entries.
 		// For this reason the variables have to be initialized.
 		DI::profiler()->reset();
+		DI::eventDispatcher()->dispatch(new Event(Event::WORKER_JOB_START));
 
 		$appHelper->setQueue($queue);
 

@@ -74,7 +74,7 @@ final class PostTemplateBuilder
 		$this->uid            = $uid;
 		$this->remote_comment = $remote_comment;
 
-		return $this->buildThreadTemplateData($item, $preview, $writable, $uid, $convResponses, $formSecurityToken, $this->getThreadLevel((int) ($item['uri-id'])), []);
+		return $this->buildThreadTemplateData($item, $preview, $writable, $uid, $convResponses, $formSecurityToken, $this->getThreadLevel((int) $item['uri-id'], (int) $item['parent-uri-id']), []);
 	}
 
 	/**
@@ -110,8 +110,13 @@ final class PostTemplateBuilder
 	 * @param int $uriid
 	 * @return int
 	 */
-	private function getThreadLevel(int $uriid): int
+	private function getThreadLevel(int $uriid, int $parentUriId): int
 	{
+		// The item is the root of its thread, no need to ask the database
+		if ($parentUriId === $uriid) {
+			return 1;
+		}
+
 		$threadlevel = 1;
 
 		while (true) {
