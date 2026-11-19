@@ -12,6 +12,7 @@ namespace Friendica\Test\Integration\Module\Api\Friendica\Photo;
 use Friendica\App\Router;
 use Friendica\Core\EarlyExitException;
 use Friendica\DI;
+use Friendica\Model\Item;
 use Friendica\Module\Api\Friendica\Photo\Delete;
 use Friendica\Network\HTTPException\BadRequestException;
 use Friendica\Test\ApiTestCase;
@@ -71,6 +72,23 @@ final class DeleteTest extends ApiTestCase
 		self::assertFalse(DI::dba()->exists('photo', ['resource-id' => self::PHOTO_RESOURCE_ID, 'uid' => 42]));
 	}
 
+	public function testApiPhotoDeleteRemovesThePhotoPost(): void
+	{
+		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
+		DI::dba()->update('post-content', ['resource-id' => self::PHOTO_RESOURCE_ID], ['uri-id' => 3]);
+		DI::dba()->update('post-user', ['post-type' => Item::PT_IMAGE], ['id' => 3]);
+
+		$request = (new ServerRequest('POST', 'https://friendica.local/api/friendica/photo/delete'))
+			->withParsedBody([
+				'photo_id' => self::PHOTO_RESOURCE_ID,
+			]);
+
+		$this->createModule()->handleRequest($request);
+
+		self::assertTrue(DI::dba()->exists('post-user', ['id' => 3, 'deleted' => true]));
+		self::assertTrue(DI::dba()->exists('post-user', ['id' => 1, 'deleted' => false]));
+	}
+
 	public function testApiPhotoDeleteWithRawJsonBody(): void
 	{
 		$this->loadFixture(__DIR__ . '/../../../../../Fixtures/photo/photo.fixture.php', DI::dba());
@@ -120,6 +138,7 @@ final class DeleteTest extends ApiTestCase
 	private function createModule(array $parameters = []): Delete
 	{
 		return new Delete(
+			DI::postDeletion(),
 			DI::mstdnError(),
 			DI::appHelper(),
 			DI::l10n(),

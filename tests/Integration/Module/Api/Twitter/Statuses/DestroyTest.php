@@ -52,6 +52,8 @@ final class DestroyTest extends ApiTestCase
 		self::assertEquals(1, $json->id);
 		self::assertIsObject($json->user);
 		self::assertIsObject($json->friendica_author);
+
+		self::assertTrue(DI::dba()->exists('post-user', ['id' => 1, 'deleted' => true]));
 	}
 
 	public function testApiStatusesDestroyWithoutAuthenticatedUser(): void
@@ -77,6 +79,6 @@ final class DestroyTest extends ApiTestCase
 
 	private function createModule(): Destroy
 	{
-		return new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
+		return new Destroy(DI::postDeletion(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []);
 	}
 }
