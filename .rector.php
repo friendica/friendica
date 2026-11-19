@@ -22,6 +22,8 @@ return \Rector\Config\RectorConfig::configure()
 		cacheDirectory: sys_get_temp_dir() . '/rector_cached_files',
 		cacheClass: \Rector\Caching\ValueObject\Storage\FileCacheStorage::class,
 	)
+	// Slow or heavily loaded machines hit the default 120s child timeout.
+	->withParallel(timeoutSeconds: 600, maxNumberOfProcess: 4, jobSize: 10)
 	->withIndent("\t", 4)
 	->withPhpVersion(80200)
 	->withTypeCoverageLevel(6)

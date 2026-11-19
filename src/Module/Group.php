@@ -16,7 +16,6 @@ use Friendica\Content\GroupManager;
 use Friendica\Content\Nav;
 use Friendica\Content\Pager;
 use Friendica\Content\Text\BBCode;
-use Friendica\Content\Text\RenderedContent;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
@@ -55,7 +54,6 @@ class Group extends BaseModule
 		private readonly StatusEditor $statusEditor,
 		private readonly GroupManager $groupManager,
 		private readonly SystemMessages $systemMessages,
-		private readonly RenderedContent $renderedContent,
 		L10n $l10n,
 		BaseURL $baseUrl,
 		Arguments $args,
@@ -157,9 +155,10 @@ class Group extends BaseModule
 		}
 		$this->database->close($posts);
 
-		$unseen = $this->groupManager->getUnseen($uid, $uriIds);
-		$stats  = $this->groupManager->getThreadStats($uid, $uriIds, [Item::GRAVITY_COMMENT]);
-		$latest = $this->groupManager->getLatestPosts($uid, $stats, [Item::GRAVITY_COMMENT], ['guid', 'title', 'body', 'author-id', 'author-name', 'author-link', 'author-updated', 'unseen']);
+		$unseen   = $this->groupManager->getUnseen($uid, $uriIds);
+		$stats    = $this->groupManager->getThreadStats($uid, $uriIds, [Item::GRAVITY_COMMENT]);
+		$latest   = $this->groupManager->getLatestPosts($uid, $stats, [Item::GRAVITY_COMMENT], ['guid', 'title', 'body', 'author-id', 'author-name', 'author-link', 'author-updated', 'unseen']);
+		$backLink = $this->groupManager->getLink($contact);
 
 		$threads = [];
 		foreach ($uriIds as $uriId) {
@@ -171,7 +170,7 @@ class Group extends BaseModule
 
 			$thread = [
 				'guid'     => $parent['guid'],
-				'display'  => $this->groupManager->getPostLink($parent['guid'], $contact),
+				'display'  => $this->groupManager->getPostLink($parent['guid'], $backLink),
 				'thumb'    => Contact::getAvatarUrlForId($parent['author-id'], Proxy::SIZE_THUMB, $parent['author-updated']),
 				'author'   => $parent['author-name'],
 				'link'     => Contact::magicLink($parent['author-link']),
@@ -184,7 +183,7 @@ class Group extends BaseModule
 			];
 
 			if (!empty($latest[$uriId])) {
-				$thread['latest'] = $this->groupManager->getPostSummary($latest[$uriId], $contact);
+				$thread['latest'] = $this->groupManager->getPostSummary($latest[$uriId], $backLink);
 			}
 
 			$threads[] = $thread;
@@ -192,31 +191,25 @@ class Group extends BaseModule
 
 		$tpl = Renderer::getMarkupTemplate('group.tpl');
 		return Renderer::replaceMacros($tpl, [
-			'$back'          => $this->t('Back'),
-			'$back_link'     => $uid ? ($readonly ? 'groups/discover' : 'groups') : '',
-			'$readonly'      => $readonly,
-			'$join'          => $this->t('Join'),
-			'$follow'        => $uid ? 'contact/follow?binurl=' . bin2hex((string) $contact['url']) : 'profile/' . $owner['nickname'] . '/remote_follow',
-			'$register'      => !$uid && Register::getPolicy() === Register::OPEN ? $this->t('Register') : '',
-			'$fetch'         => $uid && $this->canFetch($contact, $uid) ? $this->t('Fetch latest posts') : '',
-			'$mark_seen'     => $this->t('Mark all as read'),
-			'$editor'        => $editor,
-			'$form_token'    => self::getFormSecurityToken('group'),
-			'$title'         => $contact['name'],
-			'$profile'       => Contact::magicLinkByContact($contact),
-			'$thumb'         => Contact::getThumb($contact),
-			'$about'         => $this->renderedContent->convert($contact['uri-id'], $contact['about'], BBCode::EXTERNAL),
-			'$id'            => rawurlencode((string) $this->parameters['id']),
-			'$threads_label' => $this->t('Threads'),
-			'$threads_count' => $groupStats['threads'],
-			'$unread_count'  => $groupStats['unread'],
-			'$comments'      => $this->t('Comments'),
-			'$unread'        => $this->t('Unread'),
-			'$unseen'        => $this->t('Unseen'),
-			'$no_comments'   => $this->t('No comments yet'),
-			'$no_threads'    => $this->t('There are no threads in this group.'),
-			'$threads'       => $threads,
-			'$paginate'      => $pager->renderFull($groupStats['threads']),
+			'$back'        => $this->t('Back'),
+			'$back_link'   => $uid ? ($readonly ? 'groups/discover' : 'groups') : '',
+			'$readonly'    => $readonly,
+			'$header'      => $this->groupManager->getHeader($contact, $uid),
+			'$join'        => $this->t('Join'),
+			'$follow'      => $uid ? 'contact/follow?binurl=' . bin2hex((string) $contact['url']) : 'profile/' . $owner['nickname'] . '/remote_follow',
+			'$register'    => !$uid && Register::getPolicy() === Register::OPEN ? $this->t('Register') : '',
+			'$fetch'       => $uid && $this->canFetch($contact, $uid) ? $this->t('Fetch latest posts') : '',
+			'$mark_seen'   => $this->t('Mark all as read'),
+			'$editor'      => $editor,
+			'$form_token'  => self::getFormSecurityToken('group'),
+			'$id'          => rawurlencode((string) $this->parameters['id']),
+			'$comments'    => $this->t('Comments'),
+			'$unread'      => $this->t('Unread'),
+			'$unseen'      => $this->t('Unseen'),
+			'$no_comments' => $this->t('No comments yet'),
+			'$no_threads'  => $this->t('There are no threads in this group.'),
+			'$threads'     => $threads,
+			'$paginate'    => $pager->renderFull($groupStats['threads']),
 		]);
 	}
 

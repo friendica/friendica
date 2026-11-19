@@ -76,6 +76,8 @@ class Groups extends BaseModule
 			throw new NotFoundException($this->t('Server not found.'));
 		}
 
+		$backLink = 'groups' . ($filterHost !== '' ? '/' . rawurlencode($filterHost) : '');
+
 		$stats   = $this->groupManager->getGroupStats($uid, array_column($contacts, 'pid'));
 		$threads = $this->groupManager->getLatestThreads($uid, $stats);
 		$gravity = [Item::GRAVITY_PARENT, Item::GRAVITY_COMMENT];
@@ -103,7 +105,7 @@ class Groups extends BaseModule
 			$uriId = $threads[$pid] ?? 0;
 			if (!empty($latest[$uriId])) {
 				$group['received'] = $latest[$uriId]['received'];
-				$group['latest']   = $this->groupManager->getPostSummary($latest[$uriId], $contact);
+				$group['latest']   = $this->groupManager->getPostSummary($latest[$uriId], $backLink);
 			}
 
 			if (!isset($groups[$host])) {
@@ -127,7 +129,7 @@ class Groups extends BaseModule
 			'$title'         => $single ? $single['name'] : $this->t('Groups'),
 			'$single'        => $single,
 			'$discover_link' => $single && $single['gsid'] ? 'groups/discover/' . $single['gsid'] : 'groups/discover',
-			'$action'        => 'groups' . ($filterHost !== '' ? '/' . rawurlencode($filterHost) : ''),
+			'$action'        => $backLink,
 			'$threads'       => $this->t('Threads'),
 			'$unread'        => $this->t('Unread'),
 			'$no_posts'      => $this->t('No posts yet'),

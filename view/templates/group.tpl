@@ -5,15 +5,7 @@
   * SPDX-License-Identifier: AGPL-3.0-or-later
   *}}
 <div class="generic-page-wrapper">
-	<div class="group-header">
-		<a href="{{$profile}}" class="group-header-avatar"><img src="{{$thumb}}" alt="{{$title}}"></a>
-		<div>
-			<h1><a href="{{$profile}}">{{$title}}</a></h1>
-			<span class="group-header-stat"><strong>{{$threads_count}}</strong> {{$threads_label}}</span>
-			{{if !$readonly}}<span class="group-header-stat"><strong>{{$unread_count}}</strong> {{$unread}}</span>{{/if}}
-		</div>
-	</div>
-	{{if $about}}<div class="group-header-about">{{$about nofilter}}</div>{{/if}}
+	{{include file="group/header.tpl" header=$header}}
 
 	<form method="post" action="group/{{$id}}" class="group-toolbar" up-submit>
 		<input type="hidden" name="form_security_token" value="{{$form_token}}">
@@ -28,7 +20,7 @@
 	</form>
 	{{$editor nofilter}}
 
-	<div id="group-content" data-reload-after-post>
+	<div id="group-content" data-reload-after-post data-scroll-to-content>
 		{{if !$threads}}
 			<p>{{$no_threads}}</p>
 		{{else}}

@@ -300,6 +300,15 @@ if (window.addEventListener) {
 	});
 }
 
+// Pages can mark their main block with data-scroll-to-content, so that the visitor lands on the content and not on the page header
+window.onDocumentReady('[data-scroll-to-content]', function(element) {
+	// Same offset as in scrollToItem(), so that the content ends up in the same place as on the display page
+	var top = $(element).offset().top - 100;
+	if (top > 0) {
+		$('html, body').animate({scrollTop: top}, 400);
+	}
+});
+
 // Scroll to item deduplication flags
 var scrollToItemInProgress = false;
 var lastScrollToItemId = null;
