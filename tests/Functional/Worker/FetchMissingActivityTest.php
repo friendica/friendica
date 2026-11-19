@@ -19,8 +19,12 @@ use Friendica\Test\DiceHttpMockHandlerTrait;
 use Friendica\Test\MockedTestCase;
 use Friendica\Util\DateTimeFormat;
 use Friendica\Worker\FetchMissingActivity;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Promise\Create;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
 
 class FetchMissingActivityTest extends MockedTestCase
 {
@@ -132,6 +136,22 @@ class FetchMissingActivityTest extends MockedTestCase
 		}
 
 		self::assertSame(1, $mock->count());
+	}
+
+	public function testTimeoutsSuspendFetchingFromHost(): void
+	{
+		$requests = 0;
+		// MockHandler would pass a queued exception to the on_headers callback, a real transport error never reaches it
+		$this->httpRequestHandler->setHandler(function (RequestInterface $request) use (&$requests): PromiseInterface {
+			$requests++;
+			return Create::rejectionFor(new ConnectException('Operation timed out', $request));
+		});
+
+		for ($i = 0; $i <= self::HOST_FAILURE_LIMIT; $i++) {
+			self::assertSame('', Processor::fetchMissingActivity(self::PARENT . '/' . $i));
+		}
+
+		self::assertSame(self::HOST_FAILURE_LIMIT, $requests);
 	}
 
 	public function testSuccessResetsServerErrorsOfHost(): void
