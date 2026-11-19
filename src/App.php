@@ -463,7 +463,8 @@ class App
 		if ($this->mode->isNormal() && !$this->mode->isBackend()) {
 			$requester = HTTPSignature::getSigner('', $serverVars);
 			if (!empty($requester)) {
-				OpenWebAuth::addVisitorCookieForHandle($requester);
+				// Probing the signer calls back the remote system, which can wait on this request.
+				OpenWebAuth::addVisitorCookieForHandle($requester, false);
 			}
 		} else {
 			$requester = '';
