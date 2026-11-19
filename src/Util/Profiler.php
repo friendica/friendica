@@ -185,6 +185,7 @@ class Profiler implements ContainerInterface
 		$this->performance['network']        = 0;
 		$this->performance['file']           = 0;
 		$this->performance['rendering']      = 0;
+		$this->performance['hook']           = 0;
 		$this->performance['session']        = 0;
 		$this->performance['profiler']       = 0;
 		$this->performance['marktime']       = microtime(true);
@@ -209,6 +210,7 @@ class Profiler implements ContainerInterface
 		$this->callstack['network']        = [];
 		$this->callstack['file']           = [];
 		$this->callstack['rendering']      = [];
+		$this->callstack['hook']           = [];
 		$this->callstack['session']        = [];
 	}
 
@@ -280,6 +282,16 @@ class Profiler implements ContainerInterface
 		if (isset($this->callstack['rendering'])) {
 			$output .= "\nRendering:\n";
 			foreach ($this->callstack['rendering'] as $func => $time) {
+				$time = round($time, 3);
+				if ($time > $limit) {
+					$output .= $func . ': ' . $time . "\n";
+				}
+			}
+		}
+
+		if (isset($this->callstack['hook'])) {
+			$output .= "\nHooks:\n";
+			foreach ($this->callstack['hook'] as $func => $time) {
 				$time = round($time, 3);
 				if ($time > $limit) {
 					$output .= $func . ': ' . $time . "\n";

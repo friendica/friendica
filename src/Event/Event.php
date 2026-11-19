@@ -25,6 +25,12 @@ class Event implements NamedEvent
 
 	public const LOGGING_OUT = 'friendica.logging_out';
 
+	/**
+	 * The worker is about to execute a queue entry.
+	 * Long running workers use it to drop per-request caches.
+	 */
+	public const WORKER_JOB_START = 'friendica.worker_job_start';
+
 	public function __construct(private readonly string $name) {}
 
 	public function getName(): string

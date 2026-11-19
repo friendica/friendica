@@ -405,7 +405,8 @@ class User
 		}
 
 		DBA::update('user-contact', ['is-blocked' => $blocked], ['cid' => $pcid, 'uid' => $uid], true);
-		unset(self::$isBlockedCache[$cid . ':' . $uid]);
+		// The cache may hold entries under the user contact id as well as the public contact id
+		self::$isBlockedCache = [];
 	}
 
 	/**

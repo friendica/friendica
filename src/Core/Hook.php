@@ -203,15 +203,19 @@ class Hook
 
 		$callstack = 'Hook ' . $name . ': ' . $hook[1];
 
-		DI::profiler()->startRecording('rendering');
-		@include_once($hook[0]);
-		if (function_exists($hook[1])) {
-			$func = $hook[1];
-			$func($data);
+		DI::profiler()->startRecording('hook');
+		try {
+			@include_once($hook[0]);
+			$exists = function_exists($hook[1]);
+			if ($exists) {
+				$func = $hook[1];
+				$func($data);
+			}
+		} finally {
 			DI::profiler()->stopRecording($callstack);
-		} else {
-			DI::profiler()->stopRecording($callstack);
+		}
 
+		if (!$exists) {
 			// remove orphan hooks
 			$condition = ['hook' => $name, 'file' => $hook[0], 'function' => $hook[1]];
 			self::delete($condition);

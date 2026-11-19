@@ -63,4 +63,14 @@ class ContactThreadsTest extends FixtureTestCase
 
 		self::assertSame(0, Contact::countNewThreadsFromId(self::AUTHOR, self::UID, '2026-09-01 00:00:00'));
 	}
+
+	public function testIsBlockedCacheIsInvalidatedForTheOtherContactId(): void
+	{
+		// 44 is the user contact, 45 the public contact of the same account
+		self::assertFalse(User::isIsBlocked(44, self::UID));
+
+		User::setIsBlocked(45, self::UID, true);
+
+		self::assertTrue(User::isIsBlocked(44, self::UID));
+	}
 }
