@@ -140,6 +140,8 @@ jobs:
           }
           analyse "$RUNNER_TEMP/base" "$RUNNER_TEMP/base.json" > "$RUNNER_TEMP/base.txt"
           analyse "$PWD" "$RUNNER_TEMP/head.json" > "$RUNNER_TEMP/head.txt"
+          # rc still has frozen violations, so an empty result means the analysis itself failed.
+          test -s "$RUNNER_TEMP/base.txt" && test -s "$RUNNER_TEMP/head.txt"
           new=$(comm -13 "$RUNNER_TEMP/base.txt" "$RUNNER_TEMP/head.txt")
           if [ -n "$new" ]; then
             echo "$new" | sed 's/^/::error::/'
