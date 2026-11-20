@@ -86,7 +86,6 @@ class Edit extends BaseModule
 		}
 
 		$postId = $this->parameters['post_id'] ?? 0;
-
 		if (empty($postId)) {
 			$this->errorExit($this->t('Post not found.'), HTTPException\BadRequestException::class);
 		}
@@ -96,11 +95,12 @@ class Edit extends BaseModule
 			'body', 'title', 'content-warning', 'uri-id', 'wall', 'post-type', 'guid',
 		];
 
-		$item = Post::selectFirstForUser($this->session->getLocalUserId(), $fields, [
-			'id'  => $postId,
-			'uid' => $this->session->getLocalUserId(),
+		$item = Post::selectOriginFirst($fields, [
+			'id'        => $postId,
+			'uid'       => $this->session->getLocalUserId(),
+			'author-id' => $this->session->getPublicContactId(),
+			'deleted'   => false,
 		]);
-
 		if (empty($item)) {
 			$this->errorExit($this->t('Post not found.'), HTTPException\BadRequestException::class);
 		}
