@@ -966,6 +966,7 @@ deptrac:
       - Friendica\Module\BaseApi
     Friendica\Security\OpenWebAuth:
       - Friendica\DI
+      - Friendica\Worker\AddContact
     Friendica\Security\Security:
       - Friendica\DI
     Friendica\User\Settings\Repository\UserGServer:
