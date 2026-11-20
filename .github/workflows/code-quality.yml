@@ -91,8 +91,8 @@ jobs:
         run: composer run phpstan
 
   # rc has no Deptrac of its own, so layer violations only showed up in the rc -> develop merge PR.
-  # Run develop's config and baseline against the rc code, so the PR that adds a violation fails.
-  # A new violation needs its baseline entry in develop first.
+  # develop's baseline does not fit rc's code, so compare against the merge base instead:
+  # develop's rules run on both trees, only violations the change adds fail.
   deptrac:
     name: Deptrac (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -107,7 +107,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup PHP with composer and extensions
         uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
@@ -125,13 +125,26 @@ jobs:
       - name: Install Deptrac
         run: composer require --dev --no-interaction --no-scripts "deptrac/deptrac:^3.0"
 
-      - name: Fetch Deptrac config from develop
+      - name: Fetch Deptrac rules from develop
         run: |
-          curl -fsSL -o deptrac.yaml https://raw.githubusercontent.com/friendica/friendica/develop/deptrac.yaml
-          curl -fsSL -o deptrac-baseline.yaml https://raw.githubusercontent.com/friendica/friendica/develop/deptrac-baseline.yaml
+          curl -fsSL https://raw.githubusercontent.com/friendica/friendica/develop/deptrac.yaml | sed '/^imports:/,/^$/d' > "$RUNNER_TEMP/deptrac.yaml"
 
-      - name: Run Deptrac
-        run: php -d memory_limit=1G vendor/bin/deptrac analyse --no-progress --config-file=deptrac.yaml --formatter=github-actions
+      - name: Run Deptrac on the merge base and on the change
+        run: |
+          base=$(git merge-base HEAD origin/2026.08-rc)
+          git worktree add "$RUNNER_TEMP/base" "$base"
+          ln -s "$PWD/vendor" "$RUNNER_TEMP/base/vendor"
+          analyse() {
+            (cd "$1" && cp "$RUNNER_TEMP/deptrac.yaml" deptrac.yaml && php -d memory_limit=1G vendor/bin/deptrac analyse --no-progress --formatter=json --output="$2" > /dev/null || true)
+            jq -r '.files[].messages[] | select(.type == "error") | .message' "$2" | sort -u
+          }
+          analyse "$RUNNER_TEMP/base" "$RUNNER_TEMP/base.json" > "$RUNNER_TEMP/base.txt"
+          analyse "$PWD" "$RUNNER_TEMP/head.json" > "$RUNNER_TEMP/head.txt"
+          new=$(comm -13 "$RUNNER_TEMP/base.txt" "$RUNNER_TEMP/head.txt")
+          if [ -n "$new" ]; then
+            echo "$new" | sed 's/^/::error::/'
+            exit 1
+          fi
 
   phpstan-addons:
     name: PHPStan in addons (PHP ${{ matrix.php }})
