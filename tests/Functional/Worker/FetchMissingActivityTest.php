@@ -34,6 +34,8 @@ class FetchMissingActivityTest extends MockedTestCase
 
 	private const CHILD = 'https://198.51.100.1/objects/child';
 
+	private const PRIVATE_HOST = 'https://10.0.0.1/objects';
+
 	// Consecutive server errors after which fetching from a host is suspended
 	private const HOST_FAILURE_LIMIT = 10;
 
@@ -152,6 +154,20 @@ class FetchMissingActivityTest extends MockedTestCase
 		}
 
 		self::assertSame(self::HOST_FAILURE_LIMIT, $requests);
+	}
+
+	public function testUnreachableHostIsSuspended(): void
+	{
+		// The request is rejected before any transfer and returns 0, like a host that doesn't resolve
+		DI::config()->set('system', 'block_private_addresses', true);
+		$mock = $this->mockResponses(new Response(200));
+
+		for ($i = 0; $i < self::HOST_FAILURE_LIMIT; $i++) {
+			self::assertSame('', Processor::fetchMissingActivity(self::PRIVATE_HOST . '/' . $i));
+		}
+
+		self::assertTrue(DI::distributedCache()->get(Processor::CACHEKEY_HOST_SUSPENDED . '10.0.0.1'));
+		self::assertSame(1, $mock->count());
 	}
 
 	public function testSuccessResetsServerErrorsOfHost(): void

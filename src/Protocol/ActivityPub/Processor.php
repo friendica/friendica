@@ -1827,6 +1827,7 @@ class Processor
 
 	/**
 	 * Count consecutive server errors of a host and suspend fetching from it for an hour when the limit is reached
+	 * A return code of 0 counts as well, the host couldn't be reached at all (e.g. it doesn't resolve).
 	 *
 	 * @param string $host        Host of the fetched URL
 	 * @param int    $return_code HTTP return code of the fetch
@@ -1834,7 +1835,7 @@ class Processor
 	 */
 	private static function trackHostFailures(string $host, int $return_code)
 	{
-		if ($return_code < 500) {
+		if ($return_code !== 0 && $return_code < 500) {
 			if ($return_code >= 200 && $return_code < 300) {
 				DI::distributedCache()->delete(self::CACHEKEY_HOST_FAILURES . $host);
 			}
