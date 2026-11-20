@@ -90,6 +90,49 @@ jobs:
       - name: Run PHPStan
         run: composer run phpstan
 
+  # rc has no Deptrac of its own, so layer violations only showed up in the rc -> develop merge PR.
+  # Run develop's config and baseline against the rc code, so the PR that adds a violation fails.
+  # A new violation needs its baseline entry in develop first.
+  deptrac:
+    name: Deptrac (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: ['ubuntu-latest']
+        php: ['8.5']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Setup PHP with composer and extensions
+        uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: none
+
+      - name: Clone addon repository
+        run: git clone -b develop --single-branch https://git.friendi.ca/friendica/friendica-addons.git addon
+
+      - name: Install Composer dependencies
+        uses: "ramsey/composer-install@v4"
+
+      - name: Install Deptrac
+        run: composer require --dev --no-interaction --no-scripts "deptrac/deptrac:^3.0"
+
+      - name: Fetch Deptrac config from develop
+        run: |
+          curl -fsSL -o deptrac.yaml https://raw.githubusercontent.com/friendica/friendica/develop/deptrac.yaml
+          curl -fsSL -o deptrac-baseline.yaml https://raw.githubusercontent.com/friendica/friendica/develop/deptrac-baseline.yaml
+
+      - name: Run Deptrac
+        run: php -d memory_limit=1G vendor/bin/deptrac analyse --no-progress --config-file=deptrac.yaml --formatter=github-actions
+
   phpstan-addons:
     name: PHPStan in addons (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
