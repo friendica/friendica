@@ -8,6 +8,7 @@
 namespace Friendica\Model;
 
 use BadMethodCallException;
+use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\DI;
@@ -652,6 +653,18 @@ class Post
 	{
 		$posts = DBA::selectToArray('post-user', ['uri-id'], ['unseen' => true, 'uid' => $uid], ['limit' => 100]);
 		return array_column($posts, 'uri-id');
+	}
+
+	public static function getOwnBySession(IHandleUserSessions $session, int $id, array $fields = null)
+	{
+		$post = Post::selectFirst($fields ?? ['uri-id'], [
+			'id'        => $id,
+			'uid'       => $session->getLocalUserId(),
+			'author-id' => $session->getPublicContactId(),
+			'origin'    => true,
+		]);
+
+		return is_array($post) ? $post : null;
 	}
 
 	/**

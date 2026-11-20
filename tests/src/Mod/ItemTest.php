@@ -139,6 +139,18 @@ class ItemTest extends ApiTestCase
 		self::assertEquals(Item::GRAVITY_PARENT, $stored['gravity']);
 	}
 
+	public function testItemPostFailsOwnershipTestWhenPostIdGiven(): void
+	{
+		$header = $this->mockRedirectHeader();
+		$header->expects(self::once())->with('Location: https://friendica.local/network');
+
+		$_REQUEST = ['post_id' => 1, 'body' => 'Edited via item_post() dispatch', 'return' => 'network'];
+
+		item_post();
+
+		self::expectException(HTTPException\NotFoundException::class);
+	}
+
 	public function testItemPostDispatchesToEditWhenPostIdGiven(): void
 	{
 		$header = $this->mockRedirectHeader();

@@ -45,7 +45,6 @@ function item_post(): void
 	}
 
 	$uid = DI::userSession()->getLocalUserId();
-
 	if (!$uid) {
 		throw new HTTPException\ForbiddenException();
 	}
@@ -96,8 +95,8 @@ function item_drop(int $uid, string $dropitems): void
 
 function item_edit(int $uid, array $request, bool $preview, string $return_path): void
 {
-	$post = Post::selectFirst(Item::ITEM_FIELDLIST, ['id' => $request['post_id'], 'uid' => $uid]);
-	if (!DBA::isResult($post)) {
+	$post = Post::getOwnBySession(DI::userSession(), $request['post_id'], Item::ITEM_FIELDLIST);
+	if (!$post) {
 		if ($return_path) {
 			DI::sysmsg()->addNotice(DI::l10n()->t('Unable to locate original post.'));
 			DI::baseUrl()->redirect($return_path);
