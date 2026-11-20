@@ -805,6 +805,11 @@ class Transmitter
 			}
 		}
 
+		// Comments in a group thread always address the group and the author of the post we reply to via "cc"
+		if (!empty($audience) && ($item['gravity'] == Item::GRAVITY_COMMENT)) {
+			$data = self::addGroupCommentReceivers($item, $audience, $data);
+		}
+
 		$data = self::filterReceiverData($data, $item['author-link']);
 
 		$receivers = ['to' => array_values($data['to']), 'cc' => array_values($data['cc']), 'bto' => array_values($data['bto']), 'bcc' => array_values($data['bcc']), 'audience' => array_values($data['audience'])];
@@ -821,6 +826,31 @@ class Transmitter
 		}
 
 		return $receivers;
+	}
+
+	/**
+	 * Comments in a group thread always address the group and the author of the post we reply to via "cc"
+	 *
+	 * @param array $item
+	 * @param array $audience
+	 * @param array $data
+	 * @return array
+	 */
+	private static function addGroupCommentReceivers(array $item, array $audience, array $data): array
+	{
+		foreach ($audience as $group_url) {
+			$data['cc'][] = $group_url;
+		}
+
+		$thr_parent = Post::selectFirst(['author-link'], ['uri-id' => $item['thr-parent-id']]);
+		if (!empty($thr_parent['author-link'])) {
+			$profile = APContact::getByURL($thr_parent['author-link'], false);
+			if (!empty($profile['url'])) {
+				$data['cc'][] = $profile['url'];
+			}
+		}
+
+		return $data;
 	}
 
 	private static function filterReceiverData(array $data, string $author_link): array
