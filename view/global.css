@@ -41,6 +41,10 @@ a.btn, a.btn:hover {
   text-decoration: overline;
 }
 
+.widget-actions {
+  float: right;
+}
+
 /* List of social Networks */
 img.connector, img.connector-disabled {
   height: 40px;

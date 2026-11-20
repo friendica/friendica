@@ -82,7 +82,7 @@
 	<p tabindex="0">{{$timeline_explanation}} {{$sortable}}</p>
 		<details class="settings-subsection">
 			<summary class="settings-subheading" tabindex="0"><h3>{{$timeline_enable}}</h3></summary>
-			<div class="select timelines-widget sortable">
+			<div id="timeline-settings-content" class="select timelines-widget sortable">
 				<input type="hidden" id="widget_timelineorder" name="widget_timelineorder" value=""/>
 				{{foreach $timelines as $t}}
 					{{include file="field_checkbox.tpl" field=$t.enable}}
@@ -107,7 +107,7 @@
 		<div class="settings-submit-wrapper">
 			<input type="submit" name="submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
 		</div>
-	</details>		
+	</details>
 
 	<details class="settings-section">
 		<summary class="settings-heading"><h2>{{$channel_title}}</h2></summary>
@@ -121,7 +121,7 @@
 		{{/if}}
 		<div class="settings-submit-wrapper">
 			<input type="submit" name="submit" class="settings-submit btn btn-default" value="{{$submit}}"/>
-		</div>	
+		</div>
 	</details>
 
 	<details class="settings-section">
