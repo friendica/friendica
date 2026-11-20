@@ -73,4 +73,34 @@ class APContactTest extends MockedTestCase
 		self::assertSame(self::URL, $apcontact['url']);
 		self::assertNotSame([], $this->requests);
 	}
+
+	public function testRemoteProfileCannotClaimALocalUrl(): void
+	{
+		$remoteUrl = 'https://192.0.2.20/users/bob';
+		$localUrl  = DI::baseUrl() . '/profile/alice';
+
+		$body = json_encode([
+			'@context'          => ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1'],
+			'id'                => $localUrl,
+			'url'               => $localUrl,
+			'type'              => 'Person',
+			'preferredUsername' => 'alice',
+			'inbox'             => $remoteUrl . '/inbox',
+			'publicKey'         => [
+				'id'           => $localUrl . '#main-key',
+				'owner'        => $localUrl,
+				'publicKeyPem' => 'attacker-key',
+			],
+		]);
+
+		$responses = [];
+		for ($i = 0; $i < 12; $i++) {
+			$responses[] = new Response(200, ['Content-Type' => 'application/activity+json'], $body);
+		}
+
+		$this->httpRequestHandler->setHandler(new MockHandler($responses));
+
+		self::assertSame([], APContact::getByURL($remoteUrl));
+		self::assertFalse(DBA::exists('apcontact', ['url' => $localUrl]));
+	}
 }
