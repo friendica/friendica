@@ -10,17 +10,14 @@ namespace Friendica\Network\HTTPClient\Factory;
 use Friendica\App;
 use Friendica\BaseFactory;
 use Friendica\Core\Config\Capability\IManageConfigValues;
-use Friendica\Core\System;
 use Friendica\Network\HTTPClient\Client;
 use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
-use Friendica\Util\Strings;
 use GuzzleHttp;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
-use mattwright\URLResolver;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
@@ -67,12 +64,17 @@ class HttpClient extends BaseFactory
 		) use ($logger): void {
 			$logger->info('Curl redirect.', ['url' => $request->getUri(), 'to' => $uri, 'method' => $request->getMethod()]);
 
-			// Apply the outbound restrictions to every redirect target.
-			if (Network::isUriBlocked($uri) || !Network::isValidHttpUrl((string) $uri) || Network::isPrivateTarget($uri)) {
+			// Apply the outbound restrictions to every redirect target, AddressPinningMiddleware checks the address.
+			if (Network::isUriBlocked($uri) || !Network::isValidHttpUrl((string) $uri)) {
 				$logger->notice('Redirect target is not allowed.', ['url' => $request->getUri(), 'to' => $uri]);
 				throw new TransferException('Redirect to a disallowed target: ' . $uri);
 			}
 		};
+
+		$handlerStack ??= HandlerStack::create();
+		// Pushed last, so it runs below the redirect middleware and checks every hop
+		$handlerStack->remove('address_pinning');
+		$handlerStack->push(new Client\AddressPinningMiddleware($logger), 'address_pinning');
 
 		$guzzle = new GuzzleHttp\Client([
 			RequestOptions::ALLOW_REDIRECTS => [
@@ -98,19 +100,16 @@ class HttpClient extends BaseFactory
 			RequestOptions::VERSION => (curl_version()['features'] & CURL_VERSION_HTTP2) ? 2.0 : 1.1,
 			RequestOptions::PROXY   => $proxy,
 			RequestOptions::HEADERS => [],
-			'handler'               => $handlerStack ?? HandlerStack::create(),
+			'handler'               => $handlerStack,
 		]);
 
-		$resolver = new URLResolver();
-		// One hop per call: HttpClient::finalUrl() follows the hops itself and checks every target.
-		$resolver->setMaxRedirects(1);
-		$resolver->setRequestTimeout(10);
-		// if the file is too large then exit
-		$resolver->setMaxResponseDataSize($this->config->get('performance', 'max_response_data_size', 1000000));
-		// Designate a temporary file that will store cookies during the session.
-		// Some websites test the browser for cookie support, so this enhances results.
-		$resolver->setCookieJar(System::getTempPath() . '/resolver-cookie-' . Strings::getRandomName(10));
-
-		return new Client\HttpClient($logger, $this->profiler, $guzzle, $resolver, $this->baseUrl, (int) $this->config->get('performance', 'max_download_size', 0));
+		return new Client\HttpClient(
+			$logger,
+			$this->profiler,
+			$guzzle,
+			$this->baseUrl,
+			(int) $this->config->get('performance', 'max_download_size', 0),
+			(int) $this->config->get('performance', 'max_response_data_size', 1000000),
+		);
 	}
 }
