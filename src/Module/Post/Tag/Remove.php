@@ -77,7 +77,7 @@ class Remove extends \Friendica\BaseModule
 			$this->baseUrl->redirect($returnUrl);
 		}
 
-		$item = $this->getOwnPost($item_id);
+		$item = Post::getOwnBySession($this->session, $item_id);
 		if (!$item) {
 			$this->baseUrl->redirect($returnUrl);
 		}
@@ -121,7 +121,7 @@ class Remove extends \Friendica\BaseModule
 			return;
 		}
 
-		$item = $this->getOwnPost($item_id);
+		$item = Post::getOwnBySession($this->session, $item_id);
 		if (empty($item)) {
 			return;
 		}
@@ -131,20 +131,5 @@ class Remove extends \Friendica\BaseModule
 				Tag::removeByHash($item['uri-id'], $results[1], $results[3], $results[2]);
 			}
 		}
-	}
-
-	/**
-	 * Tags are stored per uri-id and shared by every copy of the post, so only the author may remove them.
-	 */
-	private function getOwnPost(int $item_id): ?array
-	{
-		$item = Post::selectFirst(['uri-id'], [
-			'id'        => $item_id,
-			'uid'       => $this->session->getLocalUserId(),
-			'author-id' => $this->session->getPublicContactId(),
-			'origin'    => true,
-		]);
-
-		return is_array($item) ? $item : null;
 	}
 }
