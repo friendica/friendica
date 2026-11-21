@@ -757,6 +757,11 @@ class Item
 		$item['parent-uri-id'] = ItemURI::getIdByURI($item['parent-uri']);
 		$item['thr-parent-id'] = ItemURI::getIdByURI($item['thr-parent']);
 
+		// Local comments on a public post that is addressed to an audience (group) are unlisted
+		if (Tag::isUnlistedGroupReply($item)) {
+			$item['private'] = self::UNLISTED;
+		}
+
 		if (!empty($item['conversation']) && empty($item['conversation-id'])) {
 			$item['conversation-id'] = ItemURI::getIdByURI($item['conversation']);
 		}
