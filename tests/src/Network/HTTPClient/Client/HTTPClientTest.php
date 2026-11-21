@@ -15,6 +15,7 @@ use Friendica\Network\HTTPClient\Factory\HttpClient as HttpClientFactory;
 use Friendica\Util\Network;
 use Friendica\Test\DiceHttpMockHandlerTrait;
 use Friendica\Test\MockedTestCase;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\FnStream;
@@ -376,6 +377,55 @@ class HTTPClientTest extends MockedTestCase
 		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
 
 		self::assertSame($url . $expected, DI::httpClient()->finalUrl($url . $path));
+	}
+
+	/** Ensures finalUrl() reads the page when max_response_data_size is 0, which means unlimited. */
+	public function testFinalUrlWithoutSizeLimit(): void
+	{
+		DI::config()->set('performance', 'max_response_data_size', 0);
+
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		self::assertSame($url . '/final-og', DI::httpClient()->finalUrl($url . '/og'));
+	}
+
+	/** Ensures a malformed og:url from the remote page is no further hop. */
+	public function testFinalUrlIgnoresMalformedPageLink(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		self::assertSame($url . '/og-malformed', DI::httpClient()->finalUrl($url . '/og-malformed'));
+	}
+
+	public static function finalUrlTransferErrorProvider(): array
+	{
+		return [
+			'malformed redirect target' => ['/redirect-malformed'],
+			'connection lost in body'   => ['/og-cut'],
+		];
+	}
+
+	/** Ensures finalUrl() reports a broken hop as TransferException, which is what callers catch. */
+	#[DataProvider('finalUrlTransferErrorProvider')]
+	public function testFinalUrlThrowsTransferException(string $path): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		$this->expectException(TransferException::class);
+		DI::httpClient()->finalUrl($url . $path);
+	}
+
+	/** Ensures a malformed URL is reported as TransferException. */
+	public function testFinalUrlRejectsMalformedUrl(): void
+	{
+		$this->expectException(TransferException::class);
+		DI::httpClient()->finalUrl('http://:80');
 	}
 
 	/** Ensures every hop of finalUrl() connects to the checked addresses. */

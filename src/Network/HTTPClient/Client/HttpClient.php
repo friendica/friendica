@@ -341,7 +341,13 @@ class HttpClient implements ICanSendHttpRequests
 			$this->logger->debug('Local link', ['url' => $url]);
 		}
 
-		if (Network::isUriBlocked(new Uri($url))) {
+		try {
+			$uri = new Uri($url);
+		} catch (\InvalidArgumentException $exception) {
+			throw new TransferException('Invalid URL: ' . $url, 0, $exception);
+		}
+
+		if (Network::isUriBlocked($uri)) {
 			$this->logger->info('Domain is blocked.', ['url' => $url]);
 			return $url;
 		}
@@ -351,7 +357,7 @@ class HttpClient implements ICanSendHttpRequests
 			return $url;
 		}
 
-		if (Network::isPrivateTarget(new Uri($url))) {
+		if (Network::isPrivateTarget($uri)) {
 			$this->logger->notice('Target is not on the public internet.', ['url' => $url]);
 			return $url;
 		}
@@ -394,11 +400,17 @@ class HttpClient implements ICanSendHttpRequests
 					throw new TransferException('Redirect without location: ' . $url, $page['status']);
 				}
 				$next = self::resolveLink($url, $page['location']);
+				if ($next === null) {
+					throw new TransferException('Redirect with an invalid location: ' . $url, $page['status']);
+				}
 			} elseif ($page['og'] !== null || $page['canonical'] !== null) {
 				$nextOg        = $page['og'] !== null;
 				$nextCanonical = $page['canonical'] !== null && ($page['og'] === null || $page['canonical'] === $page['og']);
-				$target        = self::resolveLink($url, $page['og'] ?? $page['canonical']);
-				if ($target === $url) {
+				// A malformed og:url or canonical link is no further hop
+				$target = self::resolveLink($url, $page['og'] ?? $page['canonical']);
+				if ($target === null) {
+					$nextOg = $nextCanonical = false;
+				} elseif ($target === $url) {
 					$isOg        = $isOg || $nextOg;
 					$isCanonical = $isCanonical || $nextCanonical;
 				} else {
@@ -446,8 +458,10 @@ class HttpClient implements ICanSendHttpRequests
 	 */
 	private function fetchHop(string $url, CookieJar $jar): array
 	{
-		$sink    = new SizeLimitedStream(Utils::streamFor(fopen('php://temp', 'w+')), $this->maxResolverBodySize);
+		$stream  = Utils::streamFor(fopen('php://temp', 'w+'));
+		$sink    = $this->maxResolverBodySize > 0 ? new SizeLimitedStream($stream, $this->maxResolverBodySize) : $stream;
 		$headers = null;
+		$aborted = false;
 
 		try {
 			$this->client->request('GET', $url, [
@@ -460,16 +474,17 @@ class HttpClient implements ICanSendHttpRequests
 					'Accept'     => HttpClientAccept::HTML,
 				],
 				RequestOptions::SINK       => $sink,
-				RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$headers): void {
+				RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$headers, &$aborted): void {
 					$headers = $response;
 					if (!self::isHtmlPage($response)) {
+						$aborted = true;
 						throw new \RuntimeException('The body is not needed.');
 					}
 				},
 			]);
 		} catch (TransferException $exception) {
-			// An aborted or oversized body still leaves the status, the headers and the beginning of the page
-			if ($headers === null) {
+			// An aborted or oversized body still leaves the status, the headers and the beginning of the page, other errors don't
+			if ($headers === null || (!$aborted && self::findResponseTooLarge($exception) === null)) {
 				throw $exception;
 			}
 		}
@@ -499,8 +514,8 @@ class HttpClient implements ICanSendHttpRequests
 		return $response->getStatusCode() === 200 && stripos($response->getHeaderLine('Content-Type'), 'html') !== false;
 	}
 
-	/** Resolves a Location header or an og:url/canonical link against the URL of the page. */
-	private static function resolveLink(string $base, string $link): string
+	/** Resolves a Location header or an og:url/canonical link against the URL of the page, null when the link is malformed. */
+	private static function resolveLink(string $base, string $link): ?string
 	{
 		$link = trim($link);
 		// Links like "www.example.com/page" are common in the wild, they lack the scheme
@@ -508,7 +523,11 @@ class HttpClient implements ICanSendHttpRequests
 			$link = (new Uri($base))->getScheme() . '://' . $link;
 		}
 
-		$target = UriResolver::resolve(new Uri($base), new Uri($link));
+		try {
+			$target = UriResolver::resolve(new Uri($base), new Uri($link));
+		} catch (\InvalidArgumentException) {
+			return null;
+		}
 		if ($target->getPath() === '' && $target->getHost() !== '') {
 			$target = $target->withPath('/');
 		}

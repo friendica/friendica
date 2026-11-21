@@ -75,6 +75,21 @@ switch (parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH)) {
 		}
 		break;
 
+	case '/og-malformed':
+		echo '<html><head><meta property="og:url" content="http://:80"></head></html>';
+		break;
+
+	case '/redirect-malformed':
+		header('Location: http://:80', true, 302);
+		break;
+
+	case '/og-cut':
+		// The connection closes before the announced body is complete
+		header('Content-Length: 100000');
+		echo '<html><head><meta property="og:url" content="/final-og"></head>';
+		flush();
+		exit;
+
 	case '/redirect-image':
 		header('Location: /image', true, 302);
 		break;
