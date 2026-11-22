@@ -1875,7 +1875,8 @@ class Transmitter
 		}
 		$body = self::addEmojiTags($emojis, $body);
 
-		if (empty($item['uid']) || !Feature::isEnabled($item['uid'], Feature::EXPLICIT_MENTIONS)) {
+		// In group threads the mentions are only transmitted as tags, not as text (this is how Lemmy works)
+		if ((empty($item['uid']) || !Feature::isEnabled($item['uid'], Feature::EXPLICIT_MENTIONS)) && !Post\Group::isGroupPost($item['thr-parent-id'])) {
 			$body = self::prependMentions($body, $item['uri-id'], $item['author-link']);
 		}
 

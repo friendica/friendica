@@ -514,7 +514,7 @@ class Tag
 			return false;
 		}
 
-		return Post::exists(['uri-id' => $item['parent-uri-id'], 'private' => Item::PUBLIC]) && !empty(self::getByURIId($item['parent-uri-id'], [self::AUDIENCE]));
+		return Post::exists(['uri-id' => $item['parent-uri-id'], 'private' => Item::PUBLIC]) && Post\Group::isGroupPost($item['parent-uri-id']);
 	}
 
 	/**
@@ -522,21 +522,16 @@ class Tag
 	 *
 	 * @param integer $uriId
 	 * @param integer $parentUriId
-	 * @param integer $threadUriId URI id of the thread root
 	 * @return void
 	 */
-	public static function createImplicitMentions(int $uriId, int $parentUriId, int $threadUriId)
+	public static function createImplicitMentions(int $uriId, int $parentUriId)
 	{
-		// Replies to group posts (posts with an audience) don't get implicit mentions
-		if (!empty(self::getByURIId($threadUriId, [self::AUDIENCE]))) {
-			return;
-		}
-
 		// Always mention the direct parent author
 		$parent = Post::selectFirst(['author-link', 'author-name'], ['uri-id' => $parentUriId]);
 		self::store($uriId, self::IMPLICIT_MENTION, $parent['author-name'], $parent['author-link']);
 
-		if (DI::config()->get('system', 'disable_implicit_mentions')) {
+		// For replies to group posts only the direct parent author is mentioned (to notify them), not the other participants
+		if (DI::config()->get('system', 'disable_implicit_mentions') || Post\Group::isGroupPost($parentUriId)) {
 			return;
 		}
 

@@ -1096,7 +1096,7 @@ class Item
 	public function postProcessPost(array $post, array $recipients = [])
 	{
 		if (!Feature::isEnabled($post['uid'], Feature::EXPLICIT_MENTIONS) && ($post['gravity'] == ItemModel::GRAVITY_COMMENT)) {
-			Tag::createImplicitMentions($post['uri-id'], $post['thr-parent-id'], $post['parent-uri-id']);
+			Tag::createImplicitMentions($post['uri-id'], $post['thr-parent-id']);
 		}
 
 		$hook_data = [
