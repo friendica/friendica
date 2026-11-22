@@ -16,13 +16,14 @@ use Friendica\Network\HTTPClient\Capability\ICanHandleHttpResponses;
 use Friendica\Util\Network;
 use Friendica\Util\Profiler;
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Psr7\UriResolver;
+use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\RequestOptions;
-use mattwright\URLResolver;
-use mattwright\URLResolverResult;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -35,7 +36,13 @@ class HttpClient implements ICanSendHttpRequests
 	/** Upper bound for redirects and og:url/canonical hops in finalUrl() */
 	private const MAX_RESOLVER_HOPS = 10;
 
-	public function __construct(private readonly LoggerInterface $logger, private readonly Profiler $profiler, private readonly Client $client, private readonly URLResolver $resolver, private readonly App\BaseURL $baseUrl, private readonly int $maxBodySize = 0) {}
+	/** Timeout in seconds for a single hop in finalUrl() */
+	private const RESOLVER_TIMEOUT = 10;
+
+	/** Status codes that finalUrl() follows */
+	private const REDIRECT_STATUS = [301, 302, 303, 307, 308];
+
+	public function __construct(private readonly LoggerInterface $logger, private readonly Profiler $profiler, private readonly Client $client, private readonly App\BaseURL $baseUrl, private readonly int $maxBodySize, private readonly int $maxResolverBodySize) {}
 
 	/**
 	 * {@inheritDoc}
@@ -94,11 +101,7 @@ class HttpClient implements ICanSendHttpRequests
 			return CurlResult::createErrorCurl($this->logger, $url);
 		}
 
-		if (Network::isPrivateTarget(new Uri($url))) {
-			$this->logger->notice('Target is not on the public internet.', ['url' => $url]);
-			$this->profiler->stopRecording();
-			return CurlResult::createErrorCurl($this->logger, $url);
-		}
+		// AddressPinningMiddleware checks the target address of the request and every redirect
 
 		$conf = [];
 
@@ -334,13 +337,17 @@ class HttpClient implements ICanSendHttpRequests
 	 */
 	public function finalUrl(string $url): string
 	{
-		$this->profiler->startRecording('network');
-
 		if ($this->baseUrl->isLocalUrl($url)) {
 			$this->logger->debug('Local link', ['url' => $url]);
 		}
 
-		if (Network::isUriBlocked(new Uri($url))) {
+		try {
+			$uri = new Uri($url);
+		} catch (\InvalidArgumentException $exception) {
+			throw new TransferException('Invalid URL: ' . $url, 0, $exception);
+		}
+
+		if (Network::isUriBlocked($uri)) {
 			$this->logger->info('Domain is blocked.', ['url' => $url]);
 			return $url;
 		}
@@ -350,35 +357,76 @@ class HttpClient implements ICanSendHttpRequests
 			return $url;
 		}
 
-		if (Network::isPrivateTarget(new Uri($url))) {
+		if (Network::isPrivateTarget($uri)) {
 			$this->logger->notice('Target is not on the public internet.', ['url' => $url]);
 			return $url;
 		}
 
 		$url = Network::stripTrackingQueryParams($url);
-
 		$url = trim($url, "'");
 
-		$this->resolver->setUserAgent($this->getUserAgent(HttpClientRequest::URLRESOLVER));
+		$this->profiler->startRecording('network');
 
-		// The resolver fetches one hop per call, so every redirect target passes the outbound restrictions first.
-		$results = [];
-		$visits  = [];
-		$viaOg   = $viaCanonical = false;
+		try {
+			return $this->followHops($url);
+		} finally {
+			$this->profiler->stopRecording();
+		}
+	}
+
+	/**
+	 * Follows redirects and og:url/canonical links one hop at a time, so every target passes the outbound restrictions first.
+	 *
+	 * Picks the deepest URL in this order: og:url, canonical, success, failure, redirect.
+	 *
+	 * @throws TransferException when a hop can't be fetched
+	 */
+	private function followHops(string $url): string
+	{
+		$jar    = new CookieJar();
+		$found  = [];
+		$visits = [];
+		$viaOg  = $viaCanonical = false;
 		for ($hop = 0; $hop < self::MAX_RESOLVER_HOPS; $hop++) {
-			$urlResult = $this->resolver->resolveURL($url);
+			$page        = $this->fetchHop($url, $jar);
+			$isRedirect  = in_array($page['status'], self::REDIRECT_STATUS);
+			$isOg        = $viaOg;
+			$isCanonical = $viaCanonical;
+			$next        = null;
+			$nextOg      = $nextCanonical = false;
 
-			if ($urlResult->didErrorOccur()) {
-				throw new TransferException($urlResult->getErrorMessageString(), $urlResult->getHTTPStatusCode() ?? 0);
+			if ($isRedirect) {
+				if ($page['location'] === null) {
+					throw new TransferException('Redirect without location: ' . $url, $page['status']);
+				}
+				$next = self::resolveLink($url, $page['location']);
+				if ($next === null) {
+					throw new TransferException('Redirect with an invalid location: ' . $url, $page['status']);
+				}
+			} elseif ($page['og'] !== null || $page['canonical'] !== null) {
+				$nextOg        = $page['og'] !== null;
+				$nextCanonical = $page['canonical'] !== null && ($page['og'] === null || $page['canonical'] === $page['og']);
+				// A malformed og:url or canonical link is no further hop
+				$target = self::resolveLink($url, $page['og'] ?? $page['canonical']);
+				if ($target === null) {
+					$nextOg = $nextCanonical = false;
+				} elseif ($target === $url) {
+					$isOg        = $isOg || $nextOg;
+					$isCanonical = $isCanonical || $nextCanonical;
+				} else {
+					$next = $target;
+				}
 			}
 
-			$urlResult->isOpenGraphURL($urlResult->isOpenGraphURL() || $viaOg);
-			$urlResult->isCanonicalURL($urlResult->isCanonicalURL() || $viaCanonical);
-			$results[]    = $urlResult;
+			if ($page['status'] === 200) {
+				$found[$isOg ? 'og' : ($isCanonical ? 'canonical' : 'ok')] = $url;
+			} else {
+				$found[$isRedirect ? 'redirect' : 'fail'] = $url;
+			}
+
 			$visits[$url] = ($visits[$url] ?? 0) + 1;
 
-			$next = $urlResult->getRedirectTarget();
-			if ($next === null || ($visits[$next] ?? 0) > 1 || (isset($visits[$next]) && !$urlResult->hasRedirectHTTPStatus())) {
+			if ($next === null || ($visits[$next] ?? 0) > 1 || (isset($visits[$next]) && !$isRedirect)) {
 				break;
 			}
 
@@ -393,38 +441,103 @@ class HttpClient implements ICanSendHttpRequests
 				return $next;
 			}
 
-			$viaOg        = $urlResult->redirectTargetIsOpenGraphURL();
-			$viaCanonical = $urlResult->redirectTargetIsCanonicalURL();
+			$viaOg        = $nextOg;
+			$viaCanonical = $nextCanonical;
 			$url          = $next;
 		}
 
-		return $this->selectResolvedUrl($results);
+		return $found['og'] ?? $found['canonical'] ?? $found['ok'] ?? $found['fail'] ?? $found['redirect'] ?? $url;
 	}
 
 	/**
-	 * Picks the resolved URL with the same preference as URLResolver: og:url, canonical, success, failure, redirect.
+	 * Fetches a single hop without following redirects, only HTML bodies are read up to the size limit.
 	 *
-	 * @param URLResolverResult[] $results Results in the order they were fetched
+	 * @return array{status: int, location: ?string, og: ?string, canonical: ?string}
+	 *
+	 * @throws TransferException when no response headers were received
 	 */
-	private function selectResolvedUrl(array $results): string
+	private function fetchHop(string $url, CookieJar $jar): array
 	{
-		$found = [];
-		foreach (array_reverse($results) as $result) {
-			if ($result->hasSuccessHTTPStatus()) {
-				$type = $result->isOpenGraphURL() ? 'og' : ($result->isCanonicalURL() ? 'canonical' : 'ok');
-			} else {
-				$type = $result->hasRedirectHTTPStatus() ? 'redirect' : 'fail';
+		$stream  = Utils::streamFor(fopen('php://temp', 'w+'));
+		$sink    = $this->maxResolverBodySize > 0 ? new SizeLimitedStream($stream, $this->maxResolverBodySize) : $stream;
+		$headers = null;
+		$aborted = false;
+
+		try {
+			$this->client->request('GET', $url, [
+				RequestOptions::ALLOW_REDIRECTS => false,
+				RequestOptions::CONNECT_TIMEOUT => self::RESOLVER_TIMEOUT,
+				RequestOptions::TIMEOUT         => self::RESOLVER_TIMEOUT,
+				RequestOptions::COOKIES         => $jar,
+				RequestOptions::HEADERS         => [
+					'User-Agent' => $this->getUserAgent(HttpClientRequest::URLRESOLVER),
+					'Accept'     => HttpClientAccept::HTML,
+				],
+				RequestOptions::SINK       => $sink,
+				RequestOptions::ON_HEADERS => function (ResponseInterface $response) use (&$headers, &$aborted): void {
+					$headers = $response;
+					if (!self::isHtmlPage($response)) {
+						$aborted = true;
+						throw new \RuntimeException('The body is not needed.');
+					}
+				},
+			]);
+		} catch (TransferException $exception) {
+			// An aborted or oversized body still leaves the status, the headers and the beginning of the page, other errors don't
+			if ($headers === null || (!$aborted && self::findResponseTooLarge($exception) === null)) {
+				throw $exception;
 			}
-			$found[$type] ??= $result;
 		}
 
-		foreach (['og', 'canonical', 'ok', 'fail', 'redirect'] as $type) {
-			if (isset($found[$type])) {
-				return $found[$type]->getURL();
+		$page = [
+			'status'    => $headers->getStatusCode(),
+			'location'  => $headers->getHeaderLine('Location') ?: null,
+			'og'        => null,
+			'canonical' => null,
+		];
+
+		if (self::isHtmlPage($headers)) {
+			$sink->rewind();
+			$doc = new \DOMDocument();
+			if (@$doc->loadHTML($sink->getContents() ?: '<html></html>')) {
+				$xpath             = new \DOMXPath($doc);
+				$page['og']        = trim((string) $xpath->evaluate('string(//meta[@property="og:url"][1]/@content)')) ?: null;
+				$page['canonical'] = trim((string) $xpath->evaluate('string(//link[@rel="canonical"][1]/@href)')) ?: null;
 			}
 		}
 
-		return $results[0]->getURL();
+		return $page;
+	}
+
+	private static function isHtmlPage(ResponseInterface $response): bool
+	{
+		return $response->getStatusCode() === 200 && stripos($response->getHeaderLine('Content-Type'), 'html') !== false;
+	}
+
+	/** Resolves a Location header or an og:url/canonical link against the URL of the page, null when the link is malformed. */
+	private static function resolveLink(string $base, string $link): ?string
+	{
+		$link = trim($link);
+		// Links like "www.example.com/page" are common in the wild, they lack the scheme
+		if (stripos($link, 'www.') === 0) {
+			$link = (new Uri($base))->getScheme() . '://' . $link;
+		}
+
+		try {
+			$target = UriResolver::resolve(new Uri($base), new Uri($link));
+		} catch (\InvalidArgumentException) {
+			return null;
+		}
+		if ($target->getPath() === '' && $target->getHost() !== '') {
+			$target = $target->withPath('/');
+		}
+
+		$fragment = (new Uri($base))->getFragment();
+		if ($fragment !== '' && $target->getFragment() === '') {
+			$target = $target->withFragment($fragment);
+		}
+
+		return (string) $target;
 	}
 
 	/**
