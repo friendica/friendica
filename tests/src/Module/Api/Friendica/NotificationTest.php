@@ -24,7 +24,7 @@ class NotificationTest extends ApiTestCase
 		$assertXml = <<<XML
 <?xml version="1.0"?>
 <notes>
-  <note date="$date" date_rel="$dateRel" id="1" iid="4" link="https://friendica.local/display/1" msg="A test reply from an item" msg_cache="A test reply from an item" msg_html="A test reply from an item" msg_plain="A test reply from an item" name="Friend contact" name_cache="Friend contact" otype="item" parent="" photo="https://friendica.local/" seen="false" timestamp="1577880722" type="8" uid="42" url="https://friendica.local/profile/friendcontact" verb="http://activitystrea.ms/schema/1.0/post"/>
+  <note date="$date" date_rel="$dateRel" id="501" iid="1504" link="https://friendica.local/display/1" msg="A test reply from an item" msg_cache="A test reply from an item" msg_html="A test reply from an item" msg_plain="A test reply from an item" name="Friend contact" name_cache="Friend contact" otype="item" parent="" photo="https://friendica.local/" seen="false" timestamp="1577880722" type="8" uid="1042" url="https://friendica.local/profile/friendcontact" verb="http://activitystrea.ms/schema/1.0/post"/>
 </notes>
 XML;
 

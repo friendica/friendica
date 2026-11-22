@@ -43,7 +43,7 @@ final class CreateTest extends ApiTestCase
 	public function testApiFavoritesCreateDestroyWithCreateAction(): void
 	{
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/favorites/create.json'))
-			->withParsedBody(['id' => 3]);
+			->withParsedBody(['id' => 20003]);
 
 		$response = $this->createModule()->handleRequest($request);
 
@@ -52,12 +52,12 @@ final class CreateTest extends ApiTestCase
 		$json = $this->toJson($response);
 
 		self::assertStatus($json);
-		self::assertEquals(3, $json->id);
+		self::assertEquals(20003, $json->id);
 		self::assertTrue($json->favorited);
 
 		self::assertTrue(DI::dba()->exists('post-user', [
-			'uid'           => 42,
-			'thr-parent-id' => 3,
+			'uid'           => 1042,
+			'thr-parent-id' => 20003,
 			'vid'           => Verb::getID(Activity::LIKE),
 			'gravity'       => Item::GRAVITY_ACTIVITY,
 			'deleted'       => false,
@@ -67,7 +67,7 @@ final class CreateTest extends ApiTestCase
 	public function testApiFavoritesCreateDestroyWithCreateActionAndRss(): void
 	{
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/favorites/create.json'))
-			->withParsedBody(['id' => 3]);
+			->withParsedBody(['id' => 20003]);
 
 		$response = $this->createModule(['extension' => ICanCreateResponses::TYPE_RSS])->handleRequest($request);
 
@@ -82,7 +82,7 @@ final class CreateTest extends ApiTestCase
 		AuthTestConfig::$authenticated = false;
 
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/favorites/create.json'))
-			->withParsedBody(['id' => 3]);
+			->withParsedBody(['id' => 20003]);
 
 		$module = $this->createModule();
 

@@ -68,7 +68,7 @@ final class DeleteTest extends ApiTestCase
 		self::assertEquals('deleted', $json->result);
 		self::assertEquals('photo with id `' . self::PHOTO_RESOURCE_ID . '` has been deleted from server.', $json->message);
 
-		self::assertFalse(DI::dba()->exists('photo', ['resource-id' => self::PHOTO_RESOURCE_ID, 'uid' => 42]));
+		self::assertFalse(DI::dba()->exists('photo', ['resource-id' => self::PHOTO_RESOURCE_ID, 'uid' => 1042]));
 	}
 
 	public function testApiPhotoDeleteWithRawJsonBody(): void

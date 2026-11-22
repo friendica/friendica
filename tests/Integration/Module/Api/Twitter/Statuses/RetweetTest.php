@@ -42,7 +42,7 @@ final class RetweetTest extends ApiTestCase
 	public function testApiStatusesRepeatWithId(): void
 	{
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/statuses/retweet'))
-			->withParsedBody(['id' => 1]);
+			->withParsedBody(['id' => 20001]);
 
 		$response = $this->createModule()->handleRequest($request);
 
@@ -58,7 +58,7 @@ final class RetweetTest extends ApiTestCase
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/statuses/retweet'))
-			->withParsedBody(['id' => 5]);
+			->withParsedBody(['id' => 20005]);
 
 		$response = $this->createModule()->handleRequest($request);
 
@@ -74,7 +74,7 @@ final class RetweetTest extends ApiTestCase
 		AuthTestConfig::$authenticated = false;
 
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/statuses/retweet'))
-			->withParsedBody(['id' => 1]);
+			->withParsedBody(['id' => 20001]);
 
 		$module = $this->createModule();
 

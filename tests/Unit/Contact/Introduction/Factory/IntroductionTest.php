@@ -18,9 +18,9 @@ class IntroductionTest extends TestCase
 		return [
 			'default' => [
 				'input' => [
-					'uid'         => 42,
-					'suggest-cid' => 13,
-					'contact-id'  => 24,
+					'uid'         => 1042,
+					'suggest-cid' => 3013,
+					'contact-id'  => 3024,
 					'knowyou'     => 1,
 					'note'        => 'a note',
 					'hash'        => '12345',
@@ -29,9 +29,9 @@ class IntroductionTest extends TestCase
 					'id'          => 56,
 				],
 				'assertion' => [
-					'uid'         => 42,
-					'suggest-cid' => 13,
-					'contact-id'  => 24,
+					'uid'         => 1042,
+					'suggest-cid' => 3013,
+					'contact-id'  => 3024,
 					'knowyou'     => true,
 					'note'        => 'a note',
 					'hash'        => '12345',

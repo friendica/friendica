@@ -41,7 +41,7 @@ final class DestroyTest extends ApiTestCase
 	public function testApiStatusesDestroyWithId(): void
 	{
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/statuses/destroy'))
-			->withParsedBody(['id' => 1]);
+			->withParsedBody(['id' => 20001]);
 
 		$response = $this->createModule()->handleRequest($request);
 
@@ -49,7 +49,7 @@ final class DestroyTest extends ApiTestCase
 
 		$json = $this->toJson($response);
 
-		self::assertEquals(1, $json->id);
+		self::assertEquals(20001, $json->id);
 		self::assertIsObject($json->user);
 		self::assertIsObject($json->friendica_author);
 	}
@@ -59,7 +59,7 @@ final class DestroyTest extends ApiTestCase
 		AuthTestConfig::$authenticated = false;
 
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/statuses/destroy'))
-			->withParsedBody(['id' => 1]);
+			->withParsedBody(['id' => 20001]);
 
 		$module = $this->createModule();
 

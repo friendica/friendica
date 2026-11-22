@@ -24,21 +24,21 @@ abstract class ApiTestCase extends FixtureTestCase
 {
 	// User data that the test database is populated with
 	public const SELF_USER = [
-		'id'   => 42,
+		'id'   => 3042,
 		'name' => 'Test user',
 		'nick' => 'selfcontact',
 		'nurl' => 'http://localhost/profile/selfcontact',
 	];
 
 	public const FRIEND_USER = [
-		'id'   => 44,
+		'id'   => 3044,
 		'name' => 'Friend contact',
 		'nick' => 'friendcontact',
 		'nurl' => 'http://localhost/profile/friendcontact',
 	];
 
 	public const OTHER_USER = [
-		'id'   => 43,
+		'id'   => 3043,
 		'name' => 'othercontact',
 		'nick' => 'othercontact',
 		'nurl' => 'http://localhost/profile/othercontact',
@@ -170,7 +170,7 @@ abstract class ApiTestCase extends FixtureTestCase
 		$this->httpExceptionMock = $this->dice->create(HTTPException::class);
 
 		AuthTestConfig::$authenticated = true;
-		AuthTestConfig::$user_id       = 42;
+		AuthTestConfig::$user_id       = 1042;
 
 		$this->installAuthTest();
 	}

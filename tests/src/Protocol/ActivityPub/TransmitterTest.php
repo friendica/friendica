@@ -35,7 +35,7 @@ class TransmitterTest extends FixtureTestCase
 
 	public function testEmojiPost(): void
 	{
-		$post = Post::selectFirst([], ['id' => 14]);
+		$post = Post::selectFirst([], ['id' => 1514]);
 		$this->assertNotNull($post);
 		$note = Transmitter::createNote($post);
 		$this->assertNotNull($note); // @phpstan-ignore method.alreadyNarrowedType

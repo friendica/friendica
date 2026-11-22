@@ -12,7 +12,7 @@ use Friendica\Test\FixtureTestCase;
 
 class TagTest extends FixtureTestCase
 {
-	private const URI_ID = 7;
+	private const URI_ID = 20007;
 
 	private const CONTACT_URL = 'https://friendica.local/profile/friendcontact';
 

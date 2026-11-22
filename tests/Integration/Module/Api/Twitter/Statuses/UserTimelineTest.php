@@ -24,10 +24,10 @@ final class UserTimelineTest extends ApiTestCase
 	{
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/statuses/user_timeline'))
 			->withQueryParams([
-				'user_id'         => '43',
-				'max_id'          => '10',
+				'user_id'         => '3043',
+				'max_id'          => '20010',
 				'exclude_replies' => 'true',
-				'conversation_id' => '1',
+				'conversation_id' => '20001',
 			]);
 
 		$response = $this->createModule()->handleRequest($request);
@@ -49,7 +49,7 @@ final class UserTimelineTest extends ApiTestCase
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/statuses/user_timeline'))
 			->withQueryParams([
-				'user_id' => '43',
+				'user_id' => '3043',
 				'page'    => '-2',
 			]);
 

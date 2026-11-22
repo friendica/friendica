@@ -25,10 +25,10 @@ use Psr\Log\NullLogger;
 
 final class RemoveTest extends FixtureTestCase
 {
-	private const UID               = 42;
-	private const PUBLIC_CONTACT_ID = 48;
-	private const POST_ID           = 1;
-	private const URI_ID            = 1;
+	private const UID               = 1042;
+	private const PUBLIC_CONTACT_ID = 3048;
+	private const POST_ID           = 1501;
+	private const URI_ID            = 20001;
 	private const TAG               = 'removetest';
 
 	protected function setUp(): void
@@ -56,7 +56,7 @@ final class RemoveTest extends FixtureTestCase
 
 	public function testTagOfPostBySomeoneElseIsKept(): void
 	{
-		// Fixture post 1 is in the timeline of uid 42 but authored by contact 43.
+		// Fixture post 1502 is in the timeline of uid 1042 but authored by contact 3043.
 		$this->removeTag();
 
 		self::assertContains(self::TAG, $this->tagNames());

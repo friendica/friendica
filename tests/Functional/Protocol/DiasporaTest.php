@@ -36,8 +36,9 @@ class DiasporaTest extends FixtureTestCase
 
 	private const KNOWN_MENTION = 'carol@carol.example';
 
-	// Local user, its self contact (same id) provides the key pair
-	private const LOCAL_UID = 42;
+	// Local user, its self contact provides the key pair
+	private const LOCAL_UID = 1042;
+	private const LOCAL_CID = 3042;
 
 	private const IMPORTER = ['uid' => 0, 'page-flags' => User::PAGE_FLAGS_FREELOVE];
 
@@ -94,7 +95,7 @@ class DiasporaTest extends FixtureTestCase
 		DI::config()->set('system', 'diaspora_enabled', true);
 		DI::config()->set('system', 'relay_scope', Relay::SCOPE_NONE);
 
-		$keys             = DBA::selectFirst('contact', ['prvkey', 'pubkey'], ['id' => self::LOCAL_UID]);
+		$keys             = DBA::selectFirst('contact', ['prvkey', 'pubkey'], ['id' => self::LOCAL_CID]);
 		$this->privateKey = $keys['prvkey'];
 		$this->publicKey  = $keys['pubkey'];
 

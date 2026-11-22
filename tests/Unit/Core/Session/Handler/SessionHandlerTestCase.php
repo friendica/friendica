@@ -67,7 +67,7 @@ abstract class SessionHandlerTestCase extends TestCase
 
 	public function testWriteWithoutIdFailsWithoutTouchingTheBackend(): void
 	{
-		self::assertFalse($this->handlerWithUnusedBackend()->write('', 'uid|i:42;'));
+		self::assertFalse($this->handlerWithUnusedBackend()->write('', 'uid|i:1042;'));
 	}
 
 	/**
@@ -102,7 +102,7 @@ abstract class SessionHandlerTestCase extends TestCase
 	{
 		$handler = $this->handlerWithBrokenBackend($this->loggerExpectingOneWarning());
 
-		self::assertFalse($handler->write(self::SESSION_ID, 'uid|i:42;'));
+		self::assertFalse($handler->write(self::SESSION_ID, 'uid|i:1042;'));
 	}
 
 	public function testDestroyFailsWhenTheBackendIsBroken(): void

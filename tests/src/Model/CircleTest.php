@@ -46,19 +46,19 @@ class CircleTest extends MockedTestCase
 	{
 		$this->dbMock->shouldReceive('exists')->with(
 			'group',
-			['id' => 17, 'deleted' => false, 'uid' => 42],
+			['id' => 17, 'deleted' => false, 'uid' => 1042],
 		)->andReturn(true)->once();
 
-		self::assertTrue(Circle::exists(17, 42));
+		self::assertTrue(Circle::exists(17, 1042));
 	}
 
 	public function testExistsForAnotherUid(): void
 	{
 		$this->dbMock->shouldReceive('exists')->with(
 			'group',
-			['id' => 17, 'deleted' => false, 'uid' => 41],
+			['id' => 17, 'deleted' => false, 'uid' => 1041],
 		)->andReturn(false)->once();
 
-		self::assertFalse(Circle::exists(17, 41));
+		self::assertFalse(Circle::exists(17, 1041));
 	}
 }

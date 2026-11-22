@@ -30,7 +30,7 @@ final class ListsTest extends ApiTestCase
 
 		self::assertIsArray($json->users);
 		self::assertSame(2, $json->total_count);
-		self::assertSame([47, 45], array_map(static function ($user) {
+		self::assertSame([3047, 3045], array_map(static function ($user) {
 			return $user->pid;
 		}, $json->users));
 	}
@@ -48,7 +48,7 @@ final class ListsTest extends ApiTestCase
 
 		self::assertIsArray($json->users);
 		self::assertSame(2, $json->total_count);
-		self::assertSame([47, 45], array_map(static function ($user) {
+		self::assertSame([3047, 3045], array_map(static function ($user) {
 			return $user->pid;
 		}, $json->users));
 	}

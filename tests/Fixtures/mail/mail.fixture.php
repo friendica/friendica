@@ -7,11 +7,11 @@
 return [
 	'mail' => [
 		[
-			'uid'           => 42,
-			'author-id'     => 44,
-			'uri-id'        => 44,
-			'parent-uri-id' => 44,
-			'thr-parent-id' => 44,
+			'uid'           => 1042,
+			'author-id'     => 3044,
+			'uri-id'        => 20044,
+			'parent-uri-id' => 20044,
+			'thr-parent-id' => 20044,
 			'guid'          => '123456',
 			'from-name'     => 'Tester',
 			'title'         => 'item_title',

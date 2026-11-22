@@ -56,7 +56,7 @@ class UserTest extends FixtureTestCase
 		DI::pConfig()->set(ApiTestCase::SELF_USER['id'], 'frio', 'schema', 'red');
 
 		$userFactory = new User(DI::logger(), DI::twitterStatus());
-		$user        = $userFactory->createFromUserId(42);
+		$user        = $userFactory->createFromUserId(1042);
 
 		$this->assertSelfUser($user->toArray());
 		self::assertEquals('708fa0', $user['profile_sidebar_fill_color']);
@@ -77,7 +77,7 @@ class UserTest extends FixtureTestCase
 		DI::pConfig()->set(ApiTestCase::SELF_USER['id'], 'frio', 'schema', '---');
 
 		$userFactory = new User(DI::logger(), DI::twitterStatus());
-		$user        = $userFactory->createFromUserId(42);
+		$user        = $userFactory->createFromUserId(1042);
 
 		$this->assertSelfUser($user->toArray());
 		self::assertEquals('708fa0', $user['profile_sidebar_fill_color']);
@@ -101,7 +101,7 @@ class UserTest extends FixtureTestCase
 		DI::pConfig()->set(ApiTestCase::SELF_USER['id'], 'frio', 'background_color', '#123456');
 
 		$userFactory = new User(DI::logger(), DI::twitterStatus());
-		$user        = $userFactory->createFromUserId(42);
+		$user        = $userFactory->createFromUserId(1042);
 
 		$this->assertSelfUser($user->toArray());
 		self::assertEquals('123456', $user['profile_sidebar_fill_color']);

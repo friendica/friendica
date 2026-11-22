@@ -47,7 +47,7 @@ class RetweetTest extends ApiTestCase
 		// @phpstan-ignore method.deprecated
 		$response = (new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'id' => 1,
+				'id' => 20001,
 			]);
 
 		$json = $this->toJson($response);
@@ -68,7 +68,7 @@ class RetweetTest extends ApiTestCase
 		// @phpstan-ignore method.deprecated
 		$response = (new Retweet(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'id' => 5,
+				'id' => 20005,
 			]);
 
 		$json = $this->toJson($response);

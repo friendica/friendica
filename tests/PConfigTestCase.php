@@ -366,7 +366,7 @@ abstract class PConfigTestCase extends MockedTestCase
 	 */
 	public function testDeleteWithDB(): void
 	{
-		$uid = 42;
+		$uid = 1042;
 
 		$this->configCache->load($uid, ['test' => ['it' => 'now', 'quarter' => 'true']]);
 

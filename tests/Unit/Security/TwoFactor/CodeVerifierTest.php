@@ -21,7 +21,7 @@ use PragmaRX\Google2FA\Google2FA;
 
 final class CodeVerifierTest extends TestCase
 {
-	private const UID = 42;
+	private const UID = 1042;
 
 	private ArrayCache $cache;
 	private Google2FA $google2fa;

@@ -108,3 +108,6 @@ daemon.pid
 
 #ignore npm dependencies for the JS/CSS linters
 /node_modules
+
+#ignore test-generated smarty3 compile templates
+tests/view/smarty3/compiled

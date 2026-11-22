@@ -19,28 +19,27 @@ final class StatusesTest extends ApiTestCase
 {
 	public function testApiStatusShowWithJson(): void
 	{
-		$module = $this->createModule(43);
+		$module = $this->createModule(3043);
 
-		$request = new ServerRequest('GET', 'https://friendica.local/api/v1/accounts/43/statuses');
+		$request = new ServerRequest('GET', 'https://friendica.local/api/v1/accounts/3043/statuses');
 
 		try {
 			$module->handleRequest($request);
 			self::fail('Expected EarlyExitException');
 		} catch (EarlyExitException $e) { // @phpstan-ignore catch.neverThrown
 			$statuses = $this->toJson($e->getResponse());
-
 			self::assertNotEmpty($statuses);
 			self::assertCount(4, $statuses);
-			self::assertEquals(['5', '3', '2', '1'], array_column($statuses, 'id'));
+			self::assertEquals(['20005', '20003', '20002', '20001'], array_column($statuses, 'id'));
 			self::assertObjectHasProperty('id', $statuses[0]);
 		}
 	}
 
 	public function testApiStatusShowWithXml(): void
 	{
-		$module = $this->createModule(45);
+		$module = $this->createModule(3045);
 
-		$request = new ServerRequest('GET', 'https://friendica.local/api/v1/accounts/45/statuses');
+		$request = new ServerRequest('GET', 'https://friendica.local/api/v1/accounts/3045/statuses');
 
 		try {
 			$module->handleRequest($request);
@@ -50,7 +49,7 @@ final class StatusesTest extends ApiTestCase
 
 			self::assertNotEmpty($statuses);
 			self::assertCount(4, $statuses);
-			self::assertEquals(['100', '7', '6', '4'], array_column($statuses, 'id'));
+			self::assertEquals(['20100', '20007', '20006', '20004'], array_column($statuses, 'id'));
 			self::assertObjectHasProperty('id', $statuses[0]);
 		}
 	}

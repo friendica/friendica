@@ -25,7 +25,7 @@ final class NetworkPublicTimelineTest extends ApiTestCase
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/statuses/networkpublic_timeline'))
-			->withQueryParams(['max_id' => '10']);
+			->withQueryParams(['max_id' => '20010']);
 
 		$response = $this->createModule()->handleRequest($request);
 

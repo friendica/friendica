@@ -37,7 +37,7 @@ use ReflectionMethod;
 class NavTest extends TestCase
 {
 	private const NICK = 'testuser';
-	private const UID  = 42;
+	private const UID  = 1042;
 
 	/**
 	 * @return array Result of the private Nav::getInfo()

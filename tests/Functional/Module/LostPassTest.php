@@ -35,7 +35,7 @@ use Psr\Log\NullLogger;
 
 final class LostPassTest extends FixtureTestCase
 {
-	private const UID          = 42;
+	private const UID          = 1042;
 	private const NICKNAME     = 'selfcontact';
 	private const EMAIL        = 'selfcontact@example.com';
 	private const NEW_PASSWORD = 'Correct-Horse-Battery-77';

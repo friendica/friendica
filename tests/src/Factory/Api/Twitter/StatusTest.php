@@ -48,7 +48,7 @@ class StatusTest extends FixtureTestCase
 	public function testApiConvertItem(): void
 	{
 		$status = $this->statusFactory
-			->createFromItemId(13, ApiTestCase::SELF_USER['id'])
+			->createFromItemId(1513, ApiTestCase::SELF_USER['id'])
 			->toArray();
 
 		self::assertStringStartsWith('item_title', $status['text']);
@@ -107,7 +107,7 @@ class StatusTest extends FixtureTestCase
 	public function testApiGetEntitiesWithIncludeEntities(): void
 	{
 		$status = $this->statusFactory
-			->createFromItemId(13, ApiTestCase::SELF_USER['id'], true)
+			->createFromItemId(1513, ApiTestCase::SELF_USER['id'], true)
 			->toArray();
 
 		self::assertIsArray($status['entities']);

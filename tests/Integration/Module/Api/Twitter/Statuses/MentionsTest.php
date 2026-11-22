@@ -24,7 +24,7 @@ final class MentionsTest extends ApiTestCase
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/statuses/mentions'))
-			->withQueryParams(['max_id' => '10']);
+			->withQueryParams(['max_id' => '20010']);
 
 		$response = $module->handleRequest($request);
 

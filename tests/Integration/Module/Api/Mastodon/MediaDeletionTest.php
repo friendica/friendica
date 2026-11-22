@@ -25,7 +25,7 @@ use Psr\Http\Message\ResponseInterface;
 /** Verifies deletion against real media references and database-backed storage. */
 class MediaDeletionTest extends ApiTestCase
 {
-	private const POST_URI_ID       = 1; // Live parent status from api.fixture.php.
+	private const POST_URI_ID       = 20001; // Live parent status from api.fixture.php.
 	private const PHOTO_RESOURCE_ID = '0123456789abcdef0123456789abcdef';
 	private const CONTENT           = 'Media deletion regression fixture';
 

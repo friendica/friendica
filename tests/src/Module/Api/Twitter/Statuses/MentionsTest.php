@@ -24,7 +24,7 @@ class MentionsTest extends ApiTestCase
 		// @phpstan-ignore method.deprecated
 		$response = (new Mentions(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'max_id' => 10,
+				'max_id' => 20010,
 			]);
 
 		$json = $this->toJson($response);

@@ -26,7 +26,7 @@ class VerifyCredentialsTest extends ApiTestCase
 
 		$json = $this->toJson($response);
 
-		self::assertEquals(48, $json->id);
+		self::assertEquals(3048, $json->id);
 		self::assertIsArray($json->emojis);
 		self::assertIsArray($json->fields);
 	}

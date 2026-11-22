@@ -18,7 +18,7 @@ use Psr\Log\NullLogger;
 final class ApiResponseTest extends ApiTestCase
 {
 	/** Public contact fixture, see tests/Fixtures/api.fixture.php */
-	private const CONTACT_ID = 43;
+	private const CONTACT_ID = 3043;
 
 	private function createApiResponse(array $server = [], string $jsonpCallback = '', ?LoggerInterface $logger = null): ApiResponse
 	{

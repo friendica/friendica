@@ -51,7 +51,7 @@ class NewDMTest extends ApiTestCase
 		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
-				'user_id' => 43,
+				'user_id' => 3043,
 			]);
 
 		$json = $this->toJson($response);
@@ -74,7 +74,7 @@ class NewDMTest extends ApiTestCase
 		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
-				'user_id' => 44,
+				'user_id' => 3044,
 			]);
 
 		$json = $this->toJson($response);
@@ -99,7 +99,7 @@ class NewDMTest extends ApiTestCase
 		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'json']))
 			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
-				'user_id' => 44,
+				'user_id' => 3044,
 				'title'   => 'message_title',
 			]);
 
@@ -126,7 +126,7 @@ class NewDMTest extends ApiTestCase
 		$response = (new NewDM($directMessage, DI::dba(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'rss']))
 			->run($this->httpExceptionMock, [
 				'text'    => 'message_text',
-				'user_id' => 44,
+				'user_id' => 3044,
 				'title'   => 'message_title',
 			]);
 
