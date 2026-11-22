@@ -40,6 +40,8 @@ class HttpClient extends BaseFactory
 	 * Creates a IHTTPClient for communications with HTTP endpoints
 	 *
 	 * @param HandlerStack|null $handlerStack (optional) A handler replacement (just useful at test environments)
+	 *                                        The stack is changed in place: the address pinning moves to its bottom, also for clients already using it.
+	 *                                        Middleware pushed later sits below it and can change the target unchecked.
 	 *
 	 * @return ICanSendHttpRequests
 	 */
