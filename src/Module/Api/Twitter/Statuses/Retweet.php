@@ -41,7 +41,7 @@ class Retweet extends BaseApi
 
 		if (DBA::isResult($item) && !empty($item['body'])) {
 			if (in_array($item['network'], [Protocol::ACTIVITYPUB, Protocol::DFRN, Protocol::ATPROTO, Protocol::TUMBLR, Protocol::TWITTER])) {
-				if (!Item::performActivity($id, 'announce', $uid)) {
+				if (!Item::performActivity($item['id'], 'announce', $uid)) {
 					throw new InternalServerErrorException();
 				}
 
