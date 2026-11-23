@@ -112,7 +112,7 @@ class API extends BaseModule
 					$this->deletion->deleteForUser(['id' => $event['itemid']], $this->session->getLocalUserId());
 				}
 
-				if (Post::exists(['id' => $event['itemid']])) {
+				if (Post::exists(['id' => $event['itemid'], 'deleted' => false])) {
 					$this->sysMessages->addNotice($this->t('Failed to remove event'));
 				}
 				break;
