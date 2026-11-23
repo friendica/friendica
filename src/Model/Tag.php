@@ -502,6 +502,22 @@ class Tag
 	}
 
 	/**
+	 * Checks if a local comment replies to a public post that is addressed to an audience (group).
+	 * Such comments have to be unlisted to prevent them from being added to the public timeline.
+	 *
+	 * @param array $item
+	 * @return boolean
+	 */
+	public static function isUnlistedGroupReply(array $item): bool
+	{
+		if (empty($item['origin']) || ($item['gravity'] != Item::GRAVITY_COMMENT) || (($item['private'] ?? Item::PUBLIC) != Item::PUBLIC)) {
+			return false;
+		}
+
+		return Post::exists(['uri-id' => $item['parent-uri-id'], 'private' => Item::PUBLIC]) && Post\Group::isGroupPost($item['parent-uri-id']);
+	}
+
+	/**
 	 * Create implicit mentions for a given post
 	 *
 	 * @param integer $uriId
@@ -514,7 +530,8 @@ class Tag
 		$parent = Post::selectFirst(['author-link', 'author-name'], ['uri-id' => $parentUriId]);
 		self::store($uriId, self::IMPLICIT_MENTION, $parent['author-name'], $parent['author-link']);
 
-		if (DI::config()->get('system', 'disable_implicit_mentions')) {
+		// For replies to group posts only the direct parent author is mentioned (to notify them), not the other participants
+		if (DI::config()->get('system', 'disable_implicit_mentions') || Post\Group::isGroupPost($parentUriId)) {
 			return;
 		}
 
