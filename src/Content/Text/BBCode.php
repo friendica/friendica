@@ -689,7 +689,7 @@ class BBCode
 
 		$cnt = 0;
 		foreach ($images as $image) {
-			// We're depending on the property of 'foreach' (specified on the PHP website) that
+			// We depend on the property of 'foreach' (specified on the PHP website) that
 			// it loops over the array starting from the first element and going sequentially
 			// to the last element
 			$newbody = str_replace(
@@ -1351,8 +1351,8 @@ class BBCode
 				$text = self::convertSpoilersToHtml($text);
 				$text = self::convertStructuresToHtml($text);
 
-				// We add URL without a surrounding URL at this time, since at a earlier stage it would had been too early,
-				// since the used regular expression won't touch URL inside of BBCode elements, but with the structural ones it should.
+				// We add URL without a surrounding URL at this time, since at an earlier stage it would have been too early,
+				// since the used regular expression won't touch URL inside BBCode elements, but with the structural ones it should.
 				// At a later stage we won't be able to exclude certain parts of the code.
 				$text = self::performWithEscapedTags($text, ['url', 'img', 'audio', 'video', 'youtube', 'vimeo', 'share', 'attachment', 'iframe', 'bookmark', 'map', 'embed'], function ($text) use ($simple_html, $for_plaintext) {
 					if (!$for_plaintext) {
@@ -1388,7 +1388,7 @@ class BBCode
 				// Sanitize the created HTML.
 				$text = self::cleanupHtml($text, ['uri-id' => $uriid, 'mode' => $simple_html, 'bbcode' => $source]);
 
-				// This needs to be called after the cleanup, since otherwise some links are invalidated
+				// This needs to be called after the cleanup, as share blocks can generate relative links that are considered invalid by cleanupHtml()
 				$text = self::convertSharesToHtml($text, $simple_html, $uriid);
 
 				// Insert the previously extracted embedded image again.

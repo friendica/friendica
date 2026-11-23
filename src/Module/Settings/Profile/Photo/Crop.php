@@ -31,7 +31,19 @@ class Crop extends BaseSettings
 			[$resource_id, $scale] = explode('-', (string) $photo_prefix);
 		}
 
+		$path = 'profile/' . DI::userSession()->getLocalUserNickname();
+
+		if (!empty($request['canceled'])) {
+			DI::baseUrl()->redirect($path . '/photos');
+		}
+
 		self::checkFormSecurityTokenRedirectOnError('settings/profile/photo/crop/' . $photo_prefix, 'settings_profile_photo_crop');
+
+		// set an already uploaded photo as profile photo
+		if (($request['action'] ?? '') === 'select') {
+			$this->selectProfilePhoto($resource_id);
+			DI::baseUrl()->redirect($path);
+		}
 
 		$action = $_POST['action'] ?? 'crop';
 
@@ -40,8 +52,6 @@ class Crop extends BaseSettings
 		$selectionY = intval($_POST['ystart'] ?? 0);
 		$selectionW = intval($_POST['width'] ?? 0);
 		$selectionH = intval($_POST['height'] ?? 0);
-
-		$path = 'profile/' . DI::userSession()->getLocalUserNickname();
 
 		$base_image = Photo::selectFirst([], ['resource-id' => $resource_id, 'uid' => DI::userSession()->getLocalUserId(), 'scale' => $scale]);
 		if (DBA::isResult($base_image)) {
@@ -142,6 +152,25 @@ class Crop extends BaseSettings
 		DI::baseUrl()->redirect($path);
 	}
 
+	private function selectProfilePhoto(string $resource_id): void
+	{
+		$condition = ['resource-id' => $resource_id, 'uid' => DI::userSession()->getLocalUserId(), 'photo-type' => Photo::USER_AVATAR, 'scale' => 5];
+		if (!Photo::exists($condition)) {
+			throw new HTTPException\NotFoundException(DI::l10n()->t('Photo not found.'));
+		}
+
+		Photo::update(['profile' => false], ['uid' => DI::userSession()->getLocalUserId()]);
+
+		Photo::update(['profile' => true], ['resource-id' => $resource_id, 'uid' => DI::userSession()->getLocalUserId()]);
+
+		Contact::updateSelfFromUserID(DI::userSession()->getLocalUserId(), true);
+
+		// Update global directory in background
+		Profile::publishUpdate(DI::userSession()->getLocalUserId());
+
+		DI::sysmsg()->addInfo(DI::l10n()->t('Profile picture successfully updated.'));
+	}
+
 	protected function content(array $request = []): string
 	{
 		if (!DI::userSession()->isAuthenticated()) {
@@ -167,18 +196,17 @@ class Crop extends BaseSettings
 		// set an already uploaded photo as profile photo
 		// if photo is in 'Profile Photos', change it in db
 		if ($photos[0]['photo-type'] == Photo::USER_AVATAR && $havescale) {
-			Photo::update(['profile' => false], ['uid' => DI::userSession()->getLocalUserId()]);
-
-			Photo::update(['profile' => true], ['resource-id' => $resource_id, 'uid' => DI::userSession()->getLocalUserId()]);
-
-			Contact::updateSelfFromUserID(DI::userSession()->getLocalUserId(), true);
-
-			// Update global directory in background
-			Profile::publishUpdate(DI::userSession()->getLocalUserId());
-
-			DI::sysmsg()->addInfo(DI::l10n()->t('Profile picture successfully updated.'));
-
-			DI::baseUrl()->redirect('profile/' . DI::userSession()->getLocalUserNickname());
+			return Renderer::replaceMacros(Renderer::getMarkupTemplate('confirm.tpl'), [
+				'$l10n' => [
+					'message' => DI::l10n()->t('Do you really want to use this photo as your profile picture?'),
+					'confirm' => DI::l10n()->t('Use as profile picture'),
+					'cancel'  => DI::l10n()->t('Cancel'),
+				],
+				'$method'        => 'post',
+				'$confirm_url'   => 'settings/profile/photo/crop/' . $resource_id . '?action=select',
+				'$confirm_name'  => 'form_security_token',
+				'$confirm_value' => self::getFormSecurityToken('settings_profile_photo_crop'),
+			]);
 		}
 
 		$Image = Photo::getImageForPhoto($photos[0]);

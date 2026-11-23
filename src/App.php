@@ -38,6 +38,8 @@ use Friendica\Database\Definition\DbaDefinition;
 use Friendica\Database\Definition\ViewDefinition;
 use Friendica\Event\ConfigLoadedEvent;
 use Friendica\Event\InitEvent;
+use Friendica\Event\WorkerJobStartEvent;
+use Friendica\Model\Contact\User as ContactUser;
 use Friendica\Module\Maintenance;
 use Friendica\Module\Response;
 use Friendica\Module\Special\HTTPException as ModuleHTTPException;
@@ -356,6 +358,8 @@ class App
 		foreach (HookEventBridge::getStaticSubscribedEvents() as $eventName => $methodName) {
 			$eventDispatcher->addListener($eventName, [HookEventBridge::class, $methodName]);
 		}
+
+		$eventDispatcher->addListener(WorkerJobStartEvent::NAME, ContactUser::resetIsBlockedCache(...));
 	}
 
 	private function registerTemplateEngine(): void
@@ -463,7 +467,8 @@ class App
 		if ($this->mode->isNormal() && !$this->mode->isBackend()) {
 			$requester = HTTPSignature::getSigner('', $serverVars);
 			if (!empty($requester)) {
-				OpenWebAuth::addVisitorCookieForHandle($requester);
+				// Probing the signer calls back the remote system, which can wait on this request.
+				OpenWebAuth::addVisitorCookieForHandle($requester, false);
 			}
 		} else {
 			$requester = '';

@@ -187,6 +187,14 @@ abstract class DI
 		return self::$dice->create(Core\Cache\Capability\ICanCache::class);
 	}
 
+	/**
+	 * The cache that is shared between all processes, in contrast to cache(), which can be local to a process
+	 */
+	public static function distributedCache(): Core\Cache\Capability\ICanCache
+	{
+		return self::$dice->create('$distributedCache');
+	}
+
 	public static function config(): Core\Config\Capability\IManageConfigValues
 	{
 		return self::$dice->create(Core\Config\Capability\IManageConfigValues::class);

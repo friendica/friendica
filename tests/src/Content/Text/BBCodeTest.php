@@ -713,6 +713,52 @@ Lucas: For the right price, yes.[/share]',
 		self::assertEquals($expected, $actual);
 	}
 
+	public static function dataShareModes(): array
+	{
+		return [
+			'internal' => [BBCode::INTERNAL],
+			'external' => [BBCode::EXTERNAL],
+		];
+	}
+
+	/**
+	 * The share template contains relative links that must survive the HTML sanitizing.
+	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataShareModes')]
+	public function testShareKeepsRelativeLinks(int $simpleHtml): void
+	{
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$text = "[share author='Author' profile='https://domain.tld/profile/author' link='https://domain.tld/display/abc123' posted='2026-01-01 00:00:00' guid='abc123']Shared body[/share]";
+
+		$actual = BBCode::convertForUriId(0, $text, $simpleHtml);
+
+		self::assertStringContainsString('href="/display/abc123"', $actual);
+		self::assertStringNotContainsString('src=""', $actual);
+		self::assertStringNotContainsString('invalid-href', $actual);
+	}
+
+	public static function dataShareUnsafeLinks(): array
+	{
+		return [
+			'internal' => [BBCode::INTERNAL],
+			'external' => [BBCode::EXTERNAL],
+			'diaspora' => [BBCode::DIASPORA],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataShareUnsafeLinks')]
+	public function testShareDropsUnsafeLinks(int $simpleHtml): void
+	{
+		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
+
+		$text = "[share author='Author' profile='javascript:alert(1)' link='javascript:alert(2)' posted='2026-01-01 00:00:00' guid='abc123']Shared body[/share]";
+
+		$actual = BBCode::convertForUriId(0, $text, $simpleHtml);
+
+		self::assertStringNotContainsString('href="javascript:alert', $actual);
+	}
+
 	public static function dataProfileLink(): array
 	{
 		return [

@@ -33,7 +33,7 @@
 				</a>
 				{{/if}}
 			{{if $event.drop}}
-				<a href="{{$event.drop.0}}" onclick="return confirmDelete();" class="drop-event-link btn btn-default">
+				<a href="{{$event.drop.0}}" onclick="return confirmDelete();" class="drop-event-link btn btn-default post-action">
 					<i class="ri ri-delete-bin-line" aria-hidden="true"></i>
 					{{$event.drop.1}}
 				</a>

@@ -15,6 +15,7 @@ use Friendica\Network\HTTPClient\Factory\HttpClient as HttpClientFactory;
 use Friendica\Util\Network;
 use Friendica\Test\DiceHttpMockHandlerTrait;
 use Friendica\Test\MockedTestCase;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\FnStream;
@@ -23,6 +24,7 @@ use GuzzleHttp\Psr7\Utils;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 
 class HTTPClientTest extends MockedTestCase
 {
@@ -220,6 +222,259 @@ class HTTPClientTest extends MockedTestCase
 		$this->httpRequestHandler->setHandler(new MockHandler([new Response(200, [], 'internal')]));
 
 		self::assertTrue(DI::httpClient()->get('http://127.0.0.1:9999/')->isSuccess());
+	}
+
+	/**
+	 * Records the CURLOPT_RESOLVE entries of every request that reaches the handler.
+	 *
+	 * Must be called after the client is created, so it runs below the pinning middleware.
+	 *
+	 * @return \ArrayObject<int, string[]>
+	 */
+	private function recordPins(): \ArrayObject
+	{
+		$pins = new \ArrayObject();
+		$this->httpRequestHandler->push(fn (callable $handler): callable => function ($request, array $options) use ($handler, $pins) {
+			$pins[] = $options['curl'][CURLOPT_RESOLVE] ?? [];
+			return $handler($request, $options);
+		});
+
+		return $pins;
+	}
+
+	/** Ensures curl connects to the checked addresses of every hop instead of resolving the host again. */
+	public function testRequestAndRedirectArePinned(): void
+	{
+		$this->httpRequestHandler->setHandler(new MockHandler([
+			new Response(302, ['Location' => 'https://friendi.ca/']),
+			new Response(200),
+		]));
+		$client = DI::httpClient();
+		$pins   = $this->recordPins();
+
+		self::assertTrue($client->get('https://mastodon.social')->isSuccess());
+
+		self::assertCount(2, $pins);
+		self::assertCount(1, $pins[0]);
+		self::assertMatchesRegularExpression('/^mastodon\.social:443:[0-9a-f.:\[\],]+$/', $pins[0][0]);
+		self::assertCount(1, $pins[1]);
+		self::assertMatchesRegularExpression('/^friendi\.ca:443:[0-9a-f.:\[\],]+$/', $pins[1][0]);
+	}
+
+	/** Ensures a redirect to a host that can't be resolved isn't left to curl's own lookup. */
+	public function testRedirectToUnresolvableHostIsNotFollowed(): void
+	{
+		$mock = new MockHandler([
+			new Response(302, ['Location' => 'https://does-not-exist.invalid/']),
+			new Response(200, [], 'internal secret'),
+		]);
+		$this->httpRequestHandler->setHandler($mock);
+
+		self::assertFalse(DI::httpClient()->get('https://mastodon.social')->isSuccess());
+		self::assertCount(1, $mock);
+	}
+
+	/** Allowed internal hosts are not restricted, so curl resolves them itself. */
+	public function testAllowedInternalHostIsNotPinned(): void
+	{
+		// request() checks the host via DNS first, which ignores /etc/hosts, so a public host keeps this independent from the resolver
+		DI::config()->set('system', 'allowed_internal_hosts', 'mastodon.social');
+
+		$this->httpRequestHandler->setHandler(new MockHandler([new Response(200)]));
+		$client = DI::httpClient();
+		$pins   = $this->recordPins();
+
+		self::assertTrue($client->get('https://mastodon.social/')->isSuccess());
+		self::assertSame([[]], $pins->getArrayCopy());
+	}
+
+	/** A proxy resolves the target itself, a pinned address would not be used. */
+	public function testProxyRequestIsNotPinned(): void
+	{
+		DI::config()->set('system', 'proxy', 'http://proxy.invalid:3128');
+
+		$this->httpRequestHandler->setHandler(new MockHandler([new Response(200)]));
+		$client = (new HttpClientFactory(new NullLogger(), DI::config(), DI::profiler(), DI::baseUrl()))->createClient($this->httpRequestHandler);
+		$pins   = $this->recordPins();
+
+		self::assertTrue($client->get('https://mastodon.social')->isSuccess());
+		self::assertSame([[]], $pins->getArrayCopy());
+	}
+
+	/** Private targets stay blocked when a proxy is configured. */
+	public function testPrivateTargetIsNotRequestedThroughProxy(): void
+	{
+		DI::config()->set('system', 'proxy', 'http://proxy.invalid:3128');
+
+		$mock = new MockHandler([new Response(200, [], 'internal secret')]);
+		$this->httpRequestHandler->setHandler($mock);
+		$client = (new HttpClientFactory(new NullLogger(), DI::config(), DI::profiler(), DI::baseUrl()))->createClient($this->httpRequestHandler);
+
+		self::assertFalse($client->get('http://127.0.0.1:9999/')->isSuccess());
+		self::assertCount(1, $mock);
+	}
+
+	/** Ensures finalUrl() still resolves redirects to allowed targets. */
+	public function testFinalUrlFollowsAllowedRedirect(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		self::assertSame($url . '/final', DI::httpClient()->finalUrl($url . '/redirect'));
+	}
+
+	public static function finalUrlLinkProvider(): array
+	{
+		return [
+			'og:url wins over canonical' => ['/og', '/final-og'],
+			'canonical'                  => ['/canonical', '/final-canonical'],
+		];
+	}
+
+	/** Ensures finalUrl() follows og:url and canonical links. */
+	#[DataProvider('finalUrlLinkProvider')]
+	public function testFinalUrlFollowsPageLinks(string $path, string $expected): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		self::assertSame($url . $expected, DI::httpClient()->finalUrl($url . $path));
+	}
+
+	/** Ensures finalUrl() doesn't follow an og:url into the private network. */
+	public function testFinalUrlDoesNotFollowPageLinkToPrivateTarget(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		$marker = sys_get_temp_dir() . '/friendica-sink-hit-' . parse_url($url, PHP_URL_PORT);
+		@unlink($marker);
+
+		self::assertSame($url . '/og-loopback', DI::httpClient()->finalUrl($url . '/og-loopback'));
+		self::assertFileDoesNotExist($marker, 'the og:url into the private network was followed');
+	}
+
+	public static function finalUrlCutOffBodyProvider(): array
+	{
+		return [
+			'og:url from the start of an oversized page'      => ['/og-big', '/final-og'],
+			'non-HTML body is not read'                       => ['/redirect-image', '/image'],
+			'error page is the final URL, its og:url ignored' => ['/redirect-missing', '/missing'],
+		];
+	}
+
+	/** Ensures finalUrl() keeps status and headers of a hop whose body was cut off or not read. */
+	#[DataProvider('finalUrlCutOffBodyProvider')]
+	public function testFinalUrlHandlesCutOffBody(string $path, string $expected): void
+	{
+		DI::config()->set('performance', 'max_response_data_size', 100000);
+
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		self::assertSame($url . $expected, DI::httpClient()->finalUrl($url . $path));
+	}
+
+	/** Ensures finalUrl() reads the page when max_response_data_size is 0, which means unlimited. */
+	public function testFinalUrlWithoutSizeLimit(): void
+	{
+		DI::config()->set('performance', 'max_response_data_size', 0);
+
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		self::assertSame($url . '/final-og', DI::httpClient()->finalUrl($url . '/og'));
+	}
+
+	/** Ensures a malformed og:url from the remote page is no further hop. */
+	public function testFinalUrlIgnoresMalformedPageLink(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		self::assertSame($url . '/og-malformed', DI::httpClient()->finalUrl($url . '/og-malformed'));
+	}
+
+	public static function finalUrlTransferErrorProvider(): array
+	{
+		return [
+			'malformed redirect target' => ['/redirect-malformed'],
+			'connection lost in body'   => ['/og-cut'],
+		];
+	}
+
+	/** Ensures finalUrl() reports a broken hop as TransferException, which is what callers catch. */
+	#[DataProvider('finalUrlTransferErrorProvider')]
+	public function testFinalUrlThrowsTransferException(string $path): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		$this->expectException(TransferException::class);
+		DI::httpClient()->finalUrl($url . $path);
+	}
+
+	/** Ensures a malformed URL is reported as TransferException. */
+	public function testFinalUrlRejectsMalformedUrl(): void
+	{
+		$this->expectException(TransferException::class);
+		DI::httpClient()->finalUrl('http://:80');
+	}
+
+	/** Ensures every hop of finalUrl() connects to the checked addresses. */
+	public function testFinalUrlHopsArePinned(): void
+	{
+		$this->httpRequestHandler->setHandler(new MockHandler([
+			new Response(302, ['Location' => 'https://friendi.ca/']),
+			new Response(200, ['Content-Type' => 'text/plain']),
+		]));
+		$client = DI::httpClient();
+		$pins   = $this->recordPins();
+
+		self::assertSame('https://friendi.ca/', $client->finalUrl('https://mastodon.social'));
+
+		self::assertCount(2, $pins);
+		self::assertMatchesRegularExpression('/^mastodon\\.social:443:/', $pins[0][0]);
+		self::assertMatchesRegularExpression('/^friendi\\.ca:443:/', $pins[1][0]);
+	}
+
+	/** Ensures finalUrl() checks every redirect target, not only the first URL. */
+	public function testFinalUrlDoesNotFollowRedirectToPrivateTarget(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', true);
+		DI::config()->set('system', 'allowed_internal_hosts', '127.0.0.1');
+
+		$marker = sys_get_temp_dir() . '/friendica-sink-hit-' . parse_url($url, PHP_URL_PORT);
+		@unlink($marker);
+
+		$final = DI::httpClient()->finalUrl($url . '/redirect-loopback');
+
+		self::assertFileDoesNotExist($marker, 'the redirect into the private network was followed');
+		self::assertSame($url . '/redirect-loopback', $final);
+	}
+
+	/** Ensures finalUrl() returns a redirect target on the no_redirect_list without fetching it. */
+	public function testFinalUrlStopsAtNoRedirectTarget(): void
+	{
+		$url = $this->startServer();
+		DI::config()->set('system', 'block_private_addresses', false);
+		DI::config()->set('system', 'no_redirect_list', ['localhost']);
+
+		$marker = sys_get_temp_dir() . '/friendica-sink-hit-' . parse_url($url, PHP_URL_PORT);
+		@unlink($marker);
+
+		$final = DI::httpClient()->finalUrl($url . '/redirect-loopback');
+
+		self::assertFileDoesNotExist($marker, 'the redirect target on the no_redirect_list was fetched');
+		self::assertSame('http://localhost:' . parse_url($url, PHP_URL_PORT) . '/hit', $final);
 	}
 
 	/**

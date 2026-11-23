@@ -1423,6 +1423,15 @@ aside .widget li.selected a {
 	opacity: unset;
 }
 
+.network-sidebar-configure * {
+	color: $font_color;
+}
+
+.network-sidebar-configure *:hover,
+.network-sidebar-configure *:active {
+	color: $link_hover_color;
+}
+
 /* Widget caret expand/collapse symbols */
 .widget .fakelink[aria-expanded="false"] h3::before {
 	font-family: remixicon;
@@ -3089,6 +3098,17 @@ body.mod-login .navbar #nav-login {
 	}
 	.mod-groups #content,
 	.mod-group #content {
+		width: 100%;
+		max-width: 1350px;
+		float: none;
+		margin: 0 auto;
+	}
+
+	/* Posts that are opened from a list of groups */
+	body:has(.group-display-toolbar) main aside {
+		display: none;
+	}
+	body:has(.group-display-toolbar) #content {
 		width: 100%;
 		max-width: 1350px;
 		float: none;

@@ -36,6 +36,16 @@ class APCuCacheTest extends MemoryCacheTestCase
 		parent::tearDown();
 	}
 
+	public function testAddSetsTTL(): void
+	{
+		$this->instance->add('ttl_probe', 'value', 60);
+
+		$entries = iterator_to_array(new \APCUIterator('/ttl_probe$/'));
+
+		self::assertCount(1, $entries);
+		self::assertSame(60, current($entries)['ttl']);
+	}
+
 	public function testStats(): void
 	{
 		$stats = $this->instance->getStats();

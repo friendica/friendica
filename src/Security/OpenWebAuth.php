@@ -9,6 +9,7 @@ namespace Friendica\Security;
 
 use Friendica\Core\Cache\Enum\Duration;
 use Friendica\Core\System;
+use Friendica\Core\Worker;
 use Friendica\Event\MagicAuthSuccessEvent;
 use Friendica\Event\ZrlInitEvent;
 use Friendica\Database\DBA;
@@ -19,6 +20,7 @@ use Friendica\Network\HTTPException\InternalServerErrorException;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\Network;
 use Friendica\Util\Strings;
+use Friendica\Worker\AddContact;
 
 /**
  * Authentication via OpenWebAuth
@@ -152,17 +154,22 @@ class OpenWebAuth
 	/**
 	 * Set the visitor cookies (see remote_user()) for the given handle
 	 *
-	 * @param string $handle Visitor handle
+	 * @param string    $handle Visitor handle
+	 * @param bool|null $update true = always probe, false = probe unknown contacts in the background, null = probe when the contact is unknown or incomplete
 	 *
 	 * @return array Visitor contact array
 	 */
-	public static function addVisitorCookieForHandle(string $handle): array
+	public static function addVisitorCookieForHandle(string $handle, ?bool $update = null): array
 	{
 		$appHelper = DI::appHelper();
 
 		// Try to find the public contact entry of the visitor.
-		$cid = Contact::getIdForURL($handle);
+		$cid = Contact::getIdForURL($handle, 0, $update);
 		if (!$cid) {
+			if ($update === false) {
+				// Probe in the background, so that the contact is known at the next request.
+				AddContact::add(Worker::PRIORITY_LOW, 0, $handle);
+			}
 			DI::logger()->info('Handle not found', ['handle' => $handle]);
 			return [];
 		}
@@ -201,7 +208,8 @@ class OpenWebAuth
 		if (empty($requester)) {
 			return [];
 		}
-		return self::addVisitorCookieForHandle($requester);
+		// Probing the signer calls back the remote system, which can wait on this request.
+		return self::addVisitorCookieForHandle($requester, false);
 	}
 
 	/**

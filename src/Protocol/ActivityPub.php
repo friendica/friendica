@@ -9,12 +9,14 @@ namespace Friendica\Protocol;
 
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
+use Friendica\Core\Worker;
 use Friendica\DI;
 use Friendica\Model\APContact;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 use Friendica\Util\HTTPSignature;
 use Friendica\Util\JsonLD;
+use Friendica\Worker\AddContact;
 
 /**
  * ActivityPub Protocol class
@@ -333,8 +335,10 @@ class ActivityPub
 			return false;
 		}
 
-		$apcontact = APContact::getByURL($signer);
+		// Fetching the signer calls back the remote system, which can wait on this request.
+		$apcontact = APContact::getByURL($signer, false);
 		if (empty($apcontact)) {
+			AddContact::add(Worker::PRIORITY_LOW, 0, $signer);
 			DI::logger()->info('APContact not found', ['uid' => $uid, 'handle' => $signer, 'called_by' => $called_by]);
 			return false;
 		}

@@ -394,7 +394,9 @@ class Item
 		}
 
 		// If item is a link to an event, delete the event.
+		// The posts are unlinked first, the foreign key would delete them before the Notifier can announce the deletion.
 		if (intval($item['event-id'])) {
+			Post::update(['event-id' => null], ['event-id' => $item['event-id']]);
 			Event::delete($item['event-id']);
 		}
 
@@ -796,6 +798,11 @@ class Item
 		// Local comments on a sensitive post are sensitive as well
 		if ($item['origin'] && ($item['gravity'] == self::GRAVITY_COMMENT) && empty($item['sensitive']) && Post::exists(['uri-id' => $item['thr-parent-id'], 'sensitive' => true])) {
 			$item['sensitive'] = true;
+		}
+
+		// Local comments on a public post that is addressed to an audience (group) are unlisted
+		if (Tag::isUnlistedGroupReply($item)) {
+			$item['private'] = self::UNLISTED;
 		}
 
 		if (!empty($item['conversation']) && empty($item['conversation-id'])) {

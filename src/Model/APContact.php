@@ -518,6 +518,14 @@ class APContact
 
 		// We delete the old entry when the URL is changed
 		if ($url != $apcontact['url']) {
+			// A profile fetched from a remote address must not be stored under a local URL: that row is the local
+			// actor's stored contact, so writing the remote inbox and key into it would let the sender sign as the
+			// local actor.
+			if (DI::baseUrl()->isLocalUrl($apcontact['url'])) {
+				DI::logger()->warning('Remote profile claims a local URL', ['url' => $url, 'id' => $apcontact['url']]);
+				return is_array($fetched_contact) ? $fetched_contact : [];
+			}
+
 			DI::logger()->info('Delete changed profile url', ['old' => $url, 'new' => $apcontact['url']]);
 			DBA::delete('apcontact', ['url' => $url]);
 		}

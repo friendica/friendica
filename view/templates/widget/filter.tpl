@@ -27,6 +27,7 @@
 				{{$title}}
 			</h3>
 		</button>
+
 		{{if $edit_url}}
 			<a class="pull-right widget-action widget-action-top faded-icon" id="{{$type}}-sidebar-edit"
 				href="{{$edit_url}}" data-toggle="tooltip" title="{{$edit_text}}">

@@ -35,9 +35,11 @@ class SaveTag extends BaseModule
 		}
 	}
 
-	protected function rawContent(array $request = [])
+	protected function post(array $request = [])
 	{
-		$term = XML::unescape(trim($_GET['term'] ?? ''));
+		self::checkFormSecurityTokenForbiddenOnError('action');
+
+		$term = XML::unescape(trim($request['term'] ?? ''));
 
 		$item_id = $this->parameters['id'] ?? 0;
 
@@ -50,7 +52,10 @@ class SaveTag extends BaseModule
 			}
 			Model\Post\Category::storeFileByURIId($item['uri-id'], DI::userSession()->getLocalUserId(), Model\Post\Category::FILE, $term);
 		}
+	}
 
+	protected function rawContent(array $request = []): never
+	{
 		// return filer dialog
 		$filetags = Model\Post\Category::getArray(DI::userSession()->getLocalUserId(), Model\Post\Category::FILE);
 

@@ -53,8 +53,11 @@ class FriendSuggest extends BaseModule
 	{
 		$cid = intval($this->parameters['contact']);
 
-		// We do query the "uid" as well to ensure that it is our contact
-		if (!$this->dba->exists('contact', ['id' => $cid, 'uid' => DI::userSession()->getLocalUserId()])) {
+		self::checkFormSecurityTokenRedirectOnError('fsuggest/' . $cid, 'fsuggest');
+
+		// The menu links to the public contact, so fetch the user's own contact for this person
+		$cid = ContactModel::getUserContactId($cid, DI::userSession()->getLocalUserId());
+		if (!$cid) {
 			throw new NotFoundException($this->t('Contact not found.'));
 		}
 
@@ -77,12 +80,13 @@ class FriendSuggest extends BaseModule
 			$cid,
 			$contact['name'],
 			$contact['url'],
-			$contact['request'],
+			$contact['request'] ?? '', // Local contacts don't have a request URL
 			$contact['avatar'],
 			$note,
 		));
 
-		Worker::add(Worker::PRIORITY_HIGH, 'Notifier', Delivery::SUGGESTION, $suggest->id);
+		// Without the uid the Notifier can't find our contact and skips the delivery
+		Worker::add(Worker::PRIORITY_HIGH, 'Notifier', Delivery::SUGGESTION, $suggest->id, DI::userSession()->getLocalUserId());
 
 		DI::sysmsg()->addInfo($this->t('Friend suggestion sent.'));
 	}
@@ -114,7 +118,7 @@ class FriendSuggest extends BaseModule
 			AND NOT `deleted`
 			AND `notify` != ""',
 			DI::userSession()->getLocalUserId(),
-			$cid,
+			$ucid, // Don't offer the contact as a suggestion for themselves
 			Protocol::DFRN,
 		]);
 
@@ -135,7 +139,8 @@ class FriendSuggest extends BaseModule
 				'',
 				$formattedContacts,
 			],
-			'$submit' => $this->t('Submit'),
+			'$submit'              => $this->t('Submit'),
+			'$form_security_token' => self::getFormSecurityToken('fsuggest'),
 		]);
 	}
 }

@@ -59,11 +59,11 @@ $a->strings['Album was empty.'] = 'Albumi oli tyhjä.';
 $a->strings['Failed to delete the photo.'] = 'Kuvan poistaminen epäonnistui.';
 $a->strings['Public access denied.'] = 'Julkinen käyttö estetty.';
 $a->strings['No photos selected'] = 'Ei valittuja kuvia';
-$a->strings['Upload photo to this album'] = 'Lataa kuva tähän albumiin';
-$a->strings['Upload selected photo'] = 'Lataa valittu kuva palvelimelle';
+$a->strings['Upload photo to this album'] = 'Lähetä kuva tähän albumiin';
+$a->strings['Upload selected photo'] = 'Lähetä valittu kuva palvelimelle';
 $a->strings['The maximum accepted image size is %s'] = 'Suurin sallittu kuvan koko on %s';
-$a->strings['Upload Photos to %s'] = 'Lataa kuvat albumiin %s';
-$a->strings['Upload Photos'] = 'Lataa kuvat';
+$a->strings['Upload Photos to %s'] = 'Lähetä kuvat albumiin %s';
+$a->strings['Upload Photos'] = 'Lähetä kuvat';
 $a->strings['Album name: '] = 'Albumin nimi:';
 $a->strings['If you want to add this photo to an album, begin typing its name, and existing albums will be suggested, which you can select. If you choose something new, it will be created.'] = 'Jos haluat lisätä tämän kuvan albumiin, ala kirjoittaa sen nimeä, jolloin ehdotukset olemassa olevista ablumeista tulevat esiin ja voit valita niistä haluamasi. Jos kirjoitat uuden albumin nimen, se luodaan.';
 $a->strings['Permissions'] = 'Käyttöoikeudet';
@@ -118,7 +118,13 @@ $a->strings['Cancel upload'] = 'Peru lähetys';
 $a->strings['Upload canceled.'] = 'Lähetys peruttiin.';
 $a->strings['Are you sure you want to cancel this upload?'] = 'Haluatko varmasti perua tämän lähetyksen?';
 $a->strings['Remove file'] = 'Poista tiedosto';
-$a->strings['You can\'t upload any more files.'] = 'Et voi ladata enempää tiedostoja.';
+$a->strings['You can\'t upload any more files.'] = 'Et voi lähettää enempää tiedostoja.';
+$a->strings['Fetching...'] = 'Noudetaan...';
+$a->strings['Receiving data...'] = 'Vastaanotetaan dataa...';
+$a->strings['Processing...'] = 'Prosessoidaan...';
+$a->strings['Posting...'] = 'Julkaistaan...';
+$a->strings['Timeout'] = 'Aikakatkaisu';
+$a->strings['The request took too long. Please try again.'] = 'Pyyntö kesti liian kauan. Yritä uudestaan.';
 $a->strings['toggle mobile'] = 'käytä tai älä käytä mobiilisivustoa';
 $a->strings['Close'] = 'Sulje';
 $a->strings['Method not allowed for this module. Allowed method(s): %s'] = 'Moduuli ei salli tätä menetelmää. Sallitut menetelmät: %s';
@@ -168,8 +174,9 @@ $a->strings['User not found'] = 'Käyttäjää ei löydy';
 $a->strings['Enter new password: '] = 'Syötä uusi salasana:';
 $a->strings['Password update failed. Please try again.'] = 'Salasanan vaihto epäonnistui. Yritä uudelleen.';
 $a->strings['Password changed.'] = 'Salasana vaihdettu.';
-$a->strings['Enter user name: '] = 'Syötä käyttäjänimi:';
-$a->strings['Enter user email address: '] = 'Syötä käyttäjän sähköpostiosoite:';
+$a->strings['Enter display name: '] = 'Syötä näyttönimi:';
+$a->strings['Enter username: '] = 'Syötä käyttäjänimi:';
+$a->strings['Enter email address: '] = 'Syödä sähköpostiosoite:';
 $a->strings['Enter a language (optional): '] = 'Syötä kieli (valinnainen):';
 $a->strings['Enter URL of an image to use as avatar (optional): '] = 'Syötä avatarina käytettävän kuvan URL (valinnainen):';
 $a->strings['User is not pending.'] = 'Käyttäjän tila ei ole avoin';
@@ -253,52 +260,10 @@ $a->strings['<button type="button" %2$s>%1$d person</button> reshared this'] = [
 	0 => '<button type="button" %2$s>%1$d ihminen</button> jakoi tämän uudelleen',
 	1 => '<button type="button" %2$s>%1$d ihmistä</button> jakoi tämän uudelleen',
 ];
-$a->strings['Visible to <strong>everybody</strong>'] = 'Näkyy <strong>kaikille</strong>';
-$a->strings['Please enter a image/video/audio/webpage URL:'] = 'Syötä kuvan/videon/audion/verkkosivun URL:';
-$a->strings['Tag term:'] = 'Tunniste:';
-$a->strings['Save to Folder'] = 'Tallenna kansioon';
-$a->strings['Where are you right now?'] = 'Missä olet nyt?';
-$a->strings['Delete item(s)?'] = 'Poista kohde/kohteet?';
-$a->strings['Post published.'] = 'Julkaisu julkaistu.';
-$a->strings['Go to post'] = 'Siirry julkaisuun';
-$a->strings['Created at'] = 'Sijainti';
-$a->strings['New Post'] = 'Uusi julkaisu';
-$a->strings['Post'] = 'Julkaisu';
-$a->strings['Loading...'] = 'Ladataan…';
-$a->strings['upload photo'] = 'lähetä kuva';
-$a->strings['Attach file'] = 'Liitä tiedosto';
-$a->strings['attach file'] = 'liitä tiedosto';
-$a->strings['Bold'] = 'Lihavoitu';
-$a->strings['Italic'] = 'Kursivoitu';
-$a->strings['Underline'] = 'Alleviivaus';
-$a->strings['Quote'] = 'Lainaus';
-$a->strings['Add emojis'] = 'Lisää emoji';
-$a->strings['Content Warning'] = 'Sisältövaroitus';
-$a->strings['Code'] = 'Koodi';
-$a->strings['Image'] = 'Kuva';
-$a->strings['Link'] = 'Linkki';
-$a->strings['Link or Media'] = 'Linkki tai media';
-$a->strings['Set your location'] = 'Aseta sijaintisi';
-$a->strings['set location'] = 'aseta sijainti';
-$a->strings['Clear browser location'] = 'Tyhjennä selaimen sijainti';
-$a->strings['clear location'] = 'tyhjennä sijainti';
-$a->strings['Set title'] = 'Aseta otsikko';
-$a->strings['Set summary, abstract or spoiler text'] = 'Aseta yhteenveto, tiivistelmä tai spoileriteksti';
-$a->strings['Categories (comma-separated list)'] = 'Luokat (pilkuilla eroteltu luettelo)';
-$a->strings['Sensitive post'] = 'Arkaluontoista materiaalia sisältävä julkaisu';
-$a->strings['Scheduled at'] = 'Ajastus';
-$a->strings['Permission settings'] = 'Käyttöoikeusasetukset';
-$a->strings['Public post'] = 'Julkinen julkaisu';
-$a->strings['Preview'] = 'Esikatselu';
-$a->strings['Message'] = 'Viesti';
-$a->strings['Add file'] = 'Lisää tiedosto';
-$a->strings['Open Compose page'] = 'Avaa julkaisun kirjoitussivu';
-$a->strings['remove'] = 'poista';
-$a->strings['Delete Selected Items'] = 'Poista valitut kohteet';
 $a->strings['You had been addressed (%s).'] = 'Sinua puhutellaan (%s).';
 $a->strings['You are following %s.'] = 'Sinä seuraat %s.';
-$a->strings['You subscribed to %s.'] = 'Olet tilannut %s.';
 $a->strings['You subscribed to one or more tags in this post.'] = 'Olet tilannut yhden tai useamman tunnisteen, joita on käytetty tässä julkaisussa.';
+$a->strings['You subscribed to %s.'] = 'Olet tilannut %s.';
 $a->strings['%s reshared this.'] = '%s jatkoi tämän uudelleen.';
 $a->strings['Reshared'] = 'Uudelleenjaot';
 $a->strings['Reshared by %s <%s>'] = 'Uudelleenjaot %s <%s>';
@@ -316,13 +281,8 @@ $a->strings['Distributed'] = 'Jaeltu';
 $a->strings['Pushed to us'] = 'Työnnetty meille';
 $a->strings['Channel "%s": %s'] = 'Kanava "%s": %s';
 $a->strings['Channel "%s"'] = 'Kanava "%s"';
-$a->strings['Select'] = 'Valitse';
-$a->strings['Pinned item'] = 'Kiinnitetty kohde';
-$a->strings['View %s\'s profile @ %s'] = 'Katso henkilön %s profiilia @ %s';
-$a->strings['Categories:'] = 'Luokat:';
-$a->strings['Filed under:'] = 'Arkistoitu kansioon:';
-$a->strings['%s from %s'] = '%s sovelluksesta %s';
-$a->strings['View in context'] = 'Näytä kontekstissa';
+$a->strings['Delete Selected Items'] = 'Poista valitut kohteet';
+$a->strings['remove'] = 'poista';
 $a->strings['For you'] = 'Sinulle';
 $a->strings['Posts from contacts you interact with and who interact with you'] = 'Julkaisut niiltä kontakteilta, joiden kanssa olet vuorovaikutuksessa';
 $a->strings['Discover'] = 'Löydöt';
@@ -355,6 +315,135 @@ $a->strings['Personal'] = 'Minä';
 $a->strings['Posts that mention or involve you'] = 'Julkaisut, jotka liittyvät sinuun tai mainitsevat sinut';
 $a->strings['Bookmarked'] = 'Lisätty kirjanmerkkeihin';
 $a->strings['Favourite Posts'] = 'Suosikkijulkaisut';
+$a->strings['Unknown parent'] = 'Tuntematon vanhempi';
+$a->strings['This entry was edited'] = 'Tätä kohdetta on muokattu';
+$a->strings['Pinned to your wall'] = 'Kiinnitetty seinällesi';
+$a->strings['Comment this item on your system'] = 'Kommentoi tätä kohdetta järjestelmässäsi';
+$a->strings['Remote comment'] = 'Etäkommentti';
+$a->strings['Categories:'] = 'Luokat:';
+$a->strings['Filed under:'] = 'Arkistoitu kansioon:';
+$a->strings['View %s\'s profile @ %s'] = 'Katso henkilön %s profiilia @ %s';
+$a->strings['to'] = 'henkilölle';
+$a->strings['via'] = 'kautta';
+$a->strings['Wall-to-Wall'] = 'Seinäjulkaisu';
+$a->strings['via Wall-To-Wall:'] = 'seinäjulkaisun kautta';
+$a->strings['%s from %s'] = '%s sovelluksesta %s';
+$a->strings['Raw content'] = 'Käsittelemätön sisältö';
+$a->strings['Load more comments'] = 'Lataa lisää kommentteja';
+$a->strings['%d comment'] = [
+	0 => '%d kommentti',
+	1 => '%d kommenttia',
+];
+$a->strings['Comment'] = 'Kommentti';
+$a->strings['Like'] = 'Tykkää';
+$a->strings['Dislike'] = 'En tykkää';
+$a->strings['Reshare'] = 'Jaa uudelleen';
+$a->strings['Reply to %s'] = 'Vastaus käyttäjälle %s';
+$a->strings['More'] = 'Lisää';
+$a->strings['Loading ...'] = 'Ladataan...';
+$a->strings['Notifier task is pending'] = 'Muistutustehtävä vireillä';
+$a->strings['Delivery to remote servers is pending'] = 'Toimitus etäservereille vireillä';
+$a->strings['Delivery to remote servers is underway'] = 'Toimitus etäservereillle käynnissä';
+$a->strings['Delivery to remote servers is mostly done'] = 'Toimitus etäservereille pääosin valmis';
+$a->strings['Delivery to remote servers is done'] = 'Toimitus etäservereille valmis';
+$a->strings['in reply to %s'] = 'vastauksena käyttäjälle %s';
+$a->strings['Parent is probably private or not federated.'] = 'Vanhempi on todennäköisesti yksityinen tai sitä ei ole federoitu.';
+$a->strings['Show comments'] = 'Näytä kommentit';
+$a->strings['Close comments'] = 'Sulje kommentit';
+$a->strings['Show more comments'] = 'Näytä lisää kommentteja';
+$a->strings['Show fewer comments'] = 'Näytä vähemmän kommentteja';
+$a->strings['Detected languages'] = 'Havaitut kielet';
+$a->strings['Share via ...'] = 'Jaa palvelun ... kautta';
+$a->strings['Share via external services'] = 'Jaa ulkoisten palvelujen kautta';
+$a->strings['Turn off related notifications'] = 'Laita pois päältä liittyvät ilmoitukset';
+$a->strings['Turn on related notifications'] = 'Laita päälle liittyvät ilmoitukset';
+$a->strings['Toggle notifications for this post'] = 'Vaihtele tämän julkaisun ilmoitusasetuksia';
+$a->strings['Notifications turned off for this post'] = 'Tämän julkaisun ilmoitukset on laitettu pois päältä';
+$a->strings['Edit event'] = 'Muokkaa tapahtumaa';
+$a->strings['Edit post'] = 'Muokkaa viestiä';
+$a->strings['Bookmark'] = 'Lisää kirjanmerkki';
+$a->strings['Remove bookmark'] = 'Pois kirjanmerkki';
+$a->strings['Starred'] = 'Tähdelliset';
+$a->strings['Add tag to post'] = 'Lisää tunniste julkaisuun';
+$a->strings['Save to folder'] = 'Tallenna kansioon';
+$a->strings['Connector Message'] = 'Yhdistäjäviesti';
+$a->strings['Select'] = 'Valitse';
+$a->strings['Delete globally'] = 'Poista maailmanlaajuisesti';
+$a->strings['Remove locally'] = 'Poista paikallisesti';
+$a->strings['Block %s'] = 'Estä %s';
+$a->strings['Ignore %s'] = 'Sivuuta %s';
+$a->strings['Collapse %s'] = 'Laskosta piiloon %s';
+$a->strings['Report this post'] = 'Raportoi tämä julkaisu';
+$a->strings['Ignore %s server'] = 'Sivuuta %s palvelin ';
+$a->strings['I will attend'] = 'Osallistun';
+$a->strings['I will not attend'] = 'En aio osallistua';
+$a->strings['I might attend'] = 'Saatan osallistua';
+$a->strings['Going'] = 'Tulen paikalle';
+$a->strings['Can\'t Go'] = 'En pääse';
+$a->strings['Maybe'] = 'Ehkä';
+$a->strings['%s (Received %s)'] = '%s (Vastaanotettu %s)';
+$a->strings['I like this (toggle)'] = 'Tykkään tästä (vaihda)';
+$a->strings['I don\'t like this (toggle)'] = 'En tykkää tästä (vaihda)';
+$a->strings['Quote share this'] = 'Lainaa ja jaa tämä';
+$a->strings['Quote Share'] = 'Lainaa ja jaa';
+$a->strings['Reshare this'] = 'Jaa tämä uudelleen';
+$a->strings['Cancel your Reshare'] = 'Peruuta uudelleenjako';
+$a->strings['Unshare'] = 'Peruuta jako';
+$a->strings['Private Message'] = 'Yksityisviesti';
+$a->strings['Public Message'] = 'Julkinen viesti';
+$a->strings['Unlisted Message'] = 'Listaamaton viesti';
+$a->strings['Reshared by: %s'] = 'Käyttäjän %s uudelleen jakama';
+$a->strings['Viewed by: %s'] = '%s näki';
+$a->strings['Read by: %s'] = '%s luki';
+$a->strings['Liked by: %s'] = '%s tykkäsi';
+$a->strings['Disliked by: %s'] = '%s ei tykännyt';
+$a->strings['Attended by: %s'] = 'Osallistujat: %s';
+$a->strings['Maybe attended by: %s'] = 'Mahdollisesti osallistuvat: %s';
+$a->strings['Not attended by: %s'] = 'Eivät osallistu: %s';
+$a->strings['Commented by: %s'] = '%s kommentoi';
+$a->strings['Reacted with %s by: %s'] = 'Reaktio %s käyttäjiltä %s';
+$a->strings['Quote shared by: %s'] = 'Käyttäjän %s lainaama ja jakama';
+$a->strings['This is you'] = 'Tämä olet sinä';
+$a->strings['Post comment'] = 'Julkaise kommentti';
+$a->strings['Loading...'] = 'Ladataan…';
+$a->strings['Bold'] = 'Lihavoitu';
+$a->strings['Italic'] = 'Kursivoitu';
+$a->strings['Underline'] = 'Alleviivaus';
+$a->strings['Content Warning'] = 'Sisältövaroitus';
+$a->strings['Quote'] = 'Lainaus';
+$a->strings['Add emojis'] = 'Lisää emoji';
+$a->strings['Code'] = 'Koodi';
+$a->strings['Image'] = 'Kuva';
+$a->strings['Link'] = 'Linkki';
+$a->strings['Link or Media'] = 'Linkki tai media';
+$a->strings['Please enter a image/video/audio/webpage URL:'] = 'Syötä kuvan/videon/audion/verkkosivun URL:';
+$a->strings['Preview'] = 'Esikatselu';
+$a->strings['Visible to <strong>everybody</strong>'] = 'Näkyy <strong>kaikille</strong>';
+$a->strings['Please enter a video URL:'] = 'Syötä videon URL:';
+$a->strings['Please enter an audio URL:'] = 'Syötä audion URL:';
+$a->strings['Tag term:'] = 'Tunniste:';
+$a->strings['Save to Folder'] = 'Tallenna kansioon';
+$a->strings['Where are you right now?'] = 'Missä olet nyt?';
+$a->strings['Delete item(s)?'] = 'Poista kohde/kohteet?';
+$a->strings['Post published.'] = 'Julkaisu julkaistu.';
+$a->strings['Go to post'] = 'Siirry julkaisuun';
+$a->strings['Created at'] = 'Sijainti';
+$a->strings['Post to group'] = 'Julkaise ryhmään';
+$a->strings['New Post'] = 'Uusi julkaisu';
+$a->strings['Post'] = 'Julkaisu';
+$a->strings['Attach file'] = 'Liitä tiedosto';
+$a->strings['Set your location'] = 'Aseta sijaintisi';
+$a->strings['Clear browser location'] = 'Tyhjennä selaimen sijainti';
+$a->strings['Video'] = 'Video';
+$a->strings['Set title'] = 'Aseta otsikko';
+$a->strings['Set summary, abstract or spoiler text'] = 'Aseta yhteenveto, tiivistelmä tai spoileriteksti';
+$a->strings['Categories (comma-separated list)'] = 'Luokat (pilkuilla eroteltu luettelo)';
+$a->strings['Sensitive post'] = 'Arkaluontoista materiaalia sisältävä julkaisu';
+$a->strings['Scheduled at'] = 'Ajastus';
+$a->strings['Permission settings'] = 'Käyttöoikeusasetukset';
+$a->strings['Message'] = 'Viesti';
+$a->strings['Add file'] = 'Lisää tiedosto';
+$a->strings['Open Compose page'] = 'Avaa julkaisun kirjoitussivu';
 $a->strings['General Features'] = 'Yleiset ominaisuudet';
 $a->strings['Display the community in the navigation'] = 'Näytä yhteisö navigaatiossa';
 $a->strings['If enabled, the community can be accessed via the navigation menu. Independent from this setting, the community timelines can always be accessed via the channels.'] = 'Jos käytössä, yhteisöön on pääsy navigointivalikon kautta. Yhteisöjen aikajanoille on aina pääsy kanavien kautta tästä asetuksesta riippumatta.';
@@ -373,6 +462,8 @@ $a->strings['Circles'] = 'Piirit';
 $a->strings['Display posts that have been created by accounts of the selected circle.'] = 'Näyttää julkaisut, jotka ovat julkaisseet valitun piirin käyttäjät.';
 $a->strings['Groups'] = 'Ryhmät';
 $a->strings['Display posts that have been distributed by the selected group.'] = 'Näyttää julkaisut, jotka ovat valitun ryhmän jakelemia.';
+$a->strings['Pages'] = 'Sivut';
+$a->strings['Display posts from Organization and News Pages.'] = 'Näytä julkaisut organisaatiosta ja uusilta sivuilta.';
 $a->strings['Archives'] = 'Arkisto';
 $a->strings['Display an archive where posts can be selected by month and year.'] = 'Näyttää arkiston, jossa julkaisuja voidaan valita kuukauden ja vuoden perusteella.';
 $a->strings['Protocols'] = 'Yhteyskäytännöt';
@@ -411,14 +502,11 @@ $a->strings['Fetch more replies'] = 'Nouda lisää vastauksia';
 $a->strings['View Status'] = 'Näytä tila';
 $a->strings['View Profile'] = 'Näytä profiili';
 $a->strings['View Photos'] = 'Näytä kuvia';
-$a->strings['Network Posts'] = 'Verkoston julkaisut';
-$a->strings['View Contact'] = 'Näytä kontakti';
+$a->strings['Posts'] = 'Julkaisut';
+$a->strings['Settings'] = 'Asetukset';
 $a->strings['Collapse'] = 'Taittele piiloon';
 $a->strings['Ignore user'] = 'Sivuuta käyttäjä';
 $a->strings['Block user'] = 'Estä käyttäjä';
-$a->strings['Ignore %s server'] = 'Sivuuta %s palvelin ';
-$a->strings['Detected languages'] = 'Havaitut kielet';
-$a->strings['Raw content'] = 'Käsittelemätön sisältö';
 $a->strings['Connect/Follow'] = 'Muodosta yhteys/Seuraa';
 $a->strings['Unable to fetch user.'] = 'Käyttäjää ei voitu noutaa.';
 $a->strings['Undetermined'] = 'Määrittämätön';
@@ -428,6 +516,7 @@ $a->strings['Detected languages in this post:
 %s'] = 'Tässä julkaisussa havaitut kielet:
 %s';
 $a->strings['Nothing new here'] = 'Täällä ei ole mitään uutta';
+$a->strings['My Profile'] = 'Profiilini';
 $a->strings['Home'] = 'Koti';
 $a->strings['Skip to main content'] = 'Ohita ja siirry pääsisältöön';
 $a->strings['Clear notifications'] = 'Tyhjennä ilmoitukset';
@@ -435,17 +524,14 @@ $a->strings['Search: @name, !group, #tags, content'] = 'Etsi: @nimi, !ryhmä, #t
 $a->strings['Sign out'] = 'Kirjaudu ulos';
 $a->strings['End this session'] = 'Lopeta istunto';
 $a->strings['Sign in'] = 'Kirjaudu';
-$a->strings['Profile'] = 'Profiili';
-$a->strings['Your profile page'] = 'Profiilisivusi';
-$a->strings['Conversations'] = 'Keskustelut';
-$a->strings['Conversations you started'] = 'Aloittamasi keskustelut';
 $a->strings['Photos'] = 'Kuvat';
-$a->strings['Your photos'] = 'Kuvasi';
-$a->strings['Calendar'] = 'Kalenteri';
-$a->strings['Your calendar'] = 'Kalenterisi';
+$a->strings['My photos'] = 'Valokuvani';
+$a->strings['Files'] = 'Tiedostot';
+$a->strings['My uploaded files'] = 'Lähetetyt tiedostoni';
 $a->strings['Personal notes'] = 'Yksityismuistiinpanot';
-$a->strings['Your personal notes'] = 'Yksityismuistiinpanosi';
-$a->strings['Home Page'] = 'Kotisivu';
+$a->strings['Only you can see these'] = 'Vain sinä voit nähdä nämä';
+$a->strings['Profile'] = 'Profiili';
+$a->strings['My profile'] = 'Profiilini';
 $a->strings['Register'] = 'Rekisteröidy';
 $a->strings['Create an account'] = 'Luo tili';
 $a->strings['Help'] = 'Ohje';
@@ -458,16 +544,13 @@ $a->strings['Full Text'] = 'Kokoteksti';
 $a->strings['Tags'] = 'Aihetunnisteet';
 $a->strings['Contacts'] = 'Yhteystiedot';
 $a->strings['Community'] = 'Yhteisö';
-$a->strings['Conversations on this and other servers'] = 'Keskustelut täällä ja muilla palvelimilla';
+$a->strings['Calendar'] = 'Kalenteri';
 $a->strings['Directory'] = 'Hakemisto';
 $a->strings['People directory'] = 'Henkilöhakemisto';
 $a->strings['Information'] = 'Tietoa';
 $a->strings['Information about this friendica instance'] = 'Tietoa tästä Friendica-ilmentymästä';
 $a->strings['Terms of Service'] = 'Käyttöehdot';
 $a->strings['Terms of Service of this Friendica instance'] = 'Tämän Friendica-ilmentymän käyttöehdot';
-$a->strings['Network'] = 'Verkko';
-$a->strings['Conversations from your friends'] = 'Kavereidesi aloittamat keskustelut';
-$a->strings['Your posts and conversations'] = 'Julkaisusi ja keskustelusi';
 $a->strings['Introductions'] = 'Esittelyt';
 $a->strings['Friend Requests'] = 'Kaveripyynnöt';
 $a->strings['Notifications'] = 'Ilmoitukset';
@@ -477,9 +560,9 @@ $a->strings['Mark all system notifications as seen'] = 'Merkitse kaikki järjest
 $a->strings['Private mail'] = 'Yksityisviesti';
 $a->strings['Inbox'] = 'Saapuneet';
 $a->strings['Outbox'] = 'Lähtevät';
-$a->strings['Accounts'] = 'Tilit';
 $a->strings['Manage other accounts, including groups and pages'] = 'Hallitse muita tilejä mukaan lukien ryhmät ja sivut';
-$a->strings['Settings'] = 'Asetukset';
+$a->strings['Switch Accounts'] = 'Vaihda tiliä';
+$a->strings['Add Account'] = 'Lisää tili';
 $a->strings['Account settings'] = 'Tiliasetukset';
 $a->strings['Manage/edit friends and contacts'] = 'Hallinnoi ja muokkaa kavereita ja yhteystietoja';
 $a->strings['Admin'] = 'Ylläpitäjä';
@@ -492,6 +575,10 @@ $a->strings['first'] = 'ensimmäinen';
 $a->strings['prev'] = 'edellinen';
 $a->strings['next'] = 'seuraava';
 $a->strings['last'] = 'viimeinen';
+$a->strings['External link to page'] = 'Ulkoinen linkki sivuun';
+$a->strings['Create new page'] = 'Luo uusi sivu';
+$a->strings['Find pages to follow'] = 'Löydä seurattavia sivuja';
+$a->strings['Back'] = 'Takaisin';
 $a->strings['<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> %3$s'] = '<a href="%1$s" target="_blank" rel="noopener noreferrer">%2$s</a> %3$s';
 $a->strings['Link to source'] = 'Linkki lähteeseen';
 $a->strings['Click to open/close'] = 'Avaa ja sulje napsauttamalla';
@@ -547,6 +634,8 @@ $a->strings['%d Contact'] = [
 	1 => '%d kontaktia',
 ];
 $a->strings['View Contacts'] = 'Näytä kontaktit';
+$a->strings['Administrator'] = 'Ylläpitäjä';
+$a->strings['Moderator'] = 'Moderaattori';
 $a->strings['Remove term'] = 'Poista kohde';
 $a->strings['(%d hour)'] = [
 	0 => '(%d tunti)',
@@ -555,7 +644,6 @@ $a->strings['(%d hour)'] = [
 $a->strings['More Trending Tags'] = 'Lisää trendaavia tunnisteita';
 $a->strings['Show More'] = 'Näytä enemmän';
 $a->strings['Show Less'] = 'Näytä vähemmän';
-$a->strings['Post to group'] = 'Julkaise ryhmään';
 $a->strings['Mention'] = 'Maininta';
 $a->strings['XMPP:'] = 'XMPP:';
 $a->strings['Matrix:'] = 'Matrix:';
@@ -563,7 +651,7 @@ $a->strings['Location:'] = 'Sijainti:';
 $a->strings['Network:'] = 'Verkosto:';
 $a->strings['Follow'] = 'Seuraa';
 $a->strings['Unfollow'] = 'Lopeta seuraaminen';
-$a->strings['View group'] = 'Näytä ryhmä';
+$a->strings['Group posts'] = 'Ryhmäjulkaisut';
 $a->strings['Yourself'] = 'Sinä itse';
 $a->strings['Mutuals'] = 'Keskinäiset';
 $a->strings['Post to Email'] = 'Viesti sähköpostiin';
@@ -609,6 +697,8 @@ $a->strings['GD graphics PHP module'] = 'GD graphicsin PHP-moduuli';
 $a->strings['Error: GD graphics PHP module with JPEG support required but not installed.'] = 'Virhe: GD graphicsin JPEG-tuellinen PHP-moduuli vaaditaan, mutta sitä ei ole asennettu.';
 $a->strings['OpenSSL PHP module'] = 'OpenSSL:n PHP-moduuli';
 $a->strings['Error: openssl PHP module required but not installed.'] = 'Virhe: openssl:n PHP-moduuli vaaditaan, mutta sitä ei ole asennettu.';
+$a->strings['Sodium PHP module'] = 'Sodium PHP -moduuli';
+$a->strings['Error: Sodium PHP module required but not installed.'] = 'Virhe: Sodium PHP -moduuli vaaditaan, mutta sitä ei ole asennettu.';
 $a->strings['mb_string PHP module'] = 'PHP-moduuli mb_string';
 $a->strings['Error: mb_string PHP module required but not installed.'] = 'Virhe: PHP-moduuli mb_string vaaditaan, mutta sitä ei ole asennettu.';
 $a->strings['iconv PHP module'] = 'iconv PHP-moduuli';
@@ -646,6 +736,8 @@ $a->strings['No TLS detected'] = 'TLS:ää ei tunnistettu';
 $a->strings['TLS detected'] = 'TLS tunnistettu';
 $a->strings['ImageMagick PHP extension is not installed'] = 'ImageMagickin PHP-laajennusta ei ole asennettu';
 $a->strings['ImageMagick PHP extension is installed'] = 'ImageMagickin PHP-laajennus on asennettu';
+$a->strings['APCu PHP extension is not available (optional, only needed for the "apcu" cache driver)'] = 'APCu PHP -laajennus ei ole saatavilla (valinnainen, tarvitaan vain "apcu" välimuistiajurille)';
+$a->strings['APCu PHP extension is available'] = 'APCu PHP -laajennus on saatavilla';
 $a->strings['Database already in use.'] = 'Tietokanta on jo käytössä.';
 $a->strings['Could not connect to database.'] = 'Tietokantaan ei saada yhteyttä.';
 $a->strings['%s (%s)'] = '%s (%s)';
@@ -655,7 +747,7 @@ $a->strings['Friendica can\'t display this page at the moment, please contact th
 $a->strings['template engine cannot be registered without a name.'] = 'mallinekonetta ei voi rekisteröidä ilman nimeä.';
 $a->strings['template engine is not registered!'] = 'mallinekonetta ei ole rekisteröity!';
 $a->strings['Storage base path'] = 'Tallennuksen kantapolku';
-$a->strings['Folder where uploaded files are saved. For maximum security, This should be a path outside web server folder tree'] = 'Tiedosto, johon palvelimelle ladatut tiedostot tallennetaan. Turvallisuuden takaamiseksi tämän pitää olla polku, joka ei ole osa verkkopalvelimen kansiorakennetta.';
+$a->strings['Folder where uploaded files are saved. For maximum security, This should be a path outside web server folder tree'] = 'Kansio, johon palvelimelle lähetetyt tiedostot tallennetaan. Turvallisuuden takaamiseksi tämän pitää olla polku, joka ei ole osa verkkopalvelimen kansiorakennetta.';
 $a->strings['Enter a valid existing folder'] = 'Syötä pätevä olemassa oleva kansio';
 $a->strings['Updates from version %s are not supported. Please update at least to version 2021.01 and wait until the postupdate finished version 1383.'] = 'Päivityksiä versiosta %s ei tueta. Päivitä vähintään versioon 2021.01 ja odota, kunnes päivitys on valmis versioon 1383.';
 $a->strings['Updates from postupdate version %s are not supported. Please update at least to version 2021.01 and wait until the postupdate finished version 1383.'] = 'Päivityksiä postupdate-versiosta %s ei tueta. Päivitä vähintään versioon 2021.01 ja odota, kunnes postupdate-päivitys versioon 1383 on valmis.';
@@ -718,7 +810,7 @@ $a->strings['Connect URL missing.'] = 'Yhteys URL-linkki puuttuu.';
 $a->strings['The contact could not be added. Please check the relevant network credentials in your Settings -> Social Networks page.'] = 'Kontaktia ei pystytty lisäämään. Tarkista verkkoasetukset omista asetuksistasi (Settings -> Social Networks).';
 $a->strings['Expected network %s does not match actual network %s'] = 'Odotettu verkko %s ei vastaa todellista verkkoa %s';
 $a->strings['This seems to be a relay account. They can\'t be followed by users.'] = 'Tämä vaikuttaa olevan välittäjätili. Käyttäjät eivät voi seurata välittäjätilejä.';
-$a->strings['The profile address specified does not provide adequate information.'] = 'Annettu profiiliosoite ei sisällä riittävästi tietoa.';
+$a->strings['The handle specified does not provide adequate information.'] = 'Annettu käyttäjätunnus ei sisällä riittävästi tietoa.';
 $a->strings['No compatible communication protocols or feeds were discovered.'] = 'Yhteensopivia viestintäyhteyskäytäntöjä tai syötteitä ei löytynyt.';
 $a->strings['An author or name was not found.'] = 'Julkaisija tai nimi puuttuu.';
 $a->strings['No browser URL could be matched to this address.'] = 'Mitään selaimen URL-osoitetta ei voitu yhdistää tähän osoitteeseen.';
@@ -819,7 +911,6 @@ $a->strings['This website has been verified to belong to the same person.'] = 'T
 $a->strings['[today]'] = '[tänään]';
 $a->strings['Birthday Reminders'] = 'Syntymäpäivämuistutukset';
 $a->strings['Birthdays this week:'] = 'Syntymäpäiviä tällä viikolla:';
-$a->strings['[No description]'] = '[Ei kuvausta]';
 $a->strings['Event Reminders'] = 'Tapahtumamuistutukset';
 $a->strings['Upcoming events the next 7 days:'] = 'Tulevat tapahtumat seuraavan 7 päivän aikana:';
 $a->strings['Hometown:'] = 'Kotikaupunki:';
@@ -886,9 +977,9 @@ $a->strings['
 $a->strings['
 		The login details are as follows:
 
-		Site Location:	%1$s
-		Login Name:		%2$s
-		Password:		%3$s
+		URL: %1$s
+		Username: %2$s
+		Password: %3$s
 
 		You may change your password from your account "Settings" page after logging
 		in.
@@ -906,53 +997,34 @@ $a->strings['
 		If you are new and do not know anybody here, they may help
 		you to make some new and interesting friends.
 
-		If you ever want to delete your account, you can do so at %1$s/settings/removeme
+		If you ever want to delete your account, you can do so at %5$s
 
 		Thank you and welcome to %4$s.'] = '
 		Kirjautumistiedot ovat seuraavat:
 
-		Sivuston sijainti:	%1$s
-		Käyttäjätunnus:		%2$s
-		Salasana:		%3$s
+		URL: %1$s
+		Käyttäjätunnus: %2$s
+		Salasana: %3$s
 
 		Kirjauduttuasi voit vaihtaa salasanasi tilisi asetussivulta.
 
-		Käytä hetki saman sivun muiden tiliasetusten tarkistamiseen.
+		Käytäthän myös hetken muiden tiliasetusten tarkistamiseen samalla sivulla.
 
 		Saatat myös haluta lisätä oletusprofiiliisi joitakin perustietoja
 		(”Profiilit”-sivulla), jotta muiden on helpompi löytää sinut.
 
-		Suosittelemme lisäämään profiilikuvan, joitakin profiilin ”hakusanoja”
-		(avuksi ystävystyttäessä) ja ehkä missä maassa asut;
-		sitä tarkempia tietoja ei tarvitse antaa.
+		Suosittelemme, että lisäät profiilikuvan, muutamia profiilin ”hakusanoja”
+		(erittäin hyödyllisiä tuttavuuksien löytämisessä) ja ehkäpä missä maassa asut, 
+		jos et halua antaa sitä tarkempia tietoja.
 
-		Kunnioitamme täysin yksityisyyttäsi, eikä mikään näistä ole pakollinen.
+		Kunnioitamme täysin yksityisyyttäsi, eikä mikään näistä ole välttämätöntä.
 		Jos kuitenkin olet uusi etkä tunne täällä ketään, ne voivat auttaa sinua
 		löytämään uusia ja kiinnostavia tuttavuuksia.
 
-		Jos koskaan haluat poistaa tilisi, se onnistuu täällä: %1$s/settings/removeme
+		Jos koskaan jonain päivänä poistaa tilisi, se onnistuu täällä: %5$s
 
-		Kiitoksia ja tervetuloa! – %4$s';
+		Kiitos ja tervetuloa! %4$s.';
 $a->strings['Registration details for %s'] = 'Rekisteröitymistiedot: %s';
-$a->strings['
-			Dear %1$s,
-				Thank you for registering at %2$s. Your account is pending for approval by the administrator.
-
-			Your login details are as follows:
-
-			Site Location:	%3$s
-			Login Name:		%4$s
-			Password:		%5$s
-		'] = '
-			Hyvä %1$s!
-				Kiitos rekisteröitymisestäsi (%2$s). Tilisi odottaa ylläpidon hyväksyntää.
-
-			Kirjautumistietosi ovat seuraavat:
-
-			Sivuston sijainti:	%3$s
-			Käyttäjätunnus:		%4$s
-			Salasana:		%5$s
-		';
 $a->strings['Registration at %s'] = 'Rekisteröityminen kohteessa %s';
 $a->strings['
 				Dear %1$s,
@@ -961,56 +1033,6 @@ $a->strings['
 				Hei %1$s
 				Kiitos rekisteröitymisestäsi sivulle %2$s. Tilisi on nyt luotu.
 			';
-$a->strings['
-			The login details are as follows:
-
-			Site Location:	%3$s
-			Login Name:		%1$s
-			Password:		%5$s
-
-			You may change your password from your account "Settings" page after logging
-			in.
-
-			Please take a few moments to review the other account settings on that page.
-
-			You may also wish to add some basic information to your default profile
-			(on the "Profiles" page) so that other people can easily find you.
-
-			We recommend adding a profile photo, adding some profile "keywords" (very useful
-			in making new friends) - and perhaps what country you live in; if you do not wish
-			to be more specific than that.
-
-			We fully respect your right to privacy, and none of these items are necessary.
-			If you are new and do not know anybody here, they may help
-			you to make some new and interesting friends.
-
-			If you ever want to delete your account, you can do so at %3$s/settings/removeme
-
-			Thank you and welcome to %2$s.'] = '
-			Sisäänkirjautumistietosi ovat seuraavanlaiset:
-
-			Sivuston sijainti:	%3$s
-			Käyttäjänimi:		%1$s
-			Salasana:		%5$s
-
-			Saatat haluta vaihtaa tilisi salasanan tilisi Asetukset-sivullla kun olet kirjautunut sisään.
-
-			Käytäthän hieman aikaa myös muiden tiliasetusten läpikäymiseen samaisella sivulla.
-
-			Saatat myös haluta lisätä joitain perustietoja oletusprofiiliisi (Profiilit-sivulla)
-			niin, että muut löytävät sinut helposti.
-
-			Suosittelemme, että lisäät profiilikuvan, joitakin profiilin "avainsanoja" (ne ovat
-			hyödyllisiä uusien kavereiden löytämisessä) ja kenties asuinmaasi, jos et halua
-			olla sitä tarkempi.
-
-			Kunnioitamme oikeuttasi yksityisyyteeni täysin eikä mikään edellisistä ole tarpeen.
-			Jos olet paikalla ensimmäistä kertaa etkä tunne täältä vielä ketään, saattaa niistä
-			kuitenkin olla apua uusiin mielenkiintoisiin ystäviin tutustumisessa.
-
-			Jos haluat joskus poistaa tilisi, voit tehdä se osoitteessa %3$s/settings/removeme
-
-			Kiitos ja tervetuloa sivustolle %2$s.';
 $a->strings['User with delegates can\'t be removed, please remove delegate users first'] = 'Käyttäjää, jolla on valtuudet, ei voida poistaa. Poista valtuutetut käyttäjät ensin.';
 $a->strings['Addon not found.'] = 'Lisäosaa ei löydy.';
 $a->strings['Addon %s disabled.'] = 'Lisäosa %s poistettu käytöstä.';
@@ -1112,6 +1134,11 @@ $a->strings['Line'] = 'Rivi';
 $a->strings['Function'] = 'Toiminto';
 $a->strings['UID'] = 'UID';
 $a->strings['Process ID'] = 'Prosessin ID';
+$a->strings['Request ID'] = 'Pyynnön ID';
+$a->strings['Worker ID'] = 'Työntekijän ID';
+$a->strings['Call stack'] = 'Kutsupino';
+$a->strings['Only the last %d lines of the log file have been searched.'] = 'Esitty vain loki-tieodoston %d viimeiseltä riviltä.';
+$a->strings['The search has been stopped after %d seconds.'] = 'Haku pysäytettiin %d sekunnin jälkeen.';
 $a->strings['Current log path: %s'] = 'Nykyinen lokipolku: %s';
 $a->strings['Inspect Deferred Worker Queue'] = 'Tarkista lykättyjen työntekijöiden jono';
 $a->strings['This page lists the deferred worker jobs. This are jobs that couldn\'t be executed at the first time.'] = 'Tällä sivulla on luettelo lykätyistä työntekijöiden töistä. Nämä ovat töitä, joita ei voitu suorittaa ensimmäisellä kerralla.';
@@ -1123,6 +1150,25 @@ $a->strings['Job Parameters'] = 'Työparametrit';
 $a->strings['Created'] = 'Luotu';
 $a->strings['Next Try'] = 'Seuraava yritys';
 $a->strings['Priority'] = 'Prioriteetti';
+$a->strings['Please select a valid user.'] = 'Valitse kelvollinen käyttäjä.';
+$a->strings['The selected user cannot be assigned moderation rights.'] = 'Valitulle käyttäjälle ei voida antaa moderointioikeuksia.';
+$a->strings['Moderation rights have been granted.'] = 'Moderointioikeudet myönnetty.';
+$a->strings['Moderation rights have been removed.'] = 'Moderointioikeudet poistettu.';
+$a->strings['Unknown role action.'] = 'Tuntematon roolitoiminto.';
+$a->strings['Roles'] = 'Roolit';
+$a->strings['Manage moderators for this node. Administrator rights are read-only and managed through the node configuration.'] = 'Hallinnoi tämän solmun moderaattoreita. Ylläpitäjänoikeudet ovat vain luku -tilassa ja niitä hallinnoidaan solmun konfiguraation kautta.';
+$a->strings['Users with administrator rights (read-only)'] = 'Käyttäjät, joilla on ylläpitäjänoikeudet (vain luku)';
+$a->strings['Users with moderation rights'] = 'Käyttäjät, joilla on moderointioikeudet';
+$a->strings['User'] = 'Käyttäjä';
+$a->strings['Actions'] = 'Toimenpiteet';
+$a->strings['No administrators found.'] = 'Ylläpitäjiä ei löydetty.';
+$a->strings['No users with moderation rights found.'] = 'Ei löydetty käyttäjiä, joilla on moderointioikeudet.';
+$a->strings['Administrator + Moderator'] = 'Ylläpitäjä + moderaattori';
+$a->strings['Remove moderation rights'] = 'Poista moderointioikeudet';
+$a->strings['Administrators always keep moderation rights.'] = 'Ylläpitäjät säilyttävät aina moderointioikeudet.';
+$a->strings['Assign moderation rights'] = 'Anna moderointioikeudet';
+$a->strings['Grant moderation rights'] = 'Myönnä moderointioikeudet';
+$a->strings['All active users already have moderation rights.'] = 'Kaikilla aktiivisilla käyttäjillä on jo moderointioikeudet.';
 $a->strings['%s is no valid input for maximum media size'] = '%s ei kelpaa arvoksi median enimmäiskoolle';
 $a->strings['%s is no valid input for maximum image size'] = '%s ei ole kelvollinen arvo kuvan enimmäiskoolle';
 $a->strings['No special theme for mobile devices'] = 'Ei mobiiliteemaa';
@@ -1150,7 +1196,7 @@ $a->strings['Site'] = 'Sivusto';
 $a->strings['General Information'] = 'Yleiset tiedot';
 $a->strings['Republish users to directory'] = 'Julkaiset käyttäjät uudestaan hakemistoon';
 $a->strings['Registration'] = 'Rekisteröityminen';
-$a->strings['File upload'] = 'Tiedoston lataus';
+$a->strings['File upload'] = 'Tiedoston lähetys';
 $a->strings['Policies'] = 'Käytännöt';
 $a->strings['Advanced'] = 'Edistynyt';
 $a->strings['Auto Discovered Contact Directory'] = 'Automaattinen löydettyjen kontaktien hakemisto';
@@ -1190,17 +1236,17 @@ $a->strings['Make this instance multi-user or single-user for the named user'] =
 $a->strings['Maximum image size'] = 'Kuvan enimmäiskoko';
 $a->strings['Maximum size in bytes of uploaded images. Default is 0, which means no limits. You can put k, m, or g behind the desired value for KiB, MiB, GiB, respectively.
 													The value of <code>upload_max_filesize</code> in your <code>PHP.ini</code> needs be set to at least the desired limit.
-													Currently <code>upload_max_filesize</code> is set to %s (%s byte)'] = 'Ladattujen kuvien enimmäiskoko bitteinä. Oletus on 0, joka tarkoittaa "ei rajoituksia". Voit syöttää k, m tai g haluamasi arvon jälkeen merkityksessä KiB, MiB ja GiB.
+													Currently <code>upload_max_filesize</code> is set to %s (%s byte)'] = 'Lähetettyjen kuvien enimmäiskoko bitteinä. Oletus on 0, joka tarkoittaa "ei rajoituksia". Voit syöttää k, m tai g haluamasi arvon jälkeen merkityksessä KiB, MiB ja GiB.
 													Arvo <code>upload_max_filesize</code> <code>PHP.ini</code>-tiedostossasi täytyy asettaa vähintään haluttuun rajaan.
 													Tällä hetkellä <code>upload_max_filesize</code> on asetettu arvoon %s (%s bittiä).';
 $a->strings['Maximum image length'] = 'Suurin kuvapituus';
-$a->strings['Maximum length in pixels of the longest side of uploaded images. Default is -1, which means no limits.'] = 'Ladattavan kuvatiedoston enimmäispituus pikseleinä. Oletusarvo on -1, eli ei enimmäispituutta.';
+$a->strings['Maximum length in pixels of the longest side of uploaded images. Default is -1, which means no limits.'] = 'Lähetettävän kuvatiedoston enimmäispituus pikseleinä. Oletusarvo on -1, eli ei enimmäispituutta.';
 $a->strings['JPEG image quality'] = 'JPEG-kuvanlaatu';
-$a->strings['Uploaded JPEGS will be saved at this quality setting [0-100]. Default is 100, which is full quality.'] = 'Ladatut JPEG-kuvat tallennetaan tällä laatuasetuksella [0-100]. Oletus on 100, eli korkein laatu.';
+$a->strings['Uploaded JPEGS will be saved at this quality setting [0-100]. Default is 100, which is full quality.'] = 'Lähetetyt JPEG-kuvat tallennetaan tällä laatuasetuksella [0-100]. Oletus on 100, eli korkein laatu.';
 $a->strings['Maximum media file size'] = 'Mediatiedoston enimmäiskoko';
 $a->strings['Maximum size in bytes of uploaded media files. Default is 0, which means no limits. You can put k, m, or g behind the desired value for KiB, MiB, GiB, respectively.
 													The value of <code>upload_max_filesize</code> in your <code>PHP.ini</code> needs be set to at least the desired limit.
-													Currently <code>upload_max_filesize</code> is set to %s (%s byte)'] = 'Ladattujen mediatiedostojen enimmäiskoko bitteinä. Oletus on 0, joka tarkoittaa "ei rajoituksia". Voit syöttää k, m tai g haluamasi arvon jälkeen merkityksessä KiB, MiB ja GiB.
+													Currently <code>upload_max_filesize</code> is set to %s (%s byte)'] = 'Lähetettyjen mediatiedostojen enimmäiskoko bitteinä. Oletus on 0, joka tarkoittaa "ei rajoituksia". Voit syöttää k, m tai g haluamasi arvon jälkeen merkityksessä KiB, MiB ja GiB.
 													Arvo <code>upload_max_filesize</code> <code>PHP.ini</code>-tiedostossasi täytyy asettaa vähintään haluttuun rajaan.
 													Tällä hetkellä <code>upload_max_filesize</code> on asetettu arvoon %s (%s bittiä)';
 $a->strings['Register policy'] = 'Rekisteröintymiskäytäntö';
@@ -1211,7 +1257,7 @@ $a->strings['If registration is permitted above, this sets the maximum number of
 $a->strings['Register text'] = 'Rekisteröitymisteksti';
 $a->strings['Will be displayed prominently on the registration page. You can use BBCode here.'] = 'Näkyvästi esillä rekisteröitymissivulla. Voit käyttää BBCodea.';
 $a->strings['Forbidden Nicknames'] = 'Kielletyt nimimerkit';
-$a->strings['Comma separated list of nicknames that are forbidden from registration. Preset is a list of role names according RFC 2142.'] = 'Pilkulla eroteltu luettelo nimimerkeistä, joiden rekisteröiminen on kiellettyä. Esiasetuksena on luettelo RFC 2142:n mukaisista roolinimistä.';
+$a->strings['Comma separated list of usernames that are forbidden from registration. Preset is a list of role names according RFC 2142.'] = 'Pilkulla eroteltu luettelo käyttäjänimistä, joiden rekisteröinti on kiellettyä. Esiasetuksena on luettelo RFC 2142:n mukaisista roolinimistä.';
 $a->strings['Accounts abandoned after x days'] = 'Käyttäjätilit hylätään X päivän jälkeen';
 $a->strings['Will not waste system resources polling external sites for abandonded accounts. Enter 0 for no time limit.'] = 'Ei tuhlaa järjestelmän resursseja ulkoisten sivustojen kyselyihin hylätyistä tileistä. Syötä 0, jos aikarajaa ei ole.';
 $a->strings['Allowed friend domains'] = 'Sallitut kaveri-verkkotunnukset';
@@ -1373,6 +1419,8 @@ $a->strings['Maximum amount of tags'] = 'Tunnisteiden enimmäismäärä';
 $a->strings['Maximum amount of tags in a post before it is rejected as spam. The post has to contain at least one link. Posts from subscribed accounts will not be rejected.'] = 'Julkaisussa olevien tunnisteiden enimmäismäärä ennen kuin se hylätään roskajulkaisuna. Julkaisussa täytyy olla vähintään yksi linkki. Tilatujen tilien julkaisuja ei hylätä.';
 $a->strings['Allow user tags'] = 'Salli käyttäjien tunnisteet';
 $a->strings['If enabled, the tags from the saved searches will used for the "tags" subscription in addition to the "relay_server_tags".'] = 'Jos käytössä, tallennettujen hakujen tunnisteita käytetään "tunniste"-tilauksiin "relay_server_tags"-tunnisteiden lisäksi.';
+$a->strings['Automatically subscribe to tag relay'] = 'Tilaa tunnistevälittäjä automaattisesti';
+$a->strings['If enabled, the system will automatically follow and unfollow tags at the tags.pub service based on the configured tags. Additionally, all public posts will be automatically sent to this relay server for distribution.'] = 'Jos tämä toiminto on käytössä, järjestelmä seuraa ja lopettaa seuraamisen automaattisesti tags.pub-palvelun tunnisteita määritettyjen tunnisteiden perusteella. Lisäksi kaikki julkiset viestit lähetetään automaattisesti tälle välityspalvelimelle jaettavaksi.';
 $a->strings['Deny undetected languages'] = 'Kieltäydy tunnistamattomista kielistä';
 $a->strings['If enabled, posts with undetected languages will be rejected.'] = 'Jos käytössä, julkaisut, joiden kieltä ei ole tunnistettu, hylätään.';
 $a->strings['Language Quality'] = 'Kielenlaatu';
@@ -1402,7 +1450,6 @@ $a->strings['Use storage backend'] = 'Tallennustilan taustapalvelin, käyttö';
 $a->strings['Save & Reload'] = 'Tallenna ja lataa uudelleen';
 $a->strings['This backend doesn\'t have custom settings'] = 'Tällä taustapalvelimella ei ole mukautettuja asetuksia.';
 $a->strings['Changing the current backend is prohibited because it is set by an environment variable'] = 'Nykyisen taustapalvelimen vaihtaminen on kielletty, koska sen on asettanut ympäristömuuttuja';
-$a->strings['Database (legacy)'] = 'Tietokanta (legacy)';
 $a->strings['Template engine (%s) error: %s'] = 'Mallinekone (%s) virhe: %s';
 $a->strings['Your DB still runs with MyISAM tables. You should change the engine type to InnoDB. As Friendica will use InnoDB only features in the future, you should change this! See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />'] = 'Tietokantasi toimii edelleen MyISAM-taulukoilla. Sinun tulisi vaihtaa moottorin tyyppi InnoDB:ksi. Koska Friendica käyttää tulevaisuudessa vain InnoDB:n ominaisuuksia, sinun tulisi muuttaa tämä! Katso <a href="%s">täältä ohjeet</a>, jotka voivat olla hyödyllisiä taulukkomoottoreiden muuntamisessa. Voit myös käyttää komentoa <tt>php bin/console.php dbstructure toinnodb</tt> Friendica-asennuksessasi automaattista muuntamista varten.<br />';
 $a->strings['Your DB still runs with InnoDB tables in the Antelope file format. You should change the file format to Barracuda. Friendica is using features that are not provided by the Antelope format. See <a href="%s">here</a> for a guide that may be helpful converting the table engines. You may also use the command <tt>php bin/console.php dbstructure toinnodb</tt> of your Friendica installation for an automatic conversion.<br />'] = 'Tietokantasi toimii edelleen InnoDB-taulukoilla Antelope-tiedostomuodossa. Sinun tulisi muuttaa tiedostomuoto Barracudaksi. Friendica käyttää ominaisuuksia, joita Antelope-muoto ei tarjoa. Katso <a href="%s">täältä</a> ohjeet, jotka voivat olla hyödyllisiä taulukkomoottoreiden muuntamisessa. Voit myös käyttää komentoa <tt>php bin/console.php dbstructure toinnodb</tt> Friendica-asennuksessasi automaattista muuntamista varten.<br />';
@@ -1445,6 +1492,14 @@ $a->strings['Enter the Terms of Service for your node here. You can use BBCode. 
 $a->strings['The rules'] = 'Säännöt';
 $a->strings['Enter your system rules here. Each line represents one rule.'] = 'Syötä järjestelmän säännöt tähän. Laita kukin sääntö omalle rivilleen.';
 $a->strings['API endpoint %s %s is not implemented but might be in the future.'] = 'API päätepistettä %s %s ei ole otettu käyttöön mutta niin saatetaan tehdä tulevaisuudessa.';
+$a->strings['No id specified.'] = 'ID:tä ei ole määritelty.';
+$a->strings['Attachment not available.'] = 'Liite ei ole saatavilla.';
+$a->strings['Attachment with id `%s` has been deleted from server.'] = 'Liite, jonka ID on "%s", on poistettu palvelimelta.';
+$a->strings['Unknown error while deleting attachment from database.'] = 'Tuntematon virhe poistettaessa liitettä tietokannasta.';
+$a->strings['circle name not specified'] = 'Piirin nimeä ei ole määritelty';
+$a->strings['gid not specified'] = 'gidiä ei ole määritelty';
+$a->strings['gid not available'] = 'gid ei ole saatavilla';
+$a->strings['no valid user list submitted'] = 'Kelvollista käyttäjälistaa ei ole lähetetty';
 $a->strings['Missing parameters'] = 'Puuttuvat parametrit';
 $a->strings['Only starting posts can be bookmarked'] = 'Vain aloitusjulkaisut voidaan lisätä kirjanmerkkeihin';
 $a->strings['Only starting posts can be muted'] = 'Vain aloitusjulkaisut voidaan mykistää';
@@ -1499,13 +1554,12 @@ $a->strings['Server Blocklist'] = 'Palvelimien estolista';
 $a->strings['Delete Item'] = 'Poista kohde';
 $a->strings['Item Source'] = 'Kohteen lähde';
 $a->strings['Profile Details'] = 'Profiilitiedot';
-$a->strings['Conversations started'] = 'Aloitetut keskustelut';
-$a->strings['Media'] = 'Media';
-$a->strings['Only You Can See This'] = 'Vain sinä näet tämän';
-$a->strings['Scheduled Posts'] = 'Ajastetut julkaisut';
+$a->strings['All posts'] = 'Kaikki julkaisut';
+$a->strings['Media posts'] = 'Mediajulkaisut';
+$a->strings['Posts containing media'] = 'Mediaa sisältävät julkaisut';
+$a->strings['Scheduled posts'] = 'Ajastetut julkaisut';
 $a->strings['Posts that are scheduled for publishing'] = 'Julkaisut, joiden julkaisu on ajastettu';
 $a->strings['Tips for New Members'] = 'Vinkkejä uusille käyttäjille';
-$a->strings['More'] = 'Lisää';
 $a->strings['People Search - %s'] = 'Käyttäjähaku - %s';
 $a->strings['Group Search - %s'] = 'Ryhmähaku - %s';
 $a->strings['No results.'] = 'Ei tuloksia.';
@@ -1532,7 +1586,6 @@ $a->strings['Event can not end before it has started.'] = 'Tapahtuma ei voi pä�
 $a->strings['Event title and start time are required.'] = 'Tapahtuman nimi ja alkamisaika vaaditaan.';
 $a->strings['Create event'] = 'Luo tapahtuma';
 $a->strings['Formatting is not supported for this field'] = 'Muotoiluja ei tueta tässä kentässä';
-$a->strings['Edit event'] = 'Muokkaa tapahtumaa';
 $a->strings['New event'] = 'Uusi tapahtuma';
 $a->strings['Ends'] = 'Päättyy';
 $a->strings['Back to the calendar'] = 'Takaisin kalenteriin';
@@ -1557,7 +1610,7 @@ $a->strings['New Event'] = 'Uusi tapahtuma';
 $a->strings['list'] = 'luettelo';
 $a->strings['Could not create circle.'] = 'Piiriä ei voitu luoda.';
 $a->strings['Circle not found.'] = 'Piiriä ei löytynyt.';
-$a->strings['Circle name was not changed.'] = 'Piirin nimeä ei muutettu.';
+$a->strings['Circle settings were not changed.'] = 'Piirin asetuksia ei muutettu.';
 $a->strings['Unknown circle.'] = 'Tuntematon piiri.';
 $a->strings['Contact not found.'] = 'Kontaktia ei löydy.';
 $a->strings['Invalid contact.'] = 'Epäkelpo kontakti.';
@@ -1572,6 +1625,8 @@ $a->strings['Filter'] = 'Suodatin';
 $a->strings['Create a circle of contacts/friends.'] = 'Luo kontakti-/kaveripiiri';
 $a->strings['Unable to remove circle.'] = 'Piiriä ei voida poistaa.';
 $a->strings['Delete Circle'] = 'Poista piiri';
+$a->strings['Public circle'] = 'Julkinen piiri';
+$a->strings['Public circles can be downloaded by others as CSV files.'] = 'Muut voivat ladata julkiset piirit itselleen CSV-tiedostoina.';
 $a->strings['Edit Circle Name'] = 'Muokkaa piirin nimeä';
 $a->strings['Mark all as read'] = 'Merkitse kaikki luetuiksi';
 $a->strings['Members'] = 'Jäsenet';
@@ -1606,10 +1661,8 @@ $a->strings['Ignore'] = 'Jätä huomiotta';
 $a->strings['Unignore'] = 'Ota huomioon';
 $a->strings['Uncollapse'] = 'Laskosta esiin';
 $a->strings['Batch Actions'] = 'Niputa toiminnot';
-$a->strings['Conversations started by this contact'] = 'Tämän kontaktin aloittamat keskustelut';
 $a->strings['Posts and Comments'] = 'Julkaisut ja kommentit';
 $a->strings['Individual Posts and Replies'] = 'Yksittäiset julkaisut ja vastaukset';
-$a->strings['Posts containing media objects'] = 'Julkaisut, jotka sisältävät mediaobjekteja';
 $a->strings['View all known contacts'] = 'Näytä kaikki tunnetut kontaktit';
 $a->strings['Advanced Contact Settings'] = 'Kontakti-lisäasetukset';
 $a->strings['Friend'] = 'Kaveri';
@@ -1617,13 +1670,12 @@ $a->strings['Follows you'] = 'Seuraa sinua';
 $a->strings['You follow'] = 'Sinä seuraat';
 $a->strings['Pending outgoing contact request'] = 'Avoimet lähetetyt kontaktipyynnöt';
 $a->strings['Pending incoming contact request'] = 'Avoimet sisääntulevat kontaktipyynnöt';
-$a->strings['This is you'] = 'Tämä olet sinä';
 $a->strings['Visit %s\'s profile [%s]'] = 'Näytä %s-käyttäjän profiili [%s]';
 $a->strings['Contact update failed.'] = 'Kontaktipäivitys epäonnistui.';
 $a->strings['Return to contact editor'] = 'Palaa kontaktin muokkaamiseen';
 $a->strings['Submit'] = 'Lähetä';
 $a->strings['Name'] = 'Nimi';
-$a->strings['Account Nickname'] = 'Tilin lempinimi';
+$a->strings['Account username'] = 'Tilin käyttäjänimi';
 $a->strings['Account URL'] = 'Tilin URL-osoite';
 $a->strings['Poll/Feed URL'] = 'URL kyselyitä/syötteitä varten';
 $a->strings['New photo from this URL'] = 'Uusi kuva osoitteesta';
@@ -1712,10 +1764,9 @@ $a->strings['Manage remote servers'] = 'Hallinnoi etäpalvelimia';
 $a->strings['Hide this contact from others'] = 'Piilota kontakti muilta';
 $a->strings['Replies/likes to your public posts <strong>may</strong> still be visible'] = 'Vastaukset/tykkäykset sinun julkisiin julkaisuihisi <strong>saattavat</strong> olla edelleen näkyvillä';
 $a->strings['Notification for new posts'] = 'Ilmoitukset uusista julkaisuista';
-$a->strings['Send a notification of every new post of this contact'] = 'Lähetä ilmoitus tämän kontaktin kaikista uusista julkaisuista';
+$a->strings['Send a notification of every new post of this contact'] = 'Lähetä ilmoitus tämän kontaktin jokaisesta uudesta julkaisusta.';
 $a->strings['Keyword Deny List'] = 'Avainsanojen kieltolista';
 $a->strings['Comma separated list of keywords that should not be converted to hashtags, when "Fetch information and keywords" is selected'] = 'Pilkulla eroteltu luettelo avainsanoista, joita ei muunneta aihetunnisteiksi, kun "Nouda tiedot ja avainsanat" on valittuna';
-$a->strings['Actions'] = 'Toimenpiteet';
 $a->strings['Status'] = 'Tila';
 $a->strings['Mirror postings from this contact'] = 'Peilaa tämän kontaktin julkaisut';
 $a->strings['Mark this contact as remote_self, this will cause friendica to repost new entries from this contact.'] = 'Merkitse tämä kontakti etäitseksi. Tämä saa Friendican uudelleenjulkaisemaan tämän kontaktin uudet merkinnät.';
@@ -1761,6 +1812,7 @@ $a->strings['Include'] = 'Sisällytä';
 $a->strings['Hide'] = 'Piilota';
 $a->strings['Credits'] = 'Tunnustukset';
 $a->strings['Friendica is a community project, that would not be possible without the help of many people. Here is a list of those who have contributed to the code or the translation of Friendica. Thank you all!'] = 'Friendica on yhteisöprojekti, joka ei olisi mahdollinen ilman monien ihmisten apua. Tässä on luettelo niistä, jotka ovat antaneet työpanoksensa Friendican koodin tai käännöksen kehittämiseen. Kiitos teille kaikille!';
+$a->strings['Only logged in users are permitted to perform a conversion.'] = 'Vain sisäänkirjautuneet käyttäjät voivat suorittaa konversion.';
 $a->strings['Formatted'] = 'Muotoiltu';
 $a->strings['Activity'] = 'Toiminta';
 $a->strings['Object data'] = 'Objektin tiedot';
@@ -1869,6 +1921,7 @@ $a->strings['You are cordially invited to join me and other close friends on Fri
 $a->strings['You will need to supply this invitation code: $invite_code'] = 'Sinun täytyy antaa tämä kutsukoodi: $invite_code';
 $a->strings['Once you have registered, please connect with me via my profile page at:'] = 'Kun olet rekisteröitynyt, lähetä minulle kaverikutsu profiilisivuni kautta:';
 $a->strings['For more information about the Friendica project and why we feel it is important, please visit http://friendi.ca'] = 'Lisätietoja Friendica-projektista ja siitä, miksi pidämme sitä tärkeänä, löytyy osoitteesta http://friendi.ca.';
+$a->strings['Parameter id is missing.'] = 'Parametrin ID puuttuu.';
 $a->strings['Please enter a post body.'] = 'Syötä julkaisun leipäteksti.';
 $a->strings['This feature is only available with the frio theme.'] = 'Tämä ominaisuus on saatavilla vain frio-teemassa.';
 $a->strings['Compose new personal note'] = 'Kirjoita uusi yksityismuistiinpano';
@@ -1877,10 +1930,78 @@ $a->strings['Visibility'] = 'Näkyvyys';
 $a->strings['Clear the location'] = 'Tyhjennä sijainti';
 $a->strings['Location services are unavailable on your device'] = 'Laitteesi sijaintipalvelut eivät ole käytettävissä';
 $a->strings['Location services are disabled. Please check the website\'s permissions on your device'] = 'Sijaintipalvelut eivät ole käytössä. Tarkista laitteeltasi sivuston käyttöoikeudet';
+$a->strings['Writing Assistant'] = 'Kirjoitusavustaja';
+$a->strings['Distraction-Free'] = 'Häiriötön';
+$a->strings['Image Descriptions'] = 'Kuvien kuvaukset';
+$a->strings['Focus Preview'] = 'Fokus-esikatselu';
 $a->strings['If you want to always use this editor for posting, you can configure the New Post button to always open it in your <a href="/settings/display">Theme settings</a>.'] = 'Jos julkaisemiseen haluaa aina käyttää tätä muokkainta, <a href="/settings/display">teeman asetuksista</a> Uusi julkaisu -painikkeen voi asettaa avaamaan sen.';
+$a->strings['Advanced Composer'] = 'Edistynyt kirjoittaja';
+$a->strings['Writing & Accessibility Assistant'] = 'Kirjoitus- ja saavutettavuusavustaja';
+$a->strings['Structure & Balance'] = 'Rakenne ja tasapainoisuus';
+$a->strings['Accessibility Checklist'] = 'Saavutettavuuden tarkistuslista';
+$a->strings['Readability & Style'] = 'Luettavuus ja tyyli';
+$a->strings['Paragraph Structure'] = 'Kappalerakenne';
+$a->strings['Text Balance'] = 'Tekstin tasapainoisuus';
+$a->strings['Link Density'] = 'Linkkitiheys';
+$a->strings['Hashtag Density'] = 'Tunnistetiheys';
+$a->strings['Balanced'] = 'Tasapainoinen';
+$a->strings['One block'] = 'Yksi lohko';
+$a->strings['Very compact'] = 'Todella tiivis';
+$a->strings['Well structured'] = 'Hyvä rakenne';
+$a->strings['Short post'] = 'Lyhyt julkaisu';
+$a->strings['Easy to read'] = 'Helppo lukea';
+$a->strings['Complex'] = 'Monimutkainen';
+$a->strings['Medium'] = 'Keskitaso';
+$a->strings['Subtle'] = 'Hienostunut';
+$a->strings['Very dense'] = 'Erittäin tiivis';
+$a->strings['Many links'] = 'Monta linkkiä';
+$a->strings['Many tags'] = 'Monta tunnistetta';
+$a->strings['All images have descriptions (Alt-Text)'] = 'Kaikissa kuvissa on kuvaus (vaihtoehtoinen teksti)';
+$a->strings['Images missing descriptions (Alt-Text) detected!'] = 'Havaittu kuvia, joista puuttuu kuvaus (vaihtoehtoinen teksti)!';
+$a->strings['No emoji overload (max 4 consecutive)'] = 'Ei emoji-ylikuormaa (enintään 4 perättäistä)';
+$a->strings['Emoji overload detected (hurts screen readers)'] = 'Emoji-ylikuorma havaittu (häiritsee näytönlukijoita)';
+$a->strings['Good text structuring (paragraphs used)'] = 'Hyvä tekstin rakenne (kappalejakoa käytetty)';
+$a->strings['No paragraphs found (hard to read)'] = 'Ei kappalejakoa (vaikea lukea)';
+$a->strings['No paragraphs required for short texts'] = 'Kappalejakoa ei vaadita lyhyeltä tekstiltä';
+$a->strings['Your post is beautifully readable and accessible!'] = 'Julkaisusi on kauniisti luettavissa ja sen saavutettavuus on hyvä!';
+$a->strings['Tip: Adding double line breaks to create paragraphs makes long texts much easier to scan.'] = 'Vinkki: Kappalejaon lisääminen kaksoisrivinvaihdoilla tekee pitkistä teksteistä paljon helpompia skannata.';
+$a->strings['Tip: Some sentences are very long (> 25 words). Shortening them increases reading flow!'] = 'Vinkki: Osa lauseista on todella pitkiä (yli 25 sanaa). Niiden lyhentäminen parantaa lukemisen sujuvuutta.';
+$a->strings['Tip: Typing in ALL CAPS feels like shouting. Consider using standard capitalization.'] = 'Vinkki: SUURAAKKOSILLA kirjoittaminen antaa vaikutelman huutamisesta. Harkitse tavanomaisen isojen kirjainten käytön noudattamista.';
+$a->strings['Tip: Too many hashtags make the text feel restless. Try to focus on the key ones.'] = 'Vinkki: Liian suuri määrä aihetunnisteita antaa tekstistä levottoman vaikutelman. Yritä keskittyä vain olennaisiin aihetunnisteisiin.';
+$a->strings['Tip: Emoji clusters can be disruptive for visitors using assistive technology.'] = 'Vinkki: Useat perättäiset emojit voivat olla häiritseviä lukijoille, jotka käyttävät lukemisessa aputeknologiaa.';
+$a->strings['Tip: An image is missing a description (Alt-Text). Adding a brief text ensures everyone can participate!'] = 'Vinkki: Kuvasta puuttuu kuvaus (Alt-text). Lisäämäällä lyhyen kuvailevan tekstin varmistat, että kaikki voivat osallistua!';
+$a->strings['Tip: Text is extremely long. Real-time analysis paused for performance.'] = 'Vinkki: Teksti on todella pitkä. Reaaliaikainen analyysi on keskeytetty suorituskyvyn takaamiseksi.';
+$a->strings['Preview Paused'] = 'Esikatselu keskeytetty';
+$a->strings['The post is extremely long. The live preview has been paused to keep your browser tab responsive.'] = 'Tämä julkaisu on todella pitkä. Reaaliaikainen esikatselu on keskeytetty, jotta selaimesi välilehti toimii sujuvasti. ';
+$a->strings['characters'] = 'merkkiä';
+$a->strings['Distraction-free mode'] = 'Häiriötön tila';
+$a->strings['Refresh Preview'] = 'Päivitä esikatselu';
+$a->strings['Publish'] = 'Julkaise';
+$a->strings['Desktop'] = 'Työpöytä';
+$a->strings['Mobile'] = 'Mobiili';
+$a->strings['Back to Editor'] = 'Takaisin muokkaimeen';
+$a->strings['Loading Preview...'] = 'Ladataan esikatselua...';
+$a->strings['Just now · Preview'] = 'Juuri nyt · Esikatselu';
+$a->strings['You'] = 'Sinä';
+$a->strings['Advanced Composer (deactivatable in settings)'] = 'Edistynyt kirjoittaja (voidaan ottaa pois käytöstä asetuksissa)';
+$a->strings['How does the analysis work?'] = 'Miten analyysi toimii?';
+$a->strings['No external services · All processing on your own instance'] = 'Ei ulkoisia palveluja · Kaikki prosessointi tapahtuu omalla instanssillasi';
+$a->strings['Text analysis runs entirely in your browser - no data is sent anywhere for analysis. No third-party APIs, no cookies, no tracking. The optional post preview works exactly like Friendica\'s built-in preview button: your draft is sent to your own Friendica instance for rendering. The only server-side storage is your personal enable/disable preference in the standard Friendica settings.'] = 'Tekstianalyysi suoritetaan kokonaan selaimessasi – tietoja ei lähetetä mihinkään analysoitavaksi. Analyysissä ei käytetä kolmansien osapuolten sovellusrajapintoja, evästeitä, eikä seurantaa. Valinnainen viestin esikatselu toimii täsmälleen samalla tavalla kuin Friendican sisäänrakennettu esikatselupainike: luonnoksesi lähetetään omaan Friendica-instanssiisi renderoitavaksi. Ainoa palvelinpuolen tallennustila on henkilökohtainen asetuksesi, jolla voit ottaa toiminnon käyttöön tai poistaa sen käytöstä Friendican vakioasetuksissa.';
+$a->strings['Counts how many paragraphs your post contains (separated by blank lines). A single unbroken block of text scores low (30 %) because readers find it hard to scan. Two or more paragraphs score 100 %. Posts under 600 characters are always rated "Short post" regardless of structure.'] = 'Laskee, kuinka monta (tyhjillä riveillä erotettua) kappaletta julkaisussasi on. Yksi yhtenäinen tekstikappale saa alhaisen pistemäärän (30 %), koska lukijoiden on vaikea silmäillä sitä. Kaksi tai useampia kappaleita saa 100 % pistemäärän. Alle 600 merkin pituiset julkaisut luokitellaan aina ”lyhyiksi julkaisuiksi” rakenteesta riippumatta.';
+$a->strings['Measures average sentence length and flags sentences longer than 25 words. An average above 24 words scores 40 % ("Complex"), above 16 words scores 75 % ("Medium"), everything else scores 100 % ("Easy to read"). Shorter sentences improve readability for all audiences.'] = 'Mittaa lauseiden keskimääräisen pituuden ja merkitsee yli 25 sanan pituiset lauseet. Yli 24 sanan keskiarvo saa 40 % täysistä pisteistä ("Monimutkainen"), yli 16 sanan keskiarvo saa 75 % ("Keskitaso") ja kaikki muut saavat 100 % ("Helppolukuinen"). Lyhyemmät lauseet parantavat luettavuutta kaikille kohderyhmille.';
+$a->strings['Counts all http/https URLs in your post. More than 5 links scores 30 % ("Very dense") - posts that are mostly links feel like spam to readers and federation filters. Up to 3 links scores 100 % ("Subtle").'] = 'Laskee julkaisuissasi olevien http/https-URL-osoitteiden määrän. Yli 5 linkkiä antaa tulokseksi 30 % täysistä pisteistä ("Erittäin tiheä"), sillä julkaisut, jotka koostuvat pääosin linkeistä, vaikuttavat lukijoille ja federaatiosuodattimille roskapostilta. Enintään 3 linkkiä antaa tulokseksi 100 % ("Hienovarainen").';
+$a->strings['Counts #hashtags. More than 6 scores 30 % ("Very dense"). Posts with fewer, focused hashtags reach more people than hashtag-stuffed ones. Up to 3 hashtags scores 100 % ("Subtle").'] = 'Laskee #aihetunnisteiden määrän. Yli 6 aihetunnistetta saa tulokseksi 30 % täysistä pisteistä ("Erittäin tiheä"). Viestit, joissa on vähemmän, mutta kohdennettuja aihetunnisteita, tavoittavat enemmän ihmisiä kuin aihetunnisteilla täytetyt viestit. Enintään 3 aihetunnistetta saa tulokseksi 100 % ("Hienovarainen").';
+$a->strings['Alt-Text Check'] = 'Alt-text-tarkastus';
+$a->strings['Checks every [img] BBCode tag in your post for an alt text description. Alt text is essential for screen readers and users with visual impairments - it ensures everyone can participate in the conversation.'] = 'Tarkistaa jokaisen viestissäsi olevan [img] BBCode-tagin alt-tekstin kuvauksen. Alt-teksti on välttämätöntä näytönlukijoille ja näkövammaisille käyttäjille – se varmistaa, että kaikki voivat osallistua keskusteluun. ';
+$a->strings['Emoji Check'] = 'Emoji-tarkastus';
+$a->strings['Detects sequences of 5 or more consecutive emoji. Screen readers read every emoji aloud by name ("grinning face", "thumbs up" ...), so a long cluster becomes an exhausting wall of words for blind users. Up to 4 consecutive emoji is fine.'] = 'Tunnistaa vähintään viiden peräkkäisen emojin sarjat. Näytönlukijat lukevat jokaisen emojin ääneen sen nimellä (”hymyilevä kasvot”, ”peukalo ylös” jne.), joten pitkä emojijono muuttuu sokeille käyttäjille uuvuttavaksi sanamassaksi. Enintään neljä peräkkäistä emojia on sopiva määrä.';
+$a->strings['Paragraph Check (Accessibility)'] = 'Kappalejaon tarkistus (saavutettavuus)';
+$a->strings['For posts longer than 300 characters, checks whether at least one paragraph break exists. Screen readers and cognitive-accessibility tools benefit greatly from structured text. Short posts are always rated neutral.'] = 'Jos viestin pituus on yli 300 merkkiä, tarkistetaan, onko siinä vähintään yksi kappaleenvaihto. Näytönlukijat ja kognitiivisen esteettömyyden työkalut hyötyvät suuresti jäsennellystä tekstistä. Lyhyet viestit luokitellaan aina neutraaleiksi.';
+$a->strings['Image description'] = 'Kuvan kuvaus';
 $a->strings['Post by %s'] = 'Käyttäjän %s julkaisut';
 $a->strings['The feed for this item is unavailable.'] = 'Tämän kohteen syöte ei ole käytettävissä.';
 $a->strings['Unable to follow this item.'] = 'Tätä kohdetta ei voi seurata.';
+$a->strings['No search text found for this item. This can happen when the author has set their account to be non-discoverable or their posts to be non-indexable for searches.'] = 'Etsittyä tekstiä ei löytynyt tästä kohteesta. Näin voi käydä, kun tekijä on estänyt asetuksissa tilinsä löytämisen tai julkaisujensa indeksoinnin hakuja varten.';
 $a->strings['No valid account found.'] = 'Voimassa olevaa tiliä ei löytynyt.';
 $a->strings['Password reset request issued. Check your email.'] = 'Salasanan nollauspyyntö lähetetty. Tarkista sähköpostisi.';
 $a->strings['
@@ -1904,35 +2025,12 @@ $a->strings['
 
 			Salasanaasi ei muuteta, ellei voida varmistaa, että 
 			pyyntö on tullut sinulta.';
-$a->strings['
-			Follow this link soon to verify your identity:
-
-			%1$s
-
-			You will then receive a follow-up message containing the new password.
-			You may change that password from your account settings page after logging in.
-
-			The login details are as follows:
-
-			Site Location:	%2$s
-			Login Name:	%3$s'] = '
-			Seuraa tätä linkkiä pian vahvistaaksesi henkilöllisyytesi:
-
-			%1$s
-
-			Saat sitten seurantaviestin, joka sisältää uuden salasanan.
-			Voit muuttaa salasanan tilisi asetussivulla kirjautumisen jälkeen.
-
-			Kirjautumistiedot ovat seuraavat:
-
-			Sivuston sijainti: 	%2$s
-			Kirjautumistunnus:	%3$s';
 $a->strings['Password reset requested at %s'] = 'Salasanan nollauspyyntö kohteessa %s';
 $a->strings['Request could not be verified. (You may have previously submitted it.) Password reset failed.'] = 'Pyyntöä ei voitu vahvistaa. (Saatoit lähettää pyyntöä aikaisemmin.) Salasanan nollaus epäonnistui.';
 $a->strings['Request has expired, please make a new one.'] = 'Pyyntö on vanhentunut, lähetä uusi pyyntö.';
 $a->strings['Forgot your Password?'] = 'Unohditko salasanasi?';
 $a->strings['Enter your email address and submit to have your password reset. Then check your email for further instructions.'] = 'Syötä sähköpostiosoitteesi salasanan nollausta varten. Lisäohjeet lähetetään sähköpostitse.';
-$a->strings['Nickname or email'] = 'Nimimerkki tai sähköposti';
+$a->strings['Username or email'] = 'Käyttäjänimi tai sähköposti';
 $a->strings['Reset my password'] = 'Nollaa salasanani';
 $a->strings['Password Reset'] = 'Salasanan nollaus';
 $a->strings['Your password has been reset as requested.'] = 'Salasanasi on nollattu pyynnöstäsi.';
@@ -1945,45 +2043,25 @@ $a->strings['
 				Dear %1$s,
 					Your password has been changed as requested. Please retain this
 				information for your records (or change your password immediately to
-				something that you will remember).
-			'] = '
+				something that you will remember).'] = '
 				Hyvä %1$s,
 					Salasanasi on vaihdettu pyynnöstäsi. Säilytäthän nämä
 				tiedot myöhempää käyttöä varten (tai vaihdathan salasanasi välittömästi
-				sellaiseksi, että muistat sen).
-			';
-$a->strings['
-				Your login details are as follows:
-
-				Site Location:	%1$s
-				Login Name:	%2$s
-				Password:	%3$s
-
-				You may change that password from your account settings page after logging in.
-			'] = '
-				Sisäänkirjautumistietosi ovat seuraavanlaiset:
-
-				Sivuston sijainti:	%1$s
-				Sisäänkirjautumisnimi:	%2$s
-				Salasana:	%3$s
-
-				Voit vaihtaa salasanasi tilisi asetukset-sivulla kun olet kirjautunut sisään.
-			';
+				sellaiseksi, että muistat sen).';
 $a->strings['Your password has been changed at %s'] = 'Salasanasi on vaihdettu sivustolla %s';
 $a->strings['System down for maintenance'] = 'Järjestelmä poissa käytöstä huollon takia';
 $a->strings['This Friendica node is currently in maintenance mode, either automatically because it is self-updating or manually by the node administrator. This condition should be temporary, please come back in a few minutes.'] = 'Tämä Friendica-solmu on tällä hetkellä huollossa joko automaattisesti – koska se päivittyy itsestään – tai solmun ylläpitäjän asettamana. Tilanne on väliaikainen. Palaa muutaman minuutin kuluttua.';
 $a->strings['A Decentralized Social Network'] = 'Hajautettu sosiaalinen verkko';
 $a->strings['You need to be logged in to access this page.'] = 'Tämän sivun käyttöön vaaditaan kirjautuminen.';
-$a->strings['Files'] = 'Tiedostot';
+$a->strings['Sorry, maybe your upload is bigger than the PHP configuration allows'] = 'Lähetyksesi vaikuttaa olevan suurempi kuin mitä PHP-asetus sallii';
+$a->strings['Or - did you try to upload an empty file?'] = 'Vai yrititkö lähettää tyhjän tiedoston?';
+$a->strings['File exceeds size limit of %s'] = 'Tiedosto ylittää kokorajoituksen %s';
+$a->strings['File upload failed.'] = 'Tiedoston lähettäminen epäonnistui.';
 $a->strings['Upload'] = 'Lähetä';
 $a->strings['Breadcrumb'] = 'Leivänmuru';
 $a->strings['Switch between photo and attachment mode'] = 'Vaihda valokuva- ja liitetilan välillä';
 $a->strings['Album navigation'] = 'Albumin navigointi';
 $a->strings['Browser content'] = 'Selainsisältö';
-$a->strings['Sorry, maybe your upload is bigger than the PHP configuration allows'] = 'Lähetyksesi vaikuttaa olevan suurempi kuin mitä PHP-asetus sallii';
-$a->strings['Or - did you try to upload an empty file?'] = 'Yrititkö ladata tyhjän tiedoston?';
-$a->strings['File exceeds size limit of %s'] = 'Tiedosto ylittää kokorajoituksen %s';
-$a->strings['File upload failed.'] = 'Tiedoston lähettäminen epäonnistui.';
 $a->strings['Unable to process image.'] = 'Kuvan käsitteleminen epäonnistui.';
 $a->strings['Image upload failed.'] = 'Kuvan lähettäminen epäonnistui.';
 $a->strings['List of all users'] = 'Kaikkien käyttäjien luettelo';
@@ -2017,6 +2095,8 @@ $a->strings['Export to CSV file'] = 'Vie CSV-tiedostoksi';
 $a->strings['select all'] = 'valitse kaikki';
 $a->strings['select none'] = 'älä valitse mitään';
 $a->strings['No remote contact is blocked from this node.'] = 'Tästä solmusta ei ole estetty yhtään etäyhteystietoa';
+$a->strings['No blocked remote contact matches your search.'] = 'Yksikään estetty etäkontakti ei vastaa hakuasi.';
+$a->strings['Reset'] = 'Nollaa';
 $a->strings['Blocked Remote Contacts'] = 'Estetyt etäyhteystiedot';
 $a->strings['Block New Remote Contact'] = 'Estä uusi etäyhteystieto';
 $a->strings['Photo'] = 'Valokuva';
@@ -2122,6 +2202,8 @@ $a->strings['Save changes to the blocklist'] = 'Tallenna muutokset estolistaan';
 $a->strings['Current Entries in the Blocklist'] = 'Nykyinen estolista';
 $a->strings['Delete entry from the blocklist'] = 'Poista merkintä estolistalta';
 $a->strings['Delete entry from the blocklist?'] = 'Poistetaanko merkintä estolistalta?';
+$a->strings['No server domain pattern is blocked on this node.'] = 'Yhtäkään palvelimen toimialuekaavaa ei ole estetty tässä solmussa.';
+$a->strings['No blocked server domain pattern matches your search.'] = 'Yksikään estetty palvelimen toimialuekaava ei vastaa hakuasi.';
 $a->strings['Item marked for deletion.'] = 'Kohde merkitty poistettavaksi.';
 $a->strings['Delete this Item'] = 'Poista tämä kohde';
 $a->strings['On this page you can delete an item from your node. If the item is a top level posting, the entire thread will be deleted.'] = 'Tällä sivulla voit poistaa kohteen solmustasi. Jos kohde on ylätason julkaisu, koko ketju poistetaan.';
@@ -2141,6 +2223,7 @@ $a->strings['No source recorded'] = 'Ei tallennettua lähdettä';
 $a->strings['Please make sure the <code>debug.store_source</code> config key is set in <code>config/local.config.php</code> for future items to have sources.'] = 'Varmistathan, että <code>debug.store_source</code> konfigurointiavain on asetettu osoitteessa <code>config/local.config.php</code>, jotta tulevilla kohteilla on lähteet.';
 $a->strings['Item Guid'] = 'Kohdeopas';
 $a->strings['Contact not found or their server is already blocked on this node.'] = 'Kontaktia ei löydy tai palvelin on jo estetty tällä solmulla.';
+$a->strings['The moderation report has been submitted.'] = 'Moderointiraportti on lähetetty.';
 $a->strings['Please login to access this page.'] = 'Kirjaudu sisään saadaksesi pääsyn tälle sivulle.';
 $a->strings['Create Moderation Report'] = 'Luo moderointiraportti';
 $a->strings['Pick Contact'] = 'Valitse kontakti';
@@ -2185,15 +2268,72 @@ $a->strings['3. Pick posts'] = '3. Valitse julkaisuja';
 $a->strings['List of reports'] = 'Raporttiluettelo';
 $a->strings['This page display reports created by our or remote users.'] = 'Tällä sivulla näytetään raportit, joka ovat luoneet meidän käyttäjämme tai etäkäyttäjät.';
 $a->strings['No report exists at this node.'] = 'Tässä solmussa ei ole raportteja.';
-$a->strings['Comment'] = 'Kommentti';
 $a->strings['Category'] = 'Luokka';
 $a->strings['Select all'] = 'Valitse kaikki';
 $a->strings['Close selected reports'] = 'Sulje valitut raportit';
+$a->strings['Open reports'] = 'Avoimet raportit';
+$a->strings['Closed reports'] = 'Suljetut raportit';
+$a->strings['All reports'] = 'Kaikki raportit';
+$a->strings['All categories'] = 'Kaikki luokat';
 $a->strings['%s total report'] = [
 	0 => 'Yhteensä %s raportti',
 	1 => 'Yhteensä %s raporttia',
 ];
 $a->strings['URL of the reported contact.'] = 'Raportoidun kontaktin URL';
+$a->strings['Report details'] = 'Raportin yksityiskohdat';
+$a->strings['Back to reports'] = 'Takaisin raportteihin';
+$a->strings['Forwarded'] = 'Välitetty eteenpäin';
+$a->strings['Not forwarded'] = 'Ei välitetty eteenpäin';
+$a->strings['Assigned user id:'] = 'Tehtäväksi saanut käyttäjätunnus:';
+$a->strings['Unassigned'] = 'Ei annettu tehtäväksi';
+$a->strings['Reporter:'] = 'Raportoija:';
+$a->strings['Target:'] = 'Kohde:';
+$a->strings['Category and rules'] = 'Luokka ja säännöt';
+$a->strings['Node rules'] = 'Solmun säännöt';
+$a->strings['Attached posts'] = 'Liitetyt julkaisut';
+$a->strings['URI-ID'] = 'URI-ID';
+$a->strings['Public remarks'] = 'Julkiset huomautukset';
+$a->strings['Private remarks'] = 'Yksityiset huomautukset';
+$a->strings['This report is finalized and read-only.'] = 'Tämä raportti on käsitelty loppuun ja se on vain luku -tilassa.';
+$a->strings['Save remarks'] = 'Tallenna huomautukset';
+$a->strings['Assign to me'] = 'Anna tehtäväksi minulle';
+$a->strings['Unassign'] = 'Poista annettu tehtävä';
+$a->strings['Mark resolved'] = 'Merkitse ratkaistuksi';
+$a->strings['Save category and rules'] = 'Tallenna luokka ja säännöt';
+$a->strings['Delete all reported posts'] = 'Poista kaikki raportoidut julkaisut';
+$a->strings['Block local user'] = 'Estä paikallinen käyttäjä';
+$a->strings['Block remote contact'] = 'Poista etäkontakti';
+$a->strings['Block remote contact and purge content'] = 'Poista etäkontakti ja puhdista sisältö';
+$a->strings['Delete this reported post'] = 'Poista tämä raportoitu julkaisu';
+$a->strings['Warn user'] = 'Varoita käyttäjää';
+$a->strings['Warning message'] = 'Varoitusviesti';
+$a->strings['Silence local user (future posts unlisted)'] = 'Hiljennä paikallinen käyttäjä (tulevia julkaisuja ei listata)';
+$a->strings['%s reported post marked for deletion'] = [
+	0 => '%s raportoitu julkaisu merkitty poistettavaksi',
+	1 => '%s raportoitua julkaisua merkitty poistettavaksi',
+];
+$a->strings['This report has no attached posts.'] = 'Tässä raportissa ei ole liitettyjä julkaisuja';
+$a->strings['Invalid reported post id.'] = 'Epäkelpo raportoidun julkaisun ID.';
+$a->strings['This post is not attached to the report.'] = 'Tämä julkaisu ei ole liitetty raporttiin.';
+$a->strings['Reported post marked for deletion.'] = 'Raportoitu julkaisu merkitty poistettavaksi.';
+$a->strings['Reported target contact not found.'] = 'Raportoitua kohdekontaktia ei löytynyt.';
+$a->strings['The local user has been blocked.'] = 'Paikallinen käyttäjä on estetty.';
+$a->strings['Could not map the reported local contact to a user account.'] = 'Ei voitu yhdistää raportoitua paikallista kontaktia käyttäjätiliin.';
+$a->strings['Failed to block the remote contact.'] = 'Etäkontaktin estäminen epäonnistui.';
+$a->strings['The remote contact has been blocked and related content will be purged.'] = 'Etäkontakti on estetty ja häneen liittyvä sisältö puhdistetaan.';
+$a->strings['The remote contact has been blocked.'] = 'Etäkontakti on estetty.';
+$a->strings['Please provide a warning message.'] = 'Anna varoitusviesti.';
+$a->strings['Moderator warning:'] = 'Moderaattorin varoitus:';
+$a->strings['Warning text has been saved, but automatic delivery is only available for local users.'] = 'Varoitusteksti on tallennettu, mutta sen automaattinen toimitus on saatavilla vain paikallisille käyttäjille.';
+$a->strings['Warning text has been saved, but the local user has no deliverable email address.'] = 'Varoitusteksti on tallennettu, mutta paikallisella käyttäjällä ei ole sähköpostiosoitetta, johon se voidaan toimittaa.';
+$a->strings['Moderation warning from %s'] = 'Moderointivaroitus käyttäjältä %s';
+$a->strings['Your recent activity was reported to the moderation team. Please review this warning message.'] = 'Sinun viimeaikainen toimintasi on raportoitu moderointitiimille. Lue oheinen varoitusviesti.';
+$a->strings['Warning sent to the local user and stored in public remarks.'] = 'Varoitus lähetetty paikalliselle käyttäjälle ja tallennettu julkisiin huomautuksiin.';
+$a->strings['Warning text was stored, but sending the email failed.'] = 'Varoitusteksti taltioitiin, mutta sähköpostin lähetys epäonnistui.';
+$a->strings['This action is only available for local users.'] = 'Tämä toiminto on saatavailla vain paikallisille käyttäjille.';
+$a->strings['Local user silenced: future posts will be unlisted, and public community visibility is reduced.'] = 'Paikallinen käyttäjä hiljennetty: tulevia julkaisuja ei listata ja julkista näkyvyyttä yhteisössä on vähennetty.';
+$a->strings['All assignments'] = 'Kaikki annetut tehtävät';
+$a->strings['Assigned to me'] = 'Minulle annetut tehtävät';
 $a->strings['Channel Relay'] = 'Kanavavälitys';
 $a->strings['Registered users'] = 'Rekisteröityneet käyttäjät';
 $a->strings['Pending registrations'] = 'Vireillä olevat rekisteröinnit';
@@ -2208,11 +2348,11 @@ $a->strings['%s user deleted'] = [
 	1 => '%s käyttäjää poistettu',
 ];
 $a->strings['Register date'] = 'Rekisteripäivämäärä';
-$a->strings['Last login'] = 'Viimeisin kirjautuminen';
+$a->strings['Last activity'] = 'Viimeisin toiminta';
 $a->strings['Last public item'] = 'Viimeisin julkinen kohde';
 $a->strings['Active Accounts'] = 'Aktiiviset tilit';
 $a->strings['User blocked'] = 'Käyttäjä estetty';
-$a->strings['Site admin'] = 'Sivuston ylläpito';
+$a->strings['Site admin'] = 'Sivuston ylläpitäjä';
 $a->strings['Account expired'] = 'Tili vanhentunut';
 $a->strings['Create a new user'] = 'Luo uusi käyttäjä';
 $a->strings['Selected users will be deleted!\n\nEverything these users had posted on this site will be permanently deleted!\n\nAre you sure?'] = 'Valitut käyttäjät poistetaan!\n\nKaikki näiden tälle sivustolle julkaisemat viestit poistetaan pysyvästi!\n\nOletko varma?';
@@ -2282,12 +2422,16 @@ $a->strings['The Photo with id %s is not available.'] = 'Tunnisteen %s valokuva 
 $a->strings['Invalid external resource with url %s.'] = 'Epäkelpo ulkoinen resurssi URL:ssä %s.';
 $a->strings['Invalid photo with id %s.'] = 'Epäkelpo valokuva, jonka ID on %s.';
 $a->strings['Post not found.'] = 'Julkaisua ei löytynyt.';
-$a->strings['Edit post'] = 'Muokkaa viestiä';
+$a->strings['upload photo'] = 'lähetä kuva';
+$a->strings['attach file'] = 'liitä tiedosto';
 $a->strings['web link'] = 'WWW-linkki';
 $a->strings['Insert video link'] = 'Lisää videolinkki';
 $a->strings['video link'] = 'videolinkki';
 $a->strings['Insert audio link'] = 'Lisää äänilinkki';
 $a->strings['audio link'] = 'äänilinkki';
+$a->strings['set location'] = 'aseta sijainti';
+$a->strings['clear location'] = 'tyhjennä sijainti';
+$a->strings['Public post'] = 'Julkinen julkaisu';
 $a->strings['Remove Item Tag'] = 'Poista kohteelta aihetunniste';
 $a->strings['Select a tag to remove: '] = 'Valitse poistettava aihetunniste:';
 $a->strings['Wrong type "%s", expected one of: %s'] = 'Väärä tyyppi ”%s”, odotettiin yhtä seuraavista: %s';
@@ -2302,18 +2446,19 @@ $a->strings['Attributed To:'] = 'Lähde:';
 $a->strings['Collection (%s)'] = 'Kokoelma (%s)';
 $a->strings['Followers (%s)'] = 'Seuraajat (%s)';
 $a->strings['%d more'] = '%d lisää';
+$a->strings['Profile not found.'] = 'Profiilia ei löytynyt.';
+$a->strings['Public circle not found.'] = 'Julkista piiriä ei löytynyt.';
 $a->strings['No contacts.'] = 'Ei yhteystietoja.';
 $a->strings['%s\'s posts'] = 'Käyttäjän %s julkaisut';
 $a->strings['%s\'s comments'] = 'Käyttäjän %s kommentit';
 $a->strings['%s\'s timeline'] = 'Käyttäjän %s aikajana';
 $a->strings['Personal notes are visible only by yourself.'] = 'Yksityismuistiinpanot näkyvät vain sinulle.';
 $a->strings['Image exceeds size limit of %s'] = 'Kuva ylittää kokorajoituksen %s';
-$a->strings['Image upload didn\'t complete, please try again'] = 'Kuvan lataus ei onnistunut, yritä uudelleen';
+$a->strings['Image upload didn\'t complete, please try again'] = 'Kuvan lähetys ei onnistunut, yritä uudelleen';
 $a->strings['Image file is missing'] = 'Kuvatiedosto puuttuu';
 $a->strings['Server can\'t accept new file upload at this time, please contact your administrator'] = 'Palvelin ei tällä hetkellä hyväksy uusien tiedostojen lähettämistä: ota yhteys ylläpitoon';
 $a->strings['Image file is empty.'] = 'Kuvatiedosto on tyhjä.';
 $a->strings['View Album'] = 'Näytä albumi';
-$a->strings['Profile not found.'] = 'Profiilia ei löytynyt.';
 $a->strings['You\'re currently viewing your profile as <b>%s</b> <a href="%s" class="btn btn-sm pull-right">Cancel</a>'] = 'Katselet profiiliasi parhaillaan roolissa <b>%s</b> <a href="%s" class="btn btn-sm pull-right">Peruutal</a>';
 $a->strings['Display name:'] = 'Näyttönimi:';
 $a->strings['d MMMM'] = 'd MMMM';
@@ -2325,6 +2470,7 @@ $a->strings['%d year old'] = [
 ];
 $a->strings['Description:'] = 'Kuvaus:';
 $a->strings['Groups:'] = 'Ryhmät:';
+$a->strings['Public circles (CSV):'] = 'Julkiset piirit (CSV):';
 $a->strings['View profile as:'] = 'Näytä profiili:';
 $a->strings['View as selected profile'] = 'Näytä valittuna profiilina';
 $a->strings['View as'] = 'Katsele roolissa';
@@ -2338,8 +2484,7 @@ $a->strings['If you are not yet a member of the free social web, <a href="%s">fo
 $a->strings['Your Webfinger address or profile URL:'] = 'Sinun Webfinger-osoitteesi tai -profiilisi URL-osoite:';
 $a->strings['Restricted profile'] = 'Rajoitettu profiili';
 $a->strings['This profile has been restricted which prevents access to their public content from anonymous visitors.'] = 'Tämä profiili on rajoitettu, mikä estää anonyymien kävijöiden pääsyn sen julkiseen sisältöön.';
-$a->strings['Private Message'] = 'Yksityisviesti';
-$a->strings['via'] = 'kautta';
+$a->strings['Scheduled Posts'] = 'Ajastetut julkaisut';
 $a->strings['Scheduled'] = 'Ajastettu';
 $a->strings['Content'] = 'Sisältö';
 $a->strings['Remove post'] = 'Poista julkaisu';
@@ -2364,7 +2509,8 @@ $a->strings['Create Page'] = 'Luo sivu';
 $a->strings['Personal Soap-Box (auto-approve Follow requests)'] = 'Henkilökohtainen saippualaatikko (hyväksyy automaattisesti seuraajapyynöt)';
 $a->strings['Personal Love-All (auto-approve Friend requests)'] = 'Henkilökohtainen rakkautta kaikille (hyväksyy automaattisesti kaveripyynnöt)';
 $a->strings['Account type:'] = 'Tilityyppi:';
-$a->strings['You can change the account type later. (<a href="'] = 'Voit muuttaa tilityyppiä myöhemmin. (<a href="';
+$a->strings['You can change the account type later.'] = 'Voit muuttaa tilityyppiä myöhemmin.';
+$a->strings['(Account type help)'] = '(Tilityyppien ohje)';
 $a->strings['Note for the admin'] = 'Huomautus ylläpidolle';
 $a->strings['Leave a message for the admin, why you want to join this node'] = 'Kerro ylläpitäjälle, miksi haluat liittyä tähän solmuun';
 $a->strings['Membership on this site is by invitation only.'] = 'Tähän sivustoon voi liittyä vain kutsusta.';
@@ -2375,8 +2521,8 @@ $a->strings['Please repeat your e-mail address:'] = 'Toista sähköpostiosoite:'
 $a->strings['New Password:'] = 'Uusi salasana:';
 $a->strings['Leave empty for an auto generated password.'] = 'Jätä tyhjäksi, jos haluat automaattisesti luodun salasanan.';
 $a->strings['Confirm:'] = 'Vahvista:';
-$a->strings['Choose a profile nickname. This must begin with a text character. Your profile address on this site will then be "<strong>nickname@%s</strong>".'] = 'Valitse profiilin kutsumanimi. Sen on alettava kirjaimella. Profiilin osoite sivustolla on tällöin ”<strong>kutsumanimi@%s</strong>”.';
-$a->strings['Choose a nickname: '] = 'Valitse kutsumanimi:';
+$a->strings['Usernames must begin with a text character. Your handle on this site will then be "<strong>username@%s</strong>".'] = 'Käyttäjänimien on alettava kirjaimella. Käyttäjätunnuksesi on sitten tällä sivustolla "<strong>käyttäjänimi@%s</strong>".';
+$a->strings['Choose a username: '] = 'Valitse käyttäjänimi:';
 $a->strings['Import'] = 'Tuo';
 $a->strings['Import your profile to this friendica instance'] = 'Tuo profiilisi tähän Friendica-ilmentymään.';
 $a->strings['Note: This node explicitly contains adult content'] = 'Huom! Tämä solmu sisältää aikuisille suunnattua sisältöä.';
@@ -2386,14 +2532,14 @@ $a->strings['Password doesn\'t match.'] = 'Salasanat eivät täsmää.';
 $a->strings['Please enter your password.'] = 'Anna salasana.';
 $a->strings['You have entered too much information.'] = 'Olet antanut liikaa tietoa.';
 $a->strings['Please enter the identical mail address in the second field.'] = 'Anna toiseen kenttään tarkalleen sama sähköpostiosoite.';
-$a->strings['Nickname cannot start with a digit.'] = 'Kutsumanimi ei voi alkaa numerolla.';
-$a->strings['Nickname can only contain US-ASCII characters.'] = 'Kutsumanimi voi sisältää vain US-ASCII-merkkejä.';
+$a->strings['Username cannot start with a digit.'] = 'Käyttäjänimi ei voi alkaa numerolla.';
+$a->strings['Usernames can only contain US-ASCII characters.'] = 'Käyttäjänimet voivat sisältää vain US-ASCII-merkkejä.';
+$a->strings['Your registration can not be processed.'] = 'Rekisteröitymistäsi ei voida käsitellä.';
+$a->strings['You have to leave a request note for the admin.'] = 'Sinun pitää jättää viesti pyynnöstäsi ylläpitäjälle.';
 $a->strings['The additional account was created.'] = 'Lisätili luotiin.';
 $a->strings['Registration successful. Please check your email for further instructions.'] = 'Rekisteröityminen onnistui. Saat kohta lisäohjeita sähköpostitse.';
 $a->strings['Failed to send email message. Here your accout details:<br> login: %s<br> password: %s<br><br>You can change your password after login.'] = 'Sähköpostiviestin lähettäminen epäonnistui. Tässä tilitietosi: <br>tunnus: %s <br>salasana: %s<br><br> Salasanaa voi vaihtaa kirjautumisen jälkeen. ';
 $a->strings['Registration successful.'] = 'Rekisteröityminen onnistui.';
-$a->strings['Your registration can not be processed.'] = 'Rekisteröitymistäsi ei voida käsitellä.';
-$a->strings['You have to leave a request note for the admin.'] = 'Sinun pitää jättää viesti pyynnöstäsi ylläpitäjälle.';
 $a->strings['An internal error occured.'] = 'Tapahtui sisäinen virhe.';
 $a->strings['Your registration is pending approval by the site owner.'] = 'Rekisteröintisi odottaa ylläpitäjän hyväksyntää.';
 $a->strings['You must be logged in to use this module.'] = 'Tämän moduulin käyttö vaatii kirjautumista.';
@@ -2501,6 +2647,8 @@ $a->strings['Hide your public content from anonymous viewers'] = 'Piilota julkin
 $a->strings['Anonymous visitors will only see your basic profile details. Your public posts and replies will still be freely accessible on the remote servers of your followers and through relays.'] = 'Anonyymit vierailijat näkevät vain profiilisi perustiedot. Julkisiin julkaisuihisi ja vastauksiisi on edelleen vapaa pääsy seuraajiesi etäpalvelimilla ja välittäjien kautta.';
 $a->strings['Make public posts unlisted'] = 'Tee julkisista julkaisuista listaamattomia';
 $a->strings['Your public posts will not appear on the community pages or in search results, nor be sent to relay servers. However they can still appear on public feeds on remote servers.'] = 'Julkiset julkaisusi eivät näy yhteisösivuilla tai hakutuloksissa, eikä niitä lähetetä välittäjäpalvelimille. Julkaisusi saattavat kuitenkin näkyä etäpalvelimien julkisissa syötteissä.';
+$a->strings['Do not send public posts to relay servers'] = 'Älä lähetä julkisia julkaisuja välityspalvelimille';
+$a->strings['Your public posts will not be forwarded to relay servers.'] = 'Sinun julkisia julkaisujasi ei välitetä eteenpäin välityspalvelimille. ';
 $a->strings['Make all posted pictures accessible'] = 'Anna pääsy kaikkiin julkaistuihin kuviin';
 $a->strings['This option makes every posted picture accessible via the direct link. This is a workaround for the problem that most other networks can\'t handle permissions on pictures. Non public pictures still won\'t be visible for the public on your photo albums though.'] = 'Tämä valita antaa pääsyn jokaiseen julkaistuun kuvaan suoran linkin kautta. Tämä on hätäratkaisu siihen ongelmaan, että suurin osa muista verkostoista ei pysty käsittelemään kuvien käyttöoikeuksia. Yksityiset kuvat eivät kuitenkaan edelleenkään ole julkisesti näkyvillä valokuva-albumeissasi.';
 $a->strings['Allow friends to post to your profile page?'] = 'Annetaanko kavereiden julkaista profiilisivullasi?';
@@ -2539,7 +2687,7 @@ $a->strings['Someone commented in your thread'] = 'Joku jätti kommentin ketjuus
 $a->strings['Someone commented in a thread where you commented'] = 'Joku kommentoi ketjussa, jossa sinä olet kommentoinut';
 $a->strings['Someone commented in a thread where you interacted'] = 'Joku kommentoi ketjussa, jonka kanssa olet ollut vuorovaikutuksessa';
 $a->strings['Activate desktop notifications'] = 'Ota työpöytäilmoitukset käyttöön';
-$a->strings['Show desktop popup on new notifications'] = 'Näytä uudet työpöytäilmoitukset ponnahdusikkunassa';
+$a->strings['Show a popup on new notifications while this browser window is open. Your browser will ask you to allow this once, and the setting only applies to the browser and device you enable it on.'] = 'Näytä ponnahdusikkuna uusista ilmoituksista, kun tämä selainikkuna on auki. Selain pyytää sinua sallimaan tämän kerran, ja asetus koskee vain sitä selainta ja laitetta, jossa olet ottanut sen käyttöön.';
 $a->strings['Text-only notification emails'] = 'Ilmoitussähköposteissa vain tekstiä';
 $a->strings['Send text only notification emails, without the html part'] = 'Lähetä ilmoitussähköposteissa vain tekstiä ilman HTML-koodia';
 $a->strings['Show detailled notifications'] = 'Näytä yksityiskohtaiset ilmoitukset';
@@ -2553,9 +2701,13 @@ $a->strings['If you have moved this profile from another server, and some of you
 $a->strings['Resend relocate message to contacts'] = 'Lähetä siirtoviesti uudelleen kontakteille';
 $a->strings['Addon Settings'] = 'Lisäosa-asetukset';
 $a->strings['None of the addons installed on this server have any settings.'] = 'Yhdessäkään tälle palvelimelle asennetuissa lisäosissa ei ole mitään asetuksia.';
+$a->strings['File is empty.'] = 'Tiedosto on tyhjä.';
+$a->strings['Filename'] = 'Tiedostonimi';
+$a->strings['Size'] = 'Koko';
+$a->strings['Uploaded'] = 'Lähetetty';
+$a->strings['You have no uploaded files.'] = 'Sinulla ei ole palvelimelle lähetettyjä tiedostoja.';
 $a->strings['This page can be used to define the channels that will automatically be reshared by your account.'] = 'Voit käyttää tätä sivua niiden kanavien määrittämiseen, jotka jaetaan automaattisesti tililäsi.';
 $a->strings['This page can be used to define your own channels.'] = 'Voit määrittää omat kanavasi tällä sivulla.';
-$a->strings['Publish'] = 'Julkaise';
 $a->strings['When selected, the channel results are reshared. This only works for public ActivityPub posts from the public timeline or the user defined circles.'] = 'Kun valinta on päällä, kanavan tulokset jaetaan uudestaan. Tämä toimii vain julkisilta aikajanoilta tai käyttäjän määrittämilta piireiltä tulleille julkisille ActivityPub-julkaisuille.';
 $a->strings['Label'] = 'Nimike';
 $a->strings['Access Key'] = 'Pääsyavain';
@@ -2633,9 +2785,11 @@ $a->strings['Action after import:'] = 'Toiminta tuonnin jälkeen:';
 $a->strings['Move to folder'] = 'Siirrä kansioon';
 $a->strings['Move to folder:'] = 'Siirrä kansioon:';
 $a->strings['Importing Contacts done'] = 'Kontaktien tuonti valmis';
-$a->strings['Contact CSV file upload error'] = 'Kontakti-CSV-tiedoston latausvirhe';
-$a->strings['Upload File'] = 'Lataa tiedosto';
+$a->strings['Contact CSV file upload error'] = 'Kontakti-CSV-tiedoston lähetysvirhe';
+$a->strings['Upload a CSV file that contains the handle of your followed accounts in the first column you exported from the old account. Your contacts will be added in the background. This can take some time.'] = 'Lähetä palvelimelle CSV-tiedosto, jonka ensimmäisessä sarakkeessa on seuraamiesi tilien tunnukset, jotka olet vienyt vanhasta tilistä. Kontaktisi lisätään taustalla. Tämä voi kestää jonkin aikaa.';
+$a->strings['Upload File'] = 'Lähetä tiedosto';
 $a->strings['Your legacy ActivityPub/GNU Social account'] = 'Vanha ActivityPub/GNU Social -tilisi';
+$a->strings['If you enter your old account name from an ActivityPub based system or your GNU Social/Statusnet account name here (in the format user@domain.tld), your contacts will be added in the background. This can take some time.'] = 'Jos syötät tähän vanhan käyttäjätunnuksesi ActivityPub-pohjaisesta järjestelmästä tai GNU Social/Statusnet-tilisi käyttäjätunnuksen (muodossa user@domain.tld), kontaktisi lisätään taustalla. Tämä voi kestää jonkin aikaa.';
 $a->strings['Delegation successfully granted.'] = 'Valtuutus myönnetty onnistuneesti';
 $a->strings['Parent user not found, unavailable or password doesn\'t match.'] = 'Emokäyttäjää ei löytynyt, se ei ole saatavilla tai salasana ei täsmää.';
 $a->strings['Delegation successfully revoked.'] = 'Delegoinin kumoaminen onnistui.';
@@ -2654,6 +2808,9 @@ $a->strings['Potential Delegates'] = 'Mahdolliset valtuutetut';
 $a->strings['No entries.'] = 'Ei kohteita.';
 $a->strings['The theme you chose isn\'t available.'] = 'Valitsemasi teema ei ole saatavilla.';
 $a->strings['%s - (Unsupported)'] = '%s - (Ei tueta)';
+$a->strings['Don\'t update'] = 'Älä päivitä';
+$a->strings['Update at the top of the page'] = 'Päivitä sivun ylhäällä';
+$a->strings['Always update'] = 'Päivitä aina';
 $a->strings['Color/Black'] = 'Väri/musta';
 $a->strings['Black'] = 'Musta';
 $a->strings['Color/White'] = 'Väri/valkoinen';
@@ -2676,10 +2833,12 @@ $a->strings['Mobile theme'] = 'Mobiiliteema';
 $a->strings['Number of items to display per page:'] = 'Näytettävien kohteiden määrä sivulla:';
 $a->strings['Maximum of 100 items'] = 'Enintään 100 kohdetta';
 $a->strings['Number of items to display per page when viewed from mobile device:'] = 'Näytettävien kohteiden määrä sivulla mobiililaitteella katseltaessa:';
-$a->strings['Regularly update the page content'] = 'Päivitä sivun sisältö säännöllisesti';
-$a->strings['When enabled, new content on network, community and channels are added on top.'] = 'Kun käytössä, verkoston, yhteisön ja kanavien uusi sisältö lisätään ylös.';
+$a->strings['Regularly update the timeline'] = 'Päivitä aikajana säännölllisesti';
+$a->strings['Controls whether new content on network, community and channels is added on top of the timeline. The display page is never updated automatically.'] = 'Määrittää, lisätäänkö verkoston, yhteisön ja kanavien uusi sisältö aikajanan alkuun. Näyttösivua ei päivitetä koskaan automaattisesti.';
 $a->strings['Display emojis'] = 'Näytä emojit';
 $a->strings['When enabled, emoticons are replaced with matching emojis.'] = 'Kun käytössä, emoticonit korvataan vastaavilla emojeilla.';
+$a->strings['Enable SPA mode'] = 'Ota käyttöön SPA-tila';
+$a->strings['Warning - Experimental feature: This may lead to errors or unexpected behaviour. When enabled, supported pages are loaded by replacing only the main content instead of reloading the whole browser page, which makes navigation faster.'] = 'Varoitus – Kokeellinen ominaisuus: Tämä voi aiheuttaa virheitä tai odottamatonta käyttäytymistä. Kun ominaisuus on otettu käyttöön, tuetut sivut ladataan korvaamalla vain pääsisältö sen sijaan, että koko selain sivu ladattaisiin uudelleen, mikä nopeuttaa sivustolla liikkumista.';
 $a->strings['Infinite scroll'] = 'Loputon selaaminen';
 $a->strings['Automatic fetch new items when reaching the page end.'] = 'Nouda automaattisesti uudet kohteet, kun saavutaan sivun loppuun.';
 $a->strings['Enable Smart Threading'] = 'Laita päälle älykäs ketjutus';
@@ -2690,9 +2849,11 @@ $a->strings['Display the resharer'] = 'Näytä uudelleenjakaja';
 $a->strings['Display the first resharer as icon and text on a reshared item.'] = 'Näytä ensimmäinen uudelleen jakaja kuvakkeena ja tekstinä uudelleen jaetussa kohteessa.';
 $a->strings['Stay local'] = 'Pysy paikallisena';
 $a->strings['Don\'t go to a remote system when following a contact link.'] = 'Älä siirry etäjärjestelmään kun seuraat kontaktilinkkiä.';
+$a->strings['Compact conversation view'] = 'Kompakti keskustelunäkymä';
+$a->strings['Show only comments from the thread author and yourself that form coherent conversation threads. Hides replies to filtered-out comments.'] = 'Näytä vain ketjun aloittajan ja omat kommenttisi, jotka muodostavat johdonmukaisia keskusteluketjuja. Piilottaa suodatettuihin kommentteihin annetut vastaukset.';
 $a->strings['Show the post deletion checkbox'] = 'Näytä poista julkaisu -valintaruutu';
 $a->strings['Display the checkbox for the post deletion on the network page.'] = 'Näytä valintaruutu, jolla voi poistaa julkaisun verkostosivulla.';
-$a->strings['DIsplay the event list'] = 'Näytä tapahtumaluettelo';
+$a->strings['Display the event list'] = 'Näytä tapahtumaluettelo';
 $a->strings['Display the birthday reminder and event list on the network page.'] = 'Näytä syntymäpäivämuistus- ja tapahtumaluettelo verkostosivulla.';
 $a->strings['Link preview mode'] = 'Linkin esikatselun ulkoasu';
 $a->strings['Appearance of the link preview that is added to each post with a link.'] = 'Linkin esikatselun ulkoasu, joka lisätään jokaiseen linkin sisältävään julkaisuun.';
@@ -2719,6 +2880,7 @@ $a->strings['Beginning of week:'] = 'Viikon alku:';
 $a->strings['Default calendar view:'] = 'Oletus kalenterinäkymä:';
 $a->strings['Additional Features'] = 'Lisäominaisuuksia';
 $a->strings['Connected Apps'] = 'Yhdistetyt sovellukset';
+$a->strings['Home Page'] = 'Kotisivu';
 $a->strings['Remove authorization'] = 'Poista lupa';
 $a->strings['You have no connected apps.'] = 'Sinulla ei ole yhdistettyjä sovelluksia.';
 $a->strings['Display Name is required.'] = 'Näyttönimi on pakollinen.';
@@ -2732,9 +2894,9 @@ $a->strings['The homepage is verified. A rel="me" link back to your Friendica pr
 $a->strings['To verify your homepage, add a rel="me" link to it, pointing to your profile URL (%s).'] = 'Vahvistaaksesi kotisivusi, lisää profiilisi URL-osoitteeseen (%s) osoittava rel="me" -linkki sivuillesi.';
 $a->strings['Profile Actions'] = 'Profiilin toiminnot';
 $a->strings['Edit Profile Details'] = 'Muokkaa profiilin yksityiskohdat';
-$a->strings['To change your profile picture, you can either upload a new picture here, or click to visit your photos to pick among your existing pictures.'] = 'Voit joko ladata uuden kuvan tässä tai mennä kuviisi ja valita jonkin olemassa olevista kuvistasi vaihtaaksesi profiilikuvasi.';
-$a->strings['Upload new picture'] = 'Lataa uusi kuva';
-$a->strings['Upload selected picture'] = 'Lataa valittu kuva palvelimelle';
+$a->strings['To change your profile picture, you can either upload a new picture here, or click to visit your photos to pick among your existing pictures.'] = 'Voit joko lähettää uuden kuvan tässä tai siirtyä kuviisi ja valita jonkin olemassa olevista kuvistasi vaihtaaksesi profiilikuvasi.';
+$a->strings['Upload new picture'] = 'Lähetä uusi kuva';
+$a->strings['Upload selected picture'] = 'Lähetä valittu kuva palvelimelle';
 $a->strings['Pick existing picture from photos'] = 'Valitse kuva valokuvistasi';
 $a->strings['Go to my photos'] = 'Siirry omiin kuviin';
 $a->strings['Profile picture'] = 'Profiilikuva';
@@ -2903,11 +3065,12 @@ $a->strings['Possible reasons include:'] = 'Mahdollisia syitä ovat muun muassa:
 $a->strings['Go back'] = 'Palaa takaisin';
 $a->strings['Stack trace:'] = 'Pinojälki:';
 $a->strings['Exception thrown in %s:%d'] = 'Poikkeus aiheutui kohdassa %s:%d';
-$a->strings['At the time of registration, and for providing communications between the user account and their contacts, the user has to provide a display name (pen name), an username (nickname) and a working email address. The names will be accessible on the profile page of the account by any visitor of the page, even if other profile details are not displayed. The email address will only be used to send the user notifications about interactions, but wont be visibly displayed. The listing of an account in the node\'s user directory or the global user directory is optional and can be controlled in the user settings, it is not necessary for communication.'] = 'Rekisteröitymisen yhteydessä sekä käyttäjätilin ja hänen kontaktiensa välisen viestinnän mahdollistamiseksi käyttäjän on annettava näyttönimi (nimimerkki), käyttäjätunnus (lempinimi) ja toimiva sähköpostiosoite. Nimet ovat näkyvissä tilin profiilisivulla kaikille sivun kävijöille, vaikka muita profiilitietoja ei näytetä. Sähköpostiosoitetta käytetään vain käyttäjälle lähetettäviin ilmoituksiin vuorovaikutuksesta, mutta se ei ole muille näkyvissä. Tilin lisääminen solmun käyttäjähakemistoon tai yleiseen käyttäjähakemistoon on vapaaehtoista ja sitä voi hallita käyttäjäasetuksissa; se ei ole välttämätöntä viestinnän kannalta. ';
+$a->strings['At the time of registration, and for providing communications between the user account and their contacts, the user has to provide a display name, a username and a working email address. The names will be accessible on the profile page of the account by any visitor of the page, even if other profile details are not displayed. The email address will only be used to send the user notifications about interactions, but wont be visibly displayed. The listing of an account in the node\'s user directory or the global user directory is optional and can be controlled in the user settings, it is not necessary for communication.'] = 'Rekisteröitymisen yhteydessä sekä käyttäjätilin ja hänen kontaktiensa välisen viestinnän mahdollistamiseksi käyttäjän on annettava näyttönimi, käyttäjätunnus ja toimiva sähköpostiosoite. Nimet ovat näkyvissä tilin profiilisivulla kaikille sivun kävijöille, vaikka muita profiilitietoja ei näytettäisikään. Sähköpostiosoitetta käytetään ainoastaan käyttäjälle lähetettäviin ilmoituksiin, mutta sitä ei näytetä näkyvästi. Tilin lisääminen solmun käyttäjäluetteloon tai yleiseen käyttäjäluetteloon on vapaaehtoista ja sitä voidaan hallita käyttäjäasetuksissa, mutta se ei ole välttämätöntä viestinnän kannalta.';
 $a->strings['This data is required for communication and is passed on to the nodes of the communication partners and is stored there. Users can enter additional private data that may be transmitted to the communication partners accounts.'] = 'Nämä tiedot ovat välttämättömiä viestinnän kannalta, ja ne välitetään viestintäkumppaneiden solmuihin, joihin ne tallennetaan. Käyttäjät voivat syöttää muita henkilökohtaisia tietoja, jotka saatetaan välittää viestintäkumppaneiden tileille.';
-$a->strings['At any point in time a logged in user can export their account data from the <a href="%1$s/settings/userexport">account settings</a>. If the user wants to delete their account they can do so at <a href="%1$s/settings/removeme">%1$s/settings/removeme</a>. The deletion of the account will be permanent. Deletion of the data will also be requested from the nodes of the communication partners.'] = 'Kirjautunut käyttäjä voi milloin tahansa viedä tilitietonsa <a href="%1$s/settings/userexport">tilin asetuksista</a>. Jos käyttäjä haluaa poistaa tilinsä, hän voi tehdä sen osoitteessa <a href="%1$s/settings/removeme">%1$s/settings/removeme</a>. Tilin poistaminen on lopullista. Tietojen poistamista pyydetään myös viestintäkumppaneiden solmuilta.';
+$a->strings['At any point in time a logged in user can export their account data from the <a href="%1$s">account settings</a>. If the user wants to delete their account they can do so at <a href="%2$s">%2$s</a>. The deletion of the account will be permanent. Deletion of the data will also be requested from the nodes of the communication partners.'] = 'Kirjautunut käyttäjä voi milloin tahansa viedä tilitietonsa kohdasta <a href="%1$s">tiliasetukset</a>. Jos käyttäjä haluaa poistaa tilinsä, hän voi tehdä sen osoitteessa <a href="%2$s">%2$s</a>. Tilin poistaminen on lopullista. Tietojen poistamista pyydetään myös viestintäkumppaneiden solmuilta.';
 $a->strings['Privacy Statement'] = 'Tietosuojalausunto';
 $a->strings['Rules'] = 'Säännöt';
+$a->strings['At any point in time a logged in user can export their account data from the <a href="%1$s">account settings</a>. If the user wants to delete their account they can do so at <a href="%1$s">%1$s</a>. The deletion of the account will be permanent. Deletion of the data will also be requested from the nodes of the communication partners.'] = 'Kirjautunut käyttäjä voi milloin tahansa viedä tilitietonsa kohdasta <a href="%1$s">tiliasetukset</a>. Jos käyttäjä haluaa poistaa tilinsä, hän voi tehdä sen osoitteessa <a href="%1$s">%1$s</a>. Tilin poistaminen on lopullista. Tietojen poistamista pyydetään myös viestintäkumppaneiden solmuilta.';
 $a->strings['Parameter uri_id is missing.'] = 'Parameterin uri_id puuttuu.';
 $a->strings['The requested item doesn\'t exist or has been deleted.'] = 'Pyytämäsi kohde ei ole olemassa tai se on poistettu.';
 $a->strings['You are now logged in as %s'] = 'Olet nyt kirjautunut sisään tilillä %s';
@@ -2918,7 +3081,7 @@ $a->strings['Select an identity to manage: '] = 'Valitse identiteetti hallitavak
 $a->strings['User imports on closed servers can only be done by an administrator.'] = 'Suljetuilla palvelimilla vain ylläpitäjät voivat tuoda käyttäjiä.';
 $a->strings['Move account'] = 'Siirrä tili';
 $a->strings['You can import an account from another Friendica server.'] = 'Voit tuoda käyttäjätilin toiselta Friendica-palvelimelta.';
-$a->strings['You need to export your account from the old server and upload it here. We will recreate your old account here with all your contacts. We will try also to inform your friends that you moved here.'] = 'Sinun on viety tilisi vanhalta palvelimelta ja ladattava se tänne. Luomme vanhan tilisi uudelleen tänne kaikkine yhteystietoinesi. Yritämme myös ilmoittaa kavereillesi, että olet siirtynyt tänne.';
+$a->strings['You need to export your account from the old server and upload it here. We will recreate your old account here with all your contacts. We will try also to inform your friends that you moved here.'] = 'Sinun on vietävä tilisi vanhalta palvelimelta ja lähetettävä se tänne. Luomme vanhan tilisi uudelleen tänne kaikkine yhteystietoinesi. Yritämme myös ilmoittaa kavereillesi, että olet siirtynyt tänne.';
 $a->strings['This feature is experimental. We can\'t import contacts from the OStatus network (GNU Social/Statusnet) or from Diaspora'] = 'Tämä on kokeellinen ominaisuus. Emme voi tuoda kontakteja OStatus-verkolta (GNU social/Statusnet) tai Diasporalta.';
 $a->strings['Account file'] = 'Tilitiedosto';
 $a->strings['To export your account, go to "Settings->Export your personal data" and select "Export account"'] = 'Vie tilisi siirtymällä asetusten kohtaan ”Vie henkilökohtaiset tiedot” ja valitse ”Vie tili”';
@@ -2942,8 +3105,8 @@ $a->strings['Complete the walk-through to get a quick overview of your profile a
 $a->strings['Go to Your Settings'] = 'Omat Asetukset';
 $a->strings['On your <em>Settings</em> page -  change your initial password. Also make a note of your Identity Address. This looks just like an email address - and will be useful in making friends on the free social web.'] = 'Muuta alkuperäinen salasanasi <em>Asetukset</em>-sivulla. Kirjoita myös muistiin identiteettiosoitteesi. Se näyttää aivan sähköpostiosoitteelta ja siitä on hyötyä, kun haluat hankkia ystäviä ilmaisessa sosiaalisessa verkostossa.';
 $a->strings['Review the other settings, particularly the privacy settings. An unpublished directory listing is like having an unlisted phone number. In general, you should probably publish your listing - unless all of your friends and potential friends know exactly how to find you.'] = 'Tarkista muut asetukset, erityisesti tietosuoja-asetukset. Julkaisematon hakemistomerkintä on kuin salainen puhelinnumero. Yleensä sinun kannattaa todennäköisesti julkaista merkintäsi, elleivät kaikki ystäväsi ja potentiaaliset ystäväsi tiedä tarkalleen, miten sinut löytää.';
-$a->strings['Upload Profile Photo'] = 'Lataa profiilikuva';
-$a->strings['Upload a profile photo if you have not done so already. Studies have shown that people with real photos of themselves are ten times more likely to make friends than people who do not.'] = 'Lataa profiilikuva, jos et ole jo tehnyt niin. Tutkimukset osoittavat, että henkilöt, joilla on itsestään oikea valokuva profiilissa, saavat kavereita kymmenen kertaa todennäköisemmin kuin henkilöt, joilla ei ole omaa kuvaa profiilikuvana.';
+$a->strings['Upload Profile Photo'] = 'Lähetä profiilikuva';
+$a->strings['Upload a profile photo if you have not done so already. Studies have shown that people with real photos of themselves are ten times more likely to make friends than people who do not.'] = 'Lähetä profiilikuva, jos et ole jo tehnyt niin. Tutkimukset osoittavat, että henkilöt, joilla on itsestään oikea valokuva profiilissa, saavat kavereita kymmenen kertaa todennäköisemmin kuin henkilöt, joilla ei ole omaa kuvaa profiilikuvana.';
 $a->strings['Edit Your Profile'] = 'Muokkaa profiilisi';
 $a->strings['Edit your <strong>default</strong> profile to your liking. Review the settings for hiding your list of friends and hiding the profile from unknown visitors.'] = 'Muokkaa <strong>oletus</strong>profiiliasi sinulle mieluisaksi. Tarkista asetuksesi kaverilistojesi piilottamiseksi ja piilottaaksesi profiilisi tuntemattomilta vierailijoilta.';
 $a->strings['Profile Keywords'] = 'Profiilin avainsanat';
@@ -3041,15 +3204,20 @@ $a->strings['Please visit %s  if you wish to make any changes to this relationsh
 $a->strings['registration request'] = 'rekisteröintipyyntö';
 $a->strings['You\'ve received a registration request from \'%1$s\' at %2$s'] = 'Olet vastaanottanut rekisteröintipyynnön henkilöltä \'%1$s\' kohteessa %2$s';
 $a->strings['You\'ve received a [url=%1$s]registration request[/url] from %2$s.'] = 'Olet vastaanottanut [url=%1$s]rekisteröintipyynnön[/url] henkilöltä %2$s.';
-$a->strings['Display Name:	%s
-Site Location:	%s
-Login Name:	%s (%s)'] = 'Näyttönimi:	%s
-Sivuston sijainti:	%s
-Käyttäjätunnus:	%s (%s)';
+$a->strings['Display Name: %s
+URL: %s
+Username: %s (%s)'] = 'Näyttönimi: %s
+URL-osoite: %s
+Käyttäjänimi: %s (%s)';
 $a->strings['Please visit %s to approve or reject the request.'] = 'Hyväksy tai hylkää pyyntö %s-sivustossa.';
 $a->strings['new registration'] = 'uusi rekisteröityminen';
 $a->strings['You\'ve received a new registration from \'%1$s\' at %2$s'] = 'Olet saanut uuden rekisteröitymisen nimimerkiltä %1$s kohteessa %2$s';
 $a->strings['You\'ve received a [url=%1$s]new registration[/url] from %2$s.'] = 'Olet saanut [url=%1$s]uuden rekisteröitymisen[/url] nimimerkiltä %2$s.';
+$a->strings['Display name: %s
+URL: %s
+Username: %s (%s)'] = 'Näyttönimi: %s
+URL-osoite: %s
+Käyttäjänimi: %s (%s)';
 $a->strings['Please visit %s to have a look at the new registration.'] = 'Käy osoitteessa %s nähdäksesi uuden rekisteröitymisen.';
 $a->strings['%s %s tagged you'] = '%s %s mainitsi sinut';
 $a->strings['%s %s shared a new post'] = '%s %s jakoi uuden julkaisun';
@@ -3059,75 +3227,6 @@ $a->strings['This message was sent to you by %s, a member of the Friendica socia
 $a->strings['You may visit them online at %s'] = 'Voit vierailla heidän luonaan netissä paikassa %s';
 $a->strings['Please contact the sender by replying to this post if you do not wish to receive these messages.'] = 'Ota yhteyttä lähettäjään vastaamalla tähän julkaisuun, jos et halua enää vastaanottaa näitä viestejä.';
 $a->strings['%s posted an update.'] = '%s julkaisi päivityksen.';
-$a->strings['Public Message'] = 'Julkinen viesti';
-$a->strings['Unlisted Message'] = 'Listaamaton viesti';
-$a->strings['This entry was edited'] = 'Tätä kohdetta on muokattu';
-$a->strings['Connector Message'] = 'Yhdistäjäviesti';
-$a->strings['Pinned to your wall'] = 'Kiinnitetty seinällesi';
-$a->strings['Delete globally'] = 'Poista maailmanlaajuisesti';
-$a->strings['Remove locally'] = 'Poista paikallisesti';
-$a->strings['Block %s'] = 'Estä %s';
-$a->strings['Ignore %s'] = 'Sivuuta %s';
-$a->strings['Collapse %s'] = 'Laskosta piiloon %s';
-$a->strings['Report this post'] = 'Raportoi tämä julkaisu';
-$a->strings['Save to folder'] = 'Tallenna kansioon';
-$a->strings['I will attend'] = 'Osallistun';
-$a->strings['I will not attend'] = 'En aio osallistua';
-$a->strings['I might attend'] = 'Saatan osallistua';
-$a->strings['Turn off related notifications'] = 'Laita pois päältä liittyvät ilmoitukset';
-$a->strings['Turn on related notifications'] = 'Laita päälle liittyvät ilmoitukset';
-$a->strings['Notifications turned off for this post'] = 'Tämän julkaisun ilmoitukset on laitettu pois päältä';
-$a->strings['Bookmark'] = 'Lisää kirjanmerkki';
-$a->strings['Remove bookmark'] = 'Pois kirjanmerkki';
-$a->strings['Starred'] = 'Tähdelliset';
-$a->strings['Pin to your wall'] = 'Kiinnitä seinällesi';
-$a->strings['Unpin from your wall'] = 'Poista kiinnitys seinältäsi';
-$a->strings['Add tag to post'] = 'Lisää tunniste julkaisuun';
-$a->strings['I like this (toggle)'] = 'Tykkään tästä (vaihda)';
-$a->strings['Like'] = 'Tykkää';
-$a->strings['I don\'t like this (toggle)'] = 'En tykkää tästä (vaihda)';
-$a->strings['Dislike'] = 'En tykkää';
-$a->strings['Quote share this'] = 'Lainaa ja jaa tämä';
-$a->strings['Quote Share'] = 'Lainaa ja jaa';
-$a->strings['Reshare this'] = 'Jaa tämä uudelleen';
-$a->strings['Reshare'] = 'Jaa uudelleen';
-$a->strings['Cancel your Reshare'] = 'Peruuta uudelleenjako';
-$a->strings['Unshare'] = 'Peruuta jako';
-$a->strings['%s (Received %s)'] = '%s (Vastaanotettu %s)';
-$a->strings['Comment this item on your system'] = 'Kommentoi tätä kohdetta järjestelmässäsi';
-$a->strings['Remote comment'] = 'Etäkommentti';
-$a->strings['Share via ...'] = 'Jaa palvelun ... kautta';
-$a->strings['Share via external services'] = 'Jaa ulkoisten palvelujen kautta';
-$a->strings['Unknown parent'] = 'Tuntematon vanhempi';
-$a->strings['in reply to %s'] = 'vastauksena käyttäjälle %s';
-$a->strings['Parent is probably private or not federated.'] = 'Vanhempi on todennäköisesti yksityinen tai sitä ei ole federoitu.';
-$a->strings['to'] = 'henkilölle';
-$a->strings['Wall-to-Wall'] = 'Seinäjulkaisu';
-$a->strings['via Wall-To-Wall:'] = 'seinäjulkaisun kautta';
-$a->strings['Reply to %s'] = 'Vastaus käyttäjälle %s';
-$a->strings['Notifier task is pending'] = 'Muistutustehtävä vireillä';
-$a->strings['Delivery to remote servers is pending'] = 'Toimitus etäservereille vireillä';
-$a->strings['Delivery to remote servers is underway'] = 'Toimitus etäservereillle käynnissä';
-$a->strings['Delivery to remote servers is mostly done'] = 'Toimitus etäservereille pääosin valmis';
-$a->strings['Delivery to remote servers is done'] = 'Toimitus etäservereille valmis';
-$a->strings['%d comment'] = [
-	0 => '%d kommentti',
-	1 => '%d kommenttia',
-];
-$a->strings['Show more'] = 'Näytä lisää';
-$a->strings['Show fewer'] = 'Näytä vähemmän';
-$a->strings['Reshared by: %s'] = 'Käyttäjän %s uudelleen jakama';
-$a->strings['Viewed by: %s'] = '%s näki';
-$a->strings['Read by: %s'] = '%s luki';
-$a->strings['Liked by: %s'] = '%s tykkäsi';
-$a->strings['Disliked by: %s'] = '%s ei tykännyt';
-$a->strings['Attended by: %s'] = 'Osallistujat: %s';
-$a->strings['Maybe attended by: %s'] = 'Mahdollisesti osallistuvat: %s';
-$a->strings['Not attended by: %s'] = 'Eivät osallistu: %s';
-$a->strings['Commented by: %s'] = '%s kommentoi';
-$a->strings['Reacted with %s by: %s'] = 'Reaktio %s käyttäjiltä %s';
-$a->strings['Quote shared by: %s'] = 'Käyttäjän %s lainaama ja jakama';
-$a->strings['Post comment'] = 'Julkaise kommentti';
 $a->strings['Chat'] = 'Chat';
 $a->strings['(no subject)'] = '(ei aihetta)';
 $a->strings['The folder %s must be writable by webserver.'] = 'Kansion %s täytyy olla verkkopalvelimen kirjoitettavissa.';
@@ -3135,7 +3234,7 @@ $a->strings['Login failed.'] = 'Kirjautuminen epäonnistui';
 $a->strings['Login failed. Please check your credentials.'] = 'Sisään kirjautuminen epäonnistui. Tarkista sisäänkirjautumistietosi.';
 $a->strings['Login failed because your account is blocked.'] = 'Sisäänkirjautuminen epäonnistui, koska tilisi on estetty.';
 $a->strings['Welcome %s'] = 'Tervetuloa %s';
-$a->strings['Please upload a profile photo.'] = 'Lataa profiilikuva.';
+$a->strings['Please upload a profile photo.'] = 'Lähetä profiilikuva.';
 $a->strings['OpenWebAuth: %1$s welcomes %2$s'] = 'OpenWebAuth: %1$s toivottaa tervetulleeksi %2$s';
 $a->strings['Friendica Notification'] = 'Friendica-ilmoitus';
 $a->strings['%1$s, %2$s Administrator'] = '%1$s, %2$s ylläpitäjä';
@@ -3175,6 +3274,12 @@ $a->strings['Set the background image'] = 'Aseta taustakuva';
 $a->strings['Background image style'] = 'Taustakuvan tyyli';
 $a->strings['Always open Compose page'] = 'Avaa aina kirjoitussivu';
 $a->strings['If enabled, the button to make a new post always opens a dedicated page (the <a href="/compose">Compose page</a>) instead of a small window on top of the current page. When disabled, the "Compose page" can be accessed with a middle click on the button to make a new post, or via a button in the small window.'] = 'Kun käytössä, painike, joka avaa uuden julkaisun, avaa sen aina erilliselle sivulle (<a href="/compose">kirjoitussivulle</a>) sen sijaan, että avaisi sen pieneen ikkunaan nykyisen sivun yläreunaan. Kun pois käytöstä, kirjoitussivulle pääsee keskiklikkaamalla uuden julkaisun painiketta tai pienessä ikkunassa olevasta painikkeesta.';
+$a->strings['Enable Advanced Composer'] = 'Ota käyttöön edistynyt kirjoittaja';
+$a->strings['When enabled, the Advanced Composer writing assistant will be available in the compose view.'] = 'Kun tämä toiminto on käytössä, edistynyt kirjoittaja -kirjoitusavustaja on käytettävissä kirjoitusnäkymässä.';
+$a->strings['Show Navbar Button Labels'] = 'Näytä Navipalkin painikkeiden nimilaput';
+$a->strings['Shows or hides the button labels under the main navigation bar buttons.'] = 'Näyttää tai piilottaa painikkeiden nimilaput päänavigointipalkin painikkeiden alta.';
+$a->strings['Show Action Button Labels'] = 'Näytä toimintopainikkeiden nimilaput';
+$a->strings['Shows or hides the button labels under posts and replies.'] = 'Näyttää tai piilottaa painikkeiden nimilaput julkaisujen ja vastausten alta.';
 $a->strings['Login page background image'] = 'Kirjautumissivun taustakuva';
 $a->strings['Login page background color'] = 'Kirjautumissivun taustaväri';
 $a->strings['Leave background image and color empty to use theme defaults.'] = 'Jätä taustakuva ja väri tyhjiksi, jos haluat käyttää teeman oletusasetuksia.';
@@ -3192,7 +3297,9 @@ $a->strings['Dark'] = 'Tumma';
 $a->strings['Custom'] = 'Mukautettu';
 $a->strings['Guest'] = 'Vieras';
 $a->strings['Visitor'] = 'Vierailija';
-$a->strings['Your postings with media'] = 'Mediaa sisältävät julkaisusi';
+$a->strings['Your calendar'] = 'Kalenterisi';
+$a->strings['Back home'] = 'Takaisin kotiin';
+$a->strings['Back to my instance'] = 'Takaisin minun instanssiini';
 $a->strings['Comma separated list of helper groups'] = 'Pilkulla eroteltu luettelo apuryhmistä';
 $a->strings['don\'t show'] = 'älä näytä';
 $a->strings['show'] = 'näytä';

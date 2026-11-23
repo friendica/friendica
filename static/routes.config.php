@@ -389,7 +389,7 @@ return [
 		'/addons'         => [Module\Admin\Addons\Index::class,   [R::GET, R::POST]],
 		'/addons/{addon}' => [Module\Admin\Addons\Details::class, [R::GET, R::POST]],
 
-		'/dbsync[/{action}[/{update:\d+}]]' => [Module\Admin\DBSync::class, [R::GET]],
+		'/dbsync[/{action}[/{update:\d+}]]' => [Module\Admin\DBSync::class, [R::GET, R::POST]],
 
 		'/features'   => [Module\Admin\Features::class,   [R::GET, R::POST]],
 		'/federation' => [Module\Admin\Federation::class, [R::GET]],
@@ -434,7 +434,7 @@ return [
 		'[/]'                                           => [Module\Calendar\Show::class,       [R::GET         ]],
 		'/show/{nickname}'                              => [Module\Calendar\Show::class,       [R::GET         ]],
 		'/export/{nickname}[/{format:csv|ical}]'        => [Module\Calendar\Export::class,     [R::GET         ]],
-		'/api/{action:ignore|unignore|delete}/{id:\d+}' => [Module\Calendar\Event\API::class,  [R::GET         ]],
+		'/api/{action:ignore|unignore|delete}/{id:\d+}' => [Module\Calendar\Event\API::class,  [         R::POST]],
 		'/api/{action:create}'                          => [Module\Calendar\Event\API::class,  [        R::POST]],
 		'/api/get[/{nickname}]'                         => [Module\Calendar\Event\Get::class,  [R::GET         ]],
 		'/api/view'                                     => [Module\Calendar\View::class,       [        R::POST]],
@@ -505,8 +505,8 @@ return [
 		'/reshare/{guid}'        => [Module\Diaspora\Fetch::class, [R::GET]],
 	],
 	'/filed'                     => [Module\Search\Filed::class,          [R::GET]],
-	'/filer[/{id:\d+}]'          => [Module\Filer\SaveTag::class,         [R::GET]],
-	'/filerm/{id:\d+}'           => [Module\Filer\RemoveTag::class,       [R::GET, R::POST]],
+	'/filer[/{id:\d+}]'          => [Module\Filer\SaveTag::class,         [R::GET, R::POST]],
+	'/filerm/{id:\d+}'           => [Module\Filer\RemoveTag::class,       [        R::POST]],
 	'/follow_confirm'            => [Module\FollowConfirm::class,         [R::POST]],
 	'/followers/{nickname}'      => [Module\ActivityPub\Followers::class, [R::GET]],
 	'/following/{nickname}'      => [Module\ActivityPub\Following::class, [R::GET]],
@@ -534,8 +534,9 @@ return [
 		'/rename' => [Module\Folders\Rename::class, [R::GET, R::POST]],
 	],
 	'/group/{id}'                   => [Module\Group::class,            [R::GET, R::POST]],
-	'/groups'                       => [Module\Groups::class,           [R::GET]],
+	'/groups'                       => [Module\Groups::class,           [R::GET, R::POST]],
 	'/groups/discover[/{gsid:\d+}]' => [Module\Groups\Discover::class, [R::GET]],
+	'/groups/{host}'                => [Module\Groups::class,           [R::GET, R::POST]],
 
 	'/hashtag'                    => [Module\Hashtag::class,           [R::GET]],
 	'/help[/{doc:.+}]'            => [Module\Help::class,              [R::GET]],
@@ -634,7 +635,7 @@ return [
 
 	'/notification' => [
 		'[/]'       => [Module\Notifications\Notification::class, [R::GET]],
-		'/mark/all' => [Module\Notifications\Notification::class, [R::GET]],
+		'/mark/all' => [Module\Notifications\Notification::class, [R::POST]],
 		'/{id:\d+}' => [Module\Notifications\Notification::class, [R::GET, R::POST]],
 	],
 
@@ -700,8 +701,8 @@ return [
 		'[/]'           => [Module\Search\Index::class,     [R::GET         ]],
 		'/acl'          => [Module\Search\Acl::class,       [R::GET, R::POST]],
 		'/saved'        => [Module\Search\SavedList::class, [R::GET         ]],
-		'/saved/add'    => [Module\Search\Saved::class,     [R::GET         ]],
-		'/saved/remove' => [Module\Search\Saved::class,     [R::GET         ]],
+		'/saved/add'    => [Module\Search\Saved::class,     [        R::POST]],
+		'/saved/remove' => [Module\Search\Saved::class,     [        R::POST]],
 		'/user/tags'    => [Module\Search\Tags::class,      [        R::POST]],
 	],
 

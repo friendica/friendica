@@ -193,6 +193,36 @@ document.addEventListener("click", function (event) {
 	}
 });
 
+/**
+ * Sends action links as POST request, a declined confirmation cancels them
+ */
+document.addEventListener("click", function (event) {
+	const action = event.target.closest("a.post-action");
+	if (!action || event.defaultPrevented) {
+		return;
+	}
+
+	event.preventDefault();
+
+	// Never send the token to another origin
+	if (action.origin !== window.location.origin) {
+		return;
+	}
+
+	const form = document.createElement("form");
+	form.method = "post";
+	form.action = action.href;
+
+	const token = document.createElement("input");
+	token.type = "hidden";
+	token.name = "form_security_token";
+	token.value = action.dataset.token || getActionToken();
+	form.appendChild(token);
+
+	document.body.appendChild(form);
+	form.submit();
+});
+
 function openClose(theID) {
 	var el = document.getElementById(theID);
 	if (el) {
@@ -269,6 +299,15 @@ if (window.addEventListener) {
 		});
 	});
 }
+
+// Pages can mark their main block with data-scroll-to-content, so that the visitor lands on the content and not on the page header
+window.onDocumentReady('[data-scroll-to-content]', function(element) {
+	// Same offset as in scrollToItem(), so that the content ends up in the same place as on the display page
+	var top = $(element).offset().top - 100;
+	if (top > 0) {
+		$('html, body').animate({scrollTop: top}, 400);
+	}
+});
 
 // Scroll to item deduplication flags
 var scrollToItemInProgress = false;
@@ -409,8 +448,8 @@ window.onDocumentReady('body', function() {
 			document.title = originalTitle;
 		}
 
-		['home', 'intro', 'mail', 'events', 'birthdays', 'notification'].forEach(function(type) {
-			var number = data[type];
+		['home', 'intro', 'mail', 'events', 'birthdays', 'notification', 'groups'].forEach(function(type) {
+			var number = (type === 'groups') ? data['groups-unread'] : data[type];
 			updateCounter(type, number);
 		});
 
@@ -857,6 +896,13 @@ function isColumnMode() {
 	return document.body.classList.contains('column-view');
 }
 
+/**
+ * Returns the security token for action requests
+ */
+function getActionToken() {
+	return actionToken;
+}
+
 function NavUpdate() {
 	if (!stopped && !doNotDisturb) {
 		if (force_update) {
@@ -867,6 +913,10 @@ function NavUpdate() {
 		pingRequest
 			.done(function(data) {
 				if (data.result) {
+					if (data.result.token) {
+						actionToken = data.result.token;
+					}
+
 					if (force_update) {
 						showProcessing();
 					}
@@ -2284,7 +2334,7 @@ function checkboxhighlight(box) {
 
 function notificationMarkAll() {
 	showFetching();
-	$.get('notification/mark/all')
+	$.post('notification/mark/all', {form_security_token: getActionToken()})
 		.done(function(data) {
 			showProcessing();
 			if (timer) {

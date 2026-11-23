@@ -2,6 +2,7 @@ deptrac:
   skip_violations:
     Friendica\App\Page:
       - Friendica\App
+      - Friendica\BaseModule
       - Friendica\Content\Nav
       - Friendica\Content\Text\HTML
       - Friendica\DI
@@ -23,14 +24,10 @@ deptrac:
       - Friendica\Object\Image
     Friendica\Content\ContactSelector:
       - Friendica\DI
-    Friendica\Content\Conversation\Factory\ChannelPost:
-      - Friendica\Protocol\Activity
     Friendica\Content\Conversation\Factory\Community:
       - Friendica\Module\Conversation\Community
     Friendica\Content\Conversation\Factory\Network:
       - Friendica\Content\Conversation\ConversationRenderer
-    Friendica\Content\Conversation\Factory\SystemChannelPost:
-      - Friendica\Protocol\Activity
     Friendica\Content\Feature:
       - Friendica\DI
     Friendica\Content\PageInfo:
@@ -165,7 +162,6 @@ deptrac:
     Friendica\Model\APContact:
       - Friendica\Content\Text\HTML
       - Friendica\DI
-      - Friendica\Protocol\ActivityNamespace
       - Friendica\Protocol\ActivityPub
       - Friendica\Protocol\ActivityPub\Transmitter
     Friendica\Model\Attach:
@@ -186,7 +182,6 @@ deptrac:
       - Friendica\Content\Text\HTML
       - Friendica\DI
       - Friendica\Object\Image
-      - Friendica\Protocol\Activity
       - Friendica\Protocol\ActivityPub\Transmitter
       - Friendica\Worker\AddContact
       - Friendica\Worker\ContactDiscovery
@@ -203,7 +198,6 @@ deptrac:
     Friendica\Model\Contact\Relation:
       - Friendica\Content\Widget
       - Friendica\DI
-      - Friendica\Protocol\Activity
       - Friendica\Protocol\ActivityPub
       - Friendica\Worker\AddContact
     Friendica\Model\Contact\User:
@@ -212,8 +206,6 @@ deptrac:
       - Friendica\Content\Feature
       - Friendica\Content\Text\BBCode
       - Friendica\DI
-      - Friendica\Protocol\Activity
-      - Friendica\Protocol\Activity\ObjectType
     Friendica\Model\GServer:
       - Friendica\DI
       - Friendica\Module\Register
@@ -227,23 +219,19 @@ deptrac:
       - Friendica\Content\Text\BBCode
       - Friendica\Content\Text\HTML
       - Friendica\DI
-      - Friendica\Protocol\Activity
       - Friendica\Protocol\ActivityPub\Processor
       - Friendica\Protocol\ActivityPub\Receiver
       - Friendica\Protocol\ActivityPub\Transmitter
-      - Friendica\Protocol\Activity\ObjectType
       - Friendica\Protocol\Delivery
       - Friendica\Protocol\Diaspora
     Friendica\Model\ItemHelper:
       - Friendica\Content\Item
-      - Friendica\Protocol\Activity
     Friendica\Model\ItemURI:
       - Friendica\DI
     Friendica\Model\Log\ParsedLogIterator:
       - Friendica\Object\Log\ParsedLogLine
     Friendica\Model\Mail:
       - Friendica\DI
-      - Friendica\Protocol\Activity
       - Friendica\Protocol\Delivery
     Friendica\Model\Nodeinfo:
       - Friendica\DI
@@ -253,15 +241,11 @@ deptrac:
       - Friendica\Security\Security
     Friendica\Model\Post:
       - Friendica\DI
-      - Friendica\Protocol\Activity
-      - Friendica\Protocol\Activity\ObjectType
     Friendica\Model\Post\Collection:
       - Friendica\DI
       - Friendica\Protocol\ActivityPub\Transmitter
     Friendica\Model\Post\Content:
       - Friendica\DI
-    Friendica\Model\Post\Counts:
-      - Friendica\Protocol\Activity
     Friendica\Model\Post\Delayed:
       - Friendica\DI
     Friendica\Model\Post\Delivery:
@@ -269,7 +253,6 @@ deptrac:
     Friendica\Model\Post\Engagement:
       - Friendica\Content\Text\BBCode
       - Friendica\DI
-      - Friendica\Protocol\Activity
       - Friendica\Protocol\ActivityPub\Receiver
       - Friendica\Protocol\Relay
     Friendica\Model\Post\History:
@@ -301,16 +284,13 @@ deptrac:
       - Friendica\DI
     Friendica\Model\Post\User:
       - Friendica\DI
-      - Friendica\Protocol\Activity
     Friendica\Model\Post\UserNotification:
       - Friendica\DI
-      - Friendica\Protocol\Activity
     Friendica\Model\Profile:
       - Friendica\Content\Feature
       - Friendica\Content\Text\BBCode
       - Friendica\Content\Widget\ContactBlock
       - Friendica\DI
-      - Friendica\Protocol\Activity
       - Friendica\Protocol\Diaspora
       - Friendica\Security\PermissionSet\Entity\PermissionSet
     Friendica\Model\Register:
@@ -897,24 +877,19 @@ deptrac:
     Friendica\Navigation\Notifications\Factory\FormattedNotify:
       - Friendica\Content\Text\BBCode
       - Friendica\Module\BaseNotifications
-      - Friendica\Protocol\Activity
     Friendica\Navigation\Notifications\Factory\Introduction:
       - Friendica\Content\Text\BBCode
       - Friendica\Module\BaseNotifications
     Friendica\Navigation\Notifications\Factory\Notification:
       - Friendica\Content\Text\BBCode
       - Friendica\Content\Text\Plaintext
-      - Friendica\Protocol\Activity
     Friendica\Navigation\Notifications\Factory\Notify:
       - Friendica\Content\Text\BBCode
-    Friendica\Navigation\Notifications\Repository\Notification:
-      - Friendica\Protocol\Activity
     Friendica\Navigation\Notifications\Repository\Notify:
       - Friendica\Content\Text\BBCode
       - Friendica\Content\Text\Plaintext
       - Friendica\Factory\Api\Mastodon\Notification
       - Friendica\Object\Api\Mastodon\Notification
-      - Friendica\Protocol\Activity
     Friendica\Network\HTTPClient\Client\HttpClient:
       - Friendica\App
     Friendica\Network\HTTPClient\Response\GuzzleResponse:
@@ -926,7 +901,6 @@ deptrac:
       - Friendica\Model\GServer
       - Friendica\Model\Profile
       - Friendica\Model\User
-      - Friendica\Protocol\ActivityNamespace
       - Friendica\Protocol\ActivityPub
       - Friendica\Protocol\ActivityPub\Transmitter
       - Friendica\Protocol\Diaspora
@@ -996,6 +970,7 @@ deptrac:
       - Friendica\Module\BaseApi
     Friendica\Security\OpenWebAuth:
       - Friendica\DI
+      - Friendica\Worker\AddContact
     Friendica\Security\Security:
       - Friendica\DI
     Friendica\User\Settings\Repository\UserGServer:

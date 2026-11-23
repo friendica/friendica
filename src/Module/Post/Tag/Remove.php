@@ -45,6 +45,13 @@ class Remove extends \Friendica\BaseModule
 			$this->baseUrl->redirect($request['return'] ?? '');
 		}
 
+		self::checkFormSecurityTokenRedirectOnError($request['return'] ?? '', 'action');
+
+		if (isset($this->parameters['tag_name'])) {
+			$this->removeTagsFromItem($this->parameters['item_id'], [trim(hex2bin($this->parameters['tag_name']))]);
+			$this->baseUrl->redirect($request['return'] ?? '');
+		}
+
 		$requestTags = array_key_exists('tag', $request) ? (array) $request['tag'] : [];
 		$tags        = [];
 		foreach ($requestTags as $tag => $checked) {
@@ -65,17 +72,12 @@ class Remove extends \Friendica\BaseModule
 			$this->baseUrl->redirect($returnUrl);
 		}
 
-		if (isset($this->parameters['tag_name'])) {
-			$this->removeTagsFromItem($this->parameters['item_id'], [trim(hex2bin($this->parameters['tag_name']))]);
-			$this->baseUrl->redirect($returnUrl);
-		}
-
 		$item_id = intval($this->parameters['item_id']);
 		if (!$item_id) {
 			$this->baseUrl->redirect($returnUrl);
 		}
 
-		$item = Post::selectFirst(['uri-id'], ['id' => $item_id, 'uid' => $this->session->getLocalUserId()]);
+		$item = $this->getOwnPost($item_id);
 		if (!$item) {
 			$this->baseUrl->redirect($returnUrl);
 		}
@@ -101,9 +103,10 @@ class Remove extends \Friendica\BaseModule
 				'cancel' => $this->t('Cancel'),
 			],
 
-			'$item_id'        => $item_id,
-			'$return'         => urlencode($returnUrl),
-			'$tag_checkboxes' => $tag_checkboxes,
+			'$form_security_token' => self::getFormSecurityToken('action'),
+			'$item_id'             => $item_id,
+			'$return'              => urlencode($returnUrl),
+			'$tag_checkboxes'      => $tag_checkboxes,
 		]);
 	}
 
@@ -118,7 +121,7 @@ class Remove extends \Friendica\BaseModule
 			return;
 		}
 
-		$item = Post::selectFirst(['uri-id'], ['id' => $item_id, 'uid' => $this->session->getLocalUserId()]);
+		$item = $this->getOwnPost($item_id);
 		if (empty($item)) {
 			return;
 		}
@@ -128,5 +131,20 @@ class Remove extends \Friendica\BaseModule
 				Tag::removeByHash($item['uri-id'], $results[1], $results[3], $results[2]);
 			}
 		}
+	}
+
+	/**
+	 * Tags are stored per uri-id and shared by every copy of the post, so only the author may remove them.
+	 */
+	private function getOwnPost(int $item_id): ?array
+	{
+		$item = Post::selectFirst(['uri-id'], [
+			'id'        => $item_id,
+			'uid'       => $this->session->getLocalUserId(),
+			'author-id' => $this->session->getPublicContactId(),
+			'origin'    => true,
+		]);
+
+		return is_array($item) ? $item : null;
 	}
 }

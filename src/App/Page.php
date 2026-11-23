@@ -12,6 +12,7 @@ use DOMDocument;
 use DOMXPath;
 use Friendica\App;
 use Friendica\AppHelper;
+use Friendica\BaseModule;
 use Friendica\Content\Nav;
 use Friendica\Content\Text\HTML;
 use Friendica\Core\Config\Capability\IManageConfigValues;
@@ -270,6 +271,7 @@ class Page implements ArrayAccess
 			],
 
 			'$local_user'     => $localUID,
+			'$action_token'   => BaseModule::getFormSecurityToken('action'),
 			'$generator'      => 'Friendica' . ' ' . App::version(),
 			'$update_content' => (int) $pConfig->get($localUID, 'system', 'update_content'),
 			'$spa_mode'       => ($_GET['mode'] ?? '') === 'column' ? 0 : (int) $pConfig->get($localUID, 'system', 'enable_spa'),

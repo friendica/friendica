@@ -41,6 +41,10 @@ a.btn, a.btn:hover {
   text-decoration: overline;
 }
 
+.widget-actions {
+  float: right;
+}
+
 /* List of social Networks */
 img.connector, img.connector-disabled {
   height: 40px;
@@ -438,6 +442,11 @@ td.federation-data {
   height: 20px;
   width: 20px;
   vertical-align: middle;
+}
+
+.network-sidebar-configure {
+  margin-bottom: 15px;
+  text-align: center;
 }
 
 /* help widget */
@@ -1262,6 +1271,16 @@ summary.wall-item-summary {
 	background-color: rgba(127, 127, 127, 0.05);
 	border: 1px solid rgba(127, 127, 127, 0.3);
 	border-radius: 4px;
+}
+
+.generic-page-wrapper.group-display-wrapper {
+	min-height: 0;
+}
+
+.group-toolbar-start {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 #group-discover .group-overview-avatar {

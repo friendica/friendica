@@ -112,10 +112,10 @@
 							{{/foreach}}
 						{{/if}}
 						{{foreach $item.folders as $cat}}
-							<span class="folder"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+							<span class="folder"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" class="post-action" title="{{$remove}}">x</a>) {{/if}} </span>
 						{{/foreach}}
 						{{foreach $item.categories as $cat}}
-							<span class="category"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" title="{{$remove}}">x</a>) {{/if}} </span>
+							<span class="category"><a href="{{$cat.url}}">{{$cat.name}}</a>{{if $cat.removeurl}} (<a href="{{$cat.removeurl}}" class="post-action" title="{{$remove}}">x</a>) {{/if}} </span>
 						{{/foreach}}
 						</div>
 					{{/if}}
@@ -192,7 +192,7 @@
 									<input type="checkbox" title="{{$item.drop.select}}" name="itemselected[]" class="item-select" value="{{$item.id}}" />
                                 {{/if}}
                                 {{if $item.drop && $item.drop.dropping}}
-									<a role="button" href="item/drop/{{$item.id}}/{{$item.return}}" onclick="return confirmDelete();" title="{{$item.drop.label}}"><i class="icon-trash icon-large"><span class="sr-only">{{$item.drop.label}}</span></i></a>
+									<a role="button" class="post-action" href="item/drop/{{$item.id}}/{{$item.return}}" onclick="return confirmDelete();" title="{{$item.drop.label}}"><i class="icon-trash icon-large"><span class="sr-only">{{$item.drop.label}}</span></i></a>
                                 {{/if}}
                                 {{if $item.report}}
 									<a href="{{$item.report.href}}" title="{{$item.report.label}}"><i class="icon-flag icon-large"><span class="sr-only">{{$item.report.label}}</span></i></a>

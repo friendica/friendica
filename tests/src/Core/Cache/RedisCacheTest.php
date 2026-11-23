@@ -56,6 +56,46 @@ class RedisCacheTest extends MemoryCacheTestCase
 		parent::tearDown();
 	}
 
+	public function testAddSetsTTL(): void
+	{
+		$this->instance->add('ttl_probe', 'value', 60);
+
+		$ttl = $this->redisClient()->ttl($this->redisKey('ttl_probe'));
+
+		self::assertGreaterThan(0, $ttl);
+		self::assertLessThanOrEqual(60, $ttl);
+	}
+
+	public function testAddDefaultTTL(): void
+	{
+		$this->instance->add('ttl_probe', 'value');
+
+		self::assertGreaterThan(0, $this->redisClient()->ttl($this->redisKey('ttl_probe')));
+	}
+
+	public function testAddWithoutTTLNeverExpires(): void
+	{
+		$this->instance->add('ttl_probe', 'value', 0);
+
+		self::assertSame(-1, $this->redisClient()->ttl($this->redisKey('ttl_probe')));
+	}
+
+	private function redisClient(): \Redis
+	{
+		$redis = new \Redis();
+		$redis->connect($_SERVER['REDIS_HOST'] ?? 'localhost', (int) ($_SERVER['REDIS_PORT'] ?? 6379));
+
+		return $redis;
+	}
+
+	private function redisKey(string $suffix): string
+	{
+		$keys = $this->redisClient()->keys('*' . $suffix);
+		self::assertCount(1, $keys);
+
+		return $keys[0];
+	}
+
 	public function testStats(): void
 	{
 		$stats = $this->instance->getStats();

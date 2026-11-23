@@ -11,6 +11,7 @@ use Friendica\App\BaseURL;
 use Friendica\Content\Contact\Repository\ContactByType;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
+use Friendica\Content\Text\RenderedContent;
 use Friendica\Content\Text\Plaintext;
 use Friendica\Core\Addon\AddonHelper;
 use Friendica\Core\Cache\Capability\ICanCache;
@@ -34,13 +35,12 @@ class GroupManager
 {
 	private const CONTACT_TYPES = [Contact::TYPE_COMMUNITY];
 
-	// Like on the contact page: public threads come from the global copy, private ones from the copy of the user
-	private const THREADS = "FROM `post-thread-user` INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id`
-		WHERE (`post-thread-user`.`uid` = 0 OR (`post-thread-user`.`uid` = ? AND NOT `post-user`.`global`)) AND " . self::THREAD_VISIBLE;
-
 	// Like in Post::selectForUser(): hidden, deleted and blocked or ignored threads are skipped
 	private const THREAD_VISIBLE = "`post-user`.`visible` AND NOT `post-user`.`deleted`
 		AND NOT `post-user`.`author-id` IN (SELECT `cid` FROM `user-contact` WHERE `uid` = ? AND (`blocked` OR `ignored`))";
+
+	/** @var int[][] Blocked or ignored authors per user, so that they are only fetched once per request */
+	private array $ignoredAuthors = [];
 
 	public function __construct(
 		private readonly ContactByType $contacts,
@@ -50,6 +50,7 @@ class GroupManager
 		private readonly IHandleUserSessions $session,
 		private readonly Database $database,
 		private readonly ICanCache $cache,
+		private readonly RenderedContent $renderedContent,
 	) {}
 
 	/**
@@ -189,6 +190,69 @@ class GroupManager
 	}
 
 	/**
+	 * Counts the threads with unread posts in all groups of the user
+	 *
+	 * This is the sum of the "unread" numbers of getGroupStats() and is meant for the navigation bar.
+	 *
+	 * @param int $uid User id
+	 *
+	 * @return int
+	 * @throws \Exception
+	 */
+	public function countUnreadThreads(int $uid): int
+	{
+		// The navigation bar asks for this number on every ping, but the query is expensive for users with busy groups
+		$key   = 'GroupManager::countUnreadThreads:' . $uid;
+		$count = $this->cache->get($key);
+		if (is_int($count)) {
+			return $count;
+		}
+
+		$pcids = array_column($this->getList($uid, false, true, true), 'pid');
+		$count = empty($pcids) ? 0 : array_sum($this->countUnreadThreadsPerGroup($uid, $pcids));
+
+		$this->cache->set($key, $count, Duration::MINUTE);
+
+		return $count;
+	}
+
+	/**
+	 * Counts the threads with unread posts per group
+	 *
+	 * @param int   $uid   User id
+	 * @param int[] $pcids Public contact ids of the groups
+	 *
+	 * @return int[] Number of threads with unread posts, keyed by the public contact id. Groups without unread threads are missing.
+	 * @throws \Exception
+	 */
+	private function countUnreadThreadsPerGroup(int $uid, array $pcids): array
+	{
+		$counts  = [];
+		$authors = $this->getIgnoredAuthors($uid);
+
+		// The join order is forced: The optimizer otherwise starts with all threads of the groups instead of the few unseen posts
+		$unread = $this->database->p(
+			"SELECT `post-thread-user`.`owner-id`, COUNT(DISTINCT `post-user`.`parent-uri-id`) AS `unread` FROM `post-user`
+				STRAIGHT_JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
+				WHERE `post-user`.`uid` = ? AND `post-user`.`unseen` AND NOT `post-user`.`hidden` AND NOT `post-user`.`deleted`
+				AND `post-user`.`gravity` IN (?, ?) AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
+				AND NOT `post-thread-user`.`deleted`" . $this->excludeAuthors($authors) . "
+				GROUP BY `post-thread-user`.`owner-id`",
+			$uid,
+			Item::GRAVITY_PARENT,
+			Item::GRAVITY_COMMENT,
+			...$pcids,
+			...$authors,
+		);
+		while ($row = $this->database->fetch($unread)) {
+			$counts[$row['owner-id']] = (int) $row['unread'];
+		}
+		$this->database->close($unread);
+
+		return $counts;
+	}
+
+	/**
 	 * Marks all posts in the threads of a group as seen
 	 *
 	 * @param int $uid  User id
@@ -198,6 +262,54 @@ class GroupManager
 	public function markSeen(int $uid, int $pcid): void
 	{
 		Item::update(['unseen' => false], ["`uid` = ? AND `unseen` AND `parent-uri-id` IN (SELECT `uri-id` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` = ?)", $uid, $uid, $pcid]);
+		$this->invalidateUnreadCache($uid);
+	}
+
+	/**
+	 * Marks all posts in the threads of all groups of the user as seen
+	 *
+	 * @param int    $uid  User id
+	 * @param string $host Limits the groups to the ones on this server, if it isn't empty
+	 * @throws \Exception
+	 */
+	public function markAllSeen(int $uid, string $host = ''): void
+	{
+		$pcids = array_column($this->getListByHost($uid, $host), 'pid');
+		if (empty($pcids)) {
+			return;
+		}
+
+		Item::update(['unseen' => false], array_merge(["`uid` = ? AND `unseen` AND `parent-uri-id` IN (SELECT `uri-id` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . '))', $uid, $uid], $pcids));
+		$this->invalidateUnreadCache($uid);
+	}
+
+	/**
+	 * Invalidates the cache of countUnreadThreads() for the user
+	 *
+	 * @param int $uid User id
+	 */
+	public function invalidateUnreadCache(int $uid): void
+	{
+		$this->cache->delete('GroupManager::countUnreadThreads:' . $uid);
+	}
+
+	/**
+	 * Fetches the groups of the user, optionally only the ones on a single server
+	 *
+	 * @param int    $uid  User id
+	 * @param string $host Host name of the server, all groups if it is empty
+	 *
+	 * @return array{url: string, addr: string, alias: string, name: string, id: int, pid: int, micro: ?string, thumb: ?string, network: string, about: string, gsid: ?int}[]
+	 * @throws \Exception
+	 */
+	public function getListByHost(int $uid, string $host = ''): array
+	{
+		$contacts = $this->getList($uid, true, true, true);
+		if ($host === '') {
+			return $contacts;
+		}
+
+		return array_values(array_filter($contacts, fn (array $contact): bool => strcasecmp(parse_url((string) $contact['url'], PHP_URL_HOST) ?: '', $host) === 0));
 	}
 
 	/**
@@ -239,10 +351,9 @@ class GroupManager
 		}
 		$this->database->close($posts);
 
-		// The global copy has no seen state, so the unread posts are counted on the copy of the user
 		$unread = $this->database->p(
-			"SELECT `parent-uri-id`, COUNT(*) AS `unread` FROM `post-user`
-				WHERE `uid` = ? AND `unseen` AND `visible` AND NOT `deleted` AND `gravity` IN (" . $gravityPlaceholders . ")
+			"SELECT `parent-uri-id`, COUNT(CASE WHEN `unseen` THEN 1 END) AS `unread` FROM `post-user`
+				WHERE `uid` = ? AND `visible` AND NOT `deleted` AND `gravity` IN (" . $gravityPlaceholders . ")
 				AND `parent-uri-id` IN (" . $parentPlaceholders . ")
 				GROUP BY `parent-uri-id`",
 			$uid,
@@ -308,20 +419,46 @@ class GroupManager
 	/**
 	 * Prepares a post from getLatestPosts() for the display
 	 *
-	 * @param array $post Post with guid, title, body, author and unseen fields
+	 * @param array  $post     Post with guid, title, body, author and unseen fields
+	 * @param string $backLink Relative link of the page the post is shown on, so that the display page can link back to it without relying on the browser history
 	 *
 	 * @return array
 	 */
-	public function getPostSummary(array $post): array
+	public function getPostSummary(array $post, string $backLink): array
 	{
 		return [
-			'link'        => 'display/' . $post['guid'],
+			'link'        => $this->getPostLink($post['guid'], $backLink),
 			'author'      => $post['author-name'],
 			'author_link' => Contact::magicLink($post['author-link']),
 			'thumb'       => Contact::getAvatarUrlForId($post['author-id'], Proxy::SIZE_MICRO, $post['author-updated']),
 			'received'    => $this->l10n->relativeDateTime($post['received']),
 			'excerpt'     => Plaintext::shorten($post['title'] ?: BBCode::toPlaintext($post['body'], false), 100),
 			'unseen'      => $post['unseen'],
+		];
+	}
+
+	/**
+	 * Prepares the header of a group (name, avatar, statistics and description) for the display
+	 *
+	 * @param array $contact Public contact of the group
+	 * @param int   $uid     User id
+	 *
+	 * @return array
+	 */
+	public function getHeader(array $contact, int $uid): array
+	{
+		$stats = $this->getGroupStats($uid, [$contact['id']])[$contact['id']] ?? ['threads' => 0, 'unread' => 0];
+
+		return [
+			'title'         => $contact['name'],
+			'profile'       => Contact::magicLinkByContact($contact),
+			'thumb'         => Contact::getThumb($contact),
+			'about'         => $this->renderedContent->convert($contact['uri-id'], $contact['about'], BBCode::EXTERNAL),
+			'readonly'      => !Contact::isSharing($contact['id'], $uid, true),
+			'threads_label' => $this->l10n->t('Threads'),
+			'threads_count' => $stats['threads'],
+			'unread_label'  => $this->l10n->t('Unread'),
+			'unread_count'  => $stats['unread'],
 		];
 	}
 
@@ -334,12 +471,37 @@ class GroupManager
 	 */
 	public function getLink(array $contact): string
 	{
+		return 'group/' . rawurlencode($this->getGroupId($contact));
+	}
+
+	/**
+	 * Fetches the identifier of a group that is used in the addresses of its pages
+	 *
+	 * @param array $contact Contact with id, url and addr fields
+	 *
+	 * @return string
+	 */
+	public function getGroupId(array $contact): string
+	{
 		$id = (string) $contact['addr'] ?: (string) $contact['id'];
-		if (Contact::isLocal($contact['url'])) {
+		if ($this->baseUrl->isLocalUrl($contact['url'])) {
 			$id = strstr($id, '@', true) ?: $id;
 		}
 
-		return 'group/' . rawurlencode($id);
+		return $id;
+	}
+
+	/**
+	 * Creates the link to a post that is shown in the context of a group, with a back link to the page it is shown on
+	 *
+	 * @param string $guid     Guid of the post
+	 * @param string $backLink Relative link of the page the post is shown on, so that the display page can link back to it without relying on the browser history
+	 *
+	 * @return string
+	 */
+	public function getPostLink(string $guid, string $backLink): string
+	{
+		return 'display/' . $guid . '?from=' . rawurlencode($backLink);
 	}
 
 	/**
@@ -373,29 +535,55 @@ class GroupManager
 	 */
 	public function getThreadIds(int $uid, int $pcid, int $start, int $limit): array
 	{
-		// Both parts are served by the index on uid, owner-id and commented, so they are combined afterwards
-		$join    = "FROM `post-thread-user` INNER JOIN `post-user` ON `post-user`.`id` = `post-thread-user`.`post-user-id` WHERE ";
-		$threads = $this->database->p(
-			"(SELECT `post-thread-user`.`uri-id`, `post-thread-user`.`commented` " . $join . "`post-thread-user`.`uid` = 0
-				AND `post-thread-user`.`owner-id` = ? AND " . self::THREAD_VISIBLE . "
-				ORDER BY `post-thread-user`.`commented` DESC LIMIT ?)
-			UNION ALL
-			(SELECT `post-thread-user`.`uri-id`, `post-thread-user`.`commented` " . $join . "`post-thread-user`.`uid` = ?
-				AND `post-thread-user`.`owner-id` = ? AND NOT `post-user`.`global` AND " . self::THREAD_VISIBLE . "
-				ORDER BY `post-thread-user`.`commented` DESC LIMIT ?)
-			ORDER BY `commented` DESC LIMIT ?, ?",
-			$pcid,
-			$uid,
-			$start + $limit,
-			$uid,
-			$pcid,
-			$uid,
-			$start + $limit,
-			$start,
-			$limit,
-		);
+		$wanted  = $start + $limit;
+		$size    = $wanted + 5;
+		$offset  = 0;
+		$visible = [];
 
-		return array_column($this->database->toArray($threads), 'uri-id');
+		$authors = array_flip($this->getIgnoredAuthors($uid));
+
+		do {
+			$candidates = $this->database->toArray($this->database->p(
+				"(SELECT `uri-id`, `post-user-id`, `author-id`, `commented` FROM `post-thread-user` WHERE `uid` = 0 AND `owner-id` = ? AND NOT `deleted`
+					ORDER BY `commented` DESC, `uri-id` DESC LIMIT ?)
+				UNION ALL
+				(SELECT `uri-id`, `post-user-id`, `author-id`, `commented` FROM `post-thread-user` WHERE `uid` = ? AND `owner-id` = ? AND NOT `deleted`
+					ORDER BY `commented` DESC, `uri-id` DESC LIMIT ?)
+				ORDER BY `commented` DESC, `uri-id` DESC LIMIT ?, ?",
+				$pcid,
+				$offset + $size,
+				$uid,
+				$pcid,
+				$offset + $size,
+				$offset,
+				$size,
+			));
+
+			$complete   = count($candidates) < $size;
+			$candidates = array_filter($candidates, fn (array $candidate): bool => !isset($authors[$candidate['author-id']]));
+
+			$postUserIds = array_filter(array_column($candidates, 'post-user-id'));
+			if (!empty($postUserIds)) {
+				$ids = array_column($this->database->toArray($this->database->p(
+					"SELECT `post-user`.`id` FROM `post-user`
+						WHERE `post-user`.`id` IN (" . implode(', ', array_fill(0, count($postUserIds), '?')) . ")
+						AND (`post-user`.`uid` = 0 OR NOT `post-user`.`global`) AND " . self::THREAD_VISIBLE,
+					...array_merge(array_values($postUserIds), [$uid]),
+				)), 'id', 'id');
+
+				foreach ($candidates as $candidate) {
+					if (isset($ids[$candidate['post-user-id']])) {
+						$visible[] = $candidate['uri-id'];
+					}
+				}
+			}
+
+			$offset += $size;
+
+			$size *= 2;
+		} while (!$complete && count($visible) < $wanted);
+
+		return array_slice($visible, $start, $limit);
 	}
 
 	/**
@@ -415,22 +603,7 @@ class GroupManager
 
 		$stats = [];
 
-		$counts  = [];
-		$missing = [];
-		foreach ($pcids as $pcid) {
-			$cached = $this->cache->get('group-threads:' . $uid . ':' . $pcid);
-			if (is_array($cached)) {
-				$counts[$pcid] = $cached;
-			} else {
-				$missing[] = $pcid;
-			}
-		}
-
-		if (!empty($missing)) {
-			$counts += $this->countThreads($uid, $missing);
-		}
-
-		foreach ($counts as $pcid => $count) {
+		foreach ($this->countThreads($uid, $pcids) as $pcid => $count) {
 			$stats[$pcid] = [
 				'threads'   => $count['threads'],
 				'unread'    => 0,
@@ -438,31 +611,20 @@ class GroupManager
 			];
 		}
 
-		$placeholders = implode(', ', array_fill(0, count($pcids), '?'));
-
-		$unread = $this->database->p(
-			"SELECT `post-thread-user`.`owner-id`, COUNT(DISTINCT `post-user`.`parent-uri-id`) AS `unread` FROM `post-user`
-				INNER JOIN `post-thread-user` ON `post-thread-user`.`uri-id` = `post-user`.`parent-uri-id` AND `post-thread-user`.`uid` = `post-user`.`uid`
-				WHERE `post-user`.`uid` = ? AND `post-user`.`unseen` AND NOT `post-user`.`hidden` AND NOT `post-user`.`deleted`
-				AND `post-user`.`gravity` IN (?, ?) AND `post-thread-user`.`owner-id` IN (" . $placeholders . ")
-				GROUP BY `post-thread-user`.`owner-id`",
-			$uid,
-			Item::GRAVITY_PARENT,
-			Item::GRAVITY_COMMENT,
-			...$pcids,
-		);
-		while ($row = $this->database->fetch($unread)) {
-			if (isset($stats[$row['owner-id']])) {
-				$stats[$row['owner-id']]['unread'] = (int) $row['unread'];
+		foreach ($this->countUnreadThreadsPerGroup($uid, $pcids) as $pcid => $unread) {
+			if (isset($stats[$pcid])) {
+				$stats[$pcid]['unread'] = $unread;
 			}
 		}
-		$this->database->close($unread);
 
 		return $stats;
 	}
 
 	/**
 	 * Counts the threads and fetches the latest activity of the given groups
+	 *
+	 * The numbers are taken from the index of the thread table alone. Deleted threads and threads from blocked or ignored authors are left out,
+	 * other visibility criteria are only checked when the threads are really displayed.
 	 *
 	 * @param int   $uid   User id
 	 * @param int[] $pcids Public contact ids of the groups
@@ -474,21 +636,67 @@ class GroupManager
 	{
 		$counts = [];
 
+		$authors = $this->getIgnoredAuthors($uid);
+
+		// Public threads are in the global copy, private ones in the copy of the user. Threads that are in both copies are counted once.
 		$threads = $this->database->p(
-			"SELECT `post-thread-user`.`owner-id`, COUNT(*) AS `threads`, MAX(`post-thread-user`.`commented`) AS `commented` " . self::THREADS . "
-				AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
-				GROUP BY `post-thread-user`.`owner-id`",
-			$uid,
+			"SELECT `owner-id`, COUNT(DISTINCT `uri-id`) AS `threads`, MAX(`commented`) AS `commented`
+				FROM `post-thread-user` WHERE `uid` IN (0, ?)
+				AND `owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
+				AND NOT `deleted`" . $this->excludeAuthors($authors) . "
+				GROUP BY `owner-id`",
 			$uid,
 			...$pcids,
+			...$authors,
 		);
 		while ($row = $this->database->fetch($threads)) {
-			$counts[$row['owner-id']] = ['threads' => (int) $row['threads'], 'commented' => $row['commented']];
-			$this->cache->set('group-threads:' . $uid . ':' . $row['owner-id'], $counts[$row['owner-id']], Duration::FIVE_MINUTES);
+			$counts[$row['owner-id']] = [
+				'threads'   => (int) $row['threads'],
+				'commented' => (string) $row['commented'],
+			];
 		}
 		$this->database->close($threads);
 
 		return $counts;
+	}
+
+	/**
+	 * Fetches the contacts that the user has blocked or ignored
+	 *
+	 * The list is fetched separately and then used as a fixed list, so that the counting queries can be done on the index alone.
+	 *
+	 * @param int $uid User id
+	 *
+	 * @return int[] Public contact ids
+	 * @throws \Exception
+	 */
+	private function getIgnoredAuthors(int $uid): array
+	{
+		if ($uid === 0) {
+			return [];
+		}
+
+		if (!isset($this->ignoredAuthors[$uid])) {
+			$this->ignoredAuthors[$uid] = array_map(intval(...), array_column($this->database->selectToArray('user-contact', ['cid'], ["`uid` = ? AND (`blocked` OR `ignored`)", $uid]), 'cid'));
+		}
+
+		return $this->ignoredAuthors[$uid];
+	}
+
+	/**
+	 * Creates the condition that excludes threads from the given authors
+	 *
+	 * @param int[] $authors Public contact ids of the authors
+	 *
+	 * @return string SQL condition with placeholders for the authors, empty when there are no authors
+	 */
+	private function excludeAuthors(array $authors): string
+	{
+		if (empty($authors)) {
+			return '';
+		}
+
+		return " AND NOT `post-thread-user`.`author-id` IN (" . implode(', ', array_fill(0, count($authors), '?')) . ")";
 	}
 
 	/**
@@ -502,29 +710,14 @@ class GroupManager
 	 */
 	public function getLatestThreads(int $uid, array $stats): array
 	{
-		if (empty($stats)) {
-			return [];
-		}
+		$latest = [];
 
-		$latest    = [];
-		$pcids     = array_keys($stats);
-		$commented = array_values(array_unique(array_column($stats, 'commented')));
-
-		$threads = $this->database->p(
-			"SELECT `post-thread-user`.`owner-id`, `post-thread-user`.`uri-id`, `post-thread-user`.`commented` " . self::THREADS . "
-				AND `post-thread-user`.`owner-id` IN (" . implode(', ', array_fill(0, count($pcids), '?')) . ")
-				AND `post-thread-user`.`commented` IN (" . implode(', ', array_fill(0, count($commented), '?')) . ")",
-			$uid,
-			$uid,
-			...$pcids,
-			...$commented,
-		);
-		while ($thread = $this->database->fetch($threads)) {
-			if (!isset($latest[$thread['owner-id']]) && ($thread['commented'] === $stats[$thread['owner-id']]['commented'])) {
-				$latest[$thread['owner-id']] = $thread['uri-id'];
+		foreach (array_keys($stats) as $pcid) {
+			$threadIds = $this->getThreadIds($uid, $pcid, 0, 1);
+			if (!empty($threadIds)) {
+				$latest[$pcid] = $threadIds[0];
 			}
 		}
-		$this->database->close($threads);
 
 		return $latest;
 	}

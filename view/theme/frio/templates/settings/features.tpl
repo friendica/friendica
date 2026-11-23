@@ -10,12 +10,12 @@
 		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 		{{* We organize the settings in collapsable panel-groups *}}
 		<div class="panel-group panel-group-settings" id="settings">
-			{{foreach $features as $g => $f}}
+			{{foreach $features as $key => $f}}
 			<details class="panel">
-				<summary class="section-subtitle-wrapper panel-heading accordion-toggle"  id="{{$g}}-settings-title"><h2>{{$f.0}}</h2></summary>
-				<div id="{{$g}}-settings-content">
-					<div class="panel-body {{if $g == $network_mode}}network sortable{{/if}}">
-						{{if $g == $network_mode}}
+				<summary id="{{$key}}-settings-title" class="section-subtitle-wrapper panel-heading accordion-toggle"><h2>{{$f.0}}</h2></summary>
+				<div id="{{$key}}-settings-content">
+					<div class="panel-body {{if $key == $network_mode}}network sortable{{/if}}">
+						{{if $key == $network_mode}}
 						<input type="hidden" id="feature_widgetorder" name="feature_widgetorder" value=""/>
 						<p tabindex="0">{{$sortable}}</p>
 						{{/if}}
@@ -25,7 +25,7 @@
 						<div class="clear"></div>
 					</div>
 					<div class="panel-footer">
-						{{if $g == $network_mode}}
+						{{if $key == $network_mode}}
 							{{include file="field_checkbox.tpl" field=$reset}}
 						{{/if}}
 						<button type="submit" name="submit" class="btn btn-primary" value="{{$submit}}">{{$submit}}</button>

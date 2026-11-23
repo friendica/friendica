@@ -36,9 +36,12 @@
 	{{if $delegates}}
     	{{foreach $delegates as $delegate}}
 			<div class="contact-block-div">
-				<a class="contact-block-link" href="settings/delegation/remove/{{$delegate.uid}}">
-					<img class="contact-block-img" src="photo/thumb/{{$delegate.uid}}" title="{{$delegate.username}} ({{$delegate.nickname}})">
-				</a>
+				<form action="settings/delegation/remove/{{$delegate.uid}}" method="post">
+					<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
+					<button type="submit" class="contact-block-link btn-link">
+						<img class="contact-block-img" src="photo/thumb/{{$delegate.uid}}" title="{{$delegate.username}} ({{$delegate.nickname}})">
+					</button>
+				</form>
 			</div>
     	{{/foreach}}
 		<div class="clear"></div>
@@ -50,9 +53,12 @@
 	{{if $potentials}}
     	{{foreach $potentials as $potential}}
 		<div class="contact-block-div">
-			<a class="contact-block-link" href="settings/delegation/add/{{$potential.uid}}">
-				<img class="contact-block-img" src="photo/thumb/{{$potential.uid}}" title="{{$potential.username}} ({{$potential.nickname}})">
-			</a>
+			<form action="settings/delegation/add/{{$potential.uid}}" method="post">
+				<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
+				<button type="submit" class="contact-block-link btn-link">
+					<img class="contact-block-img" src="photo/thumb/{{$potential.uid}}" title="{{$potential.username}} ({{$potential.nickname}})">
+				</button>
+			</form>
 		</div>
     	{{/foreach}}
 		<div class="clear"></div>

@@ -101,14 +101,14 @@ class Queue
 	}
 
 	/**
-	 * Delete all entries that depend on the given worker id
+	 * Delete all entries that wait for the given parent, together with their children
 	 *
-	 * @param integer $wid
+	 * @param string $uri URI of the parent
 	 * @return void
 	 */
-	public static function deleteByWorkerId(int $wid)
+	public static function deleteByReplyToId(string $uri)
 	{
-		$entries = DBA::select('inbox-entry', ['id'], ['wid' => $wid]);
+		$entries = DBA::select('inbox-entry', ['id'], ["`in-reply-to-id` = ? AND `object-id` != ?", $uri, $uri]);
 		while ($entry = DBA::fetch($entries)) {
 			self::deleteById($entry['id']);
 		}

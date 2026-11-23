@@ -17,6 +17,8 @@
  * information.
  */
 
+use Friendica\App\Router;
+use Friendica\BaseModule;
 use Friendica\Content\Conversation\ConversationRenderer;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
@@ -38,6 +40,12 @@ use Friendica\Content\Post\Entity\PostMedia;
 
 function item_post(): void
 {
+	// Module\Item\Compose also calls this function, so only item/<action>/… requests are actions.
+	if (DI::args()->get(0) === 'item' && DI::args()->has(1)) {
+		item_action();
+		return;
+	}
+
 	$uid = DI::userSession()->getLocalUserId();
 
 	if (!$uid) {
@@ -389,9 +397,20 @@ function item_post_return(string $baseurl, string $return_path, array $item = []
 
 function item_content()
 {
+	if (DI::args()->getMethod() !== Router::POST) {
+		throw new HTTPException\MethodNotAllowedException();
+	}
+
+	return '';
+}
+
+function item_action(): void
+{
 	if (!DI::userSession()->isAuthenticated()) {
 		throw new HTTPException\UnauthorizedException();
 	}
+
+	BaseModule::checkFormSecurityTokenForbiddenOnError('action');
 
 	$args = DI::args();
 
@@ -399,7 +418,6 @@ function item_content()
 		throw new HTTPException\BadRequestException();
 	}
 
-	$o = '';
 	switch ($args->get(1)) {
 		case 'drop':
 			if (DI::mode()->isAjax()) {
@@ -408,9 +426,9 @@ function item_content()
 				System::jsonExit([intval($args->get(2)), DI::userSession()->getLocalUserId()]);
 			} else {
 				if (!empty($args->get(3))) {
-					$o = drop_item($args->get(2), $args->get(3));
+					drop_item($args->get(2), $args->get(3));
 				} else {
-					$o = drop_item($args->get(2));
+					drop_item($args->get(2));
 				}
 			}
 			break;
@@ -463,8 +481,6 @@ function item_content()
 			}
 			break;
 	}
-
-	return $o;
 }
 
 /**

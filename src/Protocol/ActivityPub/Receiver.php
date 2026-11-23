@@ -1932,9 +1932,6 @@ class Receiver
 
 	/**
 	 * Extracts a potential alternate URL from a list of additional URL elements
-	 *
-	 * @param array $urls
-	 * @return string
 	 */
 	private static function extractAlternateUrl(array $urls, string $id): string
 	{
@@ -2257,10 +2254,6 @@ class Receiver
 			}
 		}
 
-		if (!empty($object_data['alternate-url']) && !Network::isValidHttpUrl($object_data['alternate-url'])) {
-			$object_data['alternate-url'] = null;
-		}
-
 		if (in_array($object_data['object_type'], ['as:Audio', 'as:Video'])) {
 			$object_data['alternate-url'] = self::extractAlternateUrl($object['as:url'] ?? [], $object_data['id']) ?: $object_data['alternate-url'];
 
@@ -2277,6 +2270,10 @@ class Receiver
 			}
 
 			$object_data['attachments'] = array_merge($object_data['attachments'], self::processAttachmentUrls($object['as:url'] ?? [], self::processIcon($object), $player, $embed));
+		}
+
+		if (!empty($object_data['alternate-url']) && !Network::isValidHttpUrl($object_data['alternate-url'])) {
+			$object_data['alternate-url'] = null;
 		}
 
 		// Support for quoted posts (Pleroma, Fedibird and Misskey)

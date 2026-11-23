@@ -37,6 +37,9 @@ deptrac:
                 value: src/App/.*
               - type: directory
                 value: src/Capabilities/.*
+              # shared vocabulary of the contact noun, used by Model\Contact and the contact features
+              - type: directory
+                value: src/Contact/Enum/.*
               - type: bool
                 must:
                     - type: directory
@@ -58,6 +61,9 @@ deptrac:
                 value: src/Util/.*
               - type: classLike
                 value: ^Friendica\\(AppHelper|AppLegacy|Base(Collection|DataTransferObject|Entity|Factory|Repository))$
+              # shared vocabulary: constants only, every tier names verbs and object types
+              - type: classLike
+                value: ^Friendica\\Protocol\\(Activity|Activity\\ObjectType|ActivityNamespace)$
 
         # --- Tier 1: Domain ---------------------------------------------------
         # The core nouns everything else points at. Uses Base only.
@@ -81,8 +87,13 @@ deptrac:
                 value: src/Content/Conversation/(Collection|Entity|Factory|Repository)/.*
         - name: Feature/Contact
           collectors:
-              - type: directory
-                value: src/Contact/.*
+              - type: bool
+                must:
+                    - type: directory
+                      value: src/Contact/.*
+                must_not:
+                    - type: layer
+                      value: Base
         - name: Feature/Moderation
           collectors:
               - type: directory
@@ -131,8 +142,13 @@ deptrac:
                 value: src/Module/.*
               - type: directory
                 value: src/Object/.*
-              - type: directory
-                value: src/Protocol/.*
+              - type: bool
+                must:
+                    - type: directory
+                      value: src/Protocol/.*
+                must_not:
+                    - type: layer
+                      value: Base
               - type: directory
                 value: src/Worker/.*
               - type: classLike

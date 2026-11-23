@@ -102,14 +102,15 @@ function configureUnpoly() {
   up.link.config.followSelectors.push('a[href]');
   up.form.config.submitSelectors.push('form[method="get" i]');
 
-  // Links Unpoly must not intercept. Fancybox, modal and onclick links carry their
+  // Links Unpoly must not intercept. Fancybox, modal, onclick and POST links carry their
   // own behavior; anything else needing an exception uses up-follow="false"
   // on the link itself (e.g. the delegation links in Nav.php's templates).
   up.link.config.noFollowSelectors.push(
     '.modal-open',
     '.add-to-modal',
     '[data-fancybox]',
-    '[onclick]'
+    '[onclick]',
+    '.post-action'
   );
 }
 

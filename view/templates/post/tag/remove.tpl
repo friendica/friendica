@@ -10,6 +10,7 @@
 	<p id="tag-remove-desc">{{$l10n.desc}}</p>
 
 	<form id="tagrm" action="post/{{$item_id}}/tag/remove?return={{$return}}" method="post">
+		<input type="hidden" name="form_security_token" value="{{$form_security_token}}">
 		<ul>
 {{foreach $tag_checkboxes as $tag_checkbox}}
 			<li>

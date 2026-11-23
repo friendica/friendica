@@ -38,7 +38,7 @@ class PostUpdate
 	// Needed for the helper function to read from the legacy term table
 	public const OBJECT_TYPE_POST = 1;
 
-	public const VERSION = 1604;
+	public const VERSION = 1607;
 
 	/**
 	 * Calls the post update functions
@@ -118,6 +118,9 @@ class PostUpdate
 			return false;
 		}
 		if (!self::update1604()) {
+			return false;
+		}
+		if (!self::update1607()) {
 			return false;
 		}
 		return true;
@@ -1498,6 +1501,56 @@ class PostUpdate
 
 		if ($rows <= 100) {
 			DI::keyValue()->set('post_update_version', 1604);
+			DI::logger()->info('Done');
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Copy the "deleted" marker of the thread starting posts to the "post-thread-user" table
+	 *
+	 * @return bool "true" when the job is done
+	 */
+	private static function update1607()
+	{
+		// Was the script completed?
+		if (DI::keyValue()->get('post_update_version') >= 1607) {
+			return true;
+		}
+
+		$id = (int) (DI::keyValue()->get('post_update_version_1607_id') ?? 0);
+		if ($id == 0) {
+			$thread = DBA::selectFirst('post-thread-user', ['post-user-id'], ["NOT `post-user-id` IS NULL"], ['order' => ['post-user-id' => true]]);
+			$id     = (int) ($thread['post-user-id'] ?? 0) + 1;
+		}
+
+		DI::logger()->info('Start', ['post-user-id' => $id]);
+
+		$threads = DBA::selectToArray('post-thread-user', ['post-user-id'], ["`post-user-id` < ?", $id], ['order' => ['post-user-id' => true], 'limit' => 10000]);
+		if (DBA::errorNo() != 0) {
+			DI::logger()->error('Database error', ['no' => DBA::errorNo(), 'message' => DBA::errorMessage()]);
+			return false;
+		}
+
+		$rows = count($threads);
+		if ($rows > 0) {
+			$ids = array_column($threads, 'post-user-id');
+			$id  = (int) min($ids);
+
+			$deleted = array_column(DBA::selectToArray('post-user', ['id'], ['id' => $ids, 'deleted' => true]), 'id');
+			if (!empty($deleted)) {
+				DBA::update('post-thread-user', ['deleted' => true], ['post-user-id' => $deleted]);
+			}
+
+			DI::keyValue()->set('post_update_version_1607_id', $id);
+
+			DI::logger()->info('Processed', ['rows' => $rows, 'deleted' => count($deleted), 'last' => $id]);
+		}
+
+		if ($rows < 10000) {
+			DI::keyValue()->set('post_update_version', 1607);
 			DI::logger()->info('Done');
 			return true;
 		}
