@@ -26,7 +26,7 @@ final class Network extends Timeline
 			new NetworkEntity(NetworkEntity::RECEIVED, $this->l10n->t('Latest Posts'), $this->l10n->t('Sort by post received date'), 't', $command . '?' . http_build_query(['order' => ConversationRenderer::ORDER_RECEIVED])),
 			new NetworkEntity(NetworkEntity::CREATED, $this->l10n->t('Latest Creation'), $this->l10n->t('Sort by post creation date'), 'q', $command . '?' . http_build_query(['order' => ConversationRenderer::ORDER_CREATED])),
 			new NetworkEntity(NetworkEntity::MENTION, $this->l10n->t('Personal'), $this->l10n->t('Posts that mention or involve you'), 'r', $command . '?' . http_build_query(['mention' => true])),
-			new NetworkEntity(NetworkEntity::STAR, $this->l10n->t('Bookmarked'), $this->l10n->t('Favourite Posts'), 'm', $command . '?' . http_build_query(['star' => true])),
+			new NetworkEntity(NetworkEntity::STAR, $this->l10n->t('Bookmarked'), $this->l10n->t('Posts you have bookmarked'), 'm', $command . '?' . http_build_query(['star' => true])),
 		];
 		return new Timelines($tabs);
 	}
