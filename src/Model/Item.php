@@ -792,6 +792,11 @@ class Item
 			$item['sensitive'] = true;
 		}
 
+		// Local comments on a public post that is addressed to an audience (group) are unlisted
+		if (Tag::isUnlistedGroupReply($item)) {
+			$item['private'] = self::UNLISTED;
+		}
+
 		if (!empty($item['conversation']) && empty($item['conversation-id'])) {
 			$item['conversation-id'] = ItemURI::getIdByURI($item['conversation']);
 		}

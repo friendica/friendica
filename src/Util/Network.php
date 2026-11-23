@@ -255,13 +255,65 @@ class Network
 	/** Checks whether an outbound request targets a non-public address. */
 	public static function isPrivateTarget(UriInterface $uri): bool
 	{
+		$host = $uri->getHost();
+		if (!self::isRestrictedHost($host)) {
+			return false;
+		}
+
+		return self::findNonPublicAddress($host, self::resolveHost($host)) !== null;
+	}
+
+	/**
+	 * Resolves the host of an outbound request, so the connection can be pinned to the checked addresses.
+	 *
+	 * Without pinning, curl resolves the host a second time and DNS can point it elsewhere in between.
+	 *
+	 * @return string[]|null Addresses to connect to, empty when the target is not allowed, null when the host is not restricted
+	 */
+	public static function getPinnedAddresses(UriInterface $uri): ?array
+	{
+		$host = $uri->getHost();
+		if (!self::isRestrictedHost($host)) {
+			return null;
+		}
+
+		$addresses = self::resolveHost($host);
+		if (self::findNonPublicAddress($host, $addresses) !== null) {
+			return [];
+		}
+
+		// curl doesn't resolve an IP literal, there is nothing to pin
+		if (filter_var(trim($host, '[]'), FILTER_VALIDATE_IP)) {
+			return null;
+		}
+
+		// An empty list means the host couldn't be resolved, curl must not try it on its own
+		return $addresses;
+	}
+
+	/**
+	 * Builds a CURLOPT_RESOLVE entry that makes curl connect to the given addresses.
+	 *
+	 * @param string[] $addresses
+	 */
+	public static function getCurlResolveEntry(UriInterface $uri, array $addresses): string
+	{
+		$port = $uri->getPort() ?? (strtolower($uri->getScheme()) === 'https' ? 443 : 80);
+
+		$addresses = array_map(fn (string $address): string => str_contains($address, ':') ? '[' . $address . ']' : $address, $addresses);
+
+		return $uri->getHost() . ':' . $port . ':' . implode(',', $addresses);
+	}
+
+	/** Checks whether outbound requests to the host are limited to public addresses. */
+	private static function isRestrictedHost(string $host): bool
+	{
 		// Coerce here because environment variables always arrive as strings ("false" would otherwise be truthy)
 		// @todo Replace this check with a proper sanitation functionality (must work for env variables, config-files and database entries)
 		if (!filter_var(DI::config()->get('system', 'block_private_addresses', true), FILTER_VALIDATE_BOOLEAN)) {
 			return false;
 		}
 
-		$host = $uri->getHost();
 		if ($host === '') {
 			return false;
 		}
@@ -270,18 +322,20 @@ class Network
 			return false;
 		}
 
-		if (self::isAllowedInternalHost($host, (string) DI::config()->get('system', 'allowed_internal_hosts', ''))) {
-			return false;
-		}
+		return !self::isAllowedInternalHost($host, (string) DI::config()->get('system', 'allowed_internal_hosts', ''));
+	}
 
-		foreach (self::resolveHost($host) as $address) {
+	/** @param string[] $addresses */
+	private static function findNonPublicAddress(string $host, array $addresses): ?string
+	{
+		foreach ($addresses as $address) {
 			if (IpAddress::isNonPublic($address)) {
 				DI::logger()->info('Target is not on the public internet.', ['host' => $host, 'address' => $address]);
-				return true;
+				return $address;
 			}
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
