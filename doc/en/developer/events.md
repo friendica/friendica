@@ -21,7 +21,6 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `prepare_body_content_filter` | `\Friendica\Event\PreparePostFilterContentEvent` |
 | `prepare_body` | `\Friendica\Event\PreparePostEvent` |
 | `prepare_body_final` | `\Friendica\Event\PreparePostEndEvent` |
-| `display_item` | `\Friendica\Event\DisplayItemEvent` |
 | `put_item_in_cache` | `\Friendica\Event\CacheItemEvent` |
 | `check_item_notification` | `\Friendica\Event\CheckItemNotificationEvent` |
 | `conversation_start` | `\Friendica\Event\ConversationStartEvent` |
@@ -117,6 +116,12 @@ Legacy hooks registered via `\Friendica\Core\Hook::register()` are still support
 | `zrl_init` | `\Friendica\Event\ZrlInitEvent` |
 | `acl_lookup_end` | `\Friendica\Event\AclLookupEndEvent` |
 | `moderation_users_tabs` | `\Friendica\Event\ModerationUsersTabsEvent` |
+| `load_config` | `\Friendica\Event\ConfigLoadedEvent` |
+| `route_collection` | `\Friendica\Event\CollectRoutesEvent` |
+| `<module>_mod_init` | `\Friendica\Event\ModuleInitEvent` |
+| `<module>_mod_post` | `\Friendica\Event\ModulePostEvent` |
+| `<Module class>_mod_content` | `\Friendica\Event\ModuleContentEvent` |
+| `<module>_post_recipient` | `\Friendica\Event\ModulePostRecipientEvent` |
 
 See the individual event documentation below for the full list.
 
@@ -1278,3 +1283,64 @@ Fired when the photo upload form is being built.
 
 **Modifiable:**
 - `setFormArray(array $form): void` — change the form data
+
+### `\Friendica\Event\ConfigLoadedEvent`
+
+Fired after the configuration files have been loaded.
+
+**Contained data:**
+- `getConfig(): ConfigFileManager` — the config file manager (read-only)
+
+### `\Friendica\Event\CollectRoutesEvent`
+
+Fired while the router is built. Addons can add their own routes.
+
+**Contained data:**
+- `getRouteCollector(): RouteCollector` — the FastRoute collector to add routes to
+
+**Modifiable:**
+- `setRouteCollector(RouteCollector $routeCollector): void` — replace the route collector
+
+### `\Friendica\Event\ModuleInitEvent`
+
+Fired before a module initializes and handles the request. The legacy hook name is `<module>_mod_init`.
+
+**Contained data:**
+- `getModuleName(): string` — the short name of the module, e.g. `profile`
+- `getModuleClass(): string` — the module class name
+
+### `\Friendica\Event\ModulePostEvent`
+
+Fired before a module handles a POST request. The legacy hook name is `<module>_mod_post`.
+
+**Contained data:**
+- `getModuleName(): string` — the short name of the module
+- `getModuleClass(): string` — the module class name
+- `getPost(): array` — the POST data
+
+**Modifiable:**
+- `setPost(array $post): void` — change the POST data the module receives
+
+### `\Friendica\Event\ModuleContentEvent`
+
+Fired before the content of a module is rendered. The content of the event is output in front of the module content. The legacy hook name is `<Module class>_mod_content`, with the fully qualified class name of the module.
+
+**Contained data:**
+- `getModuleName(): string` — the short name of the module
+- `getModuleClass(): string` — the module class name
+- `getContent(): string` — the content added so far
+
+**Modifiable:**
+- `setContent(string $content): void` — change the content
+
+### `\Friendica\Event\ModulePostRecipientEvent`
+
+Fired when the recipient selection (ACL) of the post form is rendered. The legacy hook name is `<module>_post_recipient`.
+
+**Contained data:**
+- `getModuleName(): string` — the short name of the module
+- `getModuleClass(): string` — the module class name
+- `getHtml(): string` — the rendered recipient selection
+
+**Modifiable:**
+- `setHtml(string $html): void` — change the HTML

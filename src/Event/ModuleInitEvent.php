@@ -19,6 +19,8 @@ final class ModuleInitEvent extends AbstractEvent
 	public const NAME = 'friendica.module_init';
 
 	/**
+	 * @internal
+	 *
 	 * @param class-string<\Friendica\BaseModule> $moduleClass
 	 */
 	public function __construct(private readonly string $moduleName, private readonly string $moduleClass)

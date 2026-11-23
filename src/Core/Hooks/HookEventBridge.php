@@ -1660,10 +1660,13 @@ final class HookEventBridge
 
 	public static function onOcrDetectionEvent(OcrDetectionEvent $event): void
 	{
-		$data = static::callHook($event->getName(), [
-			'img_str'     => $event->getImgStr(),
-			'description' => $event->getDescription(),
-		]);
+		$hookData = ['img_str' => $event->getImgStr()];
+
+		if ($event->getDescription() !== null) {
+			$hookData['description'] = $event->getDescription();
+		}
+
+		$data = static::callHook($event->getName(), $hookData);
 
 		if (isset($data['description'])) {
 			$event->setDescription($data['description']);

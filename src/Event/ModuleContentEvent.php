@@ -19,10 +19,15 @@ final class ModuleContentEvent extends AbstractEvent
 	public const NAME = 'friendica.module_content';
 
 	/**
+	 * @internal
+	 *
 	 * @param class-string<\Friendica\BaseModule> $moduleClass
 	 */
-	public function __construct(private readonly string $moduleName, private readonly string $moduleClass, private string $content)
-	{
+	public function __construct(
+		private readonly string $moduleName,
+		private readonly string $moduleClass,
+		private string $content,
+	) {
 		parent::__construct(self::NAME);
 	}
 

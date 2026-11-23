@@ -19,10 +19,15 @@ final class ModulePostEvent extends AbstractEvent
 	public const NAME = 'friendica.module_post';
 
 	/**
+	 * @internal
+	 *
 	 * @param class-string<\Friendica\BaseModule> $moduleClass
 	 */
-	public function __construct(private readonly string $moduleName, private readonly string $moduleClass, private array $post)
-	{
+	public function __construct(
+		private readonly string $moduleName,
+		private readonly string $moduleClass,
+		private array $post,
+	) {
 		parent::__construct(self::NAME);
 	}
 

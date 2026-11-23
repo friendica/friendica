@@ -1010,7 +1010,7 @@ class HookEventBridgeTest extends TestCase
 
 		$reflectionProperty->setValue(null, function (string $name, array $data): array {
 			$this->assertSame('ocr-detection', $name);
-			$this->assertSame(['img_str' => 'binary data', 'description' => null], $data);
+			$this->assertSame(['img_str' => 'binary data'], $data);
 
 			return ['img_str' => 'binary data', 'description' => 'A photo of a cat'];
 		});
@@ -1018,6 +1018,25 @@ class HookEventBridgeTest extends TestCase
 		HookEventBridge::onOcrDetectionEvent($event);
 
 		$this->assertSame('A photo of a cat', $event->getDescription());
+	}
+
+	public function testOnOcrDetectionEventPassesAnExistingDescriptionToTheHook(): void
+	{
+		$event = new OcrDetectionEvent('binary data');
+		$event->setDescription('Existing description');
+
+		$reflectionProperty = new \ReflectionProperty(HookEventBridge::class, 'mockedCallHook');
+
+		$reflectionProperty->setValue(null, function (string $name, array $data): array {
+			$this->assertSame('ocr-detection', $name);
+			$this->assertSame(['img_str' => 'binary data', 'description' => 'Existing description'], $data);
+
+			return $data;
+		});
+
+		HookEventBridge::onOcrDetectionEvent($event);
+
+		$this->assertSame('Existing description', $event->getDescription());
 	}
 
 	public function testOnNetworkToNameEventCallsHookWithCorrectValue(): void

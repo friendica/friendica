@@ -19,6 +19,9 @@ final class CollectRoutesEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.collect_routes';
 
+	/**
+	 * @internal
+	 */
 	public function __construct(private RouteCollector $routeCollector)
 	{
 		parent::__construct(self::NAME);

@@ -19,6 +19,9 @@ final class ConfigLoadedEvent extends AbstractEvent
 {
 	public const NAME = 'friendica.config_loaded';
 
+	/**
+	 * @internal
+	 */
 	public function __construct(private readonly ConfigFileManager $config)
 	{
 		parent::__construct(self::NAME);
