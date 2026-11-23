@@ -52,7 +52,7 @@ class MediaDeletionTest extends ApiTestCase
 	#[DataProvider('deletionCases')]
 	public function testDeletionPreservesInUseAndForeignMedia(string $table, bool $owned, bool $inUse, bool $imagePost): void
 	{
-		$uid = $owned ? self::SELF_USER['id'] : self::OTHER_USER['id'];
+		$uid = $owned ? self::SELF_USER['uid'] : self::OTHER_USER['id'];
 		if (!$owned) {
 			self::assertTrue(DI::dba()->insert('user', ['uid' => $uid, 'nickname' => 'media-owner']));
 		}

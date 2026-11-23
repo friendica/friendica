@@ -24,8 +24,10 @@ abstract class ApiTestCase extends FixtureTestCase
 {
 	// User data that the test database is populated with
 	public const SELF_USER = [
-		'id'   => 3042,
-		'name' => 'Test user',
+		'id'   => 3048, // Public contact id
+		'uid'  => 1042, // User id
+		'cid'  => 3042, // Self contact id
+		'name' => 'Self contact',
 		'nick' => 'selfcontact',
 		'nurl' => 'http://localhost/profile/selfcontact',
 	];

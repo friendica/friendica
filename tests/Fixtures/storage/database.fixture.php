@@ -13,7 +13,7 @@ return [
 		// Id prefix: 10
 		[
 			'uid'      => 1042,
-			'username' => 'Test user',
+			'username' => 'Self contact',
 			'nickname' => 'selfcontact',
 			'verified' => 1,
 			'password' => '$2y$10$DLRNTRmJgKe1cSrFJ5Jb0edCqvXlA9sh/RHdSnfxjbR.04yZRm4Qm',

@@ -27,8 +27,8 @@ final class RemoveTest extends FixtureTestCase
 {
 	private const UID               = 1042;
 	private const PUBLIC_CONTACT_ID = 3048;
-	private const POST_ID           = 1501;
-	private const URI_ID            = 20001;
+	private const POST_ID           = 1502;
+	private const URI_ID            = 20002;
 	private const TAG               = 'removetest';
 
 	protected function setUp(): void

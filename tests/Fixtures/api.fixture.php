@@ -25,7 +25,7 @@ return [
 		// Id prefix: 10
 		[
 			'uid'      => 1042, // selfcontact
-			'username' => 'Test user',
+			'username' => 'Self contact',
 			'nickname' => 'selfcontact',
 			'verified' => 1,
 			'prvkey'   => "-----BEGIN RSA PRIVATE KEY-----\nMIICXgIBAAKBgQDVqxF9kIgtgRL0+q+jTi578FA1r1+crEmlYc0pdxcbmmrhjuRc\nrK1gX3r0mnP25fkHzG+6CAjgbDBRFM1/RXBCyp/KHVks7eQ4yr4MxTRlsxo5qf2o\nnbyNzM7Q+LZhFhe/yIoGN/fuEjlqBE98IfPOrUjsQPX240vGNXIkfLiAWwIDAQAB\nAoGBAIwuiPIdggqAtWQ+mD8HCx5LQwSFw6/xpPu5F7ZNqL52aAsGCbL3o2QoIG4c\na1qf9Ot16BNgNBqxQF3hzRTkBMrKYlmNTUkwJXun/zjQJq2JvOlcrSuXlIucUjs4\nXekVN25aYPHrX9m2FEIUwZTb4UYXbR80KbIDI53BkQ6EwSbpAkEA7aO49CR2Hf1Y\n1d2GaUI/Z0wvbj//+t0Kg0bPt16ca8KVjEQQA5ylsDaiw510jDz9NBQxSOk6If23\nUeRixc1RDQJBAOYtN4YnPM1Zfp6IxXlqMCc+xUWRTPEPFt+WpG+v79koNamAeA6o\nZzTl92hl58IqSdbgojeE2zXWQRvlimFMLQcCQQCV6jND0byyLqFcSeQBg0l8YROK\n+dUC7W80YfeoNod3c8nkMwvnO2tLPyxvO2XLEq6prBNra7bAus5rWyj0oBIBAkEA\n1EvUMFm0TLpEfLgtWuTD8Q6GKLnxO0ztjd+FXrXpBGN/ywyArxRHzJRmctW6wmz6\nmcOqGobhIHCysKYv0bnOtQJAc2M5RwlASHH4jGJzXgt3nboyiJfufM0RV9iry3ho\nCXQRWAONKoLqnsfC6qNP8OzY8FMJcwmPWj7Q/6z6yLBFTA==\n-----END RSA PRIVATE KEY-----",
@@ -232,7 +232,7 @@ return [
 		[
 			'id'       => 3049, // remotecontact (public)
 			'uid'      => 0,
-			'uri-id'   => 20043, // 'https://friendica.local/profile/othercontact'
+			'uri-id'   => 20049, // 'https://domain.tld/profile/remotecontact'
 			'name'     => 'Remote user',
 			'nick'     => 'remotecontact',
 			'self'     => 0,
@@ -251,7 +251,7 @@ return [
 	'apcontact' => [
 		[
 			'url'              => 'https://friendica.local/profile/selfcontact',
-			'uri-id'           => 20001, // '1'
+			'uri-id'           => 20042, // 'https://friendica.local/profile/selfcontact'
 			'uuid'             => '42',
 			'type'             => 'Person',
 			'following'        => 'https://friendica.local/following/selfcontact',
