@@ -114,9 +114,6 @@ class Media extends BaseApi
 		}
 
 		Photo::delete(['uid' => $uid, 'resource-id' => $photo['resource-id']]);
-		// This is only needed for images that had been stored in older versions.
-		// @todo Possibly add an update job that deletes the related items and then remove the line here.
-		Item::deleteForUser(['uid' => $uid, 'resource-id' => $photo['resource-id'], 'post-type' => Item::PT_IMAGE, 'origin' => true], $uid);
 		Photo::clearAlbumCache($uid);
 
 		$this->earlyJsonExit(new \stdClass());
