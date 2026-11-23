@@ -46,7 +46,7 @@
         "view/templates/widget/trending_tags.tpl": 1,
         "view/theme/frio/templates/circle_side.tpl": 1,
         "view/theme/frio/templates/contact/entry.tpl": 2,
-        "view/theme/frio/templates/nav.tpl": 3,
+        "view/theme/frio/templates/nav.tpl": 2,
         "view/theme/frio/templates/widget/saved_searches.tpl": 1
     }
 }

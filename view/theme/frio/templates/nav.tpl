@@ -214,10 +214,7 @@
 									<div class="user-avatar">
 										<img id="avatar" src="{{$userinfo.icon}}" alt="{{$userinfo.name}}">
 										<span class="dropdown-indicator" aria-hidden="true">
-											<svg viewBox="6 6 12 12" width="100%" height="100%" fill="currentColor" version="1.1" id="svg1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-											  <defs id="defs1" />
-											  <path d="M 12,14 8,10 h 8 z" id="path1" />
-											</svg>
+											<i class="ri ri-arrow-down-s-line ri-xl" aria-hidden="true"></i>
 										</span>
 									</div>
 								</button>
@@ -232,8 +229,7 @@
 									{{/if}}
 									<li>
 										<a role="menuitem" id="nav-profile-link" href="{{$userinfo.link.0}}" title="{{$userinfo.link.3}}">
-										<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"
-											style="max-width:30px; max-height:30px; min-width:30px; min-height:30px; width:30px; height:30px; margin-left: -5px; border-radius: 100%;"/>&nbsp;
+										<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"/>&nbsp;
 											<strong>
 											{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}) {{/if}}
 											</strong>
