@@ -31,7 +31,7 @@ final class PushSubscriptionTest extends ApiTestCase
 		$this->resetAuthStatics();
 
 		// Avoid scheduling worker tasks during the OAuth token lookup
-		DI::pConfig()->set(42, 'suggestion', 'last_update', time());
+		DI::pConfig()->set(1042, 'suggestion', 'last_update', time());
 	}
 
 	protected function tearDown(): void
@@ -83,7 +83,7 @@ final class PushSubscriptionTest extends ApiTestCase
 			self::assertTrue($subscription->alerts->mention);
 			self::assertTrue($subscription->alerts->poll);
 
-			self::assertTrue(DI::dba()->exists('subscription', ['application-id' => $applicationId, 'uid' => 42]));
+			self::assertTrue(DI::dba()->exists('subscription', ['application-id' => $applicationId, 'uid' => 1042]));
 		}
 	}
 
@@ -174,7 +174,7 @@ final class PushSubscriptionTest extends ApiTestCase
 			self::assertTrue($subscription->alerts->mention);
 			self::assertFalse($subscription->alerts->poll);
 
-			self::assertTrue(DI::dba()->exists('subscription', ['application-id' => $applicationId, 'uid' => 42]));
+			self::assertTrue(DI::dba()->exists('subscription', ['application-id' => $applicationId, 'uid' => 1042]));
 		}
 	}
 
@@ -197,7 +197,7 @@ final class PushSubscriptionTest extends ApiTestCase
 			self::assertEquals(200, $e->getResponse()->getStatusCode());
 			self::assertSame([], $subscription);
 
-			self::assertFalse(DI::dba()->exists('subscription', ['application-id' => $applicationId, 'uid' => 42]));
+			self::assertFalse(DI::dba()->exists('subscription', ['application-id' => $applicationId, 'uid' => 1042]));
 		}
 	}
 
@@ -219,7 +219,7 @@ final class PushSubscriptionTest extends ApiTestCase
 
 		DI::dba()->insert('application-token', [
 			'application-id' => $application['id'],
-			'uid'            => 42,
+			'uid'            => 1042,
 			'code'           => 'testcode',
 			'access_token'   => self::ACCESS_TOKEN,
 			'created_at'     => '2020-01-01 12:00:00',
@@ -239,7 +239,7 @@ final class PushSubscriptionTest extends ApiTestCase
 	{
 		DI::dba()->insert('subscription', [
 			'application-id' => $applicationId,
-			'uid'            => 42,
+			'uid'            => 1042,
 			'endpoint'       => 'https://example.org/push',
 			'pubkey'         => 'testpubkey',
 			'secret'         => 'testsecret',

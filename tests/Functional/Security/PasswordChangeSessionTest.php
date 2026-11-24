@@ -17,7 +17,7 @@ use Friendica\Test\FixtureTestCase;
 
 final class PasswordChangeSessionTest extends FixtureTestCase
 {
-	private const UID      = 42;
+	private const UID      = 1042;
 	private const PASSWORD = 'Correct-Horse-Battery-77';
 
 	protected function setUp(): void

@@ -22,8 +22,8 @@ class SavedSearchesTest extends ApiTestCase
 		$result = $this->toJson($response);
 
 		self::assertEquals(['Content-type' => ['application/json'], ICanCreateResponses::X_HEADER => ['json']], $response->getHeaders());
-		self::assertEquals(1, $result[0]->id);
-		self::assertEquals(1, $result[0]->id_str);
+		self::assertEquals(901, $result[0]->id);
+		self::assertEquals(901, $result[0]->id_str);
 		self::assertEquals('Saved search', $result[0]->name);
 		self::assertEquals('Saved search', $result[0]->query);
 	}

@@ -12,5 +12,5 @@ class AuthTestConfig
 	/** @var bool */
 	public static $authenticated = true;
 	/** @var int  */
-	public static $user_id = 42;
+	public static $user_id = 1042;
 }

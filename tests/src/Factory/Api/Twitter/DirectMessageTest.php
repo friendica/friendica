@@ -26,7 +26,7 @@ class DirectMessageTest extends FixtureTestCase
 		$id  = $ids[0]['id'];
 
 		$directMessage = (new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser()))
-			->createFromMailId($id, ApiTestCase::SELF_USER['id'])
+			->createFromMailId($id, ApiTestCase::SELF_USER['uid'])
 			->toArray();
 
 		self::assertEquals('item_title' . "\n" . 'item_body', $directMessage['text']);
@@ -49,7 +49,7 @@ class DirectMessageTest extends FixtureTestCase
 		$id  = $ids[0]['id'];
 
 		$directMessage = (new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser()))
-			->createFromMailId($id, ApiTestCase::SELF_USER['id'], 'html')
+			->createFromMailId($id, ApiTestCase::SELF_USER['uid'], 'html')
 			->toArray();
 
 		self::assertEquals('item_title', $directMessage['title']);
@@ -68,7 +68,7 @@ class DirectMessageTest extends FixtureTestCase
 		$id  = $ids[0]['id'];
 
 		$directMessage = (new DirectMessage(DI::logger(), DI::dba(), DI::twitterUser()))
-			->createFromMailId($id, ApiTestCase::SELF_USER['id'], 'plain')
+			->createFromMailId($id, ApiTestCase::SELF_USER['uid'], 'plain')
 			->toArray();
 
 		self::assertEquals('item_title', $directMessage['title']);

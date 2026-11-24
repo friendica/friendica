@@ -40,9 +40,9 @@ class StatusesTest extends ApiTestCase
 		// @phpstan-ignore method.deprecated
 		$response = (new Statuses(DI::dba(), DI::twitterStatus(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'list_id' => 1,
+				'list_id' => 701,
 				'page'    => -1,
-				'max_id'  => 10,
+				'max_id'  => 20010,
 			]);
 
 		$json = $this->toJson($response);
@@ -64,7 +64,7 @@ class StatusesTest extends ApiTestCase
 		// @phpstan-ignore method.deprecated
 		$response = (new Statuses(DI::dba(), DI::twitterStatus(), DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), [], ['extension' => 'rss']))
 			->run($this->httpExceptionMock, [
-				'list_id' => 1,
+				'list_id' => 701,
 			]);
 
 		self::assertXml((string) $response->getBody());

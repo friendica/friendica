@@ -90,9 +90,9 @@ class BasicAuthTest extends ApiTestCase
 	public function testApiLoginWithCorrectLogin(): void
 	{
 		BasicAuth::setCurrentUserID();
-		$_SERVER['PHP_AUTH_USER'] = 'Test user';
+		$_SERVER['PHP_AUTH_USER'] = 'Self contact';
 		$_SERVER['PHP_AUTH_PW']   = 'password';
-		self::assertEquals(parent::SELF_USER['id'], BasicAuth::getCurrentUserID(true));
+		self::assertEquals(parent::SELF_USER['uid'], BasicAuth::getCurrentUserID(true));
 	}
 
 	/**

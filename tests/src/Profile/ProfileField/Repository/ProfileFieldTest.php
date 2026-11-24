@@ -46,7 +46,7 @@ class ProfileFieldTest extends FixtureTestCase
 		self::expectExceptionMessage('PermissionSet needs to be saved first.');
 		self::expectException(ProfileFieldPersistenceException::class);
 
-		$profileField = $this->factory->createFromValues(42, 0, 'public', 'value', $this->permissionSetFactory->createFromString(42, '', '<~>'));
+		$profileField = $this->factory->createFromValues(1042, 0, 'public', 'value', $this->permissionSetFactory->createFromString(1042, '', '<~>'));
 
 		self::assertEquals($profileField->uid, $profileField->permissionSet->uid);
 
@@ -58,7 +58,7 @@ class ProfileFieldTest extends FixtureTestCase
 	 */
 	public function testSaveNew(): void
 	{
-		$profileField = $this->factory->createFromValues(42, 0, 'public', 'value', $this->permissionSetRepository->save($this->permissionSetFactory->createFromString(42, '', '<~>')));
+		$profileField = $this->factory->createFromValues(1042, 0, 'public', 'value', $this->permissionSetRepository->save($this->permissionSetFactory->createFromString(1042, '', '<~>')));
 
 		self::assertEquals($profileField->uid, $profileField->permissionSet->uid);
 
@@ -80,7 +80,7 @@ class ProfileFieldTest extends FixtureTestCase
 	 */
 	public function testUpdateOrder(): void
 	{
-		$profileField = $this->factory->createFromValues(42, 0, 'public', 'value', $this->permissionSetRepository->save($this->permissionSetFactory->createFromString(42, '', '<~>')));
+		$profileField = $this->factory->createFromValues(1042, 0, 'public', 'value', $this->permissionSetRepository->save($this->permissionSetFactory->createFromString(1042, '', '<~>')));
 
 		self::assertEquals($profileField->uid, $profileField->permissionSet->uid);
 
@@ -113,7 +113,7 @@ class ProfileFieldTest extends FixtureTestCase
 	 */
 	public function testUpdate(): void
 	{
-		$profileField = $this->factory->createFromValues(42, 0, 'public', 'value', $this->permissionSetRepository->save($this->permissionSetFactory->createFromString(42, '', '<~>')));
+		$profileField = $this->factory->createFromValues(1042, 0, 'public', 'value', $this->permissionSetRepository->save($this->permissionSetFactory->createFromString(1042, '', '<~>')));
 
 		self::assertEquals($profileField->uid, $profileField->permissionSet->uid);
 
@@ -126,12 +126,12 @@ class ProfileFieldTest extends FixtureTestCase
 
 		self::assertEquals($savedProfileField, $selectedProfileField);
 
-		$savedProfileField->update('another', 5, $this->permissionSetRepository->selectPublicForUser(42));
+		$savedProfileField->update('another', 5, $this->permissionSetRepository->selectPublicForUser(1042));
 		self::assertEquals(PermissionSet::PUBLIC, $savedProfileField->permissionSet->id);
 
 		$publicProfileField = $this->depository->save($savedProfileField);
 
-		self::assertEquals($this->permissionSetRepository->selectPublicForUser(42), $publicProfileField->permissionSet);
+		self::assertEquals($this->permissionSetRepository->selectPublicForUser(1042), $publicProfileField->permissionSet);
 		self::assertEquals('another', $publicProfileField->value);
 		self::assertEquals(5, $publicProfileField->order);
 

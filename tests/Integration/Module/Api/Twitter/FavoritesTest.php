@@ -27,7 +27,7 @@ final class FavoritesTest extends ApiTestCase
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/favorites'))
-			->withQueryParams(['page' => '-1', 'max_id' => '10']);
+			->withQueryParams(['page' => '-1', 'max_id' => '20010']);
 
 		$response = $module->handleRequest($request);
 

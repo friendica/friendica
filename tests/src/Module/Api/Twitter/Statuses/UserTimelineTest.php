@@ -25,10 +25,10 @@ class UserTimelineTest extends ApiTestCase
 		// @phpstan-ignore method.deprecated
 		$response = (new UserTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'user_id'         => 43, // Public contact id
-				'max_id'          => 10,
+				'user_id'         => 3043, // Public contact id
+				'max_id'          => 20010,
 				'exclude_replies' => true,
-				'conversation_id' => 1,
+				'conversation_id' => 20001,
 			]);
 
 		$json = $this->toJson($response);
@@ -54,7 +54,7 @@ class UserTimelineTest extends ApiTestCase
 		// @phpstan-ignore method.deprecated
 		$response = (new UserTimeline(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'user_id' => 43, // Public contact id
+				'user_id' => 3043, // Public contact id
 				'page'    => -2,
 			]);
 

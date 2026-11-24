@@ -122,7 +122,7 @@ class PreloadPConfigTest extends PConfigTestCase
 
 		// constructor loading
 		$this->configModel->shouldReceive('load')
-						  ->with(42)
+						  ->with(1042)
 						  ->andReturn(['config' => []])
 						  ->once();
 

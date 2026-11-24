@@ -30,7 +30,7 @@ final class ListsTest extends ApiTestCase
 
 		self::assertIsArray($json->users);
 		self::assertSame(1, $json->total_count);
-		self::assertSame(47, $json->users[0]->pid);
+		self::assertSame(3047, $json->users[0]->pid);
 	}
 
 	public function testApiStatusesFollowersWithUndefinedCursor(): void
@@ -46,7 +46,7 @@ final class ListsTest extends ApiTestCase
 
 		self::assertIsArray($json->users);
 		self::assertSame(1, $json->total_count);
-		self::assertSame(47, $json->users[0]->pid);
+		self::assertSame(3047, $json->users[0]->pid);
 	}
 
 	public function testApiStatusesFollowersWithUnallowedUser(): void

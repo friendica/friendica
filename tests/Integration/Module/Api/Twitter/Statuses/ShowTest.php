@@ -36,7 +36,7 @@ final class ShowTest extends ApiTestCase
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/statuses/show'))
-			->withQueryParams(['id' => '1']);
+			->withQueryParams(['id' => '20001']);
 
 		$response = $module->handleRequest($request);
 
@@ -54,7 +54,7 @@ final class ShowTest extends ApiTestCase
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/statuses/show'))
-			->withQueryParams(['id' => '1', 'conversation' => '1']);
+			->withQueryParams(['id' => '20001', 'conversation' => '20001']);
 
 		$response = $module->handleRequest($request);
 

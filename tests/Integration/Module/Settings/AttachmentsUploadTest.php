@@ -23,7 +23,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class AttachmentsUploadTest extends FixtureTestCase
 {
-	private const USER_ID  = 42; // Local user from api.fixture.php.
+	private const USER_ID  = 1042; // Local user from api.fixture.php.
 	private const FILENAME = 'upload-limit-regression.txt';
 
 	private array $originalFiles;

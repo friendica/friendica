@@ -25,7 +25,7 @@ use Psr\Http\Message\ResponseInterface;
 /** Verifies deletion against real media references and database-backed storage. */
 class MediaDeletionTest extends ApiTestCase
 {
-	private const POST_URI_ID       = 1; // Live parent status from api.fixture.php.
+	private const POST_URI_ID       = 20001; // Live parent status from api.fixture.php.
 	private const PHOTO_RESOURCE_ID = '0123456789abcdef0123456789abcdef';
 	private const CONTENT           = 'Media deletion regression fixture';
 
@@ -52,7 +52,7 @@ class MediaDeletionTest extends ApiTestCase
 	#[DataProvider('deletionCases')]
 	public function testDeletionPreservesInUseAndForeignMedia(string $table, bool $owned, bool $inUse, bool $imagePost): void
 	{
-		$uid = $owned ? self::SELF_USER['id'] : self::OTHER_USER['id'];
+		$uid = $owned ? self::SELF_USER['uid'] : self::OTHER_USER['id'];
 		if (!$owned) {
 			self::assertTrue(DI::dba()->insert('user', ['uid' => $uid, 'nickname' => 'media-owner']));
 		}

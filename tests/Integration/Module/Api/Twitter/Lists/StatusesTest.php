@@ -37,7 +37,7 @@ final class StatusesTest extends ApiTestCase
 		Renderer::registerTemplateEngine(\Friendica\Render\FriendicaSmartyEngine::class);
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/lists/statuses'))
-			->withQueryParams(['list_id' => '1', 'page' => '-1', 'max_id' => '10']);
+			->withQueryParams(['list_id' => '701', 'page' => '-1', 'max_id' => '20010']);
 
 		$response = $this->createModule()->handleRequest($request);
 
@@ -61,7 +61,7 @@ final class StatusesTest extends ApiTestCase
 		]);
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/lists/statuses.rss'))
-			->withQueryParams(['list_id' => '1']);
+			->withQueryParams(['list_id' => '701']);
 
 		$response = $module->handleRequest($request);
 

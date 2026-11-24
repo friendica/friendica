@@ -33,7 +33,7 @@ class PermissionSetTest extends FixtureTestCase
 
 	public function testSelectOneByIdPublic(): void
 	{
-		$permissionSet = $this->repository->selectPublicForUser(1);
+		$permissionSet = $this->repository->selectPublicForUser(1001);
 
 		$this->assertInstanceOf(PermissionSet::class, $permissionSet);
 		self::assertEmpty($permissionSet->allow_cid);
@@ -41,7 +41,7 @@ class PermissionSetTest extends FixtureTestCase
 		self::assertEmpty($permissionSet->deny_cid);
 		self::assertEmpty($permissionSet->deny_gid);
 		self::assertSame(PermissionSetRepository::PUBLIC, $permissionSet->id);
-		self::assertEquals(1, $permissionSet->uid);
+		self::assertEquals(1001, $permissionSet->uid);
 	}
 
 	/**
@@ -49,23 +49,23 @@ class PermissionSetTest extends FixtureTestCase
 	 */
 	public function testSaving(): void
 	{
-		$permissionSet = $this->factory->createFromString(42, '', '<~>');
+		$permissionSet = $this->factory->createFromString(1042, '', '<~>');
 
 		$permissionSet = $this->repository->selectOrCreate($permissionSet);
 
 		self::assertNotNull($permissionSet->id);
 
-		$permissionSetSelected = $this->repository->selectOneById($permissionSet->id, 42);
+		$permissionSetSelected = $this->repository->selectOneById($permissionSet->id, 1042);
 
 		self::assertEquals($permissionSet, $permissionSetSelected);
 
-		$newPermissionSet   = $permissionSet->withAllowedContacts(['1', '2']);
+		$newPermissionSet   = $permissionSet->withAllowedContacts(['3001', '3002']);
 		$savedPermissionSet = $this->repository->save($newPermissionSet);
 
 		self::assertNotNull($savedPermissionSet->id);
 		self::assertNull($newPermissionSet->id);
 
-		$permissionSetSavedSelected = $this->repository->selectOneById($savedPermissionSet->id, 42);
+		$permissionSetSavedSelected = $this->repository->selectOneById($savedPermissionSet->id, 1042);
 
 		self::assertEquals($savedPermissionSet, $permissionSetSavedSelected);
 	}
@@ -101,22 +101,22 @@ class PermissionSetTest extends FixtureTestCase
 				'group_member'   => [],
 				'permissionSets' => [
 					[
-						'uid'       => 42,
-						'allow_cid' => '<43>',
+						'uid'       => 1042,
+						'allow_cid' => '<3043>',
 						'allow_gid' => '',
-						'deny_cid'  => '<44>',
+						'deny_cid'  => '<3044>',
 						'deny_gid'  => '',
 					],
 					[
-						'uid'       => 42,
+						'uid'       => 1042,
 						'allow_cid' => '',
 						'allow_gid' => '',
 						'deny_cid'  => '',
 						'deny_gid'  => '',
 					],
 					[
-						'uid'       => 42,
-						'allow_cid' => '<44>',
+						'uid'       => 1042,
+						'allow_cid' => '<3044>',
 						'allow_gid' => '',
 						'deny_cid'  => '',
 						'deny_gid'  => '',
@@ -125,31 +125,31 @@ class PermissionSetTest extends FixtureTestCase
 				'assertions' => [
 					[
 						'input' => [
-							'cid' => 43,
-							'uid' => 42,
+							'cid' => 3043,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, ['43'], [], ['44'], []),
-							new PermissionSet(42, [], [], [], []),
+							new PermissionSet(1042, ['3043'], [], ['3044'], []),
+							new PermissionSet(1042, [], [], [], []),
 						]),
 					],
 					[
 						'input' => [
-							'cid' => 44,
-							'uid' => 42,
+							'cid' => 3044,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], []),
-							new PermissionSet(42, ['44'], [], [], []),
+							new PermissionSet(1042, [], [], [], []),
+							new PermissionSet(1042, ['3044'], [], [], []),
 						]),
 					],
 					[
 						'input' => [
-							'cid' => 47,
-							'uid' => 42,
+							'cid' => 3047,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], []),
+							new PermissionSet(1042, [], [], [], []),
 						]),
 					],
 				],
@@ -158,7 +158,7 @@ class PermissionSetTest extends FixtureTestCase
 				'group_member'   => [],
 				'permissionSets' => [
 					[
-						'uid'       => 42,
+						'uid'       => 1042,
 						'allow_cid' => '',
 						'allow_gid' => '',
 						'deny_cid'  => '',
@@ -168,29 +168,29 @@ class PermissionSetTest extends FixtureTestCase
 				'assertions' => [
 					[
 						'input' => [
-							'cid' => 43,
-							'uid' => 42,
+							'cid' => 3043,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], []),
+							new PermissionSet(1042, [], [], [], []),
 						]),
 					],
 					[
 						'input' => [
-							'cid' => 44,
-							'uid' => 42,
+							'cid' => 3044,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], []),
+							new PermissionSet(1042, [], [], [], []),
 						]),
 					],
 					[
 						'input' => [
-							'cid' => 47,
-							'uid' => 42,
+							'cid' => 3047,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], []),
+							new PermissionSet(1042, [], [], [], []),
 						]),
 					],
 				],
@@ -202,22 +202,22 @@ class PermissionSetTest extends FixtureTestCase
 				'assertions' => [
 					[
 						'input' => [
-							'cid' => 43,
-							'uid' => 42,
+							'cid' => 3043,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets(),
 					],
 					[
 						'input' => [
-							'cid' => 44,
-							'uid' => 42,
+							'cid' => 3044,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets(),
 					],
 					[
 						'input' => [
-							'cid' => 47,
-							'uid' => 42,
+							'cid' => 3047,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets(),
 					],
@@ -226,121 +226,121 @@ class PermissionSetTest extends FixtureTestCase
 			'with_groups' => [
 				'group_member' => [
 					[
-						'id'         => 1,
-						'gid'        => 1,
-						'contact-id' => 47,
+						'id'         => 801,
+						'gid'        => 701,
+						'contact-id' => 3047,
 					],
 					[
-						'id'         => 2,
-						'gid'        => 1,
-						'contact-id' => 42,
+						'id'         => 802,
+						'gid'        => 701,
+						'contact-id' => 3042,
 					],
 					[
-						'id'         => 3,
-						'gid'        => 2,
-						'contact-id' => 43,
+						'id'         => 803,
+						'gid'        => 702,
+						'contact-id' => 3043,
 					],
 				],
 				'permissionSets' => [
 					[
-						'uid'       => 42,
-						'allow_cid' => '<43>',
-						'allow_gid' => '<3>',
-						'deny_cid'  => '<44>,<46>',
+						'uid'       => 1042,
+						'allow_cid' => '<3043>',
+						'allow_gid' => '<703>',
+						'deny_cid'  => '<3044>,<3046>',
 						'deny_gid'  => '',
 					],
 					[
-						'uid'       => 42,
+						'uid'       => 1042,
 						'allow_cid' => '',
 						'allow_gid' => '',
 						'deny_cid'  => '',
-						'deny_gid'  => '<2>',
+						'deny_gid'  => '<702>',
 					],
 					[
-						'uid'       => 42,
-						'allow_cid' => '<44>',
+						'uid'       => 1042,
+						'allow_cid' => '<3044>',
 						'allow_gid' => '',
 						'deny_cid'  => '',
 						'deny_gid'  => '',
 					],
 					[
-						'uid'       => 42,
+						'uid'       => 1042,
 						'allow_cid' => '',
 						'allow_gid' => '',
 						'deny_cid'  => '',
-						'deny_gid'  => '<1>',
+						'deny_gid'  => '<701>',
 					],
 					[
-						'uid'       => 42,
-						'allow_cid' => '<45>',
+						'uid'       => 1042,
+						'allow_cid' => '<3045>',
 						'allow_gid' => '',
 						'deny_cid'  => '',
-						'deny_gid'  => '<1><2>',
+						'deny_gid'  => '<701><702>',
 					],
 				],
 				'assertions' => [
 					[
 						'input' => [
-							'cid' => 42,
-							'uid' => 42,
+							'cid' => 3042,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], ['2']),
+							new PermissionSet(1042, [], [], [], ['702']),
 						]),
 					],
 					[
 						'input' => [
-							'cid' => 43,
-							'uid' => 42,
+							'cid' => 3043,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, ['43'], ['3'], ['44', '46'], []),
-							new PermissionSet(42, [], [], [], ['2']),
-							new PermissionSet(42, [], [], [], ['1']),
+							new PermissionSet(1042, ['3043'], ['703'], ['3044', '3046'], []),
+							new PermissionSet(1042, [], [], [], ['702']),
+							new PermissionSet(1042, [], [], [], ['701']),
 						]),
 					],
 					[
 						'input' => [
-							'cid' => 44,
-							'uid' => 42,
+							'cid' => 3044,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], ['2']),
-							new PermissionSet(42, ['44'], [], [], []),
-							new PermissionSet(42, [], [], [], ['1']),
-							new PermissionSet(42, ['45'], [], [], ['1', '2']),
+							new PermissionSet(1042, [], [], [], ['702']),
+							new PermissionSet(1042, ['3044'], [], [], []),
+							new PermissionSet(1042, [], [], [], ['701']),
+							new PermissionSet(1042, ['3045'], [], [], ['701', '702']),
 						]),
 					],
 					[
 						'input' => [
-							'cid' => 45,
-							'uid' => 42,
+							'cid' => 3045,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], ['2']),
-							new PermissionSet(42, ['44'], [], [], []),
-							new PermissionSet(42, [], [], [], ['1']),
-							new PermissionSet(42, ['45'], [], [], ['1', '2']),
+							new PermissionSet(1042, [], [], [], ['702']),
+							new PermissionSet(1042, ['3044'], [], [], []),
+							new PermissionSet(1042, [], [], [], ['701']),
+							new PermissionSet(1042, ['3045'], [], [], ['701', '702']),
 						]),
 					],
 					[
 						'input' => [
-							'cid' => 46,
-							'uid' => 42,
+							'cid' => 3046,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], ['2']),
-							new PermissionSet(42, [], [], [], ['1']),
+							new PermissionSet(1042, [], [], [], ['702']),
+							new PermissionSet(1042, [], [], [], ['701']),
 						]),
 					],
 					[
 						'input' => [
-							'cid' => 47,
-							'uid' => 42,
+							'cid' => 3047,
+							'uid' => 1042,
 						],
 						'output' => new PermissionSets([
-							new PermissionSet(42, [], [], [], ['2']),
-							new PermissionSet(42, [], [], [], ['1']),
+							new PermissionSet(1042, [], [], [], ['702']),
+							new PermissionSet(1042, [], [], [], ['701']),
 						]),
 					],
 				],
@@ -372,9 +372,9 @@ class PermissionSetTest extends FixtureTestCase
 	public function testSelectOneByIdInvalid(): void
 	{
 		self::expectException(PermissionSetNotFoundException::class);
-		self::expectExceptionMessage('PermissionSet with id -1 for user 42 doesn\'t exist.');
+		self::expectExceptionMessage('PermissionSet with id -1 for user 1042 doesn\'t exist.');
 
-		$this->repository->selectOneById(-1, 42);
+		$this->repository->selectOneById(-1, 1042);
 	}
 
 	#[\PHPUnit\Framework\Attributes\DataProvider('dataSet')]

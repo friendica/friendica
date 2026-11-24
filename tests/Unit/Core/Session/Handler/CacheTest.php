@@ -63,9 +63,9 @@ class CacheTest extends SessionHandlerTestCase
 		$cache->expects(self::once())
 			->method('get')
 			->with(self::CACHE_KEY)
-			->willReturn('authenticated|b:1;uid|i:42;');
+			->willReturn('authenticated|b:1;uid|i:1042;');
 
-		self::assertSame('authenticated|b:1;uid|i:42;', $this->handler($cache)->read(self::SESSION_ID));
+		self::assertSame('authenticated|b:1;uid|i:1042;', $this->handler($cache)->read(self::SESSION_ID));
 	}
 
 	public function testReadReturnsEmptyStringForAnUnknownSession(): void
@@ -94,10 +94,10 @@ class CacheTest extends SessionHandlerTestCase
 		$cache = $this->createMock(ICanCache::class);
 		$cache->expects(self::once())
 			->method('set')
-			->with(self::CACHE_KEY, 'uid|i:42;', AbstractSessionHandler::EXPIRE)
+			->with(self::CACHE_KEY, 'uid|i:1042;', AbstractSessionHandler::EXPIRE)
 			->willReturn(true);
 
-		self::assertTrue($this->handler($cache)->write(self::SESSION_ID, 'uid|i:42;'));
+		self::assertTrue($this->handler($cache)->write(self::SESSION_ID, 'uid|i:1042;'));
 	}
 
 	public function testWriteFailsWhenTheCacheRejectsTheValue(): void
@@ -105,7 +105,7 @@ class CacheTest extends SessionHandlerTestCase
 		$cache = $this->createMock(ICanCache::class);
 		$cache->method('set')->willReturn(false);
 
-		self::assertFalse($this->handler($cache)->write(self::SESSION_ID, 'uid|i:42;'));
+		self::assertFalse($this->handler($cache)->write(self::SESSION_ID, 'uid|i:1042;'));
 	}
 
 	public function testWriteWithEmptyDataDropsTheCachedSession(): void

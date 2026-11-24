@@ -80,8 +80,8 @@ final class UpdateTest extends ApiTestCase
 		self::assertEquals('updated', $json->result);
 		self::assertEquals('album `test_album` with all containing photos has been renamed to `test_album_2`.', $json->message);
 
-		self::assertFalse(DI::dba()->exists('photo', ['uid' => 42, 'album' => 'test_album']));
-		self::assertTrue(DI::dba()->exists('photo', ['uid' => 42, 'album' => 'test_album_2']));
+		self::assertFalse(DI::dba()->exists('photo', ['uid' => 1042, 'album' => 'test_album']));
+		self::assertTrue(DI::dba()->exists('photo', ['uid' => 1042, 'album' => 'test_album_2']));
 	}
 
 	public function testApiPhotoalbumUpdateWithUnallowedUser(): void

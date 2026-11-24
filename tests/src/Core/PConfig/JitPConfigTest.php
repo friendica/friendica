@@ -130,7 +130,7 @@ class JitPConfigTest extends PConfigTestCase
 
 		// mocking one get without result
 		$this->configModel->shouldReceive('get')
-						  ->with(42, 'test', 'it')
+						  ->with(1042, 'test', 'it')
 						  ->andReturn(null)
 						  ->once();
 

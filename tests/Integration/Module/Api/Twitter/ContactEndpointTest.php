@@ -27,42 +27,42 @@ final class ContactEndpointTest extends ApiTestCase
 		], ContactEndpointMock::ids([], 0, -1));
 
 		self::assertSame([
-			'ids'                 => [45],
+			'ids'                 => [3045],
 			'next_cursor'         => 0,
 			'next_cursor_str'     => '0',
 			'previous_cursor'     => 0,
 			'previous_cursor_str' => '0',
 			'total_count'         => 1,
-		], ContactEndpointMock::ids([45], 1, -1));
+		], ContactEndpointMock::ids([3045], 1, -1));
 
 		self::assertSame([
-			'ids'                 => [45, 47],
+			'ids'                 => [3045, 3047],
 			'next_cursor'         => 0,
 			'next_cursor_str'     => '0',
 			'previous_cursor'     => 0,
 			'previous_cursor_str' => '0',
 			'total_count'         => 2,
-		], ContactEndpointMock::ids([45, 47], 2, -1));
+		], ContactEndpointMock::ids([3045, 3047], 2, -1));
 
 		// The count is matched by the caller, a partial page keeps the next cursor
 		self::assertSame([
-			'ids'                 => [45],
-			'next_cursor'         => 45,
-			'next_cursor_str'     => '45',
+			'ids'                 => [3045],
+			'next_cursor'         => 3045,
+			'next_cursor_str'     => '3045',
 			'previous_cursor'     => 0,
 			'previous_cursor_str' => '0',
 			'total_count'         => 2,
-		], ContactEndpointMock::ids([45], 2, -1, 1));
+		], ContactEndpointMock::ids([3045], 2, -1, 1));
 
 		// Empty page after a next-cursor only has a previous cursor
 		self::assertSame([
 			'ids'                 => [],
 			'next_cursor'         => 0,
 			'next_cursor_str'     => '0',
-			'previous_cursor'     => -45,
-			'previous_cursor_str' => '-45',
+			'previous_cursor'     => -3045,
+			'previous_cursor_str' => '-3045',
 			'total_count'         => 2,
-		], ContactEndpointMock::ids([], 2, 45, 1));
+		], ContactEndpointMock::ids([], 2, 3045, 1));
 
 		// Empty page on the first page marks the end of the result set
 		self::assertSame([
@@ -77,9 +77,9 @@ final class ContactEndpointTest extends ApiTestCase
 
 	public function testIdsStringify(): void
 	{
-		$result = ContactEndpointMock::ids([45, 47], 2, -1, ContactEndpoint::DEFAULT_COUNT, true);
+		$result = ContactEndpointMock::ids([3045, 3047], 2, -1, ContactEndpoint::DEFAULT_COUNT, true);
 
-		self::assertSame(['45', '47'], $result['ids']);
+		self::assertSame(['3045', '3047'], $result['ids']);
 
 		foreach ($result['ids'] as $id) {
 			self::assertIsString($id);
@@ -93,25 +93,25 @@ final class ContactEndpointTest extends ApiTestCase
 
 	public function testIdsPagination(): void
 	{
-		$firstPage = ContactEndpointMock::ids([45], 2, -1, 1);
+		$firstPage = ContactEndpointMock::ids([3045], 2, -1, 1);
 
 		self::assertSame([
-			'ids'                 => [45],
-			'next_cursor'         => 45,
-			'next_cursor_str'     => '45',
+			'ids'                 => [3045],
+			'next_cursor'         => 3045,
+			'next_cursor_str'     => '3045',
 			'previous_cursor'     => 0,
 			'previous_cursor_str' => '0',
 			'total_count'         => 2,
 		], $firstPage);
 
-		$secondPage = ContactEndpointMock::ids([47], 2, $firstPage['next_cursor'], 1);
+		$secondPage = ContactEndpointMock::ids([3047], 2, $firstPage['next_cursor'], 1);
 
 		self::assertSame([
-			'ids'                 => [47],
-			'next_cursor'         => 47,
-			'next_cursor_str'     => '47',
-			'previous_cursor'     => -47,
-			'previous_cursor_str' => '-47',
+			'ids'                 => [3047],
+			'next_cursor'         => 3047,
+			'next_cursor_str'     => '3047',
+			'previous_cursor'     => -3047,
+			'previous_cursor_str' => '-3047',
 			'total_count'         => 2,
 		], $secondPage);
 
@@ -122,15 +122,15 @@ final class ContactEndpointTest extends ApiTestCase
 			'ids'                 => [],
 			'next_cursor'         => 0,
 			'next_cursor_str'     => '0',
-			'previous_cursor'     => -47,
-			'previous_cursor_str' => '-47',
+			'previous_cursor'     => -3047,
+			'previous_cursor_str' => '-3047',
 			'total_count'         => 2,
 		], $emptyNextPage);
 	}
 
 	public function testList(): void
 	{
-		$result = ContactEndpointMock::list([45], 1, 42);
+		$result = ContactEndpointMock::list([3045], 1, 1042);
 
 		self::assertArrayHasKey('users', $result);
 		self::assertContainsOnlyInstancesOf(User::class, $result['users']);
@@ -138,14 +138,14 @@ final class ContactEndpointTest extends ApiTestCase
 
 		$user = $result['users'][0]->toArray();
 
-		self::assertSame(45, $user['id']);
-		self::assertSame('45', $user['id_str']);
+		self::assertSame(3045, $user['id']);
+		self::assertSame('3045', $user['id_str']);
 		self::assertSame('Friend contact', $user['name']);
 		self::assertSame('friendcontact', $user['screen_name']);
 		self::assertSame('https://friendica.local/profile/friendcontact', $user['url']);
-		self::assertSame(42, $user['uid']);
-		self::assertSame(44, $user['cid']);
-		self::assertSame(45, $user['pid']);
+		self::assertSame(1042, $user['uid']);
+		self::assertSame(3044, $user['cid']);
+		self::assertSame(3045, $user['pid']);
 		self::assertSame('DFRN', $user['location']);
 		self::assertTrue($user['verified']);
 		self::assertFalse($user['following']);
@@ -156,7 +156,7 @@ final class ContactEndpointTest extends ApiTestCase
 		self::assertSame('0', $result['previous_cursor_str']);
 		self::assertSame(1, $result['total_count']);
 
-		$emptyResult = ContactEndpointMock::list([], 0, 42);
+		$emptyResult = ContactEndpointMock::list([], 0, 1042);
 
 		self::assertSame([], $emptyResult['users']);
 		self::assertSame(-1, $emptyResult['next_cursor']);

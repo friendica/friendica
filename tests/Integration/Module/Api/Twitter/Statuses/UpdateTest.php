@@ -68,7 +68,7 @@ final class UpdateTest extends ApiTestCase
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/statuses/update'))
 			->withParsedBody([
 				'status'                => 'Status content',
-				'in_reply_to_status_id' => 1,
+				'in_reply_to_status_id' => 20001,
 			]);
 
 		$response = $this->createModule()->handleRequest($request);
@@ -101,7 +101,7 @@ final class UpdateTest extends ApiTestCase
 	{
 		DI::config()->set('system', 'throttle_limit_day', 1);
 
-		DBA::update('post-thread-user', ['received' => DateTimeFormat::utcNow()], ['uri-id' => [1, 3], 'uid' => 42]);
+		DBA::update('post-thread-user', ['received' => DateTimeFormat::utcNow()], ['uri-id' => [20001, 20003], 'uid' => 1042]);
 
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/statuses/update'))
 			->withParsedBody(['status' => 'Status content']);

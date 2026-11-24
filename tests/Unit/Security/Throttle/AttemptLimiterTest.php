@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AttemptLimiterTest extends TestCase
 {
-	private const UID          = 42;
+	private const UID          = 1042;
 	private const MAX_FAILURES = 3;
 
 	private ArrayCache $cache;

@@ -27,7 +27,7 @@ class ShowTest extends ApiTestCase
 		$json = $this->toJson($response);
 
 		// We can't use assertSelfUser() here because the user object is missing some properties.
-		self::assertEquals(static::SELF_USER['id'], $json->cid);
+		self::assertEquals(static::SELF_USER['cid'], $json->cid);
 		self::assertEquals('DFRN', $json->location);
 		self::assertEquals(static::SELF_USER['name'], $json->name);
 		self::assertEquals(static::SELF_USER['nick'], $json->screen_name);

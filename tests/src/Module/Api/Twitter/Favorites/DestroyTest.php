@@ -46,7 +46,7 @@ class DestroyTest extends ApiTestCase
 		// @phpstan-ignore method.deprecated
 		$response = (new Destroy(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
-				'id' => 3,
+				'id' => 20003,
 			]);
 
 		$json = $this->toJson($response);

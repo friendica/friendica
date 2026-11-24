@@ -38,7 +38,7 @@ class StatusTest extends FixtureTestCase
 
 	public function testSimpleStatus(): void
 	{
-		$post = Post::selectFirst([], ['id' => 13]);
+		$post = Post::selectFirst([], ['id' => 1513]);
 		$this->assertNotNull($post);
 		$result = $this->status->createFromUriId($post['uri-id']);
 		$this->assertNotNull($result);
@@ -46,7 +46,7 @@ class StatusTest extends FixtureTestCase
 
 	public function testSimpleEmojiStatus(): void
 	{
-		$post = Post::selectFirst([], ['id' => 14]);
+		$post = Post::selectFirst([], ['id' => 1514]);
 		$this->assertNotNull($post);
 		$result = $this->status->createFromUriId($post['uri-id'])->toArray();
 		$this->assertEquals(':like: :friendica: no <code>:dislike</code> :p: :embarrassed: 🤗 ❤ :smileyheart333: 🔥', $result['content']);

@@ -22,8 +22,9 @@ class UserTest extends FixtureTestCase
 	 */
 	protected function assertSelfUser(array $user)
 	{
-		self::assertEquals(ApiTestCase::SELF_USER['id'], $user['uid']);
-		self::assertEquals(ApiTestCase::SELF_USER['id'], $user['cid']);
+		self::assertEquals(ApiTestCase::SELF_USER['id'], $user['id']);
+		self::assertEquals(ApiTestCase::SELF_USER['uid'], $user['uid']);
+		self::assertEquals(ApiTestCase::SELF_USER['cid'], $user['cid']);
 		self::assertEquals('DFRN', $user['location']);
 		self::assertEquals(ApiTestCase::SELF_USER['name'], $user['name']);
 		self::assertEquals(ApiTestCase::SELF_USER['nick'], $user['screen_name']);
@@ -38,7 +39,7 @@ class UserTest extends FixtureTestCase
 	public function testApiGetUser(): void
 	{
 		$user = (new User(DI::logger(), DI::twitterStatus()))
-			->createFromUserId(ApiTestCase::SELF_USER['id'])
+			->createFromUserId(ApiTestCase::SELF_USER['uid'])
 			->toArray();
 
 		$this->assertSelfUser($user);
@@ -53,10 +54,10 @@ class UserTest extends FixtureTestCase
 		$this->markTestIncomplete('Needs missing fields for profile colors at API User object first.');
 
 		/*
-		DI::pConfig()->set(ApiTestCase::SELF_USER['id'], 'frio', 'schema', 'red');
+		DI::pConfig()->set(ApiTestCase::SELF_USER['uid'], 'frio', 'schema', 'red');
 
 		$userFactory = new User(DI::logger(), DI::twitterStatus());
-		$user        = $userFactory->createFromUserId(42);
+		$user        = $userFactory->createFromUserId(ApiTestCase::SELF_USER['uid']);
 
 		$this->assertSelfUser($user->toArray());
 		self::assertEquals('708fa0', $user['profile_sidebar_fill_color']);
@@ -74,10 +75,10 @@ class UserTest extends FixtureTestCase
 		$this->markTestIncomplete('Needs missing fields for profile colors at API User object first.');
 
 		/*
-		DI::pConfig()->set(ApiTestCase::SELF_USER['id'], 'frio', 'schema', '---');
+		DI::pConfig()->set(ApiTestCase::SELF_USER['uid'], 'frio', 'schema', '---');
 
 		$userFactory = new User(DI::logger(), DI::twitterStatus());
-		$user        = $userFactory->createFromUserId(42);
+		$user        = $userFactory->createFromUserId(ApiTestCase::SELF_USER['uid']);
 
 		$this->assertSelfUser($user->toArray());
 		self::assertEquals('708fa0', $user['profile_sidebar_fill_color']);
@@ -95,13 +96,13 @@ class UserTest extends FixtureTestCase
 		$this->markTestIncomplete('Needs missing fields for profile colors at API User object first.');
 
 		/*
-		DI::pConfig()->set(ApiTestCase::SELF_USER['id'], 'frio', 'schema', '---');
-		DI::pConfig()->set(ApiTestCase::SELF_USER['id'], 'frio', 'nav_bg', '#123456');
-		DI::pConfig()->set(ApiTestCase::SELF_USER['id'], 'frio', 'link_color', '#123456');
-		DI::pConfig()->set(ApiTestCase::SELF_USER['id'], 'frio', 'background_color', '#123456');
+		DI::pConfig()->set(ApiTestCase::SELF_USER['uid'], 'frio', 'schema', '---');
+		DI::pConfig()->set(ApiTestCase::SELF_USER['uid'], 'frio', 'nav_bg', '#123456');
+		DI::pConfig()->set(ApiTestCase::SELF_USER['uid'], 'frio', 'link_color', '#123456');
+		DI::pConfig()->set(ApiTestCase::SELF_USER['uid'], 'frio', 'background_color', '#123456');
 
 		$userFactory = new User(DI::logger(), DI::twitterStatus());
-		$user        = $userFactory->createFromUserId(42);
+		$user        = $userFactory->createFromUserId(ApiTestCase::SELF_USER['uid']);
 
 		$this->assertSelfUser($user->toArray());
 		self::assertEquals('123456', $user['profile_sidebar_fill_color']);

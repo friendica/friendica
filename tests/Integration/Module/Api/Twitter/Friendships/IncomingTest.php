@@ -21,8 +21,8 @@ final class IncomingTest extends ApiTestCase
 	public function testApiFriendshipsIncoming(): void
 	{
 		DI::dba()->insert('intro', [
-			'uid'        => 42,
-			'contact-id' => 43,
+			'uid'        => 1042,
+			'contact-id' => 3043,
 		]);
 
 		$request = new ServerRequest('GET', 'https://friendica.local/api/friendships/incoming');
@@ -34,15 +34,15 @@ final class IncomingTest extends ApiTestCase
 		$json = $this->toJson($response);
 
 		self::assertIsArray($json->ids);
-		self::assertSame([43], $json->ids);
+		self::assertSame([3043], $json->ids);
 		self::assertSame(1, $json->total_count);
 	}
 
 	public function testApiFriendshipsIncomingWithUndefinedCursor(): void
 	{
 		DI::dba()->insert('intro', [
-			'uid'        => 42,
-			'contact-id' => 43,
+			'uid'        => 1042,
+			'contact-id' => 3043,
 		]);
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/friendships/incoming'))
@@ -55,7 +55,7 @@ final class IncomingTest extends ApiTestCase
 		$json = $this->toJson($response);
 
 		self::assertIsArray($json->ids);
-		self::assertSame([43], $json->ids);
+		self::assertSame([3043], $json->ids);
 		self::assertSame(1, $json->total_count);
 	}
 

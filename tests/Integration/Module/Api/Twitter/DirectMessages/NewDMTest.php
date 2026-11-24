@@ -44,7 +44,7 @@ final class NewDMTest extends ApiTestCase
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/direct_messages/new'))
 			->withParsedBody([
 				'text'    => 'message_text',
-				'user_id' => 43,
+				'user_id' => 3043,
 			]);
 
 		$response = $this->createModule()->handleRequest($request);
@@ -63,7 +63,7 @@ final class NewDMTest extends ApiTestCase
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/direct_messages/new'))
 			->withParsedBody([
 				'text'    => 'message_text',
-				'user_id' => 44,
+				'user_id' => 3044,
 			]);
 
 		$response = $this->createModule()->handleRequest($request);
@@ -84,7 +84,7 @@ final class NewDMTest extends ApiTestCase
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/direct_messages/new'))
 			->withParsedBody([
 				'text'    => 'message_text',
-				'user_id' => 44,
+				'user_id' => 3044,
 				'title'   => 'message_title',
 			]);
 
@@ -107,7 +107,7 @@ final class NewDMTest extends ApiTestCase
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/direct_messages/new'))
 			->withParsedBody([
 				'text'    => 'message_text',
-				'user_id' => 44,
+				'user_id' => 3044,
 				'title'   => 'message_title',
 			]);
 
@@ -126,12 +126,12 @@ final class NewDMTest extends ApiTestCase
 	public function testApiDirectMessagesNewWithReplyTo(): void
 	{
 		DI::dba()->insert('mail', [
-			'uid'           => 42,
-			'author-id'     => 48,
-			'contact-id'    => 44,
-			'uri-id'        => 44,
-			'parent-uri-id' => 44,
-			'thr-parent-id' => 44,
+			'uid'           => 1042,
+			'author-id'     => 3048,
+			'contact-id'    => 3044,
+			'uri-id'        => 20044,
+			'parent-uri-id' => 20044,
+			'thr-parent-id' => 20044,
 			'guid'          => '123456',
 			'from-name'     => 'Tester',
 			'title'         => 'item_title',
@@ -144,7 +144,7 @@ final class NewDMTest extends ApiTestCase
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/direct_messages/new'))
 			->withParsedBody([
 				'text'    => 'message_text',
-				'user_id' => 44,
+				'user_id' => 3044,
 				'replyto' => $parentMailId,
 			]);
 
@@ -166,7 +166,7 @@ final class NewDMTest extends ApiTestCase
 		$request = (new ServerRequest('POST', 'https://friendica.local/api/direct_messages/new'))
 			->withParsedBody([
 				'text'    => 'message_text',
-				'user_id' => 44,
+				'user_id' => 3044,
 			]);
 
 		$module = $this->createModule();

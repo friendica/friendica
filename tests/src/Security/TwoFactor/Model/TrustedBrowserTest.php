@@ -20,14 +20,14 @@ class TrustedBrowserTest extends MockedTestCase
 
 		$trustedBrowser = new TrustedBrowser(
 			$hash,
-			42,
+			1042,
 			'PHPUnit',
 			true,
 			DateTimeFormat::utcNow(),
 		);
 
 		$this->assertEquals($hash, $trustedBrowser->cookie_hash);
-		$this->assertEquals(42, $trustedBrowser->uid);
+		$this->assertEquals(1042, $trustedBrowser->uid);
 		$this->assertEquals('PHPUnit', $trustedBrowser->user_agent);
 		$this->assertTrue($trustedBrowser->trusted);
 		$this->assertNotEmpty($trustedBrowser->created);
@@ -40,7 +40,7 @@ class TrustedBrowserTest extends MockedTestCase
 
 		$trustedBrowser = new TrustedBrowser(
 			$hash,
-			42,
+			1042,
 			'PHPUnit',
 			true,
 			$past,

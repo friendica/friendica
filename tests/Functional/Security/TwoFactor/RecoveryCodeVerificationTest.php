@@ -23,7 +23,7 @@ use PragmaRX\Google2FA\Google2FA;
 
 final class RecoveryCodeVerificationTest extends FixtureTestCase
 {
-	private const UID  = 42;
+	private const UID  = 1042;
 	private const CODE = 'abcdef-123456';
 
 	private CodeVerifier $verifier;

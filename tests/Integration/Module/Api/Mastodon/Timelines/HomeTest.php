@@ -23,7 +23,7 @@ final class HomeTest extends ApiTestCase
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/v1/timelines/home'))
-			->withQueryParams(['max_id' => '10', 'exclude_replies' => 'true']);
+			->withQueryParams(['max_id' => '20010', 'exclude_replies' => 'true']);
 
 		try {
 			$module->handleRequest($request);
@@ -32,7 +32,7 @@ final class HomeTest extends ApiTestCase
 			$statuses = $this->toJson($e->getResponse());
 
 			self::assertCount(3, $statuses);
-			self::assertEquals(['6', '3', '1'], array_column($statuses, 'id'));
+			self::assertEquals(['20006', '20003', '20001'], array_column($statuses, 'id'));
 		}
 	}
 
@@ -41,7 +41,7 @@ final class HomeTest extends ApiTestCase
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/v1/timelines/home'))
-			->withQueryParams(['min_id' => '1']);
+			->withQueryParams(['min_id' => '20001']);
 
 		try {
 			$module->handleRequest($request);
@@ -50,7 +50,7 @@ final class HomeTest extends ApiTestCase
 			$statuses = $this->toJson($e->getResponse());
 
 			self::assertCount(2, $statuses);
-			self::assertEquals(['6', '3'], array_column($statuses, 'id'));
+			self::assertEquals(['20006', '20003'], array_column($statuses, 'id'));
 		}
 	}
 
@@ -84,7 +84,7 @@ final class HomeTest extends ApiTestCase
 			$statuses = $this->toJson($e->getResponse());
 
 			self::assertCount(6, $statuses);
-			self::assertEquals(['6', '5', '4', '3', '2', '1'], array_column($statuses, 'id'));
+			self::assertEquals(['20006', '20005', '20004', '20003', '20002', '20001'], array_column($statuses, 'id'));
 		}
 	}
 

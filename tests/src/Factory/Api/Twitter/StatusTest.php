@@ -48,7 +48,7 @@ class StatusTest extends FixtureTestCase
 	public function testApiConvertItem(): void
 	{
 		$status = $this->statusFactory
-			->createFromItemId(13, ApiTestCase::SELF_USER['id'])
+			->createFromItemId(1513, ApiTestCase::SELF_USER['uid'])
 			->toArray();
 
 		self::assertStringStartsWith('item_title', $status['text']);
@@ -91,7 +91,7 @@ class StatusTest extends FixtureTestCase
 			[
 				'title'  => 'item_title',
 				'body'   => 'item_title item_body',
-				'uri-id' => 1,
+				'uri-id' => 20001,
 			]
 		);
 		self::assertEquals('item_title item_body', $result['text']);
@@ -107,7 +107,7 @@ class StatusTest extends FixtureTestCase
 	public function testApiGetEntitiesWithIncludeEntities(): void
 	{
 		$status = $this->statusFactory
-			->createFromItemId(13, ApiTestCase::SELF_USER['id'], true)
+			->createFromItemId(1513, ApiTestCase::SELF_USER['uid'], true)
 			->toArray();
 
 		self::assertIsArray($status['entities']);
@@ -129,7 +129,7 @@ class StatusTest extends FixtureTestCase
 		$posts = DI::dba()->selectToArray('post-view', ['uri-id']);
 		foreach ($posts as $item) {
 			$status = $this->statusFactory
-				->createFromUriId($item['uri-id'], ApiTestCase::SELF_USER['id'])
+				->createFromUriId($item['uri-id'], ApiTestCase::SELF_USER['uid'])
 				->toArray();
 
 			self::assertIsInt($status['id']);

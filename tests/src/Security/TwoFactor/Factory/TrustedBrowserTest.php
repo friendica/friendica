@@ -21,7 +21,7 @@ class TrustedBrowserTest extends MockedTestCase
 
 		$row = [
 			'cookie_hash' => Strings::getRandomHex(),
-			'uid'         => 42,
+			'uid'         => 1042,
 			'user_agent'  => 'PHPUnit',
 			'created'     => DateTimeFormat::utcNow(),
 			'trusted'     => true,
@@ -57,7 +57,7 @@ class TrustedBrowserTest extends MockedTestCase
 	{
 		$factory = new TrustedBrowser(new NullLogger());
 
-		$uid       = 42;
+		$uid       = 1042;
 		$userAgent = 'PHPUnit';
 
 		$trustedBrowser = $factory->createForUserWithUserAgent($uid, $userAgent, true);

@@ -29,7 +29,7 @@ class FavoritesTest extends ApiTestCase
 		$response = (new Favorites(DI::mstdnError(), DI::appHelper(), DI::l10n(), DI::baseUrl(), DI::args(), DI::logger(), DI::profiler(), DI::apiResponse(), []))
 			->run($this->httpExceptionMock, [
 				'page'   => -1,
-				'max_id' => 10,
+				'max_id' => 20010,
 			]);
 
 		$json = $this->toJson($response);

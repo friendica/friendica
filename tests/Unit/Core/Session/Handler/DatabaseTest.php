@@ -95,9 +95,9 @@ class DatabaseTest extends SessionHandlerTestCase
 		$dba->expects(self::once())
 			->method('selectFirst')
 			->with('session', ['data'], ['sid' => self::SESSION_ID])
-			->willReturn(['data' => 'authenticated|b:1;uid|i:42;']);
+			->willReturn(['data' => 'authenticated|b:1;uid|i:1042;']);
 
-		self::assertSame('authenticated|b:1;uid|i:42;', $this->handler($dba)->read(self::SESSION_ID));
+		self::assertSame('authenticated|b:1;uid|i:1042;', $this->handler($dba)->read(self::SESSION_ID));
 	}
 
 	public function testReadReturnsEmptyStringForAnUnknownSession(): void
@@ -132,12 +132,12 @@ class DatabaseTest extends SessionHandlerTestCase
 		$dba   = $this->createDatabaseMock();
 		$this->recordWrites($dba, $calls);
 
-		self::assertTrue($this->handler($dba)->write(self::SESSION_ID, 'uid|i:42;'));
+		self::assertTrue($this->handler($dba)->write(self::SESSION_ID, 'uid|i:1042;'));
 
 		self::assertSame(['insert'], array_column($calls, 'method'));
 		self::assertSame('session', $calls[0]['table']);
 		self::assertSame(self::SESSION_ID, $calls[0]['fields']['sid']);
-		self::assertSame('uid|i:42;', $calls[0]['fields']['data']);
+		self::assertSame('uid|i:1042;', $calls[0]['fields']['data']);
 		self::assertEqualsWithDelta(time() + 300, $calls[0]['fields']['expire'], 2);
 	}
 
@@ -145,23 +145,23 @@ class DatabaseTest extends SessionHandlerTestCase
 	{
 		$calls = [];
 		$dba   = $this->createDatabaseMock();
-		$dba->method('selectFirst')->willReturn(['data' => 'uid|i:42;']);
+		$dba->method('selectFirst')->willReturn(['data' => 'uid|i:1042;']);
 		$this->recordWrites($dba, $calls);
 
 		$handler = $this->handler($dba);
 		$handler->read(self::SESSION_ID);
 
-		self::assertTrue($handler->write(self::SESSION_ID, 'uid|i:42;authenticated|b:1;'));
+		self::assertTrue($handler->write(self::SESSION_ID, 'uid|i:1042;authenticated|b:1;'));
 
 		self::assertSame(['update'], array_column($calls, 'method'));
 		self::assertSame('session', $calls[0]['table']);
-		self::assertSame('uid|i:42;authenticated|b:1;', $calls[0]['fields']['data']);
+		self::assertSame('uid|i:1042;authenticated|b:1;', $calls[0]['fields']['data']);
 		self::assertEqualsWithDelta(time() + AbstractSessionHandler::EXPIRE, $calls[0]['fields']['expire'], 2);
 
 		// The row is only touched when data or expiry actually changed
 		self::assertSame('`sid` = ? AND (`data` != ? OR `expire` != ?)', $calls[0]['condition'][0]);
 		self::assertSame(self::SESSION_ID, $calls[0]['condition'][1]);
-		self::assertSame('uid|i:42;authenticated|b:1;', $calls[0]['condition'][2]);
+		self::assertSame('uid|i:1042;authenticated|b:1;', $calls[0]['condition'][2]);
 	}
 
 	/**
@@ -171,14 +171,14 @@ class DatabaseTest extends SessionHandlerTestCase
 	{
 		$calls = [];
 		$dba   = $this->createDatabaseMock();
-		$dba->method('selectFirst')->willReturnOnConsecutiveCalls(['data' => 'uid|i:42;'], false);
+		$dba->method('selectFirst')->willReturnOnConsecutiveCalls(['data' => 'uid|i:1042;'], false);
 		$this->recordWrites($dba, $calls);
 
 		$handler = $this->handler($dba);
 		$handler->read(self::SESSION_ID);
 		$handler->read(self::SESSION_ID);
 
-		self::assertTrue($handler->write(self::SESSION_ID, 'uid|i:42;'));
+		self::assertTrue($handler->write(self::SESSION_ID, 'uid|i:1042;'));
 
 		self::assertSame(['insert'], array_column($calls, 'method'));
 	}

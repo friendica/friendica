@@ -11,7 +11,6 @@ namespace Friendica\Test\Integration\Module\Api\Mastodon\Timelines;
 
 use Friendica\Core\EarlyExitException;
 use Friendica\DI;
-use Friendica\Model\Item;
 use Friendica\Module\Api\Mastodon\Timelines\PublicTimeline;
 use Friendica\Test\ApiTestCase;
 use Friendica\Test\Util\AuthTestConfig;
@@ -32,7 +31,7 @@ final class PublicTimelineTest extends ApiTestCase
 			$statuses = $this->toJson($e->getResponse());
 
 			self::assertCount(4, $statuses);
-			self::assertEquals(['7', '6', '3', '1'], array_column($statuses, 'id'));
+			self::assertEquals(['20007', '20006', '20003', '20001'], array_column($statuses, 'id'));
 		}
 	}
 
@@ -50,7 +49,7 @@ final class PublicTimelineTest extends ApiTestCase
 			$statuses = $this->toJson($e->getResponse());
 
 			self::assertCount(8, $statuses);
-			self::assertEquals(['100', '7', '6', '5', '4', '3', '2', '1'], array_column($statuses, 'id'));
+			self::assertEquals(['20100', '20007', '20006', '20005', '20004', '20003', '20002', '20001'], array_column($statuses, 'id'));
 		}
 	}
 
@@ -59,7 +58,7 @@ final class PublicTimelineTest extends ApiTestCase
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/v1/timelines/public'))
-			->withQueryParams(['max_id' => '7']);
+			->withQueryParams(['max_id' => '20007']);
 
 		try {
 			$module->handleRequest($request);
@@ -68,7 +67,7 @@ final class PublicTimelineTest extends ApiTestCase
 			$statuses = $this->toJson($e->getResponse());
 
 			self::assertCount(3, $statuses);
-			self::assertEquals(['6', '3', '1'], array_column($statuses, 'id'));
+			self::assertEquals(['20006', '20003', '20001'], array_column($statuses, 'id'));
 		}
 	}
 
@@ -86,26 +85,12 @@ final class PublicTimelineTest extends ApiTestCase
 			$statuses = $this->toJson($e->getResponse());
 
 			self::assertCount(2, $statuses);
-			self::assertEquals(['7', '6'], array_column($statuses, 'id'));
+			self::assertEquals(['20007', '20006'], array_column($statuses, 'id'));
 		}
 	}
 
 	public function testApiStatusesPublicTimelineWithLocal(): void
 	{
-		DI::dba()->insert('post-origin', [
-			'id'            => 6,
-			'uri-id'        => 6,
-			'uid'           => 42,
-			'parent-uri-id' => 6,
-			'thr-parent-id' => 6,
-			'created'       => '2020-01-01 12:00:00',
-			'received'      => '2020-01-01 12:00:00',
-			'gravity'       => Item::GRAVITY_PARENT,
-			'vid'           => 8,
-			'private'       => Item::PUBLIC,
-			'wall'          => 1,
-		]);
-
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/v1/timelines/public'))
@@ -117,8 +102,10 @@ final class PublicTimelineTest extends ApiTestCase
 		} catch (EarlyExitException $e) { // @phpstan-ignore catch.neverThrown
 			$statuses = $this->toJson($e->getResponse());
 
-			self::assertCount(1, $statuses);
-			self::assertEquals('6', $statuses[0]->id);
+			self::assertCount(3, $statuses);
+			self::assertEquals('20006', $statuses[0]->id);
+			self::assertEquals('20003', $statuses[1]->id);
+			self::assertEquals('20001', $statuses[2]->id);
 		}
 	}
 

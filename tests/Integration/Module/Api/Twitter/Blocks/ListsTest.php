@@ -21,13 +21,13 @@ final class ListsTest extends ApiTestCase
 	public function testApiStatusesFWithBlocks(): void
 	{
 		DI::dba()->insert('user-contact', [
-			'uid'     => 42,
-			'cid'     => 45,
+			'uid'     => 1042,
+			'cid'     => 3045,
 			'blocked' => true,
 		]);
 		DI::dba()->insert('user-contact', [
-			'uid'     => 42,
-			'cid'     => 47,
+			'uid'     => 1042,
+			'cid'     => 3047,
 			'blocked' => true,
 		]);
 
@@ -41,7 +41,7 @@ final class ListsTest extends ApiTestCase
 
 		self::assertIsArray($json->users);
 		self::assertSame(2, $json->total_count);
-		self::assertSame([47, 45], array_map(static function ($user) {
+		self::assertSame([3047, 3045], array_map(static function ($user) {
 			return $user->pid;
 		}, $json->users));
 	}
@@ -49,13 +49,13 @@ final class ListsTest extends ApiTestCase
 	public function testApiBlocksListWithUndefinedCursor(): void
 	{
 		DI::dba()->insert('user-contact', [
-			'uid'     => 42,
-			'cid'     => 45,
+			'uid'     => 1042,
+			'cid'     => 3045,
 			'blocked' => true,
 		]);
 		DI::dba()->insert('user-contact', [
-			'uid'     => 42,
-			'cid'     => 47,
+			'uid'     => 1042,
+			'cid'     => 3047,
 			'blocked' => true,
 		]);
 
@@ -70,7 +70,7 @@ final class ListsTest extends ApiTestCase
 
 		self::assertIsArray($json->users);
 		self::assertSame(2, $json->total_count);
-		self::assertSame([47, 45], array_map(static function ($user) {
+		self::assertSame([3047, 3045], array_map(static function ($user) {
 			return $user->pid;
 		}, $json->users));
 	}

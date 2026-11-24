@@ -26,11 +26,11 @@ class ItemTest extends FixtureTestCase
 	public function testPrepareBodyProvidesAllTagLists(): void
 	{
 		DBA::insert('tag', ['name' => 'friendica', 'url' => '']);
-		DBA::insert('post-tag', ['uri-id' => 1, 'type' => Tag::HASHTAG, 'tid' => DBA::lastInsertId()]);
+		DBA::insert('post-tag', ['uri-id' => 20001, 'type' => Tag::HASHTAG, 'tid' => DBA::lastInsertId()]);
 		DBA::insert('tag', ['name' => 'bob', 'url' => 'https://remote.example/profile/bob']);
-		DBA::insert('post-tag', ['uri-id' => 1, 'type' => Tag::IMPLICIT_MENTION, 'tid' => DBA::lastInsertId()]);
+		DBA::insert('post-tag', ['uri-id' => 20001, 'type' => Tag::IMPLICIT_MENTION, 'tid' => DBA::lastInsertId()]);
 
-		$item = Post::selectFirst([], ['uri-id' => 1, 'uid' => 42]);
+		$item = Post::selectFirst([], ['uri-id' => 20001, 'uid' => 1042]);
 		Item::prepareBody($item, true);
 
 		$expected = Tag::populateFromItem($item);

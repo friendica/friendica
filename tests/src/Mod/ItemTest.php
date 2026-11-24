@@ -39,7 +39,7 @@ class ItemTest extends ApiTestCase
 		parent::setUp();
 
 		DI::session()->set('authenticated', true);
-		DI::session()->set('uid', 42);
+		DI::session()->set('uid', 1042);
 
 		DBA::update('apcontact', ['updated' => DateTimeFormat::utcNow()], ['url' => 'https://friendica.local/profile/selfcontact']);
 	}
@@ -50,7 +50,7 @@ class ItemTest extends ApiTestCase
 	}
 
 	/**
-	 * Whether the logged in user (uid 42) can still see the given `post-user` row.
+	 * Whether the logged in user (uid 1042) can still see the given `post-user` row.
 	 *
 	 * Deletion in Friendica only sets a flag, so "gone" means "no longer returned by the user facing
 	 * query" - Post::selectFirstForUser() adds the `NOT deleted` condition (Post::exists() doesn't) and
@@ -58,7 +58,7 @@ class ItemTest extends ApiTestCase
 	 */
 	private function isVisibleForUser(int $id): bool
 	{
-		return DBA::isResult(Post::selectFirstForUser(42, ['id'], ['id' => $id]));
+		return DBA::isResult(Post::selectFirstForUser(1042, ['id'], ['id' => $id]));
 	}
 
 	private function setActionToken(): void
@@ -114,7 +114,7 @@ class ItemTest extends ApiTestCase
 			$_REQUEST = [];
 		}
 
-		$stored = Post::selectFirst(['id'], ['uid' => 42, 'body' => 'This must never be stored']);
+		$stored = Post::selectFirst(['id'], ['uid' => 1042, 'body' => 'This must never be stored']);
 		self::assertFalse(DBA::isResult($stored));
 	}
 
@@ -134,7 +134,7 @@ class ItemTest extends ApiTestCase
 			$_REQUEST = [];
 		}
 
-		$stored = Post::selectFirst(['gravity'], ['uid' => 42, 'body' => 'Posted via item_post() dispatch']);
+		$stored = Post::selectFirst(['gravity'], ['uid' => 1042, 'body' => 'Posted via item_post() dispatch']);
 		self::assertTrue(DBA::isResult($stored));
 		self::assertEquals(Item::GRAVITY_PARENT, $stored['gravity']);
 	}
@@ -144,7 +144,7 @@ class ItemTest extends ApiTestCase
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
-		$_REQUEST = ['post_id' => 1, 'body' => 'Edited via item_post() dispatch', 'return' => 'network'];
+		$_REQUEST = ['post_id' => 1501, 'body' => 'Edited via item_post() dispatch', 'return' => 'network'];
 
 		try {
 			item_post();
@@ -155,7 +155,7 @@ class ItemTest extends ApiTestCase
 			$_REQUEST = [];
 		}
 
-		$post = Post::selectFirst(['body'], ['id' => 1]);
+		$post = Post::selectFirst(['body'], ['id' => 1501]);
 		self::assertSame('Edited via item_post() dispatch', $post['body']);
 	}
 
@@ -177,7 +177,7 @@ class ItemTest extends ApiTestCase
 			$_REQUEST = [];
 		}
 
-		self::assertTrue(DBA::isResult(Post::selectFirst(['id'], ['uid' => 42, 'body' => 'Posted via compose'])));
+		self::assertTrue(DBA::isResult(Post::selectFirst(['id'], ['uid' => 1042, 'body' => 'Posted via compose'])));
 	}
 
 	public function testItemPostDropitemsDelegationIsNotAutomaticallyTestable(): void
@@ -194,7 +194,7 @@ class ItemTest extends ApiTestCase
 	{
 		$this->expectException(HTTPException\NotFoundException::class);
 
-		item_edit(42, ['post_id' => 999999], false, '');
+		item_edit(1042, ['post_id' => 999999], false, '');
 	}
 
 	public function testItemEditPostNotFoundWithReturnPathRedirectsAndAddsNotice(): void
@@ -203,7 +203,7 @@ class ItemTest extends ApiTestCase
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
 		try {
-			item_edit(42, ['post_id' => 999999], false, 'network');
+			item_edit(1042, ['post_id' => 999999], false, 'network');
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
@@ -218,19 +218,19 @@ class ItemTest extends ApiTestCase
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
 		$request = [
-			'post_id' => 1,
+			'post_id' => 1501,
 			'body'    => 'Edited body content',
 			'title'   => 'Edited title',
 		];
 
 		try {
-			item_edit(42, $request, false, 'network');
+			item_edit(1042, $request, false, 'network');
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
 		}
 
-		$post = Post::selectFirst(['body', 'title'], ['id' => 1]);
+		$post = Post::selectFirst(['body', 'title'], ['id' => 1501]);
 		self::assertSame('Edited body content', $post['body']);
 		self::assertSame('Edited title', $post['title']);
 	}
@@ -239,14 +239,14 @@ class ItemTest extends ApiTestCase
 	{
 		$this->expectException(HTTPException\OKException::class);
 
-		item_edit(42, ['post_id' => 1, 'body' => 'Another edit'], false, '');
+		item_edit(1042, ['post_id' => 1501, 'body' => 'Another edit'], false, '');
 	}
 
 	public function testItemInsertCommentOnMissingParentWithoutReturnPathThrowsNotFound(): void
 	{
 		$this->expectException(HTTPException\NotFoundException::class);
 
-		item_insert(42, ['parent' => 999999, 'body' => 'a comment'], false, '');
+		item_insert(1042, ['parent' => 999999, 'body' => 'a comment'], false, '');
 	}
 
 	public function testItemInsertCommentOnMissingParentWithReturnPathRedirects(): void
@@ -255,7 +255,7 @@ class ItemTest extends ApiTestCase
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
 		try {
-			item_insert(42, ['parent' => 999999, 'body' => 'a comment'], false, 'network');
+			item_insert(1042, ['parent' => 999999, 'body' => 'a comment'], false, 'network');
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
@@ -270,14 +270,14 @@ class ItemTest extends ApiTestCase
 		$header->expects(self::once())->with(self::stringStartsWith('Location: https://friendica.local/network'));
 
 		try {
-			item_insert(42, ['body' => 'A brand new top level post', 'return' => 'network'], false, 'network');
+			item_insert(1042, ['body' => 'A brand new top level post', 'return' => 'network'], false, 'network');
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
 		}
 
 		$stored = Post::selectFirst(['id', 'body', 'uid', 'gravity', 'parent'], [
-			'uid'  => 42,
+			'uid'  => 1042,
 			'body' => 'A brand new top level post',
 		]);
 		self::assertTrue(DBA::isResult($stored));
@@ -295,16 +295,16 @@ class ItemTest extends ApiTestCase
 		$header->expects(self::once());
 
 		try {
-			item_insert(42, ['parent' => 3, 'body' => 'A reply to post 3'], false, 'network');
+			item_insert(1042, ['parent' => 1503, 'body' => 'A reply to post 3'], false, 'network');
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
 		}
 
-		$parent = Post::selectFirst(['id'], ['id' => 3]);
+		$parent = Post::selectFirst(['id'], ['id' => 1503]);
 
 		$stored = Post::selectFirst(['body', 'gravity', 'parent'], [
-			'uid'  => 42,
+			'uid'  => 1042,
 			'body' => 'A reply to post 3',
 		]);
 		self::assertTrue(DBA::isResult($stored));
@@ -324,16 +324,16 @@ class ItemTest extends ApiTestCase
 		];
 
 		try {
-			item_insert(42, $request, false, 'network');
+			item_insert(1042, $request, false, 'network');
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
 		}
 
-		$stored = Post::selectFirst(['id'], ['uid' => 42, 'body' => 'A post scheduled for the future']);
+		$stored = Post::selectFirst(['id'], ['uid' => 1042, 'body' => 'A post scheduled for the future']);
 		self::assertFalse(DBA::isResult($stored), 'The post must not be inserted immediately when scheduled for the future.');
 
-		$delayed = DBA::selectFirst('delayed-post', ['uid'], ['uid' => 42]);
+		$delayed = DBA::selectFirst('delayed-post', ['uid'], ['uid' => 1042]);
 		self::assertTrue(DBA::isResult($delayed), 'A delayed-post row must be queued instead.');
 	}
 
@@ -343,13 +343,13 @@ class ItemTest extends ApiTestCase
 		$header->expects(self::once());
 
 		try {
-			item_insert(42, ['parent' => 7, 'body' => 'A reply to the public copy'], false, 'network');
+			item_insert(1042, ['parent' => 1507, 'body' => 'A reply to the public copy'], false, 'network');
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
 		}
 
-		$stored = Post::selectFirst(['gravity', 'parent'], ['uid' => 42, 'body' => 'A reply to the public copy']);
+		$stored = Post::selectFirst(['gravity', 'parent'], ['uid' => 1042, 'body' => 'A reply to the public copy']);
 		self::assertTrue(DBA::isResult($stored));
 		self::assertEquals(Item::GRAVITY_COMMENT, $stored['gravity']);
 	}
@@ -358,7 +358,7 @@ class ItemTest extends ApiTestCase
 	{
 		$this->expectException(HTTPException\BadRequestException::class);
 
-		item_process(['uid' => 42, 'gravity' => Item::GRAVITY_PARENT, 'network' => Protocol::DFRN], ['body' => ''], false, '');
+		item_process(['uid' => 1042, 'gravity' => Item::GRAVITY_PARENT, 'network' => Protocol::DFRN], ['body' => ''], false, '');
 	}
 
 	public function testItemProcessEmptyBodyWithReturnPathRedirectsAndAddsNotice(): void
@@ -367,7 +367,7 @@ class ItemTest extends ApiTestCase
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
 		try {
-			item_process(['uid' => 42, 'gravity' => Item::GRAVITY_PARENT, 'network' => Protocol::DFRN], ['body' => ''], false, 'network');
+			item_process(['uid' => 1042, 'gravity' => Item::GRAVITY_PARENT, 'network' => Protocol::DFRN], ['body' => ''], false, 'network');
 			self::fail('Expected a redirect (FoundException)');
 		} catch (HTTPException\FoundException) {
 			// expected
@@ -386,7 +386,7 @@ class ItemTest extends ApiTestCase
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
-		$post = ['uid' => 42, 'gravity' => Item::GRAVITY_PARENT, 'network' => Protocol::DFRN, 'cancel' => true];
+		$post = ['uid' => 1042, 'gravity' => Item::GRAVITY_PARENT, 'network' => Protocol::DFRN, 'cancel' => true];
 
 		try {
 			item_process($post, ['body' => 'This should be cancelled'], false, 'network');
@@ -395,7 +395,7 @@ class ItemTest extends ApiTestCase
 			// expected
 		}
 
-		$stored = Post::selectFirst(['id'], ['uid' => 42, 'body' => 'This should be cancelled']);
+		$stored = Post::selectFirst(['id'], ['uid' => 1042, 'body' => 'This should be cancelled']);
 		self::assertFalse(DBA::isResult($stored));
 	}
 
@@ -440,10 +440,10 @@ class ItemTest extends ApiTestCase
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
-		self::assertTrue(DBA::update('post-user', ['deleted' => 1], ['id' => 2]));
+		self::assertTrue(DBA::update('post-user', ['deleted' => 1], ['id' => 1502]));
 
 		try {
-			drop_item(2);
+			drop_item(1502);
 			self::fail('Expected a redirect (FoundException)');
 			/** @phpstan-ignore catch.neverThrown (PHPStan can't trace the throw through DI::baseUrl()->redirect() -> System::externalRedirect(); empirically verified by this passing test) */
 		} catch (HTTPException\FoundException) {
@@ -456,17 +456,17 @@ class ItemTest extends ApiTestCase
 
 	/**
 	 * Dropping a single comment must not touch the rest of the thread: only that comment disappears,
-	 * the parent (post-user id 1) and its sibling comments (ids 4 and 5) stay readable.
+	 * the parent (post-user id 1501) and its sibling comments (ids 1504 and 1505) stay readable.
 	 */
 	public function testDropItemOwnerDeletesCommentAndRedirectsToParentDisplay(): void
 	{
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/display/1');
 
-		self::assertTrue($this->isVisibleForUser(2), 'The comment must exist before the drop.');
+		self::assertTrue($this->isVisibleForUser(1502), 'The comment must exist before the drop.');
 
 		try {
-			drop_item(2);
+			drop_item(1502);
 			self::fail('Expected a redirect (FoundException)');
 			/** @phpstan-ignore catch.neverThrown (PHPStan can't trace the throw through DI::baseUrl()->redirect() -> System::externalRedirect(); empirically verified by this passing test) */
 		} catch (HTTPException\FoundException) {
@@ -474,17 +474,17 @@ class ItemTest extends ApiTestCase
 		}
 
 		/** @phpstan-ignore deadCode.unreachable (see the catch.neverThrown suppression above) */
-		$item = DBA::selectFirst('post-user', ['deleted', 'hidden'], ['id' => 2]);
+		$item = DBA::selectFirst('post-user', ['deleted', 'hidden'], ['id' => 1502]);
 		self::assertEquals(1, $item['hidden']);
 		self::assertEquals(1, $item['deleted']);
 
 		// The comment is gone from the user's point of view ...
-		self::assertFalse($this->isVisibleForUser(2), 'The dropped comment must be gone.');
+		self::assertFalse($this->isVisibleForUser(1502), 'The dropped comment must be gone.');
 
 		// ... while the rest of the thread is untouched.
-		self::assertTrue($this->isVisibleForUser(1), 'The parent must survive dropping one of its comments.');
-		self::assertTrue($this->isVisibleForUser(4), 'A sibling comment must survive dropping another comment.');
-		self::assertTrue($this->isVisibleForUser(5), 'A sibling comment must survive dropping another comment.');
+		self::assertTrue($this->isVisibleForUser(1501), 'The parent must survive dropping one of its comments.');
+		self::assertTrue($this->isVisibleForUser(1504), 'A sibling comment must survive dropping another comment.');
+		self::assertTrue($this->isVisibleForUser(1505), 'A sibling comment must survive dropping another comment.');
 	}
 
 	/**
@@ -496,15 +496,15 @@ class ItemTest extends ApiTestCase
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
 
-		// Fixture thread: post-user id 1 is the parent of the comments 2, 4 and 5 (all uid 42).
-		$thread = [1, 2, 4, 5];
+		// Fixture thread: post-user id 1501 is the parent of the comments 1502, 1504 and 1505 (all uid 1042).
+		$thread = [1501, 1502, 1504, 1505];
 
 		foreach ($thread as $id) {
 			self::assertTrue($this->isVisibleForUser($id), sprintf('Item %d must exist before the drop.', $id));
 		}
 
 		try {
-			drop_item(1);
+			drop_item(1501);
 			self::fail('Expected a redirect (FoundException)');
 			/** @phpstan-ignore catch.neverThrown (PHPStan can't trace the throw through DI::baseUrl()->redirect() -> System::externalRedirect(); empirically verified by this passing test) */
 		} catch (HTTPException\FoundException) {
@@ -522,10 +522,10 @@ class ItemTest extends ApiTestCase
 	}
 
 	/**
-	 * Post-user id 7 is the uid-0 (public/global) copy of uri-id 1, owned by no local user. Logged
-	 * in as uid 42 - who neither owns it nor has a matching remote-contact relation to it - drop_item()
+	 * Post-user id 1507 is the uid-0 (public/global) copy of uri-id 20001, owned by no local user. Logged
+	 * in as uid 1042 - who neither owns it nor has a matching remote-contact relation to it - drop_item()
 	 * takes the permission-denied branch instead of deleting: notice added, redirect to the item's
-	 * own display page (guid "1", shared with post-user id 1 since both reference uri-id 1), and
+	 * own display page (guid "1", shared with post-user id 1501 since both reference uri-id 20001), and
 	 * critically the item is left untouched.
 	 */
 	public function testDropItemPermissionDeniedLeavesItemUntouched(): void
@@ -534,7 +534,7 @@ class ItemTest extends ApiTestCase
 		$header->expects(self::once())->with('Location: https://friendica.local/display/1');
 
 		try {
-			drop_item(7);
+			drop_item(1507);
 			self::fail('Expected a redirect (FoundException)');
 			/** @phpstan-ignore catch.neverThrown (PHPStan can't trace the throw through DI::baseUrl()->redirect() -> System::externalRedirect(); empirically verified by this passing test) */
 		} catch (HTTPException\FoundException) {
@@ -544,7 +544,7 @@ class ItemTest extends ApiTestCase
 		/** @phpstan-ignore deadCode.unreachable (see the catch.neverThrown suppression above) */
 		self::assertContains('Permission denied.', DI::sysmsg()->getNotices());
 
-		$item = DBA::selectFirst('post-user', ['deleted'], ['id' => 7]);
+		$item = DBA::selectFirst('post-user', ['deleted'], ['id' => 1507]);
 		self::assertEquals(0, $item['deleted']);
 	}
 
@@ -617,7 +617,7 @@ class ItemTest extends ApiTestCase
 	public function testItemActionRequiresFormSecurityToken(): void
 	{
 		unset($_REQUEST['form_security_token']);
-		$this->setArgs('item/block/1');
+		$this->setArgs('item/block/1501');
 
 		$this->expectException(HTTPException\ForbiddenException::class);
 
@@ -627,7 +627,7 @@ class ItemTest extends ApiTestCase
 	public function testItemActionRejectsInvalidFormSecurityToken(): void
 	{
 		$_REQUEST['form_security_token'] = 'invalid';
-		$this->setArgs('item/block/1');
+		$this->setArgs('item/block/1501');
 
 		$this->expectException(HTTPException\ForbiddenException::class);
 
@@ -657,7 +657,7 @@ class ItemTest extends ApiTestCase
 	public function testItemActionBlockNonAjaxRedirectsAfterAction(): void
 	{
 		$this->setActionToken();
-		$this->setArgs('item/block/1');
+		$this->setArgs('item/block/1501');
 
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
@@ -673,7 +673,7 @@ class ItemTest extends ApiTestCase
 	public function testItemActionIgnoreNonAjaxRedirectsAfterAction(): void
 	{
 		$this->setActionToken();
-		$this->setArgs('item/ignore/1');
+		$this->setArgs('item/ignore/1501');
 
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');
@@ -689,7 +689,7 @@ class ItemTest extends ApiTestCase
 	public function testItemActionCollapseNonAjaxRedirectsAfterAction(): void
 	{
 		$this->setActionToken();
-		$this->setArgs('item/collapse/1');
+		$this->setArgs('item/collapse/1501');
 
 		$header = $this->mockRedirectHeader();
 		$header->expects(self::once())->with('Location: https://friendica.local/network');

@@ -27,7 +27,7 @@ final class SearchTest extends ApiTestCase
 	{
 		$gserver = DBA::selectFirst('gserver', ['id'], ['nurl' => 'http://friendica.local']);
 		DBA::update('gserver', ['failed' => 0, 'blocked' => 0], ['id' => $gserver['id']]);
-		DBA::update('contact', ['gsid' => $gserver['id'], 'failed' => 0], ['id' => 45]);
+		DBA::update('contact', ['gsid' => $gserver['id'], 'failed' => 0], ['id' => 3045]);
 
 		$module = $this->createModule();
 
@@ -57,7 +57,7 @@ final class SearchTest extends ApiTestCase
 			'type' => Tag::HASHTAG,
 		]);
 		DBA::insert('post-tag', [
-			'uri-id' => 7,
+			'uri-id' => 20007,
 			'type'   => Tag::HASHTAG,
 			'tid'    => 1000,
 			'cid'    => 0,
@@ -76,15 +76,15 @@ final class SearchTest extends ApiTestCase
 
 			self::assertNotEmpty($json->statuses);
 			self::assertCount(1, $json->statuses);
-			self::assertEquals('7', $json->statuses[0]->id);
+			self::assertEquals('20007', $json->statuses[0]->id);
 		}
 	}
 
 	public function testApiSearchReturnsStatusesFromFullTextSearch(): void
 	{
 		DBA::insert('post-searchindex', [
-			'uri-id'     => 7,
-			'owner-id'   => 43,
+			'uri-id'     => 20007,
+			'owner-id'   => 3043,
 			'searchtext' => 'This is a reply',
 		]);
 
@@ -101,7 +101,7 @@ final class SearchTest extends ApiTestCase
 
 			self::assertNotEmpty($json->statuses);
 			self::assertCount(1, $json->statuses);
-			self::assertEquals('7', $json->statuses[0]->id);
+			self::assertEquals('20007', $json->statuses[0]->id);
 		}
 	}
 
@@ -112,7 +112,7 @@ final class SearchTest extends ApiTestCase
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/v2/search'))
-			->withQueryParams(['q' => 'reply', 'max_id' => '7']);
+			->withQueryParams(['q' => 'reply', 'max_id' => '20007']);
 
 		try {
 			$module->handleRequest($request);
@@ -121,7 +121,7 @@ final class SearchTest extends ApiTestCase
 			$json = $this->toJson($e->getResponse());
 
 			self::assertCount(1, $json->statuses);
-			self::assertEquals('6', $json->statuses[0]->id);
+			self::assertEquals('20006', $json->statuses[0]->id);
 		}
 	}
 
@@ -132,7 +132,7 @@ final class SearchTest extends ApiTestCase
 		$module = $this->createModule();
 
 		$request = (new ServerRequest('GET', 'https://friendica.local/api/v2/search'))
-			->withQueryParams(['q' => 'reply', 'min_id' => '6']);
+			->withQueryParams(['q' => 'reply', 'min_id' => '20006']);
 
 		try {
 			$module->handleRequest($request);
@@ -141,7 +141,7 @@ final class SearchTest extends ApiTestCase
 			$json = $this->toJson($e->getResponse());
 
 			self::assertCount(1, $json->statuses);
-			self::assertEquals('7', $json->statuses[0]->id);
+			self::assertEquals('20007', $json->statuses[0]->id);
 		}
 	}
 
@@ -198,13 +198,13 @@ final class SearchTest extends ApiTestCase
 	private function insertSearchIndexEntries(): void
 	{
 		DBA::insert('post-searchindex', [
-			'uri-id'     => 6,
-			'owner-id'   => 43,
+			'uri-id'     => 20006,
+			'owner-id'   => 3043,
 			'searchtext' => 'This is also a reply',
 		]);
 		DBA::insert('post-searchindex', [
-			'uri-id'     => 7,
-			'owner-id'   => 43,
+			'uri-id'     => 20007,
+			'owner-id'   => 3043,
 			'searchtext' => 'This is a reply',
 		]);
 	}
