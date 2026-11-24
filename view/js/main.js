@@ -1243,13 +1243,36 @@ function imgdull(node) {
 function iframePlaceholderOnce(button) {
 	var placeholder = button.closest('.iframe-placeholder');
 	var fragment = placeholder.querySelector('template').content.cloneNode(true);
-	// Scripts cloned out of a <template> never run, the resize script of embed-iframe-resize.tpl needs re-creating to execute.
-	fragment.querySelectorAll('script[data-iframe-resize]').forEach(function(oldScript) {
-		var newScript = document.createElement('script');
-		newScript.textContent = oldScript.textContent;
-		oldScript.replaceWith(newScript);
+	// Scripts cloned out of a <template> don't run reliably (never when the page part had been loaded via Ajax),
+	// so the scripts of the players and embeds are re-created in their original order.
+	var scripts = [];
+	fragment.querySelectorAll('script').forEach(function(oldScript) {
+		var marker = document.createComment('');
+		oldScript.replaceWith(marker);
+		scripts.push({marker: marker, old: oldScript});
 	});
 	placeholder.replaceWith(fragment);
+
+	function runNext() {
+		var entry = scripts.shift();
+		if (!entry) {
+			return;
+		}
+		var newScript = document.createElement('script');
+		Array.from(entry.old.attributes).forEach(function(attribute) {
+			newScript.setAttribute(attribute.name, attribute.value);
+		});
+		newScript.textContent = entry.old.textContent;
+		if (newScript.src) {
+			newScript.onload = runNext;
+			newScript.onerror = runNext;
+		}
+		entry.marker.replaceWith(newScript);
+		if (!newScript.src) {
+			runNext();
+		}
+	}
+	runNext();
 }
 
 function iframePlaceholderAlways(button) {

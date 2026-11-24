@@ -293,6 +293,16 @@ class PostMedia extends BaseEntity
 	}
 
 	/**
+	 * Checks if the media can be played with the local audio or video player
+	 *
+	 * @return boolean
+	 */
+	public function isPlayable(): bool
+	{
+		return in_array($this->type, [self::TYPE_AUDIO, self::TYPE_VIDEO, self::TYPE_HLS]);
+	}
+
+	/**
 	 * Checks if the media is an article
 	 *
 	 * @return boolean

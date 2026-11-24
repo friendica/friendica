@@ -14,6 +14,7 @@ use Friendica\BaseModule;
 use Friendica\BaseRepository;
 use Friendica\Content\Item;
 use Friendica\Content\Post\Collection\PostMedias as PostMediasCollection;
+use Friendica\Content\Post\Entity\FileKind;
 use Friendica\Content\Post\Entity\PostMedia as PostMediaEntity;
 use Friendica\Content\Post\Factory\PostMedia as PostMediaFactory;
 use Friendica\Content\Text\HTML;
@@ -25,6 +26,7 @@ use Friendica\Database\Database;
 use Friendica\Database\DBA;
 use Friendica\Model\Post;
 use Friendica\Network\HTTPException\NotFoundException;
+use Friendica\Util\Network;
 use Friendica\Util\ParseUrl;
 use Friendica\Util\Proxy;
 use Friendica\Util\Strings;
@@ -362,6 +364,46 @@ class PostMedia extends BaseRepository
 	}
 
 	/**
+	 * Checks whether content from the given URL may be embedded for the viewer.
+	 *
+	 * Locally hosted content is always allowed, external content only when the
+	 * viewer enabled "Embed external media" in the display settings.
+	 *
+	 * @param int    $uid         Viewer user id
+	 * @param string $url         URL the embed would load the content from
+	 * @param bool   $isEmbedHtml Whether $url is raw embed HTML, which can reference arbitrary hosts
+	 * @return bool Whether the embed may be rendered
+	 */
+	public function mayEmbedUrl(int $uid, string $url, bool $isEmbedHtml = false): bool
+	{
+		if (!$isEmbedHtml && $url !== '' && $this->baseURL->isLocalUrl($url)) {
+			return true;
+		}
+
+		return (bool) $this->pConfig->get($uid, 'system', 'embed_external_media', true);
+	}
+
+	/**
+	 * Checks whether the given media may be embedded as player/embed iframe for the viewer.
+	 *
+	 * @param int              $uid       Viewer user id
+	 * @param PostMediaEntity $postMedia Media entity to check
+	 * @return bool Whether an embed of this media may be rendered
+	 */
+	public function mayEmbedMedia(int $uid, PostMediaEntity $postMedia): bool
+	{
+		if ($postMedia->hasPlayerUrl() && $postMedia->hasPlayerHeight()) {
+			return $this->mayEmbedUrl($uid, (string) $postMedia->playerUrl);
+		}
+
+		if ($postMedia->hasEmbedHtml() && !$postMedia->isPhoto()) {
+			return $this->mayEmbedUrl($uid, (string) $postMedia->embedHtml, true);
+		}
+
+		return true;
+	}
+
+	/**
 	 * Create a PostMedia entity from a remote URL using siteinfo parsing.
 	 *
 	 * @param string $url Remote resource URL
@@ -486,6 +528,13 @@ class PostMedia extends BaseRepository
 				$player = $this->getAudioAttachment($media, $uid);
 			} elseif (in_array($media->type, [PostMediaEntity::TYPE_VIDEO, PostMediaEntity::TYPE_HLS])) {
 				$player = $this->getVideoAttachment($media, $uid);
+			} elseif ($local_visitor && !$this->mayEmbedMedia($uid, $media)) {
+				if ($this->containsOtherLink($xpath, [$href, (string) $media->url])) {
+					$node->parentNode->removeChild($node);
+					$changed = true;
+					continue;
+				}
+				$player = $this->getLinkAttachment($media);
 			} elseif ($local_visitor && $media->hasPlayerUrl() && $media->hasPlayerHeight()) {
 				$player = $this->getPlayerIframe($media);
 			} elseif ($local_visitor && $media->hasEmbedHtml() && !$media->isPhoto()) {
@@ -515,6 +564,26 @@ class PostMedia extends BaseRepository
 	}
 
 	/**
+	 * Checks whether the document contains a regular (not embedded) link to one of the given URLs.
+	 *
+	 * @param DOMXPath $xpath XPath object of the document
+	 * @param string[] $urls  URLs to search for
+	 * @return bool
+	 */
+	private function containsOtherLink(DOMXPath $xpath, array $urls): bool
+	{
+		foreach ($xpath->query('//a[@href and not(@class="embed")]') as $link) {
+			foreach ($urls as $url) {
+				if (Strings::compareLink($this->getNodeAttribute($link, 'href'), $url)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Render a video attachment as HTML.
 	 *
 	 * @param PostMediaEntity $postMedia Media entity to render
@@ -523,45 +592,77 @@ class PostMedia extends BaseRepository
 	 */
 	public function getVideoAttachment(PostMediaEntity $postMedia, int $uid): string
 	{
+		if (!$this->mayEmbedUrl($uid, (string) $postMedia->url)) {
+			return $this->getFileAttachment($postMedia, $uid);
+		}
+
+		$embed = $this->pConfig->get($uid, 'system', 'embed_media', false) && $this->pConfig->get($uid, 'system', 'embed_external_media', true);
+
+		if ($embed && $postMedia->hasPlayerUrl() && $postMedia->hasPlayerHeight()) {
+			$media = $this->getPlayerIframe($postMedia);
+		} elseif ($embed && $postMedia->hasEmbedHtml() && !$postMedia->isPhoto()) {
+			$media = $this->getEmbedIframe($postMedia);
+		} else {
+			$media = $this->getVideoPlayer($postMedia, $uid);
+		}
+		return $media;
+	}
+
+	/**
+	 * Render the local player for audio or video, independent from the setting to embed external media.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to render
+	 * @param int $uid Viewer user id
+	 * @return string HTML snippet for the player or the consent placeholder
+	 */
+	public function getPlayer(PostMediaEntity $postMedia, int $uid): string
+	{
+		return $postMedia->type === PostMediaEntity::TYPE_AUDIO ? $this->getAudioPlayer($postMedia, $uid) : $this->getVideoPlayer($postMedia, $uid);
+	}
+
+	/**
+	 * Render the local video player.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to render
+	 * @param int $uid Viewer user id
+	 * @return string HTML snippet for the player or the consent placeholder
+	 */
+	private function getVideoPlayer(PostMediaEntity $postMedia, int $uid): string
+	{
+		if ($postMedia->width === 0 && $postMedia->height === 0) {
+			return $this->getAudioPlayer($postMedia, $uid);
+		}
+
 		if ($postMedia->id && ($postMedia->preview || ($postMedia->blurhash && $this->config->get('system', 'ffmpeg_installed')))) {
 			$preview_url = $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_MEDIUM);
 		} else {
 			$preview_url = '';
 		}
 
-		if ($this->pConfig->get($uid, 'system', 'embed_media', false) && $postMedia->hasPlayerUrl() && $postMedia->hasPlayerHeight()) {
-			$media = $this->getPlayerIframe($postMedia);
-		} elseif ($this->pConfig->get($uid, 'system', 'embed_media', false) && $postMedia->hasEmbedHtml() && !$postMedia->isPhoto()) {
-			$media = $this->getEmbedIframe($postMedia);
+		if ($this->config->get('system', 'videojs')) {
+			$template = 'content/videojs.tpl';
 		} else {
-			if ($postMedia->width === 0 && $postMedia->height === 0) {
-				return $this->getAudioAttachment($postMedia, $uid);
-			}
-			if ($this->config->get('system', 'videojs')) {
-				$template = 'content/videojs.tpl';
-			} else {
-				$template = $postMedia->type == PostMediaEntity::TYPE_HLS ? 'content/hls.tpl' : 'content/video.tpl';
-			}
-			$style = 'aspect-ratio:' . $postMedia->width . '/' . $postMedia->height . ';';
-			$src   = $postMedia->type == PostMediaEntity::TYPE_HLS
-				? Post\Media::resolvePlaylistUrl((string) $postMedia->url)
-				: (string) $postMedia->url;
-			$media = Renderer::replaceMacros(Renderer::getMarkupTemplate($template), [
-				'$video' => [
-					'id'          => $postMedia->id,
-					'src'         => $src,
-					'name'        => $postMedia->name ?: $postMedia->url,
-					'preview'     => $preview_url,
-					'mime'        => (string) $postMedia->mimetype,
-					'height'      => 'auto',
-					'width'       => '100%',
-					'style'       => $style,
-					'description' => $postMedia->description,
-				],
-			]);
-			$media = $this->gateExternalMedia($media, $src, (string) $postMedia->url, $uid, $style, 'auto', '100%', $preview_url);
+			$template = $postMedia->type == PostMediaEntity::TYPE_HLS ? 'content/hls.tpl' : 'content/video.tpl';
 		}
-		return $media;
+		$style = 'aspect-ratio:' . $postMedia->width . '/' . $postMedia->height . ';';
+		$src   = $postMedia->type == PostMediaEntity::TYPE_HLS
+			? Post\Media::resolvePlaylistUrl((string) $postMedia->url)
+			: (string) $postMedia->url;
+		$media = Renderer::replaceMacros(Renderer::getMarkupTemplate($template), [
+			'$video' => [
+				'id'          => $postMedia->id,
+				'src'         => $src,
+				'name'        => $postMedia->name ?: $postMedia->url,
+				'preview'     => $preview_url,
+				'mime'        => (string) $postMedia->mimetype,
+				'height'      => 'auto',
+				'width'       => '100%',
+				'style'       => $style,
+				'description' => $postMedia->description,
+			],
+		]);
+
+		return $this->gateExternalMedia($media, $src, (string) $postMedia->url, $uid, $style, 'auto', '100%', $preview_url);
 	}
 
 	/**
@@ -685,7 +786,7 @@ class PostMedia extends BaseRepository
 		$list  = $xpath->query('//iframe[@class="embed"]');
 		foreach ($list as $iframe) {
 			$host = $this->getNodeAttribute($iframe, 'data-host');
-			if ($host !== '' && $this->isTrustedHost($uid, $host)) {
+			if ($host !== '' && $this->pConfig->get($uid, 'system', 'embed_external_media', true) && $this->isTrustedHost($uid, $host)) {
 				continue;
 			}
 
@@ -839,6 +940,22 @@ class PostMedia extends BaseRepository
 	 */
 	public function getAudioAttachment(PostMediaEntity $postMedia, int $uid): string
 	{
+		if (!$this->mayEmbedUrl($uid, (string) $postMedia->url)) {
+			return $this->getFileAttachment($postMedia, $uid);
+		}
+
+		return $this->getAudioPlayer($postMedia, $uid);
+	}
+
+	/**
+	 * Render the local audio player.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to render
+	 * @param int $uid Viewer user id
+	 * @return string HTML snippet for the player or the consent placeholder
+	 */
+	private function getAudioPlayer(PostMediaEntity $postMedia, int $uid): string
+	{
 		$media = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/audio.tpl'), [
 			'$audio' => [
 				'id'   => $postMedia->id,
@@ -849,6 +966,78 @@ class PostMedia extends BaseRepository
 		]);
 
 		return $this->gateExternalMedia($media, (string) $postMedia->url, (string) $postMedia->url, $uid);
+	}
+
+	/**
+	 * Get the link media for the page of an external video that has got an external player
+	 *
+	 * @param PostMediaEntity      $video
+	 * @param PostMediasCollection $links Link media of the post
+	 * @param array                $item  Post that contains the video
+	 * @return PostMediaEntity|null Link media or null if the video can't be represented by a link
+	 */
+	public function getVideoCard(PostMediaEntity $video, PostMediasCollection $links, array $item): ?PostMediaEntity
+	{
+		if (!in_array($video->type, [PostMediaEntity::TYPE_VIDEO, PostMediaEntity::TYPE_HLS]) || (!($video->hasPlayerUrl() && $video->hasPlayerHeight()) && !$video->hasEmbedHtml())) {
+			return null;
+		}
+
+		$plink = (string) ($item['plink'] ?? '');
+		if (!Network::isValidHttpUrl($plink) || $this->baseURL->isLocalUrl($plink)) {
+			return null;
+		}
+
+		/** @var PostMediaEntity $link */
+		foreach ($links as $link) {
+			if (Strings::compareLink((string) $link->url, $plink)) {
+				return $link;
+			}
+		}
+
+		return $this->getFactory()->createLinkFromVideo($video, $plink, $item['title'] ?? '', $item['author-name'] ?? '', $item['author-link'] ?? '');
+	}
+
+	/**
+	 * Render the media as a file attachment.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to render
+	 * @param int             $uid       Viewer user id
+	 * @return string HTML snippet for the file attachment
+	 */
+	private function getFileAttachment(PostMediaEntity $postMedia, int $uid): string
+	{
+		return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/attachments.tpl'), [
+			'$collapsible' => false,
+			'$open'        => true,
+			'$summary'     => '',
+			'$attachments' => [$this->getFileAttachmentData($postMedia, (string) $postMedia->url, $uid)],
+		]);
+	}
+
+	/**
+	 * Get the template data for a file attachment.
+	 *
+	 * @param PostMediaEntity $postMedia Media entity to render
+	 * @param string          $url       URL the attachment links to
+	 * @param int             $uid       Viewer user id
+	 * @return array Data for an entry in the attachments template
+	 */
+	public function getFileAttachmentData(PostMediaEntity $postMedia, string $url, int $uid): array
+	{
+		$kind = FileKind::fromMimeType($postMedia->mimetype);
+
+		// The preview is delivered by this system, a blurhash can only be rendered when the dimensions are known
+		$has_preview = $postMedia->id && ($postMedia->preview || ($postMedia->blurhash && $postMedia->width && $postMedia->height));
+
+		return [
+			'url'     => strip_tags($url),
+			'name'    => trim($postMedia->name ?? '' ?: mb_strimwidth(trim((string) preg_replace('/\s+/', ' ', $postMedia->description ?? '')), 0, 100, '…') ?: basename(parse_url((string) $postMedia->url, PHP_URL_PATH) ?: (string) $postMedia->url)),
+			'size'    => $postMedia->size ? Strings::formatBytes($postMedia->size) : '',
+			'kind'    => $kind->value,
+			'type'    => $kind->label($this->l10n),
+			'preview' => $has_preview ? $this->baseURL . $postMedia->getPreviewPath(Proxy::SIZE_THUMB) : '',
+			'player'  => $uid && $postMedia->id && $postMedia->isPlayable() ? $this->baseURL . '/media/player/' . $postMedia->id : '',
+		];
 	}
 
 	/**

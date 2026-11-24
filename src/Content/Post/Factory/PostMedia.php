@@ -180,6 +180,56 @@ class PostMedia extends BaseFactory implements ICanCreateFromTableRow
 	}
 
 	/**
+	 * Create a link entity for the page of a video. It intentionally doesn't contain the player of the video.
+	 *
+	 * @param PostMediaEntity $video
+	 * @param string          $url        URL of the video page
+	 * @param string          $name       Title of the video
+	 * @param string          $authorName
+	 * @param string          $authorUrl
+	 * @return PostMediaEntity
+	 */
+	public function createLinkFromVideo(PostMediaEntity $video, string $url, string $name, string $authorName, string $authorUrl): PostMediaEntity
+	{
+		return $this->createFromTableRow([
+			'id'              => 0,
+			'uri-id'          => $video->uriId,
+			'url'             => $url,
+			'type'            => PostMediaEntity::TYPE_HTML,
+			'mimetype'        => null,
+			'media-uri-id'    => null,
+			'width'           => null,
+			'height'          => null,
+			'size'            => null,
+			'preview'         => $video->preview ? (string) $video->preview : null,
+			'preview-width'   => $video->previewWidth,
+			'preview-height'  => $video->previewHeight,
+			'description'     => null,
+			'name'            => $name ?: null,
+			'author-url'      => $authorUrl ?: null,
+			'author-name'     => $authorName ?: null,
+			'author-image'    => null,
+			'publisher-url'   => null,
+			'publisher-name'  => null,
+			'publisher-image' => null,
+			'blurhash'        => $video->blurhash,
+			'player-url'      => null,
+			'player-width'    => null,
+			'player-height'   => null,
+			'embed-type'      => null,
+			'embed-html'      => null,
+			'embed-width'     => null,
+			'embed-height'    => null,
+			'page-type'       => null,
+			'schematypes'     => null,
+			'attach-id'       => null,
+			'language'        => null,
+			'published'       => null,
+			'modified'        => null,
+		]);
+	}
+
+	/**
 	 * Create a PostMedia entity from parsed URL data
 	 *
 	 * @param array $data

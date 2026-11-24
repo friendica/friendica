@@ -18,8 +18,12 @@
 			}
 
 			function play() {
+				if (!video.isConnected) {
+					return;
+				}
 				if (Hls.isSupported()) {
 					var hls = new Hls();
+					video.hls = hls;
 					hls.loadSource(videoSrc);
 					hls.attachMedia(video);
 					hls.on(Hls.Events.ERROR, function (event, data) {
