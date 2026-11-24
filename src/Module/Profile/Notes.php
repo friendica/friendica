@@ -22,9 +22,11 @@ use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Session\Model\UserSession;
 use Friendica\Model\Item;
 use Friendica\Model\Post;
+use Friendica\Model\Profile as ProfileModel;
 use Friendica\Database\DBA;
 use Friendica\Module\BaseProfile;
 use Friendica\Network\HTTPException\ForbiddenException;
+use Friendica\Network\HTTPException\NotFoundException;
 use Friendica\Util\Profiler;
 use Psr\Log\LoggerInterface;
 
@@ -71,6 +73,10 @@ class Notes extends BaseProfile
 	{
 		if (!$this->userSession->getLocalUserId()) {
 			throw new ForbiddenException();
+		}
+
+		if (!ProfileModel::load($this->appHelper, $this->userSession->getLocalUserNickname())) {
+			throw new NotFoundException($this->t('Profile not found.'));
 		}
 
 		Nav::setSelected('home');
