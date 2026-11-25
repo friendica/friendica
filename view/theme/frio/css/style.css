@@ -11,6 +11,7 @@
 
 :root {
 	--topbar-first-size: 55px;
+	--main-image-border-radius: 100%;
 
 	/* Mostly just bootstraps own colours, available here to use them for things that there aren't helper classes for in Bootstrap 3, like border colour */
 	--default: #ededed; /* Not default */
@@ -243,7 +244,7 @@ ul#nav-user-menu {
 	background-color: $nav_icon_hover_color;
 }
 #nav-profile-link img {
-	border-radius: 100%;
+	border-radius: var(--main-image-border-radius);
 	height: 30px;
 	margin-left: -5px;
 	width: 30px;
@@ -857,7 +858,7 @@ nav.navbar .nav > li > button:focus,
 	width: 42px;
 }
 #topbar-first .nav > .account .user-avatar img {
-	border-radius: 100%;
+	border-radius: var(--main-image-border-radius);
 	height: 100%;
 	width: 100%;
 }
@@ -975,7 +976,7 @@ nav.navbar .nav > li > button:focus,
 }
 #topbar-first .dropdown-indicator {
 	background: rgb(0, 0, 0, 0.5);
-	border-radius: 100%;
+	border-radius: var(--main-image-border-radius);
 	position: absolute;
 	bottom: 0;
 	right: 0;
@@ -1486,7 +1487,7 @@ aside img.vcard-photo {
 aside .vcard img.u-photo,
 aside img.vcard-photo,
 #change-profile-picture {
-	border-radius: 100%;
+	border-radius: var(--main-image-border-radius);
 }
 aside .vcard .tool .action {
 	position: absolute;
@@ -1566,7 +1567,7 @@ aside .vcard a.btn, aside .vcard button {
 #nav-short-info .contact-wrapper img {
 	height: 34px;
 	width: 34px;
-	border-radius: 100%;
+	border-radius: var(--main-image-border-radius);
 }
 #vcard-short-desc,
 #nav-short-info .contact-wrapper .media-body {
@@ -2112,7 +2113,7 @@ aside .panel-body {
 .contact-photo {
 	height: 48px;
 	width: 48px;
-	border-radius: 100%;
+	border-radius: var(--main-image-border-radius);
 	/*maybe some adional stuff is needed for the different screen sizes */
 }
 .contact-photo-image-wrapper {
@@ -2149,7 +2150,7 @@ aside .panel-body {
 .contact-photo-xs {
 	height: 38px;
 	width: 38px;
-	border-radius: 100%;
+	border-radius: var(--main-image-border-radius);
 }
 .wwto .contact-photo {
 	width: auto;
@@ -3365,7 +3366,7 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	width: 48px;
 }
 .message-content-wrapper .contact-photo-wrapper img {
-	border-radius: 100%;
+	border-radius: var(--main-image-border-radius);
 }
 .mail-thread #prvmail-to-label,
 .mail-thread #prvmail-subject-label {
@@ -4277,7 +4278,7 @@ body .tread-wrapper .hovercard:hover .hover-card-content a {
 
 .hover-card-pic img.thumbnail {
 	border: none;
-	border-radius: 100%;
+	border-radius: var(--main-image-border-radius);
 	box-shadow: unset;
 }
 
