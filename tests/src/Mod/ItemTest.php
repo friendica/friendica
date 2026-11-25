@@ -40,6 +40,7 @@ class ItemTest extends ApiTestCase
 
 		DI::session()->set('authenticated', true);
 		DI::session()->set('uid', 1042);
+		DI::session()->set('my_address', 'selfcontact@friendica.local');
 
 		DBA::update('apcontact', ['updated' => DateTimeFormat::utcNow()], ['url' => 'https://friendica.local/profile/selfcontact']);
 	}
@@ -137,6 +138,15 @@ class ItemTest extends ApiTestCase
 		$stored = Post::selectFirst(['gravity'], ['uid' => 1042, 'body' => 'Posted via item_post() dispatch']);
 		self::assertTrue(DBA::isResult($stored));
 		self::assertEquals(Item::GRAVITY_PARENT, $stored['gravity']);
+	}
+
+	public function testItemPostFailsOwnershipTestWhenPostIdGiven(): void
+	{
+		$_REQUEST = ['post_id' => 1502, 'body' => 'Edited via item_post() dispatch'];
+
+		self::expectException(HTTPException\NotFoundException::class);
+
+		item_post();
 	}
 
 	public function testItemPostDispatchesToEditWhenPostIdGiven(): void

@@ -393,9 +393,9 @@ return [
 			'thr-parent-id' => 20001, // 'https://friendica.local/objects/1'
 			'gravity'       => Item::GRAVITY_PARENT,
 			'network'       => Protocol::DFRN,
-			'owner-id'      => 3043, // othercontact (public)
-			'author-id'     => 3043, // othercontact (public)
-			'causer-id'     => 3043, // othercontact (public)
+			'owner-id'      => 3048, // selfcontact (public)
+			'author-id'     => 3048, // selfcontact (public)
+			'causer-id'     => 3048, // selfcontact (public)
 			'vid'           => 408,
 			'private'       => Item::PUBLIC,
 			'global'        => true,
@@ -499,10 +499,10 @@ return [
 			'id'            => 1501,
 			'uri-id'        => 20001, // 'https://friendica.local/objects/1'
 			'visible'       => 1,
-			'contact-id'    => 3043, // othercontact (public)
-			'author-id'     => 3043, // othercontact (public)
-			'owner-id'      => 3043, // othercontact (public)
-			'causer-id'     => 3043, // othercontact (public)
+			'contact-id'    => 3048, // selfcontact (public)
+			'author-id'     => 3048, // selfcontact (public)
+			'owner-id'      => 3048, // selfcontact (public)
+			'causer-id'     => 3048, // selfcontact (public)
 			'uid'           => 1042, // selfcontact
 			'vid'           => 408,
 			'unseen'        => 1,
@@ -793,9 +793,9 @@ return [
 	'post-thread' => [
 		[
 			'uri-id'    => 20001, // 'https://friendica.local/objects/1'
-			'author-id' => 3043, // othercontact (public)
-			'owner-id'  => 3043, // othercontact (public)
-			'causer-id' => 3043, // othercontact (public)
+			'author-id' => 3048, // selfcontact (public)
+			'owner-id'  => 3048, // selfcontact (public)
+			'causer-id' => 3048, // selfcontact (public)
 			'network'   => Protocol::DFRN,
 		],
 		[
@@ -826,10 +826,10 @@ return [
 			'uid'          => 1042, // selfcontact
 			'wall'         => 1,
 			'post-user-id' => 1501,
-			'author-id'    => 3043, // othercontact (public)
-			'owner-id'     => 3043, // othercontact (public)
-			'causer-id'    => 3043, // othercontact (public)
-			'contact-id'   => 3043, // othercontact (public)
+			'author-id'    => 3048, // selfcontact (public)
+			'owner-id'     => 3048, // selfcontact (public)
+			'causer-id'    => 3048, // selfcontact (public)
+			'contact-id'   => 3048, // selfcontact (public)
 			'network'      => Protocol::DFRN,
 			'starred'      => 1,
 			'origin'       => 1,

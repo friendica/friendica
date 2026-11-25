@@ -511,7 +511,7 @@ final class PostTemplateBuilder
 		}
 
 		$edpost = false;
-		if ($this->uid && $item['origin']) {
+		if ($this->uid && $item['origin'] && $item['author-id'] == Contact::getPublicIdByUserId($this->uid)) {
 			if (!empty($item['event-id'])) {
 				$edpost = ['calendar/event/edit/' . $item['event-id'], $this->l10n->t('Edit event')];
 			} else {
