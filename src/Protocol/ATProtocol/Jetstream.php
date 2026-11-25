@@ -88,6 +88,7 @@ class Jetstream
 	{
 		$timeout       = 300;
 		$timeout_limit = 10;
+		$ping_interval = 20;
 		$timestamp     = $this->keyValue->get('jetstream_timestamp') ?? 0;
 		$cursor        = '';
 		$this->logger->notice('Start listening');
@@ -100,7 +101,7 @@ class Jetstream
 
 			$this->syncContacts();
 			try {
-				$configuration = new \WebSocket\Configuration($this->logger, null, $timeout);
+				$configuration = new \WebSocket\Configuration(new JetstreamConnectionLogger($this->logger), null, $timeout);
 				// @todo make the path configurable
 				$this->client = new \WebSocket\Client('wss://' . $this->atprotocol->getJetstream() . '/subscribe?requireHello=true' . $cursor, $configuration);
 				// The library no longer answers pings or the close handshake on its own
@@ -113,7 +114,19 @@ class Jetstream
 			}
 			$this->setOptions();
 			$last_timeout = time();
+			$last_ping    = time();
 			while (true) {
+				// Proactively ping the server, so connections aren't dropped as idle by a middlebox between pings
+				if (time() - $last_ping >= $ping_interval) {
+					try {
+						$this->client->send(new \WebSocket\Message\Ping());
+					} catch (\WebSocket\Exception\Exception $e) {
+						$this->logger->notice('Failed to send keepalive ping, reconnecting', ['message' => $e->getMessage()]);
+						break;
+					}
+					$last_ping = time();
+				}
+
 				try {
 					$message = $this->client->receive();
 
@@ -148,6 +161,10 @@ class Jetstream
 					} else {
 						$this->logger->notice('Timeout', ['duration' => $timeout_duration, 'timestamp' => $timestamp, 'message' => $e->getMessage()]);
 					}
+					break;
+				} catch (\WebSocket\Exception\ConnectionClosedException $e) {
+					// The remote side (or a middlebox) closed an idle connection. The outer loop reconnects automatically.
+					$this->logger->notice('Connection closed by remote, reconnecting', ['timestamp' => $timestamp, 'message' => $e->getMessage()]);
 					break;
 				} catch (\WebSocket\Exception\Exception $e) {
 					$this->logger->error('Error while trying to receive a message', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
