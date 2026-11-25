@@ -1487,6 +1487,9 @@ summary.wall-item-summary {
 .media-player.fancybox-content {
 	padding: 44px 16px 16px;
 }
+.media-player-audio {
+	width: min(500px, 100vw - 48px);
+}
 .media-player-audio audio {
 	width: 100%;
 }

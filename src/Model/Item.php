@@ -3728,7 +3728,7 @@ class Item
 
 		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
-			if (strpos((string) $item['body'], (string) $PostMedia->url)) {
+			if (!$PostMedia->isPlayable() && strpos((string) $item['body'], (string) $PostMedia->url)) {
 				continue;
 			}
 

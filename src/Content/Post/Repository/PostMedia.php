@@ -380,6 +380,11 @@ class PostMedia extends BaseRepository
 			return true;
 		}
 
+		return $this->isExternalMediaEnabled($uid);
+	}
+
+	private function isExternalMediaEnabled(int $uid): bool
+	{
 		return (bool) $this->pConfig->get($uid, 'system', 'embed_external_media', true);
 	}
 
@@ -596,7 +601,7 @@ class PostMedia extends BaseRepository
 			return $this->getFileAttachment($postMedia, $uid);
 		}
 
-		$embed = $this->pConfig->get($uid, 'system', 'embed_media', false) && $this->pConfig->get($uid, 'system', 'embed_external_media', true);
+		$embed = $this->pConfig->get($uid, 'system', 'embed_media', false) && $this->isExternalMediaEnabled($uid);
 
 		if ($embed && $postMedia->hasPlayerUrl() && $postMedia->hasPlayerHeight()) {
 			$media = $this->getPlayerIframe($postMedia);
@@ -786,7 +791,7 @@ class PostMedia extends BaseRepository
 		$list  = $xpath->query('//iframe[@class="embed"]');
 		foreach ($list as $iframe) {
 			$host = $this->getNodeAttribute($iframe, 'data-host');
-			if ($host !== '' && $this->pConfig->get($uid, 'system', 'embed_external_media', true) && $this->isTrustedHost($uid, $host)) {
+			if ($host !== '' && $this->isTrustedHost($uid, $host)) {
 				continue;
 			}
 
@@ -1020,7 +1025,7 @@ class PostMedia extends BaseRepository
 	 * @param PostMediaEntity $postMedia Media entity to render
 	 * @param string          $url       URL the attachment links to
 	 * @param int             $uid       Viewer user id
-	 * @return array Data for an entry in the attachments template
+	 * @return array{url: string, name: string, size: string, kind: string, type: string, preview: string, player: string} Data for an entry in the attachments template
 	 */
 	public function getFileAttachmentData(PostMediaEntity $postMedia, string $url, int $uid): array
 	{
@@ -1031,7 +1036,7 @@ class PostMedia extends BaseRepository
 
 		return [
 			'url'     => strip_tags($url),
-			'name'    => trim($postMedia->name ?? '' ?: mb_strimwidth(trim((string) preg_replace('/\s+/', ' ', $postMedia->description ?? '')), 0, 100, '…') ?: basename(parse_url((string) $postMedia->url, PHP_URL_PATH) ?: (string) $postMedia->url)),
+			'name'    => trim(mb_strimwidth(trim((string) preg_replace('/\s+/', ' ', $postMedia->description ?? '')), 0, 100, '…') ?: $postMedia->name ?? '' ?: basename(parse_url((string) $postMedia->url, PHP_URL_PATH) ?: (string) $postMedia->url)),
 			'size'    => $postMedia->size ? Strings::formatBytes($postMedia->size) : '',
 			'kind'    => $kind->value,
 			'type'    => $kind->label($this->l10n),

@@ -1251,7 +1251,11 @@ function iframePlaceholderOnce(button) {
 		oldScript.replaceWith(marker);
 		scripts.push({marker: marker, old: oldScript});
 	});
+	var dialog = placeholder.closest('.fancybox-container');
 	placeholder.replaceWith(fragment);
+	if (dialog) {
+		dialog.focus();
+	}
 
 	function runNext() {
 		var entry = scripts.shift();

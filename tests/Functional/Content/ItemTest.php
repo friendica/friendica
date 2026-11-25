@@ -7,7 +7,10 @@
 
 namespace Friendica\Test\Functional\Content;
 
+use Friendica\Content\Post\Collection\PostMedias;
+use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Core\Protocol;
+use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\Database\PostUpdate;
 use Friendica\DI;
@@ -15,11 +18,15 @@ use Friendica\Model\Circle;
 use Friendica\Model\Contact;
 use Friendica\Model\Item;
 use Friendica\Model\ItemURI;
+use Friendica\Render\FriendicaSmartyEngine;
 use Friendica\Test\FixtureTestCase;
+use Friendica\Test\src\Content\Post\PostMediaRowTrait;
 use Friendica\Util\Strings;
 
 class ItemTest extends FixtureTestCase
 {
+	use PostMediaRowTrait;
+
 	private const UID = 42;
 
 	// Self contact of the user in the fixture
@@ -161,5 +168,40 @@ class ItemTest extends FixtureTestCase
 		$item  = $this->getItem('<' . $group['contact']['id'] . '>', Item::GRAVITY_COMMENT);
 
 		$this->assertUnchanged($item, DI::contentItem()->expandTags($item, false, true));
+	}
+
+	private function nonVisualAttachments(PostMedia $media, string $body): string
+	{
+		Renderer::registerTemplateEngine(FriendicaSmartyEngine::class);
+
+		$item = [
+			'body'           => $body,
+			'author-id'      => self::FRIEND_ID,
+			'author-network' => Protocol::DFRN,
+			'author-link'    => 'https://remote.example/profile/friend',
+			'author-alias'   => '',
+		];
+
+		return (new \ReflectionMethod(Item::class, 'addNonVisualAttachments'))->invoke(null, new PostMedias([$media]), $item, '', self::UID);
+	}
+
+	public function testPlayableMediaLinkedInBodyIsStillListedAsAttachment(): void
+	{
+		$url   = 'https://remote.example/clips/holiday.mp4';
+		$video = $this->createMedia(['url' => $url, 'type' => PostMedia::TYPE_VIDEO, 'mimetype' => 'video/mp4']);
+
+		$result = $this->nonVisualAttachments($video, '[url=' . $url . ']Holiday[/url]');
+
+		self::assertStringContainsString('holiday.mp4', $result);
+	}
+
+	public function testOtherMediaLinkedInBodyIsNotListedAsAttachment(): void
+	{
+		$url = 'https://remote.example/files/agenda.pdf';
+		$pdf = $this->createMedia(['url' => $url, 'type' => PostMedia::TYPE_DOCUMENT, 'mimetype' => 'application/pdf']);
+
+		$result = $this->nonVisualAttachments($pdf, '[url=' . $url . ']Agenda[/url]');
+
+		self::assertStringNotContainsString('agenda.pdf', $result);
 	}
 }

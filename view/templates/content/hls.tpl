@@ -14,7 +14,12 @@
 			var videoSrc = '{{$video.src}}';
 
 			function hide() {
-				document.getElementById('video-top-wrapper-{{$video.id}}').style.display = 'none';
+				var wrapper = document.getElementById('video-top-wrapper-{{$video.id}}');
+				if (wrapper.closest('.media-player')) {
+					wrapper.replaceWith(video.querySelector('a'));
+					return;
+				}
+				wrapper.style.display = 'none';
 			}
 
 			function play() {
