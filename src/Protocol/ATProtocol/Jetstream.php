@@ -13,6 +13,7 @@ namespace Friendica\Protocol\ATProtocol;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
 use Friendica\Core\Logger\Capability\DefaultContextLogger;
+use Friendica\Core\Logger\Type\LevelCapLogger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
@@ -88,7 +89,6 @@ class Jetstream
 	{
 		$timeout       = 300;
 		$timeout_limit = 10;
-		$ping_interval = 20;
 		$timestamp     = $this->keyValue->get('jetstream_timestamp') ?? 0;
 		$cursor        = '';
 		$this->logger->notice('Start listening');
@@ -101,7 +101,7 @@ class Jetstream
 
 			$this->syncContacts();
 			try {
-				$configuration = new \WebSocket\Configuration(new JetstreamConnectionLogger($this->logger), null, $timeout);
+				$configuration = new \WebSocket\Configuration(new LevelCapLogger($this->logger), null, $timeout);
 				// @todo make the path configurable
 				$this->client = new \WebSocket\Client('wss://' . $this->atprotocol->getJetstream() . '/subscribe?requireHello=true' . $cursor, $configuration);
 				// The library no longer answers pings or the close handshake on its own
@@ -114,19 +114,7 @@ class Jetstream
 			}
 			$this->setOptions();
 			$last_timeout = time();
-			$last_ping    = time();
 			while (true) {
-				// Proactively ping the server, so connections aren't dropped as idle by a middlebox between pings
-				if (time() - $last_ping >= $ping_interval) {
-					try {
-						$this->client->send(new \WebSocket\Message\Ping());
-					} catch (\WebSocket\Exception\Exception $e) {
-						$this->logger->notice('Failed to send keepalive ping, reconnecting', ['message' => $e->getMessage()]);
-						break;
-					}
-					$last_ping = time();
-				}
-
 				try {
 					$message = $this->client->receive();
 
