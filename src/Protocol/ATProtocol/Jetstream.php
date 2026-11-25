@@ -13,6 +13,7 @@ namespace Friendica\Protocol\ATProtocol;
 use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\KeyValueStorage\Capability\IManageKeyValuePairs;
 use Friendica\Core\Logger\Capability\DefaultContextLogger;
+use Friendica\Core\Logger\Type\LevelCapLogger;
 use Friendica\Core\Protocol;
 use Friendica\Core\System;
 use Friendica\Model\Contact;
@@ -100,7 +101,7 @@ class Jetstream
 
 			$this->syncContacts();
 			try {
-				$configuration = new \WebSocket\Configuration($this->logger, null, $timeout);
+				$configuration = new \WebSocket\Configuration(new LevelCapLogger($this->logger), null, $timeout);
 				// @todo make the path configurable
 				$this->client = new \WebSocket\Client('wss://' . $this->atprotocol->getJetstream() . '/subscribe?requireHello=true' . $cursor, $configuration);
 				// The library no longer answers pings or the close handshake on its own
@@ -148,6 +149,10 @@ class Jetstream
 					} else {
 						$this->logger->notice('Timeout', ['duration' => $timeout_duration, 'timestamp' => $timestamp, 'message' => $e->getMessage()]);
 					}
+					break;
+				} catch (\WebSocket\Exception\ConnectionClosedException $e) {
+					// The remote side (or a middlebox) closed an idle connection. The outer loop reconnects automatically.
+					$this->logger->notice('Connection closed by remote, reconnecting', ['timestamp' => $timestamp, 'message' => $e->getMessage()]);
 					break;
 				} catch (\WebSocket\Exception\Exception $e) {
 					$this->logger->error('Error while trying to receive a message', ['code' => $e->getCode(), 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
