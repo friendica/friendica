@@ -2113,8 +2113,11 @@ aside .panel-body {
 .contact-photo {
 	height: 48px;
 	width: 48px;
-	border-radius: var(--main-image-border-radius);
+	border-radius: 3px;
 	/*maybe some adional stuff is needed for the different screen sizes */
+}
+.click-card .contact-photo {
+	border-radius: var(--main-image-border-radius);
 }
 .contact-photo-image-wrapper {
 	width: 100%;
