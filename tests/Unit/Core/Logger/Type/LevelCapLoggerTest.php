@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Friendica\Test\src\Core\Logger;
+namespace Friendica\Test\Unit\Core\Logger\Type;
 
 use Friendica\Core\Logger\Type\LevelCapLogger;
 use PHPUnit\Framework\Attributes\DataProvider;
