@@ -211,13 +211,11 @@
 										<strong>{{$userinfo.name}}</strong><br>
 										{{if $nav.remote}}<span class="truncate">{{$nav.remote}}</span>{{/if}}
 									</div>
-									<div class="user-avatar hidden-xs">
-									<img id="avatar" src="{{$userinfo.icon}}" alt="{{$userinfo.name}}">
-									<span class="caret"></span>
-									</div>
-									<div aria-hidden="true" class="mobile-toggle visible-xs">
-										<span class="sr-only">Toggle navigation</span>
-										<i class="ri ri-more-2-line ri-fw ri-lg" aria-hidden="true"></i>
+									<div class="user-avatar">
+										<img id="avatar" src="{{$userinfo.icon}}" alt="{{$userinfo.name}}">
+										<span class="dropdown-indicator" aria-hidden="true">
+											<i class="ri ri-arrow-down-s-line ri-xl" aria-hidden="true"></i>
+										</span>
 									</div>
 								</button>
 
@@ -231,9 +229,10 @@
 									{{/if}}
 									<li>
 										<a role="menuitem" id="nav-profile-link" href="{{$userinfo.link.0}}" title="{{$userinfo.link.3}}">
-										<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"
-											style="max-width:15px; max-height:15px; min-width:15px; min-height:15px; width:15px; height:15px;"/>&nbsp;
-										{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}) {{/if}}
+										<img src="{{$userinfo.icon}}" alt="{{$userinfo.name}}"/>&nbsp;
+											<strong>
+											{{$userinfo.name}}{{if $nav.remote}} ({{$nav.remote}}) {{/if}}
+											</strong>
 										</a>
 									</li>
 									{{if $nav.delegation}}

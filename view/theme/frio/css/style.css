@@ -11,6 +11,7 @@
 
 :root {
 	--topbar-first-size: 55px;
+	--main-image-border-radius: 100%;
 
 	/* Mostly just bootstraps own colours, available here to use them for things that there aren't helper classes for in Bootstrap 3, like border colour */
 	--default: #ededed; /* Not default */
@@ -238,10 +239,17 @@ ul#nav-user-menu {
 	width: calc(100% - 20px);
 	border-radius: 4px;
 }
-	#nav-profile-link:hover,
-	#nav-profile-link:focus {
-		background-color: $nav_icon_hover_color;
-	}
+#nav-profile-link:hover,
+#nav-profile-link:focus {
+	background-color: $nav_icon_hover_color;
+}
+#nav-profile-link img {
+	border-radius: var(--main-image-border-radius);
+	height: 30px;
+	margin-left: -5px;
+	width: 30px;
+}
+
 #nav-delegation-link {
 	background-color: $nav_bg;
 	color: $nav_icon_color;
@@ -274,12 +282,6 @@ ul#nav-user-menu {
 
 /* Fix header overflowing on narrow viewports */
 @media screen and (max-width: 400px) {
-	#topbar-first .nav > li > a,
-	#topbar-first .nav > li > button,
-	#topbar-first .navbar-toggle {
-		padding-left: 5px;
-		padding-right: 5px;
-	}
 	#topbar-first .topbar-nav .nav-segment > a,
 	button#main-menu {
 		min-width: 35px;
@@ -337,7 +339,8 @@ ul#nav-user-menu {
 		width: 150px;
 	}
 	#topbar-first > .container-fluid, #topbar-second > .container-fluid {
-		padding-inline: 2px;
+		padding-left: 2px;
+		padding-right: 13px;
 	}
 #nav-user-menu {
 	width: clamp(200px, 50vw, 275px);
@@ -658,7 +661,7 @@ header #banner {
 }
 header #banner #logo-img,
 .navbar-brand #logo-img {
-	font-size: 36px;
+	font-size: 40px;
 	color: $nav_icon_color;
 }
 
@@ -849,11 +852,15 @@ nav.navbar .nav > li > button:focus,
 #topbar-first .nav > li > a.selected:focus {
 	background-color: transparent;
 }
-#topbar-first .nav > .account img {
-	height: 32px;
-	width: 32px;
-	max-width: 35px;
-	border-radius: 3px;
+#topbar-first .nav > .account .user-avatar {
+	flex-shrink: 0;
+	height: 42px;
+	width: 42px;
+}
+#topbar-first .nav > .account .user-avatar img {
+	border-radius: var(--main-image-border-radius);
+	height: 100%;
+	width: 100%;
 }
 #topbar-first .nav > .account .dropdown-toggle span {
 	font-size: 12px;
@@ -967,8 +974,14 @@ nav.navbar .nav > li > button:focus,
 #topbar-first .dropdown-footer {
 	margin: 10px 10px 5px;
 }
-#topbar-first .caret {
-	border-top-color: #bebebe;
+#topbar-first .dropdown-indicator {
+	background: rgb(0, 0, 0, 0.5);
+	border-radius: var(--main-image-border-radius);
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	height: 15px;
+	width: 15px;
 }
 #topbar-first .btn-group > a {
 	background-color: #7f9baa;
@@ -1287,7 +1300,7 @@ ul li .intro-wrapper button.intro-action-link {
 }
 
 .tooltip {
-		font-size: 15px;
+	font-size: 15px;
 }
 
 .nav-pills .dropdown-menu li > a:hover,
@@ -1470,7 +1483,11 @@ aside .vcard #profile-photo-wrapper {
 aside .vcard img.u-photo,
 aside img.vcard-photo {
 	width: 100%;
-	border-radius: 3px;
+}
+aside .vcard img.u-photo,
+aside img.vcard-photo,
+#change-profile-picture {
+	border-radius: var(--main-image-border-radius);
 }
 aside .vcard .tool .action {
 	position: absolute;
@@ -1550,7 +1567,7 @@ aside .vcard a.btn, aside .vcard button {
 #nav-short-info .contact-wrapper img {
 	height: 34px;
 	width: 34px;
-	border-radius: 3px;
+	border-radius: var(--main-image-border-radius);
 }
 #vcard-short-desc,
 #nav-short-info .contact-wrapper .media-body {
@@ -2099,6 +2116,9 @@ aside .panel-body {
 	border-radius: 3px;
 	/*maybe some adional stuff is needed for the different screen sizes */
 }
+.click-card .contact-photo {
+	border-radius: var(--main-image-border-radius);
+}
 .contact-photo-image-wrapper {
 	width: 100%;
 	height: 100%;
@@ -2133,7 +2153,7 @@ aside .panel-body {
 .contact-photo-xs {
 	height: 38px;
 	width: 38px;
-	border-radius: 3px;
+	border-radius: var(--main-image-border-radius);
 }
 .wwto .contact-photo {
 	width: auto;
@@ -3348,6 +3368,9 @@ ul li:hover .contact-wrapper .contact-action-link:hover {
 	height: 48px;
 	width: 48px;
 }
+.message-content-wrapper .contact-photo-wrapper img {
+	border-radius: var(--main-image-border-radius);
+}
 .mail-thread #prvmail-to-label,
 .mail-thread #prvmail-subject-label {
 	display: none;
@@ -4256,6 +4279,12 @@ body .tread-wrapper .hovercard:hover .hover-card-content a {
 	color: $link_color !important;
 }
 
+.hover-card-pic img.thumbnail {
+	border: none;
+	border-radius: var(--main-image-border-radius);
+	box-shadow: unset;
+}
+
 /* Pagination improvements */
 .pagination {
 	text-align: center;
@@ -4847,10 +4876,7 @@ div.login-form, .login-content-wrapper,
   body.show-nav-labels .navbar-left:has(a[href="community"]) #nav-calendar-link {
   	display: none;
   }
-}
 
-	/* Even smaller mobile displays */
-@media (width < 382px) {
 	.topbar-nav .nav-segment a.nav-menu, .topbar-actions .nav-segment a.nav-menu, .topbar-actions .nav-segment button, .topbar-actions .navbar-toggle {
 		padding-left: 6px!important;
 		padding-right: 6px!important;
@@ -4859,6 +4885,21 @@ div.login-form, .login-content-wrapper,
 	#topbar-first #mobile-left-menu {
 		padding-inline-end: 3px;
 		padding-inline-start: 3px;
+	}
+
+}
+
+	/* Even smaller mobile displays */
+@media (width < 382px) {
+
+	#topbar-first .nav > .account .user-avatar {
+		height: 30px;
+		width: 30px;
+	}
+
+  #search-mobile-btn {
+		padding-left: 2px;
+		padding-right: 3px;
 	}
 
 	/* Compose adjustments, mostly to improve the bbcode button experience at lower resolutions */
