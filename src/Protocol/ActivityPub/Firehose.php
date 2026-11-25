@@ -15,7 +15,7 @@ use Friendica\Content\Conversation\Repository\UserDefinedChannel;
 use Friendica\Core\Protocol;
 use Friendica\Model\Contact;
 use Friendica\Model\Post\Engagement;
-use Friendica\Network\HTTPClient\Client\HttpClient;
+use Friendica\Network\HTTPClient\Capability\ICanSendHttpRequests;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPClient\Client\HttpClientOptions;
 use Friendica\Network\HTTPClient\Client\HttpClientRequest;
@@ -34,7 +34,7 @@ class Firehose
 
 	public function __construct(
 		private readonly LoggerInterface $logger,
-		private readonly HttpClient $httpClient,
+		private readonly ICanSendHttpRequests $httpClient,
 		private readonly ContentItem $contentItem,
 		private readonly UserDefinedChannel $userDefinedChannel,
 	) {}
