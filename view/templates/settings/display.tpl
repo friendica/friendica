@@ -53,6 +53,7 @@
 		{{include file="field_select.tpl" field=$font}}
 		{{include file="field_select.tpl" field=$text_spacing}}
 		{{include file="field_select.tpl" field=$attachment_icons}}
+		{{include file="field_checkbox.tpl" field=$embed_external_media}}
 		{{include file="field_checkbox.tpl" field=$embed_media}}
 		{{include file="field_checkbox.tpl" field=$filter_timeline_language}}
 		<div id="timeline-languages-wrapper">
@@ -74,6 +75,16 @@
 
 			toggleTimelineLanguages();
 			$filterTimelineLanguage.on('change', toggleTimelineLanguages);
+
+			let $embedExternalMedia = $("#id_embed_external_media");
+			let $embedMedia         = $("#id_embed_media");
+
+			function toggleEmbedMedia() {
+				$embedMedia.prop('disabled', !$embedExternalMedia.is(':checked'));
+			}
+
+			toggleEmbedMedia();
+			$embedExternalMedia.on('change', toggleEmbedMedia);
 		})();
 	</script>
 

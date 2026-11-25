@@ -1484,6 +1484,42 @@ summary.wall-item-summary {
 	mask-image: url(asset/remixicon/icons/Document/file-fill.svg);
 	background-color: #868e96;
 }
+.media-player.fancybox-content {
+	padding: 44px 16px 16px;
+}
+.media-player-audio {
+	width: min(500px, 100vw - 48px);
+}
+.media-player-audio audio {
+	width: 100%;
+}
+.media-player-video {
+	width: max(min(280px, 100vw - 48px), min(900px, 100vw - 48px, (100vh - 110px) * var(--media-ratio)));
+}
+.media-player-video > .video-top-wrapper,
+.media-player-video > .iframe-placeholder {
+	position: relative;
+	aspect-ratio: var(--media-ratio) !important;
+	width: 100% !important;
+	height: auto !important;
+	max-height: none;
+}
+.media-player-video .video-top-wrapper > video,
+.media-player-video .video-js {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100% !important;
+	max-height: none;
+	padding-top: 0 !important;
+	object-fit: contain;
+}
+.attachpreview {
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+}
 .body-attach > .attachlink {
 	display: flex;
 	align-items: center;

@@ -11,7 +11,6 @@ use Friendica\Contact\LocalRelationship\Entity\LocalRelationship;
 use Friendica\Content\ContactSelector;
 use Friendica\Content\Image;
 use Friendica\Content\Post\Collection\PostMedias;
-use Friendica\Content\Post\Entity\FileKind;
 use Friendica\Content\Post\Entity\PostMedia;
 use Friendica\Content\Text\BBCode;
 use Friendica\Content\Text\HTML;
@@ -3031,9 +3030,10 @@ class Item
 
 			if ($attach) {
 				$splitAttachments = DI::postMediaRepository()->splitAttachments($item['uri-id'], [], $item['has-media'] ?? false, $uid != 0);
+				$splitAttachments = self::moveExternalMedia($splitAttachments, $item, $uid);
 
 				$ev = self::addVisualAttachments($splitAttachments['visual'], $item, $ev, false, $uid);
-				$ev = self::addNonVisualAttachments($splitAttachments['additional'], $item, $ev);
+				$ev = self::addNonVisualAttachments($splitAttachments['additional'], $item, $ev, $uid);
 				$ev = self::addHiddenAttachments($splitAttachments['hidden'], $item, $ev);
 			}
 
@@ -3196,11 +3196,15 @@ class Item
 			return $s;
 		}
 
+		$itemSplitAttachments = self::moveExternalMedia($itemSplitAttachments, $item, $uid);
+
 		if (!empty($sharedSplitAttachments)) {
+			$sharedSplitAttachments = self::moveExternalMedia($sharedSplitAttachments, $shared_item, $uid);
+
 			$s    = self::addGallery($s, $sharedSplitAttachments['visual']);
 			$s    = self::addVisualAttachments($sharedSplitAttachments['visual'], $shared_item, $s, true, $uid);
 			$s    = self::addLinkAttachment($shared_uri_id ?: $item['uri-id'], $sharedSplitAttachments, $body, $s, true, $quote_shared_links, $uid, $shared_item);
-			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s);
+			$s    = self::addNonVisualAttachments($sharedSplitAttachments['additional'], $item, $s, $uid);
 			$s    = self::addHiddenAttachments($sharedSplitAttachments['hidden'], $item, $s);
 			$body = BBCode::removeSharedData($body);
 		}
@@ -3214,7 +3218,7 @@ class Item
 		$s = self::addGallery($s, $itemSplitAttachments['visual']);
 		$s = self::addVisualAttachments($itemSplitAttachments['visual'], $item, $s, false, $uid);
 		$s = self::addLinkAttachment($item['uri-id'], $itemSplitAttachments, $body, $s, false, $shared_links, $uid, $item);
-		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s);
+		$s = self::addNonVisualAttachments($itemSplitAttachments['additional'], $item, $s, $uid);
 		$s = self::addHiddenAttachments($itemSplitAttachments['hidden'], $item, $s);
 		$s = self::addQuestions($item, $s);
 
@@ -3453,6 +3457,60 @@ class Item
 	}
 
 	/**
+	 * Move external audio and video to the non-visual attachments when the viewer doesn't want external media to be embedded
+	 *
+	 * Videos that are provided with an external player (mostly from Peertube) are replaced by a link card for the video page.
+	 * This card is returned in the additional key "card".
+	 *
+	 * @param PostMedias[] $attachments Split attachments of the post
+	 * @param array        $item        Post, media that its body contains isn't shown as attachment
+	 * @param int          $uid
+	 * @return PostMedias[] Modified attachments
+	 */
+	private static function moveExternalMedia(array $attachments, array $item, int $uid): array
+	{
+		$body       = (string) $item['body'];
+		$visual     = new PostMedias();
+		$additional = new PostMedias();
+		$card       = null;
+
+		/** @var PostMedia $PostMedia */
+		foreach ($attachments['visual'] as $PostMedia) {
+			if (!$PostMedia->isPlayable() || DI::postMediaRepository()->mayEmbedUrl($uid, (string) $PostMedia->url)) {
+				$visual[] = $PostMedia;
+				continue;
+			}
+
+			if (self::containsLink($body, (string) $PostMedia->url, $PostMedia->type) || self::containsEmbed($body, (string) $PostMedia->url)) {
+				continue;
+			}
+
+			$video_card = DI::postMediaRepository()->getVideoCard($PostMedia, $attachments['link'], $item);
+			if ($video_card) {
+				$card ??= $video_card;
+			} else {
+				$additional[] = $PostMedia;
+			}
+		}
+
+		foreach ($attachments['additional'] as $PostMedia) {
+			if ($card && in_array($PostMedia->type, [PostMedia::TYPE_VIDEO, PostMedia::TYPE_HLS, PostMedia::TYPE_TORRENT]) && !DI::baseUrl()->isLocalUrl((string) $PostMedia->url)) {
+				continue;
+			}
+			$additional[] = $PostMedia;
+		}
+
+		$attachments['visual']     = $visual;
+		$attachments['additional'] = $additional;
+
+		if ($card) {
+			$attachments['card'] = new PostMedias([$card]);
+		}
+
+		return $attachments;
+	}
+
+	/**
 	 * Add visual attachments to the content
 	 *
 	 * @param PostMedias $PostMedias
@@ -3585,13 +3643,18 @@ class Item
 			}
 		}
 
+		if (!empty($attachments['card'])) {
+			$attachment = $attachments['card'][0];
+			$has_media  = false;
+		}
+
 		if (!isset($attachment) && preg_match("/.*(\[attachment.*?\].*?\[\/attachment\]).*/ism", $body, $match)) {
 			$attachment = DI::postMediaFactory()->createFromAttachment(BBCode::getAttachmentData($match[1]), $uriid);
 		}
 
 		DI::profiler()->stopRecording();
 
-		if (isset($attachment) && !in_array(strtolower($attachment->url), $ignore_links)) {
+		if (isset($attachment) && !in_array(strtolower((string) $attachment->url), $ignore_links)) {
 			if (isset($attachment->description) || isset($attachment->preview) || (isset($attachment->name) && !Strings::compareLink($attachment->name, $attachment->url))) {
 				// @todo Use a template
 				$preview_mode = DI::pConfig()->get($uid, 'system', 'preview_mode', BBCode::PREVIEW_AUTO);
@@ -3600,8 +3663,9 @@ class Item
 				} elseif ($preview_mode == BBCode::PREVIEW_AUTO) {
 					$preview_mode = $attachment->isArticle() ? BBCode::PREVIEW_SMALL : BBCode::PREVIEW_LARGE;
 				}
-				if (!$has_media && $preview_mode != BBCode::PREVIEW_NONE && !self::containsEmbed($body, $attachment->url)) {
-					$rendered = BBCode::convertAttachmentFromPostMedia($attachment, BBCode::INTERNAL, $uriid, $preview_mode, $uid != 0, self::hideDescription($attachment, $content));
+				$may_embed = DI::postMediaRepository()->mayEmbedMedia($uid, $attachment);
+				if (!$has_media && $preview_mode != BBCode::PREVIEW_NONE && (!$may_embed || !self::containsEmbed($body, $attachment->url))) {
+					$rendered = BBCode::convertAttachmentFromPostMedia($attachment, BBCode::INTERNAL, $uriid, $preview_mode, $uid != 0 && $may_embed, self::hideDescription($attachment, $content));
 				} elseif (!self::containsLink($content, $attachment->url, PostMedia::TYPE_HTML)) {
 					$rendered = Renderer::replaceMacros(Renderer::getMarkupTemplate('content/link.tpl'), [
 						'$url'   => $attachment->url,
@@ -3652,18 +3716,19 @@ class Item
 	 * @param PostMedias $PostMedias
 	 * @param array      $item
 	 * @param string     $content
+	 * @param int        $uid
 	 * @return string modified content
 	 * @throws InternalServerErrorException
 	 * @throws \ImagickException
 	 */
-	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content): string
+	private static function addNonVisualAttachments(PostMedias $PostMedias, array $item, string $content, int $uid): string
 	{
 		DI::profiler()->startRecording('rendering');
 		$attachments = [];
 
 		/** @var PostMedia $PostMedia */
 		foreach ($PostMedias as $PostMedia) {
-			if (strpos((string) $item['body'], (string) $PostMedia->url)) {
+			if (!$PostMedia->isPlayable() && strpos((string) $item['body'], (string) $PostMedia->url)) {
 				continue;
 			}
 
@@ -3676,17 +3741,7 @@ class Item
 			];
 			$the_url = Contact::magicLinkByContact($author, $PostMedia->url);
 
-			$name = trim($PostMedia->description ?? '' ?: $PostMedia->name ?? '' ?: basename(parse_url($PostMedia->url, PHP_URL_PATH) ?: $PostMedia->url));
-
-			$kind = FileKind::fromMimeType($PostMedia->mimetype);
-
-			$attachments[] = [
-				'url'  => strip_tags($the_url),
-				'name' => $name,
-				'size' => $PostMedia->size ? Strings::formatBytes($PostMedia->size) : '',
-				'kind' => $kind->value,
-				'type' => $kind->label(DI::l10n()),
-			];
+			$attachments[] = DI::postMediaRepository()->getFileAttachmentData($PostMedia, $the_url, $uid);
 		}
 
 		if (!empty($attachments)) {

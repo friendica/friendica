@@ -582,6 +582,7 @@ return [
 		'/attachment/upload'       => [Module\Media\Attachment\Upload::class,  [       R::POST]],
 		'/photo/browser[/{album}]' => [Module\Media\Photo\Browser::class,      [R::GET]],
 		'/photo/upload'            => [Module\Media\Photo\Upload::class,       [       R::POST]],
+		'/player/{id:\d+}'         => [Module\Media\Player::class,             [R::GET]],
 	],
 
 	'/moderation' => [

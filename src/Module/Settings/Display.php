@@ -126,6 +126,7 @@ class Display extends BaseSettings
 		$display_eventlist        = (bool) $request['display_eventlist'];
 		$preview_mode             = (int) $request['preview_mode'];
 		$update_content           = (int) $request['update_content'];
+		$embed_external_media     = (bool) $request['embed_external_media'];
 		$embed_media              = (bool) $request['embed_media'];
 		$widget_timelineorder     = trim($request['widget_timelineorder']);
 		$menu_timelineorder       = trim($request['menu_timelineorder']);
@@ -194,7 +195,10 @@ class Display extends BaseSettings
 		$this->pConfig->set($uid, 'system', 'show_page_drop', $show_page_drop);
 		$this->pConfig->set($uid, 'system', 'display_eventlist', $display_eventlist);
 		$this->pConfig->set($uid, 'system', 'preview_mode', $preview_mode);
-		$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
+		$this->pConfig->set($uid, 'system', 'embed_external_media', $embed_external_media);
+		if ($embed_external_media) {
+			$this->pConfig->set($uid, 'system', 'embed_media', $embed_media);
+		}
 		if ($widget_timeline_reset) {
 			$this->pConfig->delete($uid, 'system', 'widget_timeline_order');
 		} else {
@@ -325,11 +329,12 @@ class Display extends BaseSettings
 			ConversationRenderer::COMMENTS_MODE_COMPACT => $this->t('Compact conversation view: only comments from the thread author and yourself that form coherent conversation threads'),
 			ConversationRenderer::COMMENTS_MODE_HIDDEN  => $this->t('Hide comments in feeds'),
 		];
-		$click_to_display  = $this->pConfig->get($uid, 'system', 'click_to_display', false);
-		$widgets_as_menu   = $this->pConfig->get($uid, 'system', 'widgets_as_menu', false);
-		$show_page_drop    = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
-		$display_eventlist = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
-		$embed_media       = $this->pConfig->get($uid, 'system', 'embed_media', false);
+		$click_to_display     = $this->pConfig->get($uid, 'system', 'click_to_display', false);
+		$widgets_as_menu      = $this->pConfig->get($uid, 'system', 'widgets_as_menu', false);
+		$show_page_drop       = $this->pConfig->get($uid, 'system', 'show_page_drop', true);
+		$display_eventlist    = $this->pConfig->get($uid, 'system', 'display_eventlist', true);
+		$embed_external_media = $this->pConfig->get($uid, 'system', 'embed_external_media', true);
+		$embed_media          = $this->pConfig->get($uid, 'system', 'embed_media', false);
 
 		$hide_empty_descriptions = $this->pConfig->get($uid, 'accessibility', 'hide_empty_descriptions', false);
 		$hide_custom_emojis      = $this->pConfig->get($uid, 'accessibility', 'hide_custom_emojis', false);
@@ -552,7 +557,8 @@ class Display extends BaseSettings
 			'$font'                     => ['font', $this->t('Font'), $font, $this->t('Replace the font of the theme with a font that is easier to read. OpenDyslexic is designed for people with dyslexia, Atkinson Hyperlegible and Luciole for people with low vision, Lexend for a smoother reading flow, Andika for beginning readers.'), $fonts, false],
 			'$text_spacing'             => ['text_spacing', $this->t('Text spacing'), $text_spacing, $this->t('Increase the spacing between letters, words and lines to make texts easier to read. "Large" corresponds to the text spacing values of WCAG 2.1 success criterion 1.4.12.'), $text_spacings, false],
 			'$attachment_icons'         => ['attachment_icons', $this->t('Attachment icons style'), $attachment_icons, $this->t('Style of the file attachment icons'), $attachment_icon_modes, false],
-			'$embed_media'              => ['embed_media', $this->t('Embed supported media'), $embed_media, $this->t('When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos.')],
+			'$embed_external_media'     => ['embed_external_media', $this->t('Embed external media'), $embed_external_media, $this->t('When enabled, media from external sources will be embedded in posts, like for example YouTube or PeerTube videos. When disabled, external media is shown as an attachment or a link.')],
+			'$embed_media'              => ['embed_media', $this->t('Embed supported media'), $embed_media, $this->t('When enabled, remote media will be embedded in the post instead of using the local player if this is supported by the remote system. This is useful for media where the remote player is better than the local one, like for example Peertube videos.'), $embed_external_media ? '' : 'disabled'],
 			'$filter_timeline_language' => ['filter_timeline_language', $this->t('Filter timeline by language'), $filter_timeline_language, $this->t('When enabled, only posts in the selected languages are shown in the network timeline.')],
 			'$timeline_languages'       => ['timeline_languages[]', $this->t('Timeline languages:'), $timeline_languages, $this->t('Select all the languages you want to see in your timelines. "Undetermined" describes all posts for which no language information was detected (e.g. posts with just an image or too little text to be sure of the language).'), $languages, 'multiple'],
 

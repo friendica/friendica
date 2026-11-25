@@ -14,12 +14,21 @@
 			var videoSrc = '{{$video.src}}';
 
 			function hide() {
-				document.getElementById('video-top-wrapper-{{$video.id}}').style.display = 'none';
+				var wrapper = document.getElementById('video-top-wrapper-{{$video.id}}');
+				if (wrapper.closest('.media-player')) {
+					wrapper.replaceWith(video.querySelector('a'));
+					return;
+				}
+				wrapper.style.display = 'none';
 			}
 
 			function play() {
+				if (!video.isConnected) {
+					return;
+				}
 				if (Hls.isSupported()) {
 					var hls = new Hls();
+					video.hls = hls;
 					hls.loadSource(videoSrc);
 					hls.attachMedia(video);
 					hls.on(Hls.Events.ERROR, function (event, data) {
