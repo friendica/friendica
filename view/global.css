@@ -745,7 +745,8 @@ img {
  */
 figure.img-allocated-height {
 	position: relative;
-	background: center / auto rgba(0, 0, 0, 0.05) url(/images/icons/image.png) no-repeat;
+	background-color: rgba(0, 0, 0, 0.05);
+	/* background-image: url(/images/icons/image.png); */
 	margin: 0;
 }
 figure.img-allocated-height img{
