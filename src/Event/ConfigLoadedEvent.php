@@ -10,19 +10,21 @@ declare(strict_types=1);
 namespace Friendica\Event;
 
 use Friendica\Core\Config\Util\ConfigFileManager;
+use Friendica\Core\Event\AbstractEvent;
 
 /**
  * Notify that the config was loaded
- *
- * @internal
  */
-final class ConfigLoadedEvent extends Event
+final class ConfigLoadedEvent extends AbstractEvent
 {
-	public const CONFIG_LOADED = 'friendica.config_loaded';
+	public const NAME = 'friendica.config_loaded';
 
-	public function __construct(string $name, private readonly ConfigFileManager $config)
+	/**
+	 * @internal
+	 */
+	public function __construct(private readonly ConfigFileManager $config)
 	{
-		parent::__construct($name);
+		parent::__construct(self::NAME);
 	}
 
 	public function getConfig(): ConfigFileManager

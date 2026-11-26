@@ -13,8 +13,8 @@ use Friendica\Core\Logger\Type\WorkerLogger;
 use Friendica\Core\Worker\Entity\Process;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
-use Friendica\Event\Event;
+use Friendica\Event\AddWorkerTaskEvent;
+use Friendica\Event\WorkerJobStartEvent;
 use Friendica\Util\DateTimeFormat;
 
 /**
@@ -556,7 +556,7 @@ class Worker
 		// We use the callstack here to analyze the performance of executed worker entries.
 		// For this reason the variables have to be initialized.
 		DI::profiler()->reset();
-		DI::eventDispatcher()->dispatch(new Event(Event::WORKER_JOB_START));
+		DI::eventDispatcher()->dispatch(new WorkerJobStartEvent());
 
 		$appHelper->setQueue($queue);
 
@@ -1251,15 +1251,13 @@ class Worker
 			@trigger_error('`' . __METHOD__ . '()`: Passing ' . get_debug_type($command) . ' as $command is deprecated since 2026.08, it will be enforced as `string` in a future release.', E_USER_DEPRECATED);
 		}
 
-		$arr = ['args' => [$run_parameter, $command, ...$args], 'run_cmd' => true];
-
 		$eventDispatcher = DI::eventDispatcher();
 
-		$arr = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::ADD_WORKER_TASK, $arr),
-		)->getArray();
+		$event = $eventDispatcher->dispatch(
+			new AddWorkerTaskEvent([$run_parameter, $command, ...$args], true),
+		);
 
-		if (!$arr['run_cmd']) {
+		if (!$event->isRunCmd()) {
 			return 1;
 		}
 

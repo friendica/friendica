@@ -14,7 +14,7 @@ use Friendica\Content\Widget;
 use Friendica\Core\Renderer;
 use Friendica\Core\Search;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\DirectoryItemEvent;
 use Friendica\Model;
 use Friendica\Model\Profile;
 use Friendica\Network\HTTPException;
@@ -161,18 +161,11 @@ class Directory extends BaseModule
 
 		];
 
-		$eventDispatcher = DI::eventDispatcher();
+		$event = DI::eventDispatcher()->dispatch(
+			new DirectoryItemEvent($contact, $entry),
+		);
 
-		$hook_data = [
-			'contact' => $contact,
-			'entry'   => $entry,
-		];
-
-		$hook_data = $eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::DIRECTORY_ITEM, $hook_data),
-		)->getArray();
-
-		$entry = $hook_data['entry'] ?? $entry;
+		$entry = $event->getEntryArray();
 
 		unset($profile);
 		unset($location);

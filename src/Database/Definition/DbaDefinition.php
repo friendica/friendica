@@ -9,7 +9,7 @@ namespace Friendica\Database\Definition;
 
 use Exception;
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\DbStructureDefinitionEvent;
 
 /**
  * Stores the whole database definition
@@ -160,8 +160,8 @@ class DbaDefinition
 			$eventDispatcher = DI::eventDispatcher();
 
 			$definition = $eventDispatcher->dispatch(
-				new ArrayFilterEvent(ArrayFilterEvent::DB_STRUCTURE_DEFINITION, $definition),
-			)->getArray();
+				new DbStructureDefinitionEvent($definition),
+			)->getDefinitionArray();
 		}
 
 		$this->definition = $definition;

@@ -10,19 +10,21 @@ declare(strict_types=1);
 namespace Friendica\Event;
 
 use FastRoute\RouteCollector;
+use Friendica\Core\Event\AbstractEvent;
 
 /**
  * Allow addons to collect routes.
- *
- * @internal
  */
-final class CollectRoutesEvent extends Event
+final class CollectRoutesEvent extends AbstractEvent
 {
-	public const COLLECT_ROUTES = 'friendica.collect_routes';
+	public const NAME = 'friendica.collect_routes';
 
-	public function __construct(string $name, private RouteCollector $routeCollector)
+	/**
+	 * @internal
+	 */
+	public function __construct(private RouteCollector $routeCollector)
 	{
-		parent::__construct($name);
+		parent::__construct(self::NAME);
 	}
 
 	public function getRouteCollector(): RouteCollector

@@ -12,7 +12,7 @@ use Friendica\Core\Protocol;
 use Friendica\Core\Renderer;
 use Friendica\Database\DBA;
 use Friendica\DI;
-use Friendica\Event\HtmlFilterEvent;
+use Friendica\Event\ContactBlockEndEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\User;
 
@@ -114,9 +114,7 @@ class ContactBlock
 
 		$eventDispatcher = DI::eventDispatcher();
 
-		$o = $eventDispatcher->dispatch(
-			new HtmlFilterEvent(HtmlFilterEvent::CONTACT_BLOCK_END, $o),
-		)->getHtml();
+		$o = $eventDispatcher->dispatch(new ContactBlockEndEvent($o))->getHtml();
 
 		return $o;
 	}

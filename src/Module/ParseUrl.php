@@ -13,7 +13,7 @@ use Friendica\BaseModule;
 use Friendica\Content\Text\BBCode;
 use Friendica\Core\L10n;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\ParseLinkEvent;
 use Friendica\Model\Post;
 use Friendica\Network\HTTPClient\Client\HttpClientAccept;
 use Friendica\Network\HTTPException\BadRequestException;
@@ -73,21 +73,15 @@ class ParseUrl extends BaseModule
 			}
 		}
 
-		$hook_data = [
-			'url'    => $url,
-			'format' => $format,
-			'text'   => null,
-		];
+		$event = $this->eventDispatcher->dispatch(
+			new ParseLinkEvent($url, $format),
+		);
 
-		$hook_data = $this->eventDispatcher->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::PARSE_LINK, $hook_data),
-		)->getArray();
-
-		if ($hook_data['text']) {
+		if ($event->getText()) {
 			if ($format == 'json') {
-				$this->earlyJsonExit($hook_data['text']);
+				$this->earlyJsonExit($event->getText());
 			} else {
-				$this->earlyHttpExit($hook_data['text']);
+				$this->earlyJsonExit($event->getText());
 			}
 		}
 

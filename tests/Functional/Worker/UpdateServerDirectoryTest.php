@@ -8,7 +8,7 @@
 namespace Friendica\Test\Functional\Worker;
 
 use Friendica\DI;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\AddWorkerTaskEvent;
 use Friendica\Test\DiceHttpMockHandlerTrait;
 use Friendica\Test\MockedTestCase;
 use Friendica\Worker\UpdateServerDirectory;
@@ -31,17 +31,16 @@ class UpdateServerDirectoryTest extends MockedTestCase
 
 		$this->setupHttpMockHandler();
 
-		/** @var \Friendica\Event\EventDispatcher */
+		/** @var \Friendica\Core\Event\EventDispatcher */
 		$eventDispatcher = DI::eventDispatcher();
 
 		// The tasks are only collected, they aren't added to the worker queue
-		$eventDispatcher->addListener(ArrayFilterEvent::ADD_WORKER_TASK, function (ArrayFilterEvent $event): void {
-			$arr = $event->getArray();
-			if ($arr['args'][1] === 'DiscoverGroup') {
-				$this->discovered[] = $arr['args'][2];
+		$eventDispatcher->addListener(AddWorkerTaskEvent::NAME, function (AddWorkerTaskEvent $event): void {
+			$args = $event->getArgsArray();
+			if ($args[1] === 'DiscoverGroup') {
+				$this->discovered[] = $args[2];
 			}
-			$arr['run_cmd'] = false;
-			$event->setArray($arr);
+			$event->setRunCmd(false);
 		});
 	}
 

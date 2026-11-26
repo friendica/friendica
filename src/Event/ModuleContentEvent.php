@@ -9,21 +9,26 @@ declare(strict_types=1);
 
 namespace Friendica\Event;
 
+use Friendica\Core\Event\AbstractEvent;
+
 /**
  * Allow modules to react on content rendering.
- *
- * @internal
  */
-final class ModuleContentEvent extends Event
+final class ModuleContentEvent extends AbstractEvent
 {
-	public const MODULE_CONTENT = 'friendica.module_content';
+	public const NAME = 'friendica.module_content';
 
 	/**
+	 * @internal
+	 *
 	 * @param class-string<\Friendica\BaseModule> $moduleClass
 	 */
-	public function __construct(string $name, private readonly string $moduleName, private readonly string $moduleClass, private string $content)
-	{
-		parent::__construct($name);
+	public function __construct(
+		private readonly string $moduleName,
+		private readonly string $moduleClass,
+		private string $content,
+	) {
+		parent::__construct(self::NAME);
 	}
 
 	public function getModuleName(): string

@@ -10,7 +10,7 @@ namespace Friendica\Module\Security;
 use Friendica\App;
 use Friendica\BaseModule;
 use Friendica\Core\L10n;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\LoginFormEvent;
 use Friendica\Core\Renderer;
 use Friendica\Core\Session\Capability\IHandleUserSessions;
 use Friendica\DI;
@@ -187,9 +187,10 @@ class Login extends BaseModule
 			],
 		);
 
-		$o = DI::eventDispatcher()->dispatch(
-			new ArrayFilterEvent(ArrayFilterEvent::LOGIN_FORM, ['html' => $o]),
-		)->getArray()['html'] ?? '';
+		$event = DI::eventDispatcher()->dispatch(
+			new LoginFormEvent($o),
+		);
+		$o = $event->getHtml();
 
 		return $o;
 	}

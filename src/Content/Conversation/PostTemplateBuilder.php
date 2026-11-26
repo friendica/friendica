@@ -18,7 +18,8 @@ use Friendica\Core\Config\Capability\IManageConfigValues;
 use Friendica\Core\L10n;
 use Friendica\Core\PConfig\Capability\IManagePersonalConfigValues;
 use Friendica\Core\Protocol;
-use Friendica\Event\ArrayFilterEvent;
+use Friendica\Event\RenderLocationEvent;
+use Friendica\Event\DisplayItemEvent;
 use Friendica\Model\Contact;
 use Friendica\Model\Item as ItemModel;
 use Friendica\Model\Post;
@@ -438,9 +439,8 @@ final class PostTemplateBuilder
 			'smart_threading'    => $this->uid ? !$this->pConfig->get($this->uid, 'system', 'no_smart_threading', false) : false,
 		];
 
-		$arr    = ['item' => $item, 'output' => $tmpItem];
-		$arr    = $this->eventDispatcher->dispatch(new ArrayFilterEvent(ArrayFilterEvent::DISPLAY_ITEM, $arr))->getArray();
-		$result = $arr['output'];
+		$event  = $this->eventDispatcher->dispatch(new DisplayItemEvent($item, $tmpItem));
+		$result = $event->getTemplateDataArray();
 
 		$children = [];
 		if (!empty($item['children']) && is_array($item['children'])) {
@@ -750,9 +750,8 @@ final class PostTemplateBuilder
 	 */
 	private function buildLocationData(array $item): array
 	{
-		$locate        = ['location' => $item['location'] ?? '', 'coord' => $item['coord'] ?? '', 'html' => ''];
-		$locate        = $this->eventDispatcher->dispatch(new ArrayFilterEvent(ArrayFilterEvent::RENDER_LOCATION, $locate))->getArray();
-		$location_html = $locate['html'] ?: Strings::escapeHtml($locate['location'] ?: $locate['coord'] ?: '');
+		$event         = $this->eventDispatcher->dispatch(new RenderLocationEvent($item['location'] ?? '', $item['coord'] ?? ''));
+		$location_html = $event->getHtml() ?: Strings::escapeHtml($event->getLocation() ?: $event->getCoord() ?: '');
 
 		return ['location_html' => $location_html];
 	}
