@@ -23,7 +23,7 @@
 		<ul>
 			{{foreach $page.1 as $item}}
 				<li class="{{$item.2}}">
-					<a href="{{$item.0}}" {{if $item.accesskey}}accesskey="{{$item.accesskey}}" {{/if}}>
+					<a href="{{$item.0}}" {{if $item.accesskey}}accesskey="{{$item.accesskey}}" {{/if}}{{if $item.up_follow}}up-follow="{{$item.up_follow}}" {{/if}}>
 						{{$item.1}}
 						{{if $name == "users"}}
 							<span id="pending-update" class="badge pull-right"></span>
