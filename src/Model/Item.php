@@ -313,28 +313,12 @@ class Item
 	 * @param array   $condition The condition for finding the item entries
 	 * @param integer $uid       User who wants to delete this item
 	 * @return void
-	 * @throws \Friendica\Network\HTTPException\InternalServerErrorException
+	 * @deprecated 2026.11 - Use \Friendica\Post\Deletion::deleteForUser() instead
+	 * @see \Friendica\Post\Deletion::deleteForUser()
 	 */
 	public static function deleteForUser(array $condition, int $uid)
 	{
-		if ($uid == 0) {
-			return;
-		}
-
-		$items = Post::select(['id', 'uid', 'uri-id'], $condition);
-		while ($item = Post::fetch($items)) {
-			if (in_array($item['uid'], [$uid, 0])) {
-				Post\User::update($item['uri-id'], $uid, ['hidden' => true], true);
-				Post\ThreadUser::update($item['uri-id'], $uid, ['hidden' => true], true);
-			}
-
-			if ($item['uid'] == $uid) {
-				self::markForDeletionById($item['id'], Worker::PRIORITY_HIGH);
-			} elseif ($item['uid'] != 0) {
-				DI::logger()->warning('Wrong ownership. Not deleting item', ['id' => $item['id']]);
-			}
-		}
-		DBA::close($items);
+		DI::postDeletion()->deleteForUser($condition, $uid);
 	}
 
 	/**

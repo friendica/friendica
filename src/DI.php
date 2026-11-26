@@ -588,6 +588,11 @@ abstract class DI
 	// "Post" namespace instances
 	//
 
+	public static function postDeletion(): Post\Deletion
+	{
+		return self::$dice->create(Post\Deletion::class);
+	}
+
 	public static function postLinkResolver(): Post\LinkResolver
 	{
 		return self::$dice->create(Post\LinkResolver::class);
