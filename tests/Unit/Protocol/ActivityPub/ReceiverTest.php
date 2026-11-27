@@ -155,4 +155,58 @@ class ReceiverTest extends TestCase
 
 		self::assertSame($expected, $method->invoke(null, $place));
 	}
+
+	public static function dataHostedBySigner(): array
+	{
+		return [
+			'same host' => [
+				'objectId' => 'https://example.test/note/1',
+				'signer'   => ['https://example.test/users/alice'],
+				'expected' => true,
+			],
+			'different case' => [
+				'objectId' => 'https://Example.TEST/note/1',
+				'signer'   => ['https://example.test/users/alice'],
+				'expected' => true,
+			],
+			'second signer' => [
+				'objectId' => 'https://example.test/note/1',
+				'signer'   => ['https://other.test/users/bob', 'https://example.test/users/alice'],
+				'expected' => true,
+			],
+			'other host' => [
+				'objectId' => 'https://example.test/note/1',
+				'signer'   => ['https://other.test/users/bob'],
+				'expected' => false,
+			],
+			'subdomain' => [
+				'objectId' => 'https://example.test/note/1',
+				'signer'   => ['https://sub.example.test/users/alice'],
+				'expected' => false,
+			],
+			'id without host' => [
+				'objectId' => '/note/1',
+				'signer'   => ['https://example.test/users/alice'],
+				'expected' => false,
+			],
+			'signer without host' => [
+				'objectId' => 'https://example.test/note/1',
+				'signer'   => ['/users/alice'],
+				'expected' => false,
+			],
+			'no signer' => [
+				'objectId' => 'https://example.test/note/1',
+				'signer'   => [],
+				'expected' => false,
+			],
+		];
+	}
+
+	#[DataProvider('dataHostedBySigner')]
+	public function testIsHostedBySigner(string $objectId, array $signer, bool $expected): void
+	{
+		$method = new \ReflectionMethod(Receiver::class, 'isHostedBySigner');
+
+		self::assertSame($expected, $method->invoke(null, $objectId, $signer));
+	}
 }
