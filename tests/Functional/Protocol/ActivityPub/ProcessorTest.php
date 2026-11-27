@@ -54,4 +54,32 @@ class ProcessorTest extends FixtureTestCase
 		self::assertTrue(ItemURI::exists($uriId));
 		self::assertTrue(DBA::exists('post-media', ['uri-id' => $uriId]));
 	}
+
+	public function testLocalPostIsNotUpdatedFromOutside(): void
+	{
+		$condition = ['uri-id' => 20001];
+		$fields    = ['title', 'body'];
+		$before    = DBA::selectFirst('post-content', $fields, $condition);
+
+		// The author matches, so only the check for local posts rejects this update
+		Processor::updateItem([
+			'id'                    => 'https://friendica.local/objects/1',
+			'author'                => 'https://friendica.local/profile/othercontact',
+			'actor'                 => 'https://friendica.local/profile/othercontact',
+			'object_type'           => 'as:Note',
+			'updated'               => '2026-11-27T12:00:00Z',
+			'name'                  => '',
+			'content'               => 'defaced',
+			'source'                => null,
+			'tags'                  => [],
+			'attachments'           => [],
+			'emojis'                => [],
+			'languages'             => [],
+			'transmitted-languages' => [],
+			'location'              => null,
+			'generator'             => null,
+		]);
+
+		self::assertSame($before, DBA::selectFirst('post-content', $fields, $condition));
+	}
 }
