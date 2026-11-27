@@ -733,6 +733,16 @@ class Receiver
 			}
 		}
 
+		// An inline object is only trusted when it is hosted on the system of one of the signers.
+		// Otherwise the object is fetched from its origin.
+		if ($trust_source && in_array($type, ['as:Create', 'as:Update']) && is_array($activity['as:object'])) {
+			$inline_object_id = (string) JsonLD::fetchElement($activity, 'as:object', '@id');
+			if (!self::isHostedBySigner($inline_object_id, $signer)) {
+				DI::logger()->info('Object id is not hosted by the signer. The object will be fetched.', ['type' => $type, 'object-id' => $inline_object_id, 'signer' => $signer, 'actor' => $actor]);
+				$trust_source = false;
+			}
+		}
+
 		// $trust_source is called by reference and is set to true if the content was retrieved successfully
 		$object_data = self::prepareObjectData($activity, $uid, $push, $trust_source, $original_actor);
 		if (empty($object_data)) {
@@ -1477,6 +1487,25 @@ class Receiver
 		}
 
 		return $object_data;
+	}
+
+	/**
+	 * Checks if the given object id is located on the host of one of the signers
+	 */
+	private static function isHostedBySigner(string $object_id, array $signer): bool
+	{
+		$object_host = strtolower((string) parse_url($object_id, PHP_URL_HOST));
+		if ($object_host === '') {
+			return false;
+		}
+
+		foreach ($signer as $url) {
+			if (strtolower((string) parse_url((string) $url, PHP_URL_HOST)) === $object_host) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

@@ -250,6 +250,13 @@ class Processor
 			return;
 		}
 
+		$author_id = Contact::getIdForURL($activity['author'] ?? '');
+		if (empty($author_id) || ($author_id !== (int) $item['author-id'])) {
+			DI::logger()->notice('Update is not from the author of the post, skipping update', ['uri' => $activity['id'], 'author-id' => $item['author-id'], 'author-link' => $item['author-link'], 'update-author' => $activity['author'] ?? '', 'update-author-id' => $author_id]);
+			Queue::remove($activity);
+			return;
+		}
+
 		$item['changed'] = DateTimeFormat::utcNow();
 		$item['edited']  = DateTimeFormat::utc($activity['updated']);
 
