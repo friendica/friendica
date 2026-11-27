@@ -761,7 +761,7 @@ class Notify extends BaseRepository
 		$item = Model\Post::selectFirstForUser(
 			$Notification->uid,
 			Model\Item::ITEM_FIELDLIST,
-			['uid'   => [0, $Notification->uid], 'uri-id' => $Notification->targetUriId, 'deleted' => false],
+			['uid' => [0, $Notification->uid], 'uri-id' => $Notification->targetUriId, 'deleted' => false],
 			['order' => ['uid' => true]],
 		);
 		if (empty($item)) {

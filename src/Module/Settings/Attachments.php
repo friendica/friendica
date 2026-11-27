@@ -80,7 +80,7 @@ class Attachments extends BaseSettings
 
 		$attachments = Attach::selectToArray(
 			['id', 'filename', 'filetype', 'filesize', 'created'],
-			['uid'   => $uid],
+			['uid' => $uid],
 			['order' => ['created' => true], 'limit' => [$pager->getStart(), $pager->getItemsPerPage()]],
 		);
 

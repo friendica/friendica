@@ -118,7 +118,7 @@ class Cron
 					DBA::update(
 						'workerqueue',
 						['executed' => DBA::NULL_DATETIME, 'created' => DateTimeFormat::utcNow(), 'priority' => $new_priority, 'pid' => 0],
-						['id'       => $entry["id"]],
+						['id' => $entry["id"]],
 					);
 				} else {
 					DI::logger()->info('Process runtime is okay', ['duration' => number_format($duration, 3), 'max' => $max_duration, 'id' => $entry["id"], 'pid' => $entry["pid"], 'command' => $command]);

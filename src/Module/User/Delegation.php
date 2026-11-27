@@ -150,7 +150,7 @@ class Delegation extends BaseModule
 
 			$notifications += $this->db->count(
 				'mail',
-				['uid'      => $identity['uid'], 'seen' => false],
+				['uid' => $identity['uid'], 'seen' => false],
 				['distinct' => true, 'expression' => 'convid'],
 			);
 

@@ -34,7 +34,7 @@ class Display extends DisplayModule
 		$item = Post::selectFirst(
 			['uid', 'parent-uri-id', 'uri-id'],
 			['uri-id' => $uriId, 'uid' => [0, $profileUid]],
-			['order'  => ['uid' => true]],
+			['order' => ['uid' => true]],
 		);
 
 		if (empty($item)) {

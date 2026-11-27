@@ -129,7 +129,7 @@ class Contacts extends BaseModule
 				$contact = Model\Contact::selectFirst(
 					[],
 					['uri-id' => $contact['uri-id'], 'uid' => [0, $this->userSession->getLocalUserId()]],
-					['order'  => ['uid' => 'DESC']],
+					['order' => ['uid' => 'DESC']],
 				);
 				return Module\Contact::getContactTemplateVars($contact);
 			},

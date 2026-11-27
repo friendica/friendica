@@ -3570,7 +3570,7 @@ class Contact
 				DBA::update(
 					'contact',
 					['bdyear' => substr($nextbd, 0, 4), 'bd' => $nextbd],
-					['id'     => $contact['id']],
+					['id' => $contact['id']],
 				);
 			}
 		}

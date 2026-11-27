@@ -651,7 +651,7 @@ class PostUpdate
 			DBA::update(
 				'contact',
 				['gsid' => GServer::getRealID($contact['baseurl'], true), 'baseurl' => (string) GServer::cleanUri(new Uri($contact['baseurl']))],
-				['id'   => $contact['id']],
+				['id' => $contact['id']],
 			);
 
 			++$rows;
@@ -706,7 +706,7 @@ class PostUpdate
 			DBA::update(
 				'apcontact',
 				['gsid' => GServer::getRealID($apcontact['baseurl'], true), 'baseurl' => (string) GServer::cleanUri(new Uri($apcontact['baseurl']))],
-				['url'  => $apcontact['url']],
+				['url' => $apcontact['url']],
 			);
 
 			++$rows;
@@ -1244,7 +1244,7 @@ class PostUpdate
 			DBA::update(
 				'contact',
 				['gsid' => GServer::getRealID($server, true), 'baseurl' => (string) GServer::cleanUri(new Uri($server))],
-				['id'   => $contact['id']],
+				['id' => $contact['id']],
 			);
 
 			++$rows;
