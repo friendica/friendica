@@ -51,6 +51,11 @@ class LDSignature
 		}
 		$pubkey = $profile['pubkey'];
 
+		if (!JsonLD::isSignable(self::signableData($data))) {
+			DI::logger()->info('Document contains data that is not covered by the signature', ['actor' => $profile['url']]);
+			return false;
+		}
+
 		$ohash = self::hash(self::signableOptions($data['signature']));
 		$dhash = self::hash(self::signableData($data));
 

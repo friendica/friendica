@@ -7,8 +7,14 @@
 
 namespace Friendica\Test\Unit\Util;
 
+use Dice\Dice;
+use Friendica\Core\Cache\Capability\ICanCache;
+use Friendica\DI;
+use Friendica\Util\BasePath;
 use Friendica\Util\JsonLD;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * JsonLD utility test class
@@ -169,5 +175,105 @@ class JsonLDTest extends TestCase
 
 		$data = JsonLD::fetchElement($object, 'source', 'content', 'mediaType2', 'text/bbcode');
 		self::assertNull($data);
+	}
+
+	private function initSignableEnvironment(): void
+	{
+		$cache = \Mockery::mock(ICanCache::class);
+		$cache->shouldReceive('get')->andReturn(null);
+		$cache->shouldReceive('set')->andReturn(true);
+
+		$basePath = \Mockery::mock(BasePath::class);
+		$basePath->shouldReceive('getPath')->andReturn(dirname(__DIR__, 3));
+
+		$dice = \Mockery::mock(Dice::class);
+		$dice->shouldReceive('create')->with(LoggerInterface::class)->andReturn(new NullLogger());
+		$dice->shouldReceive('create')->with(ICanCache::class)->andReturn($cache);
+		$dice->shouldReceive('create')->with(BasePath::class)->andReturn($basePath);
+
+		DI::init($dice, true);
+	}
+
+	private function getSignedActivity(): array
+	{
+		return [
+			'@context' => ['https://www.w3.org/ns/activitystreams', 'https://w3id.org/security/v1', ['sensitive' => 'as:sensitive']],
+			'id'       => 'https://social.example/users/alice/statuses/1/activity',
+			'type'     => 'Create',
+			'actor'    => 'https://social.example/users/alice',
+			'to'       => ['https://www.w3.org/ns/activitystreams#Public'],
+			'object'   => [
+				'id'           => 'https://social.example/users/alice/statuses/1',
+				'type'         => 'Note',
+				'attributedTo' => 'https://social.example/users/alice',
+				'summary'      => 'Content warning',
+				'sensitive'    => true,
+				'content'      => '<p>Honest post</p>',
+				'contentMap'   => ['en' => '<p>Honest post</p>'],
+				'replies'      => ['type' => 'Collection', 'first' => ['type' => 'CollectionPage', 'items' => []]],
+			],
+		];
+	}
+
+	public static function dataSignable(): array
+	{
+		return [
+			'honest' => [
+				'changes'  => [],
+				'signable' => true,
+			],
+			'scheme-less-ids' => [
+				'changes' => ['id' => 'social.example/users/alice/statuses/2/activity', 'object' => [
+					'id'      => 'social.example/users/alice/statuses/2',
+					'type'    => 'Note',
+					'content' => '<p>Forged post</p>',
+				]],
+				'signable' => false,
+			],
+			'scheme-less-object' => [
+				'changes'  => ['type' => 'Delete', 'object' => 'social.example/users/alice/statuses/1'],
+				'signable' => false,
+			],
+			'blank-node-id' => [
+				'changes'  => ['id' => '_:b0'],
+				'signable' => false,
+			],
+			'undefined-term' => [
+				'changes'  => ['identifier' => 'en'],
+				'signable' => false,
+			],
+			'undefined-type' => [
+				'changes'  => ['type' => 'Review'],
+				'signable' => false,
+			],
+			'invalid-language' => [
+				'changes'  => ['contentMap' => ['not a language' => 'Forged post']],
+				'signable' => false,
+			],
+			'differently-described-node' => [
+				'changes'  => ['instrument' => ['id' => 'https://social.example/users/alice/statuses/1', 'content' => 'Additional content']],
+				'signable' => false,
+			],
+			'identically-described-node' => [
+				'changes'  => ['target' => ['id' => 'https://social.example/users/alice', 'type' => 'Person'], 'actor' => ['id' => 'https://social.example/users/alice', 'type' => 'Person']],
+				'signable' => true,
+			],
+			'changed-by-fixes' => [
+				'changes'  => ['@context' => ['https://www.w3.org/ns/activitystreams', ['sensitive' => 'as:sensitive']], 'owner' => 'https://social.example/users/alice'],
+				'signable' => false,
+			],
+			'suspicious-command' => [
+				'changes'  => ['@graph' => []],
+				'signable' => false,
+			],
+		];
+	}
+
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataSignable')]
+	public function testIsSignable(array $changes, bool $signable): void
+	{
+		$this->initSignableEnvironment();
+
+		self::assertSame($signable, JsonLD::isSignable(array_merge($this->getSignedActivity(), $changes)));
 	}
 }

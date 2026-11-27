@@ -228,6 +228,145 @@ class JsonLD
 		return $json;
 	}
 
+	/**
+	 * Checks if the given JSON array can be covered completely by a JSON-LD signature.
+	 *
+	 * The signature is calculated on the RDF representation. Statements with relative IRIs, blank node predicates
+	 * and other invalid data are silently skipped there, so the signature wouldn't cover them while they would
+	 * still be processed after compaction. The same applies to data that is changed by fixInvalidJsonLD and
+	 * to nodes that are described differently at several places in the document.
+	 *
+	 * @param array $json
+	 * @return boolean
+	 */
+	public static function isSignable(array $json): bool
+	{
+		if (!self::isValidObject($json)) {
+			return false;
+		}
+
+		jsonld_set_document_loader('Friendica\Util\JsonLD::documentLoader');
+
+		try {
+			$expanded = jsonld_expand(json_decode(json_encode($json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+			$fixed    = jsonld_expand(self::fixInvalidJsonLD($json));
+		} catch (Exception $e) {
+			DI::logger()->notice('JsonLD expand error', ['msg' => $e->getMessage()]);
+			return false;
+		}
+
+		$expanded = json_decode(json_encode($expanded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);
+		$fixed    = json_decode(json_encode($fixed, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), true);
+
+		if ($expanded !== $fixed) {
+			DI::logger()->info('The document is changed by the JSON-LD fixes');
+			return false;
+		}
+
+		if (!is_array($expanded) || count($expanded) !== 1) {
+			DI::logger()->info('The document does not consist of a single node');
+			return false;
+		}
+
+		$described = [];
+		$problem   = self::getUnsignableData($expanded, $described);
+		if ($problem !== '') {
+			DI::logger()->info('The document contains data that is not covered by the signature', ['problem' => $problem]);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Searches an element of an expanded JSON-LD document for data that would be skipped in the RDF representation
+	 *
+	 * @param mixed $element
+	 * @param array $described Descriptions of the nodes that had been found so far, indexed by their IRI
+	 * @return string Description of the first problem that had been found, empty if there is none
+	 */
+	private static function getUnsignableData($element, array &$described): string
+	{
+		if (!is_array($element)) {
+			return '';
+		}
+
+		if (array_is_list($element)) {
+			foreach ($element as $entry) {
+				$problem = self::getUnsignableData($entry, $described);
+				if ($problem !== '') {
+					return $problem;
+				}
+			}
+			return '';
+		}
+
+		if (array_key_exists('@value', $element)) {
+			if (isset($element['@type']) && !self::isAbsoluteIri($element['@type'])) {
+				return 'Invalid value type ' . $element['@type'];
+			}
+			if (isset($element['@language']) && !preg_match('/^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$/', (string) $element['@language'])) {
+				return 'Invalid language ' . $element['@language'];
+			}
+			if (isset($element['@direction']) || isset($element['@index'])) {
+				return 'Unsupported @direction or @index';
+			}
+			return '';
+		}
+
+		if (array_key_exists('@list', $element)) {
+			if (isset($element['@index'])) {
+				return 'Unsupported @index';
+			}
+			return self::getUnsignableData($element['@list'], $described);
+		}
+
+		if (isset($element['@id'])) {
+			if (!self::isAbsoluteIri($element['@id'])) {
+				return 'Invalid id ' . $element['@id'];
+			}
+			if (count($element) > 1) {
+				$description = json_encode($element);
+				if (isset($described[$element['@id']]) && ($described[$element['@id']] !== $description)) {
+					return 'Node is described differently at several places ' . $element['@id'];
+				}
+				$described[$element['@id']] = $description;
+			}
+		}
+
+		foreach ($element['@type'] ?? [] as $type) {
+			if (!self::isAbsoluteIri($type)) {
+				return 'Invalid type ' . $type;
+			}
+		}
+
+		foreach ($element as $property => $value) {
+			if (in_array($property, ['@id', '@type'], true)) {
+				continue;
+			}
+			if (!self::isAbsoluteIri($property)) {
+				return 'Invalid property ' . $property;
+			}
+			$problem = self::getUnsignableData($value, $described);
+			if ($problem !== '') {
+				return $problem;
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Checks if the value is a well-formed absolute IRI. Blank node identifiers aren't accepted.
+	 *
+	 * @param mixed $value
+	 * @return boolean
+	 */
+	private static function isAbsoluteIri($value): bool
+	{
+		return is_string($value) && preg_match('~^[A-Za-z][A-Za-z0-9+.\-]*:[^\x00-\x20<>"{}|\\\\^`#]*(#[^\x00-\x20<>"{}|\\\\^`#]*)?$~', $value) === 1;
+	}
+
 	private static function fixInvalidJsonLD(array $json): stdClass
 	{
 		if (empty($json['@context'])) {
