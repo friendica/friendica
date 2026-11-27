@@ -59,6 +59,7 @@ class StatusTest extends FixtureTestCase
 	 * Test the api_convert_item() function with an empty item body.
 	 *
 	 */
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testApiConvertItemWithoutBody(): void
 	{
 		self::markTestIncomplete('Needs a dataset first');
@@ -82,6 +83,7 @@ class StatusTest extends FixtureTestCase
 	 * Test the api_convert_item() function with the title in the body.
 	 *
 	 */
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testApiConvertItemWithTitleInBody(): void
 	{
 		self::markTestIncomplete('Needs a dataset first');

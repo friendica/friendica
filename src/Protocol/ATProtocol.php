@@ -115,9 +115,7 @@ final class ATProtocol
 			$url .= '?' . http_build_query($parameters);
 		}
 
-		if (is_null($uid)) {
-			$uid = $this->getUser();
-		}
+		$uid ??= $this->getUser();
 
 		$pds = $this->getUserPds($uid);
 		if (empty($pds)) {

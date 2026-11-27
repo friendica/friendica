@@ -94,9 +94,7 @@ class Remove extends \Friendica\BaseModule
 
 		$tags = explode(',', $tag_text);
 
-		$tag_checkboxes = array_map(function ($tag_text) {
-			return ['tag[' . bin2hex($tag_text) . ']', BBCode::toPlaintext($tag_text)];
-		}, $tags);
+		$tag_checkboxes = array_map(fn ($tag_text): array => ['tag[' . bin2hex($tag_text) . ']', BBCode::toPlaintext($tag_text)], $tags);
 
 		$tpl = Renderer::getMarkupTemplate('post/tag/remove.tpl');
 		return Renderer::replaceMacros($tpl, [

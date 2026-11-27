@@ -63,7 +63,7 @@ class Instance extends BaseApi
 		$image_size_limit = Strings::getBytesFromShorthand($this->config->get('system', 'maximagesize') ?? 0);
 		$max_image_length = $this->config->get('system', 'max_image_length');
 		if ($max_image_length > 0) {
-			$image_matrix_limit = pow($max_image_length, 2);
+			$image_matrix_limit = $max_image_length ** 2;
 		} else {
 			$image_matrix_limit = 33177600; // 5760^2
 		}

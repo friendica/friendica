@@ -91,9 +91,12 @@ class ExpireReportsTest extends MockedTestCase
 
 		$logger->expects($this->exactly(2))
 			->method('notice')
-			->with('Deleted expired reports', $this->callback(static function (array $context): bool {
-				return isset($context['label'], $context['rows']) && !isset($context['pass']) && $context['rows'] === 1;
-			}));
+			->with(
+				'Deleted expired reports',
+				$this->callback(
+					static fn (array $context): bool => isset($context['label'], $context['rows']) && !isset($context['pass']) && $context['rows'] === 1,
+				),
+			);
 
 		ExpireReports::cleanupExpiredReports($database, $config, $logger);
 	}

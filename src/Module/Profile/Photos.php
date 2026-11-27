@@ -297,20 +297,18 @@ class Photos extends \Friendica\Module\BaseProfile
 			$pager->getItemsPerPage(),
 		));
 
-		$photos = array_map(function ($photo) {
-			return [
-				'id'    => $photo['id'],
-				'link'  => 'photos/' . $this->owner['nickname'] . '/image/' . $photo['resource-id'],
-				'title' => $this->t('View Photo'),
-				'src'   => 'photo/' . $photo['resource-id'] . '-' . ((($photo['scale']) == 6) ? 4 : $photo['scale']) . Images::getExtensionByMimeType($photo['type']),
-				'alt'   => $photo['filename'],
-				'album' => [
-					'link' => 'photos/' . $this->owner['nickname'] . '/album/' . bin2hex((string) $photo['album']),
-					'name' => $photo['album'],
-					'alt'  => $this->t('View Album'),
-				],
-			];
-		}, $photos);
+		$photos = array_map(fn ($photo): array => [
+			'id'    => $photo['id'],
+			'link'  => 'photos/' . $this->owner['nickname'] . '/image/' . $photo['resource-id'],
+			'title' => $this->t('View Photo'),
+			'src'   => 'photo/' . $photo['resource-id'] . '-' . ((($photo['scale']) == 6) ? 4 : $photo['scale']) . Images::getExtensionByMimeType($photo['type']),
+			'alt'   => $photo['filename'],
+			'album' => [
+				'link' => 'photos/' . $this->owner['nickname'] . '/album/' . bin2hex((string) $photo['album']),
+				'name' => $photo['album'],
+				'alt'  => $this->t('View Album'),
+			],
+		], $photos);
 
 		$tpl = Renderer::getMarkupTemplate('photos_head.tpl');
 		$this->page['htmlhead'] .= Renderer::replaceMacros($tpl, [
@@ -318,15 +316,13 @@ class Photos extends \Friendica\Module\BaseProfile
 		]);
 
 		if ($albums = Photo::getAlbums($this->owner['uid'])) {
-			$albums = array_map(function ($album) {
-				return [
-					'text'      => $album['album'],
-					'total'     => $album['total'],
-					'url'       => 'photos/' . $this->owner['nickname'] . '/album/' . bin2hex((string) $album['album']),
-					'urlencode' => urlencode((string) $album['album']),
-					'bin2hex'   => bin2hex((string) $album['album']),
-				];
-			}, $albums);
+			$albums = array_map(fn ($album): array => [
+				'text'      => $album['album'],
+				'total'     => $album['total'],
+				'url'       => 'photos/' . $this->owner['nickname'] . '/album/' . bin2hex((string) $album['album']),
+				'urlencode' => urlencode((string) $album['album']),
+				'bin2hex'   => bin2hex((string) $album['album']),
+			], $albums);
 
 			$photo_albums_widget = Renderer::replaceMacros(Renderer::getMarkupTemplate('photo_albums.tpl'), [
 				'$nick'     => $this->owner['nickname'],

@@ -433,9 +433,7 @@ class HTML
 		foreach ($matches as $match) {
 			$body = preg_replace_callback(
 				$match,
-				function ($match) use ($basepath) {
-					return self::qualifyURLsSub($match, $basepath);
-				},
+				fn ($match): string => self::qualifyURLsSub($match, $basepath),
 				(string) $body,
 			);
 		}

@@ -268,13 +268,9 @@ abstract class BaseApi extends BaseModule
 	 */
 	protected static function setBoundaries($id)
 	{
-		if (!isset(self::$boundaries['min'])) {
-			self::$boundaries['min'] = $id;
-		}
+		self::$boundaries['min'] ??= $id;
 
-		if (!isset(self::$boundaries['max'])) {
-			self::$boundaries['max'] = $id;
-		}
+		self::$boundaries['max'] ??= $id;
 
 		self::$boundaries['min'] = min(self::$boundaries['min'], $id);
 		self::$boundaries['max'] = max(self::$boundaries['max'], $id);

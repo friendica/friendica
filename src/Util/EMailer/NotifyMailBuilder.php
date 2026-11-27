@@ -91,9 +91,7 @@ class NotifyMailBuilder extends MailBuilder
 	 */
 	public function withNotification(string $subject, string $preamble, string $title, ?string $body = null)
 	{
-		if (!isset($body)) {
-			$body = $preamble;
-		}
+		$body ??= $preamble;
 
 		$this->title    = stripslashes($title);
 		$this->subject  = $subject;

@@ -1938,9 +1938,7 @@ class DFRN
 		if (in_array($entrytype, [self::REPLY, self::REPLY_RC])) {
 			$item['gravity'] = Item::GRAVITY_COMMENT;
 
-			if (!isset($item['object-type'])) {
-				$item['object-type'] = Activity\ObjectType::COMMENT;
-			}
+			$item['object-type'] ??= Activity\ObjectType::COMMENT;
 
 			if ($item['contact-id'] != $owner['contact-id']) {
 				$item['contact-id'] = $owner['contact-id'];
@@ -1964,9 +1962,7 @@ class DFRN
 		} elseif ($entrytype == self::TOP_LEVEL) {
 			$item['gravity'] = Item::GRAVITY_PARENT;
 
-			if (!isset($item['object-type'])) {
-				$item['object-type'] = Activity\ObjectType::NOTE;
-			}
+			$item['object-type'] ??= Activity\ObjectType::NOTE;
 
 			// Is it an event?
 			if (($item['object-type'] == Activity\ObjectType::EVENT) && !$owner_unknown) {

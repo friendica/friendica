@@ -237,9 +237,7 @@ class Probe
 			$data = $ap_profile;
 		}
 
-		if (!isset($data['url'])) {
-			$data['url'] = $uri;
-		}
+		$data['url'] ??= $uri;
 
 		if (empty($data['photo'])) {
 			$data['photo'] = DI::baseUrl() . Contact::DEFAULT_AVATAR_PHOTO;
@@ -905,9 +903,7 @@ class Probe
 			return [];
 		}
 
-		if (!isset($data['baseurl'])) {
-			$data['baseurl'] = '';
-		}
+		$data['baseurl'] ??= '';
 
 		if ($vcards->length > 0) {
 			$vcard = $vcards->item(0);

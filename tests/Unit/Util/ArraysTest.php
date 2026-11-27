@@ -124,10 +124,9 @@ class ArraysTest extends TestCase
 			$array,
 			Arrays::walkRecursive(
 				$array,
-				function () {
-					// Should we test this with a callback that actually does something?
-					return true;
-				},
+
+				// Should we test this with a callback that actually does something?
+				fn (): true => true,
 			),
 		);
 	}
@@ -144,10 +143,9 @@ class ArraysTest extends TestCase
 			$array,
 			Arrays::walkRecursive(
 				$array,
-				function () {
-					// Should we test this with a callback that actually does something?
-					return true;
-				},
+
+				// Should we test this with a callback that actually does something?
+				fn (): true => true,
 			),
 		);
 	}

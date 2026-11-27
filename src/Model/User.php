@@ -2242,9 +2242,7 @@ class User
 	 */
 	public static function getModeratorList(array $fields = []): array
 	{
-		$moderatorUids = array_values(array_filter(self::getModeratorUids(), function (int $uid): bool {
-			return $uid !== 0;
-		}));
+		$moderatorUids = array_values(array_filter(self::getModeratorUids(), fn (int $uid): bool => $uid !== 0));
 		if (empty($moderatorUids)) {
 			return [];
 		}

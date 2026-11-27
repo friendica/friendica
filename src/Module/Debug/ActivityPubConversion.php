@@ -31,9 +31,7 @@ class ActivityPubConversion extends BaseModule
 
 		$results = [];
 
-		$visible_whitespace = function (string $s): string {
-			return '<pre>' . htmlspecialchars($s) . '</pre>';
-		};
+		$visible_whitespace = (fn (string $s): string => '<pre>' . htmlspecialchars($s) . '</pre>');
 
 		if (!empty($_REQUEST['source'])) {
 			try {

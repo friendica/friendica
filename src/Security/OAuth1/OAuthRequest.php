@@ -26,9 +26,7 @@ class OAuthRequest implements \Stringable
 		$http_url,
 		$parameters = null,
 	) {
-		if (is_null($parameters)) {
-			$parameters = [];
-		}
+		$parameters ??= [];
 
 		$parameters       = array_merge(OAuthUtil::parse_parameters(parse_url((string) $http_url, PHP_URL_QUERY)), $parameters);
 		$this->parameters = $parameters;
@@ -113,9 +111,7 @@ class OAuthRequest implements \Stringable
 	 */
 	public static function from_consumer_and_token(OAuthConsumer $consumer, $http_method, $http_url, ?array $parameters = null, ?OAuthToken $token = null)
 	{
-		if (is_null($parameters)) {
-			$parameters = [];
-		}
+		$parameters ??= [];
 
 		$defaults = [
 			"oauth_version"      => OAuthRequest::$version,

@@ -235,12 +235,10 @@ class Widget
 			return '';
 		}
 
-		$options = array_map(function ($circle) {
-			return [
-				'ref'  => $circle['id'],
-				'name' => $circle['name'],
-			];
-		}, Circle::getByUserId(DI::userSession()->getLocalUserId()));
+		$options = array_map(fn ($circle): array => [
+			'ref'  => $circle['id'],
+			'name' => $circle['name'],
+		], Circle::getByUserId(DI::userSession()->getLocalUserId()));
 
 		return self::filter(
 			'circle',

@@ -1393,14 +1393,18 @@ class BBCode
 			}); // Escaped noparse, nobb, pre
 
 			// Remove escaping tags and replace new lines that remain
-			$text = preg_replace_callback('/\[(noparse|nobb)](.*?)\[\/\1]/ism', function ($match) {
-				return str_replace("\n", "<br>", $match[2]);
-			}, $text);
+			$text = preg_replace_callback(
+				'/\[(noparse|nobb)](.*?)\[\/\1]/ism',
+				fn ($match): string => str_replace("\n", "<br>", $match[2]),
+				$text,
+			);
 
 			// Additionally, [pre] tags preserve spaces
-			$text = preg_replace_callback("/\[pre\](.*?)\[\/pre\]/ism", function ($match) {
-				return str_replace([' ', "\n"], ['&nbsp;', "<br>"], htmlentities($match[1], ENT_NOQUOTES, 'UTF-8'));
-			}, (string) $text);
+			$text = preg_replace_callback(
+				"/\[pre\](.*?)\[\/pre\]/ism",
+				fn ($match): string => str_replace([' ', "\n"], ['&nbsp;', "<br>"], htmlentities($match[1], ENT_NOQUOTES, 'UTF-8')),
+				(string) $text,
+			);
 
 			return $text;
 		}); // Escaped code
@@ -1551,9 +1555,7 @@ class BBCode
 		if (str_contains($text, '[/map]')) {
 			$text = preg_replace_callback(
 				"/\[map\](.*?)\[\/map\]/ism",
-				function ($match) use ($simple_html) {
-					return str_replace($match[0], '<p class="map">' . Map::byLocation($match[1], $simple_html) . '</p>', $match[0]);
-				},
+				fn ($match): string => '<p class="map">' . Map::byLocation($match[1], $simple_html) . '</p>',
 				$text,
 			);
 		}
@@ -1561,9 +1563,7 @@ class BBCode
 		if (str_contains((string) $text, '[map=')) {
 			$text = preg_replace_callback(
 				"/\[map=(.*?)\]/ism",
-				function ($match) use ($simple_html) {
-					return str_replace($match[0], '<p class="map">' . Map::byCoordinates(str_replace('/', ' ', $match[1]), $simple_html) . '</p>', $match[0]);
-				},
+				fn ($match): string => '<p class="map">' . Map::byCoordinates(str_replace('/', ' ', $match[1]), $simple_html) . '</p>',
 				(string) $text,
 			);
 		}
@@ -1915,9 +1915,7 @@ class BBCode
 
 		$text = preg_replace_callback(
 			"/\[embed\](.*?)\[\/embed\]/ism",
-			function ($match) use ($max_length) {
-				return '<a class="embed" href="' . self::escapeUrl(Network::sanitizeUrl($match[1])) . '">' . Strings::getStyledURL(Network::sanitizeUrl($match[1]), $max_length) . "</a>";
-			},
+			fn ($match): string => '<a class="embed" href="' . self::escapeUrl(Network::sanitizeUrl($match[1])) . '">' . Strings::getStyledURL(Network::sanitizeUrl($match[1]), $max_length) . "</a>",
 			$text,
 		);
 
@@ -2007,17 +2005,13 @@ class BBCode
 		// Handle Diaspora posts
 		$text = preg_replace_callback(
 			"&\[url=/?posts/([^\[\]]*)\](.*)\[\/url\]&Usi",
-			function ($match) {
-				return "[url=" . DI::baseUrl() . "/display/" . $match[1] . "]" . $match[2] . "[/url]";
-			},
+			fn ($match): string => "[url=" . DI::baseUrl() . "/display/" . $match[1] . "]" . $match[2] . "[/url]",
 			(string) $text,
 		);
 
 		$text = preg_replace_callback(
 			"&\[url=/people\?q\=(.*)\](.*)\[\/url\]&Usi",
-			function ($match) {
-				return "[url=" . DI::baseUrl() . "/search?search=%40" . $match[1] . "]" . $match[2] . "[/url]";
-			},
+			fn ($match): string => "[url=" . DI::baseUrl() . "/search?search=%40" . $match[1] . "]" . $match[2] . "[/url]",
 			(string) $text,
 		);
 
@@ -2099,9 +2093,7 @@ class BBCode
 	{
 		return preg_replace_callback(
 			"/\[url\](.*?)\[\/url\]/ism",
-			function ($match) {
-				return "[url=" . self::escapeUrl($match[1]) . "]" . $match[1] . "[/url]";
-			},
+			fn ($match): string => "[url=" . self::escapeUrl($match[1]) . "]" . $match[1] . "[/url]",
 			$text,
 		);
 	}
@@ -2116,9 +2108,7 @@ class BBCode
 
 		$text = preg_replace_callback(
 			"/\[url\](.*?)\[\/url\]/ism",
-			function ($match) use ($max_length) {
-				return "[url=" . self::escapeUrl($match[1]) . "]" . Strings::getStyledURL($match[1], $max_length) . "[/url]";
-			},
+			fn ($match): string => "[url=" . self::escapeUrl($match[1]) . "]" . Strings::getStyledURL($match[1], $max_length) . "[/url]",
 			$text,
 		);
 		$text = preg_replace_callback(
@@ -2153,9 +2143,8 @@ class BBCode
 
 		$text = self::convertShare(
 			$text,
-			function (array $attributes, array $author_contact, $content, $is_quote_share) use ($simple_html) {
-				return self::convertShareCallback($attributes, $author_contact, $content, $is_quote_share, $simple_html);
-			},
+			fn (array $attributes, array $author_contact, $content, $is_quote_share): string
+				=> self::convertShareCallback($attributes, $author_contact, $content, $is_quote_share, $simple_html),
 			$uriid,
 		);
 
@@ -2304,9 +2293,7 @@ class BBCode
 		$url_search_string = "^\[\]";
 		$text              = preg_replace_callback(
 			"/#\[url\=([$url_search_string]*)\](.*?)\[\/url\]/i",
-			function ($matches) {
-				return '#' . str_replace(' ', '_', $matches[2]);
-			},
+			fn ($matches) => '#' . str_replace(' ', '_', $matches[2]),
 			$text,
 		);
 

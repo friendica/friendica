@@ -59,6 +59,7 @@ class UserSessionTest extends MockedTestCase
 		$this->assertEquals($expected, $userSession->getLocalUserId());
 	}
 
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testPublicContactId(): void
 	{
 		$this->markTestSkipped('Needs Contact::getIdForURL testable first');

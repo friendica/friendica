@@ -15,6 +15,7 @@ class MediaTest extends MockedTestCase
 	 * Test the api_get_attachments() function.
 	 *
 	 */
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testApiGetAttachments(): void
 	{
 		self::markTestIncomplete('Needs Model\Post\Media refactoring first.');
@@ -27,6 +28,7 @@ class MediaTest extends MockedTestCase
 	 * Test the api_get_attachments() function with an img tag.
 	 *
 	 */
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testApiGetAttachmentsWithImage(): void
 	{
 		self::markTestIncomplete('Needs Model\Post\Media refactoring first.');
@@ -39,6 +41,7 @@ class MediaTest extends MockedTestCase
 	 * Test the api_get_attachments() function with an img tag and an AndStatus user agent.
 	 *
 	 */
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testApiGetAttachmentsWithImageAndAndStatus(): void
 	{
 		self::markTestIncomplete('Needs Model\Post\Media refactoring first.');

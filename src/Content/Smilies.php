@@ -285,9 +285,7 @@ class Smilies
 		return self::performForEachWordMatch(
 			array_combine($search, $replace),
 			$subject,
-			function (string $_, string $value) {
-				return $value;
-			},
+			fn (string $_, string $value): string => $value,
 		);
 	}
 

@@ -172,9 +172,7 @@ class APContact
 			$url = $apcontact['url'];
 		}
 
-		if (!isset($apcontact['addr'])) {
-			$apcontact['addr'] = '';
-		}
+		$apcontact['addr'] ??= '';
 
 		if (!isset($apcontact['baseurl']) && empty(parse_url((string) $url, PHP_URL_PATH))) {
 			$apcontact['baseurl'] = $url;

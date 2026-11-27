@@ -271,9 +271,7 @@ class Tag
 	 */
 	public static function getFromBody(string $body, ?string $tags = null): array
 	{
-		if (is_null($tags)) {
-			$tags = self::TAG_CHARACTER[self::HASHTAG] . self::TAG_CHARACTER[self::MENTION] . self::TAG_CHARACTER[self::EXCLUSIVE_MENTION];
-		}
+		$tags ??= self::TAG_CHARACTER[self::HASHTAG] . self::TAG_CHARACTER[self::MENTION] . self::TAG_CHARACTER[self::EXCLUSIVE_MENTION];
 
 		if (!preg_match_all("/([" . $tags . "])\[url\=([^\[\]]*)\]([^\[\]]*)\[\/url\]/ism", $body, $result, PREG_SET_ORDER)) {
 			return [];
@@ -367,9 +365,7 @@ class Tag
 	{
 		DI::logger()->info('Check for tags', ['uri-id' => $item['uri-id'], 'hash' => $tags]);
 
-		if (is_null($tags)) {
-			$tags = self::TAG_CHARACTER[self::HASHTAG] . self::TAG_CHARACTER[self::MENTION] . self::TAG_CHARACTER[self::EXCLUSIVE_MENTION];
-		}
+		$tags ??= self::TAG_CHARACTER[self::HASHTAG] . self::TAG_CHARACTER[self::MENTION] . self::TAG_CHARACTER[self::EXCLUSIVE_MENTION];
 
 		foreach (self::getFromBody($item['body'], $tags) as $tag) {
 			self::storeByHash($item['uri-id'], $tag[1], $tag[3], $tag[2]);

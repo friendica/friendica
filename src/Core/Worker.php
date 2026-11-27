@@ -358,9 +358,7 @@ class Worker
 
 		if (method_exists(sprintf('Friendica\Worker\%s', $include), 'execute')) {
 			// We constantly update the "executed" date every minute to avoid being killed too soon
-			if (!isset(self::$last_update)) {
-				self::$last_update = strtotime((string) $queue['executed']);
-			}
+			self::$last_update ??= strtotime((string) $queue['executed']);
 
 			$age               = (time() - self::$last_update) / 60;
 			self::$last_update = time();
@@ -402,9 +400,7 @@ class Worker
 
 		if (function_exists($funcname)) {
 			// We constantly update the "executed" date every minute to avoid being killed too soon
-			if (!isset(self::$last_update)) {
-				self::$last_update = strtotime((string) $queue['executed']);
-			}
+			self::$last_update ??= strtotime((string) $queue['executed']);
 
 			$age               = (time() - self::$last_update) / 60;
 			self::$last_update = time();
@@ -743,7 +739,7 @@ class Worker
 			 * With exponent 1, you could have 20 max queues at idle and 13 at 37% of $maxsysload.
 			 */
 			$exponent = intval(DI::config()->get('system', 'worker_load_exponent', 3));
-			$slope    = pow(max(0, $maxsysload - $load) / $maxsysload, $exponent);
+			$slope    = (max(0, $maxsysload - $load) / $maxsysload) ** $exponent;
 			$queues   = intval(ceil($slope * $maxqueues));
 
 			$processlist = '';
@@ -999,12 +995,12 @@ class Worker
 
 		$total = 0;
 		for ($i = 1; $i <= $priorities; ++$i) {
-			$total += pow($i, $exponent);
+			$total += $i ** $exponent;
 		}
 
 		$limit = [];
 		for ($i = 1; $i <= $priorities; ++$i) {
-			$limit[$priorities - $i] = max(1, round($active * (pow($i, $exponent) / $total)));
+			$limit[$priorities - $i] = max(1, round($active * ($i ** $exponent / $total)));
 		}
 
 		$i = 0;

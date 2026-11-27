@@ -173,9 +173,11 @@ class Ping extends BaseModule
 			}, $notifications->getArrayCopy());
 			$navNotifications = array_filter($navNotifications);
 
-			$sysnotify_count = array_reduce($navNotifications, function (int $carry, ValueObject\FormattedNavNotification $navNotification) {
-				return $carry + ($navNotification->seen ? 0 : 1);
-			}, 0);
+			$sysnotify_count = array_reduce(
+				$navNotifications,
+				fn (int $carry, ValueObject\FormattedNavNotification $navNotification): int => $carry + ($navNotification->seen ? 0 : 1),
+				0,
+			);
 
 			// merge all notification types in one array
 			foreach ($intros as $intro) {

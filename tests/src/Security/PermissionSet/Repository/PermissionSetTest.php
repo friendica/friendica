@@ -82,15 +82,14 @@ class PermissionSetTest extends FixtureTestCase
 		self::assertEquals($expected->count(), $actual->count(), 'PermissionSets not even ' . PHP_EOL . 'expected: ' . print_r($expected, true) . 'actual: ' . print_r($actual, true));
 
 		foreach ($expected as $outputPermissionSet) {
-			self::assertCount(1, $actual->filter(function (PermissionSet $actualPermissionSet) use ($outputPermissionSet) {
-				return (
-					$actualPermissionSet->uid == $outputPermissionSet->uid
+			self::assertCount(1, $actual->filter(
+				fn (PermissionSet $actualPermissionSet): bool
+					=> $actualPermissionSet->uid == $outputPermissionSet->uid
 					&& $actualPermissionSet->allow_cid == $outputPermissionSet->allow_cid
 					&& $actualPermissionSet->allow_gid == $outputPermissionSet->allow_gid
 					&& $actualPermissionSet->deny_cid == $outputPermissionSet->deny_cid
-					&& $actualPermissionSet->deny_gid == $outputPermissionSet->deny_gid
-				);
-			}), 'PermissionSet not found: ' . print_r($outputPermissionSet, true));
+					&& $actualPermissionSet->deny_gid == $outputPermissionSet->deny_gid,
+			), 'PermissionSet not found: ' . print_r($outputPermissionSet, true));
 		}
 	}
 

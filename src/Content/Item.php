@@ -504,9 +504,7 @@ class Item
 		$receivers      = [];
 
 		// Mentions prefixed with "@!" address the contact privately
-		$private_tags = array_filter(BBCode::getTags($item['body']), function ($tag) {
-			return str_starts_with($tag, '@!') && (strlen($tag) > 2);
-		});
+		$private_tags = array_filter(BBCode::getTags($item['body']), fn ($tag): bool => str_starts_with($tag, '@!') && (strlen($tag) > 2));
 
 		// Convert mentions in the body to a unified format
 		$private_contacts = [];
@@ -1026,9 +1024,11 @@ class Item
 		} else {
 			Attach::setPermissionFromBody($post);
 		}
-		$post['body'] = preg_replace_callback("/\[attachment\](.*?)\[\/attachment\]/ism", function ($matches) {
-			return PageInfo::getFooterFromUrl($matches[1]);
-		}, (string) $post['body']);
+		$post['body'] = preg_replace_callback(
+			"/\[attachment\](.*?)\[\/attachment\]/ism",
+			fn ($matches): string => PageInfo::getFooterFromUrl($matches[1]),
+			(string) $post['body'],
+		);
 
 		// Convert links with empty descriptions to links without an explicit description
 		$post['body'] = trim((string) preg_replace('#\[url=([^\]]*?)\]\[/url\]#ism', '[url]$1[/url]', (string) $post['body']));

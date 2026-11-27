@@ -55,8 +55,10 @@ class Notifications extends BaseCollection
 
 	public function countUnseen(): int
 	{
-		return array_reduce($this->getArrayCopy(), function (int $carry, NotificationEntity $notification) {
-			return $carry + ($notification->seen ? 0 : 1);
-		}, 0);
+		return array_reduce(
+			$this->getArrayCopy(),
+			fn (int $carry, NotificationEntity $notification): int => $carry + ($notification->seen ? 0 : 1),
+			0,
+		);
 	}
 }

@@ -64,9 +64,7 @@ final class LoggerManager
 	 */
 	public function getLogger(): LoggerInterface
 	{
-		if (self::$logger === null) {
-			self::$logger = $this->createLogger();
-		}
+		self::$logger ??= $this->createLogger();
 
 		return self::$logger;
 	}

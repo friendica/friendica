@@ -195,8 +195,6 @@ class L10nTest extends MockedTestCase
 				return null;
 			});
 
-		$dba = $this->createMock(Database::class);
-
-		return new L10n($config, $dba, $session, $server, []);
+		return new L10n($config, $this->createStub(Database::class), $session, $server, []);
 	}
 }

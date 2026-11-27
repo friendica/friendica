@@ -36,8 +36,6 @@ class PostMedias extends BaseCollection
 	 */
 	public function haveDimensions(): bool
 	{
-		return array_reduce($this->getArrayCopy(), function (bool $carry, Entity\PostMedia $item) {
-			return $carry && $item->hasDimensions();
-		}, true);
+		return array_reduce($this->getArrayCopy(), fn (bool $carry, Entity\PostMedia $item): bool => $carry && $item->hasDimensions(), true);
 	}
 }

@@ -114,13 +114,9 @@ class PortableContacts extends BaseModule
 		}
 
 		foreach ($contacts as $contact) {
-			if (!isset($contact['updated'])) {
-				$contact['updated'] = '';
-			}
+			$contact['updated'] ??= '';
 
-			if (!isset($contact['generation'])) {
-				$contact['generation'] = 1;
-			}
+			$contact['generation'] ??= 1;
 
 			if (empty($contact['keywords']) && isset($contact['pub_keywords'])) {
 				$contact['keywords'] = $contact['pub_keywords'];

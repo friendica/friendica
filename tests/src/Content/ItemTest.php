@@ -77,14 +77,9 @@ class ItemTest extends MockedTestCase
 				['rendertime', 'callstack', null, false],
 			]);
 
-		$l10n    = $this->createMock(L10n::class);
-		$baseUrl = $this->createMock(BaseURL::class);
+		$mockFactory = \Closure::bind(fn ($class): \PHPUnit\Framework\MockObject\MockObject => $this->createMock($class), $this, self::class);
 
-		$mockFactory = \Closure::bind(function ($class) {
-			return $this->createMock($class);
-		}, $this, self::class);
-
-		$mockDice = new ItemTestDice($profiler, $eventDispatcher, $config, $l10n, $baseUrl, $mockFactory);
+		$mockDice = new ItemTestDice($profiler, $eventDispatcher, $config, $this->createStub(L10n::class), $this->createStub(BaseURL::class), $mockFactory);
 
 		$this->setDiceProperty($mockDice);
 	}
