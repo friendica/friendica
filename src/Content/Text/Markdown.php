@@ -65,10 +65,6 @@ class Markdown
 			 * [3] = profile URL
 			 */
 			function ($matches) {
-				if ($matches[3] == '') {
-					return '';
-				}
-
 				$data = Contact::getByURL($matches[3]);
 
 				if (empty($data)) {

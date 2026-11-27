@@ -208,11 +208,6 @@ class Strings
 	 */
 	public static function formatBytes(int $bytes, int $precision = 2): string
 	{
-		// If this method is called for an infinite (== unlimited) amount of bytes:
-		if ($bytes == INF) {
-			return 'INF';
-		}
-
 		$units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
 		$bytes = max($bytes, 0);
 		$pow   = floor(($bytes ? log($bytes) : 0) / log(1024));

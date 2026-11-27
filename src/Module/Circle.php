@@ -180,6 +180,7 @@ class Circle extends BaseModule
 		$nocircle    = false;
 		$members     = [];
 		$preselected = [];
+		$circle      = null;
 
 		// @TODO: Replace with parameter from router
 		if (
