@@ -349,9 +349,11 @@ class Create extends BaseModule
 		}
 
 		if (!empty($request['rule-ids'])) {
-			$rules = array_filter(System::getRules(true), function ($rule_id) use ($request) {
-				return in_array($rule_id, $request['rule-ids']);
-			}, ARRAY_FILTER_USE_KEY);
+			$rules = array_filter(
+				System::getRules(true),
+				fn ($rule_id): bool => in_array($rule_id, $request['rule-ids']),
+				ARRAY_FILTER_USE_KEY,
+			);
 		}
 
 		$tpl = Renderer::getMarkupTemplate('moderation/report/create/aside.tpl');

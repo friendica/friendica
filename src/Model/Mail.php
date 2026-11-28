@@ -62,9 +62,7 @@ class Mail
 	 */
 	public static function insert(array $msg, bool $notification = true)
 	{
-		if (!isset($msg['reply'])) {
-			$msg['reply'] = DBA::exists('mail', ['parent-uri' => $msg['parent-uri']]);
-		}
+		$msg['reply'] ??= DBA::exists('mail', ['parent-uri' => $msg['parent-uri']]);
 
 		if (empty($msg['convid'])) {
 			$mail = DBA::selectFirst('mail', ['convid'], ["`convid` != 0 AND `parent-uri` = ?", $msg['parent-uri']]);

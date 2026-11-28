@@ -127,8 +127,8 @@ class EmailerTest extends TestCase
 		$config = $this->createStub(IManageConfigValues::class);
 		$config->method('get')->willReturnCallback(fn (string $cat, string $key): string|true => match ([$cat, $key]) {
 			['config', 'sender_email'] => 'test@friendica.local',
-			['config', 'sitename'] => 'Friendica Social Network',
-			default => true,
+			['config', 'sitename']     => 'Friendica Social Network',
+			default                    => true,
 		});
 
 		$baseUrl = $this->createStub(BaseURL::class);

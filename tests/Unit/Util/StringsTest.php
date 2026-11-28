@@ -177,9 +177,7 @@ class StringsTest extends TestCase
 	{
 		$originalText = '[noparse][/noparse][nobb]nobb[/nobb][noparse]noparse[/noparse]';
 
-		$text = Strings::performWithEscapedBlocks($originalText, '#[(?:noparse|nobb)].*?\[/(?:noparse|nobb)]#is', function ($text) {
-			return $text;
-		});
+		$text = Strings::performWithEscapedBlocks($originalText, '#[(?:noparse|nobb)].*?\[/(?:noparse|nobb)]#is', fn ($text) => $text);
 
 		self::assertEquals($originalText, $text);
 	}
@@ -189,9 +187,7 @@ class StringsTest extends TestCase
 		$originalText = '[noparse][/noparse][nobb]nobb[/nobb][noparse]noparse[/noparse]';
 
 		$text = Strings::performWithEscapedBlocks($originalText, '#[nobb].*?\[/nobb]#is', function ($text) {
-			$text = Strings::performWithEscapedBlocks($text, '#[noparse].*?\[/noparse]#is', function ($text) {
-				return $text;
-			});
+			$text = Strings::performWithEscapedBlocks($text, '#[noparse].*?\[/noparse]#is', fn ($text) => $text);
 
 			return $text;
 		});

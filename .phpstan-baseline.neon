@@ -70,25 +70,7 @@ parameters:
 			path: tests/Unit/Core/Logger/Factory/SyslogLoggerFactoryTest.php
 
 		-
-			message: '#^Parameter \#2 \$config of class Friendica\\Console\\AutomaticInstallation constructor expects Friendica\\Core\\Config\\Capability\\IManageConfigValues, PHPUnit\\Framework\\MockObject\\MockObject given\.$#'
-			identifier: argument.type
-			count: 1
-			path: tests/src/Console/AutomaticInstallationConsoleTest.php
-
-		-
 			message: '#^Parameter \#3 \$assertion of method Friendica\\Test\\src\\Console\\AutomaticInstallationConsoleTest\:\:assertConfigEntry\(\) expects array\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: tests/src/Console/AutomaticInstallationConsoleTest.php
-
-		-
-			message: '#^Parameter \#3 \$dba of class Friendica\\Console\\AutomaticInstallation constructor expects Friendica\\Database\\Database, PHPUnit\\Framework\\MockObject\\Stub given\.$#'
-			identifier: argument.type
-			count: 1
-			path: tests/src/Console/AutomaticInstallationConsoleTest.php
-
-		-
-			message: '#^Parameter \#4 \$installer of class Friendica\\Console\\AutomaticInstallation constructor expects Friendica\\Core\\Installer\|null, PHPUnit\\Framework\\MockObject\\MockObject given\.$#'
 			identifier: argument.type
 			count: 1
 			path: tests/src/Console/AutomaticInstallationConsoleTest.php

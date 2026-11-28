@@ -110,9 +110,7 @@ class ErrorHandler
 		});
 		$this->uncaughtExceptionLevelMap = $levelMap;
 		foreach ($this->defaultExceptionLevelMap() as $class => $level) {
-			if (!isset($this->uncaughtExceptionLevelMap[$class])) {
-				$this->uncaughtExceptionLevelMap[$class] = $level;
-			}
+			$this->uncaughtExceptionLevelMap[$class] ??= $level;
 		}
 		if ($callPrevious && $prev) {
 			$this->previousExceptionHandler = $prev;

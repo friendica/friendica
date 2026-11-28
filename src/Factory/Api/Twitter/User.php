@@ -53,7 +53,7 @@ class User extends BaseFactory
 			$post = Post::selectFirstPost(
 				['uri-id'],
 				['author-id' => $publicContact['id'], 'gravity' => [Item::GRAVITY_COMMENT, Item::GRAVITY_PARENT], 'private' => [Item::PUBLIC, Item::UNLISTED]],
-				['order'     => ['uri-id' => true]],
+				['order' => ['uri-id' => true]],
 			);
 			if (!empty($post['uri-id'])) {
 				$status = $this->status->createFromUriId($post['uri-id'], $uid);

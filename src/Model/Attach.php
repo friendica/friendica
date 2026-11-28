@@ -191,9 +191,7 @@ class Attach
 			$filetype = Mimetype::getContentType($filename);
 		}
 
-		if (is_null($filesize)) {
-			$filesize = strlen($data);
-		}
+		$filesize ??= strlen($data);
 
 		$backend_ref = DI::storage()->put($data);
 		$data        = '';

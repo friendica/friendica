@@ -37,9 +37,7 @@ class SystemMailBuilderTest extends MockedTestCase
 		$this->config = \Mockery::mock(IManageConfigValues::class);
 		$this->config->shouldReceive('get')->with('config', 'admin_name')->andReturn('Admin');
 		$this->l10n = \Mockery::mock(L10n::class);
-		$this->l10n->shouldReceive('t')->andReturnUsing(function ($msg) {
-			return $msg;
-		});
+		$this->l10n->shouldReceive('t')->andReturnUsing(fn ($msg) => $msg);
 		$this->baseUrl = \Mockery::mock(BaseURL::class);
 		$this->baseUrl->shouldReceive('getHost')->andReturn('friendica.local');
 		$this->baseUrl->shouldReceive('__toString')->andReturn('http://friendica.local');

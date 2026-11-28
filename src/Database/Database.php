@@ -1747,9 +1747,7 @@ class Database
 				$max_time  = $process['Time'];
 				$max_query = $process['Info'];
 			}
-			if (!isset($states[$state])) {
-				$states[$state] = 0;
-			}
+			$states[$state] ??= 0;
 			++$states[$state];
 			++$processes;
 		}

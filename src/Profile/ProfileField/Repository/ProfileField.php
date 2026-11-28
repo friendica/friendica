@@ -238,9 +238,9 @@ class ProfileField extends BaseRepository
 
 		// Prunes profile field whose label has been emptied
 		$labels                 = $profileFields->column('label');
-		$prunedProfileFieldsOld = $profileFieldsOld->filter(function (Entity\ProfileField $profileFieldOld) use ($labels) {
-			return array_search($profileFieldOld->label, $labels) === false;
-		});
+		$prunedProfileFieldsOld = $profileFieldsOld->filter(
+			fn (Entity\ProfileField $profileFieldOld): bool => !in_array($profileFieldOld->label, $labels),
+		);
 		$this->deleteCollection($prunedProfileFieldsOld);
 
 		// Update the order based on the new Profile Field Collection

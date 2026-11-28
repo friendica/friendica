@@ -79,6 +79,7 @@ class DirectMessageTest extends FixtureTestCase
 	 * Test the api_format_messages() function with the getUserObjects GET parameter set to false.
 	 *
 	 */
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testApiFormatMessagesWithoutUserObjects(): void
 	{
 		self::markTestIncomplete('Needs processing of "getUserObjects" first');

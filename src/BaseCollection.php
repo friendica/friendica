@@ -152,8 +152,6 @@ class BaseCollection extends \ArrayIterator
 			return parent::getArrayCopy();
 		}
 
-		return array_map(function ($item) {
-			return is_object($item) ? $item->toArray() : $item;
-		}, parent::getArrayCopy());
+		return array_map(fn ($item) => is_object($item) ? $item->toArray() : $item, parent::getArrayCopy());
 	}
 }

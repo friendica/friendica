@@ -127,9 +127,7 @@ if (!isset($link_hover_color)) {
 }
 
 // Convert $bg_image_options into css.
-if (!isset($bg_image_option)) {
-	$bg_image_option = null;
-}
+$bg_image_option ??= null;
 
 switch ($bg_image_option) {
 	case 'stretch':

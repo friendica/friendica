@@ -532,7 +532,7 @@ class DBA
 		return implode(
 			'.',
 			array_map(
-				function (string $identifier) { return '`' . str_replace('`', '``', $identifier) . '`'; },
+				fn (string $identifier): string => '`' . str_replace('`', '``', $identifier) . '`',
 				explode('.', $identifier),
 			),
 		);

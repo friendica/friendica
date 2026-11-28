@@ -20,9 +20,7 @@ require_once 'view/theme/frio/php/frio_boot.php';
 require_once 'view/theme/frio/php/scheme.php';
 
 //	$minimal = is_modal();
-if (!isset($minimal)) {
-	$minimal = false;
-}
+$minimal ??= false;
 
 $basepath            = DI::baseUrl()->getPath() ? "/" . DI::baseUrl()->getPath() . "/" : "/";
 $frio                = "view/theme/frio";

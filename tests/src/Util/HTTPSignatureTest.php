@@ -297,7 +297,7 @@ G1vVmRgkLDqhc4+r3wDz3qy6JpV7tg==
 		$base   = HTTPSignature::rfc9421SignatureBase(
 			['@method', '@target-uri', 'content-digest'],
 			$params,
-			['method'         => 'POST', 'scheme' => 'https', 'authority' => 'remote.example', 'target' => '/inbox'],
+			['method' => 'POST', 'scheme' => 'https', 'authority' => 'remote.example', 'target' => '/inbox'],
 			['content-digest' => $headers['Content-Digest']],
 		);
 

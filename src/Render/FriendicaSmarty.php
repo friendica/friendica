@@ -39,9 +39,7 @@ class FriendicaSmarty extends Smarty
 		$this->setConfigDir($work_dir . '/');
 		$this->setCacheDir($work_dir . '/');
 
-		$this->registerPlugin('modifier', 'is_string', function ($value) {
-			return is_string($value);
-		});
+		$this->registerPlugin('modifier', 'is_string', fn ($value): bool => is_string($value));
 		$this->registerPlugin("modifier", "str_ends_with", "str_ends_with");
 
 		/*

@@ -53,9 +53,7 @@ class Roles extends BaseAdmin
 			$this->baseUrl->redirect('admin/roles');
 		}
 
-		$moderatorUids = array_values(array_filter(User::getModeratorUids(), function (int $moderatorUid): bool {
-			return $moderatorUid !== 0;
-		}));
+		$moderatorUids = array_values(array_filter(User::getModeratorUids(), fn (int $moderatorUid): bool => $moderatorUid !== 0));
 
 		switch ($action) {
 			case 'add':
@@ -81,9 +79,7 @@ class Roles extends BaseAdmin
 				break;
 
 			case 'remove':
-				$updatedModeratorUids = array_values(array_filter($moderatorUids, function (int $moderatorUid) use ($uid): bool {
-					return $moderatorUid !== $uid;
-				}));
+				$updatedModeratorUids = array_values(array_filter($moderatorUids, fn (int $moderatorUid): bool => $moderatorUid !== $uid));
 
 				if (count($updatedModeratorUids) !== count($moderatorUids)) {
 					$this->persistModeratorUids($updatedModeratorUids);
@@ -120,9 +116,7 @@ class Roles extends BaseAdmin
 			$moderationUserUids[(int) $moderationUser['uid']] = true;
 		}
 
-		$availableUsers = array_values(array_filter($availableUsers, function (array $user) use ($moderationUserUids): bool {
-			return empty($moderationUserUids[(int) $user['uid']]);
-		}));
+		$availableUsers = array_values(array_filter($availableUsers, fn (array $user): bool => empty($moderationUserUids[(int) $user['uid']])));
 
 		$t = Renderer::getMarkupTemplate('admin/roles.tpl');
 

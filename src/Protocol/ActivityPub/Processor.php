@@ -133,9 +133,7 @@ class Processor
 			$body,
 			array_combine(
 				array_column($emojis, 'name'),
-				array_map(function ($emoji) {
-					return '[emoji=' . $emoji['href'] . ']' . $emoji['name'] . '[/emoji]';
-				}, $emojis),
+				array_map(fn ($emoji): string => '[emoji=' . $emoji['href'] . ']' . $emoji['name'] . '[/emoji]', $emojis),
 			),
 		);
 

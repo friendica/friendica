@@ -685,9 +685,7 @@ class Item
 			return 0;
 		}
 
-		if (!isset($item['post-type'])) {
-			$item['post-type'] = empty($item['title']) ? self::PT_NOTE : self::PT_ARTICLE;
-		}
+		$item['post-type'] ??= empty($item['title']) ? self::PT_NOTE : self::PT_ARTICLE;
 
 		$uid = intval($item['uid']);
 
@@ -792,9 +790,7 @@ class Item
 			$item['parent'] = $parent_id;
 
 			// Trigger automatic reactions for addons
-			if (!isset($item['api_source'])) {
-				$item['api_source'] = true;
-			}
+			$item['api_source'] ??= true;
 
 			// We have to tell the hooks who we are - this really should be improved
 			if (!DI::userSession()->getLocalUserId()) {
@@ -2030,9 +2026,7 @@ class Item
 			// This sorting is important when there are hashtags that are part of other hashtags
 			// Otherwise there could be problems with hashtags like #test and #test2
 			// Because of this we are sorting from the longest to the shortest tag.
-			usort($tags, function ($a, $b) {
-				return strlen($b) <=> strlen($a);
-			});
+			usort($tags, fn ($a, $b): int => strlen($b) <=> strlen($a));
 
 			$URLSearchString = "^\[\]";
 
@@ -2048,25 +2042,19 @@ class Item
 			// mask hashtags inside of url, bookmarks and attachments to avoid urls in urls
 			$body = preg_replace_callback(
 				"/\[url\=([$URLSearchString]*)\](.*?)\[\/url\]/ism",
-				function ($match) {
-					return ("[url=" . str_replace("#", "&num;", $match[1]) . "]" . str_replace("#", "&num;", $match[2]) . "[/url]");
-				},
+				fn ($match): string => "[url=" . str_replace("#", "&num;", $match[1]) . "]" . str_replace("#", "&num;", $match[2]) . "[/url]",
 				(string) $body,
 			);
 
 			$body = preg_replace_callback(
 				"/\[bookmark\=([$URLSearchString]*)\](.*?)\[\/bookmark\]/ism",
-				function ($match) {
-					return ("[bookmark=" . str_replace("#", "&num;", $match[1]) . "]" . str_replace("#", "&num;", $match[2]) . "[/bookmark]");
-				},
+				fn ($match): string => "[bookmark=" . str_replace("#", "&num;", $match[1]) . "]" . str_replace("#", "&num;", $match[2]) . "[/bookmark]",
 				(string) $body,
 			);
 
 			$body = preg_replace_callback(
 				"/\[attachment (.*?)\](.*?)\[\/attachment\]/ism",
-				function ($match) {
-					return ("[attachment " . str_replace("#", "&num;", $match[1]) . "]" . $match[2] . "[/attachment]");
-				},
+				fn ($match): string => "[attachment " . str_replace("#", "&num;", $match[1]) . "]" . $match[2] . "[/attachment]",
 				(string) $body,
 			);
 
@@ -3271,13 +3259,15 @@ class Item
 			if ($PostMedia->hasDimensions()) {
 				$pattern = '#<a href="' . preg_quote($PostMedia->url) . '"[^>]*>(.*?)"></a>#';
 
-				$s = preg_replace_callback($pattern, function () use ($PostMedia) {
-					return Renderer::replaceMacros(Renderer::getMarkupTemplate('content/image/single_with_height_allocation.tpl'), [
+				$s = preg_replace_callback(
+					$pattern,
+					fn (): string => Renderer::replaceMacros(Renderer::getMarkupTemplate('content/image/single_with_height_allocation.tpl'), [
 						'$image'               => $PostMedia,
 						'$allocated_height'    => $PostMedia->getAllocatedHeight(),
 						'$allocated_max_width' => ($PostMedia->previewWidth ?? $PostMedia->width) . 'px',
-					]);
-				}, (string) $s);
+					]),
+					(string) $s,
+				);
 			} else {
 				$s = str_replace('<a href="' . $PostMedia->url . '"', '<a data-fancybox="uri-id-' . $PostMedia->uriId . '" href="' . $PostMedia->url . '"', $s);
 			}

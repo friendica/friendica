@@ -90,12 +90,8 @@ class Report extends \Friendica\BaseFactory implements ICanCreateFromTableRow
 			$uid,
 			$comment,
 			$forward,
-			new Collection\Report\Posts(array_map(function ($uriId) {
-				return new Entity\Report\Post($uriId);
-			}, $postUriIds)),
-			new Collection\Report\Rules(array_map(function ($lineId) use ($rules) {
-				return new Entity\Report\Rule($lineId, $rules[$lineId] ?? '');
-			}, $ruleIds)),
+			new Collection\Report\Posts(array_map(fn ($uriId): \Friendica\Moderation\Entity\Report\Post => new Entity\Report\Post($uriId), $postUriIds)),
+			new Collection\Report\Rules(array_map(fn ($lineId): \Friendica\Moderation\Entity\Report\Rule => new Entity\Report\Rule($lineId, $rules[$lineId] ?? ''), $ruleIds)),
 		);
 	}
 
@@ -119,12 +115,8 @@ class Report extends \Friendica\BaseFactory implements ICanCreateFromTableRow
 			$reporterId,
 			$comment,
 			$forward,
-			new Collection\Report\Posts(array_map(function ($uriId) {
-				return new Entity\Report\Post($uriId);
-			}, $uriIds)),
-			new Collection\Report\Rules(array_map(function ($lineId) use ($rules) {
-				return new Entity\Report\Rule($lineId, $rules[$lineId] ?? '');
-			}, $ruleIds)),
+			new Collection\Report\Posts(array_map(fn ($uriId): \Friendica\Moderation\Entity\Report\Post => new Entity\Report\Post($uriId), $uriIds)),
+			new Collection\Report\Rules(array_map(fn ($lineId): \Friendica\Moderation\Entity\Report\Rule => new Entity\Report\Rule($lineId, $rules[$lineId] ?? ''), $ruleIds)),
 		);
 	}
 }

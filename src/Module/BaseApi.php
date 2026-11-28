@@ -140,8 +140,12 @@ abstract class BaseApi extends BaseModule
 			}
 		} else {
 			$order_field = match ($requested_order) {
-				TimelineOrderByTypes::RECEIVED, TimelineOrderByTypes::CHANGED, TimelineOrderByTypes::EDITED, TimelineOrderByTypes::CREATED, TimelineOrderByTypes::COMMENTED => $requested_order,
-				default => throw new \Exception("Unrecognized request order: $requested_order"),
+				TimelineOrderByTypes::RECEIVED,
+				TimelineOrderByTypes::CHANGED,
+				TimelineOrderByTypes::EDITED,
+				TimelineOrderByTypes::CREATED,
+				TimelineOrderByTypes::COMMENTED => $requested_order,
+				default                         => throw new \Exception("Unrecognized request order: $requested_order"),
 			};
 
 			if (!empty($request['max_id'])) {
@@ -172,8 +176,12 @@ abstract class BaseApi extends BaseModule
 	{
 		$requested_order = $request['friendica_order'];
 		$order_field     = match ($requested_order) {
-			TimelineOrderByTypes::CHANGED, TimelineOrderByTypes::CREATED, TimelineOrderByTypes::COMMENTED, TimelineOrderByTypes::EDITED, TimelineOrderByTypes::RECEIVED => $requested_order,
-			default => 'uri-id',
+			TimelineOrderByTypes::CHANGED,
+			TimelineOrderByTypes::CREATED,
+			TimelineOrderByTypes::COMMENTED,
+			TimelineOrderByTypes::EDITED,
+			TimelineOrderByTypes::RECEIVED => $requested_order,
+			default                        => 'uri-id',
 		};
 
 		if (!empty($request['min_id'])) {
@@ -260,13 +268,9 @@ abstract class BaseApi extends BaseModule
 	 */
 	protected static function setBoundaries($id)
 	{
-		if (!isset(self::$boundaries['min'])) {
-			self::$boundaries['min'] = $id;
-		}
+		self::$boundaries['min'] ??= $id;
 
-		if (!isset(self::$boundaries['max'])) {
-			self::$boundaries['max'] = $id;
-		}
+		self::$boundaries['max'] ??= $id;
 
 		self::$boundaries['min'] = min(self::$boundaries['min'], $id);
 		self::$boundaries['max'] = max(self::$boundaries['max'], $id);

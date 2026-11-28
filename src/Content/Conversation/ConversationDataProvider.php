@@ -367,9 +367,7 @@ final readonly class ConversationDataProvider
 	private function populateThreadWithChildren(array $parents, bool $blockAuthors, string $order, int $uid, string $mode, int $sinceId = 0, string $sinceDate = '', array $existing = [], bool $pagedrop = false, bool $smartThreading = true): array
 	{
 		$userGservers = $this->userGServer->listIgnoredByUser($uid);
-		$ignoredGsids = array_map(static function (UserGServerEntity $userGServer) {
-			return $userGServer->gsid;
-		}, $userGservers->getArrayCopy());
+		$ignoredGsids = array_map(static fn (UserGServerEntity $userGServer) => $userGServer->gsid, $userGservers->getArrayCopy());
 
 		$maxComments = $mode === ConversationRenderer::MODE_DISPLAY ? $this->config->get('system', 'max_display_comments') : $this->config->get('system', 'max_comments');
 
@@ -831,9 +829,7 @@ final readonly class ConversationDataProvider
 			$existingWithDescendants = array_merge($existingWithDescendants, $descendants);
 		}
 		// Filter out existing comments and their descendants
-		$filteredRows = array_filter($rows, function ($row) use ($existingWithDescendants) {
-			return !in_array($row['uri-id'], $existingWithDescendants);
-		});
+		$filteredRows = array_filter($rows, fn ($row): bool => !in_array($row['uri-id'], $existingWithDescendants));
 		// Reindex the array
 		return array_values($filteredRows);
 	}
@@ -877,9 +873,7 @@ final readonly class ConversationDataProvider
 			$authorUriIds = array_keys($authorUriSet);
 
 			// Filter $rows: keep only entries whose uri-id is in $authorUriIds
-			$rows = array_filter($rows, function ($row) use ($authorUriIds) {
-				return in_array($row['uri-id'], $authorUriIds);
-			});
+			$rows = array_filter($rows, fn ($row): bool => in_array($row['uri-id'], $authorUriIds));
 		}
 		return $this->indexRowsByUriId($rows);
 	}
@@ -922,15 +916,11 @@ final readonly class ConversationDataProvider
 			}
 
 			if ($maxComments > 0) {
-				if (!isset($commentCounter[$row['parent-uri-id']])) {
-					$commentCounter[$row['parent-uri-id']] = 0;
-				}
+				$commentCounter[$row['parent-uri-id']] ??= 0;
 				if (($row['gravity'] === ItemModel::GRAVITY_COMMENT) && (++$commentCounter[$row['parent-uri-id']] > $maxComments)) {
 					continue;
 				}
-				if (!isset($activityCounter[$row['parent-uri-id']])) {
-					$activityCounter[$row['parent-uri-id']] = 0;
-				}
+				$activityCounter[$row['parent-uri-id']] ??= 0;
 				if (($row['gravity'] === ItemModel::GRAVITY_ACTIVITY) && (++$activityCounter[$row['parent-uri-id']] > $maxComments)) {
 					continue;
 				}
@@ -1161,9 +1151,7 @@ final readonly class ConversationDataProvider
 		for ($index = 0; $index < count($parent['children']); $index++) {
 			$child = $parent['children'][$index];
 			if (isset($child['children']) && count($child['children'])) {
-				$countPostClosure = function ($var) {
-					return $var['verb'] === Activity::POST;
-				};
+				$countPostClosure = (fn ($var): bool => $var['verb'] === Activity::POST);
 
 				$childPostCount     = count(array_filter($child['children'], $countPostClosure));
 				$remainingPostCount = count(array_filter(array_slice($parent['children'], $index), $countPostClosure));

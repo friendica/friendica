@@ -119,9 +119,7 @@ class ReportsTest extends MockedTestCase
 		$ruleFactory   = \Mockery::mock(ReportRuleFactory::class);
 
 		$reportFactory->shouldReceive('createFromTableRow')
-			->andReturnUsing(function (array $fields) use ($reportsById): ReportEntity {
-				return $reportsById[(int) $fields['id']];
-			});
+			->andReturnUsing(fn (array $fields): ReportEntity => $reportsById[(int) $fields['id']]);
 
 		return new ReportRepository($database, $logger, $reportFactory, $postFactory, $ruleFactory);
 	}

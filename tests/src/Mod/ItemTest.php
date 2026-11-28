@@ -190,6 +190,7 @@ class ItemTest extends ApiTestCase
 		self::assertTrue(DBA::isResult(Post::selectFirst(['id'], ['uid' => 1042, 'body' => 'Posted via compose'])));
 	}
 
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testItemPostDropitemsDelegationIsNotAutomaticallyTestable(): void
 	{
 		self::markTestIncomplete(
@@ -412,6 +413,7 @@ class ItemTest extends ApiTestCase
 	/**
 	 * Known gap: preview mode always terminates via System::jsonExit(), which cannot be intercepted from PHPUnit. Needs manual/browser verification instead.
 	 */
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testItemProcessPreviewModeIsNotAutomaticallyTestable(): void
 	{
 		self::markTestIncomplete(
@@ -717,6 +719,7 @@ class ItemTest extends ApiTestCase
 	 *
 	 * Needs manual/browser verification instead.
 	 */
+	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testItemActionAjaxBranchesAreNotAutomaticallyTestable(): void
 	{
 		self::markTestIncomplete(

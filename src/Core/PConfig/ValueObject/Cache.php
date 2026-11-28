@@ -85,9 +85,7 @@ class Cache
 			$this->config[$uid] = [];
 		}
 
-		if (!isset($this->config[$uid][$cat])) {
-			$this->config[$uid][$cat] = [];
-		}
+		$this->config[$uid][$cat] ??= [];
 
 		if ($this->hidePasswordOutput
 			&& $key == 'password'

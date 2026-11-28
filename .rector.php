@@ -27,13 +27,9 @@ return \Rector\Config\RectorConfig::configure()
 	->withTypeCoverageLevel(6)
 	// ->withDeadCodeLevel(0)
 	// ->withCodeQualityLevel(0)
+	->withPhpSets()
 	->withSets([
-		\Rector\Set\ValueObject\LevelSetList::UP_TO_PHP_85,
-		\Rector\PHPUnit\Set\PHPUnitSetList::PHPUNIT_120,
+		\Rector\PHPUnit\Set\PHPUnitSetList::COMPOSER_BASED,
 		\Rector\PHPUnit\Set\PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
-	])
-	->withSkip([
-		\Rector\Php56\Rector\FuncCall\PowToExpRector::class,
-		\Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector::class,
 	])
 ;

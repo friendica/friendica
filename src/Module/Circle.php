@@ -154,10 +154,11 @@ class Circle extends BaseModule
 		}
 
 		// Switch to text mode interface if we have more than 'n' contacts or circle members
-		$switchtotext = DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'circle_edit_image_limit') ?? DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'groupedit_image_limit');
-		if (is_null($switchtotext)) {
-			$switchtotext = DI::config()->get('system', 'groupedit_image_limit') ?? DI::config()->get('system', 'circle_edit_image_limit');
-		}
+		$switchtotext
+			= DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'circle_edit_image_limit')
+			?? DI::pConfig()->get(DI::userSession()->getLocalUserId(), 'system', 'groupedit_image_limit')
+			?? DI::config()->get('system', 'groupedit_image_limit')
+			?? DI::config()->get('system', 'circle_edit_image_limit');
 
 		$tpl = Renderer::getMarkupTemplate('circle_edit.tpl');
 
@@ -180,6 +181,7 @@ class Circle extends BaseModule
 		$nocircle    = false;
 		$members     = [];
 		$preselected = [];
+		$circle      = null;
 
 		// @TODO: Replace with parameter from router
 		if (

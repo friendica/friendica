@@ -93,7 +93,7 @@ class Contacts extends Module\BaseProfile
 				$contact = Model\Contact::selectFirst(
 					[],
 					['uri-id' => $contact['uri-id'], 'uid' => [0, $this->userSession->getLocalUserId()]],
-					['order'  => ['uid' => 'DESC']],
+					['order' => ['uid' => 'DESC']],
 				);
 				return $contact ? Module\Contact::getContactTemplateVars($contact) : null;
 			},

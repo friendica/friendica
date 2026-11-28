@@ -130,14 +130,14 @@ class InstallerTest extends MockedTestCase
 	public function testCheckKeys($function, $expected): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) use ($function, $expected) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) use ($function, $expected) {
 			if ($function_name === $function) {
 				return $expected;
 			}
 			return call_user_func_array(\function_exists(...), func_get_args());
 		});
 
-		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(fn ($args) => $args);
 
 		$install = new Installer();
 		self::assertSame($expected, $install->checkKeys());
@@ -146,7 +146,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutIntlChar(): void
 	{
 		$class_exists = $this->getFunctionMock('Friendica\Core', 'class_exists');
-		$class_exists->expects($this->any())->willReturnCallback(function ($class_name) {
+		$class_exists->expects($this->atLeastOnce())->willReturnCallback(function ($class_name) {
 			if ($class_name === 'IntlChar') {
 				return false;
 			}
@@ -170,7 +170,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutCurlInit(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'curl_init') {
 				return false;
 			}
@@ -194,7 +194,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutImagecreateformjpeg(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'imagecreatefromjpeg') {
 				return false;
 			}
@@ -218,7 +218,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutOpensslpublicencrypt(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'openssl_public_encrypt') {
 				return false;
 			}
@@ -242,7 +242,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutSodium(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'sodium_crypto_sign_verify_detached') {
 				return false;
 			}
@@ -266,7 +266,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutMbStrlen(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'mb_strlen') {
 				return false;
 			}
@@ -290,7 +290,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutIconvStrlen(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'iconv_strlen') {
 				return false;
 			}
@@ -314,7 +314,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutPosixkill(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'posix_kill') {
 				return false;
 			}
@@ -338,7 +338,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutProcOpen(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'proc_open') {
 				return false;
 			}
@@ -362,7 +362,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutJsonEncode(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'json_encode') {
 				return false;
 			}
@@ -386,7 +386,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutFinfoOpen(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'finfo_open') {
 				return false;
 			}
@@ -410,7 +410,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctionsWithoutGmpStrval(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'gmp_strval') {
 				return false;
 			}
@@ -434,7 +434,7 @@ class InstallerTest extends MockedTestCase
 	public function testCheckFunctions(): void
 	{
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if (in_array(
 				$function_name,
 				[
@@ -463,7 +463,7 @@ class InstallerTest extends MockedTestCase
 
 	public function testCheckLocalIni(): void
 	{
-		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(fn ($args) => $args);
 
 		self::assertTrue($this->root->hasChild('config/local.config.php'));
 
@@ -482,14 +482,14 @@ class InstallerTest extends MockedTestCase
 	{
 		// Mocking that we can use CURL
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'curl_init') {
 				return true;
 			}
 			return call_user_func_array(\function_exists(...), func_get_args());
 		});
 
-		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(fn ($args) => $args);
 
 		// Mocking the CURL Response
 		$IHTTPResult = Mockery::mock(ICanHandleHttpResponses::class);
@@ -530,14 +530,14 @@ class InstallerTest extends MockedTestCase
 	{
 		// Mocking that we can use CURL
 		$function_exists = $this->getFunctionMock('Friendica\Core', 'function_exists');
-		$function_exists->expects($this->any())->willReturnCallback(function ($function_name) {
+		$function_exists->expects($this->atLeastOnce())->willReturnCallback(function ($function_name) {
 			if ($function_name === 'curl_init') {
 				return true;
 			}
 			return call_user_func_array(\function_exists(...), func_get_args());
 		});
 
-		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(fn ($args) => $args);
 
 		// Mocking the failed CURL Response
 		$IHTTPResultF = Mockery::mock(ICanHandleHttpResponses::class);
@@ -576,7 +576,7 @@ class InstallerTest extends MockedTestCase
 	public function testImagickNotInstalled(): void
 	{
 		$class_exists = $this->getFunctionMock('Friendica\Core', 'class_exists');
-		$class_exists->expects($this->any())->willReturnCallback(function ($class_name) {
+		$class_exists->expects($this->atLeastOnce())->willReturnCallback(function ($class_name) {
 			if ($class_name === 'Imagick') {
 				return false;
 			}
@@ -604,7 +604,7 @@ class InstallerTest extends MockedTestCase
 	#[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
 	public function testAPCuNotAvailable(): void
 	{
-		$this->getFunctionMock('Friendica\Core\Cache\Type', 'extension_loaded')->expects($this->any())->willReturn(false);
+		$this->getFunctionMock('Friendica\Core\Cache\Type', 'extension_loaded')->expects($this->atLeastOnce())->willReturn(false);
 		$this->mockL10nT('APCu PHP extension is not available (optional, only needed for the "apcu" cache driver)', 1);
 
 		$install = new Installer();
@@ -624,9 +624,9 @@ class InstallerTest extends MockedTestCase
 	#[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
 	public function testAPCuAvailable(): void
 	{
-		$this->getFunctionMock('Friendica\Core\Cache\Type', 'extension_loaded')->expects($this->any())->willReturn(true);
-		$this->getFunctionMock('Friendica\Core\Cache\Type', 'ini_get')->expects($this->any())->willReturn('1');
-		$this->getFunctionMock('Friendica\Core\Cache\Type', 'phpversion')->expects($this->any())->willReturn('5.1.24');
+		$this->getFunctionMock('Friendica\Core\Cache\Type', 'extension_loaded')->expects($this->atLeastOnce())->willReturn(true);
+		$this->getFunctionMock('Friendica\Core\Cache\Type', 'ini_get')->expects($this->atLeastOnce())->willReturn('1');
+		$this->getFunctionMock('Friendica\Core\Cache\Type', 'phpversion')->expects($this->atLeastOnce())->willReturn('5.1.24');
 		$this->mockL10nT('APCu PHP extension is available', 1);
 
 		$install = new Installer();
@@ -648,7 +648,7 @@ class InstallerTest extends MockedTestCase
 	#[\PHPUnit\Framework\Attributes\DoesNotPerformAssertions]
 	public function testSetUpCache(): void
 	{
-		$this->l10nMock->shouldReceive('t')->andReturnUsing(function ($args) { return $args; });
+		$this->l10nMock->shouldReceive('t')->andReturnUsing(fn ($args) => $args);
 
 		$install     = new Installer();
 		$configCache = Mockery::mock(Cache::class);

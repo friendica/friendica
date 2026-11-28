@@ -865,12 +865,8 @@ class Photo
 		if (!preg_match_all("/\[img\](.*?)\[\/img\]/", (string) $img_body, $match)) {
 			return false;
 		}
-		$images = $match[1];
-		if (empty($images)) {
-			return false;
-		}
 
-		foreach ($images as $image) {
+		foreach ($match[1] as $image) {
 			$image_rid = self::ridFromURI($image);
 			if (empty($image_rid)) {
 				continue;

@@ -92,7 +92,7 @@ class Category
 		$tags = DBA::selectToArray(
 			'category-view',
 			['name'],
-			['uid'      => $uid, 'type' => $type],
+			['uid' => $uid, 'type' => $type],
 			['group_by' => ['name'], 'order' => ['name']],
 		);
 		if (empty($tags)) {

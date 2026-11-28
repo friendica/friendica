@@ -2518,6 +2518,7 @@ button[disabled] {
 }
 .wall-item-responses {
 	margin-top: .3em;
+	margin-bottom: .4em;
 }
 .wall-item-responses > div > p {
 	margin: 0;
@@ -2571,7 +2572,7 @@ button[disabled] {
 .hide-comments-outer {
 	display: block;
 	background-color: rgba(0, 0, 0, 0.03);
-	padding: 0.3em 10px;
+	padding: 0 10px 0.3em 10px;
 	width: 100%;
 	border: none;
 	text-align: left;

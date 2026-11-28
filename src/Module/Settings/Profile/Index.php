@@ -223,7 +223,7 @@ class Index extends BaseSettings
 					$this->session->getLocalUserId(),
 					false,
 					['allow_cid' => []],
-					['network'   => Protocol::DFRN],
+					['network' => Protocol::DFRN],
 					'profile_field[new]',
 				),
 			],

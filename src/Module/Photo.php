@@ -471,8 +471,8 @@ class Photo extends BaseApi
 
 			$default = match ($type) {
 				'profile', 'custom' => Contact::getDefaultAvatar($contact, Proxy::SIZE_SMALL),
-				'micro' => Contact::getDefaultAvatar($contact, Proxy::SIZE_MICRO),
-				default => Contact::getDefaultAvatar($contact, Proxy::SIZE_THUMB),
+				'micro'             => Contact::getDefaultAvatar($contact, Proxy::SIZE_MICRO),
+				default             => Contact::getDefaultAvatar($contact, Proxy::SIZE_THUMB),
 			};
 
 			if (DI::baseUrl()->isLocalUrl($default)) {

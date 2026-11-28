@@ -247,9 +247,7 @@ class Installer
 	{
 		$passed3 = false;
 
-		if (!isset($phppath)) {
-			$phppath = 'php';
-		}
+		$phppath ??= 'php';
 
 		$phppath = $this->sanitizePHPPath($phppath);
 

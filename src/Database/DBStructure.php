@@ -249,9 +249,7 @@ class DBStructure
 		// Get the current structure
 		$database = [];
 
-		if (is_null($tables)) {
-			$tables = DBA::toArray(DBA::p("SHOW TABLES"));
-		}
+		$tables ??= DBA::toArray(DBA::p("SHOW TABLES"));
 
 		if (DBA::isResult($tables)) {
 			foreach ($tables as $table) {
@@ -263,10 +261,8 @@ class DBStructure
 		}
 
 		// Get the definition
-		if (is_null($definition)) {
-			// just for Update purpose, reload the DBA definition with addons to explicit get the whole definition
-			$definition = DI::dbaDefinition()->load(true)->getAll();
-		}
+		// just for Update purpose, reload the DBA definition with addons to explicit get the whole definition
+		$definition ??= DI::dbaDefinition()->load(true)->getAll();
 
 		// MySQL >= 5.7.4 doesn't support the IGNORE keyword in ALTER TABLE statements
 		if ((version_compare(DBA::serverInfo(), '5.7.4') >= 0)
@@ -338,9 +334,7 @@ class DBStructure
 						unset($field_definition['Collation']);
 
 						// Only update the comment when it is defined
-						if (!isset($parameters['comment'])) {
-							$parameters['comment'] = "";
-						}
+						$parameters['comment'] ??= "";
 
 						$current_field_definition = DBA::cleanQuery(implode(",", $field_definition));
 						$new_field_definition     = DBA::cleanQuery(implode(",", $parameters));
@@ -657,9 +651,7 @@ class DBStructure
 					return false;
 				}
 				$sql .= implode(',', array_map(
-					function ($to, $from) {
-						return " CHANGE `" . $from . "` `" . $to[0] . "` " . $to[1];
-					},
+					fn ($to, $from): string => " CHANGE `" . $from . "` `" . $to[0] . "` " . $to[1],
 					$columns,
 					array_keys($columns),
 				));

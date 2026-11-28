@@ -98,17 +98,13 @@ class Profiler implements ContainerInterface
 
 		$callstack = $callstack ?: System::callstack(4, $value == 'rendering' ? 0 : 1);
 
-		if (!isset($this->performance[$value])) {
-			$this->performance[$value] = 0;
-		}
+		$this->performance[$value] ??= 0;
 
 		$this->performance[$value] += (float) $duration;
 		$this->performance['marktime'] += (float) $duration;
 
-		if (!isset($this->callstack[$value][$callstack])) {
-			// Prevent ugly E_NOTICE
-			$this->callstack[$value][$callstack] = 0;
-		}
+		// Prevent ugly E_NOTICE
+		$this->callstack[$value][$callstack] ??= 0;
 
 		$this->callstack[$value][$callstack] += (float) $duration;
 	}
@@ -133,18 +129,14 @@ class Profiler implements ContainerInterface
 
 		$duration = floatval(microtime(true) - $timestamp);
 
-		if (!isset($this->performance[$value])) {
-			// Prevent ugly E_NOTICE
-			$this->performance[$value] = 0;
-		}
+		// Prevent ugly E_NOTICE
+		$this->performance[$value] ??= 0;
 
 		$this->performance[$value] += (float) $duration;
 		$this->performance['marktime'] += (float) $duration;
 
-		if (!isset($this->callstack[$value][$callstack])) {
-			// Prevent ugly E_NOTICE
-			$this->callstack[$value][$callstack] = 0;
-		}
+		// Prevent ugly E_NOTICE
+		$this->callstack[$value][$callstack] ??= 0;
 
 		$this->callstack[$value][$callstack] += (float) $duration;
 	}

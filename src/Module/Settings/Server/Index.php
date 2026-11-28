@@ -82,13 +82,9 @@ class Index extends BaseSettings
 
 		$servers = $this->repository->selectByUserWithPagination($this->session->getLocalUserId(), $pager);
 
-		$ignoredCheckboxes = array_map(function (UserGServer $server) {
-			return ['ignored[' . $server->gsid . ']', '', $server->ignored];
-		}, $servers->getArrayCopy());
+		$ignoredCheckboxes = array_map(fn (UserGServer $server): array => ['ignored[' . $server->gsid . ']', '', $server->ignored], $servers->getArrayCopy());
 
-		$deleteCheckboxes = array_map(function (UserGServer $server) {
-			return ['delete[' . $server->gsid . ']'];
-		}, $servers->getArrayCopy());
+		$deleteCheckboxes = array_map(fn (UserGServer $server): array => ['delete[' . $server->gsid . ']'], $servers->getArrayCopy());
 
 		$tpl = Renderer::getMarkupTemplate('settings/server/index.tpl');
 		return Renderer::replaceMacros($tpl, [

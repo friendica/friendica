@@ -22,12 +22,24 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 {
 	private Cache $configCache;
 
+	/**
+	 * @var \PHPUnit\Framework\MockObject\MockObject&\Friendica\Core\Config\Capability\IManageConfigValues
+	 */
 	private \PHPUnit\Framework\MockObject\MockObject $configMock;
 
+	/**
+	 * @var \PHPUnit\Framework\MockObject\Stub&\Friendica\Database\Database
+	 */
 	private \PHPUnit\Framework\MockObject\Stub $dba;
 
+	/**
+	 * @var \PHPUnit\Framework\MockObject\MockObject&\Dice\Dice
+	 */
 	private \PHPUnit\Framework\MockObject\MockObject $dice;
 
+	/**
+	 * @var \PHPUnit\Framework\MockObject\MockObject&\Friendica\Core\Installer
+	 */
 	private \PHPUnit\Framework\MockObject\MockObject $installerMock;
 
 	private vfsStreamDirectory $root;
@@ -103,9 +115,7 @@ class AutomaticInstallationConsoleTest extends ConsoleTestCase
 				return true;
 			}
 		});
-		$this->configMock->method('get')->willReturnCallback(function ($cat, $key) {
-			return $this->configCache->get($cat, $key);
-		});
+		$this->configMock->method('get')->willReturnCallback(fn ($cat, $key) => $this->configCache->get($cat, $key));
 
 		$this->dba = $this->createStub(Database::class);
 

@@ -20,9 +20,7 @@ class CryptoTest extends TestCase
 	public function testRandomDigitsRandomInt(): void
 	{
 		$random_int = $this->getFunctionMock('Friendica\Util', 'random_int');
-		$random_int->expects($this->any())->willReturnCallback(function ($min, $max) {
-			return 1;
-		});
+		$random_int->expects($this->atLeastOnce())->willReturnCallback(fn ($min, $max): int => 1);
 
 		self::assertSame('1', Crypto::randomDigits(1));
 		self::assertSame('11111111', Crypto::randomDigits(8));
