@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Friendica\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-24 21:41+0000\n"
+"POT-Creation-Date: 2026-11-28 10:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2164,12 +2164,12 @@ msgstr ""
 msgid "Find groups to join"
 msgstr ""
 
-#: src/Content/GroupManager.php:458 src/Module/Groups.php:133
+#: src/Content/GroupManager.php:458 src/Module/Groups.php:136
 msgid "Threads"
 msgstr ""
 
 #: src/Content/GroupManager.php:460 src/Module/Group.php:207
-#: src/Module/Groups.php:134
+#: src/Module/Groups.php:137
 msgid "Unread"
 msgstr ""
 
@@ -2335,7 +2335,7 @@ msgid "My uploaded files"
 msgstr ""
 
 #: src/Content/Nav.php:214 src/Module/BaseProfile.php:101
-#: src/Module/Profile/Notes.php:82
+#: src/Module/Profile/Notes.php:88
 msgid "Personal notes"
 msgstr ""
 
@@ -2647,25 +2647,25 @@ msgstr ""
 msgid "This file isn't used in any of your posts."
 msgstr ""
 
-#: src/Content/Post/Repository/PostMedia.php:907
+#: src/Content/Post/Repository/PostMedia.php:912
 msgid "Show external content?"
 msgstr ""
 
-#: src/Content/Post/Repository/PostMedia.php:907
+#: src/Content/Post/Repository/PostMedia.php:912
 #, php-format
 msgid "Show external content from %s?"
 msgstr ""
 
-#: src/Content/Post/Repository/PostMedia.php:908
+#: src/Content/Post/Repository/PostMedia.php:913
 msgid "Once"
 msgstr ""
 
-#: src/Content/Post/Repository/PostMedia.php:909
+#: src/Content/Post/Repository/PostMedia.php:914
 msgid "Always"
 msgstr ""
 
 #: src/Content/SpaBackButton.php:34 src/Module/Group.php:194
-#: src/Module/Groups.php:137 src/Module/Groups/Discover.php:123
+#: src/Module/Groups.php:139 src/Module/Groups/Discover.php:123
 #: src/Module/Item/Display.php:189
 msgid "Back"
 msgstr ""
@@ -5907,7 +5907,7 @@ msgid "Storage"
 msgstr ""
 
 #: src/Module/Admin/Storage.php:122 src/Module/Filer/SaveTag.php:65
-#: src/Module/Post/Edit.php:146 src/Module/Profile/Notes.php:87
+#: src/Module/Post/Edit.php:146 src/Module/Profile/Notes.php:93
 #: src/Module/Settings/Channels.php:235
 msgid "Save"
 msgstr ""
@@ -6745,7 +6745,7 @@ msgstr ""
 msgid "Edit Circle Name"
 msgstr ""
 
-#: src/Module/Circle.php:314 src/Module/Group.php:202 src/Module/Groups.php:138
+#: src/Module/Circle.php:314 src/Module/Group.php:202 src/Module/Groups.php:140
 msgid "Mark all as read"
 msgstr ""
 
@@ -7826,19 +7826,23 @@ msgstr ""
 msgid "Server not found."
 msgstr ""
 
-#: src/Module/Groups.php:135
-msgid "No posts yet"
-msgstr ""
-
-#: src/Module/Groups.php:136 src/Module/Groups/Discover.php:118
+#: src/Module/Groups.php:132 src/Module/Groups/Discover.php:118
 msgid "Discover groups"
 msgstr ""
 
-#: src/Module/Groups.php:140
+#: src/Module/Groups.php:134
+msgid "Create group"
+msgstr ""
+
+#: src/Module/Groups.php:138
+msgid "No posts yet"
+msgstr ""
+
+#: src/Module/Groups.php:142
 msgid "You are not subscribed to any groups."
 msgstr ""
 
-#: src/Module/Groups.php:141
+#: src/Module/Groups.php:143
 msgid "Filter groups"
 msgstr ""
 
@@ -10032,8 +10036,9 @@ msgstr ""
 msgid "%d more"
 msgstr ""
 
-#: src/Module/Profile/CircleExport.php:49 src/Module/Profile/Profile.php:115
-#: src/Module/Profile/Profile.php:150 src/Module/Profile/Restricted.php:33
+#: src/Module/Profile/CircleExport.php:49 src/Module/Profile/Notes.php:79
+#: src/Module/Profile/Profile.php:115 src/Module/Profile/Profile.php:150
+#: src/Module/Profile/Restricted.php:33
 msgid "Profile not found."
 msgstr ""
 
@@ -10059,7 +10064,7 @@ msgstr ""
 msgid "%s's timeline"
 msgstr ""
 
-#: src/Module/Profile/Notes.php:86
+#: src/Module/Profile/Notes.php:92
 msgid "Personal notes are visible only by yourself."
 msgstr ""
 

@@ -14,6 +14,7 @@
 		<span class="group-toolbar-start">
 			{{if $single}}<a href="groups" class="btn btn-default" data-spa-back><i class="ri ri-arrow-left-line" aria-hidden="true"></i> {{$back}}</a>{{/if}}
 			<a href="{{$discover_link}}" class="btn btn-default"><i class="ri ri-compass-3-line" aria-hidden="true"></i> {{$discover}}</a>
+			{{if !$single}}<a href="{{$create_link}}" class="btn btn-default"><i class="ri ri-add-line" aria-hidden="true"></i> {{$create}}</a>{{/if}}
 		</span>
 		{{if $groups}}<button type="submit" class="btn btn-default"><i class="ri ri-check-double-line" aria-hidden="true"></i> {{$mark_seen}}</button>{{/if}}
 	</form>
