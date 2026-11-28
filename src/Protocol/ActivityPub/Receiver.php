@@ -353,8 +353,9 @@ class Receiver
 				if (($fetched_id == $id) && !empty($fetched_type) && ($fetched_type == $type)) {
 					DI::logger()->info('Activity had been fetched successfully', ['id' => $id]);
 					$trust_source = true;
-					$activity     = $object;
-				} elseif (($fetched_id == $object_id) && !empty($fetched_type) && ($fetched_type == $object_type)) {
+					$activity     = self::dropForeignInlineObject($object, $fetched_id);
+				} elseif (in_array($type, ['as:Create', 'as:Update']) && ($fetched_id == $object_id) && !empty($fetched_type) && ($fetched_type == $object_type)) {
+					// The fetched object only vouches for its own content, not for any other activity
 					DI::logger()->info('Fetched data is the object instead of the activity', ['id' => $id]);
 					$trust_source = true;
 					unset($object['@context']);
@@ -491,7 +492,8 @@ class Receiver
 				$object_data['object_object_type'] = self::fetchObjectType([], $object_data['object_object'], $fetch_uid);
 			}
 
-			if (!$trust_source && ($type == 'as:Delete') && in_array($object_data['object_type'], array_merge(['as:Tombstone', ''], self::CONTENT_TYPES))) {
+			if (!$trust_source && ($type == 'as:Delete') && in_array($object_data['object_type'], array_merge(['as:Tombstone', ''], self::CONTENT_TYPES))
+				&& !DI::baseUrl()->isLocalUrl((string) $object_data['object_id'])) {
 				$trust_source = Processor::isActivityGone($object_data['object_id']);
 				if (!$trust_source) {
 					$trust_source = !empty(APContact::getByURL($object_data['object_id'], false));
@@ -736,14 +738,22 @@ class Receiver
 			}
 		}
 
-		// An inline object is only trusted when it is hosted on the system of one of the signers.
-		// Otherwise the object is fetched from its origin.
-		if ($trust_source && in_array($type, ['as:Create', 'as:Update']) && is_array($activity['as:object'])) {
-			$inline_object_id = (string) JsonLD::fetchElement($activity, 'as:object', '@id');
-			if (!self::isHostedBySigner($inline_object_id, $signer)) {
-				DI::logger()->info('Object id is not hosted by the signer. The object will be fetched.', ['type' => $type, 'object-id' => $inline_object_id, 'signer' => $signer, 'actor' => $actor]);
+		// The signature of a group doesn't prove anything about actors on other systems.
+		// Their activities have to be confirmed by their origin.
+		if ($trust_source && ($original_actor !== '')) {
+			$inner_actor = (string) JsonLD::fetchElement($activity, 'as:actor', '@id');
+			if (!self::isHostedBySigner($inner_actor, $signer)) {
+				DI::logger()->info('Announced actor is not hosted by the signer. The activity has to be confirmed.', ['type' => $type, 'actor' => $inner_actor, 'group' => $original_actor, 'signer' => $signer]);
 				$trust_source = false;
 			}
+		}
+
+		// An inline object is only trusted when it belongs to the system of one of the signers.
+		// Otherwise the object is fetched from its origin.
+		if ($trust_source && in_array($type, ['as:Create', 'as:Update', 'as:Invite']) && is_array($activity['as:object'])
+			&& !self::isInlineObjectOfSigner($activity['as:object'], $signer)) {
+			DI::logger()->info('Inline object does not belong to the signer. The object will be fetched.', ['type' => $type, 'object-id' => JsonLD::fetchElement($activity, 'as:object', '@id'), 'signer' => $signer, 'actor' => $actor]);
+			$trust_source = false;
 		}
 
 		// $trust_source is called by reference and is set to true if the content was retrieved successfully
@@ -1512,6 +1522,50 @@ class Receiver
 	}
 
 	/**
+	 * Checks if an inline object and its creator are located on the host of one of the signers
+	 *
+	 * Objects without a type only reference the object, so its content is fetched from its origin anyway.
+	 *
+	 * @param array $object Compacted object
+	 * @param array $signer List of signers
+	 */
+	private static function isInlineObjectOfSigner(array $object, array $signer): bool
+	{
+		if (empty(JsonLD::fetchElement($object, '@type'))) {
+			return true;
+		}
+
+		if (!self::isHostedBySigner((string) JsonLD::fetchElement($object, '@id'), $signer)) {
+			return false;
+		}
+
+		$attributed_to = (string) JsonLD::fetchElement($object, 'as:attributedTo', '@id');
+
+		return ($attributed_to === '') || self::isHostedBySigner($attributed_to, $signer);
+	}
+
+	/**
+	 * Reduces the inline object of a fetched activity to its id when it belongs to a different system
+	 *
+	 * @param array  $activity    Compacted activity
+	 * @param string $activity_id Id under which the activity has been fetched
+	 */
+	private static function dropForeignInlineObject(array $activity, string $activity_id): array
+	{
+		if (!in_array(JsonLD::fetchElement($activity, '@type'), ['as:Create', 'as:Update', 'as:Invite']) || !is_array($activity['as:object'] ?? null)) {
+			return $activity;
+		}
+
+		if (!self::isInlineObjectOfSigner($activity['as:object'], [$activity_id])) {
+			$object_id = JsonLD::fetchElement($activity, 'as:object', '@id');
+			DI::logger()->info('Inline object of the fetched activity belongs to a different system. The object will be fetched.', ['id' => $activity_id, 'object-id' => $object_id]);
+			$activity['as:object'] = ['@id' => $object_id];
+		}
+
+		return $activity;
+	}
+
+	/**
 	 * Fetches the object data from external resources if needed
 	 *
 	 * @param string  $object_id    Object ID of the provided object
@@ -2229,11 +2283,20 @@ class Receiver
 		}
 
 		$actor  = JsonLD::fetchElement($object, 'as:attributedTo', '@id');
-		$author = JsonLD::fetchElement($object, 'as:actor', '@id') ?? $actor;
+		$author = JsonLD::fetchElement($object, 'as:actor', '@id');
+
+		// A content object must not name people from other systems as its creator
+		$object_id = in_array($object_data['object_type'], self::CONTENT_TYPES) ? (string) $object_data['id'] : '';
+
+		if (($object_id !== '') && !is_null($author) && !self::isHostedBySigner($object_id, [$author])) {
+			DI::logger()->notice('Ignoring an actor from a different system', ['id' => $object_id, 'actor' => $author]);
+			$author = null;
+		}
+		$author ??= $actor;
 
 		if (!empty($actor)) {
 			foreach (JsonLD::fetchElementArray($object, 'as:attributedTo', '@id') as $element) {
-				if ($element != $author) {
+				if (($element != $author) && (($object_id === '') || self::isHostedBySigner($object_id, [$element]))) {
 					$actor = $element;
 					break;
 				}

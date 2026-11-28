@@ -248,6 +248,13 @@ class Processor
 			return;
 		}
 
+		// Local posts are only changed locally
+		if (DI::baseUrl()->isLocalUrl($item['uri'])) {
+			DI::logger()->notice('Update of a local post, skipping update', ['uri' => $activity['id'], 'actor' => $activity['actor'] ?? '']);
+			Queue::remove($activity);
+			return;
+		}
+
 		$author_id = Contact::getIdForURL($activity['author'] ?? '');
 		if (empty($author_id) || ($author_id !== (int) $item['author-id'])) {
 			DI::logger()->notice('Update is not from the author of the post, skipping update', ['uri' => $activity['id'], 'author-id' => $item['author-id'], 'author-link' => $item['author-link'], 'update-author' => $activity['author'] ?? '', 'update-author-id' => $author_id]);
@@ -784,8 +791,10 @@ class Processor
 				continue;
 			}
 
-			if (($item['author-link'] != $activity['actor']) && !$item['origin']) {
-				DI::logger()->info('Not origin, not from the author, skipping update', ['id' => $item['id'], 'author' => $item['author-link'], 'actor' => $activity['actor']]);
+			// Local posts can also be tagged by contacts of the user
+			$tagger_is_contact = $item['origin'] && (Contact::isFollowerByURL($activity['actor'], $receiver) || Contact::isSharingByURL($activity['actor'], $receiver));
+			if (($item['author-link'] != $activity['actor']) && !$tagger_is_contact) {
+				DI::logger()->info('Not from the author or a contact, skipping update', ['id' => $item['id'], 'author' => $item['author-link'], 'actor' => $activity['actor']]);
 				continue;
 			}
 
@@ -850,10 +859,11 @@ class Processor
 			}
 		}
 
-		$parent = Post::selectFirst(['uri-id', 'author-id'], ['uri' => $activity['object_id']]);
+		$fields = ['uri-id', 'author-id', 'owner-id', 'owner-link'];
+		$parent = Post::selectFirst($fields, ['uri' => $activity['object_id']]);
 		if (empty($parent['uri-id'])) {
 			if (self::fetchMissingActivity($activity['object_id'], $activity, '', Receiver::COMPLETION_AUTO)) {
-				$parent = Post::selectFirst(['uri-id'], ['uri' => $activity['object_id']]);
+				$parent = Post::selectFirst($fields, ['uri' => $activity['object_id']]);
 			}
 		}
 
@@ -865,6 +875,29 @@ class Processor
 	}
 
 	/**
+	 * Checks if the actor may add or remove the post from a "featured" collection
+	 *
+	 * This is allowed for the author, the owner and people on the system of the owner (group moderators).
+	 *
+	 * @param string $actor
+	 * @param array  $post
+	 */
+	private static function mayFeaturePost(string $actor, array $post): bool
+	{
+		if (in_array(Contact::getIdForURL($actor), [(int) $post['author-id'], (int) $post['owner-id']], true)) {
+			return true;
+		}
+
+		$actor_host = strtolower((string) parse_url($actor, PHP_URL_HOST));
+		if (($actor_host !== '') && ($actor_host === strtolower((string) parse_url((string) $post['owner-link'], PHP_URL_HOST)))) {
+			return true;
+		}
+
+		DI::logger()->notice('Actor may not change the featured state of this post', ['actor' => $actor, 'uri-id' => $post['uri-id']]);
+		return false;
+	}
+
+	/**
 	 * Add a post to the "Featured" collection
 	 *
 	 * @param array $activity
@@ -872,7 +905,7 @@ class Processor
 	public static function addToFeaturedCollection(array $activity)
 	{
 		$post = self::getUriIdForFeaturedCollection($activity);
-		if (empty($post) || empty($post['author-id'])) {
+		if (empty($post) || empty($post['author-id']) || !self::mayFeaturePost($activity['actor'], $post)) {
 			Queue::remove($activity);
 			return;
 		}
@@ -891,7 +924,7 @@ class Processor
 	public static function removeFromFeaturedCollection(array $activity)
 	{
 		$post = self::getUriIdForFeaturedCollection($activity);
-		if (empty($post)) {
+		if (empty($post) || !self::mayFeaturePost($activity['actor'], $post)) {
 			Queue::remove($activity);
 			return;
 		}
@@ -2076,7 +2109,16 @@ class Processor
 		}
 
 		DI::logger()->notice('Refetch activity because of a host mismatch between requested and received id', ['url-host' => $url_host, 'id-host' => $id_host, 'url' => $url, 'id' => $id]);
-		return HTTPSignature::fetch($id);
+		$refetched = HTTPSignature::fetch($id);
+
+		// The refetched document has to belong to the system that delivered it
+		$refetched_id = (string) JsonLD::fetchElement(JsonLD::compact($refetched), '@id');
+		if (parse_url($refetched_id, PHP_URL_HOST) != $id_host) {
+			DI::logger()->notice('Refetched document belongs to a different host', ['url' => $url, 'id' => $id, 'refetched-id' => $refetched_id]);
+			return [];
+		}
+
+		return $refetched;
 	}
 
 	private static function isValidObject(array $object): bool
@@ -2675,6 +2717,12 @@ class Processor
 
 		$author_id = Contact::getIdForURL($activity['object_actor']);
 		if (empty($author_id)) {
+			return;
+		}
+
+		if (Contact::getIdForURL($activity['actor']) !== $author_id) {
+			DI::logger()->notice('Undo is not from the actor of the activity, skipping', ['uri' => $activity['object_id'], 'actor' => $activity['actor'], 'object-actor' => $activity['object_actor']]);
+			Queue::remove($activity);
 			return;
 		}
 
