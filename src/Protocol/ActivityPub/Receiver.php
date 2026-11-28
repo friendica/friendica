@@ -131,10 +131,13 @@ class Receiver
 			$ld_signer = LDSignature::getSigner($activity);
 			if (empty($ld_signer)) {
 				DI::logger()->info('Invalid JSON-LD signature from ' . $actor);
+			} elseif ($ld_signer !== $actor) {
+				DI::logger()->info('The JSON-LD signer does not fit the actor', ['actor' => $actor, 'ld_signer' => $ld_signer, 'http_signer' => $http_signer]);
+				$ld_signer = false;
 			} elseif ($ld_signer != $http_signer) {
 				$signer[] = $ld_signer;
 			}
-			if (!empty($ld_signer && ($actor == $http_signer))) {
+			if (!empty($ld_signer) && ($actor == $http_signer)) {
 				DI::logger()->info('The HTTP and the JSON-LD signature belong to ' . $ld_signer);
 				$trust_source = true;
 			} elseif (!empty($ld_signer)) {
